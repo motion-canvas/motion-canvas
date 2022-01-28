@@ -1,0 +1,34 @@
+{
+  "name": "@aarthificial/motion-canvas",
+  "version": "1.2.0",
+  "description": "Canvas-based tool for creating motion graphics",
+  "main": "index.js",
+  "author": "aarthificial",
+  "license": "ISC",
+  "scripts": {
+    "prepare": "npm run build",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "canvas": "^2.9.0",
+    "konva": "^8.3.2",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.5",
+    "webpack": "^5.68.0",
+    "webpack-dev-server": "^4.7.4"
+  },
+  "bin": {
+    "mc-serve": "./tools/serve.mjs",
+    "mc-render": "./tools/render.mjs"
+  },
+  "files": [
+    "dist/**/*",
+    "public/**/*",
+    "tsconfig.project.json"
+  ],
+  "devDependencies": {
+    "node-loader": "^2.0.0",
+    "prettier": "^2.5.1",
+    "webpack-cli": "^4.9.2"
+  }
+}
