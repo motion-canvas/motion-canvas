@@ -2,6 +2,7 @@ import {Group} from 'konva/lib/Group';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Text} from 'konva/lib/shapes/Text';
 import {Vector2d} from 'konva/lib/types';
+import {ContainerConfig} from 'konva/lib/Container';
 import {Origin, Direction} from '../types/Origin';
 import {tween} from '../tweening';
 
@@ -10,8 +11,8 @@ export class ObjectNode extends Group {
   public readonly text: Text;
   private _origin: Origin = Origin.Middle;
 
-  public constructor() {
-    super();
+  public constructor(config?: ContainerConfig) {
+    super(config);
 
     this.box = new Rect({
       x: 0,
@@ -82,7 +83,7 @@ export class ObjectNode extends Group {
     const previousWidth = this.text.width();
     this.text.width(null);
     const width = this.text.getTextWidth();
-    const height = this.text.getTextHeight();
+    const height = this.text.height();
     const boxWidth = Math.ceil((width + 80) / 20) * 20;
     this.text.width(previousWidth);
 

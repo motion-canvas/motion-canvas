@@ -8,6 +8,12 @@
     "target": "es6",
     "declaration": true,
     "moduleResolution": "node",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "MC/*": [
+        "../src/*",
+        "../dist/*"
+      ]
+    }
   }
 }

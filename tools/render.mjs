@@ -70,6 +70,7 @@ function build(entry) {
 
   let totalSize = 0;
   const project = setup.default.default(createCanvas, Image);
+  project.start();
   while (!project.next()) {
     const name = String(project.frame).padStart(6, '0');
     const content = project.toDataURL().replace(/^data:image\/png;base64,/, '');

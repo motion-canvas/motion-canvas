@@ -7,13 +7,16 @@
   "license": "ISC",
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc"
+    "build": "tsc",
+    "test:serve": "node ./tools/serve.mjs ./test/player.ts",
+    "test:render": "node ./tools/serve.mjs ./test/render.ts"
   },
   "dependencies": {
     "canvas": "^2.9.0",
     "konva": "^8.3.2",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
+    "url-loader": "^4.1.1",
     "webpack": "^5.68.0",
     "webpack-dev-server": "^4.7.4"
   },

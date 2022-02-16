@@ -7,8 +7,8 @@ export interface SceneRunner {
 
 export class Scene {
   public constructor(
-    private project: Project,
-    private layer: Layer,
+    public readonly project: Project,
+    public readonly layer: Layer,
     private runner: SceneRunner,
   ) {}
 

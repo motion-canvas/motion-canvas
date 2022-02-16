@@ -88,6 +88,7 @@ class LineSegment extends Segment {
 
 class CircleSegment extends Segment {
   private readonly length: number;
+  private readonly delta: number;
 
   public constructor(
     private center: Vector2d,
@@ -97,7 +98,10 @@ class CircleSegment extends Segment {
     private counter: boolean,
   ) {
     super();
-    this.length = Math.abs(deltaAngle * radius);
+    this.delta = this.counter
+      ? this.deltaAngle
+      : this.deltaAngle + Math.PI * 2;
+    this.length = Math.abs(this.delta * radius);
   }
 
   get arcLength(): number {
@@ -110,12 +114,8 @@ class CircleSegment extends Segment {
     to: number,
     move: boolean,
   ): [Vector2d, Vector2d, Vector2d, Vector2d] {
-    const delta = this.counter
-      ? this.deltaAngle
-      : this.deltaAngle + Math.PI * 2;
-
-    const startAngle = this.startAngle + delta * from;
-    const endAngle = this.startAngle + delta * to;
+    const startAngle = this.startAngle + this.delta * from;
+    const endAngle = this.startAngle + this.delta * to;
 
     context.arc(
       this.center.x,
@@ -160,14 +160,16 @@ class CircleSegment extends Segment {
   }
 
   public getOffset(from: number): number {
-    return this.counter ? 0 : -from * 1.045 * this.deltaAngle * this.radius / 2;
+    // May wanna go back to (-from * 1.045 * this.delta * this.radius) / 2
+    return 0;
   }
 }
 
 export class Arrow extends Shape<ArrowConfig> {
+  protected dirty = true;
+
   private segments: Segment[] = [];
   private arcLength: number = 0;
-  private dirty = true;
 
   _sceneFunc(context: Context) {
     if (this.dirty) {
