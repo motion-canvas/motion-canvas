@@ -3,11 +3,15 @@ import {Project} from './Project';
 export function Player(factory: () => Project) {
   const project = factory();
   project.start();
-  const interval = setInterval(() => {
-    if (project.next()) {
-      project.start();
-      project.next();
-      // clearInterval(interval);
+  const run = () => {
+    try {
+      if (project.next()) {
+        project.start();
+        project.next();
+      }
+      requestAnimationFrame(run);
+    } catch (e) {
     }
-  }, 1000 / project.framesPerSeconds);
+  }
+  run();
 }

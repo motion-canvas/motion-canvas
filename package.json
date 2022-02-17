@@ -9,11 +9,12 @@
     "prepare": "npm run build",
     "build": "tsc",
     "test:serve": "node ./tools/serve.mjs ./test/player.ts",
-    "test:render": "node ./tools/serve.mjs ./test/render.ts"
+    "test:render": "node ./tools/render.mjs ./test/render.ts"
   },
   "dependencies": {
     "canvas": "^2.9.0",
     "konva": "^8.3.2",
+    "mix-color": "^1.1.2",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",
     "url-loader": "^4.1.1",

@@ -1,4 +1,5 @@
 import {Vector2d} from 'konva/lib/types';
+import mixColor from "mix-color";
 
 export class TimeTween {
   public constructor(public value: number) {}
@@ -11,18 +12,20 @@ export class TimeTween {
     return TimeTween.map(from, to, value);
   }
 
-  public easeOutExpo(from = 0, to = 1) {
-    const value = this.value === 1 ? 1 : 1 - Math.pow(2, -10 * this.value);
+  public easeOutExpo(from = 0, to = 1, value?: number) {
+    value ??= this.value;
+    value = value === 1 ? 1 : 1 - Math.pow(2, -10 * value);
     return TimeTween.map(from, to, value);
   }
 
-  public easeInExpo(from = 0, to = 1) {
-    const value = this.value === 0 ? 0 : Math.pow(2, 10 * this.value - 10);
+  public easeInExpo(from = 0, to = 1, value?: number) {
+    value ??= this.value;
+    value = value === 0 ? 0 : Math.pow(2, 10 * value - 10);
     return TimeTween.map(from, to, value);
   }
 
-  public linear(from = 0, to = 1) {
-    return TimeTween.map(from, to, this.value);
+  public linear(from = 0, to = 1, value?: number) {
+    return TimeTween.map(from, to, value ?? this.value);
   }
 
   public easeInCirc(from = 0, to = 1) {
@@ -82,6 +85,10 @@ export class TimeTween {
 
       return text.join('');
     }
+  }
+
+  public color(from: string, to: string, value?: number) {
+    return mixColor(from, to, value ?? this.value);
   }
 
   public vector2d(from: Vector2d, to: Vector2d, value?: number) {

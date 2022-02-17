@@ -45,7 +45,7 @@ function build(entry) {
         },
         output: {
           filename: `result.js`,
-          path: tmpDir,
+          path: output,
           library: {
             type: 'commonjs-module',
           },
@@ -65,10 +65,11 @@ function build(entry) {
   await build(projectFile);
   const setup = await import(
     /* webpackIgnore: true */
-    `file://${path.join(tmpDir, 'result.js')}`
+    `file://${path.join(output, 'result.js')}`
   );
 
   let totalSize = 0;
+  const startTime = Date.now();
   const project = setup.default.default(createCanvas, Image);
   project.start();
   while (!project.next()) {
@@ -85,7 +86,7 @@ function build(entry) {
     process.stdout.write(
       `Frame: ${name}, Size: ${Math.round(size)} kB, Total: ${Math.round(
         totalSize,
-      )} kB`,
+      )} kB, Elapsed: ${Math.round((Date.now() - startTime) / 1000)}`,
     );
   }
 })().catch(console.error);
