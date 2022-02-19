@@ -6,3 +6,4 @@ export * from './tween';
 export * from './TimeTween';
 export * from './scheduling';
 export * from './sequence';
+export * from './threads';

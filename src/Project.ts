@@ -12,6 +12,7 @@ import {
   waitFor,
   waitUntil,
   sequence,
+  threads,
 } from './animations';
 
 Konva.autoDrawEnabled = false;
@@ -75,7 +76,10 @@ export class Project extends Stage {
     this.scenes.forEach(scene => scene.layer.destroy());
     this.scenes = [];
     this.frame = 0;
-    this.runner = this.runnerFactory(this);
+    this.runner = this.threads(join => {
+      this.join = join;
+      return this.runnerFactory(this);
+    });
   }
 
   public next(): boolean {
@@ -94,6 +98,8 @@ export class Project extends Stage {
     return frames / this.framesPerSeconds;
   }
 
+  public join: (...runners: Generator[]) => Generator;
+  public threads = threads;
   public waitFor = waitFor;
   public waitUntil = waitUntil;
   public tween = tween;
