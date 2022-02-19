@@ -255,6 +255,7 @@ export class Arrow extends Shape<ArrowConfig> {
   ) {
     const arrowSize = (this.attrs.arrowSize || 0) * size;
     const offset = this.strokeWidth() / 2;
+    // noinspection JSSuspiciousNameCombination
     const normal = {
       x: -tangent.y,
       y: tangent.x,

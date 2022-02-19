@@ -1,19 +1,22 @@
 import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
-import {tween} from '../tweening';
+import {Project} from "../Project";
 
 export function move(
+  this: Project,
   node: Node,
   position: Vector2d,
   absolute?: boolean,
 ): Generator;
 export function move(
+  this: Project,
   node: Node,
   positionX: number,
   positionY: number,
   absolute?: boolean,
 ): Generator;
 export function move(
+  this: Project,
   node: Node,
   arg0: number | Vector2d,
   arg1?: number | boolean,
@@ -39,7 +42,7 @@ export function move(
       Math.pow(positionFrom.y - positionTo.y, 2),
   );
 
-  return tween(distance / 1000, value =>
+  return this.tween(distance / 1000, value =>
     node.position(value.vector2d(positionFrom, positionTo)),
   );
 }

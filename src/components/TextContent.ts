@@ -1,11 +1,11 @@
 import {Text, TextConfig} from 'konva/lib/shapes/Text';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {tween} from '../tweening';
 import {ISurfaceChild, SURFACE_CHANGE_EVENT, SurfaceData} from './Surface';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
 import {_registerNode} from 'konva/lib/Global';
 import {Factory} from 'konva/lib/Factory';
 import {getNumberValidator} from 'konva/lib/Validators';
+import {Project} from 'MC/Project';
 
 export interface TextContentConfig extends TextConfig {
   minWidth?: number;
@@ -13,6 +13,10 @@ export interface TextContentConfig extends TextConfig {
 
 export class TextContent extends Text implements ISurfaceChild {
   private contentOffset = 0;
+
+  public get project(): Project {
+    return <Project>this.getStage();
+  }
 
   public constructor(config?: TextContentConfig) {
     super({
@@ -49,13 +53,16 @@ export class TextContent extends Text implements ISurfaceChild {
     const from = this.recalculateValues(fromText);
     const to = this.recalculateValues(text);
 
-    yield* tween(0.3, value => {
+    yield* this.project.tween(0.3, value => {
       this.text(value.text(fromText, text, value.easeInOutCubic()));
       this.width(value.easeInOutCubic(from.width, to.width));
       this.offset(
         value.vector2d(from.offset, to.offset, value.easeInOutCubic()),
       );
-      this.contentOffset = value.easeInOutCubic(from.contentOffset, to.contentOffset);
+      this.contentOffset = value.easeInOutCubic(
+        from.contentOffset,
+        to.contentOffset,
+      );
       this.fire(SURFACE_CHANGE_EVENT, undefined, true);
     });
 

@@ -1,5 +1,5 @@
-import {Vector2d} from 'konva/lib/types';
-import mixColor from "mix-color";
+import {IRect, Vector2d} from 'konva/lib/types';
+import mixColor from 'mix-color';
 
 export class TimeTween {
   public constructor(public value: number) {}
@@ -58,7 +58,9 @@ export class TimeTween {
     // left to right
     if (to.length > from.length) {
       const current = Math.floor(to.length * (value ?? this.value));
-      const currentLength = Math.floor(TimeTween.map(from.length - 1, to.length, value ?? this.value));
+      const currentLength = Math.floor(
+        TimeTween.map(from.length - 1, to.length, value ?? this.value),
+      );
       let text = '';
       for (let i = 0; i < to.length; i++) {
         if (i < current) {
@@ -73,7 +75,9 @@ export class TimeTween {
     // right to left
     else {
       const current = Math.round(from.length * (1 - (value ?? this.value)));
-      const currentLength = Math.floor(TimeTween.map(from.length + 1, to.length, value ?? this.value));
+      const currentLength = Math.floor(
+        TimeTween.map(from.length + 1, to.length, value ?? this.value),
+      );
       let text = [];
       for (let i = from.length - 1; i >= 0; i--) {
         if (i < current) {
@@ -95,6 +99,27 @@ export class TimeTween {
     return {
       x: TimeTween.map(from.x, to.x, value ?? this.value),
       y: TimeTween.map(from.y, to.y, value ?? this.value),
+    };
+  }
+
+  public rectArc(
+    from: Partial<IRect>,
+    to: Partial<IRect>,
+    reverse?: boolean,
+    value?: number,
+  ) {
+    value ??= this.easeInOutQuint(0, Math.PI / 2);
+    let xValue = Math.sin(value);
+    let yValue = 1 - Math.cos(value);
+    if (reverse) {
+      [xValue, yValue] = [yValue, xValue];
+    }
+
+    return {
+      x: TimeTween.map(from.x ?? 0, to.x ?? 0, xValue),
+      y: TimeTween.map(from.y ?? 0, to.y ?? 0, yValue),
+      width: TimeTween.map(from.width ?? 0, to.width ?? 0, xValue),
+      height: TimeTween.map(from.height ?? 0, to.height ?? 0, yValue),
     };
   }
 

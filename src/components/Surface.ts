@@ -1,5 +1,5 @@
 import {Group} from 'konva/lib/Group';
-import {ContainerConfig} from 'konva/lib/Container';
+import {Container, ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Shape} from 'konva/lib/Shape';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
@@ -7,8 +7,8 @@ import {SceneContext} from 'konva/lib/Context';
 import {Direction, Origin} from 'MC/types/Origin';
 import {Factory} from 'konva/lib/Factory';
 import {_registerNode} from 'konva/lib/Global';
-import {tween} from 'MC/tweening';
 import {parseColor} from 'mix-color';
+import {Project} from 'MC/Project';
 
 export const SURFACE_CHANGE_EVENT = 'surfaceChange';
 
@@ -110,6 +110,10 @@ export class Surface extends Group {
     return this;
   }
 
+  public get project(): Project {
+    return <Project>this.getStage();
+  }
+
   public *doRipple() {
     if (this.override) return;
     const opaque = parseColor(this.surfaceData.color);
@@ -122,7 +126,7 @@ export class Surface extends Group {
       .cornerRadius(this.surfaceData.radius)
       .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
 
-    yield* tween(1, value => {
+    yield* this.project.tween(1, value => {
       const width = this.surfaceData.width + value.easeOutExpo(0, 100);
       const height = this.surfaceData.height + value.easeOutExpo(0, 100);
       const radius = this.surfaceData.radius + value.easeOutExpo(0, 50);
@@ -203,13 +207,20 @@ export class Surface extends Group {
       .cornerRadius(this.surfaceData.radius)
       .fill(this.surfaceData.color);
 
-    this.offset(this.calculateOffset(this.surfaceData));
+    this.offset(this.calculateOffset());
+  }
+
+  public withOrigin(origin: Origin, action: () => void) {
+    const previousOrigin = this.origin();
+    this.origin(origin);
+    action();
+    this.origin(previousOrigin);
   }
 
   public handleOriginChange() {
     if (!this.surfaceData || this.override) return;
     const previousOffset = this.offset();
-    const nextOffset = this.calculateOffset(this.surfaceData);
+    const nextOffset = this.calculateOffset();
     this.offset(nextOffset);
     this.move({
       x: -previousOffset.x + nextOffset.x,
@@ -218,7 +229,7 @@ export class Surface extends Group {
   }
 
   public calculateOriginDelta(newOrigin: Origin): Vector2d {
-    const offset = this.calculateOffset(this.surfaceData);
+    const offset = this.calculateOffset();
     const nextOffset = this.calculateOffset(this.surfaceData, newOrigin);
 
     return {
@@ -258,6 +269,27 @@ export class Surface extends Group {
       this.maskData.height,
       this.maskData.radius,
     );
+  }
+
+  getClientRect(config?: {
+    skipTransform?: boolean;
+    skipShadow?: boolean;
+    skipStroke?: boolean;
+    relativeTo?: Container;
+  }): IRect {
+    if (!this.override || !this.maskData) {
+      return super.getClientRect(config);
+    }
+
+    const position = this.getAbsolutePosition();
+    const offset = this.calculateOffset(this.maskData);
+
+    return {
+      x: position.x - offset.x - this.maskData.width / 2,
+      y: position.y - offset.y - this.maskData.height / 2,
+      width: this.maskData.width,
+      height: this.maskData.height,
+    };
   }
 
   origin: GetSet<Origin, this>;

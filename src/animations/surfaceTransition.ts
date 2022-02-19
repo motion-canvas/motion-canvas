@@ -1,83 +1,90 @@
 import {Surface} from '../components/Surface';
-import {TimeTween, tween} from '../tweening';
+import {Project} from '../Project';
+import {TimeTween} from './TimeTween';
 
-export function surfaceTransition(
-  fromSurface: Surface,
-  toSurface: Surface,
-  inverse?: boolean,
-) {
-  const from = fromSurface.getSurfaceData();
-  const fromPos = fromSurface.getPosition();
-  const to = toSurface.getSurfaceData();
-  const toPos = toSurface.getPosition();
+export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
+  const fromSurface = fromSurfaceOriginal
+    .clone()
+    .moveTo(fromSurfaceOriginal.parent)
+    .zIndex(fromSurfaceOriginal.zIndex());
 
-  const fromDelta = fromSurface.calculateOriginDelta(toSurface.origin());
-  const fromNewPos = {
-    x: fromPos.x + fromDelta.x,
-    y: fromPos.y + fromDelta.y,
-  };
+  fromSurfaceOriginal.hide();
+  fromSurface.setOverride(true);
 
-  const toDelta = toSurface.calculateOriginDelta(fromSurface.origin());
-  const toNewPos = {
-    x: toPos.x + toDelta.x,
-    y: toPos.y + toDelta.y,
-  };
+  const from = fromSurfaceOriginal.getSurfaceData();
 
-  fromSurface.show();
-  toSurface.hide();
+  const project = this;
+  return function* (
+    toSurfaceOriginal: Surface,
+    inverse?: boolean,
+    surfaceCallback?: (currentSurface: Surface) => void,
+  ) {
+    const to = toSurfaceOriginal.getSurfaceData();
+    const toPos = toSurfaceOriginal.getPosition();
+    const fromPos = fromSurface.getPosition();
 
-  let check = true;
-  return tween(0.6, value => {
-    const distance = value.easeInOutQuint(0, Math.PI / 2);
-    let xValue = Math.sin(distance);
-    let yValue = 1 - Math.cos(distance);
-    if (inverse) {
-      [xValue, yValue] = [yValue, xValue];
-    }
+    const fromDelta = fromSurface.calculateOriginDelta(
+      toSurfaceOriginal.origin(),
+    );
+    const fromNewPos = {
+      x: fromPos.x + fromDelta.x,
+      y: fromPos.y + fromDelta.y,
+    };
+    const toDelta = toSurfaceOriginal.calculateOriginDelta(
+      fromSurfaceOriginal.origin(),
+    );
+    const toNewPos = {
+      x: toPos.x + toDelta.x,
+      y: toPos.y + toDelta.y,
+    };
 
-    if (value.value > 1 / 3) {
-      if (check) {
-        toSurface.setOverride(true);
-        toSurface.show();
-        fromSurface.hide();
-        fromSurface.setSurfaceData(from);
-        fromSurface.setPosition(fromPos);
-        fromSurface.getChild().opacity(1);
-        fromSurface.setOverride(false);
+    const toSurface = toSurfaceOriginal
+      .clone()
+      .moveTo(toSurfaceOriginal.parent)
+      .zIndex(toSurfaceOriginal.zIndex());
+    toSurfaceOriginal.hide();
+    toSurface.hide();
+    toSurface.setOverride(true);
+
+    surfaceCallback?.(fromSurface);
+
+    let check = true;
+    yield* project.tween(0.6, value => {
+      if (value.value > 1 / 3) {
+        if (check) {
+          toSurface.show();
+          fromSurface.destroy();
+        }
+
+        toSurface.setSurfaceData({
+          ...from,
+          ...value.rectArc(from, to, inverse),
+          radius: value.easeInOutCubic(from.radius, to.radius),
+          color: value.color(from.color, to.color, value.easeInOutQuint()),
+        });
+        toSurface.setPosition(value.rectArc(fromNewPos, toPos, inverse));
+        toSurface
+          .getChild()
+          .opacity(Math.max(TimeTween.map(0, 1, value.linear(-1 / 2, 1)), 0));
+
+        if (check) {
+          surfaceCallback?.(toSurface);
+          check = false;
+        }
+      } else {
+        fromSurface.setSurfaceData({
+          ...from,
+          ...value.rectArc(from, to, inverse),
+          radius: value.easeInOutCubic(from.radius, to.radius),
+          color: value.color(from.color, to.color, value.easeInOutQuint()),
+        });
+        fromSurface.setPosition(value.rectArc(fromPos, toNewPos, inverse));
+        fromSurface.getChild().opacity(TimeTween.map(1, 0, value.linear(0, 3)));
       }
+    });
 
-      toSurface.setSurfaceData({
-        ...from,
-        x: value.linear(from.x, to.x, xValue),
-        y: value.linear(from.y, to.y, yValue),
-        width: value.linear(from.width, to.width, xValue),
-        height: value.linear(from.height, to.height, yValue),
-        radius: value.easeInOutCubic(from.radius, to.radius),
-        color: value.color(from.color, to.color, value.easeInOutQuint()),
-      });
-      toSurface.setPosition({
-        x: value.linear(fromNewPos.x, toPos.x, xValue),
-        y: value.linear(fromNewPos.y, toPos.y, yValue),
-      });
-      toSurface
-        .getChild()
-        .opacity(Math.max(TimeTween.map(0, 1, value.linear(-1 / 2, 1)), 0));
-    } else {
-      fromSurface.setOverride(true);
-      fromSurface.setSurfaceData({
-        ...from,
-        x: value.linear(from.x, to.x, xValue),
-        y: value.linear(from.y, to.y, yValue),
-        width: value.linear(from.width, to.width, xValue),
-        height: value.linear(from.height, to.height, yValue),
-        radius: value.easeInOutCubic(from.radius, to.radius),
-        color: value.color(from.color, to.color, value.easeInOutQuint()),
-      });
-      fromSurface.setPosition({
-        x: value.linear(fromPos.x, toNewPos.x, xValue),
-        y: value.linear(fromPos.y, toNewPos.y, yValue),
-      });
-      fromSurface.getChild().opacity(TimeTween.map(1, 0, value.linear(0, 3)));
-    }
-  });
+    toSurface.destroy();
+    toSurfaceOriginal.show();
+    surfaceCallback?.(toSurfaceOriginal);
+  };
 }

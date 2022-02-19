@@ -3,7 +3,16 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
 import {Scene, SceneRunner} from './Scene';
 import {Vector2d} from 'konva/lib/types';
-import {Konva} from "konva/lib/Global";
+import {Konva} from 'konva/lib/Global';
+import {
+  move,
+  showTop,
+  surfaceTransition,
+  tween,
+  waitFor,
+  waitUntil,
+  sequence,
+} from './animations';
 
 Konva.autoDrawEnabled = false;
 
@@ -77,35 +86,19 @@ export class Project extends Stage {
     return result.done;
   }
 
-  public *waitForTime(targetTime = 0, after?: Generator): Generator {
-    while (this.frame < targetTime * this.framesPerSeconds) {
-      yield;
-    }
-
-    if (after) {
-      yield* after;
-    }
+  public secondsToFrames(seconds: number) {
+    return Math.ceil(seconds * this.framesPerSeconds);
   }
 
-  public *waitForFrames(numberOfFrames = 0, after?: Generator): Generator {
-    const startFrame = this.frame;
-    while (this.frame - startFrame < numberOfFrames) {
-      yield;
-    }
-
-    if (after) {
-      yield* after;
-    }
+  public framesToSeconds(frames: number) {
+    return frames / this.framesPerSeconds;
   }
 
-  public *waitForSeconds(numberOfSeconds = 0, after?: Generator): Generator {
-    const startFrame = this.frame;
-    while (this.frame - startFrame < numberOfSeconds * this.framesPerSeconds) {
-      yield;
-    }
-
-    if (after) {
-      yield* after;
-    }
-  }
+  public waitFor = waitFor;
+  public waitUntil = waitUntil;
+  public tween = tween;
+  public moveNode = move;
+  public showTop = showTop;
+  public surfaceTransition = surfaceTransition;
+  public sequence = sequence;
 }

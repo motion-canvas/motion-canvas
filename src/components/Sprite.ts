@@ -7,7 +7,7 @@ export interface SpriteConfig extends ShapeConfig {
 }
 
 export class Sprite extends Shape {
-  private image: HTMLImageElement;
+  private readonly image: HTMLImageElement;
 
   constructor(config?: SpriteConfig) {
     super(config);

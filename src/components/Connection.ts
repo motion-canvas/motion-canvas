@@ -5,7 +5,8 @@ import {Factory} from 'konva/lib/Factory';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {Direction} from '../types/Origin';
 import {Context} from 'konva/lib/Context';
-import {TimeTween} from '../tweening';
+import {TimeTween} from '../animations';
+import {SURFACE_CHANGE_EVENT} from 'MC/components/Surface';
 
 export interface ConnectionPoint {
   node: Node;
@@ -34,11 +35,14 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 export class Connection extends Arrow {
+  private nodeCache: Record<string, Node> = {};
+  private markAsDirtyCallback: () => void;
+
   constructor(config?: ConnectionConfig) {
     super(config);
   }
 
-  private measurePosition(
+  private static measurePosition(
     positionA: number,
     sizeA: number,
     positionB: number,
@@ -65,7 +69,7 @@ export class Connection extends Arrow {
     return {direction, range, rangeOffset, from: positionA, to: positionB};
   }
 
-  private calculateCrossing(
+  private static calculateCrossing(
     crossing: number,
     measurement: Measurement,
   ): number {
@@ -96,127 +100,111 @@ export class Connection extends Arrow {
 
   _sceneFunc(context: Context) {
     if (this.dirty) {
-      if (!this.attrs.from || !this.attrs.to) {
-        this.attrs.points = [];
-      } else {
-        const from: ConnectionPoint = this.attrs.from;
-        const to: ConnectionPoint = this.attrs.to;
-
-        const fromPosition = from.node.absolutePosition();
-        const fromSize = from.node.size();
-        fromSize.width /= 2;
-        fromSize.height /= 2;
-        const toPosition = to.node.absolutePosition();
-        const toSize = to.node.size();
-        toSize.width /= 2;
-        toSize.height /= 2;
-
-        this.attrs.points = [];
-        const horizontal = this.measurePosition(
-          fromPosition.x,
-          fromSize.width,
-          toPosition.x,
-          toSize.width,
-        );
-        const vertical = this.measurePosition(
-          fromPosition.y,
-          fromSize.height,
-          toPosition.y,
-          toSize.height,
-        );
-
-        if (from.vertical) {
-          this.attrs.points.push(fromPosition.x, vertical.range[0]);
-        } else {
-          this.attrs.points.push(horizontal.range[0], fromPosition.y);
-        }
-
-        let toVertical = to.vertical;
-        if (
-          from.vertical !== toVertical &&
-          (horizontal.direction === 0 || vertical.direction === 0)
-        ) {
-          toVertical = from.vertical;
-        }
-
-        let distance = 100;
-        if (from.vertical === toVertical) {
-          if (from.vertical) {
-            distance = Math.abs(toPosition.x - fromPosition.x);
-            if (distance > 0) {
-              const y = this.calculateCrossing(this.attrs.crossing.y, vertical);
-              this.attrs.points.push(fromPosition.x, y);
-              this.attrs.points.push(toPosition.x, y);
-            }
-          } else {
-            distance = Math.abs(toPosition.y - fromPosition.y);
-            if (distance > 0) {
-              const x = this.calculateCrossing(
-                this.attrs.crossing.x,
-                horizontal,
-              );
-              this.attrs.points.push(x, fromPosition.y);
-              this.attrs.points.push(x, toPosition.y);
-            }
-          }
-        } else {
-          if (from.vertical) {
-            this.attrs.points.push(fromPosition.x, toPosition.y);
-          } else {
-            this.attrs.points.push(toPosition.x, fromPosition.y);
-          }
-        }
-
-        if (toVertical) {
-          this.attrs.points.push(toPosition.x, vertical.range[1]);
-        } else {
-          this.attrs.points.push(horizontal.range[1], toPosition.y);
-        }
-
-        this.attrs.radius = Math.min(8, distance / 2);
-      }
+      this.recalculate();
     }
 
     super._sceneFunc(context);
   }
 
-  private previousFromNode: Node | null = null;
-  public fromChanged() {
-    if (this.previousFromNode === this.attrs.from?.node) return;
-    this.markAsDirtyCallback ??= () => this.markAsDirty();
+  private recalculate() {
+    const from: ConnectionPoint = this.from();
+    const to: ConnectionPoint = this.to();
+    const crossing = this.crossing();
 
-    this.previousFromNode?.off(
-      'absoluteTransformChange',
-      this.markAsDirtyCallback,
+    if (!from.node || !to.node) {
+      this.points([]);
+      return;
+    }
+
+    const fromRect = from.node.getClientRect();
+    fromRect.width /= 2;
+    fromRect.height /= 2;
+    fromRect.x += fromRect.width;
+    fromRect.y += fromRect.height;
+    const toRect = to.node.getClientRect();
+    toRect.width /= 2;
+    toRect.height /= 2;
+    toRect.x += toRect.width;
+    toRect.y += toRect.height;
+
+    const points: number[] = [];
+    const horizontal = Connection.measurePosition(
+      fromRect.x,
+      fromRect.width,
+      toRect.x,
+      toRect.width,
     );
-    this.previousFromNode = this.attrs.from?.node;
-    this.previousFromNode?.on(
-      'absoluteTransformChange',
-      this.markAsDirtyCallback,
+    const vertical = Connection.measurePosition(
+      fromRect.y,
+      fromRect.height,
+      toRect.y,
+      toRect.height,
     );
-    this.markAsDirty();
+
+    if (from.vertical) {
+      points.push(fromRect.x, vertical.range[0]);
+    } else {
+      points.push(horizontal.range[0], fromRect.y);
+    }
+
+    let toVertical = to.vertical;
+    if (
+      from.vertical !== toVertical &&
+      (horizontal.direction === 0 || vertical.direction === 0)
+    ) {
+      toVertical = from.vertical;
+    }
+
+    let distance = 100;
+    if (from.vertical === toVertical) {
+      if (from.vertical) {
+        distance = Math.abs(toRect.x - fromRect.x);
+        if (distance >= 1) {
+          const y = Connection.calculateCrossing(crossing.y, vertical);
+          points.push(fromRect.x, y);
+          points.push(toRect.x, y);
+        }
+      } else {
+        distance = Math.abs(toRect.y - fromRect.y);
+        if (distance >= 1) {
+          const x = Connection.calculateCrossing(crossing.x, horizontal);
+          points.push(x, fromRect.y);
+          points.push(x, toRect.y);
+        }
+      }
+    } else {
+      if (from.vertical) {
+        points.push(fromRect.x, toRect.y);
+      } else {
+        points.push(toRect.x, fromRect.y);
+      }
+    }
+
+    if (toVertical) {
+      points.push(toRect.x, vertical.range[1]);
+    } else {
+      points.push(horizontal.range[1], toRect.y);
+    }
+
+    this.radius(Math.min(8, distance / 2));
+    this.points(points);
   }
 
-  private previousToNode: Node | null = null;
-  public toChanged() {
-    if (this.previousToNode === this.attrs.to?.node) return;
+  public nodeChanged(name: string, node: Node) {
+    this.nodeCache ??= {};
     this.markAsDirtyCallback ??= () => this.markAsDirty();
 
-    this.previousToNode?.off(
-      'absoluteTransformChange',
-      this.markAsDirtyCallback,
-    );
-    this.previousToNode = this.attrs.to?.node;
-    this.previousToNode?.on(
-      'absoluteTransformChange',
-      this.markAsDirtyCallback,
-    );
+    if (this.nodeCache[name] === node) return;
+
+    this.nodeCache[name]
+      ?.off('absoluteTransformChange', this.markAsDirtyCallback)
+      .off(SURFACE_CHANGE_EVENT, this.markAsDirtyCallback);
+    this.nodeCache[name] = node;
+    this.nodeCache[name]
+      ?.on('absoluteTransformChange', this.markAsDirtyCallback)
+      .on(SURFACE_CHANGE_EVENT, this.markAsDirtyCallback);
     this.markAsDirty();
   }
-
-  private markAsDirtyCallback = () => {
-    this.markAsDirty();
-  };
 
   from: GetSet<ConnectionPoint, this>;
   to: GetSet<ConnectionPoint, this>;
@@ -237,8 +225,11 @@ Factory.addGetterSetter(
     offset: 0,
   },
   undefined,
-  Connection.prototype.fromChanged,
+  function (this: Connection) {
+    this.nodeChanged('from', this.from().node);
+  },
 );
+
 Factory.addGetterSetter(
   Connection,
   'to',
@@ -248,7 +239,9 @@ Factory.addGetterSetter(
     offset: 0,
   },
   undefined,
-  Connection.prototype.toChanged,
+  function (this: Connection) {
+    this.nodeChanged('to', this.to().node);
+  },
 );
 Factory.addGetterSetter(
   Connection,
