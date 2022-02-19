@@ -133,4 +133,31 @@ export class TimeTween {
   public static map(from: number, to: number, value: number) {
     return from + (to - from) * value;
   }
+
+  public static remap(
+    fromIn: number,
+    toIn: number,
+    fromOut: number,
+    toOut: number,
+    value: number,
+  ) {
+    return fromOut + ((value - fromIn) * (toOut - fromOut)) / (toIn - fromIn);
+  }
+
+  public static clampRemap(
+    fromIn: number,
+    toIn: number,
+    fromOut: number,
+    toOut: number,
+    value: number,
+  ) {
+    const remappedValue = TimeTween.remap(fromIn, toIn, fromOut, toOut, value);
+    if (fromOut > toOut) [fromOut, toOut] = [toOut, fromOut];
+
+    return remappedValue < fromOut
+      ? fromOut
+      : remappedValue > toOut
+      ? toOut
+      : remappedValue;
+  }
 }
