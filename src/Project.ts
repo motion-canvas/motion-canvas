@@ -30,6 +30,9 @@ export class Project extends Stage {
   public readonly center: Vector2d;
   public framesPerSeconds = 60;
   public frame: number = 0;
+  public get time(): number {
+    return this.framesToSeconds(this.frame);
+  }
 
   private runner: Generator;
   private scenes: Scene[] = [];
