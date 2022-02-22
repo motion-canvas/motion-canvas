@@ -5,7 +5,8 @@ export function* waitUntil(
   targetTime = 0,
   after?: Generator,
 ): Generator {
-  while (this.frame < targetTime * this.framesPerSeconds) {
+  const frames = this.secondsToFrames(targetTime);
+  while (this.frame < frames) {
     yield;
   }
 

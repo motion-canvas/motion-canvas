@@ -20,11 +20,58 @@
         align-items: center;
         justify-content: center;
         background: black;
+        font-family: Roboto, sans-serif;
+      }
+
+      #controls {
+        padding: 8px;
+        border-radius: 8px;
+        display: grid;
+        grid-auto-flow: column;
+        grid-gap: 8px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
       }
     </style>
   </head>
   <body>
     <div id="container"></div>
+    <form id="controls">
+      <div>
+        <input type="checkbox" id="controls-play" name="play" checked />
+        <label for="controls-play">Play</label>
+      </div>
+      <div>
+        <input type="checkbox" id="controls-loop" name="loop" checked />
+        <label for="controls-loop">Loop</label>
+      </div>
+      <input type="number" id="controls-from" name="from" value="0" />
+      <input type="button" id="controls-reset" name="refresh" value="Reset" />
+      <input type="button" id="controls-next" name="next" value="Next" />
+      <div>
+        <label for="controls-current">Current:</label>
+        <input
+          type="number"
+          readonly
+          id="controls-current"
+          name="current"
+          value="0"
+        />
+      </div>
+      <div>
+        <label for="controls-speed">Speed:</label>
+        <select name="speed" id="controls-speed">
+          <option value="2">2x</option>
+          <option value="1.5">1.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="0.5">0.5x</option>
+          <option value="0.25">0.25x</option>
+        </select>
+      </div>
+    </form>
     <script src="index.js"></script>
   </body>
 </html>

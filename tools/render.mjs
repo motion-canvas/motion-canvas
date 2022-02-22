@@ -4,12 +4,10 @@ import 'konva';
 import path from 'path';
 import fs from 'fs';
 import webpack from 'webpack';
-import os from 'os';
 import {fileURLToPath} from 'url';
 import canvas from 'canvas';
 const {createCanvas, Image} = canvas;
 
-const tmpDir = path.resolve(os.tmpdir(), 'motion-canvas');
 const projectFile = path.resolve(process.cwd(), process.argv[2]);
 const output = path.resolve(process.cwd(), process.argv[3] ?? 'output');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -73,6 +71,7 @@ function build(entry) {
   const project = setup.default.default(createCanvas, Image);
   project.start();
   while (!project.next()) {
+    project.draw();
     const name = String(project.frame).padStart(6, '0');
     const content = project.toDataURL().replace(/^data:image\/png;base64,/, '');
     const size = (content.length * 2) / 1024;

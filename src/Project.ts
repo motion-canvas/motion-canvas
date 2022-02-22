@@ -88,10 +88,9 @@ export class Project extends Stage {
     });
   }
 
-  public next(): boolean {
+  public next(speed: number = 1): boolean {
     const result = this.runner.next();
-    this.draw();
-    this.frame++;
+    this.frame += speed;
 
     return result.done;
   }
