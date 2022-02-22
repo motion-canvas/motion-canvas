@@ -9,10 +9,12 @@
     "prepare": "npm run build",
     "build": "tsc",
     "test:serve": "node ./tools/serve.mjs ./test/player.ts",
-    "test:render": "node ./tools/render.mjs ./test/render.ts"
+    "test:render": "node ./tools/render.mjs ./test/render.ts",
+    "test:image": "node ./tools/image.mjs ./test/img ./test/animations.json"
   },
   "dependencies": {
     "canvas": "^2.9.0",
+    "image-size": "^1.0.1",
     "konva": "^8.3.2",
     "mix-color": "^1.1.2",
     "ts-loader": "^9.2.6",
@@ -23,7 +25,8 @@
   },
   "bin": {
     "mc-serve": "./tools/serve.mjs",
-    "mc-render": "./tools/render.mjs"
+    "mc-render": "./tools/render.mjs",
+    "mc-image": "./tools/image.mjs"
   },
   "files": [
     "dist/**/*",

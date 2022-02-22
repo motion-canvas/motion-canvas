@@ -6,7 +6,8 @@ import {GetSet, Vector2d} from 'konva/lib/types';
 import {Direction} from '../types/Origin';
 import {Context} from 'konva/lib/Context';
 import {TimeTween} from '../animations';
-import {SURFACE_CHANGE_EVENT} from 'MC/components/Surface';
+import {SURFACE_CHANGE_EVENT} from './Surface';
+import {Project} from '../Project';
 
 export interface ConnectionPoint {
   node: Node;
@@ -37,6 +38,10 @@ function clamp(value: number, min: number, max: number): number {
 export class Connection extends Arrow {
   private nodeCache: Record<string, Node> = {};
   private markAsDirtyCallback: () => void;
+
+  public get project(): Project {
+    return <Project>this.getStage();
+  }
 
   constructor(config?: ConnectionConfig) {
     super(config);
@@ -116,12 +121,13 @@ export class Connection extends Arrow {
       return;
     }
 
-    const fromRect = from.node.getClientRect();
+    const fromRect = from.node.getClientRect({relativeTo: this.getLayer()});
     fromRect.width /= 2;
     fromRect.height /= 2;
     fromRect.x += fromRect.width;
     fromRect.y += fromRect.height;
-    const toRect = to.node.getClientRect();
+    const toRect = to.node.getClientRect({relativeTo: this.getLayer()});
+
     toRect.width /= 2;
     toRect.height /= 2;
     toRect.x += toRect.width;

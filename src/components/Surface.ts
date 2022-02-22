@@ -281,14 +281,17 @@ export class Surface extends Group {
       return super.getClientRect(config);
     }
 
-    const position = this.getAbsolutePosition();
+    const position = this.getAbsolutePosition(this.getLayer());
+    const scale = this.getAbsoluteScale(this.getLayer());
     const offset = this.calculateOffset(this.maskData);
+    offset.x *= scale.x;
+    offset.y *= scale.y;
 
     return {
-      x: position.x - offset.x - this.maskData.width / 2,
-      y: position.y - offset.y - this.maskData.height / 2,
-      width: this.maskData.width,
-      height: this.maskData.height,
+      x: position.x - offset.x - this.maskData.width * scale.x / 2,
+      y: position.y - offset.y - this.maskData.height * scale.y / 2,
+      width: this.maskData.width * scale.x,
+      height: this.maskData.height * scale.y,
     };
   }
 

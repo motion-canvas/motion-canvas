@@ -37,6 +37,7 @@ export function Player(factory: () => Project, audioSrc?: string) {
           return;
         }
 
+        startTime = performance.now();
         project.start();
         project.next();
         if (audio) {

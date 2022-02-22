@@ -177,15 +177,15 @@ export class Arrow extends Shape<ArrowConfig> {
       this.dirty = false;
     }
 
-    let start = (this.attrs.start ?? 0) * this.arcLength;
-    let end = (this.attrs.end ?? 1) * this.arcLength;
+    let start = this.start() * this.arcLength;
+    let end = this.end() * this.arcLength;
     if (start > end) {
       [start, end] = [end, start];
     }
     let offset = start;
 
     const distance = end - start;
-    const arrowSize = this.attrs.arrowSize || 0;
+    const arrowSize = this.arrowSize();
     const arrowScale =
       (distance > arrowSize ? arrowSize : distance < 0 ? 0 : distance) /
       arrowSize;
@@ -253,7 +253,7 @@ export class Arrow extends Shape<ArrowConfig> {
     tangent: Vector2d,
     size: number,
   ) {
-    const arrowSize = (this.attrs.arrowSize || 0) * size;
+    const arrowSize = this.arrowSize() * size;
     const offset = this.strokeWidth() / 2;
     // noinspection JSSuspiciousNameCombination
     const normal = {
@@ -278,12 +278,11 @@ export class Arrow extends Shape<ArrowConfig> {
   }
 
   private calculatePath() {
-    if (!this.attrs.points || !this.attrs.radius) return;
     this.arcLength = 0;
     this.segments = [];
 
-    const points: number[] = this.attrs.points;
-    const radius = this.attrs.radius || 0;
+    const points: number[] = this.points();
+    const radius = this.radius();
 
     let lastX = points[0];
     let lastY = points[1];
@@ -356,13 +355,13 @@ export class Arrow extends Shape<ArrowConfig> {
   }
 
   getWidth() {
-    const points = (<number[]>this.attrs.points || [0, 0]).filter(
+    const points = (<number[]>this.points()).filter(
       (value, index) => index % 2 === 1,
     );
     return Math.max(...points) - Math.min(...points);
   }
   getHeight() {
-    const points = (<number[]>this.attrs.points || [0, 0]).filter(
+    const points = (<number[]>this.points()).filter(
       (value, index) => index % 2 === 0,
     );
     return Math.max(...points) - Math.min(...points);
@@ -372,6 +371,7 @@ export class Arrow extends Shape<ArrowConfig> {
   points: GetSet<number[], this>;
   start: GetSet<number, this>;
   end: GetSet<number, this>;
+  arrowSize: GetSet<number, this>;
 }
 
 Arrow.prototype.className = 'Arrow';
@@ -382,7 +382,7 @@ _registerNode(Arrow);
 Factory.addGetterSetter(
   Arrow,
   'radius',
-  0,
+  8,
   getNumberValidator(),
   Arrow.prototype.markAsDirty,
 );
@@ -395,3 +395,4 @@ Factory.addGetterSetter(
 );
 Factory.addGetterSetter(Arrow, 'start', 0, getNumberValidator());
 Factory.addGetterSetter(Arrow, 'end', 1, getNumberValidator());
+Factory.addGetterSetter(Arrow, 'arrowSize', 16, getNumberValidator());

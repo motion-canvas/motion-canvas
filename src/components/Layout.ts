@@ -1,21 +1,30 @@
 import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
-import {Center} from 'MC/types/Origin';
+import {Center} from '../types/Origin';
 import {GetSet, IRect} from 'konva/lib/types';
 import {_registerNode} from 'konva/lib/Global';
 import {Factory} from 'konva/lib/Factory';
-import {ISurfaceChild, Surface, SURFACE_CHANGE_EVENT, SurfaceData} from 'MC/components/Surface';
+import {
+  ISurfaceChild,
+  Surface,
+  SURFACE_CHANGE_EVENT,
+  SurfaceData,
+} from './Surface';
 import {Shape} from 'konva/lib/Shape';
-import {getNumberValidator} from 'konva/lib/Validators';
+import {getNumberValidator, getStringValidator} from 'konva/lib/Validators';
 
 export interface LayoutConfig extends ContainerConfig {
   direction?: Center;
   padding?: number;
+  background?: string;
 }
 
 export class Layout extends Group implements ISurfaceChild {
   public direction: GetSet<Center, this>;
   public padding: GetSet<number, this>;
+  public background: GetSet<string, this>;
+
+  private contentSize = {width: 0, height: 0};
 
   constructor(config?: LayoutConfig) {
     super(config);
@@ -26,8 +35,8 @@ export class Layout extends Group implements ISurfaceChild {
 
   getSurfaceData(): SurfaceData {
     return {
-      ...this.getClientRect(),
-      color: 'rgba(36, 36, 36, 1)',
+      ...this.getClientRect({relativeTo: this.getLayer()}),
+      color: this.background(),
       radius: 20,
     };
   }
@@ -52,28 +61,32 @@ export class Layout extends Group implements ISurfaceChild {
     if (!this.children) return;
 
     const padding = this.attrs.padding ?? 20;
-    let height = 0;
-    let width = 0;
+    this.contentSize.height = 0;
+    this.contentSize.width = 0;
     if (this.attrs.direction === Center.Horizontal) {
       for (const child of this.children) {
-        const rect = child.getClientRect();
-        const offset = child instanceof Surface ? child.calculateOffset() : {x: 0, y: 0};
-        height = Math.max(height, rect.height);
-        width += rect.width / 2;
-        child.position({x: width, y: offset.y});
-        width += rect.width / 2 + padding;
+        const rect = child.getClientRect({relativeTo: child.getLayer()});
+        const offset =
+          child instanceof Surface ? child.calculateOffset() : {x: 0, y: 0};
+        this.contentSize.height = Math.max(this.contentSize.height, rect.height);
+        this.contentSize.width += rect.width / 2;
+        child.position({x: this.contentSize.width, y: offset.y});
+        this.contentSize.width += rect.width / 2 + padding;
       }
-      this.offsetX((width - padding) / 2);
+      this.contentSize.width -= padding;
+      this.offsetX((this.contentSize.width) / 2);
     } else {
       for (const child of this.children) {
-        const rect = child.getClientRect();
-        const offset = child instanceof Surface ? child.calculateOffset() : {x: 0, y: 0};
-        width = Math.max(width, rect.width);
-        height += rect.height / 2;
-        child.position({x: offset.x, y: height});
-        height += rect.height / 2 + padding;
+        const rect = child.getClientRect({relativeTo: child.getLayer()});
+        const offset =
+          child instanceof Surface ? child.calculateOffset() : {x: 0, y: 0};
+        this.contentSize.width = Math.max(this.contentSize.width, rect.width);
+        this.contentSize.height += rect.height / 2;
+        child.position({x: offset.x, y: this.contentSize.height});
+        this.contentSize.height += rect.height / 2 + padding;
       }
-      this.offsetY((height - padding) / 2);
+      this.contentSize.height -= padding;
+      this.offsetY((this.contentSize.height) / 2);
     }
 
     this.fire(SURFACE_CHANGE_EVENT, undefined, true);
@@ -85,14 +98,20 @@ export class Layout extends Group implements ISurfaceChild {
     skipStroke?: boolean;
     relativeTo?: Container;
   }): IRect {
-    const padding = this.attrs.padding ?? 20;
-    const rect = super.getClientRect(config);
-    rect.x -= padding;
-    rect.y -= padding;
-    rect.width += padding * 2;
-    rect.height += padding * 2;
+    const padding = this.padding();
+    const position = this.getAbsolutePosition(config?.relativeTo);
+    const scale = this.getAbsoluteScale(config?.relativeTo);
+    const size = {
+      width: (this.contentSize.width + padding * 2) * scale.x,
+      height: (this.contentSize.height + padding * 2) * scale.y,
+    };
 
-    return rect;
+    return {
+      x: position.x - size.width / 2,
+      y: position.y - size.height / 2,
+      width: size.width,
+      height: size.height,
+    };
   }
 }
 
@@ -115,3 +134,4 @@ Factory.addGetterSetter(
   // @ts-ignore
   Layout.prototype.recalculate,
 );
+Factory.addGetterSetter(Layout, 'background', '#242424', getStringValidator());

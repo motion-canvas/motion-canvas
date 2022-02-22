@@ -35,7 +35,7 @@ export class TextContent extends Text implements ISurfaceChild {
 
   getSurfaceData(): SurfaceData {
     return {
-      ...this.getClientRect(),
+      ...this.getClientRect({relativeTo: this.getLayer()}),
       radius: 40,
       color: '#c0b3a3',
     };

@@ -2,38 +2,43 @@ import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
 import {Project} from "../Project";
 
+export interface MoveConfig {
+  absolute?: boolean,
+  speed?: number,
+}
+
 export function move(
   this: Project,
   node: Node,
   position: Vector2d,
-  absolute?: boolean,
+  config?: MoveConfig,
 ): Generator;
 export function move(
   this: Project,
   node: Node,
   positionX: number,
   positionY: number,
-  absolute?: boolean,
+  config?: MoveConfig,
 ): Generator;
 export function move(
   this: Project,
   node: Node,
   arg0: number | Vector2d,
-  arg1?: number | boolean,
-  arg2?: boolean,
+  arg1?: number | MoveConfig,
+  arg2?: MoveConfig,
 ): Generator {
   let delta: Vector2d;
-  let absolute: boolean;
+  let config: MoveConfig;
   if (typeof arg0 === 'number') {
     delta = {x: arg0, y: <number>arg1};
-    absolute = arg2;
+    config = arg2 ?? {};
   } else {
     delta = arg0;
-    absolute = <boolean>arg1;
+    config = <MoveConfig>arg1 ?? {};
   }
 
   const positionFrom = node.position();
-  let positionTo = absolute
+  let positionTo = config.absolute
     ? delta
     : {x: delta.x + positionFrom.x, y: delta.y + positionFrom.y};
 
@@ -42,7 +47,7 @@ export function move(
       Math.pow(positionFrom.y - positionTo.y, 2),
   );
 
-  return this.tween(distance / 1000, value =>
-    node.position(value.vector2d(positionFrom, positionTo)),
+  return this.tween(distance / 1000 * (config.speed ?? 1), value =>
+    node.position(value.vector2d(positionFrom, positionTo, value.easeInOutQuint())),
   );
 }

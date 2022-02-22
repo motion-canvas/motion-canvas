@@ -13,6 +13,8 @@ import {
   waitUntil,
   sequence,
   threads,
+  ThreadsJoin,
+  ThreadsCancel,
 } from './animations';
 
 Konva.autoDrawEnabled = false;
@@ -79,8 +81,9 @@ export class Project extends Stage {
     this.scenes.forEach(scene => scene.layer.destroy());
     this.scenes = [];
     this.frame = 0;
-    this.runner = this.threads(join => {
+    this.runner = this.threads((join, cancel) => {
       this.join = join;
+      this.cancel = cancel;
       return this.runnerFactory(this);
     });
   }
@@ -101,7 +104,8 @@ export class Project extends Stage {
     return frames / this.framesPerSeconds;
   }
 
-  public join: (...runners: Generator[]) => Generator;
+  public join: ThreadsJoin;
+  public cancel: ThreadsCancel;
   public threads = threads;
   public waitFor = waitFor;
   public waitUntil = waitUntil;
