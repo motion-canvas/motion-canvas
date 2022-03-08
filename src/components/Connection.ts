@@ -3,11 +3,11 @@ import {Node} from 'konva/lib/Node';
 import {_registerNode} from 'konva/lib/Global';
 import {Factory} from 'konva/lib/Factory';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {Direction} from '../types/Origin';
+import {Direction} from '../types';
 import {Context} from 'konva/lib/Context';
 import {TimeTween} from '../animations';
-import {SURFACE_CHANGE_EVENT} from './Surface';
 import {Project} from '../Project';
+import {LAYOUT_CHANGE_EVENT} from "MC/components/ILayoutNode";
 
 export interface ConnectionPoint {
   node: Node;
@@ -204,11 +204,11 @@ export class Connection extends Arrow {
 
     this.nodeCache[name]
       ?.off('absoluteTransformChange', this.markAsDirtyCallback)
-      .off(SURFACE_CHANGE_EVENT, this.markAsDirtyCallback);
+      .off(LAYOUT_CHANGE_EVENT, this.markAsDirtyCallback);
     this.nodeCache[name] = node;
     this.nodeCache[name]
       ?.on('absoluteTransformChange', this.markAsDirtyCallback)
-      .on(SURFACE_CHANGE_EVENT, this.markAsDirtyCallback);
+      .on(LAYOUT_CHANGE_EVENT, this.markAsDirtyCallback);
     this.markAsDirty();
   }
 

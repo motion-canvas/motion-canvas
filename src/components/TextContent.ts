@@ -1,18 +1,22 @@
-import {Text, TextConfig} from 'konva/lib/shapes/Text';
+import {Text} from 'konva/lib/shapes/Text';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {ISurfaceChild, SURFACE_CHANGE_EVENT, SurfaceData} from './Surface';
-import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
-import {_registerNode} from 'konva/lib/Global';
+import {Shape} from 'konva/lib/Shape';
 import {Factory} from 'konva/lib/Factory';
 import {getNumberValidator} from 'konva/lib/Validators';
-import {Project} from 'MC/Project';
+import {Project} from '../Project';
+import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
+import {Group} from 'konva/lib/Group';
+import {Size} from '../types';
 
-export interface TextContentConfig extends TextConfig {
+export interface TextContentConfig extends LayoutGroupConfig {
   minWidth?: number;
+  text?: string;
 }
 
-export class TextContent extends Text implements ISurfaceChild {
-  private contentOffset = 0;
+export class TextContent extends LayoutGroup {
+  public minWidth: GetSet<number, this>;
+
+  private text: Text;
 
   public get project(): Project {
     return <Project>this.getStage();
@@ -20,93 +24,93 @@ export class TextContent extends Text implements ISurfaceChild {
 
   public constructor(config?: TextContentConfig) {
     super({
-      ...config,
-      x: 0,
-      y: 0,
-      height: 80,
-      fontSize: 28,
-      verticalAlign: 'middle',
-      fontFamily: 'JetBrains Mono',
-      fill: 'rgba(30, 30, 28, 0.87)',
-    });
-
-    this.recalculate();
-  }
-
-  getSurfaceData(): SurfaceData {
-    return {
-      ...this.getClientRect({relativeTo: this.getLayer()}),
-      radius: 40,
       color: '#c0b3a3',
-    };
+      radius: 40,
+      height: 80,
+      ...config,
+    });
+    this.add(
+      new Text({
+        name: 'text',
+        height: 80,
+        fontSize: 28,
+        text: config.text,
+        verticalAlign: 'middle',
+        fontFamily: 'JetBrains Mono',
+        fill: 'rgba(30, 30, 30, 0.87)',
+      }),
+    );
   }
 
-  public setText(text: string): this {
-    super.setText(text);
-    this.recalculate();
+  add(...children: (Shape | Group)[]): this {
+    super.add(...children);
+    const text = children.find<Text>((child): child is Text =>
+      child.hasName('text'),
+    );
+
+    if (text) {
+      this.text?.destroy();
+      this.text = text;
+      this.text?.text(this.getText());
+      this.handleLayoutChange();
+    }
 
     return this;
   }
 
+  getLayoutSize(): Size {
+    return this.getSize();
+  }
+
+  public setText(value: string): this {
+    this.text?.setText(value);
+    this.attrs.text = value;
+    this.handleLayoutChange();
+    return this;
+  }
+
+  public getText(): string {
+    return this.attrs.text ?? '';
+  }
+
   public *animateText(text: string) {
-    const fromText = this.text();
+    const fromText = this.text.text();
     const from = this.recalculateValues(fromText);
     const to = this.recalculateValues(text);
 
     yield* this.project.tween(0.3, value => {
-      this.text(value.text(fromText, text, value.easeInOutCubic()));
+      this.text.setText(value.text(fromText, text, value.easeInOutCubic()));
       this.width(value.easeInOutCubic(from.width, to.width));
-      this.offset(
+      this.text.offset(
         value.vector2d(from.offset, to.offset, value.easeInOutCubic()),
       );
-      this.contentOffset = value.easeInOutCubic(
-        from.contentOffset,
-        to.contentOffset,
-      );
-      this.fire(SURFACE_CHANGE_EVENT, undefined, true);
+      this.fireLayoutChange();
     });
 
-    this.recalculate();
+    this.setText(text);
   }
 
-  private recalculate() {
-    const values = this.recalculateValues(this.text());
+  protected handleLayoutChange() {
+    if (!this.text) return;
 
-    this.offset(values.offset);
+    const values = this.recalculateValues(this.text.text());
+    this.text.offset(values.offset);
     this.width(values.width);
-    this.contentOffset = values.contentOffset;
-    this.fire(SURFACE_CHANGE_EVENT, undefined, true);
+    this.fireLayoutChange();
   }
 
   private recalculateValues(text: string) {
-    const minWidth = this.attrs.minWidth ?? 0;
-    const size = this.measureSize(text);
+    const minWidth = this.minWidth();
+    const size = this.text.measureSize(text);
     const textWidth = Math.max(minWidth, size.width);
     const boxWidth = Math.ceil((textWidth + 80) / 20) * 20;
 
     return {
       width: boxWidth,
-      offset: <Vector2d>{x: textWidth / 2, y: 38},
-      contentOffset: (boxWidth - textWidth) / 2,
+      offset: <Vector2d>{x: size.width / 2, y: 38},
     };
   }
-
-  getClientRect(config?: ShapeGetClientRectConfig): {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-  } {
-    const rect = super.getClientRect(config);
-    rect.x -= this.contentOffset;
-    return rect;
-  }
-
-  public minWidth: GetSet<number, this>;
 }
-
-TextContent.prototype.className = 'TextContent';
-_registerNode(TextContent);
 
 Factory.addGetterSetter(
   TextContent,

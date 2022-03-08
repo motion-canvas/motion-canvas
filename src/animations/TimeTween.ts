@@ -38,11 +38,12 @@ export class TimeTween {
     return TimeTween.map(from, to, value);
   }
 
-  public easeInOutCubic(from = 0, to = 1) {
-    const value =
-      this.value < 0.5
-        ? 4 * this.value * this.value * this.value
-        : 1 - Math.pow(-2 * this.value + 2, 3) / 2;
+  public easeInOutCubic(from = 0, to = 1, value?: number) {
+    value ??= this.value;
+    value =
+      value < 0.5
+        ? 4 * value * value * value
+        : 1 - Math.pow(-2 * value + 2, 3) / 2;
     return TimeTween.map(from, to, value);
   }
 

@@ -8,6 +8,7 @@ import {
   move,
   showTop,
   surfaceTransition,
+  showSurface,
   tween,
   waitFor,
   waitUntil,
@@ -112,5 +113,6 @@ export class Project extends Stage {
   public moveNode = move;
   public showTop = showTop;
   public surfaceTransition = surfaceTransition;
+  public showSurface = showSurface;
   public sequence = sequence;
 }

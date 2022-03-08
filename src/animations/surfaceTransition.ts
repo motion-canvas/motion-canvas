@@ -17,28 +17,20 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
 
   fromSurfaceOriginal.hide();
   fromSurface.setOverride(true);
-
-  const from = fromSurfaceOriginal.getSurfaceData();
+  const from = fromSurfaceOriginal.getMask();
 
   const project = this;
-  return function* (
-    target: Surface,
-    config: SurfaceTransitionConfig = {},
-  ) {
-    const to = target.getSurfaceData();
+  return function* (target: Surface, config: SurfaceTransitionConfig = {}) {
+    const to = target.getMask();
     const toPos = target.getPosition();
     const fromPos = fromSurface.getPosition();
 
-    const fromDelta = fromSurface.calculateOriginDelta(
-      target.origin(),
-    );
+    const fromDelta = fromSurface.getOriginDelta(target.getOrigin());
     const fromNewPos = {
       x: fromPos.x + fromDelta.x,
       y: fromPos.y + fromDelta.y,
     };
-    const toDelta = target.calculateOriginDelta(
-      fromSurfaceOriginal.origin(),
-    );
+    const toDelta = target.getOriginDelta(fromSurfaceOriginal.getOrigin());
     const toNewPos = {
       x: toPos.x + toDelta.x,
       y: toPos.y + toDelta.y,
@@ -57,7 +49,7 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
           fromSurface.destroy();
         }
 
-        target.setSurfaceData({
+        target.setMask({
           ...from,
           ...value.rectArc(from, to, config.reverse),
           radius: value.easeInOutCubic(from.radius, to.radius),
@@ -75,7 +67,7 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
           check = false;
         }
       } else {
-        fromSurface.setSurfaceData({
+        fromSurface.setMask({
           ...from,
           ...value.rectArc(from, to, config.reverse),
           radius: value.easeInOutCubic(from.radius, to.radius),

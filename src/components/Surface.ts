@@ -1,21 +1,14 @@
 import {Group} from 'konva/lib/Group';
-import {Container, ContainerConfig} from 'konva/lib/Container';
+import {ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Shape} from 'konva/lib/Shape';
-import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {SceneContext} from 'konva/lib/Context';
-import {Direction, Origin} from 'MC/types/Origin';
-import {Factory} from 'konva/lib/Factory';
-import {_registerNode} from 'konva/lib/Global';
 import {parseColor} from 'mix-color';
-import {Project} from 'MC/Project';
-
-export const SURFACE_CHANGE_EVENT = 'surfaceChange';
-
-export type SurfaceData = IRect & {
-  radius: number;
-  color: string;
-};
+import {Project} from '../Project';
+import {LayoutGroup} from './LayoutGroup';
+import {LayoutShape} from './LayoutShape';
+import {Origin, Size} from '../types';
+import {getOriginDelta, getOriginOffset, LayoutAttrs} from './ILayoutNode';
 
 function roundRect(
   ctx: CanvasRenderingContext2D | SceneContext,
@@ -36,27 +29,25 @@ function roundRect(
   ctx.closePath();
 }
 
-export interface ISurfaceChild {
-  getSurfaceData(): SurfaceData;
-}
-
-function isSurfaceChild(
-  node: Shape | Group | ISurfaceChild,
-): node is (Shape | Group) & ISurfaceChild {
-  return 'getSurfaceData' in node;
+export type LayoutData = LayoutAttrs & Size;
+export interface SurfaceMask {
+  width: number;
+  height: number;
+  radius: number;
+  color: string;
 }
 
 export interface SurfaceConfig extends ContainerConfig {
   origin?: Origin;
 }
 
-export class Surface extends Group {
+export class Surface extends LayoutGroup {
   private box: Rect;
   private ripple: Rect;
-  private child: (Shape | Group) & ISurfaceChild;
-  private override: boolean;
-  private surfaceData: SurfaceData;
-  private maskData: SurfaceData;
+  private child: LayoutGroup | LayoutShape;
+  private override: boolean = false;
+  private mask: SurfaceMask = null;
+  private layoutData: LayoutData;
 
   public constructor(config?: SurfaceConfig) {
     super(config);
@@ -79,24 +70,30 @@ export class Surface extends Group {
     );
   }
 
+  getLayoutSize(): Size {
+    return this.override && this.mask
+      ? {
+          width: this.mask?.width ?? 0,
+          height: this.mask?.height ?? 0,
+        }
+      : {
+          width: this.layoutData?.width ?? 0,
+          height: this.layoutData?.height ?? 0,
+        };
+  }
+
   add(...children: (Shape | Group)[]): this {
     super.add(...children);
-    const child = children.find(isSurfaceChild);
+    const child = children.find<LayoutShape | LayoutGroup>(
+      (child): child is LayoutShape | LayoutGroup =>
+        child instanceof LayoutShape || child instanceof LayoutGroup,
+    );
     const ripple = children.find<Rect>((child): child is Rect =>
       child.hasName('ripple'),
     );
     const box = children.find<Rect>((child): child is Rect =>
       child.hasName('box'),
     );
-
-    if (child) {
-      if (this.child) {
-        this.child.off(SURFACE_CHANGE_EVENT, this.handleSurfaceChange);
-      }
-      this.child = child;
-      this.child.on(SURFACE_CHANGE_EVENT, this.handleSurfaceChange);
-      this.handleSurfaceChange();
-    }
 
     if (box) {
       this.box?.destroy();
@@ -105,6 +102,11 @@ export class Surface extends Group {
     if (ripple) {
       this.ripple?.destroy();
       this.ripple = ripple;
+    }
+
+    if (child) {
+      this.child = child;
+      this.handleLayoutChange();
     }
 
     return this;
@@ -116,20 +118,20 @@ export class Surface extends Group {
 
   public *doRipple() {
     if (this.override) return;
-    const opaque = parseColor(this.surfaceData.color);
+    const opaque = parseColor(this.layoutData.color);
     this.ripple.show();
     this.ripple
-      .offsetX(this.surfaceData.width / 2)
-      .offsetY(this.surfaceData.height / 2)
-      .width(this.surfaceData.width)
-      .height(this.surfaceData.height)
-      .cornerRadius(this.surfaceData.radius)
+      .offsetX(this.layoutData.width / 2)
+      .offsetY(this.layoutData.height / 2)
+      .width(this.layoutData.width)
+      .height(this.layoutData.height)
+      .cornerRadius(this.layoutData.radius)
       .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
 
     yield* this.project.tween(1, value => {
-      const width = this.surfaceData.width + value.easeOutExpo(0, 100);
-      const height = this.surfaceData.height + value.easeOutExpo(0, 100);
-      const radius = this.surfaceData.radius + value.easeOutExpo(0, 50);
+      const width = this.layoutData.width + value.easeOutExpo(0, 100);
+      const height = this.layoutData.height + value.easeOutExpo(0, 100);
+      const radius = this.layoutData.radius + value.easeOutExpo(0, 50);
 
       this.ripple
         .offsetX(width / 2)
@@ -148,163 +150,113 @@ export class Surface extends Group {
     this.ripple.hide();
   }
 
-  public getChild(): (Shape | Group) & ISurfaceChild {
+  public getChild(): LayoutShape | LayoutGroup {
     return this.child;
   }
 
   public setOverride(value: boolean) {
     this.override = value;
     this.clipFunc(value ? this.drawMask : null);
-    if (!value) this.handleSurfaceChange();
+    if (!value) {
+      this.handleLayoutChange();
+    } else {
+      this.box
+        .offsetX(5000)
+        .offsetY(5000)
+        .position({x: 0, y: 0})
+        .width(10000)
+        .height(100000);
+    }
   }
 
-  public getSurfaceData(): SurfaceData {
-    return this.surfaceData;
-  }
+  public setMask(data: SurfaceMask) {
+    const newOffset = getOriginOffset(data, this.getOrigin());
+    const contentSize = this.child.getLayoutSize();
+    const contentMargin = this.child.getMargin();
+    const scale = Math.min(
+      1,
+      data.width / (contentSize.width + contentMargin * 2),
+    );
 
-  public setSurfaceData(data: SurfaceData) {
-    if (!this.override) return;
-    const offset = this.offsetY();
-    const newOffset = this.calculateOffset(data);
-    const scale = Math.min(1, data.width / this.surfaceData.width);
-
-    this.maskData = data;
-    this.maskData.x = -data.width / 2;
-    this.maskData.y = -data.height / 2 + offset - newOffset.y;
-
-    this.offsetX(newOffset.x);
+    this.mask = data;
+    this.offset(newOffset);
     this.child.scaleX(scale);
     this.child.scaleY(scale);
-
-    this.child.position({
-      x: 0,
-      y: (-this.surfaceData.height * (1 - scale)) / 2,
-    });
-
-    this.box
-      .offsetX(data.width / 2)
-      .offsetY(data.height / 2 - offset + newOffset.y)
-      // .absolutePosition(this.surfaceData)
-      .width(data.width)
-      .height(data.height)
-      .cornerRadius(data.radius)
-      .fill(data.color);
+    this.child.position(
+      getOriginDelta(data, Origin.Middle, this.child.getOrigin()),
+    );
+    this.box.fill(data.color);
+    this.fireLayoutChange();
   }
 
-  private handleSurfaceChange = () => {
+  public getMask(): SurfaceMask {
+    return this.layoutData;
+  }
+
+  protected handleLayoutChange() {
     if (this.override) return;
-    this.maskData = this.surfaceData = this.child.getSurfaceData();
-    this.updateSurface();
-  };
 
-  private updateSurface() {
-    this.box
-      .offsetX(this.surfaceData.width / 2)
-      .offsetY(this.surfaceData.height / 2)
-      // .absolutePosition(this.surfaceData)
-      .width(this.surfaceData.width)
-      .height(this.surfaceData.height)
-      .cornerRadius(this.surfaceData.radius)
-      .fill(this.surfaceData.color);
-
-    this.offset(this.calculateOffset());
-  }
-
-  public withOrigin(origin: Origin, action: () => void) {
-    const previousOrigin = this.origin();
-    this.origin(origin);
-    action();
-    this.origin(previousOrigin);
-  }
-
-  public handleOriginChange() {
-    if (!this.surfaceData || this.override) return;
-    const previousOffset = this.offset();
-    const nextOffset = this.calculateOffset();
-    this.offset(nextOffset);
-    this.move({
-      x: -previousOffset.x + nextOffset.x,
-      y: -previousOffset.y + nextOffset.y,
-    });
-  }
-
-  public calculateOriginDelta(newOrigin: Origin): Vector2d {
-    const offset = this.calculateOffset();
-    const nextOffset = this.calculateOffset(this.surfaceData, newOrigin);
-
-    return {
-      x: -offset.x + nextOffset.x,
-      y: -offset.y + nextOffset.y,
+    this.layoutData ??= {
+      origin: Origin.Middle,
+      color: '#F0F',
+      height: 0,
+      width: 0,
+      padding: 0,
+      margin: 0,
+      radius: 0,
     };
+
+    this.layoutData.origin = this.getOrigin();
+    if (this.child) {
+      const size = this.child.getLayoutSize();
+      const margin = this.child.getMargin();
+      const scale = this.child.getAbsoluteScale(this);
+
+      this.layoutData = {
+        ...this.layoutData,
+        width: (size.width + margin * 2) * scale.x,
+        height: (size.height + margin * 2) * scale.y,
+        radius: this.child.getRadius(),
+        color: this.child.getColor(),
+      };
+
+      this.child.position(
+        getOriginDelta(
+          this.getLayoutSize(),
+          Origin.Middle,
+          this.child.getOrigin(),
+        ),
+      );
+    }
+
+    this.updateBackground(this.layoutData);
+    this.setOrigin(this.getOrigin());
+    this.fireLayoutChange();
   }
 
-  public calculateOffset(surfaceData?: SurfaceData, origin?: Origin): Vector2d {
-    surfaceData ??= this.surfaceData;
-    origin ??= this.attrs.origin ?? Origin.Middle;
-    const width = surfaceData.width / 2;
-    const height = surfaceData.height / 2;
-    const offset: Vector2d = {x: 0, y: 0};
-
-    if (origin & Direction.Left) {
-      offset.x = -width;
-    } else if (origin & Direction.Right) {
-      offset.x = width;
+  private updateBackground(data: LayoutData) {
+    if (this.box) {
+      this.box
+        .offsetX(data.width / 2)
+        .offsetY(data.height / 2)
+        .width(data.width)
+        .height(data.height)
+        .cornerRadius(data.radius)
+        .fill(data.color);
     }
-
-    if (origin & Direction.Top) {
-      offset.y = -height;
-    } else if (origin & Direction.Bottom) {
-      offset.y = height;
-    }
-
-    return offset;
   }
 
   private drawMask(ctx: CanvasRenderingContext2D) {
+    const offset = this.offsetY();
+    const newOffset = getOriginOffset(this.mask, this.getOrigin());
+
     roundRect(
       ctx,
-      this.maskData.x,
-      this.maskData.y,
-      this.maskData.width,
-      this.maskData.height,
-      this.maskData.radius,
+      -this.mask.width / 2,
+      -this.mask.height / 2 + offset - newOffset.y,
+      this.mask.width,
+      this.mask.height,
+      this.mask.radius,
     );
   }
-
-  getClientRect(config?: {
-    skipTransform?: boolean;
-    skipShadow?: boolean;
-    skipStroke?: boolean;
-    relativeTo?: Container;
-  }): IRect {
-    if (!this.override || !this.maskData) {
-      return super.getClientRect(config);
-    }
-
-    const position = this.getAbsolutePosition(this.getLayer());
-    const scale = this.getAbsoluteScale(this.getLayer());
-    const offset = this.calculateOffset(this.maskData);
-    offset.x *= scale.x;
-    offset.y *= scale.y;
-
-    return {
-      x: position.x - offset.x - this.maskData.width * scale.x / 2,
-      y: position.y - offset.y - this.maskData.height * scale.y / 2,
-      width: this.maskData.width * scale.x,
-      height: this.maskData.height * scale.y,
-    };
-  }
-
-  origin: GetSet<Origin, this>;
 }
-
-Surface.prototype.className = 'Surface';
-_registerNode(Surface);
-
-Factory.addGetterSetter(
-  Surface,
-  'origin',
-  Origin.Middle,
-  undefined,
-  Surface.prototype.handleOriginChange,
-);

@@ -1,19 +1,11 @@
-import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
-import {
-  getBooleanValidator,
-  getNumberValidator,
-  getStringValidator,
-} from 'konva/lib/Validators';
-import {Project} from 'MC/Project';
-import {
-  ISurfaceChild,
-  SURFACE_CHANGE_EVENT,
-  SurfaceData,
-} from 'MC/components/Surface';
+import {getBooleanValidator, getNumberValidator, getStringValidator,} from 'konva/lib/Validators';
+import {Project} from '../Project';
+import {LayoutShape, LayoutShapeConfig} from "./LayoutShape";
+import {Size} from "../types";
 
 interface FrameData {
   fileName: string;
@@ -28,7 +20,7 @@ interface SpriteData {
   skins: Record<string, FrameData>;
 }
 
-export interface SpriteConfig extends ShapeConfig {
+export interface SpriteConfig extends LayoutShapeConfig {
   animationData: SpriteData;
   animation: string;
   skin?: string;
@@ -38,7 +30,7 @@ export interface SpriteConfig extends ShapeConfig {
 
 const COMPUTE_CANVAS_SIZE = 1024;
 
-export class Sprite extends Shape implements ISurfaceChild {
+export class Sprite extends LayoutShape {
   public animation: GetSet<string, this>;
   public skin: GetSet<string, this>;
   public playing: GetSet<boolean, this>;
@@ -74,11 +66,10 @@ export class Sprite extends Shape implements ISurfaceChild {
     this.recalculate();
   }
 
-  getSurfaceData(): SurfaceData {
+  getLayoutSize(): Size {
     return {
-      ...this.getClientRect({relativeTo: this.getLayer()}),
-      color: '#58817b',
-      radius: 8,
+      width: this.frame?.width ?? 0,
+      height: this.frame?.height ?? 0,
     };
   }
 
@@ -91,8 +82,8 @@ export class Sprite extends Shape implements ISurfaceChild {
       0,
       this.frame.width,
       this.frame.height,
-      0,
-      0,
+      this.frame.width / -2,
+      this.frame.height / -2,
       this.frame.width,
       this.frame.height,
     );
@@ -106,12 +97,12 @@ export class Sprite extends Shape implements ISurfaceChild {
 
     this.frameId %= animation.frames.length;
     this.frame = animation.frames[this.frameId];
-    this.width(this.frame.width);
-    this.offsetX(this.frame.width / 2);
-    this.height(this.frame.height);
-    this.offsetY(this.frame.height / 2);
+    this.offset(this.getOriginOffset());
 
-    const frameData = this.context.createImageData(this.frame.width, this.frame.height);
+    const frameData = this.context.createImageData(
+      this.frame.width,
+      this.frame.height,
+    );
 
     if (skin) {
       for (let y = 0; y < this.frame.height; y++) {
@@ -124,7 +115,8 @@ export class Sprite extends Shape implements ISurfaceChild {
           frameData.data[id] = skin.data[skinId];
           frameData.data[id + 1] = skin.data[skinId + 1];
           frameData.data[id + 2] = skin.data[skinId + 2];
-          frameData.data[id + 3] = this.frame.data[id + 3] * skin.data[skinId + 3];
+          frameData.data[id + 3] =
+            this.frame.data[id + 3] * skin.data[skinId + 3];
         }
       }
     } else {
@@ -134,7 +126,7 @@ export class Sprite extends Shape implements ISurfaceChild {
     this.context.clearRect(0, 0, this.frame.width, this.frame.height);
     this.context.putImageData(frameData, 0, 0);
 
-    this.fire(SURFACE_CHANGE_EVENT, undefined, true);
+    this.fireLayoutChange();
   }
 
   public play(): Generator {
