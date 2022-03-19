@@ -10,11 +10,16 @@ class Controls {
   private current: HTMLInputElement;
   private speed: HTMLInputElement;
   private fps: HTMLInputElement;
+  private loadingIndicator: HTMLElement;
   private stepRequested: boolean = false;
   private resetRequested: boolean = false;
   private lastUpdate: number = 0;
   private updateTimes: number[] = [];
   private overallTime: number = 0;
+
+  public set loading(value: boolean) {
+    this.loadingIndicator.hidden = !value;
+  }
 
   public get isPlaying(): boolean {
     if (this.stepRequested) {
@@ -53,6 +58,7 @@ class Controls {
     this.current = form.current;
     this.speed = form.speed;
     this.fps = form.fps;
+    this.loadingIndicator = document.getElementById('loading');
 
     form.next.addEventListener('click', this.handleNext);
     form.refresh.addEventListener('click', this.handleReset);
@@ -178,7 +184,15 @@ export function Player(factory: () => Project, audioSrc?: string) {
   };
 
   const request = () => {
-    requestAnimationFrame(() => run().catch(console.error));
+    requestAnimationFrame(async () => {
+      try {
+        controls.loading = true;
+        await run();
+        controls.loading = false;
+      } catch (e) {
+        console.log(e);
+      }
+    });
   };
 
   reset().then(request).catch(console.error);
