@@ -48,7 +48,7 @@ export class MeshBoneMaterial extends ShaderMaterial {
   }
 
   public set transparency(value: number) {
-    this.uniforms.opacity.value = value;
+    this.uniforms.opacity = {value};
   }
 
   public get transparency(): number {
