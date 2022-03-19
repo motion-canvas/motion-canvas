@@ -2,16 +2,16 @@ import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {Size} from '../types';
 import {Util} from 'konva/lib/Util';
 import {Context} from 'konva/lib/Context';
-
 import * as THREE from 'three';
-import {GetSet} from 'konva/lib/types';
-import {Factory} from 'konva/lib/Factory';
+import {CanvasHelper} from '../helpers';
 
 export interface ThreeViewConfig extends LayoutShapeConfig {
   canvasSize: Size;
   cameraScale?: number;
   quality?: number;
   skipFrames?: number;
+  scene?: THREE.Scene;
+  camera?: THREE.Camera;
 }
 
 interface Pool<T> {
@@ -39,13 +39,6 @@ const canvasPool2D = new CanvasPool();
 const canvasPool3D = new CanvasPool();
 
 export class ThreeView extends LayoutShape {
-  public canvasSize: GetSet<Size, this>;
-  public cameraScale: GetSet<number, this>;
-  public quality: GetSet<number, this>;
-  public skipFrames: GetSet<number, this>;
-  public readonly scene: THREE.Scene;
-  public readonly camera: THREE.OrthographicCamera;
-
   private readonly threeCanvas: HTMLCanvasElement;
   private readonly copyCanvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
@@ -62,18 +55,85 @@ export class ThreeView extends LayoutShape {
     this.copyCanvas = canvasPool2D.borrow();
     this.copyContext = this.copyCanvas.getContext('2d');
 
-    this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(0x568585);
-    this.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 1000);
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.threeCanvas,
       antialias: true,
     });
     this.context = this.renderer.getContext();
-    this.camera.position.z = 3;
-    this.camera.position.y = 2;
 
     this.handleCanvasSizeChange();
+  }
+
+  public setScene(value: THREE.Scene): this {
+    this.attrs.scene = value;
+    return this;
+  }
+
+  public getScene(): THREE.Scene {
+    return this.attrs.scene ?? null;
+  }
+
+  public setCamera(value: THREE.Camera): this {
+    this.attrs.camera = value;
+    return this;
+  }
+
+  public getCamera<TCamera extends THREE.Camera>(): TCamera {
+    return this.attrs.camera ?? null;
+  }
+
+  public setCanvasSize(value: Size): this {
+    this.attrs.canvasSize = value;
+    return this;
+  }
+
+  public getCanvasSize(): Size {
+    return this.attrs.canvasSize
+      ? {...this.attrs.canvasSize}
+      : {width: 0, height: 0};
+  }
+
+  public setCameraScale(value: number): this {
+    this.attrs.cameraScale = value;
+    return this;
+  }
+
+  public getCameraScale(): number {
+    return this.attrs.cameraScale ?? 1;
+  }
+
+  public setQuality(value: number): this {
+    this.attrs.quality = value;
+    return this;
+  }
+
+  public getQuality(): number {
+    return this.attrs.quality ?? 1;
+  }
+
+  public setSkipFrames(value: number): this {
+    this.attrs.skipFrames = value;
+    return this;
+  }
+
+  public getSkipFrames(): number {
+    return this.attrs.skipFrames ?? 0;
+  }
+
+  setColor(value: string): this {
+    const scene = this.getScene();
+    if (scene) {
+      scene.background = new THREE.Color(value);
+    }
+
+    return this;
+  }
+
+  getColor(): string {
+    const background = this.getScene()?.background;
+    return background instanceof THREE.Color
+      ? background.getHexString()
+      : '#000000';
   }
 
   destroy(): this {
@@ -87,19 +147,25 @@ export class ThreeView extends LayoutShape {
   private handleCanvasSizeChange() {
     if (!this.renderer) return;
 
-    const size = {...this.canvasSize()};
+    const size = this.getCanvasSize();
+    const camera = this.getCamera();
 
     const ratio = size.width / size.height;
-    const scale = this.cameraScale() / 2;
-    this.camera.left = -ratio * scale;
-    this.camera.right = ratio * scale;
-    this.camera.bottom = -scale;
-    this.camera.top = scale;
+    const scale = this.getCameraScale() / 2;
+    if (camera instanceof THREE.OrthographicCamera) {
+      camera.left = -ratio * scale;
+      camera.right = ratio * scale;
+      camera.bottom = -scale;
+      camera.top = scale;
+      camera.updateProjectionMatrix();
+    } else if (camera instanceof THREE.PerspectiveCamera) {
+      camera.aspect = ratio;
+      camera.updateProjectionMatrix();
+    }
 
-    size.width *= this.quality();
-    size.height *= this.quality();
+    size.width *= this.getQuality();
+    size.height *= this.getQuality();
     this.renderer.setSize(size.width, size.height);
-    this.camera.updateProjectionMatrix();
     this.copyCanvas.width = size.width;
     this.copyCanvas.height = size.height;
     this.copyData = this.copyContext.createImageData(size.width, size.height);
@@ -107,18 +173,18 @@ export class ThreeView extends LayoutShape {
   }
 
   getLayoutSize(): Size {
-    return this.canvasSize();
+    return this.getCanvasSize();
   }
 
   _sceneFunc(context: Context) {
-    const scale = this.quality();
-    const size = {...this.canvasSize()};
+    const scale = this.getQuality();
+    const size = this.getCanvasSize();
     size.width *= scale;
     size.height *= scale;
 
     if (this.renderedFrames < 1) {
-      this.renderedFrames = this.skipFrames();
-      this.renderer.render(this.scene, this.camera);
+      this.renderedFrames = this.getSkipFrames();
+      this.renderer.render(this.getScene(), this.getCamera());
       this.context.readPixels(
         0,
         0,
@@ -138,9 +204,18 @@ export class ThreeView extends LayoutShape {
     context.save();
     context._context.imageSmoothingEnabled = false;
     context.scale(1 / scale, 1 / -scale);
+
+    CanvasHelper.roundRect(
+      context._context,
+      size.width / -2,
+      size.height / -2,
+      size.width,
+      size.height,
+      this.getRadius(),
+    );
+    context.clip();
     context.drawImage(
       this.copyCanvas,
-      // this.copyImage,
       0,
       0,
       size.width,
@@ -153,29 +228,3 @@ export class ThreeView extends LayoutShape {
     context.restore();
   }
 }
-
-Factory.addGetterSetter(
-  ThreeView,
-  'canvasSize',
-  {width: 1, height: 1},
-  undefined,
-  //@ts-ignore
-  ThreeView.handleCanvasSizeChange,
-);
-Factory.addGetterSetter(
-  ThreeView,
-  'cameraScale',
-  1,
-  undefined,
-  //@ts-ignore
-  ThreeView.handleCanvasSizeChange,
-);
-Factory.addGetterSetter(
-  ThreeView,
-  'quality',
-  1,
-  undefined,
-  //@ts-ignore
-  ThreeView.handleCanvasSizeChange,
-);
-Factory.addGetterSetter(ThreeView, 'skipFrames', 0);

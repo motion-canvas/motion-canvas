@@ -2,32 +2,13 @@ import {Group} from 'konva/lib/Group';
 import {ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Shape} from 'konva/lib/Shape';
-import {SceneContext} from 'konva/lib/Context';
 import {parseColor} from 'mix-color';
 import {Project} from '../Project';
 import {LayoutGroup} from './LayoutGroup';
 import {LayoutShape} from './LayoutShape';
 import {Origin, Size} from '../types';
 import {getOriginDelta, getOriginOffset, LayoutAttrs} from './ILayoutNode';
-
-function roundRect(
-  ctx: CanvasRenderingContext2D | SceneContext,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-) {
-  if (width < 2 * radius) radius = width / 2;
-  if (height < 2 * radius) radius = height / 2;
-  ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.arcTo(x + width, y, x + width, y + height, radius);
-  ctx.arcTo(x + width, y + height, x, y + height, radius);
-  ctx.arcTo(x, y + height, x, y, radius);
-  ctx.arcTo(x, y, x + width, y, radius);
-  ctx.closePath();
-}
+import {CanvasHelper} from "../helpers";
 
 export type LayoutData = LayoutAttrs & Size;
 export interface SurfaceMask {
@@ -250,7 +231,7 @@ export class Surface extends LayoutGroup {
     const offset = this.offsetY();
     const newOffset = getOriginOffset(this.mask, this.getOrigin());
 
-    roundRect(
+    CanvasHelper.roundRect(
       ctx,
       -this.mask.width / 2,
       -this.mask.height / 2 + offset - newOffset.y,
