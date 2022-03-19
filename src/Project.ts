@@ -49,6 +49,7 @@ export class Project extends Stage {
     super({
       width: Sizes[size][0],
       height: Sizes[size][1],
+      listening: false,
       ...config,
     });
 
@@ -89,8 +90,12 @@ export class Project extends Stage {
     });
   }
 
-  public next(speed: number = 1): boolean {
-    const result = this.runner.next();
+  public async next(speed: number = 1): Promise<boolean> {
+    let result = this.runner.next();
+    while (typeof result.value?.then === 'function') {
+      const value = await result.value;
+      result = this.runner.next(value);
+    }
     this.frame += speed;
 
     return result.done;

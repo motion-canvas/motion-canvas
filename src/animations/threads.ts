@@ -12,8 +12,8 @@ export interface ThreadsFactory {
 
 export function* threads(factory: ThreadsFactory): Generator {
   let runners: Generator[] = [];
-  let cancelled: Set<Generator> = new Set<Generator>();
-  let previous: Map<Generator, Generator> = new Map<Generator, Generator>();
+  let cancelled= new Set<Generator>();
+  let values = new Map<Generator, any>();
   const join = function* (...tasks: Generator[]): Generator {
     while (tasks.find(runner => runners.includes(runner))) {
       yield;
@@ -33,13 +33,18 @@ export function* threads(factory: ThreadsFactory): Generator {
         continue;
       }
 
-      const result = runner.next(previous.get(runner));
+      const result = runner.next(values.get(runner));
 
-      if (result.value?.next) {
+      if (typeof result.value?.then === 'function') {
         if (!result.done) {
           runners.push(runner);
         }
-        previous.set(runner, result.value);
+        values.set(runner, yield result.value);
+      } else if (result.value?.next) {
+        if (!result.done) {
+          runners.push(runner);
+        }
+        values.set(runner, result.value);
         cancelled.delete(result.value);
         runners.push(result.value);
       } else if (!result.done) {

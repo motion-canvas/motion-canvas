@@ -9,8 +9,12 @@ class Controls {
   private from: HTMLInputElement;
   private current: HTMLInputElement;
   private speed: HTMLInputElement;
+  private fps: HTMLInputElement;
   private stepRequested: boolean = false;
   private resetRequested: boolean = false;
+  private lastUpdate: number = 0;
+  private updateTimes: number[] = [];
+  private overallTime: number = 0;
 
   public get isPlaying(): boolean {
     if (this.stepRequested) {
@@ -48,17 +52,58 @@ class Controls {
     this.from = form.from;
     this.current = form.current;
     this.speed = form.speed;
+    this.fps = form.fps;
 
-    form.next.addEventListener('click', () => {
-      this.stepRequested = true;
-    });
-    form.refresh.addEventListener('click', () => {
-      this.resetRequested = true;
+    form.next.addEventListener('click', this.handleNext);
+    form.refresh.addEventListener('click', this.handleReset);
+
+    this.play.checked = localStorage.getItem('play') === 'true';
+    this.play.addEventListener('change', () => this.toggle(this.play.checked));
+
+    document.addEventListener('keydown', event => {
+      switch (event.key) {
+        case ' ':
+          this.toggle();
+          break;
+        case 'ArrowRight':
+          this.handleNext();
+          break;
+      }
     });
   }
 
+  public onReset() {
+    this.overallTime = 0;
+    this.updateTimes = [];
+  }
+
   public onFrame(frame: number) {
+    const passed = performance.now() - this.lastUpdate;
+
+    this.overallTime += passed;
+    this.updateTimes.push(passed);
+    if (this.updateTimes.length > 10) {
+      this.overallTime -= this.updateTimes.shift();
+    }
+
+    const average = this.overallTime / this.updateTimes.length;
+    this.fps.value = Math.floor(1000 / average).toString();
     this.current.value = Math.floor(frame).toString();
+
+    this.lastUpdate = performance.now();
+  }
+
+  private handleReset = () => {
+    this.resetRequested = true;
+  }
+
+  private handleNext = () => {
+    this.stepRequested = true;
+  }
+
+  private toggle = (value?: boolean) => {
+    this.play.checked = value ?? !this.play.checked;
+    localStorage.setItem('play', this.play.checked ? 'true' : 'false');
   }
 }
 
@@ -75,11 +120,12 @@ export function Player(factory: () => Project, audioSrc?: string) {
     audio.play();
   }
 
-  const reset = () => {
+  const reset = async () => {
     startTime = performance.now();
     project.start();
-    project.next();
+    await project.next();
     project.draw();
+    controls.onReset();
     controls.onFrame(project.frame);
     finished = false;
     if (audio) {
@@ -87,53 +133,53 @@ export function Player(factory: () => Project, audioSrc?: string) {
     }
   };
 
-  const run = () => {
+  const run = async () => {
     if (controls.shouldReset) {
-      reset();
+      await reset();
     }
 
     if (!controls.isPlaying || audio?.currentTime < project.time) {
-      requestAnimationFrame(run);
+      request();
       return;
     }
 
-    try {
-      if (finished) {
-        if (controls.isLooping) {
-          // Prevent animation from restarting too quickly.
-          const animationDuration = performance.now() - startTime;
-          if (animationDuration < MINIMUM_ANIMATION_DURATION) {
-            setTimeout(run, MINIMUM_ANIMATION_DURATION - animationDuration);
-            return;
-          }
-          reset();
-        } else {
-          requestAnimationFrame(run);
+    if (finished) {
+      if (controls.isLooping) {
+        // Prevent animation from restarting too quickly.
+        const animationDuration = performance.now() - startTime;
+        if (animationDuration < MINIMUM_ANIMATION_DURATION) {
+          setTimeout(run, MINIMUM_ANIMATION_DURATION - animationDuration);
           return;
         }
+        await reset();
+      } else {
+        request();
+        return;
       }
-
-      finished = project.next(controls.playbackSpeed);
-
-      // Start from certain frame
-      while (project.frame < controls.startFrom && !finished) {
-        finished = project.next();
-      }
-
-      // Synchronize animation with audio.
-      if (audio?.currentTime - MAX_AUDIO_DESYNC > project.time) {
-        while (audio.currentTime > project.time && !finished) {
-          finished = project.next();
-        }
-      }
-
-      project.draw();
-      controls.onFrame(project.frame);
-      requestAnimationFrame(run);
-    } catch (e) {
-      console.error(e);
     }
+
+    finished = await project.next(controls.playbackSpeed);
+
+    // Start from certain frame
+    while (project.frame < controls.startFrom && !finished) {
+      finished = await project.next();
+    }
+
+    // Synchronize animation with audio.
+    if (audio?.currentTime - MAX_AUDIO_DESYNC > project.time) {
+      while (audio.currentTime > project.time && !finished) {
+        finished = await project.next();
+      }
+    }
+
+    project.draw();
+    controls.onFrame(project.frame);
+    request();
   };
-  reset();
-  run();
+
+  const request = () => {
+    requestAnimationFrame(() => run().catch(console.error));
+  };
+
+  reset().then(request).catch(console.error);
 }
