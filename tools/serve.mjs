@@ -34,6 +34,10 @@ const compiler = webpack({
           },
         ],
       },
+      {
+        test: /\.glsl$/i,
+        type: 'asset/source',
+      },
     ],
   },
   resolve: {
