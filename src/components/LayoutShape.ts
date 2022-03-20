@@ -1,5 +1,4 @@
 import {Container} from 'konva/lib/Container';
-import {Origin} from 'MC/types/Origin';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {
   getOriginDelta,
@@ -10,15 +9,13 @@ import {
   LayoutAttrs,
   getClientRect,
 } from './ILayoutNode';
-import {Size} from '../types';
+import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {IRect, Vector2d} from 'konva/lib/types';
 import {Project} from "../Project";
 
 export type LayoutShapeConfig = Partial<LayoutAttrs> & ShapeConfig;
 
 export abstract class LayoutShape extends Shape implements ILayoutNode {
-  public attrs: LayoutShapeConfig;
-
   public get project(): Project {
     return <Project>this.getStage();
   }
@@ -40,22 +37,22 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     return this.attrs.radius ?? 0;
   }
 
-  public setMargin(value: number): this {
-    this.attrs.margin = value;
+  public setMargin(value: PossibleSpacing): this {
+    this.attrs.margin = new Spacing(value);
     return this;
   }
 
-  public getMargin(): Origin {
-    return this.attrs.margin ?? 0;
+  public getMargin(): Spacing {
+    return this.attrs.margin ?? new Spacing();
   }
 
-  public setPadding(value: number): this {
-    this.attrs.padding = value;
+  public setPadd(value: PossibleSpacing): this {
+    this.attrs.padd = new Spacing(value);
     return this;
   }
 
-  public getPadding(): number {
-    return this.attrs.padding ?? 0;
+  public getPadd(): Spacing {
+    return this.attrs.padd ?? new Spacing();
   }
 
   public setColor(value: string): this {

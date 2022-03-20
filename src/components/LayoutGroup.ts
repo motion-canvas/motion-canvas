@@ -1,6 +1,6 @@
 import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
-import {Origin, Size} from '../types';
+import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {
   getClientRect,
   getOriginDelta,
@@ -18,8 +18,6 @@ import {Project} from '../Project';
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;
 
 export abstract class LayoutGroup extends Group implements ILayoutNode {
-  public attrs: LayoutGroupConfig;
-
   public get project(): Project {
     return <Project>this.getStage();
   }
@@ -45,22 +43,22 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     return this.attrs.radius ?? 0;
   }
 
-  public setMargin(value: number): this {
-    this.attrs.margin = value;
+  public setMargin(value: PossibleSpacing): this {
+    this.attrs.margin = new Spacing(value);
     return this;
   }
 
-  public getMargin(): Origin {
-    return this.attrs.margin ?? 0;
+  public getMargin(): Spacing {
+    return this.attrs.margin ?? new Spacing();
   }
 
-  public setPadding(value: number): this {
-    this.attrs.padding = value;
+  public setPadd(value: PossibleSpacing): this {
+    this.attrs.padd = new Spacing(value);
     return this;
   }
 
-  public getPadding(): number {
-    return this.attrs.padding ?? 0;
+  public getPadd(): Spacing {
+    return this.attrs.padd ?? new Spacing();
   }
 
   public setColor(value: string): this {

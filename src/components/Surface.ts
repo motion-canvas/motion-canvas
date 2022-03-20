@@ -152,7 +152,7 @@ export class Surface extends LayoutGroup {
     const contentMargin = this.child.getMargin();
     const scale = Math.min(
       1,
-      data.width / (contentSize.width + contentMargin * 2),
+      data.width / (contentSize.width + contentMargin.x),
     );
 
     this.mask = data;
@@ -178,7 +178,7 @@ export class Surface extends LayoutGroup {
       color: '#F0F',
       height: 0,
       width: 0,
-      padding: 0,
+      padd: 0,
       margin: 0,
       radius: 0,
     };
@@ -188,12 +188,12 @@ export class Surface extends LayoutGroup {
       const size = this.child.getLayoutSize();
       const margin = this.child.getMargin();
       const scale = this.child.getAbsoluteScale(this);
-      const padding = this.getPadding();
+      const padding = this.getPadd();
 
       this.layoutData = {
         ...this.layoutData,
-        width: (size.width + margin * 2 + padding * 2) * scale.x,
-        height: (size.height + margin * 2 + padding * 2) * scale.y,
+        width: (size.width + margin.x + padding.x) * scale.x,
+        height: (size.height + margin.y + padding.y) * scale.y,
         radius: this.child.getRadius(),
         color: this.child.getColor(),
       };

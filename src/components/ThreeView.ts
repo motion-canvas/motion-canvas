@@ -84,6 +84,7 @@ export class ThreeView extends LayoutShape {
 
   public setCanvasSize(value: Size): this {
     this.attrs.canvasSize = value;
+    this.handleCanvasSizeChange();
     return this;
   }
 
@@ -95,6 +96,7 @@ export class ThreeView extends LayoutShape {
 
   public setCameraScale(value: number): this {
     this.attrs.cameraScale = value;
+    this.handleCanvasSizeChange();
     return this;
   }
 
@@ -104,6 +106,7 @@ export class ThreeView extends LayoutShape {
 
   public setQuality(value: number): this {
     this.attrs.quality = value;
+    this.handleCanvasSizeChange();
     return this;
   }
 

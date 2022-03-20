@@ -1,5 +1,6 @@
 import {IRect, Vector2d} from 'konva/lib/types';
 import mixColor from 'mix-color';
+import {PossibleSpacing, Spacing} from "../types";
 
 export class TimeTween {
   public constructor(public value: number) {}
@@ -101,6 +102,15 @@ export class TimeTween {
       x: TimeTween.map(from.x, to.x, value ?? this.value),
       y: TimeTween.map(from.y, to.y, value ?? this.value),
     };
+  }
+
+  public spacing(from: Spacing, to: Spacing, value?: number): PossibleSpacing {
+    return [
+      TimeTween.map(from.top, to.top, value ?? this.value),
+      TimeTween.map(from.right, to.right, value ?? this.value),
+      TimeTween.map(from.bottom, to.bottom, value ?? this.value),
+      TimeTween.map(from.left, to.left, value ?? this.value),
+    ];
   }
 
   public rectArc(

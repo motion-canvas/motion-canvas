@@ -20,10 +20,10 @@ export class Layout extends LayoutGroup {
   }
 
   getLayoutSize(): Size {
-    return {
-      width: (this.contentSize?.width ?? 0) + this.getPadding() * 2,
-      height: (this.contentSize?.height ?? 0) + this.getPadding() * 2,
-    };
+    return this.getPadd().apply({
+      width: this.contentSize?.width ?? 0,
+      height: this.contentSize?.height ?? 0,
+    });
   }
 
   //TODO Recalculate upon removing children as well.
@@ -48,9 +48,9 @@ export class Layout extends LayoutGroup {
       const scale = child.getAbsoluteScale(this);
       this.contentSize.width = Math.max(
         this.contentSize.width,
-        (size.width + margin * 2) * scale.x,
+        (size.width + margin.x) * scale.x,
       );
-      this.contentSize.height += (size.height + margin * 2) * scale.y;
+      this.contentSize.height += (size.height + margin.y) * scale.y;
     }
 
     let height = this.contentSize.height / -2;
@@ -62,9 +62,9 @@ export class Layout extends LayoutGroup {
 
       child.position({
         x: -offset.x * scale.x,
-        y: height + (-offset.y + margin) * scale.y,
+        y: height + (-offset.y + margin.top) * scale.y,
       });
-      height += (size.height + margin * 2) * scale.y;
+      height += (size.height + margin.y) * scale.y;
     }
     this.offset(this.getOriginOffset());
 

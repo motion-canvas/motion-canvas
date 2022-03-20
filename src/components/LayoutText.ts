@@ -10,7 +10,7 @@ import {
   LayoutAttrs,
 } from './ILayoutNode';
 import {Project} from '../Project';
-import {Origin, Size} from '../types';
+import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 
 export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
   minWidth?: number;
@@ -28,7 +28,7 @@ export class LayoutText extends Text implements ILayoutNode {
     super({
       color: '#c0b3a3',
       radius: 40,
-      padding: 30,
+      padd: new Spacing(30),
       align: 'center',
       verticalAlign: 'middle',
       height: 20,
@@ -44,13 +44,14 @@ export class LayoutText extends Text implements ILayoutNode {
   }
 
   public getLayoutSize(custom?: LayoutTextConfig): Size {
+    const padding = this.getPadd();
     const size = this.measureSize(custom?.text ?? this.text());
     return {
       width: Math.max(
         custom?.minWidth ?? this.getMinWidth(),
-        this.overrideWidth ?? (size.width + this.getPadding() * 2),
+        this.overrideWidth ?? (size.width + padding.x),
       ),
-      height: (this.isConstructed ? this.getHeight() : 0) + this.getPadding() * 2,
+      height: (this.isConstructed ? this.getHeight() : 0) + padding.y,
     };
   }
 
@@ -63,22 +64,22 @@ export class LayoutText extends Text implements ILayoutNode {
     return this.attrs.radius ?? 0;
   }
 
-  public setMargin(value: number): this {
-    this.attrs.margin = value;
+  public setMargin(value: PossibleSpacing): this {
+    this.attrs.margin = new Spacing(value);
     return this;
   }
 
-  public getMargin(): Origin {
-    return this.attrs.margin ?? 0;
+  public getMargin(): Spacing {
+    return this.attrs.margin ?? new Spacing();
   }
 
-  public setPadding(value: number): this {
-    this.attrs.padding = value;
+  public setPadd(value: PossibleSpacing): this {
+    this.attrs.padd = new Spacing(value);
     return this;
   }
 
-  public getPadding(): number {
-    return this.attrs.padding ?? 0;
+  public getPadd(): Spacing {
+    return this.attrs.padd ?? new Spacing();
   }
 
   public setColor(value: string): this {
@@ -99,7 +100,7 @@ export class LayoutText extends Text implements ILayoutNode {
     return this.attrs.minWidth ?? 0;
   }
 
-  setText(text: string): this {
+  public setText(text: string): this {
     super.setText(text);
     this.offset(this.getOriginOffset());
     this.fireLayoutChange();
@@ -130,10 +131,11 @@ export class LayoutText extends Text implements ILayoutNode {
   }
 
   public getOriginOffset(custom?: LayoutTextConfig): Vector2d {
+    const padding = this.getPadd();
     const size = this.getLayoutSize({minWidth: 0, ...custom});
     const offset = getOriginOffset(size, custom?.origin ?? this.getOrigin());
-    offset.x += size.width / 2;
-    offset.y += size.height / 2 - this.getPadding();
+    offset.x += size.width / 2 - padding.left;
+    offset.y += size.height / 2 - padding.top;
 
     return offset;
   }

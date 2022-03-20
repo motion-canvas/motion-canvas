@@ -1,4 +1,4 @@
-import {Size, Origin, Direction} from '../types';
+import {Size, Origin, Direction, PossibleSpacing, Spacing} from '../types';
 import {Node} from 'konva/lib/Node';
 import {LayoutGroup} from 'MC/components/LayoutGroup';
 import {LayoutShape} from 'MC/components/LayoutShape';
@@ -10,16 +10,16 @@ export const LAYOUT_CHANGE_EVENT = 'layoutChange';
 
 export interface LayoutAttrs {
   radius: number;
-  margin: number;
-  padding: number;
+  margin: PossibleSpacing;
+  padd: PossibleSpacing;
   color: string;
   origin: Origin;
 }
 
 export interface ILayoutNode {
   getRadius(): number;
-  getMargin(): number;
-  getPadding(): number;
+  getMargin(): Spacing;
+  getPadd(): Spacing;
   getColor(): string;
   getOrigin(): Origin;
   getOriginOffset(custom?: Partial<LayoutAttrs>): Vector2d;

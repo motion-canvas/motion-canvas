@@ -1,7 +1,8 @@
 import {Node} from 'konva/lib/Node';
 import {Project} from '../Project';
-import {Surface} from "MC/components/Surface";
-import {TimeTween} from "MC/animations/TimeTween";
+import {Surface} from "../components/Surface";
+import {TimeTween} from "./TimeTween";
+import {Spacing} from "../types";
 
 export function showTop(this: Project, node: Node): [Generator, Generator] {
   const to = node.offsetY();
@@ -22,6 +23,7 @@ export function showTop(this: Project, node: Node): [Generator, Generator] {
 }
 
 export function showSurface(this: Project, surface: Surface): Generator {
+  const marginFrom = new Spacing();
   const margin = surface.getMargin();
   const toMask = surface.getMask();
   const fromMask = {
@@ -41,7 +43,7 @@ export function showSurface(this: Project, surface: Surface): Generator {
         height: value.easeInOutCubic(fromMask.height, toMask.height),
       }
     )
-    surface.setMargin(value.easeInOutCubic(0, margin));
+    surface.setMargin(value.spacing(marginFrom, margin, value.easeInOutCubic()));
     surface.opacity(TimeTween.clampRemap(0.3, 1, 0, 1, value.value));
   });
 }
