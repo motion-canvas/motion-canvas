@@ -1,10 +1,16 @@
-import {Size, Origin, Direction, PossibleSpacing, Spacing} from '../types';
+import {
+  Size,
+  Origin,
+  PossibleSpacing,
+  Spacing,
+  originPosition,
+} from '../types';
 import {Node} from 'konva/lib/Node';
 import {LayoutGroup} from 'MC/components/LayoutGroup';
 import {LayoutShape} from 'MC/components/LayoutShape';
 import {IRect, Vector2d} from 'konva/lib/types';
-import {Shape} from "konva/lib/Shape";
-import {Group} from "konva/lib/Group";
+import {Shape} from 'konva/lib/Shape';
+import {Group} from 'konva/lib/Group';
 
 export const LAYOUT_CHANGE_EVENT = 'layoutChange';
 
@@ -51,27 +57,7 @@ export function isInsideLayout(node: Node) {
 }
 
 export function getOriginOffset(size: Size, origin: Origin): Vector2d {
-  const width = size.width / 2;
-  const height = size.height / 2;
-  const offset: Vector2d = {x: 0, y: 0};
-
-  if (origin === Origin.Middle) {
-    return offset;
-  }
-
-  if (origin & Direction.Left) {
-    offset.x = -width;
-  } else if (origin & Direction.Right) {
-    offset.x = width;
-  }
-
-  if (origin & Direction.Top) {
-    offset.y = -height;
-  } else if (origin & Direction.Bottom) {
-    offset.y = height;
-  }
-
-  return offset;
+  return originPosition(origin, size.width / 2, size.height / 2);
 }
 
 export function getOriginDelta(size: Size, from: Origin, to: Origin) {

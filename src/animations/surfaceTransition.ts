@@ -16,7 +16,6 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
     .zIndex(fromSurfaceOriginal.zIndex());
 
   fromSurfaceOriginal.hide();
-  fromSurface.setOverride(true);
   const from = fromSurfaceOriginal.getMask();
 
   const project = this;
@@ -45,7 +44,6 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
       if (value.value > 1 / 3) {
         if (check) {
           target.show();
-          target.setOverride(true);
           fromSurface.destroy();
         }
 
@@ -85,7 +83,7 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
       }
     });
 
-    target.setOverride(false);
+    target.setMask(null);
     target.show();
   };
 }

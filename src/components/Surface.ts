@@ -6,8 +6,15 @@ import {parseColor} from 'mix-color';
 import {Project} from '../Project';
 import {LayoutGroup} from './LayoutGroup';
 import {Origin, Size} from '../types';
-import {getOriginDelta, getOriginOffset, isLayoutNode, LayoutAttrs, LayoutNode} from './ILayoutNode';
-import {CanvasHelper} from "../helpers";
+import {
+  getOriginDelta,
+  getOriginOffset,
+  isLayoutNode,
+  LayoutAttrs,
+  LayoutNode,
+} from './ILayoutNode';
+import {CanvasHelper} from '../helpers';
+import {Context} from 'konva/lib/Context';
 
 export type LayoutData = LayoutAttrs & Size;
 export interface SurfaceMask {
@@ -17,16 +24,23 @@ export interface SurfaceMask {
   color: string;
 }
 
+export interface CircleMask {
+  radius: number;
+  x: number;
+  y: number;
+}
+
 export interface SurfaceConfig extends ContainerConfig {
   origin?: Origin;
+  circleMask?: CircleMask;
 }
 
 export class Surface extends LayoutGroup {
   private box: Rect;
   private ripple: Rect;
   private child: LayoutNode;
-  private override: boolean = false;
-  private mask: SurfaceMask = null;
+  private surfaceMask: SurfaceMask | null = null;
+  private circleMask: CircleMask | null = null;
   private layoutData: LayoutData;
 
   public constructor(config?: SurfaceConfig) {
@@ -50,16 +64,20 @@ export class Surface extends LayoutGroup {
     );
   }
 
-  getLayoutSize(): Size {
-    return this.override && this.mask
-      ? {
-          width: this.mask?.width ?? 0,
-          height: this.mask?.height ?? 0,
-        }
-      : {
-          width: this.layoutData?.width ?? 0,
-          height: this.layoutData?.height ?? 0,
-        };
+  public setCircleMask(value: CircleMask | null): this {
+    this.circleMask = value;
+    return this;
+  }
+
+  public getCircleMask(): CircleMask | null {
+    return this.circleMask ?? null;
+  }
+
+  getLayoutSize(custom?: SurfaceConfig): Size {
+    return {
+      width: this.surfaceMask?.width ?? this.layoutData?.width ?? 0,
+      height: this.surfaceMask?.height ?? this.layoutData?.height ?? 0,
+    };
   }
 
   add(...children: (Shape | Group)[]): this {
@@ -94,7 +112,7 @@ export class Surface extends LayoutGroup {
   }
 
   public *doRipple() {
-    if (this.override) return;
+    if (this.surfaceMask) return;
     const opaque = parseColor(this.layoutData.color);
     this.ripple.show();
     this.ripple
@@ -131,12 +149,12 @@ export class Surface extends LayoutGroup {
     return this.child;
   }
 
-  public setOverride(value: boolean) {
-    this.override = value;
-    this.clipFunc(value ? this.drawMask : null);
-    if (!value) {
+  public setMask(data: SurfaceMask) {
+    if (data === null) {
+      this.surfaceMask = null;
       this.handleLayoutChange();
-    } else {
+      return;
+    } else if (this.surfaceMask === null) {
       this.box
         .offsetX(5000)
         .offsetY(5000)
@@ -144,9 +162,7 @@ export class Surface extends LayoutGroup {
         .width(10000)
         .height(100000);
     }
-  }
 
-  public setMask(data: SurfaceMask) {
     const newOffset = getOriginOffset(data, this.getOrigin());
     const contentSize = this.child.getLayoutSize();
     const contentMargin = this.child.getMargin();
@@ -155,7 +171,7 @@ export class Surface extends LayoutGroup {
       data.width / (contentSize.width + contentMargin.x),
     );
 
-    this.mask = data;
+    this.surfaceMask = data;
     this.offset(newOffset);
     this.child.scaleX(scale);
     this.child.scaleY(scale);
@@ -171,7 +187,7 @@ export class Surface extends LayoutGroup {
   }
 
   protected handleLayoutChange() {
-    if (this.override) return;
+    if (this.surfaceMask) return;
 
     this.layoutData ??= {
       origin: Origin.Middle,
@@ -224,17 +240,55 @@ export class Surface extends LayoutGroup {
     }
   }
 
-  private drawMask(ctx: CanvasRenderingContext2D) {
-    const offset = this.offsetY();
-    const newOffset = getOriginOffset(this.mask, this.getOrigin());
+  private drawMask(ctx: Context) {
+    if (this.surfaceMask) {
+      const offset = this.offsetY();
+      const newOffset = getOriginOffset(this.surfaceMask, this.getOrigin());
+      CanvasHelper.roundRect(
+        ctx,
+        -this.surfaceMask.width / 2,
+        -this.surfaceMask.height / 2 + offset - newOffset.y,
+        this.surfaceMask.width,
+        this.surfaceMask.height,
+        this.surfaceMask.radius,
+      );
+      if (this.circleMask) {
+        ctx._context.clip(this.drawCircleMask(new Path2D()));
+      }
+    } else {
+      this.drawCircleMask(ctx);
+    }
+  }
 
-    CanvasHelper.roundRect(
-      ctx,
-      -this.mask.width / 2,
-      -this.mask.height / 2 + offset - newOffset.y,
-      this.mask.width,
-      this.mask.height,
-      this.mask.radius,
+  private drawCircleMask<T extends Context | Path2D>(ctx: T): T {
+    const mask = this.circleMask;
+    ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2, false);
+    return ctx;
+  }
+
+  public getClipFunc() {
+    return this.circleMask || this.surfaceMask ? this.drawMask : null;
+  }
+
+  public getAbsoluteCircleMask(custom?: SurfaceConfig): CircleMask {
+    const mask = custom?.circleMask ?? this.circleMask ?? null;
+    if (mask === null) return null;
+    const size = this.getLayoutSize(custom);
+    const position = {
+      x: size.width * mask.x / 2,
+      y: size.height * mask.y / 2,
+    };
+    const farthestEdge = {
+      x: Math.abs(position.x) + size.width / 2,
+      y: Math.abs(position.y) + size.height / 2,
+    };
+    const distance = Math.sqrt(
+      farthestEdge.x * farthestEdge.x + farthestEdge.y * farthestEdge.y,
     );
+
+    return {
+      ...position,
+      radius: distance * mask.radius,
+    };
   }
 }

@@ -35,25 +35,18 @@ class CanvasPool implements Pool<HTMLCanvasElement> {
   }
 }
 
-const canvasPool2D = new CanvasPool();
 const canvasPool3D = new CanvasPool();
 
 export class ThreeView extends LayoutShape {
   private readonly threeCanvas: HTMLCanvasElement;
-  private readonly copyCanvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly context: WebGLRenderingContext;
-  private readonly copyContext: CanvasRenderingContext2D;
 
-  private copyData: ImageData;
-  private pixels: Uint8ClampedArray;
   private renderedFrames: number = 0;
 
   public constructor(config?: ThreeViewConfig) {
     super(config);
     this.threeCanvas = canvasPool3D.borrow();
-    this.copyCanvas = canvasPool2D.borrow();
-    this.copyContext = this.copyCanvas.getContext('2d');
 
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.threeCanvas,
@@ -141,7 +134,6 @@ export class ThreeView extends LayoutShape {
 
   destroy(): this {
     this.renderer.dispose();
-    canvasPool2D.dispose(this.copyCanvas);
     canvasPool3D.dispose(this.threeCanvas);
 
     return super.destroy();
@@ -169,10 +161,6 @@ export class ThreeView extends LayoutShape {
     size.width *= this.getQuality();
     size.height *= this.getQuality();
     this.renderer.setSize(size.width, size.height);
-    this.copyCanvas.width = size.width;
-    this.copyCanvas.height = size.height;
-    this.copyData = this.copyContext.createImageData(size.width, size.height);
-    this.pixels = new Uint8ClampedArray(size.width * size.height * 4);
   }
 
   getLayoutSize(): Size {
@@ -182,52 +170,38 @@ export class ThreeView extends LayoutShape {
   _sceneFunc(context: Context) {
     const scale = this.getQuality();
     const size = this.getCanvasSize();
-    size.width *= scale;
-    size.height *= scale;
 
     if (this.renderedFrames < 1) {
       this.renderedFrames = this.getSkipFrames();
       this.renderer.render(this.getScene(), this.getCamera());
-      this.context.readPixels(
-        0,
-        0,
-        size.width,
-        size.height,
-        this.context.RGBA,
-        this.context.UNSIGNED_BYTE,
-        this.pixels,
-      );
-
-      this.copyData.data.set(this.pixels);
-      this.copyContext.putImageData(this.copyData, 0, 0);
     } else {
       this.renderedFrames--;
     }
 
-    context.save();
+    context._context.save();
     context._context.imageSmoothingEnabled = false;
-    context.scale(1 / scale, 1 / -scale);
 
-    CanvasHelper.roundRect(
-      context._context,
+    context._context.clip(
+      CanvasHelper.roundRectPath(
+        new Path2D(),
+        size.width / -2,
+        size.height / -2,
+        size.width,
+        size.height,
+        this.getRadius(),
+      ),
+    );
+    context._context.drawImage(
+      this.threeCanvas,
+      0,
+      0,
+      size.width * scale,
+      size.height * scale,
       size.width / -2,
       size.height / -2,
       size.width,
       size.height,
-      this.getRadius(),
     );
-    context.clip();
-    context.drawImage(
-      this.copyCanvas,
-      0,
-      0,
-      size.width,
-      size.height,
-      size.width / -2,
-      size.height / -2,
-      size.width,
-      size.height,
-    );
-    context.restore();
+    context._context.restore();
   }
 }

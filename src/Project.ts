@@ -16,6 +16,7 @@ import {
   threads,
   ThreadsJoin,
   ThreadsCancel,
+  showCircle,
 } from './animations';
 
 Konva.autoDrawEnabled = false;
@@ -117,6 +118,7 @@ export class Project extends Stage {
   public tween = tween;
   public moveNode = move;
   public showTop = showTop;
+  public showCircle = showCircle;
   public surfaceTransition = surfaceTransition;
   public showSurface = showSurface;
   public sequence = sequence;
