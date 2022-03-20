@@ -21,3 +21,28 @@ export enum Origin {
   BottomLeft = 24,
   BottomRight = 40,
 }
+
+export function flipOrigin(origin: Direction, axis?: Center): Direction;
+export function flipOrigin(origin: Origin, axis?: Center): Origin;
+export function flipOrigin(
+  origin: Origin | Direction,
+  axis: Center = Center.Horizontal | Center.Vertical,
+): Origin | Direction {
+  if (axis & Center.Vertical) {
+    if (origin & Direction.Top) {
+      origin = (origin & ~Direction.Top) | Direction.Bottom;
+    } else if (origin & Direction.Bottom) {
+      origin = (origin & ~Direction.Bottom) | Direction.Top;
+    }
+  }
+
+  if (axis & Center.Horizontal) {
+    if (origin & Direction.Left) {
+      origin = (origin & ~Direction.Left) | Direction.Right;
+    } else if (origin & Direction.Right) {
+      origin = (origin & ~Direction.Right) | Direction.Left;
+    }
+  }
+
+  return origin;
+}

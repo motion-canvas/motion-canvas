@@ -2,7 +2,9 @@ import {Size, Origin, Direction} from '../types';
 import {Node} from 'konva/lib/Node';
 import {LayoutGroup} from 'MC/components/LayoutGroup';
 import {LayoutShape} from 'MC/components/LayoutShape';
-import {Vector2d} from 'konva/lib/types';
+import {IRect, Vector2d} from 'konva/lib/types';
+import {Shape} from "konva/lib/Shape";
+import {Group} from "konva/lib/Group";
 
 export const LAYOUT_CHANGE_EVENT = 'layoutChange';
 
@@ -20,7 +22,15 @@ export interface ILayoutNode {
   getPadding(): number;
   getColor(): string;
   getOrigin(): Origin;
-  getLayoutSize(): Size;
+  getOriginOffset(custom?: Partial<LayoutAttrs>): Vector2d;
+  getOriginDelta(newOrigin: Origin, custom?: Partial<LayoutAttrs>): Vector2d;
+  getLayoutSize(custom?: Partial<LayoutAttrs>): Size;
+}
+
+export type LayoutNode = (Shape | Group) & ILayoutNode;
+
+export function isLayoutNode(node: Node): node is LayoutNode {
+  return 'getLayoutSize' in node;
 }
 
 export function isInsideLayout(node: Node) {
@@ -75,4 +85,30 @@ export function getOriginDelta(size: Size, from: Origin, to: Origin) {
     x: toOffset.x - fromOffset.x,
     y: toOffset.y - fromOffset.y,
   };
+}
+
+export function getClientRect(
+  node: LayoutNode,
+  config?: {
+    skipTransform?: boolean;
+    skipShadow?: boolean;
+    skipStroke?: boolean;
+    relativeTo?: Node;
+  },
+): IRect {
+  const size = node.getLayoutSize();
+  const offset = node.getOriginOffset({origin: Origin.TopLeft});
+
+  const rect: IRect = {
+    x: offset.x,
+    y: offset.y,
+    width: size.width,
+    height: size.height,
+  };
+
+  if (!config?.skipTransform) {
+    return node._transformedRect(rect, config?.relativeTo);
+  }
+
+  return rect;
 }

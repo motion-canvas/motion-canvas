@@ -8,14 +8,20 @@ import {
   isInsideLayout,
   LAYOUT_CHANGE_EVENT,
   LayoutAttrs,
+  getClientRect,
 } from './ILayoutNode';
 import {Size} from '../types';
 import {IRect, Vector2d} from 'konva/lib/types';
+import {Project} from "../Project";
 
 export type LayoutShapeConfig = Partial<LayoutAttrs> & ShapeConfig;
 
 export abstract class LayoutShape extends Shape implements ILayoutNode {
   public attrs: LayoutShapeConfig;
+
+  public get project(): Project {
+    return <Project>this.getStage();
+  }
 
   public constructor(config?: LayoutShapeConfig) {
     super(config);
@@ -23,7 +29,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     this.handleLayoutChange();
   }
 
-  public abstract getLayoutSize(): Size;
+  public abstract getLayoutSize(custom?: LayoutShapeConfig): Size;
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
@@ -83,15 +89,19 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     this.setOrigin(previousOrigin);
   }
 
-  public getOriginOffset(customOrigin?: Origin): Vector2d {
+  public getOriginOffset(custom?: LayoutShapeConfig): Vector2d {
     return getOriginOffset(
-      this.getLayoutSize(),
-      customOrigin ?? this.getOrigin(),
+      this.getLayoutSize(custom),
+      custom?.origin ?? this.getOrigin(),
     );
   }
 
-  public getOriginDelta(newOrigin: Origin) {
-    return getOriginDelta(this.getLayoutSize(), this.getOrigin(), newOrigin);
+  public getOriginDelta(newOrigin: Origin, custom?: LayoutShapeConfig) {
+    return getOriginDelta(
+      this.getLayoutSize(custom),
+      custom?.origin ?? this.getOrigin(),
+      newOrigin,
+    );
   }
 
   public getClientRect(config?: {
@@ -100,21 +110,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     skipStroke?: boolean;
     relativeTo?: Container;
   }): IRect {
-    const size = this.getLayoutSize();
-    const offset = this.getOriginOffset(Origin.TopLeft);
-
-    const rect: IRect = {
-      x: offset.x,
-      y: offset.y,
-      width: size.width,
-      height: size.height,
-    };
-
-    if (!config?.skipTransform) {
-      return this._transformedRect(rect, config?.relativeTo);
-    }
-
-    return rect;
+    return getClientRect(this, config);
   }
 
   protected fireLayoutChange() {

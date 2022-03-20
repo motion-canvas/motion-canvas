@@ -5,9 +5,8 @@ import {Shape} from 'konva/lib/Shape';
 import {parseColor} from 'mix-color';
 import {Project} from '../Project';
 import {LayoutGroup} from './LayoutGroup';
-import {LayoutShape} from './LayoutShape';
 import {Origin, Size} from '../types';
-import {getOriginDelta, getOriginOffset, LayoutAttrs} from './ILayoutNode';
+import {getOriginDelta, getOriginOffset, isLayoutNode, LayoutAttrs, LayoutNode} from './ILayoutNode';
 import {CanvasHelper} from "../helpers";
 
 export type LayoutData = LayoutAttrs & Size;
@@ -25,7 +24,7 @@ export interface SurfaceConfig extends ContainerConfig {
 export class Surface extends LayoutGroup {
   private box: Rect;
   private ripple: Rect;
-  private child: LayoutGroup | LayoutShape;
+  private child: LayoutNode;
   private override: boolean = false;
   private mask: SurfaceMask = null;
   private layoutData: LayoutData;
@@ -65,10 +64,7 @@ export class Surface extends LayoutGroup {
 
   add(...children: (Shape | Group)[]): this {
     super.add(...children);
-    const child = children.find<LayoutShape | LayoutGroup>(
-      (child): child is LayoutShape | LayoutGroup =>
-        child instanceof LayoutShape || child instanceof LayoutGroup,
-    );
+    const child = children.find<LayoutNode>(isLayoutNode);
     const ripple = children.find<Rect>((child): child is Rect =>
       child.hasName('ripple'),
     );
@@ -131,7 +127,7 @@ export class Surface extends LayoutGroup {
     this.ripple.hide();
   }
 
-  public getChild(): LayoutShape | LayoutGroup {
+  public getChild(): LayoutNode {
     return this.child;
   }
 
@@ -192,11 +188,12 @@ export class Surface extends LayoutGroup {
       const size = this.child.getLayoutSize();
       const margin = this.child.getMargin();
       const scale = this.child.getAbsoluteScale(this);
+      const padding = this.getPadding();
 
       this.layoutData = {
         ...this.layoutData,
-        width: (size.width + margin * 2) * scale.x,
-        height: (size.height + margin * 2) * scale.y,
+        width: (size.width + margin * 2 + padding * 2) * scale.x,
+        height: (size.height + margin * 2 + padding * 2) * scale.y,
         radius: this.child.getRadius(),
         color: this.child.getColor(),
       };

@@ -2,6 +2,7 @@ import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
 import {Origin, Size} from '../types';
 import {
+  getClientRect,
   getOriginDelta,
   getOriginOffset,
   ILayoutNode,
@@ -12,11 +13,16 @@ import {
 import Konva from 'konva';
 import {IRect} from 'konva/lib/types';
 import Vector2d = Konva.Vector2d;
+import {Project} from '../Project';
 
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;
 
 export abstract class LayoutGroup extends Group implements ILayoutNode {
   public attrs: LayoutGroupConfig;
+
+  public get project(): Project {
+    return <Project>this.getStage();
+  }
 
   public constructor(config?: LayoutGroupConfig) {
     super({
@@ -28,7 +34,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     this.handleLayoutChange();
   }
 
-  public abstract getLayoutSize(): Size;
+  public abstract getLayoutSize(custom?: LayoutGroupConfig): Size;
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
@@ -88,15 +94,19 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     this.setOrigin(previousOrigin);
   }
 
-  public getOriginOffset(customOrigin?: Origin): Vector2d {
+  public getOriginOffset(custom?: LayoutGroupConfig): Vector2d {
     return getOriginOffset(
-      this.getLayoutSize(),
-      customOrigin ?? this.getOrigin(),
+      this.getLayoutSize(custom),
+      custom?.origin ?? this.getOrigin(),
     );
   }
 
-  public getOriginDelta(newOrigin: Origin) {
-    return getOriginDelta(this.getLayoutSize(), this.getOrigin(), newOrigin);
+  public getOriginDelta(newOrigin: Origin, custom?: LayoutGroupConfig) {
+    return getOriginDelta(
+      this.getLayoutSize(custom),
+      custom?.origin ?? this.getOrigin(),
+      newOrigin,
+    );
   }
 
   public getClientRect(config?: {
@@ -105,21 +115,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     skipStroke?: boolean;
     relativeTo?: Container;
   }): IRect {
-    const size = this.getLayoutSize();
-    const offset = this.getOriginOffset(Origin.TopLeft);
-
-    const rect: IRect = {
-      x: offset.x,
-      y: offset.y,
-      width: size.width,
-      height: size.height,
-    };
-
-    if (!config?.skipTransform) {
-      return this._transformedRect(rect, config?.relativeTo);
-    }
-
-    return rect;
+    return getClientRect(this, config);
   }
 
   protected fireLayoutChange() {
