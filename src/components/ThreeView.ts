@@ -19,26 +19,28 @@ interface Pool<T> {
   dispose(object: T): void;
 }
 
-class CanvasPool implements Pool<HTMLCanvasElement> {
-  private pool: HTMLCanvasElement[] = [];
+class RendererPool implements Pool<THREE.WebGLRenderer> {
+  private pool: THREE.WebGLRenderer[] = [];
 
-  public borrow(): HTMLCanvasElement {
+  public borrow(): THREE.WebGLRenderer {
     if (this.pool.length) {
       return this.pool.pop();
     } else {
-      return Util.createCanvasElement();
+      return new THREE.WebGLRenderer({
+        canvas: Util.createCanvasElement(),
+        antialias: true,
+      });
     }
   }
 
-  public dispose(canvas: HTMLCanvasElement) {
-    this.pool.push(canvas);
+  public dispose(renderer: THREE.WebGLRenderer) {
+    this.pool.push(renderer);
   }
 }
 
-const canvasPool3D = new CanvasPool();
+const rendererPool = new RendererPool();
 
 export class ThreeView extends LayoutShape {
-  private readonly threeCanvas: HTMLCanvasElement;
   private readonly renderer: THREE.WebGLRenderer;
   private readonly context: WebGLRenderingContext;
 
@@ -46,12 +48,7 @@ export class ThreeView extends LayoutShape {
 
   public constructor(config?: ThreeViewConfig) {
     super(config);
-    this.threeCanvas = canvasPool3D.borrow();
-
-    this.renderer = new THREE.WebGLRenderer({
-      canvas: this.threeCanvas,
-      antialias: true,
-    });
+    this.renderer = rendererPool.borrow();
     this.context = this.renderer.getContext();
 
     this.handleCanvasSizeChange();
@@ -133,8 +130,7 @@ export class ThreeView extends LayoutShape {
   }
 
   destroy(): this {
-    this.renderer.dispose();
-    canvasPool3D.dispose(this.threeCanvas);
+    rendererPool.dispose(this.renderer);
 
     return super.destroy();
   }
@@ -192,7 +188,7 @@ export class ThreeView extends LayoutShape {
       ),
     );
     context._context.drawImage(
-      this.threeCanvas,
+      this.renderer.domElement,
       0,
       0,
       size.width * scale,

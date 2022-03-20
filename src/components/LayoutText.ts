@@ -146,7 +146,7 @@ export class LayoutText extends Text implements ILayoutNode {
     const toWidth = this.getLayoutSize({text, minWidth: 0}).width;
 
     this.overrideWidth = fromWidth;
-    yield* this.project.tween(3, value => {
+    yield* this.project.tween(0.3, value => {
       this.overrideWidth = value.easeInOutCubic(fromWidth, toWidth);
       this.setText(value.text(fromText, text, value.easeInOutCubic()));
     });

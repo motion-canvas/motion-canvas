@@ -1,7 +1,6 @@
 import {Stage, StageConfig} from 'konva/lib/Stage';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
-import {Scene, SceneRunner} from './Scene';
 import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
 import {
@@ -39,7 +38,6 @@ export class Project extends Stage {
   }
 
   private runner: Generator;
-  private scenes: Scene[] = [];
 
   public constructor(
     private runnerFactory: (project: Project) => Generator,
@@ -67,22 +65,15 @@ export class Project extends Stage {
       fill: '#141414',
     });
 
-    const backgroundLayer = new Layer();
+    const backgroundLayer = new Layer({name: 'background'});
     backgroundLayer.add(this.background);
     this.add(backgroundLayer);
   }
 
-  public createScene(runner: SceneRunner) {
-    const scene = new Scene(this, new Layer(), runner);
-    this.add(scene.layer);
-    this.scenes.push(scene);
-
-    return scene;
-  }
-
   public start() {
-    this.scenes.forEach(scene => scene.layer.destroy());
-    this.scenes = [];
+    this.getLayers().forEach(
+      layer => layer.hasName('background') || layer.destroy(),
+    );
     this.frame = 0;
     this.runner = this.threads((join, cancel) => {
       this.join = join;
