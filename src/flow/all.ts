@@ -1,16 +1,10 @@
-// TODO Support threading
-export function* all(...sequences: Generator[]): Generator {
-  while (sequences.length > 0) {
-    for (let i = sequences.length - 1; i >= 0; i--) {
-      const result = sequences[i].next();
-      if (result.done) {
-        sequences.splice(i, 1);
-      }
-      if (result.value) {
-        console.warn('Unexpected value: ', result.value);
-      }
-    }
+import {join} from '../animations';
+import {decorate, threadable} from "../decorators";
 
-    yield;
+decorate(all, threadable());
+export function* all(...tasks: Generator[]): Generator {
+  for (const task of tasks) {
+    yield task;
   }
+  yield* join(true, ...tasks);
 }

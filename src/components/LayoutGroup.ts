@@ -13,15 +13,10 @@ import {
 import Konva from 'konva';
 import {IRect} from 'konva/lib/types';
 import Vector2d = Konva.Vector2d;
-import {Project} from '../Project';
 
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;
 
 export abstract class LayoutGroup extends Group implements ILayoutNode {
-  public get project(): Project {
-    return <Project>this.getStage();
-  }
-
   public constructor(config?: LayoutGroupConfig) {
     super({
       color: '#242424',
@@ -36,6 +31,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
+    this.fireLayoutChange();
     return this;
   }
 
@@ -45,6 +41,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
 
   public setMargin(value: PossibleSpacing): this {
     this.attrs.margin = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -54,6 +51,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
 
   public setPadd(value: PossibleSpacing): this {
     this.attrs.padd = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -63,6 +61,7 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
 
   public setColor(value: string): this {
     this.attrs.color = value;
+    this.fireLayoutChange();
     return this;
   }
 

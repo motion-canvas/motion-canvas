@@ -11,15 +11,10 @@ import {
 } from './ILayoutNode';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {IRect, Vector2d} from 'konva/lib/types';
-import {Project} from "../Project";
 
 export type LayoutShapeConfig = Partial<LayoutAttrs> & ShapeConfig;
 
 export abstract class LayoutShape extends Shape implements ILayoutNode {
-  public get project(): Project {
-    return <Project>this.getStage();
-  }
-
   public constructor(config?: LayoutShapeConfig) {
     super(config);
     this.on(LAYOUT_CHANGE_EVENT, () => this.handleLayoutChange());
@@ -30,6 +25,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
+    this.fireLayoutChange();
     return this;
   }
 
@@ -39,6 +35,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public setMargin(value: PossibleSpacing): this {
     this.attrs.margin = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -48,6 +45,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public setPadd(value: PossibleSpacing): this {
     this.attrs.padd = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -57,6 +55,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public setColor(value: string): this {
     this.attrs.color = value;
+    this.fireLayoutChange();
     return this;
   }
 

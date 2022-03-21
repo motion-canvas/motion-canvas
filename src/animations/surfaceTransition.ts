@@ -1,6 +1,7 @@
 import {Surface} from '../components/Surface';
-import {Project} from '../Project';
 import {TimeTween} from './TimeTween';
+import {tween} from "./tween";
+import {decorate, threadable} from "../decorators";
 
 export interface SurfaceTransitionConfig {
   reverse?: boolean;
@@ -9,7 +10,8 @@ export interface SurfaceTransitionConfig {
   onToOpacityChange?: (surface: Surface, value: TimeTween) => boolean | void;
 }
 
-export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
+decorate(surfaceTransition, threadable());
+export function surfaceTransition(fromSurfaceOriginal: Surface) {
   const fromSurface = fromSurfaceOriginal
     .clone()
     .moveTo(fromSurfaceOriginal.parent)
@@ -18,7 +20,6 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
   fromSurfaceOriginal.hide();
   const from = fromSurfaceOriginal.getMask();
 
-  const project = this;
   return function* (target: Surface, config: SurfaceTransitionConfig = {}) {
     const to = target.getMask();
     const toPos = target.getPosition();
@@ -40,7 +41,7 @@ export function surfaceTransition(this: Project, fromSurfaceOriginal: Surface) {
     config.onSurfaceChange?.(fromSurface);
 
     let check = true;
-    yield* project.tween(0.6, value => {
+    yield* tween(0.6, value => {
       if (value.value > 1 / 3) {
         if (check) {
           target.show();

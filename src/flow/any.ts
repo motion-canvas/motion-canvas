@@ -1,12 +1,10 @@
-export function* any(...sequences: Generator[]): Generator {
-  while (sequences.length > 0) {
-    for (let i = sequences.length - 1; i >= 0; i--) {
-      const result = sequences[i].next();
-      if (result.done) {
-        return;
-      }
-    }
+import {join} from '../animations';
+import {decorate, threadable} from '../decorators';
 
-    yield;
+decorate(any, threadable());
+export function* any(...tasks: Generator[]): Generator {
+  for (const task of tasks) {
+    yield task;
   }
+  yield* join(false, ...tasks);
 }

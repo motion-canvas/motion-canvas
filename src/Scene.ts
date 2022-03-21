@@ -1,5 +1,7 @@
-import {Layer} from 'konva/lib/Layer';
+import {Layer, LayerConfig} from 'konva/lib/Layer';
 import {Project} from './Project';
+import {GeneratorHelper} from './helpers';
+import {cancel} from "./animations";
 
 export interface SceneRunner {
   (layer: Scene, project: Project): Generator;
@@ -14,26 +16,37 @@ export enum SceneState {
 
 export class Scene extends Layer {
   private state: SceneState = SceneState.Pending;
+  private task: Generator;
 
   public constructor(
     public readonly project: Project,
-    private runner: SceneRunner,
+    private readonly runner: SceneRunner,
+    config?: LayerConfig,
   ) {
-    super();
+    super(config);
   }
 
-  public *run(): Generator {
+  public run(): Generator {
     this.project.add(this);
-    yield* this.runner(this, this.project);
-    this.state = SceneState.Finished;
-    // @ts-ignore
-    while (this.state !== SceneState.Disposed) {
-      yield;
-    }
+    const scene = this;
+    this.task = (function* () {
+      yield* scene.runner(scene, scene.project);
+      if (scene.state !== SceneState.Disposed) {
+        scene.state = SceneState.Finished;
+      }
+      while (scene.state !== SceneState.Disposed) {
+        yield;
+      }
+    })();
+    GeneratorHelper.makeThreadable(this.task, `${this.name()} [scene]`);
+
+    return this.task;
   }
 
   public activate() {
-    this.state = SceneState.Started;
+    if (this.state === SceneState.Pending) {
+      this.state = SceneState.Started;
+    }
   }
 
   public *start(): Generator {
@@ -49,11 +62,14 @@ export class Scene extends Layer {
   }
 
   public deactivate() {
-    this.state = SceneState.Finished;
+    if (this.state === SceneState.Started) {
+      this.state = SceneState.Finished;
+    }
   }
 
-  public dispose() {
+  public *dispose() {
     this.state = SceneState.Disposed;
+    yield* cancel(this.task);
     this.destroy();
   }
 }

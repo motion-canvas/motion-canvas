@@ -1,12 +1,12 @@
 import type {Project} from '../Project';
+import {PROJECT} from '../Project';
+import {decorate, threadable} from "../decorators";
 
-export function* waitUntil(
-  this: Project,
-  targetTime = 0,
-  after?: Generator,
-): Generator {
-  const frames = this.secondsToFrames(targetTime);
-  while (this.frame < frames) {
+decorate(waitUntil, threadable());
+export function* waitUntil(targetTime = 0, after?: Generator): Generator {
+  const project = (yield PROJECT) as Project;
+  const frames = project.secondsToFrames(targetTime);
+  while (project.frame < frames) {
     yield;
   }
 
@@ -15,14 +15,12 @@ export function* waitUntil(
   }
 }
 
-export function* waitFor(
-  this: Project,
-  seconds = 0,
-  after?: Generator,
-): Generator {
-  const frames = this.secondsToFrames(seconds);
-  const startFrame = this.frame;
-  while (this.frame - startFrame < frames) {
+decorate(waitFor, threadable());
+export function* waitFor(seconds = 0, after?: Generator): Generator {
+  const project = (yield PROJECT) as Project;
+  const frames = project.secondsToFrames(seconds);
+  const startFrame = project.frame;
+  while (project.frame - startFrame < frames) {
     yield;
   }
 

@@ -3,7 +3,6 @@ import {ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Shape} from 'konva/lib/Shape';
 import {parseColor} from 'mix-color';
-import {Project} from '../Project';
 import {LayoutGroup} from './LayoutGroup';
 import {Origin, Size} from '../types';
 import {
@@ -15,6 +14,7 @@ import {
 } from './ILayoutNode';
 import {CanvasHelper} from '../helpers';
 import {Context} from 'konva/lib/Context';
+import {tween} from "../animations";
 
 export type LayoutData = LayoutAttrs & Size;
 export interface SurfaceMask {
@@ -107,10 +107,6 @@ export class Surface extends LayoutGroup {
     return this;
   }
 
-  public get project(): Project {
-    return <Project>this.getStage();
-  }
-
   public *doRipple() {
     if (this.surfaceMask) return;
     const opaque = parseColor(this.layoutData.color);
@@ -123,7 +119,7 @@ export class Surface extends LayoutGroup {
       .cornerRadius(this.layoutData.radius)
       .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
 
-    yield* this.project.tween(1, value => {
+    yield* tween(1, value => {
       const width = this.layoutData.width + value.easeOutExpo(0, 100);
       const height = this.layoutData.height + value.easeOutExpo(0, 100);
       const radius = this.layoutData.radius + value.easeOutExpo(0, 50);
@@ -145,8 +141,8 @@ export class Surface extends LayoutGroup {
     this.ripple.hide();
   }
 
-  public getChild(): LayoutNode {
-    return this.child;
+  public getChild<T extends LayoutNode>(): T {
+    return <T>this.child;
   }
 
   public setMask(data: SurfaceMask) {

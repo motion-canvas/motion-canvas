@@ -9,18 +9,14 @@ import {
   LAYOUT_CHANGE_EVENT,
   LayoutAttrs,
 } from './ILayoutNode';
-import {Project} from '../Project';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
+import {tween} from "../animations";
 
 export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
   minWidth?: number;
 }
 
 export class LayoutText extends Text implements ILayoutNode {
-  public get project(): Project {
-    return <Project>this.getStage();
-  }
-
   private overrideWidth: number | null = null;
   private isConstructed = false;
 
@@ -57,6 +53,7 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
+    this.fireLayoutChange();
     return this;
   }
 
@@ -66,6 +63,7 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setMargin(value: PossibleSpacing): this {
     this.attrs.margin = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -75,6 +73,7 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setPadd(value: PossibleSpacing): this {
     this.attrs.padd = new Spacing(value);
+    this.fireLayoutChange();
     return this;
   }
 
@@ -84,6 +83,7 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setColor(value: string): this {
     this.attrs.color = value;
+    this.fireLayoutChange();
     return this;
   }
 
@@ -93,6 +93,7 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setMinWidth(value: number): this {
     this.attrs.minWidth = value;
+    this.fireLayoutChange();
     return this;
   }
 
@@ -146,7 +147,7 @@ export class LayoutText extends Text implements ILayoutNode {
     const toWidth = this.getLayoutSize({text, minWidth: 0}).width;
 
     this.overrideWidth = fromWidth;
-    yield* this.project.tween(0.3, value => {
+    yield* tween(0.3, value => {
       this.overrideWidth = value.easeInOutCubic(fromWidth, toWidth);
       this.setText(value.text(fromText, text, value.easeInOutCubic()));
     });

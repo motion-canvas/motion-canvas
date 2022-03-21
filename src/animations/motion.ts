@@ -1,27 +1,26 @@
 import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
-import {Project} from "../Project";
+import {tween} from "./tween";
+import {decorate, threadable} from "../decorators";
 
 export interface MoveConfig {
   absolute?: boolean,
   speed?: number,
 }
 
+decorate(move, threadable());
 export function move(
-  this: Project,
   node: Node,
   position: Vector2d,
   config?: MoveConfig,
 ): Generator;
 export function move(
-  this: Project,
   node: Node,
   positionX: number,
   positionY: number,
   config?: MoveConfig,
 ): Generator;
 export function move(
-  this: Project,
   node: Node,
   arg0: number | Vector2d,
   arg1?: number | MoveConfig,
@@ -47,7 +46,7 @@ export function move(
       Math.pow(positionFrom.y - positionTo.y, 2),
   );
 
-  return this.tween(distance / 1000 * (config.speed ?? 1), value =>
+  return tween(distance / 1000 * (config.speed ?? 1), value =>
     node.position(value.vector2d(positionFrom, positionTo, value.easeInOutQuint())),
   );
 }

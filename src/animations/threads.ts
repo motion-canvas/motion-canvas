@@ -1,41 +1,67 @@
-export interface ThreadsJoin {
-  (...tasks: Generator[]): Generator;
-}
-
-export interface ThreadsCancel {
-  (...tasks: Generator[]): void;
-}
+import {GeneratorHelper} from '../helpers';
+import {decorate, threadable} from '../decorators';
 
 export interface ThreadsFactory {
-  (join: ThreadsJoin, cancel: ThreadsCancel): Generator;
+  (): Generator;
 }
 
+decorate(join, threadable());
+export function* join(all: boolean, ...tasks: Generator[]): Generator {
+  yield* (yield {join: tasks, all}) as Generator;
+}
+
+decorate(cancel, threadable());
+export function* cancel(...tasks: Generator[]): Generator {
+  yield {cancel: tasks};
+}
+
+decorate(threads, threadable());
 export function* threads(factory: ThreadsFactory): Generator {
   let runners: Generator[] = [];
   let cancelled = new Set<Generator>();
   let values = new Map<Generator, any>();
   let children = new Map<Generator, Generator[]>();
-  const join = function* (...tasks: Generator[]): Generator {
-    while (tasks.find(runner => runners.includes(runner))) {
-      yield;
+
+  decorate(joinInternal, threadable());
+  function* joinInternal(tasks: Generator[], all: boolean): Generator {
+    if (all) {
+      while (tasks.find(runner => runners.includes(runner))) {
+        yield;
+      }
+    } else {
+      while (!tasks.find(runner => !runners.includes(runner))) {
+        yield;
+      }
     }
-  };
-  const cancel = (...tasks: Generator[]) => {
+  }
+
+  const cancelInternal = (tasks: Generator[]) => {
     tasks.forEach(task => cancelled.add(task));
   };
 
-  runners.push(factory(join, cancel));
+  const root = factory();
+  GeneratorHelper.makeThreadable(root, 'root');
+  runners.push(root);
   while (runners.length > 0) {
     const newRunners = [];
+    const cancelledRunners = new Set<Generator>();
     for (let i = 0; i < runners.length; i++) {
       const runner = runners[i];
-      const childTasks = children.get(runner) ?? [];
+      // FIXME Keep track of child-parent relations instead.
+      const childTasks = (children.get(runner) ?? []).filter(child =>
+        runners.includes(child),
+      );
       children.set(runner, childTasks);
 
+      if (cancelledRunners.has(runner)) {
+        continue;
+      }
+
       if (cancelled.has(runner)) {
+        cancelledRunners.add(runner);
         cancelled.delete(runner);
         children.delete(runner);
-        cancel(...childTasks);
+        cancelInternal(childTasks);
         continue;
       }
 
@@ -43,21 +69,37 @@ export function* threads(factory: ThreadsFactory): Generator {
       values.delete(runner);
 
       if (result.done) {
+        cancelledRunners.add(runner);
         cancelled.delete(runner);
         children.delete(runner);
-        cancel(...childTasks);
+        cancelInternal(childTasks);
         continue;
       }
 
-      if (typeof result.value?.then === 'function') {
-        values.set(runner, yield result.value);
+      let value = result.value;
+      if (value?.join) {
+        value = joinInternal(value.join, value.all);
+      } else if (value?.cancel) {
+        cancelInternal(value.cancel);
         runners.push(runner);
-      } else if (result.value?.next) {
-        values.set(runner, result.value);
-        cancelled.delete(result.value);
-        childTasks.push(result.value);
+        continue;
+      }
+
+      if (value?.next) {
+        values.set(runner, value);
+        cancelled.delete(value);
+        childTasks.push(value);
+
+        if (!Object.getPrototypeOf(value).threadable) {
+          console.warn('Non-threadable task: ', value);
+        }
+
+        GeneratorHelper.makeThreadable(value, `non-threadable ${childTasks.length}`);
         runners.push(runner);
-        runners.push(result.value);
+        runners.push(value);
+      } else if (value) {
+        values.set(runner, yield value);
+        runners.push(runner);
       } else {
         newRunners.push(runner);
       }

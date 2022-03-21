@@ -2,10 +2,16 @@ import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
-import {getBooleanValidator, getNumberValidator, getStringValidator,} from 'konva/lib/Validators';
-import {Project} from '../Project';
-import {LayoutShape, LayoutShapeConfig} from "./LayoutShape";
-import {Size} from "../types";
+import {
+  getBooleanValidator,
+  getNumberValidator,
+  getStringValidator,
+} from 'konva/lib/Validators';
+import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
+import {Size} from '../types';
+import {cancel, waitFor} from '../animations';
+import {threadable} from '../decorators';
+import {GeneratorHelper} from 'MC/helpers';
 
 interface FrameData {
   fileName: string;
@@ -45,15 +51,11 @@ export class Sprite extends LayoutShape {
     fileName: '',
   };
   private frameId: number = 0;
-  private stopped: boolean = false;
+  private task: Generator | null = null;
   private readonly computeCanvas: HTMLCanvasElement;
 
   public get context(): CanvasRenderingContext2D {
     return this.computeCanvas.getContext('2d');
-  }
-
-  public get project(): Project {
-    return <Project>this.getStage();
   }
 
   constructor(config?: SpriteConfig) {
@@ -91,8 +93,8 @@ export class Sprite extends LayoutShape {
   }
 
   private recalculate() {
-    const skin = this.animationData.skins[this.skin()];
-    const animation = this.animationData.animations[this.animation()];
+    const skin = this.animationData?.skins[this.skin()];
+    const animation = this.animationData?.animations[this.animation()];
     if (!animation || animation.frames.length === 0) return;
 
     this.frameId %= animation.frames.length;
@@ -130,24 +132,41 @@ export class Sprite extends LayoutShape {
   }
 
   public play(): Generator {
-    this.stopped = false;
-    return this.playRunner();
+    const runTask = this.playRunner();
+    if (this.task) {
+      const previousTask = this.task;
+      this.task = (function* () {
+        yield* cancel(previousTask);
+        yield* runTask;
+      })();
+      GeneratorHelper.makeThreadable(this.task, runTask);
+    } else {
+      this.task = runTask;
+    }
+
+    return this.task;
   }
 
+  public *stop() {
+    if (this.task) {
+      yield* cancel(this.task);
+      this.task = null;
+    }
+  }
+
+  @threadable()
   private *playRunner() {
-    while (!this.stopped) {
+    this.frameId = 0;
+    while (this.task !== null) {
       if (this.playing()) {
         this.frameId++;
         this.recalculate();
       }
-      yield* this.project.waitFor(1 / this.fps());
+      yield* waitFor(1 / this.fps());
     }
   }
 
-  public stop() {
-    this.stopped = true;
-  }
-
+  @threadable()
   public *waitForFrame(frame: number): Generator {
     let limit = 1000;
     while (this.frameId !== frame && limit > 0) {
@@ -161,7 +180,21 @@ export class Sprite extends LayoutShape {
   }
 }
 
-Factory.addGetterSetter(Sprite, 'animation', '', getStringValidator());
-Factory.addGetterSetter(Sprite, 'skin', '', getStringValidator());
+Factory.addGetterSetter(
+  Sprite,
+  'animation',
+  '',
+  getStringValidator(),
+  //@ts-ignore
+  Sprite.prototype.recalculate,
+);
+Factory.addGetterSetter(
+  Sprite,
+  'skin',
+  '',
+  getStringValidator(),
+  //@ts-ignore
+  Sprite.prototype.recalculate,
+);
 Factory.addGetterSetter(Sprite, 'playing', false, getBooleanValidator());
 Factory.addGetterSetter(Sprite, 'fps', 10, getNumberValidator());

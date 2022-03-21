@@ -3,20 +3,7 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
 import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
-import {
-  move,
-  showTop,
-  surfaceTransition,
-  showSurface,
-  tween,
-  waitFor,
-  waitUntil,
-  sequence,
-  threads,
-  ThreadsJoin,
-  ThreadsCancel,
-  showCircle,
-} from './animations';
+import {threads} from './animations';
 
 Konva.autoDrawEnabled = false;
 
@@ -27,6 +14,8 @@ export enum ProjectSize {
 const Sizes: Record<ProjectSize, [number, number]> = {
   [ProjectSize.FullHD]: [1920, 1080],
 };
+
+export const PROJECT = Symbol('PROJECT');
 
 export class Project extends Stage {
   public readonly background: Rect;
@@ -75,18 +64,18 @@ export class Project extends Stage {
       layer => layer.hasName('background') || layer.destroy(),
     );
     this.frame = 0;
-    this.runner = this.threads((join, cancel) => {
-      this.join = join;
-      this.cancel = cancel;
-      return this.runnerFactory(this);
-    });
+    this.runner = threads(() => this.runnerFactory(this));
   }
 
   public async next(speed: number = 1): Promise<boolean> {
     let result = this.runner.next();
-    while (typeof result.value?.then === 'function') {
-      const value = await result.value;
-      result = this.runner.next(value);
+    while (result.value) {
+      if (typeof result.value.then === 'function') {
+        const value = await result.value;
+        result = this.runner.next(value);
+      } else if (result.value === PROJECT) {
+        result = this.runner.next(this);
+      }
     }
     this.frame += speed;
 
@@ -100,17 +89,4 @@ export class Project extends Stage {
   public framesToSeconds(frames: number) {
     return frames / this.framesPerSeconds;
   }
-
-  public join: ThreadsJoin;
-  public cancel: ThreadsCancel;
-  public threads = threads;
-  public waitFor = waitFor;
-  public waitUntil = waitUntil;
-  public tween = tween;
-  public moveNode = move;
-  public showTop = showTop;
-  public showCircle = showCircle;
-  public surfaceTransition = surfaceTransition;
-  public showSurface = showSurface;
-  public sequence = sequence;
 }

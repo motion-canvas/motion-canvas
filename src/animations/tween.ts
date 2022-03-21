@@ -1,20 +1,22 @@
 import {TimeTween} from './TimeTween';
-import {Project} from '../Project';
+import {PROJECT, Project} from '../Project';
+import {decorate, threadable} from "../decorators";
 
+decorate(tween, threadable());
 export function* tween(
-  this: Project,
   duration: number,
   callback: (value: TimeTween, time: number) => void,
 ): Generator {
-  const frames = this.secondsToFrames(duration);
-  let startFrame = this.frame;
+  const project = (yield PROJECT) as Project;
+  const frames = project.secondsToFrames(duration);
+  let startFrame = project.frame;
   const timeTween = new TimeTween(0);
-  while (this.frame - startFrame < frames) {
-    const time = this.framesToSeconds(this.frame - startFrame);
-    timeTween.value = (this.frame - startFrame) / frames;
+  while (project.frame - startFrame < frames) {
+    const time = project.framesToSeconds(project.frame - startFrame);
+    timeTween.value = (project.frame - startFrame) / frames;
     callback(timeTween, time);
     yield;
   }
   timeTween.value = 1;
-  callback(timeTween, this.framesToSeconds(frames));
+  callback(timeTween, project.framesToSeconds(frames));
 }
