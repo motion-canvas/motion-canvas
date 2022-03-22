@@ -1,4 +1,5 @@
 import {Size} from './Size';
+import {IRect} from 'konva/lib/types';
 
 interface ISpacing {
   top: number;
@@ -66,10 +67,29 @@ export class Spacing implements ISpacing {
     return this;
   }
 
-  public apply(size: Size): Size {
-    return {
-      width: size.width + this.x,
-      height: size.height + this.y,
-    };
+  public expand<T extends Size | IRect>(value: T): T {
+    const result = {...value};
+
+    result.width += this.x;
+    result.height += this.y;
+    if ('x' in result) {
+      result.x -= this.left;
+      result.y -= this.top;
+    }
+
+    return result;
+  }
+
+  public shrink<T extends Size | IRect>(value: T): T {
+    const result = {...value};
+
+    result.width -= this.x;
+    result.height -= this.y;
+    if ('x' in result) {
+      result.x += this.left;
+      result.y += this.top;
+    }
+
+    return result;
   }
 }

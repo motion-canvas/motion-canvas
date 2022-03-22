@@ -1,8 +1,7 @@
 import {Group} from 'konva/lib/Group';
-import {Container, ContainerConfig} from 'konva/lib/Container';
+import {ContainerConfig} from 'konva/lib/Container';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {
-  getClientRect,
   getOriginDelta,
   getOriginOffset,
   ILayoutNode,
@@ -11,7 +10,6 @@ import {
   LayoutAttrs,
 } from '../components/ILayoutNode';
 import Konva from 'konva';
-import {IRect} from 'konva/lib/types';
 import Vector2d = Konva.Vector2d;
 
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;
@@ -104,15 +102,6 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
       custom?.origin ?? this.getOrigin(),
       newOrigin,
     );
-  }
-
-  public getClientRect(config?: {
-    skipTransform?: boolean;
-    skipShadow?: boolean;
-    skipStroke?: boolean;
-    relativeTo?: Container;
-  }): IRect {
-    return getClientRect(this, config);
   }
 
   protected fireLayoutChange() {

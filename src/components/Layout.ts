@@ -1,11 +1,12 @@
 import {Group} from 'konva/lib/Group';
-import {GetSet} from 'konva/lib/types';
-import {_registerNode} from 'konva/lib/Global';
+import {GetSet, IRect} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
 import {Shape} from 'konva/lib/Shape';
 import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
 import {LayoutShape} from './LayoutShape';
 import {Center, Origin, Size} from '../types';
+import {Container} from 'konva/lib/Container';
+import {getClientRect} from "MC/components/ILayoutNode";
 
 export interface LayoutConfig extends LayoutGroupConfig {
   direction?: Center;
@@ -20,7 +21,7 @@ export class Layout extends LayoutGroup {
   }
 
   getLayoutSize(): Size {
-    return this.getPadd().apply({
+    return this.getPadd().expand({
       width: this.contentSize?.width ?? 0,
       height: this.contentSize?.height ?? 0,
     });
@@ -70,10 +71,16 @@ export class Layout extends LayoutGroup {
 
     this.fireLayoutChange();
   }
-}
 
-Layout.prototype.className = 'Layout';
-_registerNode(Layout);
+  getClientRect(config?: {
+    skipTransform?: boolean;
+    skipShadow?: boolean;
+    skipStroke?: boolean;
+    relativeTo?: Container;
+  }): IRect {
+    return getClientRect(this, config);
+  }
+}
 
 Factory.addGetterSetter(
   Layout,

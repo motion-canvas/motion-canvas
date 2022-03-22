@@ -1,11 +1,12 @@
 import {Group} from 'konva/lib/Group';
-import {ContainerConfig} from 'konva/lib/Container';
+import {Container, ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Shape} from 'konva/lib/Shape';
 import {parseColor} from 'mix-color';
 import {LayoutGroup} from './LayoutGroup';
 import {Origin, Size} from '../types';
 import {
+  getClientRect,
   getOriginDelta,
   getOriginOffset,
   isLayoutNode,
@@ -14,7 +15,8 @@ import {
 } from './ILayoutNode';
 import {CanvasHelper} from '../helpers';
 import {Context} from 'konva/lib/Context';
-import {tween} from "../animations";
+import {tween} from '../animations';
+import {IRect} from 'konva/lib/types';
 
 export type LayoutData = LayoutAttrs & Size;
 export interface SurfaceMask {
@@ -210,13 +212,11 @@ export class Surface extends LayoutGroup {
         color: this.child.getColor(),
       };
 
-      this.child.position(
-        getOriginDelta(
-          this.getLayoutSize(),
-          Origin.Middle,
-          this.child.getOrigin(),
-        ),
-      );
+      const offset = this.child.getOriginDelta(Origin.Middle);
+      this.child.position({
+        x: -offset.x,
+        y: -offset.y,
+      });
     }
 
     this.updateBackground(this.layoutData);
@@ -271,8 +271,8 @@ export class Surface extends LayoutGroup {
     if (mask === null) return null;
     const size = this.getLayoutSize(custom);
     const position = {
-      x: size.width * mask.x / 2,
-      y: size.height * mask.y / 2,
+      x: (size.width * mask.x) / 2,
+      y: (size.height * mask.y) / 2,
     };
     const farthestEdge = {
       x: Math.abs(position.x) + size.width / 2,
@@ -286,5 +286,14 @@ export class Surface extends LayoutGroup {
       ...position,
       radius: distance * mask.radius,
     };
+  }
+
+  getClientRect(config?: {
+    skipTransform?: boolean;
+    skipShadow?: boolean;
+    skipStroke?: boolean;
+    relativeTo?: Container;
+  }): IRect {
+    return getClientRect(this, config);
   }
 }
