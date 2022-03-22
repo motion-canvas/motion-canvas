@@ -12,7 +12,7 @@ export interface LayoutConfig extends LayoutGroupConfig {
   direction?: Center;
 }
 
-export class Layout extends LayoutGroup {
+export class LinearLayout extends LayoutGroup {
   public direction: GetSet<Center, this>;
   private contentSize: Size;
 
@@ -83,10 +83,10 @@ export class Layout extends LayoutGroup {
 }
 
 Factory.addGetterSetter(
-  Layout,
+  LinearLayout,
   'direction',
   Center.Vertical,
   undefined,
   // @ts-ignore
-  Layout.prototype.recalculate,
+  LinearLayout.prototype.recalculate,
 );
