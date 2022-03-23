@@ -1,5 +1,6 @@
 import {Group} from 'konva/lib/Group';
 import {ContainerConfig} from 'konva/lib/Container';
+import {Vector2d} from 'konva/lib/types';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {
   getOriginDelta,
@@ -9,8 +10,7 @@ import {
   LAYOUT_CHANGE_EVENT,
   LayoutAttrs,
 } from '../components/ILayoutNode';
-import Konva from 'konva';
-import Vector2d = Konva.Vector2d;
+import {Node} from 'konva/lib/Node';
 
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;
 
@@ -76,6 +76,13 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     this.fireLayoutChange();
 
     return this;
+  }
+
+  public findOne<ChildNode extends Node>(
+    selector: string | Function | (new (...args: any[]) => ChildNode),
+  ): ChildNode {
+    //@ts-ignore
+    return super.findOne<ChildNode>(selector.prototype?.className ?? selector);
   }
 
   public getOrigin(): Origin {

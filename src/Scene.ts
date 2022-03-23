@@ -1,7 +1,11 @@
 import {Layer, LayerConfig} from 'konva/lib/Layer';
 import {Project} from './Project';
 import {GeneratorHelper} from './helpers';
-import {cancel} from "./animations";
+import {cancel} from './animations';
+import {Debug} from './components';
+import {Node} from 'konva/lib/Node';
+import {Group} from 'konva/lib/Group';
+import {Shape} from 'konva/lib/Shape';
 
 export interface SceneRunner {
   (layer: Scene, project: Project): Generator;
@@ -17,6 +21,7 @@ export enum SceneState {
 export class Scene extends Layer {
   private state: SceneState = SceneState.Pending;
   private task: Generator;
+  private readonly debugNode: Debug;
 
   public constructor(
     public readonly project: Project,
@@ -24,6 +29,9 @@ export class Scene extends Layer {
     config?: LayerConfig,
   ) {
     super(config);
+    this.debugNode = new Debug();
+    this.add(this.debugNode);
+    this.debugNode.hide();
   }
 
   public run(): Generator {
@@ -71,5 +79,16 @@ export class Scene extends Layer {
     this.state = SceneState.Disposed;
     yield* cancel(this.task);
     this.destroy();
+  }
+
+  public add(...children: (Shape | Group)[]): this {
+    super.add(...children);
+    this.debugNode.moveToTop();
+    return this;
+  }
+
+  public debug(node: Node) {
+    this.debugNode.target(node);
+    this.debugNode.visible(node !== null);
   }
 }

@@ -1,5 +1,5 @@
 import {Size} from './Size';
-import {IRect} from 'konva/lib/types';
+import {IRect, Vector2d} from 'konva/lib/types';
 
 interface ISpacing {
   top: number;
@@ -91,5 +91,14 @@ export class Spacing implements ISpacing {
     }
 
     return result;
+  }
+
+  public scale(scale: Vector2d): Spacing {
+    return new Spacing([
+      this.left * scale.x,
+      this.right * scale.x,
+      this.top * scale.y,
+      this.bottom * scale.y,
+    ]);
   }
 }

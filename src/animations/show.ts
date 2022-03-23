@@ -5,7 +5,7 @@ import {Origin, originPosition, Spacing} from '../types';
 import {chain} from '../flow';
 import {Vector2d} from 'konva/lib/types';
 import {tween} from './tween';
-import {decorate, threadable} from "../decorators";
+import {decorate, threadable} from '../decorators';
 
 decorate(showTop, threadable());
 export function showTop(node: Node): [Generator, Generator] {
@@ -40,17 +40,21 @@ export function showSurface(surface: Surface): Generator {
   surface.setMargin(0);
   surface.setMask(fromMask);
 
-  return tween(0.5, value => {
-    surface.setMask({
-      ...toMask,
-      width: value.easeInOutCubic(fromMask.width, toMask.width),
-      height: value.easeInOutCubic(fromMask.height, toMask.height),
-    });
-    surface.setMargin(
-      value.spacing(marginFrom, margin, value.easeInOutCubic()),
-    );
-    surface.opacity(TimeTween.clampRemap(0.3, 1, 0, 1, value.value));
-  });
+  return tween(
+    0.5,
+    value => {
+      surface.setMask({
+        ...toMask,
+        width: value.easeInOutCubic(fromMask.width, toMask.width),
+        height: value.easeInOutCubic(fromMask.height, toMask.height),
+      });
+      surface.setMargin(
+        value.spacing(marginFrom, margin, value.easeInOutCubic()),
+      );
+      surface.opacity(TimeTween.clampRemap(0.3, 1, 0, 1, value.value));
+    },
+    () => surface.setMask(null),
+  );
 }
 
 decorate(showCircle, threadable());
@@ -79,4 +83,3 @@ export function showCircle(
     () => surface.setCircleMask(null),
   );
 }
-

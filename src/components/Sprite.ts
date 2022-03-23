@@ -1,6 +1,6 @@
 import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
-import {GetSet} from 'konva/lib/types';
+import {GetSet, Vector2d} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
 import {
   getBooleanValidator,
@@ -8,10 +8,10 @@ import {
   getStringValidator,
 } from 'konva/lib/Validators';
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
-import {Size} from '../types';
 import {cancel, waitFor} from '../animations';
-import {threadable} from '../decorators';
-import {GeneratorHelper} from 'MC/helpers';
+import {KonvaNode, threadable} from '../decorators';
+import {GeneratorHelper} from '../helpers';
+import {ImageData} from 'canvas';
 
 interface FrameData {
   fileName: string;
@@ -34,8 +34,11 @@ export interface SpriteConfig extends LayoutShapeConfig {
   fps?: number;
 }
 
+export const SPRITE_CHANGE_EVENT = 'spriteChange';
+
 const COMPUTE_CANVAS_SIZE = 1024;
 
+@KonvaNode()
 export class Sprite extends LayoutShape {
   public animation: GetSet<string, this>;
   public skin: GetSet<string, this>;
@@ -52,6 +55,7 @@ export class Sprite extends LayoutShape {
   };
   private frameId: number = 0;
   private task: Generator | null = null;
+  private imageData: ImageData;
   private readonly computeCanvas: HTMLCanvasElement;
 
   public get context(): CanvasRenderingContext2D {
@@ -68,14 +72,8 @@ export class Sprite extends LayoutShape {
     this.recalculate();
   }
 
-  getLayoutSize(): Size {
-    return {
-      width: this.frame?.width ?? 0,
-      height: this.frame?.height ?? 0,
-    };
-  }
-
   _sceneFunc(context: Context) {
+    const size = this.getSize();
     context.save();
     context._context.imageSmoothingEnabled = false;
     context.drawImage(
@@ -84,10 +82,10 @@ export class Sprite extends LayoutShape {
       0,
       this.frame.width,
       this.frame.height,
-      this.frame.width / -2,
-      this.frame.height / -2,
-      this.frame.width,
-      this.frame.height,
+      size.width / -2,
+      size.height / -2,
+      size.width,
+      size.height,
     );
     context.restore();
   }
@@ -101,7 +99,7 @@ export class Sprite extends LayoutShape {
     this.frame = animation.frames[this.frameId];
     this.offset(this.getOriginOffset());
 
-    const frameData = this.context.createImageData(
+    this.imageData = this.context.createImageData(
       this.frame.width,
       this.frame.height,
     );
@@ -114,20 +112,24 @@ export class Sprite extends LayoutShape {
           const skinY = this.frame.data[id + 1];
           const skinId = ((skin.height - 1 - skinY) * skin.width + skinX) * 4;
 
-          frameData.data[id] = skin.data[skinId];
-          frameData.data[id + 1] = skin.data[skinId + 1];
-          frameData.data[id + 2] = skin.data[skinId + 2];
-          frameData.data[id + 3] =
-            this.frame.data[id + 3] * skin.data[skinId + 3];
+          this.imageData.data[id] = skin.data[skinId];
+          this.imageData.data[id + 1] = skin.data[skinId + 1];
+          this.imageData.data[id + 2] = skin.data[skinId + 2];
+          this.imageData.data[id + 3] = Math.round(
+            (this.frame.data[id + 3] / 255) *
+              (skin.data[skinId + 3] / 255) *
+              255,
+          );
         }
       }
     } else {
-      frameData.data.set(this.frame.data);
+      this.imageData.data.set(this.frame.data);
     }
 
     this.context.clearRect(0, 0, this.frame.width, this.frame.height);
-    this.context.putImageData(frameData, 0, 0);
+    this.context.putImageData(this.imageData, 0, 0);
 
+    this.fire(SPRITE_CHANGE_EVENT);
     this.fireLayoutChange();
   }
 
@@ -177,6 +179,17 @@ export class Sprite extends LayoutShape {
     if (limit === 0) {
       console.warn(`Sprite.waitForFrame cancelled`);
     }
+  }
+
+  public getColorAt(position: Vector2d): string {
+    const id = (position.y * this.imageData.width + position.x) * 4;
+    return `rgba(${this.imageData.data[id]
+      .toString()
+      .padStart(3, ' ')}, ${this.imageData.data[id + 1]
+      .toString()
+      .padStart(3, ' ')}, ${this.imageData.data[id + 2]
+      .toString()
+      .padStart(3, ' ')}, ${this.imageData.data[id + 3] / 255})`;
   }
 }
 

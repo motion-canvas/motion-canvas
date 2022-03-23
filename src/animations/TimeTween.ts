@@ -1,15 +1,16 @@
 import {IRect, Vector2d} from 'konva/lib/types';
 import mixColor from 'mix-color';
-import {PossibleSpacing, Spacing} from "../types";
+import {PossibleSpacing, Spacing} from '../types';
 
 export class TimeTween {
   public constructor(public value: number) {}
 
-  public easeInOutCirc(from = 0, to = 1) {
-    const value =
-      this.value < 0.5
-        ? (1 - Math.sqrt(1 - Math.pow(2 * this.value, 2))) / 2
-        : (Math.sqrt(1 - Math.pow(-2 * this.value + 2, 2)) + 1) / 2;
+  public easeInOutCirc(from = 0, to = 1, value?: number) {
+    value ??= this.value;
+    value =
+      value < 0.5
+        ? (1 - Math.sqrt(1 - Math.pow(2 * value, 2))) / 2
+        : (Math.sqrt(1 - Math.pow(-2 * value + 2, 2)) + 1) / 2;
     return TimeTween.map(from, to, value);
   }
 

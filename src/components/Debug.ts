@@ -1,13 +1,18 @@
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {Node} from 'konva/lib/Node';
 import {Context} from 'konva/lib/Context';
-import {isLayoutNode} from 'MC/components/ILayoutNode';
+import {isLayoutNode} from './ILayoutNode';
+import {GetSet} from 'konva/lib/types';
+import {getset} from '../decorators';
 
 export interface DebugConfig extends ShapeConfig {
   target: Node;
 }
 
 export class Debug extends Shape<DebugConfig> {
+  @getset(null)
+  public target: GetSet<Node, this>;
+
   public constructor(config?: DebugConfig) {
     super({
       strokeWidth: 2,
@@ -16,19 +21,18 @@ export class Debug extends Shape<DebugConfig> {
     });
   }
 
-  public getTarget(): Node {
-    return this.attrs.target;
-  }
-
   _sceneFunc(context: Context) {
-    const target = this.getTarget();
+    const target = this.target();
+    if (!target) return;
+
     const rect = target.getClientRect({relativeTo: this.getLayer()});
     const position = target.getAbsolutePosition(this.getLayer());
+    const scale = target.getAbsoluteScale(this.getLayer());
 
     if (isLayoutNode(target)) {
       const ctx = context._context;
-      const contentRect = target.getPadd().shrink(rect);
-      const marginRect = target.getMargin().expand(rect);
+      const contentRect = target.getPadd().scale(scale).shrink(rect);
+      const marginRect = target.getMargin().scale(scale).expand(rect);
 
       ctx.beginPath();
       ctx.rect(

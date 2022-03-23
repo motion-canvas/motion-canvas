@@ -21,7 +21,14 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     this.handleLayoutChange();
   }
 
-  public abstract getLayoutSize(custom?: LayoutShapeConfig): Size;
+  public getLayoutSize(custom?: LayoutShapeConfig): Size {
+    const padding =
+      (custom?.padd === null || custom?.padd === undefined)
+        ? this.getPadd()
+        : new Spacing(custom.padd);
+
+    return padding.expand(this.getSize());
+  }
 
   public setRadius(value: number): this {
     this.attrs.radius = value;
