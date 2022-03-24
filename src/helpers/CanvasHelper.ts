@@ -1,4 +1,5 @@
 import {Context} from 'konva/lib/Context';
+import {PossibleSpacing, Spacing} from "MC/types";
 
 export namespace CanvasHelper {
   export function roundRect<T extends CanvasRenderingContext2D | Context>(
@@ -7,10 +8,8 @@ export namespace CanvasHelper {
     y: number,
     width: number,
     height: number,
-    radius: number,
+    radius: PossibleSpacing,
   ): T {
-    if (width < 2 * radius) radius = width / 2;
-    if (height < 2 * radius) radius = height / 2;
     ctx.beginPath();
     roundRectPath(ctx, x, y, width, height, radius);
     ctx.closePath();
@@ -26,13 +25,15 @@ export namespace CanvasHelper {
     y: number,
     width: number,
     height: number,
-    radius: number,
+    radius: PossibleSpacing,
   ): T {
-    ctx.moveTo(x + radius, y);
-    ctx.arcTo(x + width, y, x + width, y + height, radius);
-    ctx.arcTo(x + width, y + height, x, y + height, radius);
-    ctx.arcTo(x, y + height, x, y, radius);
-    ctx.arcTo(x, y, x + width, y, radius);
+    //FIXME Handle too small radii
+    const spacing = new Spacing(radius);
+    ctx.moveTo(x + spacing.left, y);
+    ctx.arcTo(x + width, y, x + width, y + height, spacing.top);
+    ctx.arcTo(x + width, y + height, x, y + height, spacing.right);
+    ctx.arcTo(x, y + height, x, y, spacing.bottom);
+    ctx.arcTo(x, y, x + width, y, spacing.left);
 
     return ctx;
   }

@@ -3,12 +3,11 @@ import {GetSet, IRect} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
 import {Shape} from 'konva/lib/Shape';
 import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
-import {LayoutShape} from './LayoutShape';
-import {Center, Origin, Size} from '../types';
+import {Center, Origin, Size, Spacing} from '../types';
 import {Container} from 'konva/lib/Container';
-import {getClientRect} from "MC/components/ILayoutNode";
+import {getClientRect, getOriginDelta, isLayoutNode} from "MC/components/ILayoutNode";
 
-export interface LayoutConfig extends LayoutGroupConfig {
+export interface LinearLayoutConfig extends LayoutGroupConfig {
   direction?: Center;
 }
 
@@ -16,7 +15,7 @@ export class LinearLayout extends LayoutGroup {
   public direction: GetSet<Center, this>;
   private contentSize: Size;
 
-  constructor(config?: LayoutConfig) {
+  constructor(config?: LinearLayoutConfig) {
     super(config);
   }
 
@@ -38,14 +37,11 @@ export class LinearLayout extends LayoutGroup {
     if (!this.children) return;
 
     this.contentSize = {width: 0, height: 0};
-    const children = this.children.filter<LayoutGroup | LayoutShape>(
-      (child): child is LayoutGroup | LayoutShape =>
-        child instanceof LayoutGroup || child instanceof LayoutShape,
-    );
 
-    for (const child of children) {
-      const size = child.getLayoutSize();
-      const margin = child.getMargin();
+    for (const child of this.children) {
+      const isLayout = isLayoutNode(child);
+      const size = isLayout ? child.getLayoutSize() : child.getSize();
+      const margin = isLayout ? child.getMargin() : new Spacing();
       const scale = child.getAbsoluteScale(this);
       this.contentSize.width = Math.max(
         this.contentSize.width,
@@ -55,11 +51,12 @@ export class LinearLayout extends LayoutGroup {
     }
 
     let height = this.contentSize.height / -2;
-    for (const child of children) {
-      const size = child.getLayoutSize();
-      const margin = child.getMargin();
+    for (const child of this.children) {
+      const isLayout = isLayoutNode(child);
+      const size = isLayout ? child.getLayoutSize() : child.getSize();
+      const margin = isLayout ? child.getMargin() : new Spacing();
+      const offset = isLayout ? child.getOriginDelta(Origin.Top) : getOriginDelta(size, Origin.TopLeft, Origin.Top);
       const scale = child.getAbsoluteScale(this);
-      const offset = child.getOriginDelta(Origin.Top);
 
       child.position({
         x: -offset.x * scale.x,

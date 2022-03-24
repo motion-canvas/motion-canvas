@@ -52,7 +52,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
           ...from,
           ...value.rectArc(from, to, config.reverse),
           radius: value.easeInOutCubic(from.radius, to.radius),
-          color: value.color(from.color, to.color, value.easeInOutQuint()),
+          color: value.color(from.color, target.getChild().getColor(), value.easeInOutQuint()),
         });
         target.setPosition(value.rectArc(fromNewPos, toPos, config.reverse));
         if (!config.onToOpacityChange?.(target, value)) {
@@ -70,7 +70,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
           ...from,
           ...value.rectArc(from, to, config.reverse),
           radius: value.easeInOutCubic(from.radius, to.radius),
-          color: value.color(from.color, to.color, value.easeInOutQuint()),
+          color: value.color(from.color, target.getChild().getColor(), value.easeInOutQuint()),
         });
         fromSurface.setPosition(
           value.rectArc(fromPos, toNewPos, config.reverse),
