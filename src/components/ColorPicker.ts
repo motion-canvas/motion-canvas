@@ -2,10 +2,9 @@ import {LinearLayout, LinearLayoutConfig} from 'MC/components/LinearLayout';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Range, RangeConfig} from 'MC/components/Range';
 import {Node} from 'konva/lib/Node';
-import {GetSet} from 'konva/lib/types';
-import {getset} from 'MC/decorators';
-import mixColor, {parseColor} from "mix-color";
-import {TimeTween} from "MC/animations";
+import {AnimatedGetSet, getset} from '../decorators';
+import mixColor, {parseColor} from 'mix-color';
+import {TimeTween} from '../animations';
 
 export interface ColorPickerConfig extends LinearLayoutConfig {
   previewColor?: string;
@@ -23,9 +22,9 @@ const colorRangeConfig: RangeConfig = {
 
 export class ColorPicker extends LinearLayout {
   @getset('#000000', ColorPicker.prototype.updateColor)
-  public previewColor: GetSet<ColorPickerConfig['previewColor'], this>;
+  public previewColor: AnimatedGetSet<ColorPickerConfig['previewColor'], this>;
   @getset(0, ColorPicker.prototype.updateDissolve)
-  public dissolve: GetSet<ColorPickerConfig['dissolve'], this>;
+  public dissolve: AnimatedGetSet<ColorPickerConfig['dissolve'], this>;
 
   public readonly preview: Rect;
   public readonly r: Range;
@@ -74,6 +73,10 @@ export class ColorPicker extends LinearLayout {
     this.g.value(color.g);
     this.b.value(color.b);
     this.a.value(color.a);
+    this.r.foregroundColor(this.previewColor());
+    this.g.foregroundColor(this.previewColor());
+    this.b.foregroundColor(this.previewColor());
+    this.a.foregroundColor(this.previewColor());
     this.preview.fill(this.previewColor());
   }
 
@@ -99,5 +102,16 @@ export class ColorPicker extends LinearLayout {
 
   clone(obj?: any): this {
     return Node.prototype.clone.call(this, obj);
+  }
+
+  protected handleLayoutChange() {
+    if (this.preview) {
+      const rangeWidth = this.preview.width() - 80;
+      this.r.width(rangeWidth);
+      this.g.width(rangeWidth);
+      this.b.width(rangeWidth);
+      this.a.width(rangeWidth);
+    }
+    super.handleLayoutChange();
   }
 }

@@ -23,7 +23,7 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public getLayoutSize(custom?: LayoutShapeConfig): Size {
     const padding =
-      (custom?.padd === null || custom?.padd === undefined)
+      custom?.padd === null || custom?.padd === undefined
         ? this.getPadd()
         : new Spacing(custom.padd);
 
@@ -114,6 +114,11 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     relativeTo?: Container;
   }): IRect {
     return getClientRect(this, config);
+  }
+
+  public subscribe(event: string, handler: () => void): () => void {
+    this.on(event, handler);
+    return () => this.off(event, handler);
   }
 
   protected fireLayoutChange() {

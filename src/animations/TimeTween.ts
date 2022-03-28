@@ -30,6 +30,14 @@ export class TimeTween {
     return TimeTween.map(from, to, value ?? this.value);
   }
 
+  public sin(from = 0, to = 1, value?: number) {
+    return TimeTween.remap(-1, 1, from, to, Math.sin(value ?? this.value));
+  }
+
+  public cos(from = 0, to = 1, value?: number) {
+    return TimeTween.remap(-1, 1, from, to, Math.cos(value ?? this.value));
+  }
+
   public easeInCirc(from = 0, to = 1) {
     const value = 1 - Math.sqrt(1 - Math.pow(this.value, 2));
     return TimeTween.map(from, to, value);

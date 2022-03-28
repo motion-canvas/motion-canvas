@@ -7,6 +7,7 @@ import {
   getNumberArrayValidator,
   getNumberValidator,
 } from 'konva/lib/Validators';
+import {clamp} from 'three/src/math/MathUtils';
 
 export interface ArrowConfig extends ShapeConfig {
   radius?: number;
@@ -98,9 +99,7 @@ class CircleSegment extends Segment {
     private counter: boolean,
   ) {
     super();
-    this.delta = this.counter
-      ? this.deltaAngle
-      : this.deltaAngle + Math.PI * 2;
+    this.delta = this.counter ? this.deltaAngle : this.deltaAngle + Math.PI * 2;
     this.length = Math.abs(this.delta * radius);
   }
 
@@ -245,6 +244,14 @@ export class Arrow extends Shape<ArrowConfig> {
     }
 
     context.fillShape(this);
+  }
+
+  public getStart(): number {
+    return clamp(this.attrs.start ?? 0, 0, 1);
+  }
+
+  public getEnd(): number {
+    return clamp(this.attrs.end ?? 1, 0, 1);
   }
 
   private drawArrow(

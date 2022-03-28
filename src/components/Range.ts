@@ -1,7 +1,6 @@
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {Context} from 'konva/lib/Context';
-import {GetSet} from 'konva/lib/types';
-import {getset, KonvaNode} from 'MC/decorators';
+import {AnimatedGetSet, getset, KonvaNode} from 'MC/decorators';
 import {CanvasHelper} from 'MC/helpers';
 import {TimeTween} from 'MC/animations';
 
@@ -18,19 +17,19 @@ export interface RangeConfig extends LayoutShapeConfig {
 @KonvaNode()
 export class Range extends LayoutShape {
   @getset([0, 1])
-  public range: GetSet<RangeConfig['range'], this>;
+  public range: AnimatedGetSet<RangeConfig['range'], this>;
   @getset(0.5)
-  public value: GetSet<RangeConfig['value'], this>;
+  public value: AnimatedGetSet<RangeConfig['value'], this>;
   @getset(0)
-  public precision: GetSet<RangeConfig['precision'], this>;
+  public precision: AnimatedGetSet<RangeConfig['precision'], this>;
   @getset('#141414')
-  public backgroundColor: GetSet<RangeConfig['backgroundColor'], this>;
+  public backgroundColor: AnimatedGetSet<RangeConfig['backgroundColor'], this>;
   @getset('rgba(255, 255, 255, 0.24)')
-  public foregroundColor: GetSet<RangeConfig['foregroundColor'], this>;
+  public foregroundColor: AnimatedGetSet<RangeConfig['foregroundColor'], this>;
   @getset('rgba(255, 255, 255, 0.54')
-  public textColor: GetSet<RangeConfig['textColor'], this>;
+  public textColor: AnimatedGetSet<RangeConfig['textColor'], this>;
   @getset(null)
-  public label: GetSet<RangeConfig['label'], this>;
+  public label: AnimatedGetSet<RangeConfig['label'], this>;
 
   public constructor(config?: RangeConfig) {
     super(config);

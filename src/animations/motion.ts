@@ -46,7 +46,7 @@ export function move(
       Math.pow(positionFrom.y - positionTo.y, 2),
   );
 
-  return tween(distance / 1000 * (config.speed ?? 1), value =>
+  return tween(config.speed ?? (distance / 1000), value =>
     node.position(value.vector2d(positionFrom, positionTo, value.easeInOutQuint())),
   );
 }

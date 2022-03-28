@@ -1,9 +1,8 @@
 import {decorate, threadable} from "../decorators";
 
-function isGenerator(value: any): value is Generator {
+export function isGenerator(value: any): value is Generator {
   return Symbol.iterator in value;
 }
-
 
 decorate(chain, threadable());
 export function* chain(...args: (Generator | Function)[]) {

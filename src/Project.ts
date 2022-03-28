@@ -75,6 +75,9 @@ export class Project extends Stage {
         result = this.runner.next(value);
       } else if (result.value === PROJECT) {
         result = this.runner.next(this);
+      } else {
+        console.log('Invalid value: ', result.value);
+        result = this.runner.next();
       }
     }
     this.frame += speed;

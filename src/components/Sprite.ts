@@ -1,15 +1,9 @@
 import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {Factory} from 'konva/lib/Factory';
-import {
-  getBooleanValidator,
-  getNumberValidator,
-  getStringValidator,
-} from 'konva/lib/Validators';
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
-import {cancel, waitFor} from '../animations';
-import {KonvaNode, threadable} from '../decorators';
+import {cancel, TimeTween, waitFor} from '../animations';
+import {AnimatedGetSet, getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {ImageData} from 'canvas';
 
@@ -32,6 +26,8 @@ export interface SpriteConfig extends LayoutShapeConfig {
   skin?: string;
   playing?: boolean;
   fps?: number;
+  mask?: string;
+  maskBlend?: number;
 }
 
 export const SPRITE_CHANGE_EVENT = 'spriteChange';
@@ -40,10 +36,18 @@ const COMPUTE_CANVAS_SIZE = 1024;
 
 @KonvaNode()
 export class Sprite extends LayoutShape {
+  @getset('', Sprite.prototype.recalculate)
   public animation: GetSet<string, this>;
+  @getset('', Sprite.prototype.recalculate)
   public skin: GetSet<string, this>;
+  @getset(false)
   public playing: GetSet<boolean, this>;
-  public fps: GetSet<number, this>;
+  @getset(10)
+  public fps: AnimatedGetSet<number, this>;
+  @getset('', Sprite.prototype.recalculate)
+  public mask: GetSet<string, this>;
+  @getset('', Sprite.prototype.recalculate)
+  public maskBlend: AnimatedGetSet<number, this>;
 
   private readonly animationData: SpriteData;
   private frame: FrameData = {
@@ -93,6 +97,8 @@ export class Sprite extends LayoutShape {
   private recalculate() {
     const skin = this.animationData?.skins[this.skin()];
     const animation = this.animationData?.animations[this.animation()];
+    const mask = this.animationData?.skins[this.mask()];
+    const blend = this.maskBlend();
     if (!animation || animation.frames.length === 0) return;
 
     this.frameId %= animation.frames.length;
@@ -107,7 +113,7 @@ export class Sprite extends LayoutShape {
     if (skin) {
       for (let y = 0; y < this.frame.height; y++) {
         for (let x = 0; x < this.frame.width; x++) {
-          const id = (y * this.frame.width + x) * 4;
+          const id = this.positionToId({x, y});
           const skinX = this.frame.data[id];
           const skinY = this.frame.data[id + 1];
           const skinId = ((skin.height - 1 - skinY) * skin.width + skinX) * 4;
@@ -120,15 +126,21 @@ export class Sprite extends LayoutShape {
               (skin.data[skinId + 3] / 255) *
               255,
           );
+
+          if (mask) {
+            this.imageData.data[id + 3] *= TimeTween.map(
+              1,
+              mask.data[id] / 255,
+              blend,
+            );
+          }
         }
       }
     } else {
       this.imageData.data.set(this.frame.data);
     }
 
-    this.context.clearRect(0, 0, this.frame.width, this.frame.height);
     this.context.putImageData(this.imageData, 0, 0);
-
     this.fire(SPRITE_CHANGE_EVENT);
     this.fireLayoutChange();
   }
@@ -182,7 +194,7 @@ export class Sprite extends LayoutShape {
   }
 
   public getColorAt(position: Vector2d): string {
-    const id = (position.y * this.imageData.width + position.x) * 4;
+    const id = this.positionToId(position);
     return `rgba(${this.imageData.data[id]
       .toString()
       .padStart(3, ' ')}, ${this.imageData.data[id + 1]
@@ -191,23 +203,8 @@ export class Sprite extends LayoutShape {
       .toString()
       .padStart(3, ' ')}, ${this.imageData.data[id + 3] / 255})`;
   }
-}
 
-Factory.addGetterSetter(
-  Sprite,
-  'animation',
-  '',
-  getStringValidator(),
-  //@ts-ignore
-  Sprite.prototype.recalculate,
-);
-Factory.addGetterSetter(
-  Sprite,
-  'skin',
-  '',
-  getStringValidator(),
-  //@ts-ignore
-  Sprite.prototype.recalculate,
-);
-Factory.addGetterSetter(Sprite, 'playing', false, getBooleanValidator());
-Factory.addGetterSetter(Sprite, 'fps', 10, getNumberValidator());
+  public positionToId(position: Vector2d): number {
+    return (position.y * this.imageData.width + position.x) * 4;
+  }
+}
