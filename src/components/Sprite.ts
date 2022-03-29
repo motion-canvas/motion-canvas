@@ -7,7 +7,7 @@ import {AnimatedGetSet, getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {ImageData} from 'canvas';
 
-interface FrameData {
+export interface SpriteData {
   fileName: string;
   url: string;
   data: number[];
@@ -15,18 +15,12 @@ interface FrameData {
   height: number;
 }
 
-interface SpriteData {
-  animations: Record<string, {frames: FrameData[]}>;
-  skins: Record<string, FrameData>;
-}
-
 export interface SpriteConfig extends LayoutShapeConfig {
-  animationData: SpriteData;
-  animation: string;
-  skin?: string;
+  animation: SpriteData[];
+  skin?: SpriteData;
+  mask?: SpriteData;
   playing?: boolean;
   fps?: number;
-  mask?: string;
   maskBlend?: number;
 }
 
@@ -36,21 +30,20 @@ const COMPUTE_CANVAS_SIZE = 1024;
 
 @KonvaNode()
 export class Sprite extends LayoutShape {
-  @getset('', Sprite.prototype.recalculate)
-  public animation: GetSet<string, this>;
-  @getset('', Sprite.prototype.recalculate)
-  public skin: GetSet<string, this>;
+  @getset(null, Sprite.prototype.recalculate)
+  public animation: GetSet<SpriteConfig['animation'], this>;
+  @getset(null, Sprite.prototype.recalculate)
+  public skin: GetSet<SpriteConfig['skin'], this>;
+  @getset(null, Sprite.prototype.recalculate)
+  public mask: GetSet<SpriteConfig['mask'], this>;
   @getset(false)
-  public playing: GetSet<boolean, this>;
+  public playing: GetSet<SpriteConfig['playing'], this>;
   @getset(10)
-  public fps: AnimatedGetSet<number, this>;
-  @getset('', Sprite.prototype.recalculate)
-  public mask: GetSet<string, this>;
-  @getset('', Sprite.prototype.recalculate)
-  public maskBlend: AnimatedGetSet<number, this>;
+  public fps: AnimatedGetSet<SpriteConfig['fps'], this>;
+  @getset(0, Sprite.prototype.recalculate)
+  public maskBlend: AnimatedGetSet<SpriteConfig['maskBlend'], this>;
 
-  private readonly animationData: SpriteData;
-  private frame: FrameData = {
+  private frame: SpriteData = {
     height: 0,
     width: 0,
     url: '',
@@ -62,16 +55,14 @@ export class Sprite extends LayoutShape {
   private imageData: ImageData;
   private readonly computeCanvas: HTMLCanvasElement;
 
-  public get context(): CanvasRenderingContext2D {
-    return this.computeCanvas.getContext('2d');
-  }
+  private readonly context: CanvasRenderingContext2D;
 
   constructor(config?: SpriteConfig) {
     super(config);
-    this.animationData = config.animationData;
     this.computeCanvas = Util.createCanvasElement();
     this.computeCanvas.width = COMPUTE_CANVAS_SIZE;
     this.computeCanvas.height = COMPUTE_CANVAS_SIZE;
+    this.context = this.computeCanvas.getContext('2d');
 
     this.recalculate();
   }
@@ -95,14 +86,14 @@ export class Sprite extends LayoutShape {
   }
 
   private recalculate() {
-    const skin = this.animationData?.skins[this.skin()];
-    const animation = this.animationData?.animations[this.animation()];
-    const mask = this.animationData?.skins[this.mask()];
+    const skin = this.skin();
+    const animation = this.animation();
+    const mask = this.mask();
     const blend = this.maskBlend();
-    if (!animation || animation.frames.length === 0) return;
+    if (!this.context || !animation || animation.length === 0) return;
 
-    this.frameId %= animation.frames.length;
-    this.frame = animation.frames[this.frameId];
+    this.frameId %= animation.length;
+    this.frame = animation[this.frameId];
     this.offset(this.getOriginOffset());
 
     this.imageData = this.context.createImageData(

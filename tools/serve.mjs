@@ -24,21 +24,37 @@ const compiler = webpack({
         }
       },
       {
-        test: /\.(png|jpg|gif)$/i,
+        test: /\.glsl$/i,
+        type: 'asset/source',
+      },
+      {
+        test: /\.label$/i,
         use: [
           {
-            loader: 'url-loader',
-            options: {
-              limit: 8192,
-            },
+            loader: 'label-loader',
           },
         ],
       },
       {
-        test: /\.glsl$/i,
-        type: 'asset/source',
+        test: /\.anim$/i,
+        use: [
+          {
+            loader: 'animation-loader',
+          },
+        ],
+      },
+      {
+        test: /\.png$/i,
+        use: [
+          {
+            loader: 'sprite-loader',
+          },
+        ],
       },
     ],
+  },
+  resolveLoader: {
+    modules: ['node_modules', path.resolve(__dirname, './loaders')]
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
@@ -64,7 +80,13 @@ const server = new WebpackDevServer(
     static: path.resolve(__dirname, '../public'),
     compress: true,
     port: 9000,
-    open: true,
+    setupMiddlewares: (middlewares, devServer) => {
+      devServer.app.get('/test', (_, response) => {
+        response.send('test?');
+      });
+
+      return middlewares;
+    }
   },
   compiler,
 );

@@ -8,9 +8,7 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "test:serve": "node ./tools/serve.mjs ./test/player.ts",
-    "test:render": "node ./tools/serve.mjs ./test/render.ts",
-    "test:image": "node ./tools/image.mjs ./test/img ./test/animations.json"
+    "test:serve": "node ./tools/serve.mjs ./test/player.ts"
   },
   "dependencies": {
     "@types/wicg-file-system-access": "^2020.9.5",
