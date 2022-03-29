@@ -5,6 +5,14 @@ export interface ThreadsFactory {
   (): Generator;
 }
 
+export interface ThreadsCallback {
+  (
+    runners: Generator[],
+    children: Map<Generator, Generator[]>,
+    cancelled: Set<Generator>,
+  ): void;
+}
+
 decorate(join, threadable());
 export function* join(all: boolean, ...tasks: Generator[]): Generator {
   yield* (yield {join: tasks, all}) as Generator;
@@ -16,7 +24,7 @@ export function* cancel(...tasks: Generator[]): Generator {
 }
 
 decorate(threads, threadable());
-export function* threads(factory: ThreadsFactory): Generator {
+export function* threads(factory: ThreadsFactory, callback?: ThreadsCallback): Generator {
   let runners: Generator[] = [];
   let cancelled = new Set<Generator>();
   let values = new Map<Generator, any>();
@@ -94,7 +102,10 @@ export function* threads(factory: ThreadsFactory): Generator {
           console.warn('Non-threadable task: ', value);
         }
 
-        GeneratorHelper.makeThreadable(value, `non-threadable ${childTasks.length}`);
+        GeneratorHelper.makeThreadable(
+          value,
+          `non-threadable ${childTasks.length}`,
+        );
         runners.push(runner);
         runners.push(value);
       } else if (value) {
@@ -105,6 +116,7 @@ export function* threads(factory: ThreadsFactory): Generator {
       }
     }
     runners = newRunners;
+    callback?.(runners, children, cancelled);
     if (runners.length > 0) yield;
   }
 }

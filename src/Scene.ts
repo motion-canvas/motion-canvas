@@ -35,7 +35,7 @@ export class Scene extends Layer {
   }
 
   public run(): Generator {
-    this.project.add(this);
+    this.project.addScene(this);
     const scene = this;
     this.task = (function* () {
       yield* scene.runner(scene, scene.project);
@@ -78,7 +78,7 @@ export class Scene extends Layer {
   public *dispose() {
     this.state = SceneState.Disposed;
     yield* cancel(this.task);
-    this.destroy();
+    this.project.removeScene(this);
   }
 
   public add(...children: (Shape | Group)[]): this {

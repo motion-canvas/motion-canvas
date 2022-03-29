@@ -35,10 +35,36 @@
         color: white;
         background: rgba(0, 0, 0, 0.3);
       }
+
+      #ui {
+        min-width: 360px;
+        padding: 8px;
+        padding-right: 24px;
+        border-radius: 8px;
+        display: grid;
+        grid-auto-flow: row;
+        grid-gap: 8px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: white;
+        background: rgba(0, 0, 0, 0.3);
+      }
+
+      #ui ul {
+        padding-left: 16px;
+      }
+
+      .cancelled {
+        color: red;
+      }
     </style>
   </head>
   <body>
     <div id="container"></div>
+    <details id="ui">
+      <summary>THREADS</summary>
+    </details>
     <form id="controls">
       <div>
         <input type="checkbox" id="controls-play" name="play" checked />

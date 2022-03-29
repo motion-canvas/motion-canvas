@@ -3,7 +3,8 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
 import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
-import {threads} from './animations';
+import {threads, ThreadsCallback} from './animations';
+import {Scene} from './Scene';
 
 Konva.autoDrawEnabled = false;
 
@@ -20,6 +21,7 @@ export const PROJECT = Symbol('PROJECT');
 export class Project extends Stage {
   public readonly background: Rect;
   public readonly center: Vector2d;
+  public threadsCallback: ThreadsCallback;
   public framesPerSeconds = 60;
   public frame: number = 0;
   public get time(): number {
@@ -27,6 +29,7 @@ export class Project extends Stage {
   }
 
   private runner: Generator;
+  private readonly scenes = new Set<Scene>();
 
   public constructor(
     private runnerFactory: (project: Project) => Generator,
@@ -59,12 +62,29 @@ export class Project extends Stage {
     this.add(backgroundLayer);
   }
 
+  public addScene(scene: Scene) {
+    if (!this.scenes.has(scene)) {
+      this.scenes.add(scene);
+      this.add(scene);
+    }
+  }
+
+  public removeScene(scene: Scene) {
+    if (this.scenes.has(scene)) {
+      this.scenes.delete(scene);
+      scene.destroy();
+    }
+  }
+
   public start() {
-    this.getLayers().forEach(
-      layer => layer.hasName('background') || layer.destroy(),
-    );
+    this.scenes.forEach(scene => scene.destroy());
+    this.scenes.clear();
     this.frame = 0;
-    this.runner = threads(() => this.runnerFactory(this));
+    this.runner = threads(
+      () => this.runnerFactory(this),
+      (runners, children, cancelled) =>
+        this.threadsCallback?.(runners, children, cancelled),
+    );
   }
 
   public async next(speed: number = 1): Promise<boolean> {
