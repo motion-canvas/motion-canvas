@@ -9,10 +9,11 @@
     "prepare": "npm run build",
     "build": "tsc",
     "test:serve": "node ./tools/serve.mjs ./test/player.ts",
-    "test:render": "node ./tools/render.mjs ./test/render.ts",
+    "test:render": "node ./tools/serve.mjs ./test/render.ts",
     "test:image": "node ./tools/image.mjs ./test/img ./test/animations.json"
   },
   "dependencies": {
+    "@types/wicg-file-system-access": "^2020.9.5",
     "canvas": "^2.9.0",
     "image-size": "^1.0.1",
     "konva": "^8.3.2",
