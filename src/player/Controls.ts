@@ -8,21 +8,14 @@ export class Controls {
   private loadingIndicator: HTMLElement;
   private stepRequested: boolean = false;
   private resetRequested: boolean = false;
+  private rendering: boolean = false;
   private lastUpdate: number = 0;
   private updateTimes: number[] = [];
   private overallTime: number = 0;
+  private directory: FileSystemDirectoryHandle;
 
   public set loading(value: boolean) {
     this.loadingIndicator.hidden = !value;
-  }
-
-  public get isPlaying(): boolean {
-    if (this.stepRequested) {
-      this.stepRequested = false;
-      return true;
-    }
-
-    return this.play.checked;
   }
 
   public get isLooping(): boolean {
@@ -33,17 +26,12 @@ export class Controls {
     return parseInt(this.from.value);
   }
 
-  public get shouldReset(): boolean {
-    if (this.resetRequested) {
-      this.resetRequested = false;
-      return true;
-    }
-
-    return false;
-  }
-
   public get playbackSpeed(): number {
     return parseFloat(this.speed.value);
+  }
+
+  public get isRendering(): boolean {
+    return this.rendering;
   }
 
   public constructor(private form: HTMLFormElement) {
@@ -57,20 +45,41 @@ export class Controls {
 
     form.next.addEventListener('click', this.handleNext);
     form.refresh.addEventListener('click', this.handleReset);
+    form.render.addEventListener('click', () => this.toggleRendering());
+    this.current.addEventListener(
+      'click',
+      () => (this.from.value = this.current.value),
+    );
 
     this.play.checked = localStorage.getItem('play') === 'true';
-    this.play.addEventListener('change', () => this.toggle(this.play.checked));
+    this.play.addEventListener('change', () =>
+      this.togglePlayback(this.play.checked),
+    );
 
     document.addEventListener('keydown', event => {
       switch (event.key) {
         case ' ':
-          this.toggle();
+          event.preventDefault();
+          this.togglePlayback();
           break;
         case 'ArrowRight':
+          event.preventDefault();
           this.handleNext();
           break;
       }
     });
+  }
+
+  public consumeState() {
+    const state = {
+      isPlaying: this.play.checked || this.stepRequested,
+      shouldReset: this.resetRequested,
+    };
+
+    this.stepRequested = false;
+    this.resetRequested = false;
+
+    return state;
   }
 
   public onReset() {
@@ -94,16 +103,40 @@ export class Controls {
     this.lastUpdate = performance.now();
   }
 
+  public async onRender(frame: number, content: Blob) {
+    const name = frame.toString().padStart(6, '0');
+    const size = content.size / 1024;
+
+    try {
+      this.directory ??= await window.showDirectoryPicker();
+      const file = await this.directory.getFileHandle(`frame-${name}.png`, {
+        create: true,
+      });
+      const stream = await file.createWritable();
+      await stream.write(content);
+      await stream.close();
+      console.log(`Frame: ${name}, Size: ${Math.round(size)} kB`);
+      this.onFrame(frame);
+    } catch (e) {
+      console.error(e);
+      await this.toggleRendering(false);
+    }
+  }
+
   private handleReset = () => {
     this.resetRequested = true;
-  }
+  };
 
   private handleNext = () => {
     this.stepRequested = true;
-  }
+  };
 
-  private toggle = (value?: boolean) => {
+  private togglePlayback = (value?: boolean) => {
     this.play.checked = value ?? !this.play.checked;
     localStorage.setItem('play', this.play.checked ? 'true' : 'false');
-  }
+  };
+
+  public toggleRendering = async (value?: boolean) => {
+    this.rendering = value ?? !this.rendering;
+  };
 }

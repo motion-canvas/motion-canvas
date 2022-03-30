@@ -5,11 +5,9 @@ import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {cancel, TimeTween, waitFor} from '../animations';
 import {AnimatedGetSet, getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
-import {ImageData} from 'canvas';
 
 export interface SpriteData {
   fileName: string;
-  url: string;
   data: number[];
   width: number;
   height: number;
@@ -46,7 +44,6 @@ export class Sprite extends LayoutShape {
   private frame: SpriteData = {
     height: 0,
     width: 0,
-    url: '',
     data: [],
     fileName: '',
   };

@@ -1,6 +1,6 @@
 import {Project} from '../Project';
 import {Controls} from './Controls';
-import {ThreadsMonitor} from "./ThreadsMonitor";
+import {ThreadsMonitor} from './ThreadsMonitor';
 
 const MINIMUM_ANIMATION_DURATION = 1000;
 const MAX_AUDIO_DESYNC = 1 / 50;
@@ -34,26 +34,45 @@ export class Player {
   }
 
   private async reset() {
-    this.startTime = performance.now();
     this.project.start();
-    await this.project.next();
+    this.finished = await this.project.next();
+    while (this.project.frame < this.controls.startFrom && !this.finished) {
+      this.finished = await this.project.next();
+    }
     this.project.draw();
     this.controls.onReset();
     this.controls.onFrame(this.project.frame);
-    this.finished = false;
+    this.startTime = performance.now();
     if (this.audio) {
       this.audio.currentTime = 0;
     }
   }
 
   private async run() {
-    if (this.controls.shouldReset) {
+    const {isPlaying, shouldReset} = this.controls.consumeState();
+
+    if (shouldReset) {
       await this.reset();
+    }
+
+    if (this.controls.isRendering) {
+      if (!this.audio?.paused) {
+        this.audio?.pause();
+      }
+      this.finished = await this.project.next();
+      this.project.draw();
+      await this.controls.onRender(this.project.frame, await this.getContent());
+      if (this.finished) {
+        await this.controls.toggleRendering(false);
+      }
+
+      this.request();
+      return;
     }
 
     if (this.controls.playbackSpeed !== 1 && this.audio) {
       this.audio.currentTime = this.project.time;
-    } else if (this.controls.isPlaying) {
+    } else if (isPlaying) {
       if (this.audio?.paused) {
         await this.audio?.play();
       }
@@ -64,9 +83,10 @@ export class Player {
     }
 
     if (
-      !this.controls.isPlaying ||
+      !isPlaying ||
       (this.controls.playbackSpeed === 1 &&
-        this.audio?.currentTime < this.project.time)
+        this.audio &&
+        this.audio.currentTime < this.project.time)
     ) {
       this.request();
       return;
@@ -77,7 +97,10 @@ export class Player {
         // Prevent animation from restarting too quickly.
         const animationDuration = performance.now() - this.startTime;
         if (animationDuration < MINIMUM_ANIMATION_DURATION) {
-          setTimeout(this.run, MINIMUM_ANIMATION_DURATION - animationDuration);
+          setTimeout(
+            () => this.run(),
+            MINIMUM_ANIMATION_DURATION - animationDuration,
+          );
           return;
         }
         await this.reset();
@@ -119,5 +142,11 @@ export class Player {
         console.log(e);
       }
     });
+  }
+
+  private async getContent(): Promise<Blob> {
+    return new Promise<Blob>(resolve =>
+      this.project.toCanvas().toBlob(resolve, 'image/png'),
+    );
   }
 }

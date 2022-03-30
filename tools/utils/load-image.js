@@ -23,7 +23,6 @@ module.exports = async function (fileName) {
     return {
         fileName,
         data: Array.from(imageData.data),
-        url: `data:image/png;base64,${data}`,
         width: dimensions.width,
         height: dimensions.height,
     };
