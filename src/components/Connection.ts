@@ -7,7 +7,7 @@ import {Direction} from '../types';
 import {Context} from 'konva/lib/Context';
 import {TimeTween} from '../animations';
 import {Project} from '../Project';
-import {LAYOUT_CHANGE_EVENT} from "MC/components/ILayoutNode";
+import {LAYOUT_CHANGE_EVENT} from "./ILayoutNode";
 
 export interface ConnectionPoint {
   node: Node;

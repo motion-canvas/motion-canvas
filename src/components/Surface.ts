@@ -1,24 +1,21 @@
-import {Group} from 'konva/lib/Group';
-import {Container, ContainerConfig} from 'konva/lib/Container';
+import {Container} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
-import {Shape} from 'konva/lib/Shape';
 import {parseColor} from 'mix-color';
-import {LayoutGroup} from './LayoutGroup';
+import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
 import {Origin, Size} from '../types';
 import {
   getClientRect,
   getOriginDelta,
   getOriginOffset,
-  isLayoutNode,
-  LayoutAttrs,
   LayoutNode,
 } from './ILayoutNode';
 import {CanvasHelper} from '../helpers';
 import {Context} from 'konva/lib/Context';
 import {tween} from '../animations';
-import {IRect} from 'konva/lib/types';
+import {GetSet, IRect} from 'konva/lib/types';
+import {getset, threadable} from '../decorators';
+import {Node} from 'konva/lib/Node';
 
-export type LayoutData = LayoutAttrs & Size;
 export interface SurfaceMask {
   width: number;
   height: number;
@@ -32,38 +29,59 @@ export interface CircleMask {
   y: number;
 }
 
-export interface SurfaceConfig extends ContainerConfig {
+export interface SurfaceConfig extends LayoutGroupConfig {
+  radius?: number;
   origin?: Origin;
   circleMask?: CircleMask;
+  background?: string;
+  child?: LayoutNode;
 }
 
 export class Surface extends LayoutGroup {
-  private box: Rect;
-  private ripple: Rect;
-  private child: LayoutNode;
+  @getset(0, Surface.prototype.handleLayoutChange)
+  public radius: GetSet<SurfaceConfig['radius'], this>;
+  @getset('#FF00FF', Surface.prototype.handleLayoutChange)
+  public background: GetSet<SurfaceConfig['background'], this>;
+  @getset(null)
+  public child: GetSet<SurfaceConfig['child'], this>;
+
+  private readonly box: Rect;
+  private readonly ripple: Rect;
   private surfaceMask: SurfaceMask | null = null;
   private circleMask: CircleMask | null = null;
-  private layoutData: LayoutData;
+  private layoutData: Size;
 
   public constructor(config?: SurfaceConfig) {
     super(config);
-    this.add(
-      new Rect({
-        x: 0,
-        y: 0,
-        fill: '#242424',
-        name: 'ripple',
-        visible: false,
-      }),
-    );
-    this.add(
-      new Rect({
-        x: 0,
-        y: 0,
-        fill: '#242424',
-        name: 'box',
-      }),
-    );
+    this.ripple = new Rect({
+      x: 0,
+      y: 0,
+      fill: '#242424',
+      name: 'ripple',
+      visible: false,
+    });
+    this.box = new Rect({
+      x: 0,
+      y: 0,
+      fill: '#242424',
+      name: 'box',
+    });
+
+    this.add(this.ripple, this.box);
+    this.handleLayoutChange();
+  }
+
+  public setChild(value: LayoutNode): this {
+    this.attrs.child?.remove();
+    this.attrs.child = value;
+    this.add(value);
+    this.handleLayoutChange();
+
+    return this;
+  }
+
+  public getChild<T extends LayoutNode>(): T {
+    return <T>this.attrs.child;
   }
 
   public setCircleMask(value: CircleMask | null): this {
@@ -75,6 +93,21 @@ export class Surface extends LayoutGroup {
     return this.circleMask ?? null;
   }
 
+  public clone(obj?: any): this {
+    const clone: this = Node.prototype.clone.call(this, obj);
+    const child = this.child();
+    if (child) {
+      clone.setChild(child.clone());
+    }
+    this.getChildren().forEach(node => {
+      if (node !== child && node !== this.box && node !== this.ripple) {
+        clone.add(node.clone());
+      }
+    });
+
+    return clone;
+  }
+
   getLayoutSize(custom?: SurfaceConfig): Size {
     return {
       width: this.surfaceMask?.width ?? this.layoutData?.width ?? 0,
@@ -82,49 +115,23 @@ export class Surface extends LayoutGroup {
     };
   }
 
-  add(...children: (Shape | Group)[]): this {
-    super.add(...children);
-    const child = children.find<LayoutNode>(isLayoutNode);
-    const ripple = children.find<Rect>((child): child is Rect =>
-      child.hasName('ripple'),
-    );
-    const box = children.find<Rect>((child): child is Rect =>
-      child.hasName('box'),
-    );
-
-    if (box) {
-      this.box?.destroy();
-      this.box = box;
-    }
-    if (ripple) {
-      this.ripple?.destroy();
-      this.ripple = ripple;
-    }
-
-    if (child) {
-      this.child = child;
-      this.handleLayoutChange();
-    }
-
-    return this;
-  }
-
+  @threadable()
   public *doRipple() {
     if (this.surfaceMask) return;
-    const opaque = parseColor(this.layoutData.color);
+    const opaque = parseColor(this.background());
     this.ripple.show();
     this.ripple
       .offsetX(this.layoutData.width / 2)
       .offsetY(this.layoutData.height / 2)
       .width(this.layoutData.width)
       .height(this.layoutData.height)
-      .cornerRadius(this.layoutData.radius)
+      .cornerRadius(this.radius())
       .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
 
     yield* tween(1, value => {
       const width = this.layoutData.width + value.easeOutExpo(0, 100);
       const height = this.layoutData.height + value.easeOutExpo(0, 100);
-      const radius = this.layoutData.radius + value.easeOutExpo(0, 50);
+      const radius = this.radius() + value.easeOutExpo(0, 50);
 
       this.ripple
         .offsetX(width / 2)
@@ -143,10 +150,6 @@ export class Surface extends LayoutGroup {
     this.ripple.hide();
   }
 
-  public getChild<T extends LayoutNode>(): T {
-    return <T>this.child;
-  }
-
   public setMask(data: SurfaceMask) {
     if (data === null) {
       this.surfaceMask = null;
@@ -161,9 +164,10 @@ export class Surface extends LayoutGroup {
         .height(100000);
     }
 
+    const child = this.child();
     const newOffset = getOriginOffset(data, this.getOrigin());
-    const contentSize = this.child.getLayoutSize();
-    const contentMargin = this.child.getMargin();
+    const contentSize = child.getLayoutSize();
+    const contentMargin = child.getMargin();
     const scale = Math.min(
       1,
       data.width / (contentSize.width + contentMargin.x),
@@ -171,69 +175,63 @@ export class Surface extends LayoutGroup {
 
     this.surfaceMask = data;
     this.offset(newOffset);
-    this.child.scaleX(scale);
-    this.child.scaleY(scale);
-    this.child.position(
-      getOriginDelta(data, Origin.Middle, this.child.getOrigin()),
-    );
+    child.scaleX(scale);
+    child.scaleY(scale);
+    child.position(getOriginDelta(data, Origin.Middle, child.getOrigin()));
     this.box.fill(data.color);
     this.fireLayoutChange();
   }
 
   public getMask(): SurfaceMask {
-    return this.layoutData;
+    return {
+      ...this.layoutData,
+      radius: this.radius(),
+      color: this.background(),
+    };
   }
 
   protected handleLayoutChange() {
     if (this.surfaceMask) return;
 
     this.layoutData ??= {
-      origin: Origin.Middle,
-      color: '#F0F',
-      height: 0,
       width: 0,
-      padd: 0,
-      margin: 0,
-      radius: 0,
+      height: 0,
     };
 
-    this.layoutData.origin = this.getOrigin();
-    if (this.child) {
-      const size = this.child.getLayoutSize();
-      const margin = this.child.getMargin();
-      const scale = this.child.getAbsoluteScale(this);
+    const child = this.child();
+    if (child) {
+      const size = child.getLayoutSize();
+      const margin = child.getMargin();
+      const scale = child.getAbsoluteScale(this);
       const padding = this.getPadd();
 
       this.layoutData = {
-        ...this.layoutData,
         width: (size.width + margin.x + padding.x) * scale.x,
         height: (size.height + margin.y + padding.y) * scale.y,
-        radius: this.child.getRadius(),
-        color: this.child.getColor(),
       };
 
-      const offset = this.child.getOriginDelta(Origin.Middle);
-      this.child.position({
+      const offset = child.getOriginDelta(Origin.Middle);
+      child.position({
         x: -offset.x,
         y: -offset.y,
       });
     }
 
-    this.updateBackground(this.layoutData);
+    this.updateBackground();
     this.setOrigin(this.getOrigin());
     this.fireLayoutChange();
   }
 
-  private updateBackground(data: LayoutData) {
-    if (this.box) {
-      this.box
-        .offsetX(data.width / 2)
-        .offsetY(data.height / 2)
-        .width(data.width)
-        .height(data.height)
-        .cornerRadius(data.radius)
-        .fill(data.color);
-    }
+  private updateBackground() {
+    if (!this.box) return;
+    const size = this.getLayoutSize();
+    this.box
+      .offsetX(size.width / 2)
+      .offsetY(size.height / 2)
+      .width(size.width)
+      .height(size.height)
+      .cornerRadius(this.radius())
+      .fill(this.background());
   }
 
   private drawMask(ctx: Context) {

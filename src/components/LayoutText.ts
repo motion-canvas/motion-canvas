@@ -22,8 +22,6 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public constructor(config?: LayoutTextConfig) {
     super({
-      color: '#c0b3a3',
-      radius: 40,
       padd: new Spacing(30),
       align: 'center',
       verticalAlign: 'middle',
@@ -51,16 +49,6 @@ export class LayoutText extends Text implements ILayoutNode {
     };
   }
 
-  public setRadius(value: number): this {
-    this.attrs.radius = value;
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getRadius(): number {
-    return this.attrs.radius ?? 0;
-  }
-
   public setMargin(value: PossibleSpacing): this {
     this.attrs.margin = new Spacing(value);
     this.fireLayoutChange();
@@ -79,16 +67,6 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public getPadd(): Spacing {
     return this.attrs.padd ?? new Spacing();
-  }
-
-  public setColor(value: string): this {
-    this.attrs.color = value;
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getColor(): string {
-    return this.attrs.color ?? '#000';
   }
 
   public setMinWidth(value: number): this {

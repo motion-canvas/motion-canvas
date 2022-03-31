@@ -73,10 +73,10 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
         target.setMask({
           ...from,
           ...value.rectArc(from, to, config.reverse),
-          radius: value.easeInOutCubic(from.radius, to.radius),
+          radius: value.easeInOutCubic(from.radius, target.radius()),
           color: value.color(
             from.color,
-            target.getChild().getColor(),
+            target.background(),
             value.easeInOutQuint(),
           ),
         });
@@ -100,10 +100,10 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
         fromSurface.setMask({
           ...from,
           ...value.rectArc(from, to, config.reverse),
-          radius: value.easeInOutCubic(from.radius, to.radius),
+          radius: value.easeInOutCubic(from.radius, target.radius()),
           color: value.color(
             from.color,
-            target.getChild().getColor(),
+            target.background(),
             value.easeInOutQuint(),
           ),
         });

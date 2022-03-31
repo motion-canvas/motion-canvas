@@ -6,8 +6,8 @@ import {
   originPosition,
 } from '../types';
 import {Node} from 'konva/lib/Node';
-import {LayoutGroup} from 'MC/components/LayoutGroup';
-import {LayoutShape} from 'MC/components/LayoutShape';
+import {LayoutGroup} from './LayoutGroup';
+import {LayoutShape} from './LayoutShape';
 import {IRect, Vector2d} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
 import {Group} from 'konva/lib/Group';
@@ -15,18 +15,14 @@ import {Group} from 'konva/lib/Group';
 export const LAYOUT_CHANGE_EVENT = 'layoutChange';
 
 export interface LayoutAttrs {
-  radius: number;
   margin: PossibleSpacing;
   padd: PossibleSpacing;
-  color: string;
   origin: Origin;
 }
 
 export interface ILayoutNode {
-  getRadius(): number;
   getMargin(): Spacing;
   getPadd(): Spacing;
-  getColor(): string;
   getOrigin(): Origin;
   getOriginOffset(custom?: Partial<LayoutAttrs>): Vector2d;
   getOriginDelta(newOrigin: Origin, custom?: Partial<LayoutAttrs>): Vector2d;

@@ -6,7 +6,6 @@
     "noImplicitAny": true,
     "module": "esnext",
     "target": "es6",
-    "declaration": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
@@ -16,7 +15,6 @@
     "paths": {
       "MC/*": [
         "../src/*",
-        "../dist/*"
       ]
     }
   }

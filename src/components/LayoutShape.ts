@@ -30,16 +30,6 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
     return padding.expand(this.getSize());
   }
 
-  public setRadius(value: number): this {
-    this.attrs.radius = value;
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getRadius(): number {
-    return this.attrs.radius ?? 0;
-  }
-
   public setMargin(value: PossibleSpacing): this {
     this.attrs.margin = new Spacing(value);
     this.fireLayoutChange();
@@ -58,16 +48,6 @@ export abstract class LayoutShape extends Shape implements ILayoutNode {
 
   public getPadd(): Spacing {
     return this.attrs.padd ?? new Spacing();
-  }
-
-  public setColor(value: string): this {
-    this.attrs.color = value;
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getColor(): string {
-    return this.attrs.color ?? '#000';
   }
 
   public setOrigin(value: Origin): this {

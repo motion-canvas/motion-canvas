@@ -1,18 +1,21 @@
 import {Group} from 'konva/lib/Group';
 import {GetSet, IRect} from 'konva/lib/types';
-import {Factory} from 'konva/lib/Factory';
 import {Shape} from 'konva/lib/Shape';
 import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
 import {Center, Origin, Size, Spacing} from '../types';
 import {Container} from 'konva/lib/Container';
-import {getClientRect, getOriginDelta, isLayoutNode} from "MC/components/ILayoutNode";
+import {getClientRect, getOriginDelta, isLayoutNode} from "./ILayoutNode";
+import {getset, KonvaNode} from "../decorators";
 
 export interface LinearLayoutConfig extends LayoutGroupConfig {
   direction?: Center;
 }
 
+@KonvaNode()
 export class LinearLayout extends LayoutGroup {
+  @getset(Center.Vertical, LinearLayout.prototype.handleLayoutChange)
   public direction: GetSet<Center, this>;
+
   private contentSize: Size;
 
   constructor(config?: LinearLayoutConfig) {
@@ -78,12 +81,3 @@ export class LinearLayout extends LayoutGroup {
     return getClientRect(this, config);
   }
 }
-
-Factory.addGetterSetter(
-  LinearLayout,
-  'direction',
-  Center.Vertical,
-  undefined,
-  // @ts-ignore
-  LinearLayout.prototype.recalculate,
-);

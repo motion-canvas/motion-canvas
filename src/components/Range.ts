@@ -1,33 +1,29 @@
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {Context} from 'konva/lib/Context';
-import {AnimatedGetSet, getset, KonvaNode} from 'MC/decorators';
-import {CanvasHelper} from 'MC/helpers';
-import {TimeTween} from 'MC/animations';
+import {AnimatedGetSet, getset, KonvaNode} from '../decorators';
+import {CanvasHelper} from '../helpers';
+import {TimeTween} from '../animations';
+import {GetSet} from "konva/lib/types";
+import {getFontColor, getStyle, Style} from "../styles";
 
 export interface RangeConfig extends LayoutShapeConfig {
   range?: [number, number];
   value?: number;
   precision?: number;
-  backgroundColor?: string;
-  foregroundColor?: string;
-  textColor?: string;
   label?: string;
+  style?: Style;
 }
 
 @KonvaNode()
 export class Range extends LayoutShape {
+  @getset(null)
+  public style: GetSet<RangeConfig['style'], this>;
   @getset([0, 1])
   public range: AnimatedGetSet<RangeConfig['range'], this>;
   @getset(0.5)
   public value: AnimatedGetSet<RangeConfig['value'], this>;
   @getset(0)
   public precision: AnimatedGetSet<RangeConfig['precision'], this>;
-  @getset('#141414')
-  public backgroundColor: AnimatedGetSet<RangeConfig['backgroundColor'], this>;
-  @getset('rgba(255, 255, 255, 0.24)')
-  public foregroundColor: AnimatedGetSet<RangeConfig['foregroundColor'], this>;
-  @getset('rgba(255, 255, 255, 0.54')
-  public textColor: AnimatedGetSet<RangeConfig['textColor'], this>;
   @getset(null)
   public label: AnimatedGetSet<RangeConfig['label'], this>;
 
@@ -36,6 +32,8 @@ export class Range extends LayoutShape {
   }
 
   public _sceneFunc(context: Context) {
+    const style = getStyle(this);
+
     const ctx = context._context;
     const size = this.getSize();
     const value = this.value();
@@ -43,6 +41,10 @@ export class Range extends LayoutShape {
     const precision = this.precision();
     const label = this.label();
     const text = value.toLocaleString('en-EN', {
+      minimumFractionDigits: precision,
+      maximumFractionDigits: precision,
+    });
+    const minText = range[0].toLocaleString('en-EN', {
       minimumFractionDigits: precision,
       maximumFractionDigits: precision,
     });
@@ -57,7 +59,7 @@ export class Range extends LayoutShape {
       size.width -= 60;
     }
 
-    ctx.fillStyle = this.backgroundColor();
+    ctx.fillStyle = style.backgroundLight;
     CanvasHelper.roundRect(
       ctx,
       position.x,
@@ -68,8 +70,11 @@ export class Range extends LayoutShape {
     );
     ctx.fill();
 
-    const width = TimeTween.remap(range[0], range[1], 16, size.width, value);
-    ctx.fillStyle = this.foregroundColor();
+    ctx.font = style.bodyFont;
+    const textSize = ctx.measureText(minText);
+
+    const width = TimeTween.remap(range[0], range[1], textSize.width + 40, size.width, value);
+    ctx.fillStyle = style.foreground;
     CanvasHelper.roundRect(
       ctx,
       position.x,
@@ -80,11 +85,12 @@ export class Range extends LayoutShape {
     );
     ctx.fill();
 
-    ctx.fillStyle = this.textColor();
-    ctx.font = 'bold 28px "JetBrains Mono"';
+    ctx.font = style.bodyFont;
+    ctx.fillStyle = getFontColor(style.foreground);
     ctx.fillText(text, position.x + 20, 10);
 
     if (label) {
+      ctx.fillStyle = getFontColor(style.backgroundLight);
       ctx.fillText(label, position.x - 60, 10);
     }
   }

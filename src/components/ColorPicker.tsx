@@ -1,14 +1,18 @@
-import {LinearLayout, LinearLayoutConfig} from 'MC/components/LinearLayout';
+import {LinearLayout, LinearLayoutConfig} from './LinearLayout';
 import {Rect} from 'konva/lib/shapes/Rect';
-import {Range, RangeConfig} from 'MC/components/Range';
-import {Node} from 'konva/lib/Node';
-import {AnimatedGetSet, getset} from '../decorators';
-import mixColor, {parseColor} from 'mix-color';
+import {Range, RangeConfig} from './Range';
+import {AnimatedGetSet, getset, KonvaNode} from '../decorators';
+import {parseColor} from 'mix-color';
 import {TimeTween} from '../animations';
+import {Surface} from './Surface';
+import {Origin} from '../types';
+import {Style} from '../styles';
+import {GetSet} from 'konva/lib/types';
 
 export interface ColorPickerConfig extends LinearLayoutConfig {
   previewColor?: string;
   dissolve?: number;
+  style?: Style;
 }
 
 const colorRangeConfig: RangeConfig = {
@@ -20,7 +24,10 @@ const colorRangeConfig: RangeConfig = {
   value: 0,
 };
 
-export class ColorPicker extends LinearLayout {
+@KonvaNode()
+export class ColorPicker extends Surface {
+  @getset(null)
+  public style: GetSet<ColorPickerConfig['style'], this>;
   @getset('#000000', ColorPicker.prototype.updateColor)
   public previewColor: AnimatedGetSet<ColorPickerConfig['previewColor'], this>;
   @getset(0, ColorPicker.prototype.updateDissolve)
@@ -35,49 +42,58 @@ export class ColorPicker extends LinearLayout {
   public constructor(config?: ColorPickerConfig) {
     super(config);
 
-    this.preview = new Rect({
-      width: 360,
-      height: 200,
-      fill: 'yellow',
-      cornerRadius: [8, 8, 0, 0],
-    });
-    this.r = new Range({
-      ...colorRangeConfig,
-      label: 'R:',
-      margin: [40, 10, 10],
-    });
-    this.g = new Range({
-      ...colorRangeConfig,
-      label: 'G:',
-    });
-    this.b = new Range({
-      ...colorRangeConfig,
-      label: 'B:',
-    });
-    this.a = new Range({
-      ...colorRangeConfig,
-      label: 'A:',
-      margin: [10, 10, 40],
-    });
+    this.setChild(
+      <LinearLayout origin={Origin.Top}>
+        <Rect
+          ref={[this, 'preview']}
+          width={360}
+          height={200}
+          fill={'yellow'}
+          cornerRadius={[8, 8, 0, 0]}
+        />
+        <Range
+          ref={[this, 'r']}
+          {...colorRangeConfig}
+          label={'R:'}
+          margin={[40, 10, 10]}
+        />
+        <Range ref={[this, 'g']} {...colorRangeConfig} label={'G:'} />
+        <Range ref={[this, 'b']} {...colorRangeConfig} label={'B:'} />
+        <Range
+          ref={[this, 'a']}
+          {...colorRangeConfig}
+          label={'A:'}
+          margin={[10, 10, 40]}
+        />
+      </LinearLayout>,
+    );
 
-    this.add(this.preview, this.r, this.g, this.b, this.a);
     this.updateColor();
     this.updateDissolve();
   }
 
   private updateColor() {
-    const color = parseColor(this.previewColor());
+    const style = this.style();
+    const preview = this.previewColor();
+
+    this.style({
+      ...style,
+      foreground: preview,
+    });
+    const color = parseColor(preview);
     color.a = Math.round(color.a * 255);
 
     this.r.value(color.r);
     this.g.value(color.g);
     this.b.value(color.b);
     this.a.value(color.a);
-    this.r.foregroundColor(this.previewColor());
-    this.g.foregroundColor(this.previewColor());
-    this.b.foregroundColor(this.previewColor());
-    this.a.foregroundColor(this.previewColor());
-    this.preview.fill(this.previewColor());
+    this.preview.fill(preview);
+  }
+
+  public setStyle(value: Style): this {
+    this.attrs.style = value;
+    this.background(value.background);
+    return this;
   }
 
   private updateDissolve() {
@@ -90,18 +106,6 @@ export class ColorPicker extends LinearLayout {
     this.a.opacity(opacity);
 
     this.fireLayoutChange();
-  }
-
-  getColor(): string {
-    return mixColor(
-      super.getColor(),
-      this.previewColor(),
-      TimeTween.clampRemap(0.5, 1, 0, 1, this.dissolve()),
-    );
-  }
-
-  clone(obj?: any): this {
-    return Node.prototype.clone.call(this, obj);
   }
 
   protected handleLayoutChange() {

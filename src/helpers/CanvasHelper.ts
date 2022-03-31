@@ -1,5 +1,5 @@
 import {Context} from 'konva/lib/Context';
-import {PossibleSpacing, Spacing} from "MC/types";
+import {PossibleSpacing, Spacing} from "../types";
 
 export namespace CanvasHelper {
   export function roundRect<T extends CanvasRenderingContext2D | Context>(
