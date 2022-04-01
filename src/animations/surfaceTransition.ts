@@ -1,6 +1,12 @@
-import {Surface} from '../components/Surface';
-import {TimeTween} from './TimeTween';
-import {tween} from './tween';
+import {Surface} from '../components';
+import {
+  clampRemap,
+  colorTween,
+  easeInOutCubic,
+  easeInOutQuint,
+  rectArcTween,
+  tween,
+} from '../tweening';
 import {decorate, threadable} from '../decorators';
 
 export interface SurfaceTransitionConfig {
@@ -8,13 +14,13 @@ export interface SurfaceTransitionConfig {
   onSurfaceChange?: (surface: Surface) => void;
   onFromOpacityChange?: (
     surface: Surface,
-    value: TimeTween,
-    relativeValue: TimeTween,
+    value: number,
+    relativeValue: number,
   ) => boolean | void;
   onToOpacityChange?: (
     surface: Surface,
-    value: TimeTween,
-    relativeValue: TimeTween,
+    value: number,
+    relativeValue: number,
   ) => boolean | void;
   transitionTime?: number;
 }
@@ -39,7 +45,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
     const toPos = target.getPosition();
     const fromPos = fromSurface.getPosition();
 
-    const relativeValue = new TimeTween(0);
+    let relativeValue = 0;
     const fromDelta = fromSurface.getOriginDelta(target.getOrigin());
     const fromNewPos = {
       x: fromPos.x + fromDelta.x,
@@ -57,14 +63,8 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
 
     let check = true;
     yield* tween(0.6, value => {
-      if (value.value > transitionTime) {
-        relativeValue.value = TimeTween.clampRemap(
-          transitionTime,
-          1,
-          0,
-          1,
-          value.value,
-        );
+      if (value > transitionTime) {
+        relativeValue = clampRemap(transitionTime, 1, 0, 1, value);
         if (check) {
           target.show();
           fromSurface.destroy();
@@ -72,17 +72,24 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
 
         target.setMask({
           ...from,
-          ...value.rectArc(from, to, config.reverse),
-          radius: value.easeInOutCubic(from.radius, target.radius()),
-          color: value.color(
+          ...rectArcTween(from, to, easeInOutQuint(value), config.reverse),
+          radius: easeInOutCubic(value, from.radius, target.radius()),
+          color: colorTween(
             from.color,
             target.background(),
-            value.easeInOutQuint(),
+            easeInOutQuint(value),
           ),
         });
-        target.setPosition(value.rectArc(fromNewPos, toPos, config.reverse));
+        target.setPosition(
+          rectArcTween(
+            fromNewPos,
+            toPos,
+            easeInOutQuint(value),
+            config.reverse,
+          ),
+        );
         if (!config.onToOpacityChange?.(target, value, relativeValue)) {
-          target.getChild().opacity(relativeValue.value);
+          target.getChild().opacity(relativeValue);
         }
 
         if (check) {
@@ -90,29 +97,28 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
           check = false;
         }
       } else {
-        relativeValue.value = TimeTween.clampRemap(
-          0,
-          transitionTime,
-          1,
-          0,
-          value.value,
-        );
+        relativeValue = clampRemap(0, transitionTime, 1, 0, value);
         fromSurface.setMask({
           ...from,
-          ...value.rectArc(from, to, config.reverse),
-          radius: value.easeInOutCubic(from.radius, target.radius()),
-          color: value.color(
+          ...rectArcTween(from, to, easeInOutQuint(value), config.reverse),
+          radius: easeInOutCubic(value, from.radius, target.radius()),
+          color: colorTween(
             from.color,
             target.background(),
-            value.easeInOutQuint(),
+            easeInOutQuint(value),
           ),
         });
         fromSurface.setPosition(
-          value.rectArc(fromPos, toNewPos, config.reverse),
+          rectArcTween(
+            fromPos,
+            toNewPos,
+            easeInOutQuint(value),
+            config.reverse,
+          ),
         );
 
         if (!config.onFromOpacityChange?.(target, value, relativeValue)) {
-          fromSurface.getChild().opacity(relativeValue.value);
+          fromSurface.getChild().opacity(relativeValue);
         }
       }
     });

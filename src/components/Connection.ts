@@ -1,25 +1,17 @@
-import {Arrow, ArrowConfig} from './Arrow';
 import {Node} from 'konva/lib/Node';
-import {_registerNode} from 'konva/lib/Global';
-import {Factory} from 'konva/lib/Factory';
-import {GetSet, Vector2d} from 'konva/lib/types';
-import {Direction} from '../types';
-import {Context} from 'konva/lib/Context';
-import {TimeTween} from '../animations';
-import {Project} from '../Project';
-import {LAYOUT_CHANGE_EVENT} from "./ILayoutNode";
+import {Center} from '../types';
+import {KonvaNode} from '../decorators';
+import {Pin, PIN_CHANGE_EVENT} from './Pin';
+import {Group} from 'konva/lib/Group';
+import {ContainerConfig} from 'konva/lib/Container';
+import {Arrow} from './Arrow';
+import {map} from '../tweening';
 
-export interface ConnectionPoint {
-  node: Node;
-  direction: Direction;
-  offset: number;
-  vertical?: boolean;
-}
-
-export interface ConnectionConfig extends ArrowConfig {
-  from: ConnectionPoint;
-  to: ConnectionPoint;
-  crossing: Vector2d;
+export interface ConnectionConfig extends ContainerConfig {
+  start?: Pin;
+  end?: Pin;
+  crossing?: Node;
+  arrow?: Arrow;
 }
 
 interface Measurement {
@@ -28,6 +20,7 @@ interface Measurement {
   rangeOffset: [number, number];
   from: number;
   to: number;
+  preferNegative: boolean;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -35,16 +28,37 @@ function clamp(value: number, min: number, max: number): number {
   return value < min ? min : value > max ? max : value;
 }
 
-export class Connection extends Arrow {
-  private nodeCache: Record<string, Node> = {};
-  private markAsDirtyCallback: () => void;
-
-  public get project(): Project {
-    return <Project>this.getStage();
-  }
+@KonvaNode()
+export class Connection extends Group {
+  public readonly start: Pin;
+  public readonly end: Pin;
+  public readonly crossing: Node = null;
+  public readonly arrow: Arrow;
 
   constructor(config?: ConnectionConfig) {
     super(config);
+
+    this.start = config?.start ?? new Pin();
+    this.start.on(PIN_CHANGE_EVENT, () => this.recalculate());
+    if (!this.start.getParent()) {
+      this.add(this.start);
+    }
+
+    this.end = config?.end ?? new Pin();
+    this.end.on(PIN_CHANGE_EVENT, () => this.recalculate());
+    if (!this.end.getParent()) {
+      this.add(this.end);
+    }
+
+    if (config?.crossing) {
+      this.crossing = config.crossing;
+      this.crossing.on('absoluteTransformChange', () => this.recalculate());
+    }
+
+    this.arrow = config?.arrow ?? new Arrow();
+    if (!this.arrow.getParent()) {
+      this.add(this.arrow);
+    }
   }
 
   private static measurePosition(
@@ -53,25 +67,48 @@ export class Connection extends Arrow {
     positionB: number,
     sizeB: number,
   ): Measurement {
+    // FIXME use layout margin
+    const padding = 20;
+    const length = 20;
+    const offset = (padding + length) * 2;
+
+    let preferNegative = false;
     let direction: -1 | 0 | 1;
     let range: [number, number];
     let rangeOffset: [number, number];
 
-    if (positionA - sizeA - 80 > positionB + sizeB) {
+    if (positionA - sizeA - offset > positionB + sizeB) {
       direction = -1;
-      range = [positionA - sizeA - 20, positionB + sizeB + 20];
-      rangeOffset = [range[0] - 20, range[1] + 20];
-    } else if (positionA + sizeA + 80 < positionB - sizeB) {
+      range = [positionA - sizeA - padding, positionB + sizeB + padding];
+      rangeOffset = [range[0] - length, range[1] + length];
+    } else if (positionA + sizeA + offset < positionB - sizeB) {
       direction = 1;
-      range = [positionA + sizeA + 20, positionB - sizeB - 20];
-      rangeOffset = [range[0] + 20, range[1] - 20];
+      range = [positionA + sizeA + padding, positionB - sizeB - padding];
+      rangeOffset = [range[0] + length, range[1] - length];
     } else {
       direction = 0;
-      range = [positionA - sizeA - 20, positionB - sizeB - 20];
-      rangeOffset = [range[0] - 20, range[1] - 20];
+
+      if (
+        Math.abs(positionA + sizeA - positionB - sizeB) >
+        Math.abs(positionA - sizeA - positionB + sizeB)
+      ) {
+        range = [positionA - sizeA - padding, positionB - sizeB - padding];
+        rangeOffset = [range[0] - length, range[1] - length];
+      } else {
+        preferNegative = true;
+        range = [positionA + sizeA + padding, positionB + sizeB + padding];
+        rangeOffset = [range[0] + length, range[1] + length];
+      }
     }
 
-    return {direction, range, rangeOffset, from: positionA, to: positionB};
+    return {
+      direction,
+      range,
+      rangeOffset,
+      from: positionA,
+      to: positionB,
+      preferNegative,
+    };
   }
 
   private static calculateCrossing(
@@ -88,45 +125,41 @@ export class Connection extends Arrow {
       );
     }
 
-    return measurement.direction === 0
-      ? Math.min(
-          measurement.rangeOffset[0],
-          measurement.rangeOffset[1],
-          clampedCrossing,
-        )
-      : fractionX
-      ? TimeTween.map(
-          measurement.rangeOffset[0],
-          measurement.rangeOffset[1],
-          crossing,
-        )
+    if (measurement.direction === 0) {
+      return measurement.preferNegative
+        ? Math.max(
+            measurement.rangeOffset[0],
+            measurement.rangeOffset[1],
+            clampedCrossing,
+          )
+        : Math.min(
+            measurement.rangeOffset[0],
+            measurement.rangeOffset[1],
+            clampedCrossing,
+          );
+    }
+
+    return fractionX
+      ? map(measurement.rangeOffset[0], measurement.rangeOffset[1], crossing)
       : clampedCrossing;
   }
 
-  _sceneFunc(context: Context) {
-    if (this.dirty) {
-      this.recalculate();
-    }
-
-    super._sceneFunc(context);
-  }
-
   private recalculate() {
-    const from: ConnectionPoint = this.from();
-    const to: ConnectionPoint = this.to();
-    const crossing = this.crossing();
-
-    if (!from.node || !to.node) {
-      this.points([]);
+    if (!this.start || !this.end || !this.arrow) {
+      this.arrow?.points([]);
       return;
     }
 
-    const fromRect = from.node.getClientRect({relativeTo: this.getLayer()});
+    const crossing = this.crossing
+      ? this.crossing.getAbsolutePosition(this.getLayer())
+      : {x: 0.5, y: 0.5};
+
+    const fromRect = this.start.getClientRect({relativeTo: this.getLayer()});
     fromRect.width /= 2;
     fromRect.height /= 2;
     fromRect.x += fromRect.width;
     fromRect.y += fromRect.height;
-    const toRect = to.node.getClientRect({relativeTo: this.getLayer()});
+    const toRect = this.end.getClientRect({relativeTo: this.getLayer()});
 
     toRect.width /= 2;
     toRect.height /= 2;
@@ -147,23 +180,27 @@ export class Connection extends Arrow {
       toRect.height,
     );
 
-    if (from.vertical) {
+    if (this.start.direction() === Center.Vertical) {
       points.push(fromRect.x, vertical.range[0]);
     } else {
       points.push(horizontal.range[0], fromRect.y);
     }
 
-    let toVertical = to.vertical;
-    if (
-      from.vertical !== toVertical &&
-      (horizontal.direction === 0 || vertical.direction === 0)
-    ) {
-      toVertical = from.vertical;
+    let endDirection = this.end.direction();
+    if (this.start.direction() !== endDirection) {
+      if (endDirection === Center.Vertical && vertical.direction === 0) {
+        endDirection = this.start.direction();
+      } else if (
+        endDirection === Center.Horizontal &&
+        horizontal.direction === 0
+      ) {
+        endDirection = this.start.direction();
+      }
     }
 
     let distance = 100;
-    if (from.vertical === toVertical) {
-      if (from.vertical) {
+    if (this.start.direction() === endDirection) {
+      if (endDirection === Center.Vertical) {
         distance = Math.abs(toRect.x - fromRect.x);
         if (distance >= 1) {
           const y = Connection.calculateCrossing(crossing.y, vertical);
@@ -179,80 +216,20 @@ export class Connection extends Arrow {
         }
       }
     } else {
-      if (from.vertical) {
-        points.push(fromRect.x, toRect.y);
-      } else {
+      if (endDirection === Center.Vertical) {
         points.push(toRect.x, fromRect.y);
+      } else {
+        points.push(fromRect.x, toRect.y);
       }
     }
 
-    if (toVertical) {
+    if (endDirection === Center.Vertical) {
       points.push(toRect.x, vertical.range[1]);
     } else {
       points.push(horizontal.range[1], toRect.y);
     }
 
-    this.radius(Math.min(8, distance / 2));
-    this.points(points);
+    this.arrow.radius(Math.min(8, distance / 2));
+    this.arrow.points(points);
   }
-
-  public nodeChanged(name: string, node: Node) {
-    this.nodeCache ??= {};
-    this.markAsDirtyCallback ??= () => this.markAsDirty();
-
-    if (this.nodeCache[name] === node) return;
-
-    this.nodeCache[name]
-      ?.off('absoluteTransformChange', this.markAsDirtyCallback)
-      .off(LAYOUT_CHANGE_EVENT, this.markAsDirtyCallback);
-    this.nodeCache[name] = node;
-    this.nodeCache[name]
-      ?.on('absoluteTransformChange', this.markAsDirtyCallback)
-      .on(LAYOUT_CHANGE_EVENT, this.markAsDirtyCallback);
-    this.markAsDirty();
-  }
-
-  from: GetSet<ConnectionPoint, this>;
-  to: GetSet<ConnectionPoint, this>;
-  crossing: GetSet<Vector2d, this>;
 }
-
-Connection.prototype.className = 'Connection';
-Connection.prototype._attrsAffectingSize = ['from', 'to'];
-
-_registerNode(Arrow);
-
-Factory.addGetterSetter(
-  Connection,
-  'from',
-  {
-    node: null,
-    direction: Direction.Right,
-    offset: 0,
-  },
-  undefined,
-  function (this: Connection) {
-    this.nodeChanged('from', this.from().node);
-  },
-);
-
-Factory.addGetterSetter(
-  Connection,
-  'to',
-  {
-    node: null,
-    direction: Direction.Right,
-    offset: 0,
-  },
-  undefined,
-  function (this: Connection) {
-    this.nodeChanged('to', this.to().node);
-  },
-);
-Factory.addGetterSetter(
-  Connection,
-  'crossing',
-  {x: 0, y: 0},
-  undefined,
-  Connection.prototype.markAsDirty,
-);

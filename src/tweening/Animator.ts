@@ -1,0 +1,135 @@
+import type {Node} from 'konva/lib/Node';
+import {
+  colorTween,
+  easeInOutCubic,
+  InterpolationFunction,
+  map,
+  rectArcTween,
+  spacingTween,
+  textTween,
+  tween,
+  TweenFunction,
+  vector2dTween,
+} from './index';
+import {threadable} from '../decorators';
+import {waitFor, waitUntil} from '../animations';
+
+export class Animator<Type, This extends Node> {
+  private valueFrom: Type = null;
+  private keys: (() => Generator)[] = [];
+  private mapper: TweenFunction<any> = map;
+  private loops: number = 1;
+  private readonly setter: string;
+  private readonly getter: string;
+
+  public constructor(
+    private readonly object: This,
+    private readonly prop: string,
+  ) {
+    const name = this.prop.charAt(0).toUpperCase() + this.prop.slice(1);
+    this.getter = `get${name}`;
+    this.setter = `set${name}`;
+  }
+
+  public from(value: Type): this {
+    this.valueFrom = value;
+    return this;
+  }
+
+  public key<Rest extends any[]>(
+    value: Type,
+    time: number,
+    interpolation: InterpolationFunction = easeInOutCubic,
+    mapper?: TweenFunction<Type, Rest>,
+    ...args: Rest
+  ): this {
+    this.keys.push(() =>
+      tween(
+        time,
+        v => {
+          // @ts-ignore
+          this.object[this.setter](
+            mapper === undefined
+              ? this.mapper(this.valueFrom, value, interpolation(v))
+              : mapper(this.valueFrom, value, interpolation(v), ...args),
+          );
+        },
+        () => {
+          this.valueFrom = value;
+        },
+      ),
+    );
+
+    return this;
+  }
+
+  public back<Rest extends any[]>(
+    time: number,
+    interpolation: InterpolationFunction = easeInOutCubic,
+    mapper?: TweenFunction<Type, Rest>,
+    ...args: Rest
+  ): this {
+    return this.key(this.getValueFrom(), time, interpolation, mapper, ...args);
+  }
+
+  public waitFor(time: number): this {
+    this.keys.push(() => waitFor(time));
+    return this;
+  }
+
+  public waitUntil(time: number): this {
+    this.keys.push(() => waitUntil(time));
+    return this;
+  }
+
+  public run(loops = 1): Generator {
+    this.loops = loops;
+    if (this.valueFrom !== null) {
+      //@ts-ignore
+      this.object[this.setter](this.valueFrom);
+    }
+    this.inferProperties();
+    return this.runner();
+  }
+
+  @threadable('animatorRunner')
+  private *runner() {
+    for (let loop = 0; loop < this.loops; loop++) {
+      for (let i = 0; i < this.keys.length; i++) {
+        yield* this.keys[i]();
+      }
+    }
+  }
+
+  private getValueFrom(): Type {
+    if (this.valueFrom !== null) {
+      return this.valueFrom;
+    }
+
+    if (this.getter in this.object) {
+      //@ts-ignore
+      return this.object[this.getter]();
+    }
+  }
+
+  private inferProperties() {
+    this.valueFrom ??= this.getValueFrom();
+
+    if (typeof this.valueFrom === 'string') {
+      if (this.valueFrom.startsWith('#') || this.valueFrom.startsWith('rgb')) {
+        this.mapper = colorTween;
+      } else {
+        this.mapper = textTween;
+      }
+    } else if (typeof this.valueFrom === 'object') {
+      if ('x' in this.valueFrom) {
+        if ('width' in this.valueFrom) {
+          this.mapper = rectArcTween;
+        }
+        this.mapper = vector2dTween;
+      } else if ('left' in this.valueFrom) {
+        this.mapper = spacingTween;
+      }
+    }
+  }
+}

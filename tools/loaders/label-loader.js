@@ -1,4 +1,4 @@
-module.exports = function (source) {
+function loader(source) {
   const json = {};
   source.split(/\r?\n/).forEach(line => {
     if (!line) return;
@@ -21,4 +21,6 @@ const proxy = new Proxy(json, {
 
 export default proxy;
 `;
-};
+}
+
+module.exports = loader;

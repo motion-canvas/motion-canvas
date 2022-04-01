@@ -1,10 +1,10 @@
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {Context} from 'konva/lib/Context';
-import {AnimatedGetSet, getset, KonvaNode} from '../decorators';
+import {getset, KonvaNode} from '../decorators';
 import {CanvasHelper} from '../helpers';
-import {TimeTween} from '../animations';
-import {GetSet} from "konva/lib/types";
-import {getFontColor, getStyle, Style} from "../styles";
+import {GetSet} from 'konva/lib/types';
+import {getFontColor, getStyle, Style} from '../styles';
+import {remap} from '../tweening';
 
 export interface RangeConfig extends LayoutShapeConfig {
   range?: [number, number];
@@ -19,13 +19,13 @@ export class Range extends LayoutShape {
   @getset(null)
   public style: GetSet<RangeConfig['style'], this>;
   @getset([0, 1])
-  public range: AnimatedGetSet<RangeConfig['range'], this>;
+  public range: GetSet<RangeConfig['range'], this>;
   @getset(0.5)
-  public value: AnimatedGetSet<RangeConfig['value'], this>;
+  public value: GetSet<RangeConfig['value'], this>;
   @getset(0)
-  public precision: AnimatedGetSet<RangeConfig['precision'], this>;
+  public precision: GetSet<RangeConfig['precision'], this>;
   @getset(null)
-  public label: AnimatedGetSet<RangeConfig['label'], this>;
+  public label: GetSet<RangeConfig['label'], this>;
 
   public constructor(config?: RangeConfig) {
     super(config);
@@ -52,7 +52,7 @@ export class Range extends LayoutShape {
     const position = {
       x: size.width / -2,
       y: size.height / -2,
-    }
+    };
 
     if (label) {
       position.x += 60;
@@ -73,16 +73,15 @@ export class Range extends LayoutShape {
     ctx.font = style.bodyFont;
     const textSize = ctx.measureText(minText);
 
-    const width = TimeTween.remap(range[0], range[1], textSize.width + 40, size.width, value);
-    ctx.fillStyle = style.foreground;
-    CanvasHelper.roundRect(
-      ctx,
-      position.x,
-      position.y,
-      width,
-      size.height,
-      8,
+    const width = remap(
+      range[0],
+      range[1],
+      textSize.width + 40,
+      size.width,
+      value,
     );
+    ctx.fillStyle = style.foreground;
+    CanvasHelper.roundRect(ctx, position.x, position.y, width, size.height, 8);
     ctx.fill();
 
     ctx.font = style.bodyFont;

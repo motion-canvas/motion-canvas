@@ -1,10 +1,17 @@
 import {Node} from 'konva/lib/Node';
-import {Surface} from '../components/Surface';
-import {TimeTween} from './TimeTween';
+import {Surface} from '../components';
 import {Origin, originPosition, Spacing} from '../types';
 import {chain} from '../flow';
 import {Vector2d} from 'konva/lib/types';
-import {tween} from './tween';
+import {
+  clampRemap,
+  easeInExpo,
+  easeInOutCubic,
+  easeOutExpo,
+  linear,
+  spacingTween,
+  tween,
+} from '../tweening';
 import {decorate, threadable} from '../decorators';
 
 decorate(showTop, threadable());
@@ -16,12 +23,12 @@ export function showTop(node: Node): [Generator, Generator] {
 
   return [
     tween(0.5, value => {
-      node.opacity(Math.min(1, value.linear(0, 2)));
-      node.offsetY(value.easeOutExpo(from, to));
+      node.opacity(Math.min(1, linear(value, 0, 2)));
+      node.offsetY(easeOutExpo(value, from, to));
     }),
     tween(0.5, value => {
-      node.opacity(Math.min(1, value.linear(2, 0)));
-      node.offsetY(value.easeInExpo(to, from));
+      node.opacity(Math.min(1, linear(value, 2, 0)));
+      node.offsetY(easeInExpo(value, to, from));
     }),
   ];
 }
@@ -45,13 +52,13 @@ export function showSurface(surface: Surface): Generator {
     value => {
       surface.setMask({
         ...toMask,
-        width: value.easeInOutCubic(fromMask.width, toMask.width),
-        height: value.easeInOutCubic(fromMask.height, toMask.height),
+        width: easeInOutCubic(value, fromMask.width, toMask.width),
+        height: easeInOutCubic(value, fromMask.height, toMask.height),
       });
       surface.setMargin(
-        value.spacing(marginFrom, margin, value.easeInOutCubic()),
+        spacingTween(marginFrom, margin, easeInOutCubic(value)),
       );
-      surface.opacity(TimeTween.clampRemap(0.3, 1, 0, 1, value.value));
+      surface.opacity(clampRemap(0.3, 1, 0, 1, value));
     },
     () => surface.setMask(null),
   );
@@ -78,7 +85,7 @@ export function showCircle(
 
   return chain(
     tween(target / 2000, value => {
-      mask.radius = value.easeInOutCubic(0, target);
+      mask.radius = easeInOutCubic(value, 0, target);
     }),
     () => surface.setCircleMask(null),
   );

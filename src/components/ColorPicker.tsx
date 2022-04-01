@@ -1,13 +1,13 @@
 import {LinearLayout, LinearLayoutConfig} from './LinearLayout';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Range, RangeConfig} from './Range';
-import {AnimatedGetSet, getset, KonvaNode} from '../decorators';
+import {getset, KonvaNode} from '../decorators';
 import {parseColor} from 'mix-color';
-import {TimeTween} from '../animations';
 import {Surface} from './Surface';
 import {Origin} from '../types';
 import {Style} from '../styles';
 import {GetSet} from 'konva/lib/types';
+import {clampRemap} from '../tweening';
 
 export interface ColorPickerConfig extends LinearLayoutConfig {
   previewColor?: string;
@@ -29,9 +29,9 @@ export class ColorPicker extends Surface {
   @getset(null)
   public style: GetSet<ColorPickerConfig['style'], this>;
   @getset('#000000', ColorPicker.prototype.updateColor)
-  public previewColor: AnimatedGetSet<ColorPickerConfig['previewColor'], this>;
+  public previewColor: GetSet<ColorPickerConfig['previewColor'], this>;
   @getset(0, ColorPicker.prototype.updateDissolve)
-  public dissolve: AnimatedGetSet<ColorPickerConfig['dissolve'], this>;
+  public dissolve: GetSet<ColorPickerConfig['dissolve'], this>;
 
   public readonly preview: Rect;
   public readonly r: Range;
@@ -99,7 +99,7 @@ export class ColorPicker extends Surface {
   private updateDissolve() {
     if (!this.r) return;
 
-    const opacity = TimeTween.clampRemap(0, 0.5, 1, 0, this.dissolve());
+    const opacity = clampRemap(0, 0.5, 1, 0, this.dissolve());
     this.r.opacity(opacity);
     this.g.opacity(opacity);
     this.b.opacity(opacity);

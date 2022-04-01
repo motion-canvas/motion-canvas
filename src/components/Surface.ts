@@ -11,7 +11,7 @@ import {
 } from './ILayoutNode';
 import {CanvasHelper} from '../helpers';
 import {Context} from 'konva/lib/Context';
-import {tween} from '../animations';
+import {easeOutExpo, linear, tween} from '../tweening';
 import {GetSet, IRect} from 'konva/lib/types';
 import {getset, threadable} from '../decorators';
 import {Node} from 'konva/lib/Node';
@@ -38,9 +38,9 @@ export interface SurfaceConfig extends LayoutGroupConfig {
 }
 
 export class Surface extends LayoutGroup {
-  @getset(0, Surface.prototype.handleLayoutChange)
+  @getset(0, Surface.prototype.updateBackground)
   public radius: GetSet<SurfaceConfig['radius'], this>;
-  @getset('#FF00FF', Surface.prototype.handleLayoutChange)
+  @getset('#FF00FF', Surface.prototype.updateBackground)
   public background: GetSet<SurfaceConfig['background'], this>;
   @getset(null)
   public child: GetSet<SurfaceConfig['child'], this>;
@@ -74,7 +74,9 @@ export class Surface extends LayoutGroup {
   public setChild(value: LayoutNode): this {
     this.attrs.child?.remove();
     this.attrs.child = value;
-    this.add(value);
+    if (value) {
+      this.add(value);
+    }
     this.handleLayoutChange();
 
     return this;
@@ -94,8 +96,10 @@ export class Surface extends LayoutGroup {
   }
 
   public clone(obj?: any): this {
-    const clone: this = Node.prototype.clone.call(this, obj);
     const child = this.child();
+    this.child(null);
+    const clone: this = Node.prototype.clone.call(this, obj);
+    this.child(child);
     if (child) {
       clone.setChild(child.clone());
     }
@@ -129,9 +133,9 @@ export class Surface extends LayoutGroup {
       .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
 
     yield* tween(1, value => {
-      const width = this.layoutData.width + value.easeOutExpo(0, 100);
-      const height = this.layoutData.height + value.easeOutExpo(0, 100);
-      const radius = this.radius() + value.easeOutExpo(0, 50);
+      const width = this.layoutData.width + easeOutExpo(value, 0, 100);
+      const height = this.layoutData.height + easeOutExpo(value, 0, 100);
+      const radius = this.radius() + easeOutExpo(value, 0, 50);
 
       this.ripple
         .offsetX(width / 2)
@@ -140,7 +144,8 @@ export class Surface extends LayoutGroup {
         .height(height)
         .cornerRadius(radius)
         .fill(
-          `rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${value.linear(
+          `rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${linear(
+            value,
             0.5,
             0,
           )})`,
@@ -217,21 +222,25 @@ export class Surface extends LayoutGroup {
       });
     }
 
+    this.updateBox();
     this.updateBackground();
     this.setOrigin(this.getOrigin());
     this.fireLayoutChange();
   }
 
-  private updateBackground() {
+  private updateBox() {
     if (!this.box) return;
     const size = this.getLayoutSize();
     this.box
       .offsetX(size.width / 2)
       .offsetY(size.height / 2)
       .width(size.width)
-      .height(size.height)
-      .cornerRadius(this.radius())
-      .fill(this.background());
+      .height(size.height);
+  }
+
+  private updateBackground() {
+    if (this.surfaceMask || !this.box) return;
+    this.box.cornerRadius(this.radius()).fill(this.background());
   }
 
   private drawMask(ctx: Context) {

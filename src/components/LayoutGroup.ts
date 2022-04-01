@@ -9,7 +9,7 @@ import {
   isInsideLayout,
   LAYOUT_CHANGE_EVENT,
   LayoutAttrs,
-} from '../components/ILayoutNode';
+} from './ILayoutNode';
 import {Node} from 'konva/lib/Node';
 
 export type LayoutGroupConfig = Partial<LayoutAttrs> & ContainerConfig;

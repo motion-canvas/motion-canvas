@@ -2,9 +2,10 @@ import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
-import {cancel, TimeTween, waitFor} from '../animations';
-import {AnimatedGetSet, getset, KonvaNode, threadable} from '../decorators';
+import {cancel, waitFor} from '../animations';
+import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
+import {map} from '../tweening';
 
 export interface SpriteData {
   fileName: string;
@@ -37,9 +38,9 @@ export class Sprite extends LayoutShape {
   @getset(false)
   public playing: GetSet<SpriteConfig['playing'], this>;
   @getset(10)
-  public fps: AnimatedGetSet<SpriteConfig['fps'], this>;
+  public fps: GetSet<SpriteConfig['fps'], this>;
   @getset(0, Sprite.prototype.recalculate)
-  public maskBlend: AnimatedGetSet<SpriteConfig['maskBlend'], this>;
+  public maskBlend: GetSet<SpriteConfig['maskBlend'], this>;
 
   private frame: SpriteData = {
     height: 0,
@@ -116,11 +117,7 @@ export class Sprite extends LayoutShape {
           );
 
           if (mask) {
-            this.imageData.data[id + 3] *= TimeTween.map(
-              1,
-              mask.data[id] / 255,
-              blend,
-            );
+            this.imageData.data[id + 3] *= map(1, mask.data[id] / 255, blend);
           }
         }
       }

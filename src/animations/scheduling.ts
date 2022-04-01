@@ -1,6 +1,6 @@
 import type {Project} from '../Project';
-import {PROJECT} from '../Project';
 import {decorate, threadable} from "../decorators";
+import {PROJECT} from "../symbols";
 
 decorate(waitUntil, threadable());
 export function* waitUntil(targetTime = 0, after?: Generator): Generator {

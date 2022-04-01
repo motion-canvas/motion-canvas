@@ -3,7 +3,7 @@ const {readdirSync} = require('fs');
 const loadImage = require('../utils/load-image');
 const nameRegex = /([^\d]*)\d+\.png$/;
 
-module.exports = function () {
+function loader () {
   const callback = this.async();
   const directoryPath = path.dirname(this.resourcePath);
   const files = readdirSync(directoryPath)
@@ -15,7 +15,7 @@ module.exports = function () {
   loadAnimation(files)
     .then(result => callback(null, result))
     .catch(error => callback(error));
-};
+}
 
 async function loadAnimation(files) {
   const frames = [];
@@ -26,4 +26,4 @@ async function loadAnimation(files) {
   return `export default ${JSON.stringify(frames)};`;
 }
 
-
+module.exports = loader;

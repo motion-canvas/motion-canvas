@@ -1,3 +1,5 @@
+import './patches';
+
 import {Stage, StageConfig} from 'konva/lib/Stage';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
@@ -5,6 +7,7 @@ import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
 import {threads, ThreadsCallback} from './animations';
 import {Scene} from './Scene';
+import {PROJECT} from './symbols';
 
 Konva.autoDrawEnabled = false;
 
@@ -15,8 +18,6 @@ export enum ProjectSize {
 const Sizes: Record<ProjectSize, [number, number]> = {
   [ProjectSize.FullHD]: [1920, 1080],
 };
-
-export const PROJECT = Symbol('PROJECT');
 
 export class Project extends Stage {
   public readonly background: Rect;

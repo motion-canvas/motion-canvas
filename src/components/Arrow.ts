@@ -242,7 +242,8 @@ export class Arrow extends Shape<ArrowConfig> {
     if (this.attrs.startArrow && firstPoint && arrowScale > 0.0001) {
       this.drawArrow(context, firstPoint, firstTangent, arrowScale);
     }
-
+    context.closePath();
+    this.fill(this.stroke());
     context.fillShape(this);
   }
 
@@ -361,17 +362,8 @@ export class Arrow extends Shape<ArrowConfig> {
     this.dirty = true;
   }
 
-  getWidth() {
-    const points = (<number[]>this.points()).filter(
-      (value, index) => index % 2 === 1,
-    );
-    return Math.max(...points) - Math.min(...points);
-  }
-  getHeight() {
-    const points = (<number[]>this.points()).filter(
-      (value, index) => index % 2 === 0,
-    );
-    return Math.max(...points) - Math.min(...points);
+  public getArrowSize(): number {
+    return this.attrs.arrowSize ?? this.strokeWidth() * 2;
   }
 
   radius: GetSet<number, this>;

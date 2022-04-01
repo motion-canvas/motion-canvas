@@ -10,7 +10,7 @@ import {
   LayoutAttrs,
 } from './ILayoutNode';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
-import {tween} from "../animations";
+import {easeInOutCubic, tween, textTween} from '../tweening';
 
 export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
   minWidth?: number;
@@ -43,7 +43,7 @@ export class LayoutText extends Text implements ILayoutNode {
     return {
       width: Math.max(
         custom?.minWidth ?? this.getMinWidth(),
-        this.overrideWidth ?? (size.width + padding.x),
+        this.overrideWidth ?? size.width + padding.x,
       ),
       height: (this.isConstructed ? this.getHeight() : 0) + padding.y,
     };
@@ -126,8 +126,8 @@ export class LayoutText extends Text implements ILayoutNode {
 
     this.overrideWidth = fromWidth;
     yield* tween(0.3, value => {
-      this.overrideWidth = value.easeInOutCubic(fromWidth, toWidth);
-      this.setText(value.text(fromText, text, value.easeInOutCubic()));
+      this.overrideWidth = easeInOutCubic(value, fromWidth, toWidth);
+      this.setText(textTween(fromText, text, easeInOutCubic(value)));
     });
     this.overrideWidth = null;
 

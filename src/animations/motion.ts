@@ -1,11 +1,11 @@
 import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
-import {tween} from "./tween";
-import {decorate, threadable} from "../decorators";
+import {decorate, threadable} from '../decorators';
+import {tween, easeInOutQuint, vector2dTween} from '../tweening';
 
 export interface MoveConfig {
-  absolute?: boolean,
-  speed?: number,
+  absolute?: boolean;
+  speed?: number;
 }
 
 decorate(move, threadable());
@@ -46,7 +46,9 @@ export function move(
       Math.pow(positionFrom.y - positionTo.y, 2),
   );
 
-  return tween(config.speed ?? (distance / 1000), value =>
-    node.position(value.vector2d(positionFrom, positionTo, value.easeInOutQuint())),
+  return tween(config.speed ?? distance / 1000, value =>
+    node.position(
+      vector2dTween(positionFrom, positionTo, easeInOutQuint(value)),
+    ),
   );
 }
