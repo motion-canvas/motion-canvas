@@ -1,5 +1,6 @@
 import {Surface} from '../components';
 import {
+  calculateRatio,
   clampRemap,
   colorTween,
   easeInOutCubic,
@@ -57,6 +58,9 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
       y: toPos.y + toDelta.y,
     };
 
+    const ratio =
+      (calculateRatio(fromNewPos, toPos) + calculateRatio(from, to)) / 2;
+
     target.hide();
 
     config.onSurfaceChange?.(fromSurface);
@@ -72,7 +76,13 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
 
         target.setMask({
           ...from,
-          ...rectArcTween(from, to, easeInOutQuint(value), config.reverse),
+          ...rectArcTween(
+            from,
+            to,
+            easeInOutQuint(value),
+            config.reverse,
+            ratio,
+          ),
           radius: easeInOutCubic(value, from.radius, target.radius()),
           color: colorTween(
             from.color,
@@ -86,6 +96,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
             toPos,
             easeInOutQuint(value),
             config.reverse,
+            ratio,
           ),
         );
         if (!config.onToOpacityChange?.(target, value, relativeValue)) {
@@ -100,7 +111,13 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
         relativeValue = clampRemap(0, transitionTime, 1, 0, value);
         fromSurface.setMask({
           ...from,
-          ...rectArcTween(from, to, easeInOutQuint(value), config.reverse),
+          ...rectArcTween(
+            from,
+            to,
+            easeInOutQuint(value),
+            config.reverse,
+            ratio,
+          ),
           radius: easeInOutCubic(value, from.radius, target.radius()),
           color: colorTween(
             from.color,
@@ -114,6 +131,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
             toNewPos,
             easeInOutQuint(value),
             config.reverse,
+            ratio,
           ),
         );
 

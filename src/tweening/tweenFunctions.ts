@@ -68,10 +68,22 @@ export function rectArcTween(
   to: Partial<IRect>,
   value: number,
   reverse?: boolean,
+  ratio?: number,
 ) {
-  value = map(0, Math.PI / 2, value);
-  let xValue = Math.sin(value);
-  let yValue = 1 - Math.cos(value);
+  ratio ??= calculateRatio(from, to);
+
+  let flip = reverse;
+  if (ratio > 1) {
+    ratio = 1 / ratio;
+  } else {
+    flip = !flip;
+  }
+
+  const normalized = flip ? Math.acos(1 - value) : Math.asin(value);
+  const radians = map(normalized, map(0, Math.PI / 2, value), ratio);
+
+  let xValue = Math.sin(radians);
+  let yValue = 1 - Math.cos(radians);
   if (reverse) {
     [xValue, yValue] = [yValue, xValue];
   }
@@ -82,6 +94,25 @@ export function rectArcTween(
     width: map(from.width ?? 0, to.width ?? 0, xValue),
     height: map(from.height ?? 0, to.height ?? 0, yValue),
   };
+}
+
+export function calculateRatio(from: Partial<IRect>, to: Partial<IRect>): number {
+  let numberOfValues = 0;
+  let ratio = 0;
+  if(from.x) {
+    ratio += Math.abs((from.x - to.x) / (from.y - to.y));
+    numberOfValues++;
+  }
+  if (from.width) {
+    ratio += Math.abs((from.width - to.width) / (from.height - to.height));
+    numberOfValues ++;
+  }
+
+  if (numberOfValues) {
+    ratio /= numberOfValues;
+  }
+
+  return ratio;
 }
 
 export function map(from: number, to: number, value: number) {
