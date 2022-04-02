@@ -1,13 +1,19 @@
 import {GeneratorHelper} from '../helpers';
+import {Player} from './Player';
 
 export class ThreadsMonitor {
-  public constructor(private readonly root: HTMLElement) {}
+  public constructor(
+    private readonly player: Player,
+    private readonly root: HTMLElement,
+  ) {
+    this.player.project.threadsCallback = this.render;
+  }
 
-  public render(
+  private render = (
     runners: Generator[],
     children: Map<Generator, Generator[]>,
     cancelled: Set<Generator>,
-  ) {
+  ) => {
     const elements = new Map<Generator, HTMLElement>();
     const root = document.createElement('ul');
     for (const runner of runners) {
@@ -30,7 +36,7 @@ export class ThreadsMonitor {
 
     this.root.querySelector('ul')?.remove();
     this.root.appendChild(root);
-  }
+  };
 
   private createRunnerElement(
     runner: Generator,

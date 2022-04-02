@@ -16,6 +16,7 @@
     "image-size": "^1.0.1",
     "konva": "^8.3.2",
     "mix-color": "^1.1.2",
+    "strongly-typed-events": "^3.0.1",
     "three": "^0.138.3",
     "ts-loader": "^9.2.6",
     "typescript": "^4.5.5",

@@ -58,6 +58,44 @@
       .cancelled {
         color: red;
       }
+
+      #timeline {
+        padding: 16px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .track {
+        border-radius: 4px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.3);
+        position: relative;
+      }
+
+      .fill {
+        background-color: white;
+        border-radius: 4px;
+        width: 25%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+      }
+
+      .fill-start {
+        background-color: #FF5F5D;
+      }
+
+      .marker {
+        position: absolute;
+        top: 12px;
+        bottom: 12px;
+        width: 8px;
+        border-radius: 4px;
+        background-color: #FF5F5D;
+      }
     </style>
   </head>
   <body>
@@ -65,6 +103,14 @@
     <details id="ui">
       <summary>THREADS</summary>
     </details>
+    <div id="timeline">
+      <div class="track">
+        <div class="fill fill-seek"></div>
+        <div class="fill fill-time"></div>
+        <div class="fill fill-start"></div>
+      </div>
+      <div class="marker"></div>
+    </div>
     <form id="controls">
       <div>
         <input type="checkbox" id="controls-play" name="play" checked />

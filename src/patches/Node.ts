@@ -20,6 +20,8 @@ function patchedPosition(
       .key(value, time)
       .run();
   }
-  return oldPosition.call(this, value);
+  return value === undefined
+    ? oldPosition.call(this)
+    : oldPosition.call(this, value);
 }
 Node.prototype.position = patchedPosition;
