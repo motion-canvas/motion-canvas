@@ -56,6 +56,10 @@ export class Controls {
           event.preventDefault();
           this.player.requestNextFrame();
           break;
+        case 'ArrowLeft':
+          event.preventDefault();
+          this.player.requestReset();
+          break;
       }
     });
 

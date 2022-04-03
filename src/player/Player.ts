@@ -20,7 +20,6 @@ export interface PlayerState {
 }
 
 interface PlayerCommands {
-  next: boolean;
   reset: boolean;
   seek: number;
 }
@@ -39,7 +38,6 @@ export class Player {
   public get RenderChanged() {
     return this.renderChanged.asEvent();
   }
-  public readonly project: Project;
 
   private readonly stateChanged = new SimpleEventDispatcher<PlayerState>();
   private readonly renderChanged =
@@ -61,7 +59,6 @@ export class Player {
   };
 
   private commands: PlayerCommands = {
-    next: false,
     reset: true,
     seek: -1,
   };
@@ -77,15 +74,13 @@ export class Player {
 
   private consumeCommands(): PlayerCommands {
     const commands = {...this.commands};
-    this.commands.next = false;
     this.commands.reset = false;
     this.commands.seek = -1;
 
     return commands;
   }
 
-  public constructor(factory: () => Project, audioSrc?: string) {
-    this.project = factory();
+  public constructor(public readonly project: Project, audioSrc?: string) {
     this.startTime = performance.now();
 
     const savedState = localStorage.getItem(STORAGE_KEY);
@@ -134,8 +129,13 @@ export class Player {
     return state;
   }
 
+  public reload(): void {
+    this.requestReset();
+    this.requestSeek(this.project.frame);
+  }
+
   public requestNextFrame(): void {
-    this.commands.next = true;
+    this.commands.seek = this.state.frame + 1;
   }
 
   public requestReset(): void {
@@ -221,7 +221,6 @@ export class Player {
     // do nothing if paused or is ahead of the audio.
     if (
       this.project.frame >= state.startFrame &&
-      !commands.next &&
       (state.paused ||
         (state.speed === 1 &&
           this.audio &&

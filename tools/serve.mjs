@@ -80,13 +80,7 @@ const server = new WebpackDevServer(
     static: path.resolve(__dirname, '../public'),
     compress: true,
     port: 9000,
-    setupMiddlewares: (middlewares, devServer) => {
-      devServer.app.get('/test', (_, response) => {
-        response.send('test?');
-      });
-
-      return middlewares;
-    }
+    hot: true,
   },
   compiler,
 );

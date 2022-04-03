@@ -33,7 +33,7 @@ export class Project extends Stage {
   private readonly scenes = new Set<Scene>();
 
   public constructor(
-    private runnerFactory: (project: Project) => Generator,
+    public runnerFactory: (project: Project) => Generator,
     size: ProjectSize = ProjectSize.FullHD,
     config: Partial<StageConfig> = {},
   ) {

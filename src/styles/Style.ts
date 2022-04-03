@@ -46,5 +46,5 @@ export function getFontColor(background: string) {
   const brightness = Math.round(
     (color.r * 299 + color.g * 587 + color.b * 114) / 1000,
   );
-  return brightness > 125 ? 'black' : 'white';
+  return brightness > 125 ? 'rgba(0, 0, 0, 0.87)' : 'rgba(0, 0, 0, 0.6)';
 }
