@@ -9,10 +9,12 @@ export class Timeline {
   private readonly marker: HTMLElement;
 
   private duration: number;
+  private labelElements: Record<string, HTMLElement> = {};
 
   public constructor(
     private readonly player: Player,
     private readonly root: HTMLElement,
+    private readonly labels: Record<string, number>,
   ) {
     this.fillTime = root.querySelector('.fill-time')!;
     this.fillSeek = root.querySelector('.fill-seek')!;
@@ -24,7 +26,14 @@ export class Timeline {
 
     this.player.StateChanged.sub(this.update);
     this.root.addEventListener('click', e => {
-      this.player.requestSeek(this.mousePositionToFrame(e.clientX));
+      const target = <HTMLElement>e.target;
+      this.player.requestSeek(
+        target.classList.contains('label')
+          ? this.player.project.secondsToFrames(
+              parseFloat(target.dataset.time!),
+            )
+          : this.mousePositionToFrame(e.clientX),
+      );
     });
     this.root.addEventListener('contextmenu', e => {
       e.preventDefault();
@@ -43,6 +52,15 @@ export class Timeline {
     this.root.addEventListener('mouseenter', () => {
       this.fillSeek.style.opacity = '0.32';
     });
+
+    for (const label in labels) {
+      const element = document.createElement('div');
+      element.classList.add('label');
+      element.dataset.title = label;
+      element.dataset.time = labels[label].toString();
+      root.appendChild(element);
+      this.labelElements[label] = element;
+    }
   }
 
   private mousePositionToFrame(position: number) {
@@ -68,5 +86,20 @@ export class Timeline {
     this.marker.style.left = `${left}px`;
     this.fillTime.style.width = `${fillWidth}px`;
     this.fillStart.style.width = `${startWidth}px`;
+
+    for (const label in this.labels) {
+      const element = this.labelElements[label];
+      const elementFrame = this.player.project.secondsToFrames(
+        this.labels[label],
+      );
+      const elementLeft = clampRemap(
+        1,
+        state.duration,
+        0,
+        width - 8,
+        elementFrame,
+      );
+      element.style.left = `${elementLeft}px`;
+    }
   };
 }

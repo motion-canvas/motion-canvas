@@ -85,7 +85,7 @@
       }
 
       .fill-start {
-        background-color: #FF5F5D;
+        background-color: #FA6466;
       }
 
       .marker {
@@ -94,8 +94,47 @@
         bottom: 12px;
         width: 8px;
         border-radius: 4px;
-        background-color: #FF5F5D;
+        background-color: #FA6466;
       }
+
+      .label {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 16px;
+        padding: 12px;
+
+        display: flex;
+        justify-content: center;
+      }
+
+      .label::before {
+        content: '';
+        display: block;
+        width: 16px;
+        height: 16px;
+        border-radius: 8px;
+        background-color: #F5DC7C;
+      }
+
+      .label::after {
+        content: attr(data-title);
+        display: block;
+        position: absolute;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.87);
+        bottom: 48px;
+        text-align: center;
+        padding: 4px 8px;
+        border-radius: 2px;
+        opacity: 0;
+        pointer-events: none ;
+      }
+
+      .label:hover::after {
+        opacity: 1;
+      }
+
     </style>
   </head>
   <body>
