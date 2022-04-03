@@ -30,6 +30,8 @@ export interface PlayerRenderEvent {
   blob: Blob;
 }
 
+const STORAGE_KEY = 'player-state';
+
 export class Player {
   public get StateChanged() {
     return this.stateChanged.asEvent();
@@ -45,7 +47,6 @@ export class Player {
 
   private readonly audio: HTMLAudioElement = null;
   private startTime: number;
-  private ignoreAudioEvents = false;
 
   private state: PlayerState = {
     duration: 100,
@@ -71,6 +72,7 @@ export class Player {
       ...newState,
     };
     this.stateChanged.dispatch(this.state);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
   }
 
   private consumeCommands(): PlayerCommands {
@@ -86,6 +88,15 @@ export class Player {
     this.project = factory();
     this.startTime = performance.now();
 
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      const state = JSON.parse(savedState) as PlayerState;
+      this.state.paused = state.paused;
+      this.state.startFrame = state.startFrame;
+      this.state.loop = state.loop;
+      this.state.speed = state.speed;
+    }
+
     if (audioSrc) {
       this.audio = new Audio(audioSrc);
       this.audio.addEventListener('durationchange', () => {
@@ -93,16 +104,6 @@ export class Player {
           duration: this.project.secondsToFrames(this.audio.duration),
         });
         this.requestSeek(this.state.duration);
-      });
-      this.audio.addEventListener('play', () => {
-        if (!this.ignoreAudioEvents) {
-          this.updateState({paused: this.audio.paused});
-        }
-      });
-      this.audio.addEventListener('pause', () => {
-        if (!this.ignoreAudioEvents) {
-          this.updateState({paused: this.audio.paused});
-        }
       });
     }
 
@@ -166,13 +167,16 @@ export class Player {
     if (commands.seek >= state.startFrame) {
       state.startFrame = commands.seek;
     }
-    if (commands.reset || (commands.seek >= 0 && state.frame > commands.seek)) {
+    if (
+      commands.reset ||
+      (state.finished && state.loop) ||
+      (commands.seek >= 0 && state.frame > commands.seek)
+    ) {
       state = await this.reset(state);
     }
 
     // rendering
     if (state.render) {
-      this.ignoreAudioEvents = true;
       if (!this.audio?.paused) {
         this.audio?.pause();
       }
@@ -192,7 +196,6 @@ export class Player {
         frame: this.project.frame,
       });
       this.request();
-      this.ignoreAudioEvents = false;
       return;
     }
 
@@ -202,42 +205,17 @@ export class Player {
     }
 
     // pause / play audio.
-    if (this.audio && this.audio.paused !== state.paused) {
-      this.ignoreAudioEvents = true;
-      if (state.paused) {
+    const audioPaused = state.paused || state.finished;
+    if (this.audio && this.audio.paused !== audioPaused) {
+      if (audioPaused) {
         this.audio.pause();
       } else {
         this.audio.currentTime = Math.max(
           0,
           this.project.framesToSeconds(this.project.frame - 3),
         );
-        await this.audio.play();
+        this.audio.play();
       }
-      this.ignoreAudioEvents = false;
-    }
-
-    // handle finishing
-    if (state.finished) {
-      this.updateState({
-        duration: this.project.frame,
-        finished: state.finished,
-      });
-
-      if (state.loop) {
-        this.requestReset();
-      }
-
-      // Prevent animation from restarting too quickly.
-      const animationDuration = performance.now() - this.startTime;
-      if (animationDuration < MINIMUM_ANIMATION_DURATION) {
-        setTimeout(
-          () => this.request(),
-          MINIMUM_ANIMATION_DURATION - animationDuration,
-        );
-      } else {
-        this.request();
-      }
-      return;
     }
 
     // do nothing if paused or is ahead of the audio.
@@ -253,7 +231,9 @@ export class Player {
       return;
     }
 
-    state.finished = await this.project.next(state.speed);
+    if (!state.finished) {
+      state.finished = await this.project.next(state.speed);
+    }
 
     // Start from certain frame
     if (this.project.frame < state.startFrame) {
@@ -278,12 +258,36 @@ export class Player {
     }
 
     this.project.draw();
+
+    // handle finishing
+    if (state.finished) {
+      if (state.loop || commands.seek >= 0) {
+        this.requestReset();
+      }
+
+      state.duration = this.project.frame;
+    }
+
     this.updateState({
       finished: state.finished,
       duration: state.duration,
       frame: this.project.frame,
     });
-    this.request();
+
+    // Prevent animation from restarting too quickly.
+    const animationDuration = performance.now() - this.startTime;
+    if (
+      commands.seek < 0 &&
+      state.finished &&
+      animationDuration < MINIMUM_ANIMATION_DURATION
+    ) {
+      setTimeout(
+        () => this.request(),
+        MINIMUM_ANIMATION_DURATION - animationDuration,
+      );
+    } else {
+      this.request();
+    }
   }
 
   private request() {
