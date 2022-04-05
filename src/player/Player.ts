@@ -1,10 +1,9 @@
-import {Project} from '../Project';
+import type {Project} from '../Project';
 import {
   PromiseSimpleEventDispatcher,
   SimpleEventDispatcher,
 } from 'strongly-typed-events';
 
-const MINIMUM_ANIMATION_DURATION = 1000;
 const MAX_AUDIO_DESYNC = 1 / 50;
 
 export interface PlayerState {
@@ -35,6 +34,7 @@ export class Player {
   public get StateChanged() {
     return this.stateChanged.asEvent();
   }
+
   public get RenderChanged() {
     return this.renderChanged.asEvent();
   }
@@ -45,6 +45,7 @@ export class Player {
 
   private readonly audio: HTMLAudioElement = null;
   private startTime: number;
+  private audioError = false;
 
   private state: PlayerState = {
     duration: 100,
@@ -105,41 +106,12 @@ export class Player {
     this.request();
   }
 
-  private async reset(state: PlayerState): Promise<PlayerState> {
-    this.project.start();
-    state.finished = await this.project.next();
-    while (this.project.frame < state.startFrame && !state.finished) {
-      state.finished = await this.project.next();
-    }
-    this.project.draw();
-    this.startTime = performance.now();
-    if (this.audio) {
-      this.audio.currentTime = Math.max(
-        0,
-        this.project.framesToSeconds(state.startFrame - 3),
-      );
-    }
-    state.frame = this.project.frame;
-
-    this.updateState({
-      finished: state.finished,
-      frame: state.frame,
-    });
-
-    return state;
-  }
-
-  public reload(): void {
-    this.requestReset();
-    this.requestSeek(this.project.frame);
-  }
-
   public requestNextFrame(): void {
     this.commands.seek = this.state.frame + 1;
   }
 
   public requestReset(): void {
-    this.commands.reset = true;
+    this.commands.seek = 0;
   }
 
   public requestSeek(value: number): void {
@@ -164,22 +136,28 @@ export class Player {
   private async run() {
     let commands = this.consumeCommands();
     let state = {...this.state};
-    if (commands.seek >= state.startFrame) {
-      state.startFrame = commands.seek;
-    }
-    if (
-      commands.reset ||
-      (state.finished && state.loop) ||
-      (commands.seek >= 0 && state.frame > commands.seek)
-    ) {
-      state = await this.reset(state);
+    if (state.finished && state.loop && commands.seek < 0) {
+      commands.seek = 0;
     }
 
-    // rendering
-    if (state.render) {
-      if (!this.audio?.paused) {
-        this.audio?.pause();
+    // Pause / play audio.
+    const audioPaused = state.paused || state.finished || state.render;
+    if (this.audio && this.audio.paused !== audioPaused) {
+      if (audioPaused) {
+        this.audio.pause();
+      } else {
+        try {
+          await this.audio.play();
+          this.syncAudio(-3);
+          this.audioError = false;
+        } catch (e) {
+          this.audioError = true;
+        }
       }
+    }
+
+    // Rendering
+    if (state.render) {
       state.finished = await this.project.next();
       this.project.draw();
       await this.renderChanged.dispatch({
@@ -199,71 +177,46 @@ export class Player {
       return;
     }
 
-    // synchronize audio.
-    if (state.speed !== 1 && this.audio) {
-      this.audio.currentTime = this.project.time;
+    // Seek to the given frame
+    if (commands.seek >= 0 || this.project.frame < state.startFrame) {
+      const seekFrame = Math.max(commands.seek, state.startFrame);
+      state.finished = await this.project.seek(seekFrame, state.speed);
+      this.syncAudio(-3);
     }
-
-    // pause / play audio.
-    const audioPaused = state.paused || state.finished;
-    if (this.audio && this.audio.paused !== audioPaused) {
-      if (audioPaused) {
-        this.audio.pause();
-      } else {
-        this.audio.currentTime = Math.max(
-          0,
-          this.project.framesToSeconds(this.project.frame - 3),
-        );
-        this.audio.play();
-      }
-    }
-
-    // do nothing if paused or is ahead of the audio.
-    if (
-      this.project.frame >= state.startFrame &&
-      (state.paused ||
-        (state.speed === 1 &&
-          this.audio &&
-          this.audio.currentTime < this.project.time))
+    // Do nothing if paused or is ahead of the audio.
+    else if (
+      state.paused ||
+      (state.speed === 1 &&
+        this.hasAudio() &&
+        this.audio.currentTime < this.project.time)
     ) {
       this.request();
       return;
     }
-
-    if (!state.finished) {
-      state.finished = await this.project.next(state.speed);
-    }
-
-    // Start from certain frame
-    if (this.project.frame < state.startFrame) {
-      while (this.project.frame < state.startFrame && !state.finished) {
-        state.finished = await this.project.next();
-      }
-      if (this.audio) {
-        this.audio.currentTime = this.project.framesToSeconds(
-          state.startFrame - 3,
-        );
-      }
-    }
-
-    // Synchronize animation with audio.
-    if (
+    // Seek to synchronize animation with audio.
+    else if (
+      this.hasAudio() &&
       state.speed === 1 &&
-      this.audio?.currentTime - MAX_AUDIO_DESYNC > this.project.time
+      this.project.time < this.audio.currentTime - MAX_AUDIO_DESYNC
     ) {
-      while (this.audio.currentTime > this.project.time && !state.finished) {
-        state.finished = await this.project.next();
+      const seekFrame = this.project.secondsToFrames(this.audio.currentTime);
+      state.finished = await this.project.seek(seekFrame, state.speed);
+    }
+    // Simply move forward one frame
+    else {
+      state.finished = await this.project.next(state.speed);
+
+      // Synchronize audio.
+      if (state.speed !== 1) {
+        this.syncAudio();
       }
     }
 
+    // Draw the project
     this.project.draw();
 
     // handle finishing
     if (state.finished) {
-      if (state.loop || commands.seek >= 0) {
-        this.requestReset();
-      }
-
       state.duration = this.project.frame;
     }
 
@@ -273,20 +226,20 @@ export class Player {
       frame: this.project.frame,
     });
 
-    // Prevent animation from restarting too quickly.
-    const animationDuration = performance.now() - this.startTime;
-    if (
-      commands.seek < 0 &&
-      state.finished &&
-      animationDuration < MINIMUM_ANIMATION_DURATION
-    ) {
-      setTimeout(
-        () => this.request(),
-        MINIMUM_ANIMATION_DURATION - animationDuration,
-      );
-    } else {
-      this.request();
-    }
+    this.request();
+  }
+
+  private hasAudio(): boolean {
+    return this.audio && !this.audioError;
+  }
+
+  private syncAudio(frameOffset: number = 0) {
+    if (!this.audio) return;
+
+    this.audio.currentTime = Math.max(
+      0,
+      this.project.framesToSeconds(this.project.frame + frameOffset),
+    );
   }
 
   private request() {

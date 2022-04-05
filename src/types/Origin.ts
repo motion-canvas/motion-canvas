@@ -49,7 +49,7 @@ export function flipOrigin(
   return origin;
 }
 
-export function originPosition(origin: Origin, width = 1 , height = 1): Vector2d {
+export function originPosition(origin: Origin | Direction, width = 1 , height = 1): Vector2d {
   const position: Vector2d = {x: 0, y: 0};
 
   if (origin === Origin.Middle) {

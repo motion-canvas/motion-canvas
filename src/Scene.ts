@@ -1,84 +1,128 @@
+import type {Project} from './Project';
 import {Layer, LayerConfig} from 'konva/lib/Layer';
-import {Project} from './Project';
-import {GeneratorHelper} from './helpers';
-import {cancel} from './animations';
+import {threads, ThreadsCallback} from './animations';
 import {Debug} from './components';
 import {Node} from 'konva/lib/Node';
 import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
+import {threadable} from './decorators';
+import {PROJECT} from './symbols';
 
 export interface SceneRunner {
   (layer: Scene, project: Project): Generator;
 }
 
+export interface SceneTransition {
+  (next: Scene, previous?: Scene): Generator;
+}
+
 export enum SceneState {
-  Pending,
-  Started,
+  Initial,
+  AfterTransitionIn,
+  CanTransitionOut,
   Finished,
-  Disposed,
 }
 
 export class Scene extends Layer {
-  private state: SceneState = SceneState.Pending;
-  private task: Generator;
+  public firstFrame: number = null;
+  public transitionFrame: number = null;
+  public lastFrame: number = null;
+  public threadsCallback: ThreadsCallback = null;
+
   private readonly debugNode: Debug;
+  private previousScene: Scene = null;
+  private runner: Generator;
+  private state: SceneState = SceneState.Initial;
 
   public constructor(
     public readonly project: Project,
-    private readonly runner: SceneRunner,
-    config?: LayerConfig,
+    private runnerFactory: SceneRunner,
+    config: LayerConfig = {},
   ) {
-    super(config);
+    super({
+      name: runnerFactory.name,
+      ...config,
+    });
     this.debugNode = new Debug();
     this.add(this.debugNode);
     this.debugNode.hide();
   }
 
-  public run(): Generator {
-    this.project.addScene(this);
-    const scene = this;
-    this.task = (function* () {
-      yield* scene.runner(scene, scene.project);
-      if (scene.state !== SceneState.Disposed) {
-        scene.state = SceneState.Finished;
+  public reload(runnerFactory: SceneRunner) {
+    this.runnerFactory = runnerFactory;
+    this.transitionFrame = null;
+    this.lastFrame = null;
+  }
+
+  public async reset(previousScene: Scene = null) {
+    this.x(0).y(0);
+    this.debugNode.remove();
+    this.destroyChildren();
+    this.add(this.debugNode);
+    this.previousScene = previousScene;
+    this.runner = threads(
+      () => this.runnerFactory(this, this.project),
+      (...args) => this.threadsCallback?.(...args),
+    );
+    this.state = SceneState.Initial;
+    await this.next();
+  }
+
+  public async next() {
+    let result = this.runner.next();
+    while (result.value) {
+      if (typeof result.value.then === 'function') {
+        const value = await result.value;
+        result = this.runner.next(value);
+      } else if (result.value === PROJECT) {
+        result = this.runner.next(this.project);
+      } else {
+        console.log('Invalid value: ', result.value);
+        result = this.runner.next();
       }
-      while (scene.state !== SceneState.Disposed) {
-        yield;
-      }
-    })();
-    GeneratorHelper.makeThreadable(this.task, `${this.name()} [scene]`);
-
-    return this.task;
-  }
-
-  public activate() {
-    if (this.state === SceneState.Pending) {
-      this.state = SceneState.Started;
     }
-  }
 
-  public *start(): Generator {
-    while (this.state === SceneState.Pending) {
-      yield;
-    }
-  }
-
-  public *end(): Generator {
-    while (this.state !== SceneState.Finished) {
-      yield;
-    }
-  }
-
-  public deactivate() {
-    if (this.state === SceneState.Started) {
+    if (result.done) {
       this.state = SceneState.Finished;
     }
   }
 
-  public *dispose() {
-    this.state = SceneState.Disposed;
-    yield* cancel(this.task);
-    this.project.removeScene(this);
+  @threadable()
+  public *transition(transitionRunner?: SceneTransition) {
+    if (transitionRunner) {
+      yield* transitionRunner(this, this.previousScene);
+    }
+    if (this.state === SceneState.Initial) {
+      this.state = SceneState.AfterTransitionIn;
+    } else {
+      console.warn(
+        `Scene ${this.name} transitioned in an unexpected state: `,
+        this.state,
+      );
+    }
+  }
+
+  public canFinish() {
+    if (this.state === SceneState.AfterTransitionIn) {
+      this.state = SceneState.CanTransitionOut;
+    } else {
+      console.warn(
+        `Scene ${this.name} was marked as finished in an unexpected state: `,
+        this.state,
+      );
+    }
+  }
+
+  public isAfterTransitionIn(): boolean {
+    return this.state === SceneState.AfterTransitionIn;
+  }
+
+  public isFinished(): boolean {
+    return this.state === SceneState.Finished;
+  }
+
+  public canTransitionOut(): boolean {
+    return this.state === SceneState.CanTransitionOut;
   }
 
   public add(...children: (Shape | Group)[]): this {

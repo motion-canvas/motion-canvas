@@ -24,7 +24,10 @@ export function* cancel(...tasks: Generator[]): Generator {
 }
 
 decorate(threads, threadable());
-export function* threads(factory: ThreadsFactory, callback?: ThreadsCallback): Generator {
+export function* threads(
+  factory: ThreadsFactory,
+  callback?: ThreadsCallback,
+): Generator {
   let runners: Generator[] = [];
   let cancelled = new Set<Generator>();
   let values = new Map<Generator, any>();

@@ -5,9 +5,8 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
 import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
-import {threads, ThreadsCallback} from './animations';
-import {Scene} from './Scene';
-import {PROJECT} from './symbols';
+import {ThreadsCallback} from './animations';
+import {Scene, SceneRunner} from './Scene';
 
 Konva.autoDrawEnabled = false;
 
@@ -25,15 +24,17 @@ export class Project extends Stage {
   public threadsCallback: ThreadsCallback;
   public framesPerSeconds = 60;
   public frame: number = 0;
+
   public get time(): number {
     return this.framesToSeconds(this.frame);
   }
 
-  private runner: Generator;
-  private readonly scenes = new Set<Scene>();
+  private readonly sceneLookup: Record<string, Scene> = {};
+  private previousScene: Scene = null;
+  private currentScene: Scene = null;
 
   public constructor(
-    public runnerFactory: (project: Project) => Generator,
+    scenes: SceneRunner[],
     size: ProjectSize = ProjectSize.FullHD,
     config: Partial<StageConfig> = {},
   ) {
@@ -61,49 +62,102 @@ export class Project extends Stage {
     const backgroundLayer = new Layer({name: 'background'});
     backgroundLayer.add(this.background);
     this.add(backgroundLayer);
-  }
 
-  public addScene(scene: Scene) {
-    if (!this.scenes.has(scene)) {
-      this.scenes.add(scene);
-      this.add(scene);
+    for (const scene of scenes) {
+      const handle = new Scene(this, scene);
+      this.sceneLookup[scene.name] = handle;
+      handle.threadsCallback = (...args) => {
+        if (this.currentScene === handle) {
+          this.threadsCallback?.(...args);
+        }
+      };
     }
   }
 
-  public removeScene(scene: Scene) {
-    if (this.scenes.has(scene)) {
-      this.scenes.delete(scene);
-      scene.destroy();
+  public reload(runners: SceneRunner[]) {
+    for (const runner of runners) {
+      this.sceneLookup[runner.name]?.reload(runner);
     }
   }
 
-  public start() {
-    this.scenes.forEach(scene => scene.destroy());
-    this.scenes.clear();
-    this.frame = 0;
-    this.runner = threads(
-      () => this.runnerFactory(this),
-      (runners, children, cancelled) =>
-        this.threadsCallback?.(runners, children, cancelled),
-    );
+  private async goToScene(scene: Scene) {
+    this.previousScene?.remove();
+    this.currentScene?.remove();
+
+    this.previousScene = null;
+    this.currentScene = scene;
+    await this.currentScene.reset();
+    this.add(this.currentScene);
   }
 
   public async next(speed: number = 1): Promise<boolean> {
-    let result = this.runner.next();
-    while (result.value) {
-      if (typeof result.value.then === 'function') {
-        const value = await result.value;
-        result = this.runner.next(value);
-      } else if (result.value === PROJECT) {
-        result = this.runner.next(this);
-      } else {
-        console.log('Invalid value: ', result.value);
-        result = this.runner.next();
+    if (this.previousScene) {
+      await this.previousScene.next();
+      if (
+        this.previousScene.isFinished() &&
+        (!this.currentScene || this.currentScene.isAfterTransitionIn())
+      ) {
+        this.previousScene.remove();
+        this.previousScene.lastFrame = this.frame;
+        this.previousScene = null;
       }
     }
+
+    if (this.currentScene) {
+      await this.currentScene.next();
+      if (this.currentScene.canTransitionOut()) {
+        this.previousScene = this.currentScene;
+        this.previousScene.transitionFrame = this.frame;
+        this.currentScene = this.getNextScene(this.previousScene);
+        if (this.currentScene) {
+          await this.currentScene.reset(this.previousScene);
+          this.currentScene.firstFrame = this.frame;
+          this.add(this.currentScene);
+        }
+      }
+    }
+
     this.frame += speed;
 
-    return result.done;
+    return !this.currentScene || this.currentScene.isFinished();
+  }
+
+  public async seek(frame: number, speed: number = 1): Promise<boolean> {
+    if (
+      frame <= this.frame ||
+      !this.currentScene ||
+      (this.currentScene.lastFrame !== null &&
+        this.currentScene.lastFrame <= frame)
+    ) {
+      const scene = this.findBestScene(frame);
+      if (scene !== this.currentScene) {
+        await this.goToScene(scene);
+        this.frame = this.currentScene.firstFrame ?? 0;
+      } else if (this.frame >= frame) {
+        this.previousScene?.remove();
+        await this.currentScene.reset();
+        this.frame = this.currentScene.firstFrame ?? 0;
+      }
+    }
+
+    let finished = false;
+    while (this.frame < frame && !finished) {
+      finished = await this.next(speed);
+    }
+
+    return finished;
+  }
+
+  private findBestScene(frame: number): Scene {
+    let lastScene = null;
+    for (const scene of Object.values(this.sceneLookup)) {
+      if (scene.transitionFrame === null || scene.transitionFrame > frame) {
+        return scene;
+      }
+      lastScene = scene;
+    }
+
+    return lastScene;
   }
 
   public secondsToFrames(seconds: number) {
@@ -112,5 +166,18 @@ export class Project extends Stage {
 
   public framesToSeconds(frames: number) {
     return frames / this.framesPerSeconds;
+  }
+
+  private getNextScene(scene?: Scene): Scene {
+    const scenes = Object.values(this.sceneLookup);
+    if (!scene) {
+      return scenes[0];
+    }
+
+    const index = scenes.findIndex(s => s === scene);
+    if (index < 0) {
+      return null;
+    }
+    return scenes[index + 1] ?? null;
   }
 }
