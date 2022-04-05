@@ -27,7 +27,6 @@ export enum SceneState {
 
 export class Scene extends Layer {
   public firstFrame: number = null;
-  public transitionFrame: number = null;
   public lastFrame: number = null;
   public threadsCallback: ThreadsCallback = null;
 
@@ -53,7 +52,6 @@ export class Scene extends Layer {
 
   public reload(runnerFactory: SceneRunner) {
     this.runnerFactory = runnerFactory;
-    this.transitionFrame = null;
     this.lastFrame = null;
   }
 

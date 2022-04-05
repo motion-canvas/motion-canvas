@@ -97,7 +97,6 @@ export class Project extends Stage {
       await this.currentScene.next();
       if (this.currentScene.canTransitionOut()) {
         this.previousScene = this.currentScene;
-        this.previousScene.transitionFrame = this.frame;
         this.currentScene = this.getNextScene(this.previousScene);
         if (this.currentScene) {
           await this.currentScene.reset(this.previousScene);
@@ -148,7 +147,7 @@ export class Project extends Stage {
   private findBestScene(frame: number): Scene {
     let lastScene = null;
     for (const scene of Object.values(this.sceneLookup)) {
-      if (scene.transitionFrame === null || scene.transitionFrame > frame) {
+      if (scene.lastFrame === null || scene.lastFrame > frame) {
         return scene;
       }
       lastScene = scene;
