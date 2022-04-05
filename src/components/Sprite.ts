@@ -2,10 +2,11 @@ import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
-import {cancel, waitFor} from '../animations';
+import {waitFor} from '../animations';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {map} from '../tweening';
+import {cancel} from '../threading';
 
 export interface SpriteData {
   fileName: string;
@@ -146,6 +147,7 @@ export class Sprite extends LayoutShape {
     return this.task;
   }
 
+  @threadable()
   public *stop() {
     if (this.task) {
       yield* cancel(this.task);

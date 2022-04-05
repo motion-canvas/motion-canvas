@@ -5,7 +5,7 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Layer} from 'konva/lib/Layer';
 import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
-import {ThreadsCallback} from './animations';
+import {ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 
 Konva.autoDrawEnabled = false;

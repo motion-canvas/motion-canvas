@@ -1,6 +1,6 @@
 import type {Project} from './Project';
 import {Layer, LayerConfig} from 'konva/lib/Layer';
-import {threads, ThreadsCallback} from './animations';
+import {threads, ThreadsCallback} from './threading';
 import {Debug} from './components';
 import {Node} from 'konva/lib/Node';
 import {Group} from 'konva/lib/Group';

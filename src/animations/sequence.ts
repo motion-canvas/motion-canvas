@@ -1,6 +1,6 @@
 import {waitFor} from './scheduling';
-import {join} from './threads';
-import {decorate, threadable} from "../decorators";
+import {decorate, threadable} from '../decorators';
+import {join} from '../threading';
 
 decorate(sequence, threadable());
 export function* sequence(delay: number, ...sequences: Generator[]): Generator {
@@ -9,5 +9,5 @@ export function* sequence(delay: number, ...sequences: Generator[]): Generator {
     yield* waitFor(delay);
   }
 
-  yield* join(true, ...sequences);
+  yield* join(...sequences);
 }

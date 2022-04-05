@@ -1,4 +1,4 @@
-import {join} from '../animations';
+import {join} from '../threading';
 import {decorate, threadable} from '../decorators';
 
 decorate(any, threadable());
