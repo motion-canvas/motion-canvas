@@ -80,16 +80,6 @@ export class Project extends Stage {
     }
   }
 
-  private async goToScene(scene: Scene) {
-    this.previousScene?.remove();
-    this.currentScene?.remove();
-
-    this.previousScene = null;
-    this.currentScene = scene;
-    await this.currentScene.reset();
-    this.add(this.currentScene);
-  }
-
   public async next(speed: number = 1): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
@@ -131,12 +121,19 @@ export class Project extends Stage {
     ) {
       const scene = this.findBestScene(frame);
       if (scene !== this.currentScene) {
-        await this.goToScene(scene);
+        this.previousScene?.remove();
+        this.previousScene = null;
+        this.currentScene?.remove();
+        this.currentScene = scene;
+
         this.frame = this.currentScene.firstFrame ?? 0;
+        this.add(this.currentScene);
+        await this.currentScene.reset();
       } else if (this.frame >= frame) {
         this.previousScene?.remove();
-        await this.currentScene.reset();
+        this.previousScene = null;
         this.frame = this.currentScene.firstFrame ?? 0;
+        await this.currentScene.reset();
       }
     }
 

@@ -13,10 +13,11 @@ import {
 } from './index';
 import {threadable} from '../decorators';
 import {waitFor, waitUntil} from '../animations';
+import {ThreadGenerator} from '../threading';
 
 export class Animator<Type, This extends Node> {
   private valueFrom: Type = null;
-  private keys: (() => Generator)[] = [];
+  private keys: (() => ThreadGenerator)[] = [];
   private mapper: TweenFunction<any> = map;
   private loops: number = 1;
   private readonly setter: string;
@@ -82,7 +83,7 @@ export class Animator<Type, This extends Node> {
     return this;
   }
 
-  public run(loops = 1): Generator {
+  public run(loops = 1): ThreadGenerator {
     this.loops = loops;
     if (this.valueFrom !== null) {
       //@ts-ignore
@@ -93,7 +94,7 @@ export class Animator<Type, This extends Node> {
   }
 
   @threadable('animatorRunner')
-  private *runner() {
+  private *runner(): ThreadGenerator {
     for (let loop = 0; loop < this.loops; loop++) {
       for (let i = 0; i < this.keys.length; i++) {
         yield* this.keys[i]();

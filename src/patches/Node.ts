@@ -2,16 +2,17 @@ import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
 import {Animator} from '../tweening/Animator';
 import {ANIMATE} from '../symbols';
+import {ThreadGenerator} from '../threading';
 
 const oldPosition = Node.prototype.position;
 function patchedPosition(): Vector2d;
 function patchedPosition(value: Vector2d): Node;
 function patchedPosition(value: typeof ANIMATE): Animator<Vector2d, Node>;
-function patchedPosition(value: Vector2d, time: number): Generator;
+function patchedPosition(value: Vector2d, time: number): ThreadGenerator;
 function patchedPosition(
   value?: Vector2d | typeof ANIMATE,
   time?: number,
-): Node | Vector2d | Animator<Vector2d, Node> | Generator {
+): Node | Vector2d | Animator<Vector2d, Node> | ThreadGenerator {
   if (value === ANIMATE) {
     return new Animator<Vector2d, Node>(this, 'position');
   }

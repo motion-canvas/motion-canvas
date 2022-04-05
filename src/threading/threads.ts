@@ -1,11 +1,16 @@
 import {GeneratorHelper} from '../helpers';
 import {decorate, threadable} from '../decorators';
 import {Thread} from './Thread';
-import {THREAD_JOIN} from './join';
-import {THREAD_CANCEL} from './cancel';
+import {isJoinYieldResult, THREAD_JOIN} from './join';
+import {isCancelYieldResult, THREAD_CANCEL} from './cancel';
+import {isThreadGenerator, ThreadGenerator} from './ThreadGenerator';
+
+export function isPromise(value: any): value is Promise<any> {
+  return typeof value?.then === 'function';
+}
 
 export interface ThreadsFactory {
-  (): Generator;
+  (): ThreadGenerator;
 }
 
 export interface ThreadsCallback {
@@ -16,13 +21,16 @@ decorate(threads, threadable());
 export function* threads(
   factory: ThreadsFactory,
   callback?: ThreadsCallback,
-): Generator {
+): ThreadGenerator {
   let threads: Thread[] = [];
   const find = (runner: Generator) =>
     threads.find(thread => thread.runner === runner);
 
   decorate(joinInternal, threadable());
-  function* joinInternal(tasks: Generator[], all: boolean): Generator {
+  function* joinInternal(
+    tasks: ThreadGenerator[],
+    all: boolean,
+  ): ThreadGenerator {
     if (all) {
       while (tasks.find(runner => find(runner))) {
         yield;
@@ -57,9 +65,9 @@ export function* threads(
       }
 
       let value = result.value;
-      if (value?.[THREAD_JOIN]) {
+      if (isJoinYieldResult(value)) {
         value = joinInternal(value[THREAD_JOIN], value.all);
-      } else if (value?.[THREAD_CANCEL]) {
+      } else if (isCancelYieldResult(value)) {
         value[THREAD_CANCEL].forEach((runner: Generator) => {
           const cancelThread = find(runner);
           if (cancelThread) {
@@ -70,7 +78,7 @@ export function* threads(
         continue;
       }
 
-      if (value?.next) {
+      if (isThreadGenerator(value)) {
         const child = find(value) ?? new Thread(value);
         thread.value = value;
         if (child.canceled) {

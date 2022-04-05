@@ -2,6 +2,7 @@ import {Node} from 'konva/lib/Node';
 import {Vector2d} from 'konva/lib/types';
 import {decorate, threadable} from '../decorators';
 import {tween, easeInOutQuint, vector2dTween} from '../tweening';
+import {ThreadGenerator} from '../threading';
 
 export interface MoveConfig {
   absolute?: boolean;
@@ -13,19 +14,19 @@ export function move(
   node: Node,
   position: Vector2d,
   config?: MoveConfig,
-): Generator;
+): ThreadGenerator;
 export function move(
   node: Node,
   positionX: number,
   positionY: number,
   config?: MoveConfig,
-): Generator;
+): ThreadGenerator;
 export function move(
   node: Node,
   arg0: number | Vector2d,
   arg1?: number | MoveConfig,
   arg2?: MoveConfig,
-): Generator {
+): ThreadGenerator {
   let delta: Vector2d;
   let config: MoveConfig;
   if (typeof arg0 === 'number') {

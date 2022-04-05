@@ -1,4 +1,5 @@
 import {GeneratorHelper} from '../helpers';
+import {ThreadGenerator} from './ThreadGenerator';
 
 export class Thread {
   public children: Thread[] = [];
@@ -11,9 +12,9 @@ export class Thread {
 
   private _canceled: boolean = false;
 
-  public constructor(public readonly runner: Generator) {}
+  public constructor(public readonly runner: ThreadGenerator) {}
 
-  public next(): IteratorResult<unknown> {
+  public next() {
     const result = this.runner.next(this.value);
     this.value = null;
     return result;

@@ -1,19 +1,21 @@
 import type {Project} from './Project';
 import {Layer, LayerConfig} from 'konva/lib/Layer';
-import {threads, ThreadsCallback} from './threading';
+import {
+  isPromise,
+  ThreadGenerator,
+  threads,
+  ThreadsCallback,
+} from './threading';
 import {Debug} from './components';
 import {Node} from 'konva/lib/Node';
 import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
-import {threadable} from './decorators';
+import {SceneTransition} from './transitions';
+import {decorate, threadable} from './decorators';
 import {PROJECT} from './symbols';
 
 export interface SceneRunner {
-  (layer: Scene, project: Project): Generator;
-}
-
-export interface SceneTransition {
-  (next: Scene, previous?: Scene): Generator;
+  (layer: Scene, project: Project): ThreadGenerator;
 }
 
 export enum SceneState {
@@ -31,7 +33,7 @@ export class Scene extends Layer {
 
   private readonly debugNode: Debug;
   private previousScene: Scene = null;
-  private runner: Generator;
+  private runner: ThreadGenerator;
   private state: SceneState = SceneState.Initial;
 
   public constructor(
@@ -46,6 +48,7 @@ export class Scene extends Layer {
     this.debugNode = new Debug();
     this.add(this.debugNode);
     this.debugNode.hide();
+    decorate(runnerFactory, threadable());
   }
 
   public reload(runnerFactory: SceneRunner) {
@@ -71,7 +74,7 @@ export class Scene extends Layer {
   public async next() {
     let result = this.runner.next();
     while (result.value) {
-      if (typeof result.value.then === 'function') {
+      if (isPromise(result.value)) {
         const value = await result.value;
         result = this.runner.next(value);
       } else if (result.value === PROJECT) {

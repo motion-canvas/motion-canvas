@@ -1,14 +1,27 @@
 import {decorate, threadable} from '../decorators';
+import {ThreadGenerator} from './ThreadGenerator';
 
 export const THREAD_JOIN = Symbol('Thread join command');
 
+export interface JoinYieldResult {
+  [THREAD_JOIN]: ThreadGenerator[];
+  all: boolean;
+}
+
+export function isJoinYieldResult(value: any): value is JoinYieldResult {
+  return typeof value === 'object' && THREAD_JOIN in value;
+}
+
 decorate(join, threadable());
-export function join(all: boolean, ...tasks: Generator[]): Generator;
-export function join(...tasks: Generator[]): Generator;
+export function join(
+  all: boolean,
+  ...tasks: ThreadGenerator[]
+): ThreadGenerator;
+export function join(...tasks: ThreadGenerator[]): ThreadGenerator;
 export function* join(
-  first: Generator | boolean,
-  ...tasks: Generator[]
-): Generator {
+  first: ThreadGenerator | boolean,
+  ...tasks: ThreadGenerator[]
+): ThreadGenerator {
   let all = true;
   if (typeof first === 'boolean') {
     all = first;
@@ -16,5 +29,5 @@ export function* join(
     tasks.push(first);
   }
 
-  yield* (yield {[THREAD_JOIN]: tasks, all}) as Generator;
+  yield* yield {[THREAD_JOIN]: tasks, all};
 }

@@ -2,13 +2,14 @@ import {Factory} from 'konva/lib/Factory';
 import {ANIMATE} from '../symbols';
 import type {Node} from 'konva/lib/Node';
 import {Animator} from '../tweening/Animator';
+import {ThreadGenerator} from '../threading';
 
 declare module 'konva/lib/types' {
   export interface GetSet<Type, This extends Node> {
     (): Type;
     (value: Type): This;
     (value: typeof ANIMATE): Animator<Type, This>;
-    (value: Type, time: number): Generator;
+    (value: Type, time: number): ThreadGenerator;
   }
 }
 

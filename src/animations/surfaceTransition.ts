@@ -9,6 +9,7 @@ import {
   tween,
 } from '../tweening';
 import {decorate, threadable} from '../decorators';
+import {ThreadGenerator} from '../threading';
 
 export interface SurfaceTransitionConfig {
   reverse?: boolean;
@@ -40,7 +41,7 @@ export function surfaceTransition(fromSurfaceOriginal: Surface) {
   function* surfaceTransitionExecutor(
     target: Surface,
     config: SurfaceTransitionConfig = {},
-  ) {
+  ): ThreadGenerator {
     const transitionTime = config.transitionTime ?? 1 / 3;
     const to = target.getMask();
     const toPos = target.getPosition();

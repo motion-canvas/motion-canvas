@@ -6,7 +6,7 @@ import {waitFor} from '../animations';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {map} from '../tweening';
-import {cancel} from '../threading';
+import {cancel, ThreadGenerator} from '../threading';
 
 export interface SpriteData {
   fileName: string;
@@ -50,7 +50,7 @@ export class Sprite extends LayoutShape {
     fileName: '',
   };
   private frameId: number = 0;
-  private task: Generator | null = null;
+  private task: ThreadGenerator | null = null;
   private imageData: ImageData;
   private readonly computeCanvas: HTMLCanvasElement;
 
@@ -131,11 +131,11 @@ export class Sprite extends LayoutShape {
     this.fireLayoutChange();
   }
 
-  public play(): Generator {
+  public play(): ThreadGenerator {
     const runTask = this.playRunner();
     if (this.task) {
       const previousTask = this.task;
-      this.task = (function* () {
+      this.task = (function* (): ThreadGenerator {
         yield* cancel(previousTask);
         yield* runTask;
       })();
@@ -156,7 +156,7 @@ export class Sprite extends LayoutShape {
   }
 
   @threadable()
-  private *playRunner() {
+  private *playRunner(): ThreadGenerator {
     this.frameId = 0;
     while (this.task !== null) {
       if (this.playing()) {
@@ -168,7 +168,7 @@ export class Sprite extends LayoutShape {
   }
 
   @threadable()
-  public *waitForFrame(frame: number): Generator {
+  public *waitForFrame(frame: number): ThreadGenerator {
     let limit = 1000;
     while (this.frameId !== frame && limit > 0) {
       limit--;

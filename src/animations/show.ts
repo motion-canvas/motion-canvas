@@ -13,9 +13,10 @@ import {
   tween,
 } from '../tweening';
 import {decorate, threadable} from '../decorators';
+import {ThreadGenerator} from '../threading';
 
 decorate(showTop, threadable());
-export function showTop(node: Node): [Generator, Generator] {
+export function showTop(node: Node): [ThreadGenerator, ThreadGenerator] {
   const to = node.offsetY();
   const from = to - 40;
   node.offsetY(from);
@@ -34,7 +35,7 @@ export function showTop(node: Node): [Generator, Generator] {
 }
 
 decorate(showSurface, threadable());
-export function showSurface(surface: Surface): Generator {
+export function showSurface(surface: Surface): ThreadGenerator {
   const marginFrom = new Spacing();
   const margin = surface.getMargin();
   const toMask = surface.getMask();
@@ -68,7 +69,7 @@ decorate(showCircle, threadable());
 export function showCircle(
   surface: Surface,
   origin?: Origin | Vector2d,
-): Generator {
+): ThreadGenerator {
   const position =
     typeof origin === 'object'
       ? origin

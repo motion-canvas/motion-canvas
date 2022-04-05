@@ -1,8 +1,17 @@
 import {decorate, threadable} from '../decorators';
+import {ThreadGenerator} from './ThreadGenerator';
 
 export const THREAD_CANCEL = Symbol('Thread cancel command');
 
+export interface CancelYieldResult {
+  [THREAD_CANCEL]: ThreadGenerator[];
+}
+
+export function isCancelYieldResult(value: any): value is CancelYieldResult {
+  return typeof value === 'object' && THREAD_CANCEL in value;
+}
+
 decorate(cancel, threadable());
-export function* cancel(...tasks: Generator[]): Generator {
+export function* cancel(...tasks: ThreadGenerator[]): ThreadGenerator {
   yield {[THREAD_CANCEL]: tasks};
 }

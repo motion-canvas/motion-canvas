@@ -1,13 +1,10 @@
-import {decorate, threadable} from "../decorators";
-
-export function isGenerator(value: any): value is Generator {
-  return Symbol.iterator in value;
-}
+import {decorate, threadable} from '../decorators';
+import {isThreadGenerator, ThreadGenerator} from '../threading';
 
 decorate(chain, threadable());
-export function* chain(...args: (Generator | Function)[]) {
+export function* chain(...args: (ThreadGenerator | Function)[]) {
   for (const generator of args) {
-    if (isGenerator(generator)) {
+    if (isThreadGenerator(generator)) {
       yield* generator;
     } else {
       generator();
