@@ -16,6 +16,7 @@ export interface PlayerState {
   loop: boolean;
   speed: number;
   render: boolean;
+  muted: boolean;
 }
 
 interface PlayerCommands {
@@ -57,6 +58,7 @@ export class Player {
     loop: true,
     speed: 1,
     render: false,
+    muted: true,
   };
 
   private commands: PlayerCommands = {
@@ -91,6 +93,7 @@ export class Player {
       this.state.startFrame = state.startFrame;
       this.state.loop = state.loop;
       this.state.speed = state.speed;
+      this.state.muted = state.muted;
     }
 
     if (audioSrc) {
@@ -133,6 +136,12 @@ export class Player {
     });
   }
 
+  public toggleAudio(value?: boolean): void {
+    this.updateState({
+      muted: !(value ?? this.state.muted),
+    });
+  }
+
   private async run() {
     let commands = this.consumeCommands();
     let state = {...this.state};
@@ -154,6 +163,9 @@ export class Player {
           this.audioError = true;
         }
       }
+    }
+    if (this.audio) {
+      this.audio.muted = state.muted;
     }
 
     // Rendering

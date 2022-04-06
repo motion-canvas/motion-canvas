@@ -16,7 +16,7 @@ export function slideTransition(
       project.width(),
       project.height(),
     );
-    yield* tween(4, value => {
+    yield* tween(0.6, value => {
       previous?.position(
         vector2dTween(
           {x: 0, y: 0},

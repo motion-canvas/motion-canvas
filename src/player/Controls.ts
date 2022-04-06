@@ -3,6 +3,7 @@ import {Player, PlayerRenderEvent, PlayerState} from './Player';
 export class Controls {
   private play: HTMLInputElement;
   private loop: HTMLInputElement;
+  private audio: HTMLInputElement;
   private from: HTMLInputElement;
   private current: HTMLInputElement;
   private speed: HTMLInputElement;
@@ -19,6 +20,7 @@ export class Controls {
   ) {
     this.play = form.play;
     this.loop = form.loop;
+    this.audio = form.audio;
     this.from = form.from;
     this.current = form.current;
     this.speed = form.speed;
@@ -30,6 +32,9 @@ export class Controls {
     );
     this.loop.addEventListener('change', () =>
       this.player.updateState({loop: this.loop.checked}),
+    );
+    this.audio.addEventListener('change', () =>
+      this.player.toggleAudio(this.audio.checked),
     );
     this.from.addEventListener('change', () =>
       this.player.updateState({startFrame: parseInt(this.from.value)}),
@@ -60,6 +65,10 @@ export class Controls {
           event.preventDefault();
           this.player.requestReset();
           break;
+        case 'm':
+          event.preventDefault();
+          this.player.toggleAudio();
+          break;
       }
     });
 
@@ -76,6 +85,7 @@ export class Controls {
     this.updateFramerate(state.frame);
     this.play.checked = !state.paused;
     this.loop.checked = state.loop;
+    this.audio.checked = !state.muted;
     this.from.value = state.startFrame.toString();
     this.current.value = state.frame.toString();
     this.speed.value = state.speed.toString();
