@@ -1,11 +1,23 @@
 import {Player} from './player/Player';
 
 export function hot(player: Player, root: typeof module) {
-  const update = (modules: string[]) => {
-    player.project.reload(
+  const update = async (modules: string[]) => {
+    const runners = [];
+    for (const module of modules) {
       // @ts-ignore
-      modules.map(id => __webpack_require__(id).default),
-    );
+      const runner = __webpack_require__(module).default;
+      if (
+        // FIXME Find out a better way to detect runner factories.
+        runner.name === '__WEBPACK_DEFAULT_EXPORT__' &&
+        typeof runner === 'function'
+      ) {
+        runners.push(await runner());
+      } else {
+        runners.push(runner);
+      }
+    }
+
+    player.project.reload(runners);
     player.requestSeek(player.project.frame);
   };
 

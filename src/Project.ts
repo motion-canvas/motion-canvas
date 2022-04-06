@@ -83,10 +83,7 @@ export class Project extends Stage {
   public async next(speed: number = 1): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
-      if (
-        this.previousScene.isFinished() &&
-        (!this.currentScene || this.currentScene.isAfterTransitionIn())
-      ) {
+      if (!this.currentScene || this.currentScene.isAfterTransitionIn()) {
         this.previousScene.remove();
         this.previousScene.lastFrame = this.frame;
         this.previousScene = null;

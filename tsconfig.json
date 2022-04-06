@@ -5,7 +5,7 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
-    "target": "es6",
+    "target": "es2017",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,

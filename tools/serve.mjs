@@ -74,6 +74,9 @@ const compiler = webpack({
     compress: true,
     port: 9000,
   },
+  experiments: {
+    topLevelAwait: true,
+  }
 });
 const server = new WebpackDevServer(
   {
