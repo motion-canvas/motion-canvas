@@ -8,197 +8,81 @@
     />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
-    <title>Document</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        display: flex;
-        width: 100vw;
-        height: 100vh;
-        align-items: center;
-        justify-content: center;
-        background: black;
-        font-family: Roboto, sans-serif;
-      }
-
-      #controls {
-        padding: 8px;
-        border-radius: 8px;
-        display: grid;
-        grid-auto-flow: column;
-        grid-gap: 8px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        color: white;
-        background: rgba(0, 0, 0, 0.3);
-      }
-
-      #ui {
-        min-width: 360px;
-        padding: 8px;
-        padding-right: 24px;
-        border-radius: 8px;
-        display: grid;
-        grid-auto-flow: row;
-        grid-gap: 8px;
-        position: absolute;
-        top: 0;
-        right: 0;
-        color: white;
-        background: rgba(0, 0, 0, 0.3);
-      }
-
-      #ui ul {
-        padding-left: 16px;
-      }
-
-      .cancelled {
-        color: red;
-      }
-
-      #timeline {
-        padding: 16px;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-      }
-
-      .track {
-        border-radius: 4px;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.3);
-        position: relative;
-      }
-
-      .fill {
-        background-color: white;
-        border-radius: 4px;
-        width: 25%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-      }
-
-      .fill-start {
-        background-color: #FA6466;
-      }
-
-      .marker {
-        position: absolute;
-        top: 12px;
-        bottom: 12px;
-        width: 8px;
-        border-radius: 4px;
-        background-color: #FA6466;
-      }
-
-      .label {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 16px;
-        padding: 12px;
-
-        display: flex;
-        justify-content: center;
-      }
-
-      .label::before {
-        content: '';
-        display: block;
-        width: 16px;
-        height: 16px;
-        border-radius: 8px;
-        background-color: #F5DC7C;
-      }
-
-      .label::after {
-        content: attr(data-title);
-        display: block;
-        position: absolute;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.87);
-        bottom: 48px;
-        text-align: center;
-        padding: 4px 8px;
-        border-radius: 2px;
-        opacity: 0;
-        pointer-events: none ;
-      }
-
-      .label:hover::after {
-        opacity: 1;
-      }
-
-    </style>
+    <link rel="stylesheet" href="styles.css" />
+    <title>Motion Canvas</title>
   </head>
   <body>
     <div id="container"></div>
-    <details id="ui">
+    <details id="threads">
       <summary>THREADS</summary>
     </details>
-    <div id="timeline">
-      <div class="track">
-        <div class="fill fill-seek"></div>
-        <div class="fill fill-time"></div>
-        <div class="fill fill-start"></div>
+    <div id="ui">
+      <div id="timeline">
+        <div class="timeline-text js-current-time">0</div>
+        <div class="track">
+          <div class="fill fill-seek"></div>
+          <div class="fill fill-time"></div>
+          <div class="fill fill-start"></div>
+          <div class="marker"></div>
+        </div>
+        <div class="timeline-text js-duration">10,000</div>
       </div>
-      <div class="marker"></div>
+      <form id="controls">
+        <div class="icon-checkbox">
+          <input type="checkbox" id="controls-audio" name="audio" checked />
+          <label for="controls-audio"></label>
+        </div>
+        <input
+          class="icon-button"
+          type="button"
+          id="controls-reset"
+          name="refresh"
+        />
+        <div class="icon-checkbox">
+          <input type="checkbox" id="controls-play" name="play" checked />
+          <label for="controls-play"></label>
+        </div>
+        <input
+          class="icon-button"
+          type="button"
+          id="controls-next"
+          name="next"
+        />
+        <div class="icon-checkbox">
+          <input type="checkbox" id="controls-loop" name="loop" checked />
+          <label for="controls-loop"></label>
+        </div>
+        <div hidden>
+          <div>
+            <label for="controls-speed">Speed:</label>
+            <select name="speed" id="controls-speed">
+              <option value="2">2x</option>
+              <option value="1.5">1.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="0.5">0.5x</option>
+              <option value="0.25">0.25x</option>
+            </select>
+          </div>
+          <div>
+            <label for="controls-fps">FPS:</label>
+            <input
+              type="number"
+              readonly
+              id="controls-fps"
+              name="fps"
+              value="0"
+            />
+          </div>
+          <input
+            type="button"
+            id="controls-render"
+            name="render"
+            value="Render"
+          />
+          <div id="loading">Loading...</div>
+        </div>
+      </form>
     </div>
-    <form id="controls">
-      <div>
-        <input type="checkbox" id="controls-play" name="play" checked />
-        <label for="controls-play">Play</label>
-      </div>
-      <div>
-        <input type="checkbox" id="controls-loop" name="loop" checked />
-        <label for="controls-loop">Loop</label>
-      </div>
-      <div>
-        <input type="checkbox" id="controls-audio" name="audio" checked />
-        <label for="controls-audio">Audio</label>
-      </div>
-      <input type="number" id="controls-from" name="from" value="0" />
-      <input type="button" id="controls-reset" name="refresh" value="Reset" />
-      <input type="button" id="controls-next" name="next" value="Next" />
-      <div>
-        <label for="controls-current">Current:</label>
-        <input
-          type="number"
-          readonly
-          id="controls-current"
-          name="current"
-          value="0"
-        />
-      </div>
-      <div>
-        <label for="controls-speed">Speed:</label>
-        <select name="speed" id="controls-speed">
-          <option value="2">2x</option>
-          <option value="1.5">1.5x</option>
-          <option value="1" selected>1x</option>
-          <option value="0.5">0.5x</option>
-          <option value="0.25">0.25x</option>
-        </select>
-      </div>
-      <div>
-        <label for="controls-fps">FPS:</label>
-        <input
-          type="number"
-          readonly
-          id="controls-fps"
-          name="fps"
-          value="0"
-        />
-      </div>
-      <input type="button" id="controls-render" name="render" value="Render" />
-      <div id="loading">Loading...</div>
-    </form>
     <script src="index.js"></script>
   </body>
 </html>

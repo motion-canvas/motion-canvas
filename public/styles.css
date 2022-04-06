@@ -1,0 +1,262 @@
+:root {
+  --theme: #33a6ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: black;
+  font-family: Roboto, sans-serif;
+}
+
+#threads {
+  min-width: 360px;
+  padding: 8px;
+  padding-right: 24px;
+  border-radius: 8px;
+  display: grid;
+  grid-auto-flow: row;
+  grid-gap: 8px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: white;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+#threads ul {
+  padding-left: 16px;
+}
+
+.cancelled {
+  color: red;
+}
+
+#ui {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #242424;
+}
+
+#controls {
+  margin-bottom: 16px;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+.icon-checkbox {
+}
+
+.icon-button {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  padding: 12px;
+  margin: 12px;
+  display: block;
+  cursor: pointer;
+  border: 0;
+  opacity: 0.54;
+}
+
+.icon-button:hover {
+  opacity: 1;
+}
+
+#controls-reset {
+  -webkit-mask-image: url('icons/skip_previous.svg');
+}
+
+#controls-next {
+  -webkit-mask-image: url('icons/skip_next.svg');
+}
+
+.icon-checkbox input {
+  display: none;
+}
+
+.icon-checkbox label {
+  width: 24px;
+  height: 24px;
+  padding: 12px;
+  margin: 12px;
+  display: block;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.icon-checkbox input + label:hover {
+  opacity: 1 !important;
+}
+
+#controls-play + label {
+  -webkit-mask-image: url('icons/play_arrow.svg');
+  transform: scale(2);
+  transition: transform 50ms;
+}
+#controls-play:checked + label {
+  -webkit-mask-image: url('icons/pause.svg');
+}
+#controls-play + label:hover {
+  transform: scale(2.1);
+}
+#controls-play + label:active {
+  transform: scale(2);
+}
+
+#controls-audio + label {
+  opacity: 0.54;
+  -webkit-mask-image: url('icons/volume_off.svg');
+}
+#controls-audio:checked + label {
+  opacity: 1;
+  background: var(--theme);
+  -webkit-mask-image: url('icons/volume_on.svg');
+}
+
+#controls-loop + label {
+  opacity: 0.54;
+  -webkit-mask-image: url('icons/repeat.svg');
+}
+#controls-loop:checked + label {
+  background: var(--theme);
+  opacity: 1;
+}
+
+#timeline {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.timeline-text {
+  color: rgba(255, 255, 255, 0.6);
+  width: 60px;
+  font-family: 'JetBrains Mono', sans-serif;
+}
+
+.js-current-time {
+  text-align: right;
+}
+
+.track {
+  border-radius: 4px;
+  height: 8px;
+  margin: 0 16px;
+  background: rgba(255, 255, 255, 0.3);
+  position: relative;
+  flex-grow: 1;
+}
+
+.fill {
+  background-color: white;
+  border-radius: 4px;
+  width: 25%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.fill-seek {
+  opacity: 0;
+}
+
+#timeline:hover .fill-seek {
+  opacity: 0.32;
+}
+
+.fill-start {
+  background-color: var(--theme);
+}
+
+.marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 8px;
+  border-radius: 4px;
+  background-color: var(--theme);
+
+  display: flex;
+  justify-content: center;
+}
+
+.marker::after {
+  content: attr(data-title);
+  display: block;
+  position: absolute;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(255, 255, 255, 0.87);
+  bottom: 24px;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.marker:hover::after {
+  opacity: 1;
+}
+
+.label {
+  position: absolute;
+  top: -16px;
+  bottom: -16px;
+  width: 40px;
+  padding: 12px;
+  cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.label.hidden {
+  display: none;
+}
+
+.label.inverted::before {
+  background-color: var(--theme);
+}
+
+.label::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #ffffff;
+}
+
+.label::after {
+  content: attr(data-title);
+  display: block;
+  position: absolute;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: rgba(255, 255, 255, 0.87);
+  bottom: 36px;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 2px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.label:hover::after {
+  opacity: 1;
+}

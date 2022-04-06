@@ -1,5 +1,6 @@
 import {clampRemap} from '../tweening';
 import {Player, PlayerState} from './Player';
+import {clamp} from 'three/src/math/MathUtils';
 
 export class Timeline {
   private readonly fillTime: HTMLElement;
@@ -7,9 +8,12 @@ export class Timeline {
   private readonly fillStart: HTMLElement;
   private readonly track: HTMLElement;
   private readonly marker: HTMLElement;
+  private readonly timeText: HTMLElement;
+  private readonly durationText: HTMLElement;
 
   private duration: number;
   private labelElements: Record<string, HTMLElement> = {};
+  private lastState: PlayerState;
 
   public constructor(
     private readonly player: Player,
@@ -19,19 +23,21 @@ export class Timeline {
     this.fillTime = root.querySelector('.fill-time')!;
     this.fillSeek = root.querySelector('.fill-seek')!;
     this.fillStart = root.querySelector('.fill-start')!;
+    this.timeText = root.querySelector('.js-current-time')!;
+    this.durationText = root.querySelector('.js-duration')!;
     this.track = root.querySelector('.track')!;
     this.marker = root.querySelector('.marker')!;
-
-    this.fillSeek.style.opacity = '0';
 
     this.player.StateChanged.sub(this.update);
     this.root.addEventListener('click', e => {
       const target = <HTMLElement>e.target;
+      if (target === this.timeText) {
+        this.player.updateState({startFrame: this.lastState.frame});
+        return;
+      }
       this.player.requestSeek(
         target.classList.contains('label')
-          ? this.player.project.secondsToFrames(
-              parseFloat(target.dataset.time!),
-            )
+          ? parseFloat(target.dataset.time!)
           : this.mousePositionToFrame(e.clientX),
       );
     });
@@ -42,23 +48,25 @@ export class Timeline {
       });
     });
     this.root.addEventListener('mousemove', e => {
+      const target = <HTMLElement>e.target;
       const rect = this.track.getBoundingClientRect();
-      const x = e.clientX - rect.left;
+      let x = clamp(e.clientX - rect.left, 8, rect.width);
+
+      if (target.classList.contains('label')) {
+        const frame = parseInt(target.dataset.time!);
+        x = (frame / this.duration) * rect.width;
+      }
       this.fillSeek.style.width = `${x}px`;
-    });
-    this.root.addEventListener('mouseleave', () => {
-      this.fillSeek.style.opacity = '0';
-    });
-    this.root.addEventListener('mouseenter', () => {
-      this.fillSeek.style.opacity = '0.32';
     });
 
     for (const label in labels) {
       const element = document.createElement('div');
       element.classList.add('label');
       element.dataset.title = label;
-      element.dataset.time = labels[label].toString();
-      root.appendChild(element);
+      element.dataset.time = this.player.project
+        .secondsToFrames(labels[label])
+        .toString();
+      this.track.appendChild(element);
       this.labelElements[label] = element;
     }
   }
@@ -70,7 +78,10 @@ export class Timeline {
   }
 
   private update = (state: PlayerState) => {
-    this.duration = state.duration;
+    this.lastState = {...state};
+    this.timeText.innerText = state.frame.toString();
+    this.marker.dataset.title = `Frame:${state.startFrame}`;
+
     const width = this.track.clientWidth;
     const fillWidth = clampRemap(1, state.duration, 8, width, state.frame);
     const startWidth = clampRemap(
@@ -80,26 +91,20 @@ export class Timeline {
       width,
       state.startFrame,
     );
-    const left =
-      clampRemap(1, state.duration, 0, width - 8, state.startFrame) + 16;
 
-    this.marker.style.left = `${left}px`;
-    this.fillTime.style.width = `${fillWidth}px`;
+    this.marker.style.left = `${startWidth - 8}px`;
     this.fillStart.style.width = `${startWidth}px`;
+    this.fillTime.style.width = `${fillWidth}px`;
 
+    this.durationText.innerText = state.duration.toString();
+    this.duration = state.duration;
     for (const label in this.labels) {
       const element = this.labelElements[label];
-      const elementFrame = this.player.project.secondsToFrames(
-        this.labels[label],
-      );
-      const elementLeft = clampRemap(
-        1,
-        state.duration,
-        0,
-        width - 8,
-        elementFrame,
-      );
-      element.style.left = `${elementLeft}px`;
+      const time = parseInt(element.dataset.time);
+      const elementLeft = clampRemap(1, state.duration, 8, width, time) - 4;
+      element.style.left = `${elementLeft - 20}px`;
+      element.classList.toggle('hidden', time > state.duration);
+      element.classList.toggle('inverted', time > state.startFrame);
     }
   };
 }

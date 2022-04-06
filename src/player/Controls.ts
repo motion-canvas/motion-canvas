@@ -4,8 +4,6 @@ export class Controls {
   private play: HTMLInputElement;
   private loop: HTMLInputElement;
   private audio: HTMLInputElement;
-  private from: HTMLInputElement;
-  private current: HTMLInputElement;
   private speed: HTMLInputElement;
   private fps: HTMLInputElement;
   private loadingIndicator: HTMLElement;
@@ -21,8 +19,6 @@ export class Controls {
     this.play = form.play;
     this.loop = form.loop;
     this.audio = form.audio;
-    this.from = form.from;
-    this.current = form.current;
     this.speed = form.speed;
     this.fps = form.fps;
     this.loadingIndicator = document.getElementById('loading');
@@ -36,9 +32,6 @@ export class Controls {
     this.audio.addEventListener('change', () =>
       this.player.toggleAudio(this.audio.checked),
     );
-    this.from.addEventListener('change', () =>
-      this.player.updateState({startFrame: parseInt(this.from.value)}),
-    );
     this.speed.addEventListener('change', () =>
       this.player.updateState({speed: parseFloat(this.speed.value)}),
     );
@@ -46,10 +39,6 @@ export class Controls {
     form.refresh.addEventListener('click', () => this.player.requestReset());
     form.next.addEventListener('click', () => this.player.requestNextFrame());
     form.render.addEventListener('click', () => this.player.toggleRendering());
-
-    this.current.addEventListener('click', () =>
-      this.player.updateState({startFrame: parseInt(this.current.value)}),
-    );
 
     document.addEventListener('keydown', event => {
       switch (event.key) {
@@ -86,8 +75,6 @@ export class Controls {
     this.play.checked = !state.paused;
     this.loop.checked = state.loop;
     this.audio.checked = !state.muted;
-    this.from.value = state.startFrame.toString();
-    this.current.value = state.frame.toString();
     this.speed.value = state.speed.toString();
     this.loadingIndicator.hidden = !state.loading;
   };
@@ -107,7 +94,6 @@ export class Controls {
 
     const average = this.overallTime / this.updateTimes.length;
     this.fps.value = Math.floor(1000 / average).toString();
-    this.current.value = Math.floor(frame).toString();
 
     this.lastUpdate = performance.now();
   }

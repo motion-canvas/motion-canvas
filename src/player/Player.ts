@@ -230,6 +230,9 @@ export class Player {
     // handle finishing
     if (state.finished) {
       state.duration = this.project.frame;
+      if (commands.seek >= 0) {
+        this.requestSeek(state.startFrame);
+      }
     }
 
     this.updateState({
@@ -257,9 +260,9 @@ export class Player {
   private request() {
     requestAnimationFrame(async () => {
       try {
-        this.updateState({loading: true});
+        // this.updateState({loading: true});
         await this.run();
-        this.updateState({loading: false});
+        // this.updateState({loading: false});
       } catch (e) {
         console.error(e);
       }
