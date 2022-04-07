@@ -5,12 +5,16 @@ import {KonvaNode, getset} from '../decorators';
 
 export interface GridConfig extends LayoutShapeConfig {
   gridSize?: number;
+  subdivision?: boolean;
 }
 
 @KonvaNode()
 export class Grid extends LayoutShape {
   @getset(16, Grid.prototype.recalculate)
   public gridSize: GetSet<number, this>;
+
+  @getset(false)
+  public subdivision: GetSet<GridConfig['subdivision'], this>;
 
   private path: Path2D;
 
@@ -19,16 +23,38 @@ export class Grid extends LayoutShape {
     this._strokeFunc = context => {
       if (!this.path) this.recalculate();
       context.stroke(this.path);
+
+      if (this.subdivision()) {
+        const offset = this.gridSize() / 2;
+        const dash = offset / 8;
+        context.setLineDash([
+          0,
+          dash / 2,
+          dash,
+          dash,
+          dash,
+          dash,
+          dash,
+          dash,
+          dash / 2,
+        ]);
+        context.translate(offset, offset);
+        context.stroke(this.path);
+      }
     };
   }
 
   private recalculate() {
     this.path = new Path2D();
 
-    const gridSize = this.gridSize();
+    let gridSize = this.gridSize();
+    if (gridSize < 1) {
+      console.warn('Too small grid size: ', gridSize);
+      gridSize = 1;
+    }
     const size = this.getSize();
-    size.width /= 2;
-    size.height /= 2;
+    size.width = size.width / 2 + gridSize;
+    size.height = size.width / 2 + gridSize;
 
     for (let x = -size.width; x <= size.width; x += gridSize) {
       this.path.moveTo(x, -size.height);

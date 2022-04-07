@@ -20,6 +20,7 @@ const Sizes: Record<ProjectSize, [number, number]> = {
 
 export class Project extends Stage {
   public readonly background: Rect;
+  public readonly foreground: Layer;
   public readonly center: Vector2d;
   public threadsCallback: ThreadsCallback;
   public framesPerSeconds = 60;
@@ -63,6 +64,9 @@ export class Project extends Stage {
     backgroundLayer.add(this.background);
     this.add(backgroundLayer);
 
+    this.foreground = new Layer({name: 'foreground'});
+    this.add(this.foreground);
+
     for (const scene of scenes) {
       const handle = new Scene(this, scene);
       this.sceneLookup[scene.name] = handle;
@@ -72,6 +76,13 @@ export class Project extends Stage {
         }
       };
     }
+  }
+
+  draw(): this {
+    this.previousScene?.drawScene();
+    this.currentScene?.drawScene();
+
+    return this;
   }
 
   public reload(runners: SceneRunner[]) {
@@ -99,6 +110,7 @@ export class Project extends Stage {
           await this.currentScene.reset(this.previousScene);
           this.currentScene.firstFrame = this.frame;
           this.add(this.currentScene);
+          this.foreground.moveToTop();
         }
       }
     }
@@ -124,6 +136,7 @@ export class Project extends Stage {
 
         this.frame = this.currentScene.firstFrame ?? 0;
         this.add(this.currentScene);
+        this.foreground.moveToTop();
         await this.currentScene.reset();
       } else if (this.frame >= frame) {
         this.previousScene?.remove();
