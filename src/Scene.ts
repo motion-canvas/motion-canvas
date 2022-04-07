@@ -52,6 +52,7 @@ export class Scene extends Layer {
 
   public reload(runnerFactory: SceneRunner) {
     this.runnerFactory = runnerFactory;
+    this.debug(null);
     this.lastFrame = null;
   }
 

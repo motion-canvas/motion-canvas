@@ -95,5 +95,10 @@ export abstract class LayoutGroup extends Group implements ILayoutNode {
     this.getParent()?.fire(LAYOUT_CHANGE_EVENT, undefined, true);
   }
 
+  public _setChildrenIndices() {
+    super._setChildrenIndices();
+    this.handleLayoutChange();
+  }
+
   protected handleLayoutChange() {}
 }

@@ -30,8 +30,9 @@ Factory.overWriteSetter = function overWriteSetter(
       return new Animator(this, attr).key(val, time).run();
     }
 
+    const old = this.attrs[attr];
     this._setAttr(attr, val);
-    after?.call(this);
+    if (old !== val) after?.call(this);
 
     return this;
   };

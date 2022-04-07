@@ -19,9 +19,9 @@ export const PIN_CHANGE_EVENT = 'pinChange';
 export class Pin extends Group {
   @getset(null, Pin.prototype.firePinChangeEvent)
   public target: GetSet<PinConfig['target'], this>;
-  @getset(null)
+  @getset(null, Pin.prototype.updateAttach)
   public attach: GetSet<PinConfig['attach'], this>;
-  @getset()
+  @getset(null, Pin.prototype.firePinChangeEvent)
   public direction: GetSet<PinConfig['direction'], this>;
 
   public constructor(config?: PinConfig) {
@@ -55,6 +55,11 @@ export class Pin extends Group {
 
   @bind()
   private firePinChangeEvent() {
+    this.updateAttach();
+    this.fire(PIN_CHANGE_EVENT, undefined, true);
+  }
+
+  private updateAttach() {
     const attach = this.attach();
     if (attach) {
       const attachDirection = flipOrigin(attach.getOrigin(), this.direction());
@@ -65,8 +70,6 @@ export class Pin extends Group {
         y: rect.y + offset.y,
       });
     }
-
-    this.fire(PIN_CHANGE_EVENT, undefined, true);
   }
 
   public getClientRect(config?: {

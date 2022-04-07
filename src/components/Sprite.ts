@@ -22,11 +22,12 @@ export interface SpriteConfig extends LayoutShapeConfig {
   playing?: boolean;
   fps?: number;
   maskBlend?: number;
+  frame?: number;
 }
 
 export const SPRITE_CHANGE_EVENT = 'spriteChange';
 
-const COMPUTE_CANVAS_SIZE = 1024;
+const COMPUTE_CANVAS_SIZE = 64;
 
 @KonvaNode()
 export class Sprite extends LayoutShape {
@@ -42,14 +43,15 @@ export class Sprite extends LayoutShape {
   public fps: GetSet<SpriteConfig['fps'], this>;
   @getset(0, Sprite.prototype.recalculate)
   public maskBlend: GetSet<SpriteConfig['maskBlend'], this>;
+  @getset(0, Sprite.prototype.recalculate)
+  public frame: GetSet<SpriteConfig['frame'], this>;
 
-  private frame: SpriteData = {
+  private spriteData: SpriteData = {
     height: 0,
     width: 0,
     data: [],
     fileName: '',
   };
-  private frameId: number = 0;
   private task: ThreadGenerator | null = null;
   private imageData: ImageData;
   private readonly computeCanvas: HTMLCanvasElement;
@@ -74,8 +76,8 @@ export class Sprite extends LayoutShape {
       this.computeCanvas,
       0,
       0,
-      this.frame.width,
-      this.frame.height,
+      this.spriteData.width,
+      this.spriteData.height,
       size.width / -2,
       size.height / -2,
       size.width,
@@ -91,28 +93,28 @@ export class Sprite extends LayoutShape {
     const blend = this.maskBlend();
     if (!this.context || !animation || animation.length === 0) return;
 
-    this.frameId %= animation.length;
-    this.frame = animation[this.frameId];
+    const frameId = this.frame() % animation.length;
+    this.spriteData = animation[frameId];
     this.offset(this.getOriginOffset());
 
     this.imageData = this.context.createImageData(
-      this.frame.width,
-      this.frame.height,
+      this.spriteData.width,
+      this.spriteData.height,
     );
 
     if (skin) {
-      for (let y = 0; y < this.frame.height; y++) {
-        for (let x = 0; x < this.frame.width; x++) {
+      for (let y = 0; y < this.spriteData.height; y++) {
+        for (let x = 0; x < this.spriteData.width; x++) {
           const id = this.positionToId({x, y});
-          const skinX = this.frame.data[id];
-          const skinY = this.frame.data[id + 1];
+          const skinX = this.spriteData.data[id];
+          const skinY = this.spriteData.data[id + 1];
           const skinId = ((skin.height - 1 - skinY) * skin.width + skinX) * 4;
 
           this.imageData.data[id] = skin.data[skinId];
           this.imageData.data[id + 1] = skin.data[skinId + 1];
           this.imageData.data[id + 2] = skin.data[skinId + 2];
           this.imageData.data[id + 3] = Math.round(
-            (this.frame.data[id + 3] / 255) *
+            (this.spriteData.data[id + 3] / 255) *
               (skin.data[skinId + 3] / 255) *
               255,
           );
@@ -123,7 +125,7 @@ export class Sprite extends LayoutShape {
         }
       }
     } else {
-      this.imageData.data.set(this.frame.data);
+      this.imageData.data.set(this.spriteData.data);
     }
 
     this.context.putImageData(this.imageData, 0, 0);
@@ -157,11 +159,10 @@ export class Sprite extends LayoutShape {
 
   @threadable()
   private *playRunner(): ThreadGenerator {
-    this.frameId = 0;
+    this.frame(0);
     while (this.task !== null) {
       if (this.playing()) {
-        this.frameId++;
-        this.recalculate();
+        this.frame(this.frame() + 1);
       }
       yield* waitFor(1 / this.fps());
     }
@@ -170,7 +171,7 @@ export class Sprite extends LayoutShape {
   @threadable()
   public *waitForFrame(frame: number): ThreadGenerator {
     let limit = 1000;
-    while (this.frameId !== frame && limit > 0) {
+    while (this.frame() !== frame && limit > 0) {
       limit--;
       yield;
     }
