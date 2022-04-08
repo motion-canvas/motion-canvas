@@ -17,6 +17,7 @@ import {ThreadGenerator} from '../threading';
 
 export class Animator<Type, This extends Node> {
   private valueFrom: Type = null;
+  private lastValue: Type;
   private keys: (() => ThreadGenerator)[] = [];
   private mapper: TweenFunction<any> = map;
   private loops: number = 1;
@@ -44,6 +45,7 @@ export class Animator<Type, This extends Node> {
     mapper?: TweenFunction<Type, Rest>,
     ...args: Rest
   ): this {
+    this.lastValue = value;
     this.keys.push(() =>
       tween(
         time,
@@ -62,6 +64,29 @@ export class Animator<Type, This extends Node> {
     );
 
     return this;
+  }
+
+  public diff<Rest extends any[]>(
+    value: Type,
+    time: number,
+    interpolation: InterpolationFunction = easeInOutCubic,
+    mapper?: TweenFunction<Type, Rest>,
+    ...args: Rest
+  ): this {
+    let next: any = value;
+    const last: any =
+      this.lastValue === undefined ? this.getValueFrom() : this.lastValue;
+    if (Array.isArray(last)) {
+      next = last.map((value1, index) => value1 + next[index]);
+    } else if (typeof last === 'object') {
+      for (const key in last) {
+        next[key] += last[key];
+      }
+    } else {
+      next += last;
+    }
+
+    return this.key(next, time, interpolation, mapper, ...args);
   }
 
   public back<Rest extends any[]>(

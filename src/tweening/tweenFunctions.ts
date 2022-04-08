@@ -96,16 +96,19 @@ export function rectArcTween(
   };
 }
 
-export function calculateRatio(from: Partial<IRect>, to: Partial<IRect>): number {
+export function calculateRatio(
+  from: Partial<IRect>,
+  to: Partial<IRect>,
+): number {
   let numberOfValues = 0;
   let ratio = 0;
-  if(from.x) {
+  if (from.x) {
     ratio += Math.abs((from.x - to.x) / (from.y - to.y));
     numberOfValues++;
   }
   if (from.width) {
     ratio += Math.abs((from.width - to.width) / (from.height - to.height));
-    numberOfValues ++;
+    numberOfValues++;
   }
 
   if (numberOfValues) {
