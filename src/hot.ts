@@ -18,7 +18,7 @@ export function hot(player: Player, root: typeof module) {
     }
 
     player.project.reload(runners);
-    player.requestSeek(player.project.frame);
+    player.reload();
   };
 
   const scenePaths = require.cache[root.id].children.filter(name =>

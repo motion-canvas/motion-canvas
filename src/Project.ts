@@ -23,7 +23,7 @@ export class Project extends Stage {
   public readonly foreground: Layer;
   public readonly center: Vector2d;
   public threadsCallback: ThreadsCallback;
-  public framesPerSeconds = 60;
+  public framesPerSeconds = 30;
   public frame: number = 0;
 
   public get time(): number {

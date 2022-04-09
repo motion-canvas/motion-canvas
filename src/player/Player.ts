@@ -46,6 +46,8 @@ export class Player {
 
   private readonly audio: HTMLAudioElement = null;
   private startTime: number;
+  private renderTime: number = 0;
+  private requestId: number = null;
   private audioError = false;
 
   private state: PlayerState = {
@@ -107,6 +109,13 @@ export class Player {
     }
 
     this.request();
+  }
+
+  public reload() {
+    this.requestSeek(this.project.frame);
+    if (this.requestId === null) {
+      this.request();
+    }
   }
 
   public requestNextFrame(): void {
@@ -258,13 +267,17 @@ export class Player {
   }
 
   private request() {
-    requestAnimationFrame(async () => {
-      try {
-        // this.updateState({loading: true});
-        await this.run();
-        // this.updateState({loading: false});
-      } catch (e) {
-        console.error(e);
+    this.requestId = requestAnimationFrame(async time => {
+      if (time - this.renderTime >= 990 / this.project.framesPerSeconds) {
+        this.renderTime = time;
+        try {
+          await this.run();
+        } catch (e) {
+          this.requestId = null;
+          console.error(e);
+        }
+      } else {
+        this.request();
       }
     });
   }
