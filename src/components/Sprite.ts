@@ -5,7 +5,7 @@ import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {waitFor} from '../animations';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
-import {map} from '../tweening';
+import {InterpolationFunction, map, tween} from '../tweening';
 import {cancel, ThreadGenerator} from '../threading';
 
 export interface SpriteData {
@@ -35,7 +35,7 @@ export class Sprite extends LayoutShape {
   public animation: GetSet<SpriteConfig['animation'], this>;
   @getset(null, Sprite.prototype.recalculate)
   public skin: GetSet<SpriteConfig['skin'], this>;
-  @getset(null, Sprite.prototype.recalculate)
+  @getset(null, Sprite.prototype.recalculate, Sprite.prototype.maskTween)
   public mask: GetSet<SpriteConfig['mask'], this>;
   @getset(false)
   public playing: GetSet<SpriteConfig['playing'], this>;
@@ -54,8 +54,10 @@ export class Sprite extends LayoutShape {
   };
   private task: ThreadGenerator | null = null;
   private imageData: ImageData;
-  private readonly computeCanvas: HTMLCanvasElement;
+  private baseMask: SpriteData;
+  private baseMaskBlend = 0;
 
+  private readonly computeCanvas: HTMLCanvasElement;
   private readonly context: CanvasRenderingContext2D;
 
   constructor(config?: SpriteConfig) {
@@ -119,8 +121,13 @@ export class Sprite extends LayoutShape {
               255,
           );
 
-          if (mask) {
-            this.imageData.data[id + 3] *= map(1, mask.data[id] / 255, blend);
+          if (mask || this.baseMask) {
+            const maskValue = map(
+              mask?.data[id] ?? 255,
+              this.baseMask?.data[id] ?? 255,
+              this.baseMaskBlend,
+            );
+            this.imageData.data[id + 3] *= map(1, maskValue / 255, blend);
           }
         }
       }
@@ -179,6 +186,25 @@ export class Sprite extends LayoutShape {
     if (limit === 0) {
       console.warn(`Sprite.waitForFrame cancelled`);
     }
+  }
+
+  @threadable()
+  private *maskTween(
+    from: SpriteData,
+    to: SpriteData,
+    time: number,
+    interpolation: InterpolationFunction,
+    onEnd: () => void,
+  ): ThreadGenerator {
+    this.baseMask = from;
+    this.baseMaskBlend = 1;
+    this.mask(to);
+
+    yield* tween(time, value => {
+      this.baseMaskBlend = interpolation(1 - value);
+      this.recalculate();
+    });
+    onEnd();
   }
 
   public getColorAt(position: Vector2d): string {
