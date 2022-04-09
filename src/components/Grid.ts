@@ -54,7 +54,7 @@ export class Grid extends LayoutShape {
     }
     const size = this.getSize();
     size.width = size.width / 2 + gridSize;
-    size.height = size.width / 2 + gridSize;
+    size.height = size.height / 2 + gridSize;
 
     for (let x = -size.width; x <= size.width; x += gridSize) {
       this.path.moveTo(x, -size.height);

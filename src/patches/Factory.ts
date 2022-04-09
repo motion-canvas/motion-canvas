@@ -1,7 +1,7 @@
 import {Factory} from 'konva/lib/Factory';
 import {ANIMATE} from '../symbols';
 import type {Node} from 'konva/lib/Node';
-import {Animator} from '../tweening/Animator';
+import {Animator, TweenProvider} from '../tweening';
 import {ThreadGenerator} from '../threading';
 
 declare module 'konva/lib/types' {
@@ -16,18 +16,18 @@ declare module 'konva/lib/types' {
 Factory.overWriteSetter = function overWriteSetter(
   constructor: Function,
   attr: string,
-  validator?: any,
+  validator?: TweenProvider<any>,
   after?: () => void,
 ) {
   const name = attr.charAt(0).toUpperCase() + attr.slice(1);
   const setter = `set${name}`;
   constructor.prototype[setter] = function (val: any, time?: any) {
     if (val === ANIMATE) {
-      return new Animator(this, attr);
+      return new Animator(this, attr, validator);
     }
 
     if (time !== undefined) {
-      return new Animator(this, attr).key(val, time).run();
+      return new Animator(this, attr, validator).key(val, time).run();
     }
 
     const old = this.attrs[attr];

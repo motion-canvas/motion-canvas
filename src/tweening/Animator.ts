@@ -14,6 +14,17 @@ import {
 import {threadable} from '../decorators';
 import {waitFor, waitUntil} from '../animations';
 import {ThreadGenerator} from '../threading';
+import {GeneratorHelper} from '../helpers';
+
+export interface TweenProvider<T> {
+  (
+    from: T,
+    to: T,
+    time: number,
+    interpolation: InterpolationFunction,
+    onEnd: Function,
+  ): ThreadGenerator;
+}
 
 export class Animator<Type, This extends Node> {
   private valueFrom: Type = null;
@@ -27,6 +38,7 @@ export class Animator<Type, This extends Node> {
   public constructor(
     private readonly object: This,
     private readonly prop: string,
+    private readonly tweenProvider?: TweenProvider<Type>,
   ) {
     const name = this.prop.charAt(0).toUpperCase() + this.prop.slice(1);
     this.getter = `get${name}`;
@@ -47,20 +59,29 @@ export class Animator<Type, This extends Node> {
   ): this {
     this.lastValue = value;
     this.keys.push(() =>
-      tween(
-        time,
-        v => {
-          // @ts-ignore
-          this.object[this.setter](
-            mapper === undefined
-              ? this.mapper(this.valueFrom, value, interpolation(v))
-              : mapper(this.valueFrom, value, interpolation(v), ...args),
-          );
-        },
-        () => {
-          this.valueFrom = value;
-        },
-      ),
+      GeneratorHelper.isThreadable(this.tweenProvider)
+        ? this.tweenProvider.call(
+            this.object,
+            this.valueFrom,
+            value,
+            time,
+            interpolation,
+            () => (this.valueFrom = value),
+          )
+        : tween(
+            time,
+            v => {
+              // @ts-ignore
+              this.object[this.setter](
+                mapper === undefined
+                  ? this.mapper(this.valueFrom, value, interpolation(v))
+                  : mapper(this.valueFrom, value, interpolation(v), ...args),
+              );
+            },
+            () => {
+              this.valueFrom = value;
+            },
+          ),
     );
 
     return this;
@@ -147,7 +168,7 @@ export class Animator<Type, This extends Node> {
       } else {
         this.mapper = textTween;
       }
-    } else if (typeof this.valueFrom === 'object') {
+    } else if (this.valueFrom && typeof this.valueFrom === 'object') {
       if ('x' in this.valueFrom) {
         if ('width' in this.valueFrom) {
           this.mapper = rectArcTween;

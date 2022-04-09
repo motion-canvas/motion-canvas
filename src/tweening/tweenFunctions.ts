@@ -8,7 +8,7 @@ export interface TweenFunction<T, Rest extends any[] = any[]> {
 
 export function textTween(from: string, to: string, value: number) {
   // left to right
-  if (to.length > from.length) {
+  if (to.length >= from.length) {
     const current = Math.floor(to.length * value);
     const currentLength = Math.floor(map(from.length - 1, to.length, value));
     let text = '';

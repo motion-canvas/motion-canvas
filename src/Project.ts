@@ -68,6 +68,12 @@ export class Project extends Stage {
     this.add(this.foreground);
 
     for (const scene of scenes) {
+      if (
+        scene.name === undefined ||
+        scene.name === '__WEBPACK_DEFAULT_EXPORT__'
+      ) {
+        console.warn('Runner without a name: ', scene);
+      }
       const handle = new Scene(this, scene);
       this.sceneLookup[scene.name] = handle;
       handle.threadsCallback = (...args) => {

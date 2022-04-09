@@ -10,7 +10,8 @@ import {
   LayoutAttrs,
 } from './ILayoutNode';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
-import {easeInOutCubic, tween, textTween} from '../tweening';
+import {Animator, tween, textTween, InterpolationFunction} from '../tweening';
+import {threadable} from '../decorators';
 
 export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
   minWidth?: number;
@@ -119,19 +120,30 @@ export class LayoutText extends Text implements ILayoutNode {
     return offset;
   }
 
-  public *animate(text: string) {
-    const fromText = this.text();
-    const fromWidth = this.getLayoutSize({minWidth: 0}).width;
+  public get animate(): Animator<string, this> {
+    return new Animator<string, this>(this, 'text', this.textTween);
+  }
+
+  @threadable()
+  private *textTween(
+    fromText: string,
+    text: string,
+    time: number,
+    interpolation: InterpolationFunction,
+    onEnd: Function,
+  ) {
+    const fromWidth = this.getLayoutSize({text: fromText, minWidth: 0}).width;
     const toWidth = this.getLayoutSize({text, minWidth: 0}).width;
 
     this.overrideWidth = fromWidth;
-    yield* tween(0.3, value => {
-      this.overrideWidth = easeInOutCubic(value, fromWidth, toWidth);
-      this.setText(textTween(fromText, text, easeInOutCubic(value)));
+    yield* tween(time, value => {
+      this.overrideWidth = interpolation(value, fromWidth, toWidth);
+      this.setText(textTween(fromText, text, interpolation(value)));
     });
     this.overrideWidth = null;
 
     this.setText(text);
+    onEnd();
   }
 
   public getOriginDelta(newOrigin: Origin, custom?: LayoutTextConfig) {
