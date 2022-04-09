@@ -1,8 +1,9 @@
+import type {Node} from 'konva/lib/Node';
 import {Factory} from 'konva/lib/Factory';
 import {ANIMATE} from '../symbols';
-import type {Node} from 'konva/lib/Node';
 import {Animator, TweenProvider} from '../tweening';
 import {ThreadGenerator} from '../threading';
+import {Vector2d} from 'konva/lib/types';
 
 declare module 'konva/lib/types' {
   export interface GetSet<Type, This extends Node> {
@@ -13,40 +14,25 @@ declare module 'konva/lib/types' {
   }
 }
 
-Factory.overWriteSetter = function overWriteSetter(
-  constructor: Function,
-  attr: string,
-  validator?: TweenProvider<any>,
-  after?: () => void,
-) {
-  const name = attr.charAt(0).toUpperCase() + attr.slice(1);
-  const setter = `set${name}`;
-  constructor.prototype[setter] = function (val: any, time?: any) {
-    if (val === ANIMATE) {
-      return new Animator(this, attr, validator);
-    }
-
-    if (time !== undefined) {
-      return new Animator(this, attr, validator).key(val, time).run();
-    }
-
-    const old = this.attrs[attr];
-    this._setAttr(attr, val);
-    if (old !== val) after?.call(this);
-
-    return this;
-  };
-};
-
 Factory.addOverloadedGetterSetter = function addOverloadedGetterSetter(
   constructor: Function,
   attr: string,
+  tween?: TweenProvider<any>,
 ) {
   const capitalizedAttr = attr.charAt(0).toUpperCase() + attr.slice(1);
   const setter = 'set' + capitalizedAttr;
   const getter = 'get' + capitalizedAttr;
 
-  constructor.prototype[attr] = function (...args: any[]) {
-    return args.length ? this[setter](...args) : this[getter]();
+  constructor.prototype[attr] = function (
+    value?: Vector2d | typeof ANIMATE,
+    time?: number,
+  ) {
+    if (value === ANIMATE) {
+      return new Animator<any, Node>(this, attr, tween);
+    }
+    if (time !== undefined) {
+      return new Animator<any, Node>(this, attr, tween).key(value, time).run();
+    }
+    return value === undefined ? this[getter]() : this[setter](value);
   };
 };

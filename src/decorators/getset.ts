@@ -7,12 +7,9 @@ export function getset(
   tween?: TweenProvider<any>,
 ): PropertyDecorator {
   return function (target, propertyKey) {
-    Factory.addGetterSetter(
-      target.constructor,
-      propertyKey,
-      defaultValue,
-      tween,
-      after,
-    );
+    Factory.addGetter(target.constructor, propertyKey, defaultValue);
+    Factory.addSetter(target.constructor, propertyKey, undefined, after);
+    // @ts-ignore
+    Factory.addOverloadedGetterSetter(target.constructor, propertyKey, tween);
   };
 }
