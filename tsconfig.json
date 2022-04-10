@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
+    "rootDir": "./src",
+    "baseUrl": "./src",
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
@@ -8,13 +9,14 @@
     "target": "es2017",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "MC",
+    "jsxImportSource": "@motion-canvas/core",
     "paths": {
-      "MC/*": [
-        "../src/*",
+      "@motion-canvas/core/jsx-runtime*": [
+        "jsx-runtime.ts"
       ]
     }
   }

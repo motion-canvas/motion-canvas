@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
-    "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
-    "target": "es6",
+    "target": "es2017",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@motion-canvas/core",
     "paths": {
-      "MC/*": [
-        "../src/*",
-        "../dist/*"
-      ]
+      "MC/*": ["../../core/dist/*"],
+      "@motion-canvas/core/*": ["../../core/dist/*"],
+      "@motion-canvas/ui": ["../../ui/dist"],
+      "@motion-canvas/ui/*": ["../../ui/dist/*"],
+      "*": ["../../core/node_modules/*", "../../core/node_modules/@types/*"]
     }
   }
 }
