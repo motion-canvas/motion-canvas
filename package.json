@@ -1,0 +1,19 @@
+{
+  "name": "@motion-canvas/ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "preact": "^10.7.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
+  }
+}
