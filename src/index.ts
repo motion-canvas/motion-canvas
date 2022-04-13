@@ -1,10 +1,9 @@
-import type { Player } from "@motion-canvas/core/player/Player";
-import { render } from "preact";
-import { App } from "./App";
+import type {Player} from '@motion-canvas/core/player/Player';
+import {render} from 'preact';
+import {App} from './App';
 
-export function setup(player: Player, container: HTMLElement) {
-  render(App(), container);
-  player.project.container(
-    <HTMLDivElement>document.getElementById("container2")
-  );
-}
+const konvaContainer = document.getElementById('konva');
+konvaContainer.remove();
+render(App(), document.body);
+document.getElementById('viewport').appendChild(konvaContainer);
+konvaContainer.hidden = false;

@@ -1,13 +1,19 @@
-import { Sidebar } from "./components/Sidebar";
-import { Timeline } from "./components/Timeline";
-import { Viewport } from "./components/Viewport";
+import {Sidebar} from './components/sidebar';
+import {Timeline} from './components/timeline';
+import {Viewport} from './components/viewport';
+
+import './index.scss';
+import {ResizeableLayout} from './components/layout';
 
 export function App() {
   return (
-    <div>
-      <Sidebar />
-      <Viewport />
-      <Timeline />
-    </div>
+    <main>
+      <ResizeableLayout
+        id={'main-timeline'}
+        vertical
+        left={<ResizeableLayout id={'sidebar-vieport'} left={<Sidebar />} right={<Viewport />} />}
+        right={<Timeline />}
+      />
+    </main>
   );
 }

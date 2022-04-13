@@ -1,0 +1,69 @@
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.iconInput {
+  display: none;
+}
+
+.iconLabel {
+  width: 24px;
+  height: 24px;
+  display: block;
+  background: #ffffff;
+  cursor: pointer;
+
+  opacity: 0.54;
+  &.main {
+    opacity: 1;
+  }
+
+  .iconInput + &:hover {
+    opacity: 1 !important;
+  }
+
+  .iconInput:checked + & {
+    opacity: 1;
+    background: var(--theme);
+    &.main {
+      background: #ffffff;
+    }
+  }
+}
+
+.button {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  display: block;
+  cursor: pointer;
+  border: 0;
+  opacity: 0.54;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.pause {
+  -webkit-mask-image: url('../../img/icons/pause.svg');
+}
+.play {
+  -webkit-mask-image: url('../../img/icons/play_arrow.svg');
+}
+.repeat {
+  -webkit-mask-image: url('../../img/icons/repeat.svg');
+}
+.skipNext {
+  -webkit-mask-image: url('../../img/icons/skip_next.svg');
+}
+.skipPrevious {
+  -webkit-mask-image: url('../../img/icons/skip_previous.svg');
+}
+.volumeOn {
+  -webkit-mask-image: url('../../img/icons/volume_on.svg');
+}
+.volumeOff {
+  -webkit-mask-image: url('../../img/icons/volume_off.svg');
+}

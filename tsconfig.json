@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
+    "rootDir": "../",
     "baseUrl": "./src",
     "outDir": "./dist/",
     "sourceMap": true,
@@ -16,7 +16,7 @@
     "jsxImportSource": "preact",
     "paths": {
       "@motion-canvas/core/*": [
-        "../../core/dist/*",
+        "../../core/src/*",
       ]
     }
   }

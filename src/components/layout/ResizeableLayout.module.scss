@@ -1,0 +1,51 @@
+.root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: stretch;
+
+  &.vertical {
+    flex-direction: column;
+  }
+}
+
+.left {
+  flex-grow: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.right {
+  flex-grow: 1;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.separator {
+  width: 16px;
+  flex-shrink: 0;
+  padding: 0 7px;
+  margin: 0 -8px;
+  z-index: 1600;
+  cursor: ew-resize;
+
+  &::before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    display: block;
+    background-color: #141414;
+  }
+
+  .root.vertical > & {
+    cursor: ns-resize;
+    width: auto;
+    height: 16px;
+    padding: 7px 0;
+    margin: -8px 0;
+  }
+
+  &:hover::before {
+    background-color: black;
+  }
+}
