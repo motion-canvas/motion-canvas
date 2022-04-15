@@ -16,10 +16,23 @@
   background-color: #000000;
 }
 
-.controls {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
-  padding: 16px;
+.playback {
   background: #202020;
+  display: grid;
+  grid-template-columns: 1fr min-content 1fr;
+  padding: 16px;
+}
+
+.time {
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 14px;
+  line-height: 24px;
+  text-align: left;
+}
+
+.duration {
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 14px;
+  line-height: 24px;
+  text-align: right;
 }

@@ -1,8 +1,16 @@
 import styles from './Timeline.module.scss';
 
-import {useLayoutEffect, useMemo, useRef, useState} from 'preact/hooks';
-import {usePlayer, usePlayerState, useSize} from '../../hooks';
+import {useCallback, useLayoutEffect, useRef, useState} from 'preact/hooks';
+import {
+  useDocumentEvent,
+  usePlayer,
+  usePlayerState,
+  useSize,
+} from '../../hooks';
 import {Playhead} from './Playhead';
+import {TimestampTrack} from './TimestampTrack';
+import {LabelTrack} from './LabelTrack';
+import {SceneTrack} from './SceneTrack';
 
 const ZOOM_SPEED = 0.1;
 
@@ -16,33 +24,28 @@ export function Timeline() {
   const [mouse, setMouse] = useState(0);
 
   const trackSize = rect.width * scale;
-  const power = Math.pow(2, Math.round(Math.log2(scale)));
-  let density = Math.floor(
-    (Math.floor((state.duration * 20) / rect.width) * 10) / power,
+
+  useDocumentEvent(
+    'keydown',
+    useCallback(
+      event => {
+        if (event.key !== 'f') return;
+        const time = player.getTime();
+        const maxOffset = trackSize - rect.width;
+        const playhead = trackSize * time.completion;
+        const newScroll = playhead - rect.width / 2;
+        setScroll(
+          newScroll < 0 ? 0 : newScroll > maxOffset ? maxOffset : newScroll,
+        );
+        setScale(scale * 0.99);
+      },
+      [trackSize, rect, scale],
+    ),
   );
-  density = density < 1 ? 1 : density;
 
   useLayoutEffect(() => {
     containerRef.current.scrollLeft = scroll;
   }, [scale]);
-
-  const startFrame = Math.floor(
-    ((scroll / trackSize) * state.duration) / density,
-  );
-  const endFrame = Math.ceil(
-    (((scroll + rect.width) / trackSize) * state.duration) / density,
-  );
-
-  const timestamps = useMemo(() => {
-    const timestamps = [];
-    for (let i = startFrame; i < endFrame; i++) {
-      timestamps.push({
-        time: i * density,
-        style: {left: `${((i * density) / state.duration) * trackSize}px`},
-      });
-    }
-    return timestamps;
-  }, [startFrame, endFrame, state.duration, trackSize, density]);
 
   return (
     <div
@@ -74,17 +77,14 @@ export function Timeline() {
       onMouseMove={event => setMouse(event.x)}
     >
       <div className={styles.track} style={{width: `${trackSize}px`}}>
-        <div className={styles.timestampTrack}>
-          {timestamps.map(value => (
-            <div
-              className={styles.timestamp}
-              style={value.style}
-              key={value.time}
-            >
-              {value.time}
-            </div>
-          ))}
-        </div>
+        <TimestampTrack
+          fullLength={trackSize}
+          viewLength={rect.width}
+          offset={scroll}
+          scale={scale}
+        />
+        <SceneTrack />
+        <LabelTrack />
       </div>
       <div
         className={styles.playheadPreview}

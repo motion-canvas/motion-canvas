@@ -3,7 +3,7 @@
   width: 100%;
   height: 100%;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   position: relative;
 
   &::-webkit-scrollbar {
@@ -20,9 +20,9 @@
 }
 
 .track {
+  position: relative;
   padding-top: 16px;
   overflow: hidden;
-  height: 100%;
 }
 
 .timestampTrack {
@@ -43,12 +43,59 @@
   border-left: 1px solid rgba(255, 255, 255, 0.24);
 }
 
+.sceneTrack {
+  position: relative;
+  height: 48px;
+  padding: 4px 0;
+}
+
+.sceneClip {
+  position: absolute;
+  height: 48px;
+  padding: 4px;
+
+  &::before {
+    box-sizing: border-box;
+    padding: 0 12px;
+    content: attr(data-name);
+    display: block;
+    line-height: 42px;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.24);
+  }
+}
+
+.labelTrack {
+  position: relative;
+  height: 32px;
+  padding: 4px 0;
+}
+
+.labelClip {
+  position: absolute;
+  height: 32px;
+  padding: 4px;
+  cursor: pointer;
+
+  &::before {
+    content: attr(data-name);
+    display: block;
+    line-height: 24px;
+    border-radius: 0 12px 12px 12px;
+    padding: 0 8px;
+    background-color: var(--theme);
+  }
+}
+
 .playhead {
   position: absolute;
   width: 2px;
   top: 0;
   bottom: 0;
   background-color: var(--theme);
+  pointer-events: none;
 }
 
 .playheadPreview {
@@ -58,6 +105,7 @@
   bottom: 0;
   background-color: white;
   opacity: 0;
+  pointer-events: none;
 
   .root:hover & {
     opacity: 0.24;

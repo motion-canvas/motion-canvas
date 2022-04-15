@@ -46,6 +46,16 @@
   }
 }
 
+.select,
+.input {
+  background: #404040;
+  color: rgba(255, 255, 255, 0.6);
+  border: 0;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 14px;
+}
+
 .pause {
   -webkit-mask-image: url('../../img/icons/pause.svg');
 }
