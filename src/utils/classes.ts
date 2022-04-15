@@ -3,7 +3,7 @@ export function classes(...args: (string | [string, boolean])[]): string {
   for (const arg of args) {
     if (typeof arg === 'string') {
       classList += ' ' + arg;
-    } else if (arg[1]) {
+    } else if (arg?.[1]) {
       classList += ' ' + arg[0];
     }
   }

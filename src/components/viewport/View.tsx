@@ -1,9 +1,11 @@
 import styles from './Viewport.module.scss';
 
 import {useDocumentEvent, usePlayer, useStorage} from '../../hooks';
-import {useCallback, useRef, useState} from 'preact/hooks';
+import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
 
 const ZOOM_SPEED = 0.1;
+const konvaContainer = document.getElementById('konva');
+konvaContainer.remove();
 
 export function View() {
   const player = usePlayer();
@@ -18,15 +20,19 @@ export function View() {
   const [startPosition, setStartPosition] = useState({x: 0, y: 0});
   const [panPosition, setPanPosition] = useState({x: 0, y: 0});
   const containerRef = useRef<HTMLDivElement>();
+  const viewportRef = useRef<HTMLDivElement>();
+
+  useEffect(() => {
+    const {current} = viewportRef;
+    current.appendChild(konvaContainer);
+    konvaContainer.hidden = false;
+
+    return () => konvaContainer.remove();
+  }, [viewportRef.current]);
 
   useDocumentEvent(
     'mouseup',
-    useCallback(
-      event => {
-        setPanning(false);
-      },
-      [setPanning],
-    ),
+    useCallback(() => setPanning(false), [setPanning]),
   );
 
   useDocumentEvent(
@@ -107,6 +113,7 @@ export function View() {
           transform: `translate(${state.x}px, ${state.y}px) scale(${state.zoom})`,
         }}
         id={'viewport'}
+        ref={viewportRef}
       />
     </div>
   );

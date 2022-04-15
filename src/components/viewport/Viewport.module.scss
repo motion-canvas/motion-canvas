@@ -12,15 +12,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-grow: 1;
 
   background-color: #000000;
 }
 
 .playback {
-  background: #202020;
+  background: #181818;
   display: grid;
   grid-template-columns: 1fr min-content 1fr;
-  padding: 16px;
+  padding: 12px;
 }
 
 .time {

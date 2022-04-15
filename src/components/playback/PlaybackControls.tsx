@@ -1,6 +1,6 @@
 import styles from './Playback.module.scss';
 
-import {Icon, IconButton, IconCheckbox} from '../controls';
+import {IconType, IconButton, IconCheckbox} from '../controls';
 import {usePlayer, usePlayerState} from '../../hooks';
 import {Select} from '../controls/Select';
 import {Input} from '../controls/Input';
@@ -25,31 +25,31 @@ export function PlaybackControls() {
       />
       <IconCheckbox
         id={'audio'}
-        iconOn={Icon.volumeOn}
-        iconOff={Icon.volumeOff}
+        iconOn={IconType.volumeOn}
+        iconOff={IconType.volumeOff}
         checked={!state.muted}
         onChange={value => player.toggleAudio(value)}
       />
       <IconButton
-        icon={Icon.skipPrevious}
+        icon={IconType.skipPrevious}
         onClick={() => player.requestReset()}
       />
       <IconCheckbox
         id={'play'}
         main
-        iconOn={Icon.pause}
-        iconOff={Icon.play}
+        iconOn={IconType.pause}
+        iconOff={IconType.play}
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
       />
       <IconButton
-        icon={Icon.skipNext}
+        icon={IconType.skipNext}
         onClick={() => player.requestNextFrame()}
       />
       <IconCheckbox
         id={'loop'}
-        iconOn={Icon.repeat}
-        iconOff={Icon.repeat}
+        iconOn={IconType.repeat}
+        iconOff={IconType.repeat}
         checked={state.loop}
         onChange={value => player.updateState({loop: value})}
       />

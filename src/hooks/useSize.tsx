@@ -9,8 +9,9 @@ export function useSize<T extends Element>(
     [],
   );
   useEffect(() => {
-    observer.observe(ref.current);
-    return () => observer.unobserve(ref.current);
+    const {current} = ref;
+    observer.observe(current);
+    return () => observer.unobserve(current);
   }, [ref.current]);
 
   return rect;

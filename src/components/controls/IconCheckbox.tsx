@@ -1,11 +1,11 @@
 import styles from './Controls.module.scss';
 
 import {classes} from '../../utils';
-import {Icon} from './Icon';
+import {IconType} from './IconType';
 
 interface IconCheckboxProps {
-  iconOn?: Icon;
-  iconOff?: Icon;
+  iconOn?: IconType;
+  iconOff?: IconType;
   id: string;
   onChange?: (value: boolean) => void;
   checked?: boolean;
@@ -21,7 +21,7 @@ export function IconCheckbox({
   main = false,
 }: IconCheckboxProps) {
   return (
-    <div className={styles.icon}>
+    <div className={styles.iconCheckbox}>
       <input
         className={styles.iconInput}
         type="checkbox"
@@ -33,13 +33,14 @@ export function IconCheckbox({
       />
       <label
         className={classes(
+          styles.icon,
           styles.iconLabel,
           [styles.main, main],
-          [styles[iconOn], checked],
-          [styles[iconOff], !checked],
+          [styles[iconOn], checked || !iconOff],
+          [styles[iconOff], iconOff && !checked],
         )}
         htmlFor={id}
-      ></label>
+      />
     </div>
   );
 }

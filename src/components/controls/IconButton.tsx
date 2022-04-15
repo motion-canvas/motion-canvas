@@ -1,16 +1,17 @@
 import styles from './Controls.module.scss';
 
-import {Icon} from './Icon';
+import {IconType} from './IconType';
+import {classes} from '../../utils';
 
 interface IconButtonProps {
-  icon: Icon;
+  icon: IconType;
   onClick?: () => void;
 }
 
 export function IconButton({icon, onClick}: IconButtonProps) {
   return (
     <button
-      className={styles.button + ' ' + styles[icon]}
+      className={classes(styles.button, styles.icon, styles[icon])}
       type="button"
       onClick={onClick}
     />

@@ -7,7 +7,6 @@ import {usePlayerState} from '../../hooks';
 
 export function Viewport() {
   const state = usePlayerState();
-  console.log('update');
   return (
     <div className={styles.root}>
       <View />

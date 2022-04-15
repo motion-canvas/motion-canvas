@@ -37,6 +37,10 @@
     background-color: #141414;
   }
 
+  &:hover::before {
+    background-color: black;
+  }
+
   .root.vertical > & {
     cursor: ns-resize;
     width: auto;
@@ -45,7 +49,7 @@
     margin: -8px 0;
   }
 
-  &:hover::before {
-    background-color: black;
+  .root:not(.resizeable) > & {
+    pointer-events: none;
   }
 }

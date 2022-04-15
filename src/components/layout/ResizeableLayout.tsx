@@ -1,28 +1,30 @@
 import styles from './ResizeableLayout.module.scss';
 
-import {ComponentChild, ComponentChildren} from 'preact';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import {ComponentChild, JSX} from 'preact';
+import {useCallback, useMemo, useRef, useState} from 'preact/hooks';
 import {classes} from '../../utils';
 import {useDocumentEvent, useStorage} from '../../hooks';
 
 interface ResizeableLayoutProps {
-  left: ComponentChild;
-  right: ComponentChild;
+  start: ComponentChild;
+  end: ComponentChild;
   vertical?: boolean;
   size?: number;
   id?: string;
+  resizeable?: boolean;
 }
 
 export function ResizeableLayout({
-  left,
-  right,
+  start,
+  end,
   vertical = false,
   size = 540,
   id = null,
+  resizeable = true,
 }: ResizeableLayoutProps) {
   const [isMoving, setMoving] = useState<boolean>(false);
   const [currentSize, setSize] = useStorage(`${id}-layout-size`, size);
-  const leftRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>();
 
   useDocumentEvent(
     'mouseup',
@@ -33,36 +35,41 @@ export function ResizeableLayout({
     'mousemove',
     useCallback(
       (event: MouseEvent) => {
-        if (!leftRef.current) return;
-        const leftRect = leftRef.current.getBoundingClientRect();
-        const parentRect =
-          leftRef.current.parentElement.getBoundingClientRect();
-        setSize(vertical ? event.y - leftRect.y : event.x - leftRect.x);
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        setSize(vertical ? event.y - rect.y : event.x - rect.x);
       },
-      [leftRef.current, vertical, setSize],
+      [containerRef.current, vertical, setSize],
     ),
     isMoving,
   );
 
+  const style = useMemo<JSX.CSSProperties>(() => {
+    if (!resizeable) return {};
+    return vertical
+      ? {height: `${currentSize}px`}
+      : {width: `${currentSize}px`};
+  }, [currentSize, vertical, resizeable]);
+
   return (
-    <div className={classes(styles.root, [styles.vertical, vertical])}>
-      <div
-        ref={leftRef}
-        className={styles.left}
-        style={
-          vertical ? {height: `${currentSize}px`} : {width: `${currentSize}px`}
-        }
-      >
-        {left}
+    <div
+      className={classes(
+        styles.root,
+        [styles.vertical, vertical],
+        [styles.resizeable, resizeable],
+      )}
+    >
+      <div ref={containerRef} className={styles.left} style={style}>
+        {start}
       </div>
       <div
         onMouseDown={e => {
           e.preventDefault();
-          setMoving(true);
+          setMoving(resizeable);
         }}
         className={styles.separator}
       />
-      <div className={styles.right}>{right}</div>
+      <div className={styles.right}>{end}</div>
     </div>
   );
 }

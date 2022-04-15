@@ -1,4 +1,14 @@
 .icon {
+  &:after {
+    width: 24px;
+    height: 24px;
+    display: block;
+    content: '';
+    background: #ffffff;
+  }
+}
+
+.iconCheckbox {
   width: 24px;
   height: 24px;
 }
@@ -11,9 +21,7 @@
   width: 24px;
   height: 24px;
   display: block;
-  background: #ffffff;
   cursor: pointer;
-
   opacity: 0.54;
   &.main {
     opacity: 1;
@@ -25,8 +33,10 @@
 
   .iconInput:checked + & {
     opacity: 1;
-    background: var(--theme);
-    &.main {
+    &:after {
+      background: var(--theme);
+    }
+    &.main:after {
       background: #ffffff;
     }
   }
@@ -40,6 +50,9 @@
   cursor: pointer;
   border: 0;
   opacity: 0.54;
+  background: transparent;
+  padding: 0;
+  margin: 0;
 
   &:hover {
     opacity: 1;
@@ -56,24 +69,33 @@
   font-size: 14px;
 }
 
-.pause {
+.pause:after {
   -webkit-mask-image: url('../../img/icons/pause.svg');
 }
-.play {
+.play:after {
   -webkit-mask-image: url('../../img/icons/play_arrow.svg');
 }
-.repeat {
+.repeat:after {
   -webkit-mask-image: url('../../img/icons/repeat.svg');
 }
-.skipNext {
+.skipNext:after {
   -webkit-mask-image: url('../../img/icons/skip_next.svg');
 }
-.skipPrevious {
+.skipPrevious:after {
   -webkit-mask-image: url('../../img/icons/skip_previous.svg');
 }
-.volumeOn {
+.volumeOn:after {
   -webkit-mask-image: url('../../img/icons/volume_on.svg');
 }
-.volumeOff {
+.volumeOff:after {
   -webkit-mask-image: url('../../img/icons/volume_off.svg');
+}
+.schedule:after {
+  -webkit-mask-image: url('../../img/icons/schedule.svg');
+}
+.tune:after {
+  -webkit-mask-image: url('../../img/icons/tune.svg');
+}
+.videoSettings:after {
+  -webkit-mask-image: url('../../img/icons/video_settings.svg');
 }
