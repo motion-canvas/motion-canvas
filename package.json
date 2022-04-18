@@ -36,9 +36,14 @@
     "tsconfig.project.json"
   ],
   "devDependencies": {
+    "@types/node-sass": "^4.11.2",
     "@types/three": "^0.138.0",
+    "css-loader": "^6.7.1",
     "node-loader": "^2.0.0",
+    "node-sass": "^7.0.1",
     "prettier": "^2.5.1",
+    "sass-loader": "^12.6.0",
+    "style-loader": "^3.3.1",
     "webpack-cli": "^4.9.2"
   }
 }

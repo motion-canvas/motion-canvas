@@ -124,7 +124,7 @@ export class Scene extends Layer {
   }
 
   public canTransitionOut(): boolean {
-    return this.state === SceneState.CanTransitionOut;
+    return this.state === SceneState.CanTransitionOut || this.state === SceneState.Finished;
   }
 
   public add(...children: (Shape | Group)[]): this {

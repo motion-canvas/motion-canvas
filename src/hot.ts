@@ -1,6 +1,6 @@
 import {Player} from './player/Player';
 
-export function hot(player: Player, root: typeof module) {
+export function hot(player: Player, root: any) {
   const update = async (modules: string[]) => {
     const runners = [];
     for (const module of modules) {
@@ -21,6 +21,7 @@ export function hot(player: Player, root: typeof module) {
     player.reload();
   };
 
+  //@ts-ignore
   const scenePaths = require.cache[root.id].children.filter(name =>
     //@ts-ignore
     name.match(/\.scene\.[jt]sx?/),

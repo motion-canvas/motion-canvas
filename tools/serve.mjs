@@ -9,14 +9,38 @@ const projectFile = path.resolve(process.cwd(), process.argv[2]);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const compiler = webpack({
-  entry: projectFile,
+  entry: {
+    index: projectFile,
+    ui: path.resolve(__dirname, '../../ui/src/index.ts'),
+  },
   mode: 'development',
   devtool: 'inline-source-map',
   module: {
     rules: [
       {
+        test: /\.scss$/,
+        use: [
+          {loader: 'style-loader'},
+          {loader: 'css-loader', options: {modules: true}},
+          {loader: 'sass-loader'},
+        ],
+      },
+      {
         test: /\.tsx?$/,
+        include: path.resolve(__dirname, '../../ui/'),
         loader: 'ts-loader',
+        options: {
+          configFile: path.resolve(__dirname, '../../ui/tsconfig.json'),
+          instance: 'ui',
+        },
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: path.resolve(__dirname, '../../ui/'),
+        loader: 'ts-loader',
+        options: {
+          instance: 'project',
+        },
       },
       {
         test: /\.glsl$/i,
@@ -59,13 +83,17 @@ const compiler = webpack({
     modules: ['node_modules', path.resolve(__dirname, '../node_modules')],
     extensions: ['.js', '.ts', '.tsx'],
     alias: {
-      MC: path.resolve(__dirname, '../dist'),
-      '@motion-canvas/core': path.resolve(__dirname, '../dist'),
-      '@motion-canvas/ui': path.resolve(__dirname, '../../ui/dist'),
+      MC: path.resolve(__dirname, '../src'),
+      '@motion-canvas/core': path.resolve(__dirname, '../src'),
+    },
+  },
+  optimization: {
+    runtimeChunk: {
+      name: 'runtime',
     },
   },
   output: {
-    filename: `index.js`,
+    filename: `[name].js`,
     path: __dirname,
   },
   experiments: {

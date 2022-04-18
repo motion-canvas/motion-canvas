@@ -11,10 +11,8 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/core",
     "paths": {
-      "MC/*": ["../../core/dist/*"],
-      "@motion-canvas/core/*": ["../../core/dist/*"],
-      "@motion-canvas/ui": ["../../ui/dist"],
-      "@motion-canvas/ui/*": ["../../ui/dist/*"],
+      "MC/*": ["../../core/src/*"],
+      "@motion-canvas/core/*": ["../../core/src/*"],
       "*": ["../../core/node_modules/*", "../../core/node_modules/@types/*"]
     }
   }
