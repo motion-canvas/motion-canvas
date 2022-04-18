@@ -11,6 +11,7 @@ import {Playhead} from './Playhead';
 import {TimestampTrack} from './TimestampTrack';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
+import {RangeTrack} from './RangeTrack';
 
 const ZOOM_SPEED = 0.1;
 
@@ -18,10 +19,10 @@ export function Timeline() {
   const player = usePlayer();
   const state = usePlayerState();
   const containerRef = useRef<HTMLDivElement>();
+  const playheadRef = useRef<HTMLDivElement>();
   const rect = useSize(containerRef);
   const [scroll, setScroll] = useState(0);
   const [scale, setScale] = useState(1);
-  const [mouse, setMouse] = useState(0);
 
   const trackSize = rect.width * scale;
 
@@ -67,16 +68,24 @@ export function Timeline() {
           newScroll < 0 ? 0 : newScroll > maxOffset ? maxOffset : newScroll,
         );
       }}
-      onClick={event =>
+      onMouseUp={event =>
         player.requestSeek(
           Math.floor(
             ((scroll + event.x - rect.x) / trackSize) * state.duration,
           ),
         )
       }
-      onMouseMove={event => setMouse(event.x)}
+      onMouseMove={event => {
+        playheadRef.current.style.left = `${event.x - rect.x + scroll}px`;
+      }}
     >
       <div className={styles.track} style={{width: `${trackSize}px`}}>
+        <RangeTrack
+          fullLength={trackSize}
+          viewLength={rect.width}
+          offset={scroll}
+          scale={scale}
+        />
         <TimestampTrack
           fullLength={trackSize}
           viewLength={rect.width}
@@ -86,12 +95,7 @@ export function Timeline() {
         <SceneTrack />
         <LabelTrack />
       </div>
-      <div
-        className={styles.playheadPreview}
-        style={{
-          left: `${mouse - rect.x + scroll}px`,
-        }}
-      />
+      <div ref={playheadRef} className={styles.playheadPreview} />
       <Playhead trackSize={trackSize} />
     </div>
   );

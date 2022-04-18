@@ -36,7 +36,6 @@ function useForceRender() {
 }
 
 function Threads() {
-  console.log('render');
   const render = useForceRender();
   const player = usePlayer();
   const [thread, setThread] = useState<Thread>(player.project.thread);

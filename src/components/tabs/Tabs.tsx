@@ -2,7 +2,7 @@ import styles from './Tabs.module.scss';
 
 import {Icon, IconType} from '../controls';
 import {ComponentChildren} from 'preact';
-import {useCallback} from 'preact/hooks';
+import {useCallback, useEffect} from 'preact/hooks';
 import {classes} from '../../utils';
 import {useStorage} from '../../hooks';
 
@@ -18,10 +18,12 @@ export function Tabs({children, onToggle, id}: TabsProps) {
     (value: number) => {
       const newTab = value === tab ? -1 : value;
       setTab(newTab);
-      onToggle?.(newTab);
     },
-    [tab, setTab, onToggle],
+    [tab, setTab],
   );
+  useEffect(() => {
+    onToggle?.(tab);
+  }, [onToggle, tab]);
 
   return (
     <div className={styles.root}>

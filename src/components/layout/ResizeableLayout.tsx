@@ -1,9 +1,9 @@
 import styles from './ResizeableLayout.module.scss';
 
 import {ComponentChild, JSX} from 'preact';
-import {useCallback, useMemo, useRef, useState} from 'preact/hooks';
+import {useCallback, useMemo, useRef} from 'preact/hooks';
 import {classes} from '../../utils';
-import {useDocumentEvent, useStorage} from '../../hooks';
+import {useDrag, useStorage} from '../../hooks';
 
 interface ResizeableLayoutProps {
   start: ComponentChild;
@@ -22,26 +22,17 @@ export function ResizeableLayout({
   id = null,
   resizeable = true,
 }: ResizeableLayoutProps) {
-  const [isMoving, setMoving] = useState<boolean>(false);
   const [currentSize, setSize] = useStorage(`${id}-layout-size`, size);
   const containerRef = useRef<HTMLDivElement>();
 
-  useDocumentEvent(
-    'mouseup',
-    useCallback(() => setMoving(false), [setMoving]),
-    isMoving,
-  );
-  useDocumentEvent(
-    'mousemove',
+  const [handleDrag] = useDrag(
     useCallback(
-      (event: MouseEvent) => {
-        if (!containerRef.current) return;
+      (dx, dy, x, y) => {
         const rect = containerRef.current.getBoundingClientRect();
-        setSize(vertical ? event.y - rect.y : event.x - rect.x);
+        setSize(vertical ? y - rect.y : x - rect.x);
       },
-      [containerRef.current, vertical, setSize],
+      [vertical, setSize],
     ),
-    isMoving,
   );
 
   const style = useMemo<JSX.CSSProperties>(() => {
@@ -62,13 +53,7 @@ export function ResizeableLayout({
       <div ref={containerRef} className={styles.left} style={style}>
         {start}
       </div>
-      <div
-        onMouseDown={e => {
-          e.preventDefault();
-          setMoving(resizeable);
-        }}
-        className={styles.separator}
-      />
+      <div onMouseDown={handleDrag} className={styles.separator} />
       <div className={styles.right}>{end}</div>
     </div>
   );

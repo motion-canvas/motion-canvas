@@ -9,4 +9,5 @@ export enum IconType {
   tune = 'tune',
   videoSettings = 'videoSettings',
   schedule = 'schedule',
+  dragIndicator = 'dragIndicator',
 }

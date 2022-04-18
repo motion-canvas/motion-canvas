@@ -1,14 +1,16 @@
 import styles from './Viewport.module.scss';
 
-import {useDocumentEvent, usePlayer, useStorage} from '../../hooks';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import {useDocumentEvent, useDrag, usePlayer, useStorage} from '../../hooks';
+import {useCallback, useEffect, useRef} from 'preact/hooks';
 
 const ZOOM_SPEED = 0.1;
 const konvaContainer = document.getElementById('konva');
-konvaContainer.remove();
 
 export function View() {
   const player = usePlayer();
+  const containerRef = useRef<HTMLDivElement>();
+  const viewportRef = useRef<HTMLDivElement>();
+
   const [state, setState] = useStorage('viewport', {
     x: 0,
     y: 0,
@@ -16,11 +18,18 @@ export function View() {
     grid: false,
   });
 
-  const [isPanning, setPanning] = useState(false);
-  const [startPosition, setStartPosition] = useState({x: 0, y: 0});
-  const [panPosition, setPanPosition] = useState({x: 0, y: 0});
-  const containerRef = useRef<HTMLDivElement>();
-  const viewportRef = useRef<HTMLDivElement>();
+  const [handleDrag, isDragging] = useDrag(
+    useCallback(
+      (x, y) =>
+        setState({
+          ...state,
+          x: state.x + x,
+          y: state.y + y,
+        }),
+      [setState, state],
+    ),
+    1,
+  );
 
   useEffect(() => {
     const {current} = viewportRef;
@@ -29,26 +38,6 @@ export function View() {
 
     return () => konvaContainer.remove();
   }, [viewportRef.current]);
-
-  useDocumentEvent(
-    'mouseup',
-    useCallback(() => setPanning(false), [setPanning]),
-  );
-
-  useDocumentEvent(
-    'mousemove',
-    useCallback(
-      event => {
-        setState({
-          ...state,
-          x: startPosition.x - panPosition.x + event.x,
-          y: startPosition.y - panPosition.y + event.y,
-        });
-      },
-      [setState, state, startPosition, panPosition],
-    ),
-    isPanning,
-  );
 
   useDocumentEvent(
     'keydown',
@@ -84,15 +73,9 @@ export function View() {
     <div
       className={styles.viewport}
       ref={containerRef}
-      onMouseDown={event => {
-        if (event.button !== 1) return;
-        event.preventDefault();
-        setPanning(true);
-        setStartPosition({x: state.x, y: state.y});
-        setPanPosition({x: event.x, y: event.y});
-      }}
+      onMouseDown={handleDrag}
       onWheel={event => {
-        if (isPanning) return;
+        if (isDragging) return;
         const rect = containerRef.current.getBoundingClientRect();
         const pointer = {
           x: event.x - rect.x - rect.width / 2,

@@ -1,10 +1,11 @@
 import styles from './Timeline.module.scss';
 
-import {usePlayerState} from '../../hooks';
+import {usePlayer, usePlayerState} from '../../hooks';
 import {useScenes} from '../../hooks/useScenes';
 
 export function SceneTrack() {
   const scenes = useScenes();
+  const player = usePlayer();
   const state = usePlayerState();
 
   return (
@@ -18,6 +19,15 @@ export function SceneTrack() {
               ((scene.lastFrame - scene.firstFrame) / state.duration) * 100
             }%`,
             left: `${(scene.firstFrame / state.duration) * 100}%`,
+          }}
+          onMouseUp={event => {
+            if (event.button === 1) {
+              event.stopPropagation();
+              player.updateState({
+                startFrame: scene.firstFrame,
+                endFrame: scene.lastFrame - 1,
+              });
+            }
           }}
         />
       ))}

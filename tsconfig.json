@@ -15,9 +15,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "paths": {
-      "@motion-canvas/core/*": [
-        "../../core/src/*",
-      ]
+      "@motion-canvas/core/*": ["../../core/src/*"]
     }
   }
 }
