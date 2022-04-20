@@ -17,12 +17,12 @@ export function TimestampTrack({
   scale,
 }: TimestampTrackProps) {
   const state = usePlayerState();
-  const power = Math.pow(2, Math.round(Math.log2(scale)));
-  const density = Math.max(
-    1,
-    Math.floor((Math.floor((state.duration * 20) / viewLength) * 10) / power),
+  const power = Math.pow(
+    2,
+    Math.round(Math.log2(state.duration / scale / viewLength)),
   );
 
+  const density = Math.max(1, Math.floor(128 * power));
   const startFrame = Math.floor(
     ((offset / fullLength) * state.duration) / density,
   );

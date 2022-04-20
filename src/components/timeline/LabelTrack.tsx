@@ -1,27 +1,50 @@
 import styles from './Timeline.module.scss';
 
-import {usePlayer, usePlayerState} from '../../hooks';
+import {usePlayerState, useScenes} from '../../hooks';
+import {useMemo} from 'preact/hooks';
+import {LabelGroup} from './LabelGroup';
 
-export function LabelTrack() {
-  const player = usePlayer();
+interface LabelTrackProps {
+  fullLength: number;
+  viewLength: number;
+  offset: number;
+  scale: number;
+}
+
+export function LabelTrack({
+  fullLength,
+  viewLength,
+  offset,
+  scale,
+}: LabelTrackProps) {
+  const scenes = useScenes();
   const state = usePlayerState();
+
+  // FIXME Use Context
+  const power = Math.pow(
+    2,
+    Math.round(Math.log2(state.duration / scale / viewLength)),
+  );
+  const density = Math.max(1, Math.floor(128 * power));
+  const startFrame =
+    Math.floor(((offset / fullLength) * state.duration) / density) * density;
+  const endFrame =
+    Math.ceil(
+      (((offset + viewLength) / fullLength) * state.duration) / density,
+    ) * density;
+
+  const filtered = useMemo(
+    () =>
+      scenes.filter(
+        scene => scene.lastFrame >= startFrame && scene.firstFrame <= endFrame,
+      ),
+    [scenes, startFrame, endFrame],
+  );
 
   return (
     <div className={styles.labelTrack}>
-      {Object.entries(player.labels).map(([name, time]) => (
-        <div
-          className={styles.labelClip}
-          data-name={name}
-          style={{
-            left: `${
-              (player.project.secondsToFrames(time) / state.duration) * 100
-            }%`,
-          }}
-          onClick={event => {
-            event.stopPropagation();
-            player.requestSeek(player.project.secondsToFrames(time));
-          }}
-        />
+      {filtered.map(scene => (
+        <LabelGroup key={scene.name()} scene={scene} fullLength={fullLength} />
       ))}
     </div>
   );

@@ -51,20 +51,41 @@
 }
 
 .sceneClip {
+  $padding: 4px;
+
   position: absolute;
   height: 48px;
-  padding: 4px;
 
-  &::before {
-    box-sizing: border-box;
-    padding: 0 12px;
-    content: attr(data-name);
-    display: block;
-    line-height: 42px;
+  .scene {
+    position: absolute;
+    top: $padding;
+    bottom: $padding;
+    left: $padding;
+    right: $padding;
     border-radius: 4px;
-    width: 100%;
-    height: 100%;
     background-color: rgba(255, 255, 255, 0.16);
+
+    .sceneName {
+      line-height: 24px;
+      pointer-events: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 8px 12px;
+    }
+  }
+
+  .transition {
+    pointer-events: none;
+    position: absolute;
+    top: $padding;
+    bottom: $padding;
+    left: $padding;
+    border-radius: 4px 0 0 4px;
+    background: linear-gradient(
+      90deg,
+      rgba(36, 36, 36, 1) 0%,
+      rgba(36, 36, 36, 0) 100%
+    );
   }
 }
 
@@ -91,6 +112,19 @@
   }
 }
 
+.labelClipStart {
+  box-sizing: content-box;
+  position: absolute;
+  height: 24px;
+  margin-top: 4px;
+  margin-left: 4px;
+  padding-right: 24px;
+  cursor: pointer;
+  border-radius: 12px 0 12px 12px;
+  background-color: var(--theme-overlay);
+  pointer-events: none;
+}
+
 .playhead {
   position: absolute;
   width: 2px;
@@ -98,6 +132,18 @@
   bottom: 0;
   background-color: var(--theme);
   pointer-events: none;
+
+  &::before {
+    position: absolute;
+    content: '';
+    display: block;
+    left: -8px;
+    top: 0;
+    width: 16px;
+    height: 8px;
+    border-radius: 0 0 4px 4px;
+    background-color: var(--theme);
+  }
 }
 
 .playheadPreview {

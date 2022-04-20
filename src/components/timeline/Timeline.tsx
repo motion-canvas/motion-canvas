@@ -1,6 +1,11 @@
 import styles from './Timeline.module.scss';
 
-import {useCallback, useLayoutEffect, useRef, useState} from 'preact/hooks';
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import {
   useDocumentEvent,
   usePlayer,
@@ -15,6 +20,16 @@ import {RangeTrack} from './RangeTrack';
 
 const ZOOM_SPEED = 0.1;
 
+function useStateChange<T>(state: T, onChange: (prev: T, next: T) => any) {
+  const [cached, setCached] = useState(state);
+  useLayoutEffect(() => {
+    if (state !== cached) {
+      onChange(cached, state);
+      setCached(state);
+    }
+  }, [cached, state, onChange]);
+}
+
 export function Timeline() {
   const player = usePlayer();
   const state = usePlayerState();
@@ -25,6 +40,26 @@ export function Timeline() {
   const [scale, setScale] = useState(1);
 
   const trackSize = rect.width * scale;
+
+  useStateChange(
+    state.duration,
+    useCallback(
+      (prev, next) => setScale(Math.max(1, (scale / prev) * next)),
+      [scale],
+    ),
+  );
+
+  useStateChange(
+    rect.width,
+    useCallback(
+      (prev, next) => {
+        if (next !== 0 && prev !== 0) {
+          setScale(Math.max(1, (scale / next) * prev));
+        }
+      },
+      [scale],
+    ),
+  );
 
   useDocumentEvent(
     'keydown',
@@ -68,13 +103,15 @@ export function Timeline() {
           newScroll < 0 ? 0 : newScroll > maxOffset ? maxOffset : newScroll,
         );
       }}
-      onMouseUp={event =>
-        player.requestSeek(
-          Math.floor(
-            ((scroll + event.x - rect.x) / trackSize) * state.duration,
-          ),
-        )
-      }
+      onMouseUp={event => {
+        if (event.button === 0) {
+          player.requestSeek(
+            Math.floor(
+              ((scroll + event.x - rect.x) / trackSize) * state.duration,
+            ),
+          );
+        }
+      }}
       onMouseMove={event => {
         playheadRef.current.style.left = `${event.x - rect.x + scroll}px`;
       }}
@@ -93,7 +130,12 @@ export function Timeline() {
           scale={scale}
         />
         <SceneTrack />
-        <LabelTrack />
+        <LabelTrack
+          fullLength={trackSize}
+          viewLength={rect.width}
+          offset={scroll}
+          scale={scale}
+        />
       </div>
       <div ref={playheadRef} className={styles.playheadPreview} />
       <Playhead trackSize={trackSize} />

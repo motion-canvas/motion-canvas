@@ -29,7 +29,7 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
   const [handleDragEnd, isDraggingEnd] = useDrag(
     useCallback(
       dx => {
-        setEnd(end + (dx / fullLength) * state.duration);
+        setEnd(Math.min(state.duration, end) + (dx / fullLength) * state.duration);
       },
       [end, setEnd, fullLength, state.duration],
     ),
@@ -39,11 +39,10 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
     useCallback(
       dx => {
         setStart(start + (dx / fullLength) * state.duration);
-        setEnd(end + (dx / fullLength) * state.duration);
+        setEnd(Math.min(state.duration, end) + (dx / fullLength) * state.duration);
       },
       [start, end, fullLength, state.duration, setStart, setEnd],
     ),
-    1,
   );
 
   useEffect(() => {
@@ -54,13 +53,16 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
   useEffect(() => {
     if (!isDragging && !isDraggingStart && !isDraggingEnd) {
       const correctedStart = Math.max(0, Math.floor(start));
-      const correctedEnd = Math.min(state.duration, Math.floor(end));
+      const correctedEnd =
+        end >= state.duration
+          ? Infinity
+          : Math.min(state.duration, Math.floor(end));
       setStart(correctedStart);
       setEnd(correctedEnd);
 
       player.updateState({
         startFrame: correctedStart,
-        endFrame: end === Infinity ? Infinity : correctedEnd,
+        endFrame: correctedEnd,
       });
     }
   }, [isDragging, isDraggingStart, isDraggingEnd, start, end]);
@@ -68,11 +70,19 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
   return (
     <div
       style={{
-        left: `${(Math.floor(start) / state.duration) * 100}%`,
-        right: `${100 - (Math.floor(end + 1) / state.duration) * 100}%`,
+        left: `${(Math.max(0, start) / state.duration) * 100}%`,
+        right: `${100 - Math.min(1, (end + 1) / state.duration) * 100}%`,
       }}
       className={styles.range}
-      onMouseDown={handleDrag}
+      onMouseDown={event => {
+        if (event.button === 1) {
+          event.preventDefault();
+          setStart(0);
+          setEnd(Infinity);
+        } else {
+          handleDrag(event);
+        }
+      }}
     >
       <Icon
         onMouseDown={handleDragStart}
