@@ -1,18 +1,17 @@
 import styles from './Timeline.module.scss';
 
 import {usePlayerTime} from '../../hooks';
+import {useContext} from 'preact/hooks';
+import {TimelineContext} from './TimelineContext';
 
-interface PlayheadProps {
-  trackSize: number;
-}
-
-export function Playhead({trackSize}: PlayheadProps) {
+export function Playhead() {
+  const {fullLength} = useContext(TimelineContext);
   const time = usePlayerTime();
   return (
     <div
       className={styles.playhead}
       style={{
-        left: `${trackSize * time.completion}px`,
+        left: `${fullLength * time.completion}px`,
       }}
     />
   );

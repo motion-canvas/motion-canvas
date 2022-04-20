@@ -2,16 +2,16 @@ import styles from './Timeline.module.scss';
 
 import type {Scene, TimeEvent} from '@motion-canvas/core/Scene';
 import {useDrag, usePlayer} from '../../hooks';
-import {useCallback, useEffect, useState} from 'preact/hooks';
+import {useCallback, useContext, useEffect, useState} from 'preact/hooks';
+import {TimelineContext} from './TimelineContext';
 
 interface LabelProps {
   event: TimeEvent;
   scene: Scene;
-  fullLength: number;
-  duration: number;
 }
 
-export function Label({event, scene, duration, fullLength}: LabelProps) {
+export function Label({event, scene}: LabelProps) {
+  const {fullLength, duration} = useContext(TimelineContext);
   const player = usePlayer();
   const [frame, setFrame] = useState(event.offset);
   const [handleDrag, isDragging] = useDrag(

@@ -1,17 +1,13 @@
 import styles from './Timeline.module.scss';
 
 import {useDrag, usePlayer, usePlayerState} from '../../hooks';
-import {useCallback, useEffect, useState} from 'preact/hooks';
+import {useCallback, useContext, useEffect, useState} from 'preact/hooks';
 import {Icon, IconType} from '../controls';
+import {TimelineContext} from './TimelineContext';
 
-interface RangeTrackProps {
-  fullLength: number;
-  viewLength: number;
-  offset: number;
-  scale: number;
-}
+export function RangeTrack() {
+  const {fullLength} = useContext(TimelineContext);
 
-export function RangeTrack({fullLength}: RangeTrackProps) {
   const player = usePlayer();
   const state = usePlayerState();
   const [start, setStart] = useState(state.startFrame);
@@ -29,7 +25,9 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
   const [handleDragEnd, isDraggingEnd] = useDrag(
     useCallback(
       dx => {
-        setEnd(Math.min(state.duration, end) + (dx / fullLength) * state.duration);
+        setEnd(
+          Math.min(state.duration, end) + (dx / fullLength) * state.duration,
+        );
       },
       [end, setEnd, fullLength, state.duration],
     ),
@@ -39,7 +37,9 @@ export function RangeTrack({fullLength}: RangeTrackProps) {
     useCallback(
       dx => {
         setStart(start + (dx / fullLength) * state.duration);
-        setEnd(Math.min(state.duration, end) + (dx / fullLength) * state.duration);
+        setEnd(
+          Math.min(state.duration, end) + (dx / fullLength) * state.duration,
+        );
       },
       [start, end, fullLength, state.duration, setStart, setEnd],
     ),

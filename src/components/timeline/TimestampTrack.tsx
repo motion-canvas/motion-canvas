@@ -1,45 +1,22 @@
 import styles from './Timeline.module.scss';
 
-import {usePlayerState} from '../../hooks';
-import {useMemo} from 'preact/hooks';
+import {useContext, useMemo} from 'preact/hooks';
+import {TimelineContext} from './TimelineContext';
 
-interface TimestampTrackProps {
-  fullLength: number;
-  viewLength: number;
-  offset: number;
-  scale: number;
-}
-
-export function TimestampTrack({
-  fullLength,
-  viewLength,
-  offset,
-  scale,
-}: TimestampTrackProps) {
-  const state = usePlayerState();
-  const power = Math.pow(
-    2,
-    Math.round(Math.log2(state.duration / scale / viewLength)),
-  );
-
-  const density = Math.max(1, Math.floor(128 * power));
-  const startFrame = Math.floor(
-    ((offset / fullLength) * state.duration) / density,
-  );
-  const endFrame = Math.ceil(
-    (((offset + viewLength) / fullLength) * state.duration) / density,
-  );
+export function TimestampTrack() {
+  const {fullLength, startFrame, endFrame, density, duration} =
+    useContext(TimelineContext);
 
   const timestamps = useMemo(() => {
     const timestamps = [];
-    for (let i = startFrame; i < endFrame; i++) {
+    for (let i = startFrame; i < endFrame; i += density) {
       timestamps.push({
-        time: i * density,
-        style: {left: `${((i * density) / state.duration) * fullLength}px`},
+        time: i,
+        style: {left: `${(i / duration) * fullLength}px`},
       });
     }
     return timestamps;
-  }, [startFrame, endFrame, state.duration, fullLength, density]);
+  }, [startFrame, endFrame, duration, fullLength, density]);
 
   return (
     <div className={styles.timestampTrack}>
