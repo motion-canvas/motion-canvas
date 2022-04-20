@@ -132,6 +132,10 @@ export function remap(
   return fromOut + ((value - fromIn) * (toOut - fromOut)) / (toIn - fromIn);
 }
 
+export function clamp(min: number, max: number, value: number) {
+  return value < min ? min : value > max ? max : value;
+}
+
 export function clampRemap(
   fromIn: number,
   toIn: number,
@@ -142,9 +146,5 @@ export function clampRemap(
   const remappedValue = remap(fromIn, toIn, fromOut, toOut, value);
   if (fromOut > toOut) [fromOut, toOut] = [toOut, fromOut];
 
-  return remappedValue < fromOut
-    ? fromOut
-    : remappedValue > toOut
-    ? toOut
-    : remappedValue;
+  return clamp(fromOut, toOut, remappedValue);
 }
