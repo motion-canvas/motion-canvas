@@ -148,7 +148,7 @@ export class Player {
       const state = JSON.parse(savedState) as PlayerState;
       this.state.paused = state.paused;
       this.state.startFrame = state.startFrame;
-      this.state.endFrame = state.endFrame;
+      this.state.endFrame = state.endFrame ?? Infinity;
       this.state.loop = state.loop;
       this.state.speed = state.speed;
       this.state.muted = state.muted;
@@ -210,6 +210,7 @@ export class Player {
 
     // Recalculate
     if (commands.recalculate) {
+      console.time('reload');
       await this.project.recalculate();
       const duration = this.project.frame;
       const finished = await this.project.seek(this.frame);
@@ -217,11 +218,16 @@ export class Player {
       this.updateState({
         duration,
         finished,
+        endFrame:
+          state.endFrame !== Infinity && state.endFrame > duration
+            ? duration
+            : state.endFrame,
       });
       if (this.frame + 1 !== this.project.frame) {
         this.updateFrame(this.project.frame);
       }
       this.request();
+      console.timeEnd('reload');
       return;
     }
 

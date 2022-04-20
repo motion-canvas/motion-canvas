@@ -1,16 +1,21 @@
 import type {Project} from '../Project';
+import type {Scene} from '../Scene';
 import {decorate, threadable} from '../decorators';
-import {PROJECT} from '../symbols';
+import {PROJECT, SCENE} from '../symbols';
 import {ThreadGenerator} from '../threading';
 
 decorate(waitUntil, threadable());
 export function* waitUntil(
-  targetTime = 0,
+  targetTime: number | string = 0,
   after?: ThreadGenerator,
 ): ThreadGenerator {
-  const project = (yield PROJECT) as Project;
-  const frames = project.secondsToFrames(targetTime);
-  while (project.frame < frames) {
+  const scene: Scene = yield SCENE;
+  const frames =
+    typeof targetTime === 'string'
+      ? scene.getFrameEvent(targetTime)
+      : scene.project.secondsToFrames(targetTime);
+
+  while (scene.project.frame < frames) {
     yield;
   }
 

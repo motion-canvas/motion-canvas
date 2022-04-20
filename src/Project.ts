@@ -55,11 +55,11 @@ export class Project extends Stage {
     size: ProjectSize = ProjectSize.FullHD,
     config: Partial<StageConfig> = {},
   ) {
-    //@ts-ignore
     super({
       width: Sizes[size][0],
       height: Sizes[size][1],
       listening: false,
+      container: null,
       ...config,
     });
 
@@ -91,7 +91,11 @@ export class Project extends Stage {
         console.warn('Runner without a name: ', scene);
       }
       const handle = new Scene(this, scene);
-      this.sceneLookup[scene.name] = handle;
+      if (this.sceneLookup[scene.name]) {
+        console.warn('Duplicated scene name: ', scene.name);
+        handle.name(scene.name + Math.random());
+      }
+      this.sceneLookup[handle.name()] = handle;
       handle.threadsCallback = thread => {
         if (this.currentScene === handle) {
           this.currentThread = thread;
@@ -101,7 +105,7 @@ export class Project extends Stage {
     }
   }
 
-  draw(): this {
+  public draw(): this {
     this.previousScene?.drawScene();
     this.currentScene?.drawScene();
 
@@ -112,7 +116,6 @@ export class Project extends Stage {
     for (const runner of runners) {
       this.sceneLookup[runner.name]?.reload(runner);
     }
-    this.scenesChanged.dispatch(this.scenes);
   }
 
   public async next(speed: number = 1): Promise<boolean> {
@@ -120,8 +123,6 @@ export class Project extends Stage {
       await this.previousScene.next();
       if (!this.currentScene || this.currentScene.isAfterTransitionIn()) {
         this.previousScene.remove();
-        this.previousScene.lastFrame = this.frame;
-        this.scenesChanged.dispatch(this.scenes);
         this.previousScene = null;
       }
     }
@@ -135,12 +136,8 @@ export class Project extends Stage {
         this.currentScene = this.getNextScene(this.previousScene);
         if (this.currentScene) {
           await this.currentScene.reset(this.previousScene);
-          this.currentScene.firstFrame = this.frame;
-          this.scenesChanged.dispatch(this.scenes);
           this.add(this.currentScene);
           this.foreground.moveToTop();
-        } else {
-          this.previousScene.lastFrame = this.frame;
         }
       }
     }
@@ -149,28 +146,46 @@ export class Project extends Stage {
   }
 
   public async recalculate() {
+    const initialScene = this.currentScene;
     this.previousScene?.remove();
     this.previousScene = null;
-    this.currentScene?.remove();
-    this.currentScene = this.findBestScene(Infinity);
+    this.currentScene = null;
 
-    this.frame = this.currentScene.firstFrame ?? 0;
-    this.add(this.currentScene);
-    this.foreground.moveToTop();
-    await this.currentScene.reset();
+    this.frame = 0;
+    let offset = 0;
+    for (const scene of this.scenes) {
+      if (scene.cached) {
+        scene.firstFrame += offset;
+        this.frame = scene.lastFrame;
+      } else {
+        this.currentScene = scene;
+        await scene.reset();
+        scene.firstFrame = this.frame;
+        scene.transitionDuration = -1;
+        while (!scene.canTransitionOut()) {
+          if (scene.transitionDuration < 0 && scene.isAfterTransitionIn()) {
+            scene.transitionDuration = this.frame - scene.firstFrame;
+          }
+          this.frame++;
+          await scene.next();
+        }
+        offset += this.frame - scene.lastFrame;
+        scene.lastFrame = this.frame;
+        scene.cached = true;
 
-    let finished = false;
-    while (!finished) {
-      finished = await this.next(1);
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
     }
+
+    this.currentScene = initialScene;
+    this.scenesChanged.dispatch(this.scenes);
   }
 
   public async seek(frame: number, speed: number = 1): Promise<boolean> {
     if (
       frame <= this.frame ||
       !this.currentScene ||
-      (this.currentScene.lastFrame !== null &&
-        this.currentScene.lastFrame <= frame)
+      (this.currentScene.cached && this.currentScene.lastFrame < frame)
     ) {
       const scene = this.findBestScene(frame);
       if (scene !== this.currentScene) {
@@ -179,14 +194,14 @@ export class Project extends Stage {
         this.currentScene?.remove();
         this.currentScene = scene;
 
-        this.frame = this.currentScene.firstFrame ?? 0;
+        this.frame = this.currentScene.firstFrame;
         this.add(this.currentScene);
         this.foreground.moveToTop();
         await this.currentScene.reset();
       } else if (this.frame >= frame) {
         this.previousScene?.remove();
         this.previousScene = null;
-        this.frame = this.currentScene.firstFrame ?? 0;
+        this.frame = this.currentScene.firstFrame;
         await this.currentScene.reset();
       }
     }
@@ -202,7 +217,7 @@ export class Project extends Stage {
   private findBestScene(frame: number): Scene {
     let lastScene = null;
     for (const scene of Object.values(this.sceneLookup)) {
-      if (scene.lastFrame === null || scene.lastFrame > frame) {
+      if (!scene.cached || scene.lastFrame > frame) {
         return scene;
       }
       lastScene = scene;

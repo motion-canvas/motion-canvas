@@ -12,7 +12,8 @@ import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
 import {SceneTransition} from './transitions';
 import {decorate, threadable} from './decorators';
-import {PROJECT} from './symbols';
+import {PROJECT, SCENE} from './symbols';
+import {SimpleEventDispatcher} from 'strongly-typed-events';
 
 export interface SceneRunner {
   (layer: Scene, project: Project): ThreadGenerator;
@@ -25,12 +26,39 @@ export enum SceneState {
   Finished,
 }
 
+export interface TimeEvent {
+  name: string;
+  initialFrame: number;
+  offset: number;
+}
+
 export class Scene extends Layer {
-  public firstFrame: number = null;
-  public lastFrame: number = null;
   public threadsCallback: ThreadsCallback = null;
+  public cached = false;
+  public firstFrame: number = 0;
+  public transitionDuration: number = 0;
+  public duration: number = 0;
+
+  public get lastFrame() {
+    return this.firstFrame + this.duration;
+  }
+  public set lastFrame(value: number) {
+    this.duration = value - this.firstFrame;
+  }
+
+  public get timeEvents(): TimeEvent[] {
+    return Object.values(this.timeEventLookup);
+  }
+
+  public get TimeEventsChanged() {
+    return this.timeEventsChanged.asEvent();
+  }
 
   private readonly debugNode: Debug;
+  private readonly storageKey: string;
+  private readonly timeEventsChanged = new SimpleEventDispatcher<TimeEvent[]>();
+  private timeEventLookup: Record<string, TimeEvent> = {};
+  private storedEventLookup: Record<string, TimeEvent> = {};
   private previousScene: Scene = null;
   private runner: ThreadGenerator;
   private state: SceneState = SceneState.Initial;
@@ -48,12 +76,25 @@ export class Scene extends Layer {
     this.add(this.debugNode);
     this.debugNode.hide();
     decorate(runnerFactory, threadable());
+
+    this.storageKey = `scene-${this.name()}`;
+    const storedEvents = localStorage.getItem(this.storageKey);
+    if (storedEvents) {
+      this.storedEventLookup = JSON.parse(storedEvents);
+    }
   }
 
-  public reload(runnerFactory: SceneRunner) {
-    this.runnerFactory = runnerFactory;
+  public reload(runnerFactory?: SceneRunner) {
+    if (runnerFactory) {
+      this.runnerFactory = runnerFactory;
+    }
     this.debug(null);
-    this.lastFrame = null;
+    this.cached = false;
+    this.storedEventLookup = {
+      ...this.storedEventLookup,
+      ...this.timeEventLookup,
+    };
+    this.timeEventLookup = {};
   }
 
   public async reset(previousScene: Scene = null) {
@@ -78,6 +119,8 @@ export class Scene extends Layer {
         result = this.runner.next(value);
       } else if (result.value === PROJECT) {
         result = this.runner.next(this.project);
+      } else if (result.value === SCENE) {
+        result = this.runner.next(this);
       } else {
         console.log('Invalid value: ', result.value);
         result = this.runner.next();
@@ -124,7 +167,10 @@ export class Scene extends Layer {
   }
 
   public canTransitionOut(): boolean {
-    return this.state === SceneState.CanTransitionOut || this.state === SceneState.Finished;
+    return (
+      this.state === SceneState.CanTransitionOut ||
+      this.state === SceneState.Finished
+    );
   }
 
   public add(...children: (Shape | Group)[]): this {
@@ -136,5 +182,48 @@ export class Scene extends Layer {
   public debug(node: Node) {
     this.debugNode.target(node);
     this.debugNode.visible(node !== null);
+  }
+
+  public getFrameEvent(name: string): number {
+    const initialFrame = this.project.frame - this.firstFrame;
+    if (this.timeEventLookup[name] === undefined) {
+      this.timeEventLookup[name] = {
+        name,
+        initialFrame,
+        offset: this.storedEventLookup[name]?.offset ?? 0,
+      };
+      this.timeEventsChanged.dispatch(this.timeEvents);
+    } else if (this.timeEventLookup[name].initialFrame !== initialFrame) {
+      this.timeEventLookup[name] = {
+        ...this.timeEventLookup[name],
+        initialFrame,
+      };
+      this.timeEventsChanged.dispatch(this.timeEvents);
+    }
+
+    return (
+      this.firstFrame +
+      this.timeEventLookup[name].initialFrame +
+      this.timeEventLookup[name].offset
+    );
+  }
+
+  public setFrameEvent(name: string, frame: number) {
+    if (
+      !this.timeEventLookup[name] ||
+      this.timeEventLookup[name].offset === frame
+    ) {
+      return;
+    }
+    this.cached = false;
+    this.storedEventLookup[name] = this.timeEventLookup[name] = {
+      ...this.timeEventLookup[name],
+      offset: frame,
+    };
+    localStorage.setItem(
+      this.storageKey,
+      JSON.stringify(this.storedEventLookup),
+    );
+    this.timeEventsChanged.dispatch(this.timeEvents);
   }
 }
