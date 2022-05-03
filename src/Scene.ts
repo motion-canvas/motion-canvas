@@ -30,6 +30,7 @@ export interface TimeEvent {
   name: string;
   initialFrame: number;
   offset: number;
+  fps: number;
 }
 
 export class Scene extends Layer {
@@ -80,7 +81,16 @@ export class Scene extends Layer {
     this.storageKey = `scene-${this.name()}`;
     const storedEvents = localStorage.getItem(this.storageKey);
     if (storedEvents) {
-      this.storedEventLookup = JSON.parse(storedEvents);
+      const fps = project.framesPerSeconds;
+      for (const event of Object.values<TimeEvent>(JSON.parse(storedEvents))) {
+        const oldFps = event.fps ?? 30;
+        if (oldFps !== fps) {
+          event.initialFrame = (event.offset * fps) / oldFps;
+          event.offset = (event.offset * fps) / oldFps;
+        }
+        event.fps = fps;
+        this.storedEventLookup[event.name] = event;
+      }
     }
   }
 
@@ -95,6 +105,7 @@ export class Scene extends Layer {
       ...this.timeEventLookup,
     };
     this.timeEventLookup = {};
+    this.timeEventsChanged.dispatch([]);
   }
 
   public async reset(previousScene: Scene = null) {
@@ -191,6 +202,7 @@ export class Scene extends Layer {
         name,
         initialFrame,
         offset: this.storedEventLookup[name]?.offset ?? 0,
+        fps: this.project.framesPerSeconds,
       };
       this.timeEventsChanged.dispatch(this.timeEvents);
     } else if (this.timeEventLookup[name].initialFrame !== initialFrame) {

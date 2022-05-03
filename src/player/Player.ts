@@ -242,6 +242,9 @@ export class Player {
           this.syncAudio(-3);
           this.audioError = false;
         } catch (e) {
+          if (!this.audioError) {
+            console.error(e);
+          }
           this.audioError = true;
         }
       }

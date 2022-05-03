@@ -22,6 +22,7 @@ module.exports = async function (fileName) {
 
   return {
     fileName,
+    src: image.src,
     data: Array.from(imageData.data),
     width: dimensions.width,
     height: dimensions.height,

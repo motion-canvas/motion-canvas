@@ -115,7 +115,7 @@ export function calculateRatio(
     ratio /= numberOfValues;
   }
 
-  return ratio;
+  return isNaN(ratio) ? 1 : ratio;
 }
 
 export function map(from: number, to: number, value: number) {

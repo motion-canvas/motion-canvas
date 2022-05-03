@@ -42,6 +42,16 @@ export function easeInOutCubic(value: number, from = 0, to = 1) {
   return map(from, to, value);
 }
 
+export function easeOutCubic(value: number, from = 0, to = 1): number {
+  value = 1 - Math.pow(1 - value, 3);
+  return map(from, to, value);
+}
+
+export function easeInCubic(value: number, from = 0, to = 1): number {
+  value = value * value * value;
+  return map(from, to, value);
+}
+
 export function easeInOutQuint(value: number, from = 0, to = 1) {
   value =
     value < 0.5

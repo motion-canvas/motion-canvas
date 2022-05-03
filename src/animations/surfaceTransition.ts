@@ -28,13 +28,17 @@ export interface SurfaceTransitionConfig {
 }
 
 decorate(surfaceTransition, threadable());
-export function surfaceTransition(fromSurfaceOriginal: Surface) {
-  const fromSurface = fromSurfaceOriginal
-    .clone()
-    .moveTo(fromSurfaceOriginal.parent)
-    .zIndex(fromSurfaceOriginal.zIndex());
+export function surfaceTransition(fromSurfaceOriginal: Surface, clone = true) {
+  const fromSurface = clone
+    ? fromSurfaceOriginal
+        .clone()
+        .moveTo(fromSurfaceOriginal.parent)
+        .zIndex(fromSurfaceOriginal.zIndex())
+    : fromSurfaceOriginal;
 
-  fromSurfaceOriginal.hide();
+  if (clone) {
+    fromSurfaceOriginal.hide();
+  }
   const from = fromSurfaceOriginal.getMask();
 
   decorate(surfaceTransitionExecutor, threadable());

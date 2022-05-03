@@ -10,6 +10,8 @@ import {map} from '../tweening';
 export interface ConnectionConfig extends ContainerConfig {
   start?: Pin;
   end?: Pin;
+  startTarget?: Node;
+  endTarget?: Node;
   crossing?: Node;
   arrow?: Arrow;
 }
@@ -58,6 +60,13 @@ export class Connection extends Group {
     this.arrow = config?.arrow ?? new Arrow();
     if (!this.arrow.getParent()) {
       this.add(this.arrow);
+    }
+
+    if (config?.startTarget) {
+      this.start.target(config?.startTarget);
+    }
+    if (config?.endTarget) {
+      this.end.target(config?.endTarget);
     }
   }
 

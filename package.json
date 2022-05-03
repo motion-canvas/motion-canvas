@@ -6,7 +6,7 @@
   "author": "aarthificial",
   "license": "ISC",
   "scripts": {
-    "build": "tsc",
+    "build": "webpack",
     "watch": "tsc -w"
   },
   "types": "dist/global.d.ts",

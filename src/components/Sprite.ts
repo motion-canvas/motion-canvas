@@ -7,9 +7,11 @@ import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {InterpolationFunction, map, tween} from '../tweening';
 import {cancel, ThreadGenerator} from '../threading';
+import {parseColor} from 'mix-color';
 
 export interface SpriteData {
   fileName: string;
+  src: string;
   data: number[];
   width: number;
   height: number;
@@ -49,6 +51,7 @@ export class Sprite extends LayoutShape {
   private spriteData: SpriteData = {
     height: 0,
     width: 0,
+    src: '',
     data: [],
     fileName: '',
   };
@@ -120,19 +123,24 @@ export class Sprite extends LayoutShape {
               (skin.data[skinId + 3] / 255) *
               255,
           );
-
-          if (mask || this.baseMask) {
-            const maskValue = map(
-              mask?.data[id] ?? 255,
-              this.baseMask?.data[id] ?? 255,
-              this.baseMaskBlend,
-            );
-            this.imageData.data[id + 3] *= map(1, maskValue / 255, blend);
-          }
         }
       }
     } else {
       this.imageData.data.set(this.spriteData.data);
+    }
+
+    if (mask || this.baseMask) {
+      for (let y = 0; y < this.spriteData.height; y++) {
+        for (let x = 0; x < this.spriteData.width; x++) {
+          const id = this.positionToId({x, y});
+          const maskValue = map(
+            mask?.data[id] ?? 255,
+            this.baseMask?.data[id] ?? 255,
+            this.baseMaskBlend,
+          );
+          this.imageData.data[id + 3] *= map(1, maskValue / 255, blend);
+        }
+      }
     }
 
     this.context.putImageData(this.imageData, 0, 0);
@@ -157,6 +165,20 @@ export class Sprite extends LayoutShape {
   }
 
   @threadable()
+  public *playOnce(
+    animation: SpriteData[],
+    next: SpriteData[] = null,
+  ): ThreadGenerator {
+    next ??= this.animation();
+    this.animation(animation);
+    for (let i = 0; i < animation.length; i++) {
+      this.frame(i);
+      yield* waitFor(1 / this.fps());
+    }
+    this.animation(next);
+  }
+
+  @threadable()
   public *stop() {
     if (this.task) {
       yield* cancel(this.task);
@@ -164,12 +186,17 @@ export class Sprite extends LayoutShape {
     }
   }
 
+  private synced = false;
+
   @threadable()
   private *playRunner(): ThreadGenerator {
     this.frame(0);
     while (this.task !== null) {
       if (this.playing()) {
+        this.synced = true;
         this.frame(this.frame() + 1);
+      } else {
+        this.synced = false;
       }
       yield* waitFor(1 / this.fps());
     }
@@ -178,7 +205,11 @@ export class Sprite extends LayoutShape {
   @threadable()
   public *waitForFrame(frame: number): ThreadGenerator {
     let limit = 1000;
-    while (this.frame() !== frame && limit > 0) {
+    while (
+      this.frame() % this.animation().length !== frame &&
+      limit > 0 &&
+      !this.synced
+    ) {
       limit--;
       yield;
     }
@@ -216,6 +247,16 @@ export class Sprite extends LayoutShape {
       .padStart(3, ' ')}, ${this.imageData.data[id + 2]
       .toString()
       .padStart(3, ' ')}, ${this.imageData.data[id + 3] / 255})`;
+  }
+
+  public getParsedColorAt(position: Vector2d): ReturnType<typeof parseColor> {
+    const id = this.positionToId(position);
+    return {
+      r: this.imageData.data[id],
+      g: this.imageData.data[id + 1],
+      b: this.imageData.data[id + 2],
+      a: this.imageData.data[id + 3],
+    }
   }
 
   public positionToId(position: Vector2d): number {

@@ -39,6 +39,8 @@ export class ColorPicker extends Surface {
   public readonly b: Range;
   public readonly a: Range;
 
+  public parsedColor: ReturnType<typeof parseColor>;
+
   public constructor(config?: ColorPickerConfig) {
     super(config);
 
@@ -73,6 +75,8 @@ export class ColorPicker extends Surface {
   }
 
   private updateColor() {
+    if (!this.a) return;
+
     const style = this.style();
     const preview = this.previewColor();
 
@@ -80,13 +84,13 @@ export class ColorPicker extends Surface {
       ...style,
       foreground: preview,
     });
-    const color = parseColor(preview);
-    color.a = Math.round(color.a * 255);
+    this.parsedColor = parseColor(preview);
+    this.parsedColor.a = Math.round(this.parsedColor.a * 255);
 
-    this.r.value(color.r);
-    this.g.value(color.g);
-    this.b.value(color.b);
-    this.a.value(color.a);
+    this.r.value(this.parsedColor.r);
+    this.g.value(this.parsedColor.g);
+    this.b.value(this.parsedColor.b);
+    this.a.value(this.parsedColor.a);
     this.preview.fill(preview);
   }
 

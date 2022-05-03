@@ -1,14 +1,20 @@
 const path = require('path');
 const {readdirSync} = require('fs');
 const loadImage = require('../utils/load-image');
-const nameRegex = /([^\d]*)\d+\.png$/;
+const nameRegex = /[^\d]*(\d+)\.png$/;
 
-function loader () {
+function loader() {
   const callback = this.async();
   const directoryPath = path.dirname(this.resourcePath);
+
   const files = readdirSync(directoryPath)
-    .filter(file => nameRegex.test(file))
-    .map(file => path.resolve(directoryPath, file));
+    .map(file => nameRegex.exec(file))
+    .filter(match => !!match)
+    .map(match => [match.input, parseInt(match[1])])
+    .sort(([, indexA], [, indexB]) =>
+      indexA < indexB ? -1 : indexA > indexB ? 1 : 0,
+    )
+    .map(([file]) => path.resolve(directoryPath, file));
 
   files.forEach(file => this.addDependency(file));
 

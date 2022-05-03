@@ -98,7 +98,7 @@ export class ThreeView extends LayoutShape {
   private handleCanvasSizeChange() {
     if (!this.renderer) return;
 
-    const size = this.canvasSize();
+    const size = {...this.canvasSize()};
     const camera = this.camera();
 
     const ratio = size.width / size.height;
@@ -117,6 +117,7 @@ export class ThreeView extends LayoutShape {
     size.width *= this.quality();
     size.height *= this.quality();
     this.renderer.setSize(size.width, size.height);
+    this.fireLayoutChange();
   }
 
   getLayoutSize(): Size {
@@ -125,7 +126,7 @@ export class ThreeView extends LayoutShape {
 
   _sceneFunc(context: Context) {
     const scale = this.quality();
-    const size = this.canvasSize();
+    const size = {...this.canvasSize()};
 
     if (this.renderedFrames < 1) {
       this.renderedFrames = this.skipFrames();

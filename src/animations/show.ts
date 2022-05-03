@@ -9,6 +9,7 @@ import {
   easeInOutCubic,
   easeOutExpo,
   linear,
+  map,
   spacingTween,
   tween,
 } from '../tweening';
@@ -68,6 +69,7 @@ export function showSurface(surface: Surface): ThreadGenerator {
 decorate(showCircle, threadable());
 export function showCircle(
   surface: Surface,
+  duration: number = 0.6,
   origin?: Origin | Vector2d,
 ): ThreadGenerator {
   const position =
@@ -85,9 +87,24 @@ export function showCircle(
   mask.radius = 0;
 
   return chain(
-    tween(target / 2000, value => {
+    tween(duration, value => {
       mask.radius = easeInOutCubic(value, 0, target);
     }),
     () => surface.setCircleMask(null),
+  );
+}
+
+export function unravelSurface(surface: Surface): ThreadGenerator {
+  const mask = surface.getMask();
+  surface.setMask({...mask, height: 0});
+  return tween(
+    0.5,
+    value => {
+      surface.setMask({
+        ...mask,
+        height: map(0, mask.height, easeInOutCubic(value)),
+      });
+    },
+    () => surface.setMask(null),
   );
 }

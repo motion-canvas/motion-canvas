@@ -87,6 +87,14 @@ export class Animator<Type, This extends Node> {
     return this;
   }
 
+  public do(callback: Function): this {
+    this.keys.push(function* (): ThreadGenerator {
+      callback();
+    });
+
+    return this;
+  }
+
   public diff<Rest extends any[]>(
     value: Type,
     time: number,
@@ -124,7 +132,7 @@ export class Animator<Type, This extends Node> {
     return this;
   }
 
-  public waitUntil(time: number): this {
+  public waitUntil(time: number | string): this {
     this.keys.push(() => waitUntil(time));
     return this;
   }

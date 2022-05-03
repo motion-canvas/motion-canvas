@@ -7,12 +7,17 @@ import WebpackDevServer from 'webpack-dev-server';
 
 const projectFile = path.resolve(process.cwd(), process.argv[2]);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const withUI = process.argv[3] === '--ui';
 
 const compiler = webpack({
-  entry: {
-    index: projectFile,
-    ui: path.resolve(__dirname, '../../ui/src/index.ts'),
-  },
+  entry: withUI
+    ? {
+        index: projectFile,
+        ui: path.resolve(__dirname, '../../ui/src/index.ts'),
+      }
+    : {
+        index: projectFile,
+      },
   mode: 'development',
   devtool: 'inline-source-map',
   module: {
@@ -95,6 +100,7 @@ const compiler = webpack({
   output: {
     filename: `[name].js`,
     path: __dirname,
+    uniqueName: 'motion-canvas',
   },
   experiments: {
     topLevelAwait: true,
