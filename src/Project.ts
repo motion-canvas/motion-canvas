@@ -154,7 +154,7 @@ export class Project extends Stage {
     this.frame = 0;
     let offset = 0;
     for (const scene of this.scenes) {
-      if (scene.cached) {
+      if (scene.isMarkedAsCached()) {
         scene.firstFrame += offset;
         this.frame = scene.lastFrame;
       } else {
@@ -171,7 +171,7 @@ export class Project extends Stage {
         }
         offset += this.frame - scene.lastFrame;
         scene.lastFrame = this.frame;
-        scene.cached = true;
+        scene.markAsCached();
 
         await new Promise(resolve => setTimeout(resolve, 0));
       }
@@ -185,7 +185,8 @@ export class Project extends Stage {
     if (
       frame <= this.frame ||
       !this.currentScene ||
-      (this.currentScene.cached && this.currentScene.lastFrame < frame)
+      (this.currentScene.isMarkedAsCached() &&
+        this.currentScene.lastFrame < frame)
     ) {
       const scene = this.findBestScene(frame);
       if (scene !== this.currentScene) {
@@ -217,7 +218,7 @@ export class Project extends Stage {
   private findBestScene(frame: number): Scene {
     let lastScene = null;
     for (const scene of Object.values(this.sceneLookup)) {
-      if (!scene.cached || scene.lastFrame > frame) {
+      if (!scene.isMarkedAsCached() || scene.lastFrame > frame) {
         return scene;
       }
       lastScene = scene;

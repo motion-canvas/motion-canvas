@@ -28,14 +28,13 @@ export enum SceneState {
 
 export interface TimeEvent {
   name: string;
-  initialFrame: number;
+  initialTime: number;
+  targetTime: number;
   offset: number;
-  fps: number;
 }
 
 export class Scene extends Layer {
   public threadsCallback: ThreadsCallback = null;
-  public cached = false;
   public firstFrame: number = 0;
   public transitionDuration: number = 0;
   public duration: number = 0;
@@ -63,6 +62,8 @@ export class Scene extends Layer {
   private previousScene: Scene = null;
   private runner: ThreadGenerator;
   private state: SceneState = SceneState.Initial;
+  private cached = false;
+  private preserveEvents = false;
 
   public constructor(
     public readonly project: Project,
@@ -81,17 +82,23 @@ export class Scene extends Layer {
     this.storageKey = `scene-${this.name()}`;
     const storedEvents = localStorage.getItem(this.storageKey);
     if (storedEvents) {
-      const fps = project.framesPerSeconds;
       for (const event of Object.values<TimeEvent>(JSON.parse(storedEvents))) {
-        const oldFps = event.fps ?? 30;
-        if (oldFps !== fps) {
-          event.initialFrame = (event.offset * fps) / oldFps;
-          event.offset = (event.offset * fps) / oldFps;
-        }
-        event.fps = fps;
         this.storedEventLookup[event.name] = event;
       }
     }
+  }
+
+  public markAsCached() {
+    this.cached = true;
+    this.preserveEvents = false;
+    localStorage.setItem(
+      this.storageKey,
+      JSON.stringify(this.storedEventLookup),
+    );
+  }
+
+  public isMarkedAsCached() {
+    return this.cached;
   }
 
   public reload(runnerFactory?: SceneRunner) {
@@ -196,46 +203,67 @@ export class Scene extends Layer {
   }
 
   public getFrameEvent(name: string): number {
-    const initialFrame = this.project.frame - this.firstFrame;
+    const initialTime = this.project.framesToSeconds(
+      this.project.frame - this.firstFrame,
+    );
     if (this.timeEventLookup[name] === undefined) {
-      this.timeEventLookup[name] = {
+      const event: TimeEvent = {
         name,
-        initialFrame,
+        initialTime,
+        targetTime: this.storedEventLookup[name]?.targetTime ?? initialTime,
         offset: this.storedEventLookup[name]?.offset ?? 0,
-        fps: this.project.framesPerSeconds,
       };
+
+      if (this.storedEventLookup[name]) {
+        if (this.preserveEvents) {
+          event.targetTime = event.initialTime + event.offset;
+        } else {
+          event.offset = Math.max(0, event.targetTime - event.initialTime);
+        }
+      }
+
+      this.timeEventLookup[name] = event;
       this.timeEventsChanged.dispatch(this.timeEvents);
-    } else if (this.timeEventLookup[name].initialFrame !== initialFrame) {
-      this.timeEventLookup[name] = {
+    } else if (this.timeEventLookup[name].initialTime !== initialTime) {
+      const event: TimeEvent = {
         ...this.timeEventLookup[name],
-        initialFrame,
+        initialTime,
       };
+
+      if (this.preserveEvents) {
+        event.targetTime = event.initialTime + event.offset;
+      } else {
+        event.offset = Math.max(0, event.targetTime - event.initialTime);
+      }
+
+      this.timeEventLookup[name] = event;
+      this.storedEventLookup[name] = event;
       this.timeEventsChanged.dispatch(this.timeEvents);
     }
 
     return (
       this.firstFrame +
-      this.timeEventLookup[name].initialFrame +
-      this.timeEventLookup[name].offset
+      this.project.secondsToFrames(
+        this.timeEventLookup[name].initialTime +
+          this.timeEventLookup[name].offset,
+      )
     );
   }
 
-  public setFrameEvent(name: string, frame: number) {
+  public setFrameEvent(name: string, offset: number, preserve = true) {
     if (
       !this.timeEventLookup[name] ||
-      this.timeEventLookup[name].offset === frame
+      this.timeEventLookup[name].offset === offset
     ) {
       return;
     }
     this.cached = false;
+    this.preserveEvents = preserve;
     this.storedEventLookup[name] = this.timeEventLookup[name] = {
       ...this.timeEventLookup[name],
-      offset: frame,
+      targetTime: this.timeEventLookup[name].initialTime + offset,
+      offset,
     };
-    localStorage.setItem(
-      this.storageKey,
-      JSON.stringify(this.storedEventLookup),
-    );
     this.timeEventsChanged.dispatch(this.timeEvents);
   }
 }

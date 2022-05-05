@@ -214,7 +214,7 @@ export class Player {
 
     // Recalculate
     if (commands.recalculate) {
-      console.time('reload');
+      console.time('reload time');
       await this.project.recalculate();
       const duration = this.project.frame;
       const finished = await this.project.seek(this.frame);
@@ -231,7 +231,7 @@ export class Player {
         this.updateFrame(this.project.frame);
       }
       this.request();
-      console.timeEnd('reload');
+      console.timeEnd('reload time');
       return;
     }
 
@@ -282,7 +282,9 @@ export class Player {
     if (commands.seek >= 0 || !this.isInRange(this.project.frame, state)) {
       const seekFrame = commands.seek < 0 ? this.project.frame : commands.seek;
       const clampedFrame = this.inRange(seekFrame, state);
+      console.time('seek time');
       state.finished = await this.project.seek(clampedFrame, state.speed);
+      console.timeEnd('seek time');
       this.syncAudio(-3);
     }
     // Do nothing if paused or is ahead of the audio.
