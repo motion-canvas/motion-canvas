@@ -188,7 +188,7 @@ export class Sprite extends LayoutShape {
 
   private synced = false;
 
-  @threadable()
+  @threadable('spriteAnimationRunner')
   private *playRunner(): ThreadGenerator {
     this.frame(0);
     while (this.task !== null) {

@@ -75,6 +75,23 @@ const compiler = webpack({
           },
         ],
       },
+      {
+        oneOf: [
+          {
+            test: /\.wav$/i,
+            resourceQuery: /meta/,
+            use: [
+              {
+                loader: 'wav-loader',
+              },
+            ],
+          },
+          {
+            test: /\.wav$/i,
+            type: 'asset',
+          },
+        ],
+      },
     ],
   },
   resolveLoader: {

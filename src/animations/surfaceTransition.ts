@@ -41,8 +41,8 @@ export function surfaceTransition(fromSurfaceOriginal: Surface, clone = true) {
   }
   const from = fromSurfaceOriginal.getMask();
 
-  decorate(surfaceTransitionExecutor, threadable());
-  function* surfaceTransitionExecutor(
+  decorate(surfaceTransitionRunner, threadable());
+  function* surfaceTransitionRunner(
     target: Surface,
     config: SurfaceTransitionConfig = {},
   ): ThreadGenerator {
@@ -150,5 +150,5 @@ export function surfaceTransition(fromSurfaceOriginal: Surface, clone = true) {
     target.show();
   }
 
-  return surfaceTransitionExecutor;
+  return surfaceTransitionRunner;
 }

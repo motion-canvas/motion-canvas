@@ -17,3 +17,13 @@ declare module '*.anim' {
   const value: import('./components/Sprite').SpriteData[];
   export = value;
 }
+
+declare module '*.wav' {
+  const value: string;
+  export = value;
+}
+
+declare module '*.wav?meta' {
+  const value: import('./types/Waveform').Waveform;
+  export = value;
+}
