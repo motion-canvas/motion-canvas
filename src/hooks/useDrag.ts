@@ -5,8 +5,13 @@ interface MoveCallback {
   (dx: number, dy: number, x: number, y: number): any;
 }
 
+interface DropCallback {
+  (event: MouseEvent): any;
+}
+
 export function useDrag(
   onMove: MoveCallback,
+  onDrop?: DropCallback,
   button = 0,
 ): [(event: MouseEvent) => any, boolean] {
   const [isDragging, setDragging] = useState(false);
@@ -15,10 +20,13 @@ export function useDrag(
     'mouseup',
     useCallback(
       event => {
-        event.stopPropagation();
-        setDragging(false);
+        if (isDragging) {
+          event.stopPropagation();
+          setDragging(false);
+          onDrop?.(event);
+        }
       },
-      [setDragging],
+      [isDragging, onDrop],
     ),
     isDragging,
     true,

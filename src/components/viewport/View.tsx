@@ -28,6 +28,7 @@ export function View() {
         }),
       [setState, state],
     ),
+    undefined,
     1,
   );
 

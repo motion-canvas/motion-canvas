@@ -123,6 +123,15 @@
     padding: 0 8px;
     color: rgba(0, 0, 0, 0.87);
     background-color: var(--theme);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.54);
+  }
+
+  &:hover,
+  &:active {
+    &::before {
+      box-shadow: 0 0 0 2px white inset;
+    }
+    z-index: 1;
   }
 }
 
@@ -137,6 +146,30 @@
   border-radius: 12px 0 12px 12px;
   background-color: var(--theme-overlay);
   pointer-events: none;
+}
+
+.labelClipTarget {
+  .labelClip:hover + & {
+    display: block;
+  }
+
+  .labelClip:active + & {
+    display: none;
+  }
+
+  box-sizing: content-box;
+  position: absolute;
+  height: 16px;
+  margin-top: 4px;
+  margin-left: -16px;
+  padding-right: 16px;
+  cursor: pointer;
+  border-radius: 12px 0 12px 12px;
+  background-color: white;
+  pointer-events: none;
+  display: none;
+
+  z-index: 1;
 }
 
 .playhead {

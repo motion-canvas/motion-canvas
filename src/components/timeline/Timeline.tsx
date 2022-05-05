@@ -125,13 +125,14 @@ export function Timeline() {
             const newScale = scale * ratio < 1 ? 1 : scale * ratio;
 
             const pointer = offset + event.x - rect.x;
-            const newOffset = offset - pointer + pointer * ratio;
             const newTrackSize = rect.width * newScale;
             const maxOffset = newTrackSize - rect.width;
+            const newOffset = clamp(0, maxOffset, offset - pointer + pointer * ratio);
 
             containerRef.current.scrollLeft = newOffset;
             setScale(newScale);
-            setOffset(clamp(0, maxOffset, newOffset));
+            setOffset(newOffset);
+            playheadRef.current.style.left = `${event.x - rect.x + newOffset}px`;
           }}
           onMouseUp={event => {
             if (event.button === 0) {

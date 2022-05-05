@@ -13,16 +13,32 @@ export function RangeTrack() {
   const [start, setStart] = useState(state.startFrame);
   const [end, setEnd] = useState(state.endFrame);
 
-  const [handleDragStart, isDraggingStart] = useDrag(
+  const onDrop = useCallback(() => {
+    const correctedStart = Math.max(0, Math.floor(start));
+    const correctedEnd =
+      end >= state.duration
+        ? Infinity
+        : Math.min(state.duration, Math.floor(end));
+    setStart(correctedStart);
+    setEnd(correctedEnd);
+
+    player.updateState({
+      startFrame: correctedStart,
+      endFrame: correctedEnd,
+    });
+  }, [start, end]);
+
+  const [handleDragStart] = useDrag(
     useCallback(
       dx => {
         setStart(start + (dx / fullLength) * state.duration);
       },
       [start, setStart, fullLength, state.duration],
     ),
+    onDrop,
   );
 
-  const [handleDragEnd, isDraggingEnd] = useDrag(
+  const [handleDragEnd] = useDrag(
     useCallback(
       dx => {
         setEnd(
@@ -31,9 +47,10 @@ export function RangeTrack() {
       },
       [end, setEnd, fullLength, state.duration],
     ),
+    onDrop,
   );
 
-  const [handleDrag, isDragging] = useDrag(
+  const [handleDrag] = useDrag(
     useCallback(
       dx => {
         setStart(start + (dx / fullLength) * state.duration);
@@ -43,29 +60,13 @@ export function RangeTrack() {
       },
       [start, end, fullLength, state.duration, setStart, setEnd],
     ),
+    onDrop,
   );
 
   useEffect(() => {
     setStart(state.startFrame);
     setEnd(state.endFrame);
   }, [state.startFrame, state.endFrame]);
-
-  useEffect(() => {
-    if (!isDragging && !isDraggingStart && !isDraggingEnd) {
-      const correctedStart = Math.max(0, Math.floor(start));
-      const correctedEnd =
-        end >= state.duration
-          ? Infinity
-          : Math.min(state.duration, Math.floor(end));
-      setStart(correctedStart);
-      setEnd(correctedEnd);
-
-      player.updateState({
-        startFrame: correctedStart,
-        endFrame: correctedEnd,
-      });
-    }
-  }, [isDragging, isDraggingStart, isDraggingEnd, start, end]);
 
   return (
     <div

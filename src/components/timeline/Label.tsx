@@ -13,29 +13,32 @@ interface LabelProps {
 export function Label({event, scene}: LabelProps) {
   const {fullLength, duration} = useContext(TimelineContext);
   const player = usePlayer();
-  const [frame, setFrame] = useState(event.offset);
-  const [handleDrag, isDragging] = useDrag(
+  const durationSeconds = player.project.framesToSeconds(duration);
+  const startSeconds = player.project.framesToSeconds(scene.firstFrame);
+  const [eventTime, setEventTime] = useState(event.offset);
+  const [handleDrag] = useDrag(
     useCallback(
       dx => {
-        setFrame(frame + (dx / fullLength) * duration);
+        setEventTime(eventTime + (dx / fullLength) * durationSeconds);
       },
-      [frame, fullLength, duration],
+      [eventTime, fullLength, durationSeconds],
+    ),
+    useCallback(
+      e => {
+        const newFrame = Math.max(0, Math.floor(eventTime));
+        setEventTime(newFrame);
+        if (event.offset !== newFrame) {
+          scene.setFrameEvent(event.name, newFrame, !e.shiftKey);
+          player.reload();
+        }
+      },
+      [event, eventTime],
     ),
   );
 
   useEffect(() => {
-    setFrame(event.offset);
+    setEventTime(event.offset);
   }, [event]);
-
-  useEffect(() => {
-    if (isDragging) return;
-    const newFrame = Math.max(0, Math.floor(frame));
-    setFrame(newFrame);
-    if (event.offset !== newFrame) {
-      scene.setFrameEvent(event.name, newFrame);
-      player.reload();
-    }
-  }, [isDragging, frame, event]);
 
   return (
     <>
@@ -45,9 +48,17 @@ export function Label({event, scene}: LabelProps) {
         data-name={event.name}
         style={{
           left: `${
-            ((scene.firstFrame + event.initialFrame + Math.max(0, frame)) /
-              duration) *
+            ((startSeconds + event.initialTime + Math.max(0, eventTime)) /
+              durationSeconds) *
             100
+          }%`,
+        }}
+      />
+      <div
+        className={styles.labelClipTarget}
+        style={{
+          left: `${
+            ((startSeconds + event.targetTime) / durationSeconds) * 100
           }%`,
         }}
       />
@@ -55,9 +66,9 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClipStart}
         style={{
           left: `${
-            ((scene.firstFrame + event.initialFrame) / duration) * 100
+            ((startSeconds + event.initialTime) / durationSeconds) * 100
           }%`,
-          width: `${(Math.max(0, frame) / duration) * 100}%`,
+          width: `${(Math.max(0, eventTime) / durationSeconds) * 100}%`,
         }}
       />
     </>
