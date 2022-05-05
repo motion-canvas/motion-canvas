@@ -2,7 +2,12 @@ import styles from './Timeline.module.scss';
 
 import type {Scene, TimeEvent} from '@motion-canvas/core/Scene';
 import {useDrag, usePlayer} from '../../hooks';
-import {useCallback, useContext, useEffect, useState} from 'preact/hooks';
+import {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
 
 interface LabelProps {
@@ -14,7 +19,6 @@ export function Label({event, scene}: LabelProps) {
   const {fullLength, duration} = useContext(TimelineContext);
   const player = usePlayer();
   const durationSeconds = player.project.framesToSeconds(duration);
-  const startSeconds = player.project.framesToSeconds(scene.firstFrame);
   const [eventTime, setEventTime] = useState(event.offset);
   const [handleDrag] = useDrag(
     useCallback(
@@ -25,8 +29,7 @@ export function Label({event, scene}: LabelProps) {
     ),
     useCallback(
       e => {
-        const newFrame = Math.max(0, Math.floor(eventTime));
-        setEventTime(newFrame);
+        const newFrame = Math.max(0, eventTime);
         if (event.offset !== newFrame) {
           scene.setFrameEvent(event.name, newFrame, !e.shiftKey);
           player.reload();
@@ -36,20 +39,35 @@ export function Label({event, scene}: LabelProps) {
     ),
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     setEventTime(event.offset);
-  }, [event]);
+  }, [event.offset]);
 
   return (
     <>
       <div
-        onMouseDown={handleDrag}
+        onMouseDown={e => {
+          if (e.button === 1) {
+            e.preventDefault();
+            player.requestSeek(
+              scene.firstFrame +
+                player.project.secondsToFrames(
+                  event.initialTime + event.offset,
+                ),
+            );
+          } else {
+            handleDrag(e);
+          }
+        }}
         className={styles.labelClip}
         data-name={event.name}
         style={{
           left: `${
-            ((startSeconds + event.initialTime + Math.max(0, eventTime)) /
-              durationSeconds) *
+            (scene.firstFrame +
+              scene.project.secondsToFrames(
+                event.initialTime + Math.max(0, eventTime),
+              ) /
+                duration) *
             100
           }%`,
         }}
@@ -58,7 +76,10 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClipTarget}
         style={{
           left: `${
-            ((startSeconds + event.targetTime) / durationSeconds) * 100
+            ((scene.firstFrame +
+              scene.project.secondsToFrames(event.targetTime)) /
+              duration) *
+            100
           }%`,
         }}
       />
@@ -66,9 +87,15 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClipStart}
         style={{
           left: `${
-            ((startSeconds + event.initialTime) / durationSeconds) * 100
+            ((scene.firstFrame +
+              scene.project.secondsToFrames(event.initialTime)) /
+              duration) *
+            100
           }%`,
-          width: `${(Math.max(0, eventTime) / durationSeconds) * 100}%`,
+          width: `${
+            (Math.max(0, scene.project.secondsToFrames(eventTime)) / duration) *
+            100
+          }%`,
         }}
       />
     </>

@@ -1,14 +1,41 @@
 import styles from './Playback.module.scss';
 
 import {IconType, IconButton, IconCheckbox} from '../controls';
-import {usePlayer, usePlayerState} from '../../hooks';
+import {useDocumentEvent, usePlayer, usePlayerState} from '../../hooks';
 import {Select} from '../controls/Select';
 import {Input} from '../controls/Input';
 import {Framerate} from './Framerate';
+import {useCallback} from 'preact/hooks';
 
 export function PlaybackControls() {
   const player = usePlayer();
   const state = usePlayerState();
+
+  useDocumentEvent(
+    'keydown',
+    useCallback(
+      event => {
+        switch (event.key) {
+          case ' ':
+            player.togglePlayback();
+            break;
+          case 'ArrowLeft':
+            player.requestReset();
+            break;
+          case 'ArrowRight':
+            player.requestNextFrame();
+            break;
+          case 'm':
+            player.updateState({muted: !state.muted});
+            break;
+          case 'l':
+            player.updateState({loop: !state.loop});
+            break;
+        }
+      },
+      [state],
+    ),
+  );
 
   return (
     <div className={styles.controls}>
