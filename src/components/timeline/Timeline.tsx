@@ -20,6 +20,7 @@ import {SceneTrack} from './SceneTrack';
 import {RangeTrack} from './RangeTrack';
 import {TimelineContext, TimelineState} from './TimelineContext';
 import {clamp} from '@motion-canvas/core/tweening';
+import {AudioTrack} from './AudioTrack';
 
 const ZOOM_SPEED = 0.1;
 
@@ -110,44 +111,54 @@ export function Timeline() {
 
   return (
     <TimelineContext.Provider value={state}>
-      <div
-        className={styles.root}
-        ref={containerRef}
-        onScroll={event => setOffset((event.target as HTMLElement).scrollLeft)}
-        onWheel={event => {
-          const ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
-          const newScale = scale * ratio < 1 ? 1 : scale * ratio;
-
-          const pointer = offset + event.x - rect.x;
-          const newOffset = offset - pointer + pointer * ratio;
-          const newTrackSize = rect.width * newScale;
-          const maxOffset = newTrackSize - rect.width;
-
-          containerRef.current.scrollLeft = newOffset;
-          setScale(newScale);
-          setOffset(clamp(0, maxOffset, newOffset));
-        }}
-        onMouseUp={event => {
-          if (event.button === 0) {
-            player.requestSeek(
-              Math.floor(
-                ((offset + event.x - rect.x) / state.fullLength) * duration,
-              ),
-            );
+      <div className={styles.root}>
+        <div
+          className={styles.timeline}
+          ref={containerRef}
+          onScroll={event =>
+            setOffset((event.target as HTMLElement).scrollLeft)
           }
-        }}
-        onMouseMove={event => {
-          playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
-        }}
-      >
-        <div className={styles.track} style={{width: `${state.fullLength}px`}}>
-          <RangeTrack />
-          <TimestampTrack />
-          <SceneTrack />
-          <LabelTrack />
+          onWheel={event => {
+            if (event.shiftKey) return;
+
+            const ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
+            const newScale = scale * ratio < 1 ? 1 : scale * ratio;
+
+            const pointer = offset + event.x - rect.x;
+            const newOffset = offset - pointer + pointer * ratio;
+            const newTrackSize = rect.width * newScale;
+            const maxOffset = newTrackSize - rect.width;
+
+            containerRef.current.scrollLeft = newOffset;
+            setScale(newScale);
+            setOffset(clamp(0, maxOffset, newOffset));
+          }}
+          onMouseUp={event => {
+            if (event.button === 0) {
+              player.requestSeek(
+                Math.floor(
+                  ((offset + event.x - rect.x) / state.fullLength) * duration,
+                ),
+              );
+            }
+          }}
+          onMouseMove={event => {
+            playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+          }}
+        >
+          <div
+            className={styles.track}
+            style={{width: `${state.fullLength}px`}}
+          >
+            <RangeTrack />
+            <TimestampTrack />
+            <SceneTrack />
+            <LabelTrack />
+            <AudioTrack />
+          </div>
+          <div ref={playheadRef} className={styles.playheadPreview} />
+          <Playhead />
         </div>
-        <div ref={playheadRef} className={styles.playheadPreview} />
-        <Playhead />
       </div>
     </TimelineContext.Provider>
   );

@@ -5,7 +5,10 @@ export function useSize<T extends Element>(
 ): DOMRectReadOnly {
   const [rect, setRect] = useState<DOMRect>(new DOMRect());
   const observer = useMemo(
-    () => new ResizeObserver(entries => setRect(entries[0].contentRect)),
+    () =>
+      new ResizeObserver(() =>
+        setRect(ref.current.getBoundingClientRect()),
+      ),
     [],
   );
   useEffect(() => {
