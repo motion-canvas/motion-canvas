@@ -1,5 +1,5 @@
 import {Text, TextConfig} from 'konva/lib/shapes/Text';
-import {IRect, Vector2d} from 'konva/lib/types';
+import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
 import {
   getOriginDelta,
@@ -11,13 +11,16 @@ import {
 } from './ILayoutNode';
 import {Origin, Size, PossibleSpacing, Spacing} from '../types';
 import {Animator, tween, textTween, InterpolationFunction} from '../tweening';
-import {threadable} from '../decorators';
+import {getset, threadable} from '../decorators';
 
 export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
   minWidth?: number;
 }
 
 export class LayoutText extends Text implements ILayoutNode {
+  @getset('', undefined, LayoutText.prototype.textTween)
+  public text: GetSet<LayoutTextConfig['text'], this>;
+
   private overrideWidth: number | null = null;
   private isConstructed = false;
 

@@ -5,6 +5,14 @@ import {PROJECT, SCENE} from '../symbols';
 import {ThreadGenerator} from '../threading';
 
 decorate(waitUntil, threadable());
+export function waitUntil(
+  time: number,
+  after?: ThreadGenerator,
+): ThreadGenerator;
+export function waitUntil(
+  event: string,
+  after?: ThreadGenerator,
+): ThreadGenerator;
 export function* waitUntil(
   targetTime: number | string = 0,
   after?: ThreadGenerator,
@@ -29,7 +37,7 @@ export function* waitFor(
   seconds = 0,
   after?: ThreadGenerator,
 ): ThreadGenerator {
-  const project = (yield PROJECT) as Project;
+  const project: Project = yield PROJECT;
   const frames = project.secondsToFrames(seconds);
   const startFrame = project.frame;
   while (project.frame - startFrame < frames) {

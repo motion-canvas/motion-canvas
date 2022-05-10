@@ -27,3 +27,10 @@ declare module '*.wav?meta' {
   const value: import('./types/Waveform').Waveform;
   export = value;
 }
+
+declare namespace JSX {
+  type ElementClass = import('konva/lib/Node').Node;
+  interface ElementChildrenAttribute {
+    children: {};
+  }
+}

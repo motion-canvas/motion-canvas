@@ -15,6 +15,7 @@ import {easeOutExpo, linear, tween} from '../tweening';
 import {GetSet, IRect} from 'konva/lib/types';
 import {getset, threadable} from '../decorators';
 import {Node} from 'konva/lib/Node';
+import {Reference} from '../utils';
 
 export interface SurfaceMask {
   width: number;
@@ -30,6 +31,7 @@ export interface CircleMask {
 }
 
 export interface SurfaceConfig extends LayoutGroupConfig {
+  ref?: Reference<Surface>;
   radius?: number;
   origin?: Origin;
   circleMask?: CircleMask;

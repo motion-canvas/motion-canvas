@@ -132,7 +132,10 @@ export class Animator<Type, This extends Node> {
     return this;
   }
 
+  public waitUntil(event: string): this
+  public waitUntil(time: number): this
   public waitUntil(time: number | string): this {
+    // @ts-ignore
     this.keys.push(() => waitUntil(time));
     return this;
   }

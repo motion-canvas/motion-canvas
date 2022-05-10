@@ -14,6 +14,7 @@ import {SceneTransition} from './transitions';
 import {decorate, threadable} from './decorators';
 import {PROJECT, SCENE} from './symbols';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
+import {setScene} from './utils';
 
 export interface SceneRunner {
   (layer: Scene, project: Project): ThreadGenerator;
@@ -130,6 +131,7 @@ export class Scene extends Layer {
   }
 
   public async next() {
+    setScene(this);
     let result = this.runner.next();
     while (result.value) {
       if (isPromise(result.value)) {
@@ -192,7 +194,7 @@ export class Scene extends Layer {
   }
 
   public add(...children: (Shape | Group)[]): this {
-    super.add(...children);
+    super.add(...children.flat());
     this.debugNode.moveToTop();
     return this;
   }
