@@ -1,23 +1,15 @@
 import {Text, TextConfig} from 'konva/lib/shapes/Text';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
-import {
-  getOriginDelta,
-  getOriginOffset,
-  ILayoutNode,
-  isInsideLayout,
-  LAYOUT_CHANGE_EVENT,
-  LayoutAttrs,
-} from './ILayoutNode';
-import {Origin, Size, PossibleSpacing, Spacing} from '../types';
+import {Origin, Size, PossibleSpacing, Spacing, getOriginOffset} from '../types';
 import {Animator, tween, textTween, InterpolationFunction} from '../tweening';
 import {getset, threadable} from '../decorators';
 
-export interface LayoutTextConfig extends Partial<LayoutAttrs>, TextConfig {
+export interface LayoutTextConfig extends TextConfig {
   minWidth?: number;
 }
 
-export class LayoutText extends Text implements ILayoutNode {
+export class LayoutText extends Text {
   @getset('', undefined, LayoutText.prototype.textTween)
   public text: GetSet<LayoutTextConfig['text'], this>;
 
@@ -36,9 +28,6 @@ export class LayoutText extends Text implements ILayoutNode {
       ...config,
     });
     this.isConstructed = true;
-    this.on(LAYOUT_CHANGE_EVENT, () => this.handleLayoutChange());
-    this.handleLayoutChange();
-    this.offset(this.getOriginOffset());
   }
 
   public getLayoutSize(custom?: LayoutTextConfig): Size {
@@ -53,29 +42,9 @@ export class LayoutText extends Text implements ILayoutNode {
     };
   }
 
-  public setMargin(value: PossibleSpacing): this {
-    this.attrs.margin = new Spacing(value);
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getMargin(): Spacing {
-    return this.attrs.margin ?? new Spacing();
-  }
-
-  public setPadd(value: PossibleSpacing): this {
-    this.attrs.padd = new Spacing(value);
-    this.fireLayoutChange();
-    return this;
-  }
-
-  public getPadd(): Spacing {
-    return this.attrs.padd ?? new Spacing();
-  }
-
   public setMinWidth(value: number): this {
     this.attrs.minWidth = value;
-    this.fireLayoutChange();
+    this.markDirty();
     return this;
   }
 
@@ -85,32 +54,8 @@ export class LayoutText extends Text implements ILayoutNode {
 
   public setText(text: string): this {
     super.setText(text);
-    this.offset(this.getOriginOffset());
-    this.fireLayoutChange();
-
+    this.markDirty();
     return this;
-  }
-
-  public setOrigin(value: Origin): this {
-    if (!isInsideLayout(this)) {
-      this.move(this.getOriginDelta(value));
-    }
-    this.attrs.origin = value;
-    this.offset(this.getOriginOffset());
-    this.fireLayoutChange();
-
-    return this;
-  }
-
-  public getOrigin(): Origin {
-    return this.attrs.origin ?? Origin.Middle;
-  }
-
-  public withOrigin(origin: Origin, action: () => void) {
-    const previousOrigin = this.getOrigin();
-    this.setOrigin(origin);
-    action();
-    this.setOrigin(previousOrigin);
   }
 
   public getOriginOffset(custom?: LayoutTextConfig): Vector2d {
@@ -149,14 +94,6 @@ export class LayoutText extends Text implements ILayoutNode {
     onEnd();
   }
 
-  public getOriginDelta(newOrigin: Origin, custom?: LayoutTextConfig) {
-    return getOriginDelta(
-      this.getLayoutSize(custom),
-      custom?.origin ?? this.getOrigin(),
-      newOrigin,
-    );
-  }
-
   public getClientRect(config?: ShapeGetClientRectConfig): IRect {
     const realSize = this.getLayoutSize({minWidth: 0});
     const size = this.getLayoutSize();
@@ -175,10 +112,4 @@ export class LayoutText extends Text implements ILayoutNode {
 
     return rect;
   }
-
-  protected fireLayoutChange() {
-    this.getParent()?.fire(LAYOUT_CHANGE_EVENT, undefined, true);
-  }
-
-  protected handleLayoutChange() {}
 }

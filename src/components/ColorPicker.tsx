@@ -8,6 +8,7 @@ import {Origin} from '../types';
 import {Style} from '../styles';
 import {GetSet} from 'konva/lib/types';
 import {clampRemap} from '../tweening';
+import {useScene} from '../utils';
 
 export interface ColorPickerConfig extends LinearLayoutConfig {
   previewColor?: string;
@@ -108,11 +109,10 @@ export class ColorPicker extends Surface {
     this.g.opacity(opacity);
     this.b.opacity(opacity);
     this.a.opacity(opacity);
-
-    this.fireLayoutChange();
+    this.markDirty();
   }
 
-  protected handleLayoutChange() {
+  public recalculateLayout() {
     if (this.preview) {
       const rangeWidth = this.preview.width() - 80;
       this.r.width(rangeWidth);
@@ -120,6 +120,6 @@ export class ColorPicker extends Surface {
       this.b.width(rangeWidth);
       this.a.width(rangeWidth);
     }
-    super.handleLayoutChange();
+    super.recalculateLayout();
   }
 }

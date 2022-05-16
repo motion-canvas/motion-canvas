@@ -1,17 +1,17 @@
 import {Context} from 'konva/lib/Context';
 import {GetSet} from 'konva/lib/types';
-import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {KonvaNode, getset} from '../decorators';
 import {CanvasHelper} from '../helpers';
+import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
-export interface GridConfig extends LayoutShapeConfig {
+export interface GridConfig extends ShapeConfig {
   gridSize?: number;
   subdivision?: boolean;
   checker?: boolean;
 }
 
 @KonvaNode()
-export class Grid extends LayoutShape {
+export class Grid extends Shape {
   @getset(16, Grid.prototype.recalculate)
   public gridSize: GetSet<number, this>;
   @getset(false)

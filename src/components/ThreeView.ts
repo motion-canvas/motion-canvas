@@ -1,13 +1,13 @@
-import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {PossibleSpacing, Size} from '../types';
 import {Util} from 'konva/lib/Util';
 import {Context} from 'konva/lib/Context';
 import * as THREE from 'three';
 import {CanvasHelper} from '../helpers';
 import {GetSet} from "konva/lib/types";
-import {getset} from "../decorators";
+import {getset, KonvaNode} from '../decorators';
+import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
-export interface ThreeViewConfig extends LayoutShapeConfig {
+export interface ThreeViewConfig extends ShapeConfig {
   canvasSize: Size;
   cameraScale?: number;
   quality?: number;
@@ -44,7 +44,8 @@ class RendererPool implements Pool<THREE.WebGLRenderer> {
 
 const rendererPool = new RendererPool();
 
-export class ThreeView extends LayoutShape {
+@KonvaNode()
+export class ThreeView extends Shape {
   @getset(null)
   public scene: GetSet<ThreeViewConfig['scene'], this>
   @getset(null)
@@ -117,7 +118,7 @@ export class ThreeView extends LayoutShape {
     size.width *= this.quality();
     size.height *= this.quality();
     this.renderer.setSize(size.width, size.height);
-    this.fireLayoutChange();
+    this.markDirty();
   }
 
   getLayoutSize(): Size {

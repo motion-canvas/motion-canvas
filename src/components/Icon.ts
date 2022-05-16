@@ -1,6 +1,6 @@
-import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {KonvaNode} from '../decorators';
 import {Context} from 'konva/lib/Context';
+import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
 const FILL = [
   new Path2D(
@@ -26,12 +26,12 @@ export enum IconType {
   Unity,
 }
 
-interface IconConfig extends LayoutShapeConfig {
+interface IconConfig extends ShapeConfig {
   type?: IconType;
 }
 
-@KonvaNode()
-export class Icon extends LayoutShape {
+@KonvaNode({centroid: false})
+export class Icon extends Shape {
   private readonly paths: Path2D[];
 
   constructor(config?: IconConfig) {

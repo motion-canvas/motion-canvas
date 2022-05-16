@@ -1,3 +1,4 @@
+import {Node} from 'konva/lib/Node';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {_registerNode} from 'konva/lib/Global';
 import {Context} from 'konva/lib/Context';
@@ -8,6 +9,7 @@ import {
   getNumberValidator,
 } from 'konva/lib/Validators';
 import {clamp} from 'three/src/math/MathUtils';
+import {getset, KonvaNode} from '../decorators';
 
 export interface ArrowConfig extends ShapeConfig {
   radius?: number;
@@ -164,18 +166,23 @@ class CircleSegment extends Segment {
   }
 }
 
+@KonvaNode()
 export class Arrow extends Shape<ArrowConfig> {
-  protected dirty = true;
+  @getset(8, Node.prototype.markDirty)
+  public radius: GetSet<number, this>;
+  @getset([], Node.prototype.markDirty)
+  public points: GetSet<number[], this>;
+  @getset(0)
+  public start: GetSet<number, this>;
+  @getset(1)
+  public end: GetSet<number, this>;
+  @getset(16)
+  public arrowSize: GetSet<number, this>;
 
   private segments: Segment[] = [];
   private arcLength: number = 0;
 
   _sceneFunc(context: Context) {
-    if (this.dirty) {
-      this.calculatePath();
-      this.dirty = false;
-    }
-
     let start = this.start() * this.arcLength;
     let end = this.end() * this.arcLength;
     if (start > end) {
@@ -285,7 +292,7 @@ export class Arrow extends Shape<ArrowConfig> {
     context.closePath();
   }
 
-  private calculatePath() {
+  public recalculateLayout() {
     this.arcLength = 0;
     this.segments = [];
 
@@ -356,42 +363,10 @@ export class Arrow extends Shape<ArrowConfig> {
     );
     this.segments.push(line);
     this.arcLength += line.arcLength;
-  }
-
-  public markAsDirty() {
-    this.dirty = true;
+    super.recalculateLayout();
   }
 
   public getArrowSize(): number {
     return this.attrs.arrowSize ?? this.strokeWidth() * 2;
   }
-
-  radius: GetSet<number, this>;
-  points: GetSet<number[], this>;
-  start: GetSet<number, this>;
-  end: GetSet<number, this>;
-  arrowSize: GetSet<number, this>;
 }
-
-Arrow.prototype.className = 'Arrow';
-Arrow.prototype._attrsAffectingSize = ['points', 'radius'];
-
-_registerNode(Arrow);
-
-Factory.addGetterSetter(
-  Arrow,
-  'radius',
-  8,
-  getNumberValidator(),
-  Arrow.prototype.markAsDirty,
-);
-Factory.addGetterSetter(
-  Arrow,
-  'points',
-  [],
-  getNumberArrayValidator(),
-  Arrow.prototype.markAsDirty,
-);
-Factory.addGetterSetter(Arrow, 'start', 0, getNumberValidator());
-Factory.addGetterSetter(Arrow, 'end', 1, getNumberValidator());
-Factory.addGetterSetter(Arrow, 'arrowSize', 16, getNumberValidator());

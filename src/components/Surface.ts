@@ -1,21 +1,16 @@
-import {Container} from 'konva/lib/Container';
+import {Container, ContainerConfig} from 'konva/lib/Container';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {parseColor} from 'mix-color';
-import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
-import {Origin, Size} from '../types';
-import {
-  getClientRect,
-  getOriginDelta,
-  getOriginOffset,
-  LayoutNode,
-} from './ILayoutNode';
+import {getOriginDelta, getOriginOffset, Origin, Size} from '../types';
 import {CanvasHelper} from '../helpers';
 import {Context} from 'konva/lib/Context';
 import {easeOutExpo, linear, tween} from '../tweening';
 import {GetSet, IRect} from 'konva/lib/types';
-import {getset, threadable} from '../decorators';
+import {getset, KonvaNode, threadable} from '../decorators';
 import {Node} from 'konva/lib/Node';
 import {Reference} from '../utils';
+import {Group} from 'konva/lib/Group';
+import {Shape} from 'konva/lib/Shape';
 
 export interface SurfaceMask {
   width: number;
@@ -30,17 +25,18 @@ export interface CircleMask {
   y: number;
 }
 
-export interface SurfaceConfig extends LayoutGroupConfig {
+export interface SurfaceConfig extends ContainerConfig {
   ref?: Reference<Surface>;
   radius?: number;
   origin?: Origin;
   circleMask?: CircleMask;
   background?: string;
-  child?: LayoutNode;
+  child?: Node;
 }
 
-export class Surface extends LayoutGroup {
-  @getset(0, Surface.prototype.updateBackground)
+@KonvaNode()
+export class Surface extends Group {
+  @getset(8, Surface.prototype.updateBackground)
   public radius: GetSet<SurfaceConfig['radius'], this>;
   @getset('#FF00FF', Surface.prototype.updateBackground)
   public background: GetSet<SurfaceConfig['background'], this>;
@@ -70,21 +66,21 @@ export class Surface extends LayoutGroup {
     });
 
     this.add(this.ripple, this.box);
-    this.handleLayoutChange();
+    this.markDirty();
   }
 
-  public setChild(value: LayoutNode): this {
+  public setChild(value: Shape | Group): this {
     this.attrs.child?.remove();
     this.attrs.child = value;
     if (value) {
       this.add(value);
     }
-    this.handleLayoutChange();
+    this.markDirty();
 
     return this;
   }
 
-  public getChild<T extends LayoutNode>(): T {
+  public getChild<T extends Node>(): T {
     return <T>this.attrs.child;
   }
 
@@ -160,7 +156,7 @@ export class Surface extends LayoutGroup {
   public setMask(data: SurfaceMask) {
     if (data === null) {
       this.surfaceMask = null;
-      this.handleLayoutChange();
+      this.markDirty();
       return;
     } else if (this.surfaceMask === null) {
       this.box
@@ -186,7 +182,7 @@ export class Surface extends LayoutGroup {
     child.scaleY(scale);
     child.position(getOriginDelta(data, Origin.Middle, child.getOrigin()));
     this.box.fill(data.color);
-    this.fireLayoutChange();
+    this.markDirty();
   }
 
   public getMask(): SurfaceMask {
@@ -197,7 +193,7 @@ export class Surface extends LayoutGroup {
     };
   }
 
-  protected handleLayoutChange() {
+  public recalculateLayout() {
     if (this.surfaceMask) return;
 
     this.layoutData ??= {
@@ -226,8 +222,7 @@ export class Surface extends LayoutGroup {
 
     this.updateBox();
     this.updateBackground();
-    this.setOrigin(this.getOrigin());
-    this.fireLayoutChange();
+    super.recalculateLayout();
   }
 
   private updateBox() {
@@ -295,14 +290,5 @@ export class Surface extends LayoutGroup {
       ...position,
       radius: distance * mask.radius,
     };
-  }
-
-  getClientRect(config?: {
-    skipTransform?: boolean;
-    skipShadow?: boolean;
-    skipStroke?: boolean;
-    relativeTo?: Container;
-  }): IRect {
-    return getClientRect(this, config);
   }
 }

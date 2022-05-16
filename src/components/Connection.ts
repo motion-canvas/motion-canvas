@@ -1,7 +1,7 @@
 import {Node} from 'konva/lib/Node';
 import {Center} from '../types';
 import {KonvaNode} from '../decorators';
-import {Pin, PIN_CHANGE_EVENT} from './Pin';
+import {Pin} from './Pin';
 import {Group} from 'konva/lib/Group';
 import {ContainerConfig} from 'konva/lib/Container';
 import {Arrow} from './Arrow';
@@ -41,20 +41,17 @@ export class Connection extends Group {
     super(config);
 
     this.start = config?.start ?? new Pin();
-    this.start.on(PIN_CHANGE_EVENT, () => this.recalculate());
     if (!this.start.getParent()) {
       this.add(this.start);
     }
 
     this.end = config?.end ?? new Pin();
-    this.end.on(PIN_CHANGE_EVENT, () => this.recalculate());
     if (!this.end.getParent()) {
       this.add(this.end);
     }
 
     if (config?.crossing) {
       this.crossing = config.crossing;
-      this.crossing.on('absoluteTransformChange', () => this.recalculate());
     }
 
     this.arrow = config?.arrow ?? new Arrow();
@@ -153,7 +150,25 @@ export class Connection extends Group {
       : clampedCrossing;
   }
 
-  private recalculate() {
+  public isDirty(): boolean {
+    return this.attrs.dirty || this.start.wasDirty() || this.end.wasDirty() || this.crossing?.wasDirty();
+  }
+
+  public updateLayout() {
+    this.start.updateLayout();
+    this.end.updateLayout();
+
+    this.attrs.wasDirty = false;
+    if (this.isDirty()) {
+      this.recalculateLayout();
+      this.attrs.dirty = false;
+      this.attrs.wasDirty = true;
+    }
+
+    this.arrow.updateLayout();
+  }
+
+  public recalculateLayout() {
     if (!this.start || !this.end || !this.arrow) {
       this.arrow?.points([]);
       return;
@@ -240,5 +255,6 @@ export class Connection extends Group {
 
     this.arrow.radius(Math.min(8, distance / 2));
     this.arrow.points(points);
+    super.recalculateLayout();
   }
 }

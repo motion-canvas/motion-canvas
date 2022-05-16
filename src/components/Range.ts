@@ -1,12 +1,12 @@
-import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {Context} from 'konva/lib/Context';
 import {getset, KonvaNode} from '../decorators';
 import {CanvasHelper} from '../helpers';
 import {GetSet} from 'konva/lib/types';
 import {getFontColor, getStyle, Style} from '../styles';
 import {remap} from '../tweening';
+import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
-export interface RangeConfig extends LayoutShapeConfig {
+export interface RangeConfig extends ShapeConfig {
   range?: [number, number];
   value?: number;
   precision?: number;
@@ -15,7 +15,7 @@ export interface RangeConfig extends LayoutShapeConfig {
 }
 
 @KonvaNode()
-export class Range extends LayoutShape {
+export class Range extends Shape {
   @getset(null)
   public style: GetSet<RangeConfig['style'], this>;
   @getset([0, 1])

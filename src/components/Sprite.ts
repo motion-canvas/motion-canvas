@@ -1,13 +1,13 @@
 import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {LayoutShape, LayoutShapeConfig} from './LayoutShape';
 import {waitFor} from '../animations';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {InterpolationFunction, map, tween} from '../tweening';
 import {cancel, ThreadGenerator} from '../threading';
 import {parseColor} from 'mix-color';
+import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
 export interface SpriteData {
   fileName: string;
@@ -17,7 +17,7 @@ export interface SpriteData {
   height: number;
 }
 
-export interface SpriteConfig extends LayoutShapeConfig {
+export interface SpriteConfig extends ShapeConfig {
   animation: SpriteData[];
   skin?: SpriteData;
   mask?: SpriteData;
@@ -32,7 +32,7 @@ export const SPRITE_CHANGE_EVENT = 'spriteChange';
 const COMPUTE_CANVAS_SIZE = 64;
 
 @KonvaNode()
-export class Sprite extends LayoutShape {
+export class Sprite extends Shape {
   @getset(null, Sprite.prototype.recalculate)
   public animation: GetSet<SpriteConfig['animation'], this>;
   @getset(null, Sprite.prototype.recalculate)
@@ -145,7 +145,7 @@ export class Sprite extends LayoutShape {
 
     this.context.putImageData(this.imageData, 0, 0);
     this.fire(SPRITE_CHANGE_EVENT);
-    this.fireLayoutChange();
+    this.markDirty();
   }
 
   public play(): ThreadGenerator {

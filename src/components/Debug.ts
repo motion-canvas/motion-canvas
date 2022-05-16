@@ -1,7 +1,6 @@
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {Node} from 'konva/lib/Node';
 import {Context} from 'konva/lib/Context';
-import {isLayoutNode} from './ILayoutNode';
 import {GetSet} from 'konva/lib/types';
 import {getset} from '../decorators';
 
@@ -29,7 +28,6 @@ export class Debug extends Shape<DebugConfig> {
     const position = target.getAbsolutePosition(this.getLayer());
     const scale = target.getAbsoluteScale(this.getLayer());
 
-    if (isLayoutNode(target)) {
       const ctx = context._context;
       const contentRect = target.getPadd().scale(scale).shrink(rect);
       const marginRect = target.getMargin().scale(scale).expand(rect);
@@ -66,13 +64,5 @@ export class Debug extends Shape<DebugConfig> {
       ctx.fill();
 
       ctx.restore();
-    } else {
-      context.beginPath();
-      context.rect(rect.x, rect.y, rect.width, rect.height);
-      context.moveTo(position.x, position.y);
-      context.arc(position.x, position.y, 4, 0, Math.PI * 2, false);
-      context.closePath();
-      context.strokeShape(this);
-    }
   }
 }

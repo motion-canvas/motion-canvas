@@ -1,19 +1,19 @@
 import {Group} from 'konva/lib/Group';
 import {GetSet, IRect} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
-import {LayoutGroup, LayoutGroupConfig} from './LayoutGroup';
 import {Center, Origin, Size, Spacing} from '../types';
-import {Container} from 'konva/lib/Container';
-import {getClientRect, getOriginDelta, isLayoutNode} from './ILayoutNode';
+import {Container, ContainerConfig} from 'konva/lib/Container';
 import {getset, KonvaNode} from '../decorators';
+import {Node} from 'konva/lib/Node';
+import {Rect} from 'konva/lib/shapes/Rect';
 
-export interface LinearLayoutConfig extends LayoutGroupConfig {
+export interface LinearLayoutConfig extends ContainerConfig {
   direction?: Center;
 }
 
 @KonvaNode()
-export class LinearLayout extends LayoutGroup {
-  @getset(Center.Vertical, LinearLayout.prototype.handleLayoutChange)
+export class LinearLayout extends Group {
+  @getset(Center.Vertical, Node.prototype.markDirty)
   public direction: GetSet<Center, this>;
 
   private contentSize: Size;
@@ -32,20 +32,19 @@ export class LinearLayout extends LayoutGroup {
   //TODO Recalculate upon removing children as well.
   add(...children: (Group | Shape)[]): this {
     super.add(...children);
-    this.handleLayoutChange();
+    this.recalculateLayout();
     return this;
   }
 
-  protected handleLayoutChange() {
+  public recalculateLayout() {
     if (!this.children) return;
 
     const direction = this.direction();
     this.contentSize = {width: 0, height: 0};
 
     for (const child of this.children) {
-      const isLayout = isLayoutNode(child);
-      const size = isLayout ? child.getLayoutSize() : child.getSize();
-      const margin = isLayout ? child.getMargin() : new Spacing();
+      const size = child.getLayoutSize();
+      const margin = child.getMargin();
       const scale = child.getAbsoluteScale(this);
 
       const boxSize = {
@@ -68,24 +67,19 @@ export class LinearLayout extends LayoutGroup {
         : this.contentSize.width / -2;
 
     for (const child of this.children) {
-      const isLayout = isLayoutNode(child);
-      const size = isLayout ? child.getLayoutSize() : child.getSize();
-      const margin = isLayout ? child.getMargin() : new Spacing();
+      const size = child.getLayoutSize();
+      const margin = child.getMargin();
       const scale = child.getAbsoluteScale(this);
 
       if (direction === Center.Vertical) {
-        const offset = isLayout
-          ? child.getOriginDelta(Origin.Top)
-          : getOriginDelta(size, Origin.TopLeft, Origin.Top);
+        const offset = child.getOriginDelta(Origin.Top);
         child.position({
           x: -offset.x * scale.x,
           y: length + (-offset.y + margin.top) * scale.y,
         });
         length += (size.height + margin.y) * scale.y;
       } else {
-        const offset = isLayout
-          ? child.getOriginDelta(Origin.Left)
-          : getOriginDelta(size, Origin.TopLeft, Origin.Left);
+        const offset = child.getOriginDelta(Origin.Left);
         child.position({
           x: length + (-offset.x + margin.left) * scale.x,
           y: -offset.y * scale.y,
@@ -93,17 +87,6 @@ export class LinearLayout extends LayoutGroup {
         length += (size.width + margin.x) * scale.x;
       }
     }
-    this.offset(this.getOriginOffset());
-
-    this.fireLayoutChange();
-  }
-
-  getClientRect(config?: {
-    skipTransform?: boolean;
-    skipShadow?: boolean;
-    skipStroke?: boolean;
-    relativeTo?: Container;
-  }): IRect {
-    return getClientRect(this, config);
+    super.recalculateLayout();
   }
 }

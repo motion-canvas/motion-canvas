@@ -11,7 +11,7 @@ import {Node} from 'konva/lib/Node';
 import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
 import {SceneTransition} from './transitions';
-import {decorate, threadable} from './decorators';
+import {decorate, KonvaNode, threadable} from './decorators';
 import {PROJECT, SCENE} from './symbols';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
 import {setScene} from './utils';
@@ -34,6 +34,7 @@ export interface TimeEvent {
   offset: number;
 }
 
+@KonvaNode()
 export class Scene extends Layer {
   public threadsCallback: ThreadsCallback = null;
   public firstFrame: number = 0;
@@ -133,6 +134,7 @@ export class Scene extends Layer {
   public async next() {
     setScene(this);
     let result = this.runner.next();
+    this.updateLayout();
     while (result.value) {
       if (isPromise(result.value)) {
         const value = await result.value;
@@ -145,11 +147,28 @@ export class Scene extends Layer {
         console.log('Invalid value: ', result.value);
         result = this.runner.next();
       }
+      this.updateLayout();
     }
 
     if (result.done) {
       this.state = SceneState.Finished;
     }
+  }
+
+  public updateLayout(): boolean {
+    super.updateLayout();
+    const result = this.wasDirty();
+    let limit = 10;
+    while (this.wasDirty() && limit > 0) {
+      super.updateLayout();
+      limit--;
+    }
+
+    if (limit === 0) {
+      console.warn('Layout iteration limit exceeded');
+    }
+
+    return result;
   }
 
   @threadable()
@@ -196,6 +215,7 @@ export class Scene extends Layer {
   public add(...children: (Shape | Group)[]): this {
     super.add(...children.flat());
     this.debugNode.moveToTop();
+    this.updateLayout();
     return this;
   }
 

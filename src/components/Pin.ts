@@ -1,32 +1,28 @@
 import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
-import {Center, flipOrigin, Origin} from '../types';
+import {Center, flipOrigin, getOriginDelta, Origin} from '../types';
 import {GetSet, IRect} from 'konva/lib/types';
 import {getset, KonvaNode} from '../decorators';
-import {getOriginDelta, LAYOUT_CHANGE_EVENT, LayoutNode} from './ILayoutNode';
 import {Node} from 'konva/lib/Node';
 import {bind} from '../decorators/bind';
 
 export interface PinConfig extends ContainerConfig {
   target?: Node;
-  attach?: LayoutNode;
+  attach?: Node;
   direction?: Center;
 }
 
-export const PIN_CHANGE_EVENT = 'pinChange';
-
 @KonvaNode()
 export class Pin extends Group {
-  @getset(null, Pin.prototype.firePinChangeEvent)
+  @getset(null, Node.prototype.markDirty)
   public target: GetSet<PinConfig['target'], this>;
-  @getset(null, Pin.prototype.updateAttach)
+  @getset(null, Node.prototype.markDirty)
   public attach: GetSet<PinConfig['attach'], this>;
-  @getset(null, Pin.prototype.firePinChangeEvent)
+  @getset(null, Pin.prototype.markDirty)
   public direction: GetSet<PinConfig['direction'], this>;
 
   public constructor(config?: PinConfig) {
     super(config);
-    this.on('absoluteTransformChange', this.firePinChangeEvent);
   }
 
   public getDirection(): Center {
@@ -36,30 +32,11 @@ export class Pin extends Group {
     );
   }
 
-  public destroy(): this {
-    this.attrs.target?.off('absoluteTransformChange', this.firePinChangeEvent);
-    this.attrs.target?.off(LAYOUT_CHANGE_EVENT, this.firePinChangeEvent);
-    return super.destroy();
+  public isDirty(): boolean {
+    return super.isDirty() || this.target()?.wasDirty();
   }
 
-  public setTarget(value: Node): this {
-    this.attrs.target?.off('absoluteTransformChange', this.firePinChangeEvent);
-    this.attrs.target?.off(LAYOUT_CHANGE_EVENT, this.firePinChangeEvent);
-    this.attrs.target = value;
-    this.attrs.target?.on('absoluteTransformChange', this.firePinChangeEvent);
-    this.attrs.target?.on(LAYOUT_CHANGE_EVENT, this.firePinChangeEvent);
-    this.firePinChangeEvent();
-
-    return this;
-  }
-
-  @bind()
-  private firePinChangeEvent() {
-    this.updateAttach();
-    this.fire(PIN_CHANGE_EVENT, undefined, true);
-  }
-
-  private updateAttach() {
+  public recalculateLayout() {
     const attach = this.attach();
     if (attach) {
       const attachDirection = flipOrigin(attach.getOrigin(), this.direction());
@@ -70,6 +47,7 @@ export class Pin extends Group {
         y: rect.y + offset.y,
       });
     }
+    super.recalculateLayout();
   }
 
   public getClientRect(config?: {

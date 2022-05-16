@@ -2,7 +2,7 @@ import type {Scene} from './Scene';
 import {Node, NodeConfig} from 'konva/lib/Node';
 import {Container} from 'konva/lib/Container';
 import {Surface} from './components';
-import {LayoutNode} from './components/ILayoutNode';
+import {Shape} from 'konva/lib/Shape';
 
 function isConstructor(fn: Function): fn is new (...args: any[]) => any {
   return !!fn.prototype?.name;
@@ -34,7 +34,7 @@ export function jsx(
   const node = new type(rest);
   if (children) {
     if (node instanceof Surface) {
-      node.setChild(<LayoutNode>flatChildren[0]);
+      node.setChild(<Shape>flatChildren[0]);
     } else if (node instanceof Container) {
       node.add(...flatChildren);
     }
