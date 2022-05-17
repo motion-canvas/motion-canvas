@@ -4,7 +4,7 @@ import type {PlayerRenderEvent} from '@motion-canvas/core/player/Player';
 import {IconType} from '../controls';
 import {Tabs} from '../tabs/Tabs';
 import {usePlayer, usePlayerState} from '../../hooks';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import {useCallback, useEffect, useState} from 'preact/hooks';
 import {Thread} from '@motion-canvas/core/threading';
 import {GeneratorHelper} from '@motion-canvas/core/helpers';
 
@@ -34,24 +34,15 @@ export function Sidebar({setOpen}: SidebarProps) {
 function Rendering() {
   const player = usePlayer();
   const state = usePlayerState();
-  const directoryHandle = useRef<FileSystemDirectoryHandle>();
 
-  const handleRender = useCallback(async ({frame, blob}: PlayerRenderEvent) => {
-    const name = frame.toString().padStart(6, '0');
-    const size = blob.size / 1024;
-
+  const handleRender = useCallback(async ({frame, data}: PlayerRenderEvent) => {
     try {
-      directoryHandle.current ??= await window.showDirectoryPicker();
-      const file = await directoryHandle.current.getFileHandle(
-        `frame-${name}.png`,
-        {
-          create: true,
-        },
-      );
-      const stream = await file.createWritable();
-      await stream.write(blob);
-      await stream.close();
-      console.log(`Frame: ${name}, Size: ${Math.round(size)} kB`);
+      const name = frame.toString().padStart(6, '0');
+      await fetch(`/render/frame${name}.png`, {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain'},
+        body: data.slice(22),
+      });
     } catch (e) {
       console.error(e);
       player.toggleRendering(false);

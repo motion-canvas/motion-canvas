@@ -2,12 +2,7 @@ import styles from './Timeline.module.scss';
 
 import type {Scene, TimeEvent} from '@motion-canvas/core/Scene';
 import {useDrag, usePlayer} from '../../hooks';
-import {
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useState,
-} from 'preact/hooks';
+import {useCallback, useContext, useLayoutEffect, useState} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
 
 interface LabelProps {
@@ -63,11 +58,11 @@ export function Label({event, scene}: LabelProps) {
         data-name={event.name}
         style={{
           left: `${
-            (scene.firstFrame +
+            ((scene.firstFrame +
               scene.project.secondsToFrames(
                 event.initialTime + Math.max(0, eventTime),
-              ) /
-                duration) *
+              )) /
+              duration) *
             100
           }%`,
         }}

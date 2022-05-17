@@ -6,7 +6,7 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
-    "target": "es2017",
+    "target": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,
