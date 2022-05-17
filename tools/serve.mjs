@@ -1,16 +1,33 @@
 #!/usr/bin/env node
 
 import path from 'path';
+import fs from 'fs';
 import {fileURLToPath} from 'url';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
+import meow from 'meow';
 
-const projectFile = path.resolve(process.cwd(), process.argv[2]);
+const cli = meow({
+  importMeta: import.meta,
+  flags: {
+    ui: {
+      type: 'boolean',
+      default: false,
+    },
+    output: {
+      type: 'string',
+      alias: 'o',
+      default: 'output',
+    },
+  },
+});
+
+const projectFile = path.resolve(process.cwd(), cli.input[0]);
+const renderOutput = path.resolve(process.cwd(), cli.flags.output);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const withUI = process.argv[3] === '--ui';
 
 const compiler = webpack({
-  entry: withUI
+  entry: cli.flags.ui
     ? {
         index: projectFile,
         ui: path.resolve(__dirname, '../../ui/src/index.ts'),
@@ -130,6 +147,23 @@ const server = new WebpackDevServer(
     compress: true,
     port: 9000,
     hot: true,
+    setupMiddlewares: (middlewares, devServer) => {
+      middlewares.unshift({
+        name: 'render',
+        path: '/render/:name',
+        middleware: (req, res) => {
+          const stream = fs.createWriteStream(
+            path.join(renderOutput, req.params.name),
+            {encoding: 'base64'},
+          );
+          req.setEncoding('utf8');
+          req.pipe(stream);
+          req.on('end', () => res.end());
+        },
+      });
+
+      return middlewares;
+    },
   },
   compiler,
 );

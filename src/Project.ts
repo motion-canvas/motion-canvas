@@ -26,7 +26,7 @@ export class Project extends Stage {
   }
 
   public readonly background: Rect;
-  public readonly foreground: Layer;
+  public readonly master: Layer;
   public readonly center: Vector2d;
   public threadsCallback: ThreadsCallback;
   public framesPerSeconds = 30;
@@ -76,12 +76,10 @@ export class Project extends Stage {
       fill: '#141414',
     });
 
-    const backgroundLayer = new Layer({name: 'background'});
-    backgroundLayer.add(this.background);
-    this.add(backgroundLayer);
-
-    this.foreground = new Layer({name: 'foreground'});
-    this.add(this.foreground);
+    this.master = new Layer({name: 'master'});
+    this.master.canvas.pixelRatio = 1;
+    this.master.add(this.background);
+    this.add(this.master);
 
     for (const scene of scenes) {
       if (
@@ -106,9 +104,7 @@ export class Project extends Stage {
   }
 
   public draw(): this {
-    this.previousScene?.drawScene();
-    this.currentScene?.drawScene();
-
+    this.master.drawScene();
     return this;
   }
 
@@ -136,8 +132,7 @@ export class Project extends Stage {
         this.currentScene = this.getNextScene(this.previousScene);
         if (this.currentScene) {
           await this.currentScene.reset(this.previousScene);
-          this.add(this.currentScene);
-          this.foreground.moveToTop();
+          this.master.add(this.currentScene);
         }
       }
     }
@@ -196,8 +191,7 @@ export class Project extends Stage {
         this.currentScene = scene;
 
         this.frame = this.currentScene.firstFrame;
-        this.add(this.currentScene);
-        this.foreground.moveToTop();
+        this.master.add(this.currentScene);
         await this.currentScene.reset();
       } else if (this.frame >= frame) {
         this.previousScene?.remove();

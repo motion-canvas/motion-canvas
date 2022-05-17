@@ -35,7 +35,7 @@ export interface TimeEvent {
 }
 
 @KonvaNode()
-export class Scene extends Layer {
+export class Scene extends Group {
   public threadsCallback: ThreadsCallback = null;
   public firstFrame: number = 0;
   public transitionDuration: number = 0;

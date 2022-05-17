@@ -6,6 +6,7 @@ import {Group} from 'konva/lib/Group';
 import {ContainerConfig} from 'konva/lib/Container';
 import {Arrow} from './Arrow';
 import {map} from '../tweening';
+import {useScene} from '../utils';
 
 export interface ConnectionConfig extends ContainerConfig {
   start?: Pin;
@@ -174,16 +175,17 @@ export class Connection extends Group {
       return;
     }
 
+    const scene = useScene();
     const crossing = this.crossing
-      ? this.crossing.getAbsolutePosition(this.getLayer())
+      ? this.crossing.getAbsolutePosition(scene)
       : {x: 0.5, y: 0.5};
 
-    const fromRect = this.start.getClientRect({relativeTo: this.getLayer()});
+    const fromRect = this.start.getClientRect({relativeTo: scene});
     fromRect.width /= 2;
     fromRect.height /= 2;
     fromRect.x += fromRect.width;
     fromRect.y += fromRect.height;
-    const toRect = this.end.getClientRect({relativeTo: this.getLayer()});
+    const toRect = this.end.getClientRect({relativeTo: scene});
 
     toRect.width /= 2;
     toRect.height /= 2;

@@ -36,7 +36,7 @@ interface PlayerCommands {
 
 export interface PlayerRenderEvent {
   frame: number;
-  blob: Blob;
+  data: string;
 }
 
 const STORAGE_KEY = 'player-state';
@@ -140,8 +140,8 @@ export class Player {
   public constructor(
     public readonly project: Project,
     public readonly audio?: {
-      src: string,
-      meta: Waveform,
+      src: string;
+      meta: Waveform;
     },
     public readonly labels?: Record<string, number>,
   ) {
@@ -182,26 +182,23 @@ export class Player {
 
   public requestSeek(value: number): void {
     this.commands.seek = this.inRange(value, this.state);
-    // if (value < this.state.startFrame) {
-    //   this.updateState({startFrame: value});
-    // }
   }
 
-  public togglePlayback(value?: boolean): void {
+  public togglePlayback(value: boolean = this.state.paused): void {
     this.updateState({
-      paused: !(value ?? this.state.paused),
+      paused: !value,
     });
   }
 
-  public toggleRendering(value?: boolean): void {
+  public toggleRendering(value: boolean = !this.state.render): void {
     this.updateState({
-      render: !(value ?? this.state.render),
+      render: value,
     });
   }
 
-  public toggleAudio(value?: boolean): void {
+  public toggleAudio(value: boolean = this.state.muted): void {
     this.updateState({
-      muted: !(value ?? this.state.muted),
+      muted: !value,
     });
   }
 
@@ -261,17 +258,16 @@ export class Player {
     if (state.render) {
       state.finished = await this.project.next();
       this.project.draw();
-      await this.renderChanged.dispatch({
+      await this.renderChanged.dispatchAsync({
         frame: this.project.frame,
-        blob: await this.getContent(),
+        data: this.project.master.getNativeCanvasElement().toDataURL(),
       });
       if (state.finished || this.project.frame >= state.endFrame) {
-        state.render = false;
+        this.toggleRendering(false);
       }
 
       this.updateState({
         finished: state.finished,
-        render: state.render,
       });
       this.updateFrame(this.project.frame);
       this.request();
@@ -303,7 +299,9 @@ export class Player {
       state.speed === 1 &&
       this.project.time < this.audioElement.currentTime - MAX_AUDIO_DESYNC
     ) {
-      const seekFrame = this.project.secondsToFrames(this.audioElement.currentTime);
+      const seekFrame = this.project.secondsToFrames(
+        this.audioElement.currentTime,
+      );
       state.finished = await this.project.seek(seekFrame, state.speed);
     }
     // Simply move forward one frame
@@ -373,11 +371,5 @@ export class Player {
         this.request();
       }
     });
-  }
-
-  private async getContent(): Promise<Blob> {
-    return new Promise<Blob>(resolve =>
-      this.project.toCanvas().toBlob(resolve, 'image/png'),
-    );
   }
 }

@@ -15,6 +15,7 @@
     "canvas": "^2.9.1",
     "image-size": "^1.0.1",
     "konva": "^8.3.2",
+    "meow": "^10.1.2",
     "mix-color": "^1.1.2",
     "preact": "^10.7.1",
     "strongly-typed-events": "^3.0.1",

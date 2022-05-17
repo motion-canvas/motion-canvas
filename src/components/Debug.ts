@@ -3,6 +3,7 @@ import {Node} from 'konva/lib/Node';
 import {Context} from 'konva/lib/Context';
 import {GetSet} from 'konva/lib/types';
 import {getset} from '../decorators';
+import {useScene} from '../utils';
 
 export interface DebugConfig extends ShapeConfig {
   target: Node;
@@ -24,9 +25,10 @@ export class Debug extends Shape<DebugConfig> {
     const target = this.target();
     if (!target) return;
 
-    const rect = target.getClientRect({relativeTo: this.getLayer()});
-    const position = target.getAbsolutePosition(this.getLayer());
-    const scale = target.getAbsoluteScale(this.getLayer());
+    const scene = useScene();
+    const rect = target.getClientRect({relativeTo: scene});
+    const position = target.getAbsolutePosition(scene);
+    const scale = target.getAbsoluteScale(scene);
 
       const ctx = context._context;
       const contentRect = target.getPadd().scale(scale).shrink(rect);
