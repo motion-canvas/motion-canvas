@@ -8,7 +8,7 @@ import {Konva} from 'konva/lib/Global';
 import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
-import {PlayerState} from './player/Player';
+import {Origin} from './types';
 
 Konva.autoDrawEnabled = false;
 
@@ -73,6 +73,7 @@ export class Project extends Stage {
       y: 0,
       width: this.width(),
       height: this.height(),
+      origin: Origin.TopLeft,
       fill: '#141414',
     });
 

@@ -28,7 +28,6 @@ export interface CircleMask {
 export interface SurfaceConfig extends ContainerConfig {
   ref?: Reference<Surface>;
   radius?: number;
-  origin?: Origin;
   circleMask?: CircleMask;
   background?: string;
   child?: Node;
@@ -123,8 +122,6 @@ export class Surface extends Group {
     const opaque = parseColor(this.background());
     this.ripple.show();
     this.ripple
-      .offsetX(this.layoutData.width / 2)
-      .offsetY(this.layoutData.height / 2)
       .width(this.layoutData.width)
       .height(this.layoutData.height)
       .cornerRadius(this.radius())
@@ -136,8 +133,6 @@ export class Surface extends Group {
       const radius = this.radius() + easeOutExpo(value, 0, 50);
 
       this.ripple
-        .offsetX(width / 2)
-        .offsetY(height / 2)
         .width(width)
         .height(height)
         .cornerRadius(radius)
@@ -160,8 +155,6 @@ export class Surface extends Group {
       return;
     } else if (this.surfaceMask === null) {
       this.box
-        .offsetX(5000)
-        .offsetY(5000)
         .position({x: 0, y: 0})
         .width(10000)
         .height(100000);
@@ -177,7 +170,6 @@ export class Surface extends Group {
     );
 
     this.surfaceMask = data;
-    this.offset(newOffset);
     child.scaleX(scale);
     child.scaleY(scale);
     child.position(getOriginDelta(data, Origin.Middle, child.getOrigin()));
@@ -229,8 +221,6 @@ export class Surface extends Group {
     if (!this.box) return;
     const size = this.getLayoutSize();
     this.box
-      .offsetX(size.width / 2)
-      .offsetY(size.height / 2)
       .width(size.width)
       .height(size.height);
   }
@@ -242,12 +232,10 @@ export class Surface extends Group {
 
   private drawMask(ctx: Context) {
     if (this.surfaceMask) {
-      const offset = this.offsetY();
-      const newOffset = getOriginOffset(this.surfaceMask, this.getOrigin());
       CanvasHelper.roundRect(
         ctx,
         -this.surfaceMask.width / 2,
-        -this.surfaceMask.height / 2 + offset - newOffset.y,
+        -this.surfaceMask.height / 2,
         this.surfaceMask.width,
         this.surfaceMask.height,
         this.surfaceMask.radius,
