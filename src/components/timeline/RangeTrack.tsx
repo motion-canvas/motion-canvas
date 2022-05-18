@@ -14,19 +14,13 @@ export function RangeTrack() {
   const [end, setEnd] = useState(state.endFrame);
 
   const onDrop = useCallback(() => {
-    const correctedStart = Math.max(0, Math.floor(start));
-    const correctedEnd =
-      end >= state.duration
-        ? Infinity
-        : Math.min(state.duration, Math.floor(end));
-    setStart(correctedStart);
-    setEnd(correctedEnd);
-
     player.updateState({
-      startFrame: correctedStart,
-      endFrame: correctedEnd,
+      startFrame: Math.max(0, Math.floor(start)),
+      endFrame: end >= state.duration
+        ? Infinity
+        : Math.min(state.duration, Math.floor(end)),
     });
-  }, [start, end]);
+  }, [start, end, state.duration]);
 
   const [handleDragStart] = useDrag(
     useCallback(
@@ -78,8 +72,10 @@ export function RangeTrack() {
       onMouseDown={event => {
         if (event.button === 1) {
           event.preventDefault();
-          setStart(0);
-          setEnd(Infinity);
+          player.updateState({
+            startFrame: 0,
+            endFrame: Infinity,
+          });
         } else {
           handleDrag(event);
         }
