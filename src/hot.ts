@@ -1,10 +1,9 @@
 import {Player} from './player/Player';
 
-export function hot(player: Player, root: any) {
+export function hot(player: Player, root: NodeModule) {
   const update = async (modules: string[]) => {
     const runners = [];
     for (const module of modules) {
-      // @ts-ignore
       const runner = __webpack_require__(module).default;
       if (
         // FIXME Find out a better way to detect runner factories.
@@ -20,15 +19,33 @@ export function hot(player: Player, root: any) {
     player.project.reload(runners);
     player.reload();
   };
+  const updateAudio = async (modules: string[]) => {
+    let src = null;
+    let meta = null;
+    for (const module of modules) {
+      const audio = __webpack_require__(module);
+      if (typeof audio === 'object') {
+        meta = audio.default;
+      } else {
+        src = audio;
+      }
+    }
 
-  //@ts-ignore
-  const scenePaths = require.cache[root.id].children.filter(name =>
-    //@ts-ignore
-    name.match(/\.scene\.[jt]sx?/),
+    if (src && meta) {
+      player.reloadAudio(src, meta);
+    }
+  };
+
+  const scenePaths = __webpack_require__.c[root.id].children.filter(
+    (name: string) => name.match(/\.scene\.[jt]sx?/),
   );
 
-  //@ts-ignore
+  const audioPaths = __webpack_require__.c[root.id].children.filter(
+    (name: string) => name.match(/\.wav/),
+  );
+
   root.hot.accept(scenePaths, update);
-  //@ts-ignore
   module.hot.accept(scenePaths, update);
+  root.hot.accept(audioPaths, updateAudio);
+  module.hot.accept(audioPaths, updateAudio);
 }

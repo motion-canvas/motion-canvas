@@ -15,9 +15,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/core",
     "paths": {
-      "@motion-canvas/core/jsx-runtime*": [
-        "jsx-runtime.ts"
-      ]
+      "@motion-canvas/core/jsx-runtime*": ["jsx-runtime.ts"]
     }
   }
 }

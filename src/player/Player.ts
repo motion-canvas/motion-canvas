@@ -143,7 +143,6 @@ export class Player {
       src: string;
       meta: Waveform;
     },
-    public readonly labels?: Record<string, number>,
   ) {
     this.startTime = performance.now();
 
@@ -170,6 +169,13 @@ export class Player {
     if (this.requestId === null) {
       this.request();
     }
+  }
+
+  public reloadAudio(src: string, meta: Waveform) {
+    this.audioElement.src = src;
+    this.audio.src = src;
+    // FIXME UI should be notified about this change
+    this.audio.meta = meta;
   }
 
   public requestNextFrame(): void {

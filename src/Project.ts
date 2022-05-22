@@ -8,17 +8,17 @@ import {Konva} from 'konva/lib/Global';
 import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
-import {Origin} from './types';
+import {Origin, Size} from './types';
 
 Konva.autoDrawEnabled = false;
 
-export enum ProjectSize {
-  FullHD,
+export const ProjectSize = {
+  FullHD: {width: 1920, height: 1080},
 }
 
-const Sizes: Record<ProjectSize, [number, number]> = {
-  [ProjectSize.FullHD]: [1920, 1080],
-};
+interface ProjectConfig extends Partial<StageConfig> {
+  scenes: SceneRunner[],
+}
 
 export class Project extends Stage {
   public get ScenesChanged() {
@@ -51,21 +51,19 @@ export class Project extends Stage {
   private currentThread: Thread = null;
 
   public constructor(
-    scenes: SceneRunner[],
-    size: ProjectSize = ProjectSize.FullHD,
-    config: Partial<StageConfig> = {},
+    config: ProjectConfig,
   ) {
+    const {scenes, ...rest} = config;
     super({
-      width: Sizes[size][0],
-      height: Sizes[size][1],
       listening: false,
-      container: null,
-      ...config,
+      container: 'konva',
+      ...ProjectSize.FullHD,
+      ...rest,
     });
 
     this.center = {
-      x: Sizes[size][0] / 2,
-      y: Sizes[size][1] / 2,
+      x: this.width() / 2,
+      y: this.height() / 2,
     };
 
     this.background = new Rect({

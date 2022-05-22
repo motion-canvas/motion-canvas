@@ -95,10 +95,10 @@ export class Spacing implements ISpacing {
 
   public scale(scale: Vector2d): Spacing {
     return new Spacing([
-      this.left * scale.x,
-      this.right * scale.x,
       this.top * scale.y,
+      this.right * scale.x,
       this.bottom * scale.y,
+      this.left * scale.x,
     ]);
   }
 }

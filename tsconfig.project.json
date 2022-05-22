@@ -14,6 +14,7 @@
       "MC/*": ["../../core/src/*"],
       "@motion-canvas/core/*": ["../../core/src/*"],
       "*": ["../../core/node_modules/*", "../../core/node_modules/@types/*"]
-    }
+    },
+    "typeRoots": ["../../core/node_modules/@types", "./node_modules/@types"]
   }
 }

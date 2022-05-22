@@ -21,7 +21,7 @@ const colorRangeConfig: RangeConfig = {
   height: 60,
   range: [0, 255],
   precision: 0,
-  margin: 10,
+  margin: [10, 40],
   value: 0,
 };
 
@@ -58,7 +58,7 @@ export class ColorPicker extends Surface {
           ref={[this, 'r']}
           {...colorRangeConfig}
           label={'R:'}
-          margin={[40, 10, 10]}
+          margin={[40, 40, 10]}
         />
         <Range ref={[this, 'g']} {...colorRangeConfig} label={'G:'} />
         <Range ref={[this, 'b']} {...colorRangeConfig} label={'B:'} />
@@ -66,7 +66,7 @@ export class ColorPicker extends Surface {
           ref={[this, 'a']}
           {...colorRangeConfig}
           label={'A:'}
-          margin={[10, 10, 40]}
+          margin={[10, 40, 40]}
         />
       </LinearLayout>,
     );

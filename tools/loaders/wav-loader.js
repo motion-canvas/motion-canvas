@@ -11,7 +11,7 @@ function loader() {
   exec(
     `..\\bin\\audiowaveform.exe -i ${source} -o ${destination}`,
     {cwd: __dirname},
-    async (error, stdout) => {
+    (error, stdout) => {
       if (error) {
         callback(error);
         return;

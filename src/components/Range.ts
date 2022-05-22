@@ -93,4 +93,17 @@ export class Range extends Shape {
       ctx.fillText(label, position.x - 60, 10);
     }
   }
+
+  public _hitFunc(context: Context) {
+    const size = this.getSize();
+    const position = {
+      x: size.width / -2,
+      y: size.height / -2,
+    };
+
+    context.beginPath();
+    context.rect(position.x, position.y, size.width, size.height);
+    context.closePath();
+    context.fillShape(this);
+  }
 }

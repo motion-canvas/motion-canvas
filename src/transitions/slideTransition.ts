@@ -10,7 +10,7 @@ export function slideTransition(
   direction: Direction = Direction.Top,
 ): SceneTransition {
   return function* (next, previous): ThreadGenerator {
-    const project = (yield PROJECT) as Project;
+    const project: Project = yield PROJECT;
     const position = originPosition(
       direction,
       project.width(),

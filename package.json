@@ -39,6 +39,7 @@
   "devDependencies": {
     "@types/node-sass": "^4.11.2",
     "@types/three": "^0.138.0",
+    "@types/webpack-env": "^1.17.0",
     "css-loader": "^6.7.1",
     "node-loader": "^2.0.0",
     "node-sass": "^7.0.1",
