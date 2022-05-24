@@ -54,10 +54,15 @@ export class Player {
     return this.renderChanged.asEvent();
   }
 
+  public get Reloaded() {
+    return this.reloaded.asEvent();
+  }
+
   private readonly stateChanged = new SimpleEventDispatcher<PlayerState>();
   private readonly timeChanged = new SimpleEventDispatcher<PlayerTime>();
   private readonly renderChanged =
     new PromiseSimpleEventDispatcher<PlayerRenderEvent>();
+  private readonly reloaded = new SimpleEventDispatcher<number>();
 
   private readonly audioElement: HTMLAudioElement = null;
   private startTime: number;
@@ -217,7 +222,7 @@ export class Player {
 
     // Recalculate
     if (commands.recalculate) {
-      console.time('reload time');
+      const startTime = performance.now();
       await this.project.recalculate();
       const duration = this.project.frame;
       const finished = await this.project.seek(this.frame);
@@ -234,7 +239,7 @@ export class Player {
         this.updateFrame(this.project.frame);
       }
       this.request();
-      console.timeEnd('reload time');
+      this.reloaded.dispatch(performance.now() - startTime);
       return;
     }
 

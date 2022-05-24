@@ -13,6 +13,8 @@ import {Rect} from 'konva/lib/shapes/Rect';
 import {Container} from 'konva/lib/Container';
 import {Transform} from 'konva/lib/Util';
 import {Konva} from 'konva/lib/Global';
+import {NODE_ID} from '../symbols';
+import {useScene} from '../utils';
 
 declare module 'konva/lib/Node' {
   export interface Node {
@@ -225,7 +227,7 @@ Node.prototype.setHeight = function (this: Node, value: number) {
 };
 
 const super__getTransform = Node.prototype._getTransform;
-Node.prototype._getTransform = function () {
+Node.prototype._getTransform = function (this: Node) {
   const m = super__getTransform.call(this);
   const offset = this.getOriginOffset();
   if (offset.x !== 0 || offset.y !== 0) {
@@ -233,6 +235,18 @@ Node.prototype._getTransform = function () {
   }
   m.dirty = false;
   return m;
+};
+
+const super_setAttrs = Node.prototype.setAttrs;
+Node.prototype.setAttrs = function (this: Node, config: any) {
+  if (!(NODE_ID in this.attrs)) {
+    const scene = useScene();
+    if (scene) {
+      const type = this.className;
+      this.attrs[NODE_ID] = scene.generateNodeId(type);
+    }
+  }
+  return super_setAttrs.call(this, config);
 };
 
 Factory.addGetterSetter(Node, 'padd', new Spacing());

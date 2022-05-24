@@ -56,7 +56,6 @@ export class Scene extends Group {
     return this.timeEventsChanged.asEvent();
   }
 
-  private readonly debugNode: Debug;
   private readonly storageKey: string;
   private readonly timeEventsChanged = new SimpleEventDispatcher<TimeEvent[]>();
   private timeEventLookup: Record<string, TimeEvent> = {};
@@ -66,6 +65,7 @@ export class Scene extends Group {
   private state: SceneState = SceneState.Initial;
   private cached = false;
   private preserveEvents = false;
+  private counters: Record<string, number> = {};
 
   public constructor(
     public readonly project: Project,
@@ -76,9 +76,6 @@ export class Scene extends Group {
       name: runnerFactory.name,
       ...config,
     });
-    this.debugNode = new Debug();
-    this.add(this.debugNode);
-    this.debugNode.hide();
     decorate(runnerFactory, threadable());
 
     this.storageKey = `scene-${this.name()}`;
@@ -107,7 +104,6 @@ export class Scene extends Group {
     if (runnerFactory) {
       this.runnerFactory = runnerFactory;
     }
-    this.debug(null);
     this.cached = false;
     this.storedEventLookup = {
       ...this.storedEventLookup,
@@ -119,9 +115,8 @@ export class Scene extends Group {
 
   public async reset(previousScene: Scene = null) {
     this.x(0).y(0);
-    this.debugNode.remove();
+    this.counters = {};
     this.destroyChildren();
-    this.add(this.debugNode);
     this.previousScene = previousScene;
     this.runner = threads(
       () => this.runnerFactory(this, this.project),
@@ -214,14 +209,19 @@ export class Scene extends Group {
 
   public add(...children: (Shape | Group)[]): this {
     super.add(...children.flat());
-    this.debugNode.moveToTop();
     this.updateLayout();
     return this;
   }
 
-  public debug(node: Node) {
-    this.debugNode.target(node);
-    this.debugNode.visible(node !== null);
+  public generateNodeId(type: string): string {
+    let id = 0;
+    if (type in this.counters) {
+      id = ++this.counters[type];
+    } else {
+      this.counters[type] = id;
+    }
+
+    return `${this.name()}.${type}.${id}`;
   }
 
   public getFrameEvent(name: string): number {
