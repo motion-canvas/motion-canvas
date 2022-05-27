@@ -69,6 +69,10 @@ const compiler = webpack({
         type: 'asset/source',
       },
       {
+        test: /\.mp4/i,
+        type: 'asset',
+      },
+      {
         test: /\.label$/i,
         use: [
           {

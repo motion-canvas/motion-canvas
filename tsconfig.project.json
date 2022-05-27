@@ -4,6 +4,7 @@
     "noImplicitAny": true,
     "module": "esnext",
     "target": "es2020",
+    "allowJs": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
