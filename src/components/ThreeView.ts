@@ -136,9 +136,7 @@ export class ThreeView extends Shape {
       this.renderedFrames--;
     }
 
-    context._context.save();
     context._context.imageSmoothingEnabled = false;
-
     context._context.clip(
       CanvasHelper.roundRectPath(
         new Path2D(),
@@ -160,6 +158,5 @@ export class ThreeView extends Shape {
       size.width,
       size.height,
     );
-    context._context.restore();
   }
 }

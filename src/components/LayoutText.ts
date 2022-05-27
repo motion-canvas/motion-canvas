@@ -21,7 +21,6 @@ export class LayoutText extends Text {
       padd: new Spacing(30),
       align: 'center',
       verticalAlign: 'middle',
-      height: 20,
       fontSize: 28,
       fontFamily: 'JetBrains Mono',
       fill: 'rgba(30, 30, 30, 0.87)',
@@ -32,13 +31,28 @@ export class LayoutText extends Text {
 
   public getLayoutSize(custom?: LayoutTextConfig): Size {
     const padding = this.getPadd();
-    const size = this.measureSize(custom?.text ?? this.text());
+    let size: Size;
+    if (custom?.text) {
+      const text = this.text();
+      this.text(custom.text);
+      size = {
+        width: this.textWidth,
+        height: this.textHeight,
+      }
+      this.text(text);
+    } else {
+      size = {
+        width: this.textWidth,
+        height: this.textHeight,
+      }
+    }
+
     return {
       width: Math.max(
         custom?.minWidth ?? this.getMinWidth(),
         this.overrideWidth ?? size.width + padding.x,
       ),
-      height: (this.isConstructed ? this.getHeight() : 0) + padding.y,
+      height: this.height() + padding.y,
     };
   }
 
