@@ -7,6 +7,7 @@ import {hot} from './hot';
 interface BootstrapConfig {
   name: string;
   size?: Size;
+  background?: string | false;
   scenes: SceneRunner[];
   audio?: {
     meta: Waveform;
@@ -18,6 +19,7 @@ export function bootstrap(config: BootstrapConfig) {
   const project = new Project({
     name: config.name,
     scenes: config.scenes,
+    background: config.background ?? '#141414',
     ...(config.size ?? ProjectSize.FullHD),
   });
   const player = new Player(project, config.audio);

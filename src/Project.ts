@@ -18,6 +18,7 @@ export const ProjectSize = {
 
 interface ProjectConfig extends Partial<StageConfig> {
   scenes: SceneRunner[],
+  background: string | false,
 }
 
 export class Project extends Stage {
@@ -72,7 +73,8 @@ export class Project extends Stage {
       width: this.width(),
       height: this.height(),
       origin: Origin.TopLeft,
-      fill: '#141414',
+      fill: config.background || '#ff00ff',
+      visible: config.background !== false,
     });
 
     this.master = new Layer({name: 'master'});
