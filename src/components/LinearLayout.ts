@@ -1,7 +1,7 @@
 import {Group} from 'konva/lib/Group';
 import {GetSet, IRect} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
-import {Center, Origin, Size, Spacing} from '../types';
+import {Center, getOriginOffset, Origin, Size, Spacing} from '../types';
 import {Container, ContainerConfig} from 'konva/lib/Container';
 import {getset, KonvaNode} from '../decorators';
 import {Node} from 'konva/lib/Node';
@@ -70,19 +70,18 @@ export class LinearLayout extends Group {
       const size = child.getLayoutSize();
       const margin = child.getMargin();
       const scale = child.getAbsoluteScale(this);
-
+      const offset = child.getOriginDelta(Origin.TopLeft);
+      const parentOffset = getOriginOffset(this.contentSize, child.origin());
       if (direction === Center.Vertical) {
-        const offset = child.getOriginDelta(Origin.Top);
         child.position({
-          x: -offset.x * scale.x,
+          x: parentOffset.x,
           y: length + (-offset.y + margin.top) * scale.y,
         });
         length += (size.height + margin.y) * scale.y;
       } else {
-        const offset = child.getOriginDelta(Origin.Left);
         child.position({
           x: length + (-offset.x + margin.left) * scale.x,
-          y: -offset.y * scale.y,
+          y: parentOffset.y,
         });
         length += (size.width + margin.x) * scale.x;
       }
