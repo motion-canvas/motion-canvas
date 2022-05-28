@@ -1,16 +1,14 @@
-import {Container, ContainerConfig} from 'konva/lib/Container';
-import {Rect} from 'konva/lib/shapes/Rect';
-import {parseColor} from 'mix-color';
-import {getOriginDelta, getOriginOffset, Origin, Size} from '../types';
+import {ContainerConfig} from 'konva/lib/Container';
+import {getOriginDelta, Origin, Size} from '../types';
 import {CanvasHelper} from '../helpers';
-import {Context} from 'konva/lib/Context';
 import {easeOutExpo, linear, tween} from '../tweening';
-import {GetSet, IRect} from 'konva/lib/types';
+import {GetSet} from 'konva/lib/types';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {Node} from 'konva/lib/Node';
 import {Reference} from '../utils';
 import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
+import {Canvas} from 'konva/lib/Canvas';
 
 export interface SurfaceMask {
   width: number;
@@ -35,36 +33,20 @@ export interface SurfaceConfig extends ContainerConfig {
 
 @KonvaNode()
 export class Surface extends Group {
-  @getset(8, Surface.prototype.updateBackground)
+  @getset(8)
   public radius: GetSet<SurfaceConfig['radius'], this>;
-  @getset('#FF00FF', Surface.prototype.updateBackground)
+  @getset('#FF00FF')
   public background: GetSet<SurfaceConfig['background'], this>;
   @getset(null)
   public child: GetSet<SurfaceConfig['child'], this>;
 
-  private readonly box: Rect;
-  private readonly ripple: Rect;
   private surfaceMask: SurfaceMask | null = null;
   private circleMask: CircleMask | null = null;
   private layoutData: Size;
+  private rippleTween: number = 0;
 
   public constructor(config?: SurfaceConfig) {
     super(config);
-    this.ripple = new Rect({
-      x: 0,
-      y: 0,
-      fill: '#242424',
-      name: 'ripple',
-      visible: false,
-    });
-    this.box = new Rect({
-      x: 0,
-      y: 0,
-      fill: '#242424',
-      name: 'box',
-    });
-
-    this.add(this.ripple, this.box);
     this.markDirty();
   }
 
@@ -101,7 +83,7 @@ export class Surface extends Group {
       clone.setChild(child.clone());
     }
     this.getChildren().forEach(node => {
-      if (node !== child && node !== this.box && node !== this.ripple) {
+      if (node !== child) {
         clone.add(node.clone());
       }
     });
@@ -116,36 +98,20 @@ export class Surface extends Group {
     };
   }
 
+  /**
+   * @deprecated
+   */
+  public doRipple() {
+    return this.ripple();
+  }
+
   @threadable()
-  public *doRipple() {
+  public *ripple() {
     if (this.surfaceMask) return;
-    const opaque = parseColor(this.background());
-    this.ripple.show();
-    this.ripple
-      .width(this.layoutData.width)
-      .height(this.layoutData.height)
-      .cornerRadius(this.radius())
-      .fill(`rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${0.5})`);
-
     yield* tween(1, value => {
-      const width = this.layoutData.width + easeOutExpo(value, 0, 100);
-      const height = this.layoutData.height + easeOutExpo(value, 0, 100);
-      const radius = this.radius() + easeOutExpo(value, 0, 50);
-
-      this.ripple
-        .width(width)
-        .height(height)
-        .cornerRadius(radius)
-        .fill(
-          `rgba(${opaque.r}, ${opaque.g}, ${opaque.b}, ${linear(
-            value,
-            0.5,
-            0,
-          )})`,
-        );
+      this.rippleTween = value;
     });
-
-    this.ripple.hide();
+    this.rippleTween = 0;
   }
 
   public setMask(data: SurfaceMask) {
@@ -153,15 +119,9 @@ export class Surface extends Group {
       this.surfaceMask = null;
       this.markDirty();
       return;
-    } else if (this.surfaceMask === null) {
-      this.box
-        .position({x: 0, y: 0})
-        .width(10000)
-        .height(100000);
     }
 
     const child = this.child();
-    const newOffset = getOriginOffset(data, this.getOrigin());
     const contentSize = child.getLayoutSize();
     const contentMargin = child.getMargin();
     const scale = Math.min(
@@ -173,7 +133,6 @@ export class Surface extends Group {
     child.scaleX(scale);
     child.scaleY(scale);
     child.position(getOriginDelta(data, Origin.Middle, child.getOrigin()));
-    this.box.fill(data.color);
     this.markDirty();
   }
 
@@ -212,50 +171,85 @@ export class Surface extends Group {
       });
     }
 
-    this.updateBox();
-    this.updateBackground();
     super.recalculateLayout();
   }
 
-  private updateBox() {
-    if (!this.box) return;
-    const size = this.getLayoutSize();
-    this.box
-      .width(size.width)
-      .height(size.height);
-  }
+  public _drawChildren(drawMethod: string, canvas: Canvas, top: Node): void {
+    const context = canvas && canvas.getContext();
 
-  private updateBackground() {
-    if (this.surfaceMask || !this.box) return;
-    this.box.cornerRadius(this.radius()).fill(this.background());
-  }
+    context.save();
+    const transform = this.getAbsoluteTransform(top);
+    let m = transform.getMatrix();
+    context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+    const opacity = this.getAbsoluteOpacity();
 
-  private drawMask(ctx: Context) {
-    if (this.surfaceMask) {
+    const size = this.surfaceMask ?? this.layoutData;
+    if (this.rippleTween > 0) {
+      const width = size.width + easeOutExpo(this.rippleTween, 0, 100);
+      const height = size.height + easeOutExpo(this.rippleTween, 0, 100);
+      const radius = this.radius() + easeOutExpo(this.rippleTween, 0, 50);
+
+      context.save();
+      context._context.fillStyle = this.surfaceMask?.color ?? this.background();
+      context._context.globalAlpha = linear(this.rippleTween, opacity / 2, 0);
       CanvasHelper.roundRect(
-        ctx,
-        -this.surfaceMask.width / 2,
-        -this.surfaceMask.height / 2,
-        this.surfaceMask.width,
-        this.surfaceMask.height,
-        this.surfaceMask.radius,
+        context._context,
+        -width / 2,
+        -height / 2,
+        width,
+        height,
+        radius,
       );
-      if (this.circleMask) {
-        ctx._context.clip(this.drawCircleMask(new Path2D()));
-      }
-    } else {
-      this.drawCircleMask(ctx);
+      context._context.fill();
+      context.restore();
     }
-  }
 
-  private drawCircleMask<T extends Context | Path2D>(ctx: T): T {
-    const mask = this.circleMask;
-    ctx.arc(mask.x, mask.y, mask.radius, 0, Math.PI * 2, false);
-    return ctx;
-  }
+    if (this.surfaceMask) {
+      context._context.clip(
+        CanvasHelper.roundRectPath(
+          new Path2D(),
+          -size.width / 2,
+          -size.height / 2,
+          size.width,
+          size.height,
+          this.surfaceMask.radius,
+        ),
+      );
+    }
 
-  public getClipFunc() {
-    return this.circleMask || this.surfaceMask ? this.drawMask : null;
+    if (this.circleMask) {
+      context._context.beginPath();
+      context._context.arc(
+        this.circleMask.x,
+        this.circleMask.y,
+        this.circleMask.radius,
+        0,
+        Math.PI * 2,
+      );
+      context._context.closePath();
+      context._context.clip();
+    }
+
+    context.save();
+    context._context.fillStyle = this.surfaceMask?.color ?? this.background();
+    context._context.globalAlpha = opacity;
+    CanvasHelper.roundRect(
+      context._context,
+      -size.width / 2,
+      -size.height / 2,
+      size.width,
+      size.height,
+      this.surfaceMask?.radius ?? this.radius(),
+    );
+    context._context.fill();
+    context.restore();
+
+    m = transform.copy().invert().getMatrix();
+    context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);
+
+    super._drawChildren(drawMethod, canvas, top);
+
+    context.restore();
   }
 
   public getAbsoluteCircleMask(custom?: SurfaceConfig): CircleMask {
