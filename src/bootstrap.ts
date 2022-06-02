@@ -12,6 +12,7 @@ interface BootstrapConfig {
   audio?: {
     meta: Waveform;
     src: string;
+    offset?: number;
   };
 }
 
@@ -22,7 +23,13 @@ export function bootstrap(config: BootstrapConfig) {
     background: config.background ?? '#141414',
     ...(config.size ?? ProjectSize.FullHD),
   });
-  const player = new Player(project, config.audio);
+  const player = new Player(
+    project,
+    config.audio && {
+      offset: 0,
+      ...config.audio,
+    },
+  );
   (<any>window).player = player;
 
   //@ts-ignore

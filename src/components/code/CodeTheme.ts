@@ -1,6 +1,11 @@
-export type CodeTheme = Record<string, string> & {fallback: string};
+export type CodeTokens = Record<string, string>;
 
-export interface JSCodeTheme {
+export type CodeTheme<T extends CodeTokens = CodeTokens> = {
+  [Key: string]: T;
+  default: T;
+};
+
+export type JSCodeTokens = CodeTokens & {
   boolean?: string;
   'class-name'?: string;
   comment?: string;
@@ -18,5 +23,4 @@ export interface JSCodeTheme {
   string?: string;
   'string-property'?: string;
   'template-string'?: string;
-  fallback: string;
-}
+};

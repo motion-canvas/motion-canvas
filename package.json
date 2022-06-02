@@ -14,6 +14,7 @@
     "@types/dom-webcodecs": "^0.1.4",
     "@types/wicg-file-system-access": "^2020.9.5",
     "canvas": "^2.9.1",
+    "csv-loader": "^3.0.3",
     "image-size": "^1.0.1",
     "konva": "^8.3.2",
     "meow": "^10.1.2",

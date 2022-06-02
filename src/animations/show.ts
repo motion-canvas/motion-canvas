@@ -7,9 +7,11 @@ import {
   clampRemap,
   easeInExpo,
   easeInOutCubic,
+  easeOutCubic,
   easeOutExpo,
   linear,
   map,
+  rectArcTween,
   spacingTween,
   tween,
 } from '../tweening';
@@ -54,8 +56,7 @@ export function showSurface(surface: Surface): ThreadGenerator {
     value => {
       surface.setMask({
         ...toMask,
-        width: easeInOutCubic(value, fromMask.width, toMask.width),
-        height: easeInOutCubic(value, fromMask.height, toMask.height),
+        ...rectArcTween(fromMask, toMask, easeInOutCubic(value)),
       });
       surface.setMargin(
         spacingTween(marginFrom, margin, easeInOutCubic(value)),
@@ -96,13 +97,14 @@ export function showCircle(
 
 export function unravelSurface(surface: Surface): ThreadGenerator {
   const mask = surface.getMask();
+  surface.show();
   surface.setMask({...mask, height: 0});
   return tween(
     0.5,
     value => {
       surface.setMask({
         ...mask,
-        height: map(0, mask.height, easeInOutCubic(value)),
+        height: map(0, mask.height, easeOutCubic(value)),
       });
     },
     () => surface.setMask(null),

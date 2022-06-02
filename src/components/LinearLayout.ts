@@ -71,7 +71,10 @@ export class LinearLayout extends Group {
       const margin = child.getMargin();
       const scale = child.getAbsoluteScale(this);
       const offset = child.getOriginDelta(Origin.TopLeft);
-      const parentOffset = getOriginOffset(this.contentSize, child.origin());
+      const parentOffset = getOriginOffset(
+        margin.shrink(this.contentSize),
+        child.origin(),
+      );
       if (direction === Center.Vertical) {
         child.position({
           x: parentOffset.x,

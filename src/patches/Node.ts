@@ -69,6 +69,8 @@ declare module 'konva/lib/Node' {
     wasDirty(): boolean;
 
     subscribe(event: string, handler: () => void): () => void;
+
+    _clearCache(attr?: string | Function): void;
   }
 
   export interface NodeConfig {
@@ -247,6 +249,17 @@ Node.prototype.setAttrs = function (this: Node, config: any) {
     }
   }
   return super_setAttrs.call(this, config);
+};
+
+const super__clearCache = Node.prototype._clearCache;
+Node.prototype._clearCache = function (this: Node, attr?: string | Function) {
+  if (typeof attr === 'function') {
+    if (attr.prototype?.cachedKey) {
+      this._cache.delete(attr.prototype.cachedKey);
+    }
+  } else {
+    super__clearCache.call(this, attr);
+  }
 };
 
 Factory.addGetterSetter(Node, 'padd', new Spacing());

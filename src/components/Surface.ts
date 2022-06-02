@@ -29,6 +29,8 @@ export interface SurfaceConfig extends ContainerConfig {
   circleMask?: CircleMask;
   background?: string;
   child?: Node;
+  rescaleChild?: boolean;
+  shadow?: boolean;
 }
 
 @KonvaNode()
@@ -39,6 +41,10 @@ export class Surface extends Group {
   public background: GetSet<SurfaceConfig['background'], this>;
   @getset(null)
   public child: GetSet<SurfaceConfig['child'], this>;
+  @getset(true)
+  public rescaleChild: GetSet<SurfaceConfig['rescaleChild'], this>;
+  @getset(false)
+  public shadow: GetSet<SurfaceConfig['shadow'], this>;
 
   private surfaceMask: SurfaceMask | null = null;
   private circleMask: CircleMask | null = null;
@@ -130,8 +136,10 @@ export class Surface extends Group {
     );
 
     this.surfaceMask = data;
-    child.scaleX(scale);
-    child.scaleY(scale);
+    if (this.rescaleChild()) {
+      child.scaleX(scale);
+      child.scaleY(scale);
+    }
     child.position(getOriginDelta(data, Origin.Middle, child.getOrigin()));
     this.markDirty();
   }
@@ -204,19 +212,6 @@ export class Surface extends Group {
       context.restore();
     }
 
-    if (this.surfaceMask) {
-      context._context.clip(
-        CanvasHelper.roundRectPath(
-          new Path2D(),
-          -size.width / 2,
-          -size.height / 2,
-          size.width,
-          size.height,
-          this.surfaceMask.radius,
-        ),
-      );
-    }
-
     if (this.circleMask) {
       context._context.beginPath();
       context._context.arc(
@@ -233,6 +228,11 @@ export class Surface extends Group {
     context.save();
     context._context.fillStyle = this.surfaceMask?.color ?? this.background();
     context._context.globalAlpha = opacity;
+    if (this.shadow()) {
+      context._context.shadowColor = 'rgba(0, 0, 0, 0.32)';
+      context._context.shadowOffsetY = 10;
+      context._context.shadowBlur = 40;
+    }
     CanvasHelper.roundRect(
       context._context,
       -size.width / 2,
@@ -243,6 +243,19 @@ export class Surface extends Group {
     );
     context._context.fill();
     context.restore();
+
+    if (this.surfaceMask) {
+      context._context.clip(
+        CanvasHelper.roundRectPath(
+          new Path2D(),
+          -size.width / 2,
+          -size.height / 2,
+          size.width,
+          size.height,
+          this.surfaceMask.radius,
+        ),
+      );
+    }
 
     m = transform.copy().invert().getMatrix();
     context.transform(m[0], m[1], m[2], m[3], m[4], m[5]);

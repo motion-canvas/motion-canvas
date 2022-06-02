@@ -36,7 +36,7 @@ interface PlayerCommands {
 
 export interface PlayerRenderEvent {
   frame: number;
-  data: string;
+  data: Blob;
 }
 
 const STORAGE_KEY = 'player-state';
@@ -147,6 +147,7 @@ export class Player {
     public readonly audio?: {
       src: string;
       meta: Waveform;
+      offset: number;
     },
   ) {
     this.startTime = performance.now();
@@ -271,7 +272,7 @@ export class Player {
       this.project.draw();
       await this.renderChanged.dispatchAsync({
         frame: this.project.frame,
-        data: this.project.master.getNativeCanvasElement().toDataURL(),
+        data: await this.project.getBlob(),
       });
       if (state.finished || this.project.frame >= state.endFrame) {
         this.toggleRendering(false);
@@ -299,7 +300,7 @@ export class Player {
       state.paused ||
       (state.speed === 1 &&
         this.hasAudio() &&
-        this.audioElement.currentTime < this.project.time)
+        this.audioTime() < this.project.time)
     ) {
       this.request();
       return;
@@ -308,11 +309,9 @@ export class Player {
     else if (
       this.hasAudio() &&
       state.speed === 1 &&
-      this.project.time < this.audioElement.currentTime - MAX_AUDIO_DESYNC
+      this.project.time < this.audioTime() - MAX_AUDIO_DESYNC
     ) {
-      const seekFrame = this.project.secondsToFrames(
-        this.audioElement.currentTime,
-      );
+      const seekFrame = this.project.secondsToFrames(this.audioTime());
       state.finished = await this.project.seek(seekFrame, state.speed);
     }
     // Simply move forward one frame
@@ -364,8 +363,13 @@ export class Player {
 
     this.audioElement.currentTime = Math.max(
       0,
-      this.project.framesToSeconds(this.project.frame + frameOffset),
+      this.project.framesToSeconds(this.project.frame + frameOffset) +
+        this.audio.offset,
     );
+  }
+
+  private audioTime(): number {
+    return (this.audioElement?.currentTime ?? 0) - this.audio.offset;
   }
 
   private request() {

@@ -222,14 +222,6 @@ export class Project extends Stage {
     return lastScene;
   }
 
-  public secondsToFrames(seconds: number) {
-    return Math.ceil(seconds * this.framesPerSeconds);
-  }
-
-  public framesToSeconds(frames: number) {
-    return frames / this.framesPerSeconds;
-  }
-
   private getNextScene(scene?: Scene): Scene {
     const scenes = Object.values(this.sceneLookup);
     if (!scene) {
@@ -241,5 +233,19 @@ export class Project extends Stage {
       return null;
     }
     return scenes[index + 1] ?? null;
+  }
+
+  public secondsToFrames(seconds: number) {
+    return Math.ceil(seconds * this.framesPerSeconds);
+  }
+
+  public framesToSeconds(frames: number) {
+    return frames / this.framesPerSeconds;
+  }
+
+  public async getBlob(): Promise<Blob> {
+    return new Promise<Blob>(resolve =>
+      this.master.getNativeCanvasElement().toBlob(resolve, 'image/png'),
+    );
   }
 }

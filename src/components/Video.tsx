@@ -78,7 +78,6 @@ export class Video extends Shape {
 
   @threadable('videoRunner')
   private *playRunner(): ThreadGenerator {
-    this.frame(0);
     while (this.task !== null) {
       if (this.playing()) {
         this.frame(this.frame() + 1);

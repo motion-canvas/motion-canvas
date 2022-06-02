@@ -132,8 +132,8 @@ export class Animator<Type, This extends Node> {
     return this;
   }
 
-  public waitUntil(event: string): this
-  public waitUntil(time: number): this
+  public waitUntil(event: string): this;
+  public waitUntil(time: number): this;
   public waitUntil(time: number | string): this {
     // @ts-ignore
     this.keys.push(() => waitUntil(time));
@@ -172,22 +172,30 @@ export class Animator<Type, This extends Node> {
 
   private inferProperties() {
     this.valueFrom ??= this.getValueFrom();
+    this.mapper = Animator.inferMapper(this.valueFrom);
+  }
 
-    if (typeof this.valueFrom === 'string') {
-      if (this.valueFrom.startsWith('#') || this.valueFrom.startsWith('rgb')) {
-        this.mapper = colorTween;
+  public static inferMapper<T>(value: T): TweenFunction<T> {
+    let tween: TweenFunction<any> = map;
+
+    if (typeof value === 'string') {
+      if (value.startsWith('#') || value.startsWith('rgb')) {
+        tween = colorTween;
       } else {
-        this.mapper = textTween;
+        tween = textTween;
       }
-    } else if (this.valueFrom && typeof this.valueFrom === 'object') {
-      if ('x' in this.valueFrom) {
-        if ('width' in this.valueFrom) {
-          this.mapper = rectArcTween;
+    } else if (value && typeof value === 'object') {
+      if ('x' in value) {
+        if ('width' in value) {
+          tween = rectArcTween;
+        } else {
+          tween = vector2dTween;
         }
-        this.mapper = vector2dTween;
-      } else if ('left' in this.valueFrom) {
-        this.mapper = spacingTween;
+      } else if ('left' in value) {
+        tween = spacingTween;
       }
     }
+
+    return tween as TweenFunction<T>;
   }
 }

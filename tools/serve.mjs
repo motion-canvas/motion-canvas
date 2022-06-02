@@ -73,6 +73,15 @@ const compiler = webpack({
         type: 'asset',
       },
       {
+        test: /\.csv$/,
+        loader: 'csv-loader',
+        options: {
+          dynamicTyping: true,
+          header: true,
+          skipEmptyLines: true,
+        },
+      },
+      {
         test: /\.label$/i,
         use: [
           {
@@ -143,6 +152,12 @@ const compiler = webpack({
   experiments: {
     topLevelAwait: true,
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+      // Required to load additional languages for Prism
+      Prism: 'prismjs',
+    }),
+  ],
 });
 
 const server = new WebpackDevServer(
@@ -160,7 +175,6 @@ const server = new WebpackDevServer(
             path.join(renderOutput, req.params.name),
             {encoding: 'base64'},
           );
-          req.setEncoding('utf8');
           req.pipe(stream);
           req.on('end', () => res.end());
         },

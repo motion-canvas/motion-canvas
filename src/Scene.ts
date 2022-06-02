@@ -78,7 +78,7 @@ export class Scene extends Group {
     });
     decorate(runnerFactory, threadable());
 
-    this.storageKey = `scene-${this.name()}`;
+    this.storageKey = `scene-${this.project.name()}-${this.name()}`;
     const storedEvents = localStorage.getItem(this.storageKey);
     if (storedEvents) {
       for (const event of Object.values<TimeEvent>(JSON.parse(storedEvents))) {
@@ -114,7 +114,7 @@ export class Scene extends Group {
   }
 
   public async reset(previousScene: Scene = null) {
-    this.x(0).y(0);
+    this.x(0).y(0).opacity(1).show();
     this.counters = {};
     this.destroyChildren();
     this.previousScene = previousScene;
@@ -170,6 +170,8 @@ export class Scene extends Group {
   public *transition(transitionRunner?: SceneTransition) {
     if (transitionRunner) {
       yield* transitionRunner(this, this.previousScene);
+    } else {
+      this.previousScene?.hide();
     }
     if (this.state === SceneState.Initial) {
       this.state = SceneState.AfterTransitionIn;

@@ -23,6 +23,11 @@ declare module '*.wav' {
   export = value;
 }
 
+declare module '*.csv' {
+  const value: any;
+  export = value;
+}
+
 declare module '*.wav?meta' {
   const value: import('./types/Waveform').Waveform;
   export = value;
