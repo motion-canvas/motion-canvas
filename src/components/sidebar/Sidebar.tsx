@@ -40,8 +40,7 @@ function Rendering() {
       const name = frame.toString().padStart(6, '0');
       await fetch(`/render/frame${name}.png`, {
         method: 'POST',
-        headers: {'Content-Type': 'text/plain'},
-        body: data.slice(22),
+        body: data,
       });
     } catch (e) {
       console.error(e);
