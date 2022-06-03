@@ -1,7 +1,7 @@
 import {decorate, threadable} from '../decorators';
 import type {Project} from '../Project';
-import {PROJECT} from '../symbols';
 import {ThreadGenerator} from '../threading';
+import { useProject } from "../utils";
 
 decorate(tween, threadable());
 export function* tween(
@@ -9,7 +9,7 @@ export function* tween(
   onProgress: (value: number, time: number) => void,
   onEnd?: (value: number, time: number) => void,
 ): ThreadGenerator {
-  const project = (yield PROJECT) as Project;
+  const project = useProject();
   const frames = project.secondsToFrames(duration);
   let startFrame = project.frame;
   let value = 0;

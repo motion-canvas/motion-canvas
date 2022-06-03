@@ -12,7 +12,6 @@ import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
 import {SceneTransition} from './transitions';
 import {decorate, KonvaNode, threadable} from './decorators';
-import {PROJECT, SCENE} from './symbols';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
 import {setScene} from './utils';
 
@@ -134,10 +133,6 @@ export class Scene extends Group {
       if (isPromise(result.value)) {
         const value = await result.value;
         result = this.runner.next(value);
-      } else if (result.value === PROJECT) {
-        result = this.runner.next(this.project);
-      } else if (result.value === SCENE) {
-        result = this.runner.next(this);
       } else {
         console.log('Invalid value: ', result.value);
         result = this.runner.next();

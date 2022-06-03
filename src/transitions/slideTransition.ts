@@ -2,15 +2,15 @@ import type {Project} from '../Project';
 import type {SceneTransition} from './SceneTransition';
 
 import {Direction, originPosition} from '../types';
-import {PROJECT} from '../symbols';
 import {easeInOutCubic, tween, vector2dTween} from '../tweening';
 import {ThreadGenerator} from '../threading';
+import { useProject } from "../utils";
 
 export function slideTransition(
   direction: Direction = Direction.Top,
 ): SceneTransition {
   return function* (next, previous): ThreadGenerator {
-    const project: Project = yield PROJECT;
+    const project = useProject();
     const position = originPosition(
       direction,
       project.width(),
