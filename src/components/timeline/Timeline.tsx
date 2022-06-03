@@ -155,7 +155,7 @@ export function Timeline() {
             <TimestampTrack />
             <SceneTrack />
             <LabelTrack />
-            <AudioTrack />
+            {player.audio && <AudioTrack />}
           </div>
           <div ref={playheadRef} className={styles.playheadPreview} />
           <Playhead />

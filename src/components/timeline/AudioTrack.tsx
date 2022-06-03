@@ -20,10 +20,12 @@ export function AudioTrack() {
     const samplesPerSeconds = audio.sample_rate / audio.samples_per_pixel;
     const step = Math.ceil(density / 256);
     const start = Math.floor(
-      player.project.framesToSeconds(startFrame) * samplesPerSeconds,
+      (player.project.framesToSeconds(startFrame) + player.audio.offset) *
+        samplesPerSeconds,
     );
     const end = Math.floor(
-      player.project.framesToSeconds(endFrame) * samplesPerSeconds,
+      (player.project.framesToSeconds(endFrame) + player.audio.offset) *
+        samplesPerSeconds,
     );
 
     context.clearRect(0, 0, viewLength, 64);
