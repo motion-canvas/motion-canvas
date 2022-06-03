@@ -14,12 +14,17 @@ export function RangeTrack() {
   const [end, setEnd] = useState(state.endFrame);
 
   const onDrop = useCallback(() => {
-    player.updateState({
-      startFrame: Math.max(0, Math.floor(start)),
-      endFrame: end >= state.duration
+    let startFrame = Math.max(0, Math.floor(start));
+    let endFrame =
+      end >= state.duration
         ? Infinity
-        : Math.min(state.duration, Math.floor(end)),
-    });
+        : Math.min(state.duration, Math.floor(end));
+
+    if (startFrame > endFrame) {
+      [startFrame, endFrame] = [endFrame, startFrame];
+    }
+
+    player.updateState({startFrame, endFrame});
   }, [start, end, state.duration]);
 
   const [handleDragStart] = useDrag(
@@ -27,7 +32,7 @@ export function RangeTrack() {
       dx => {
         setStart(start + (dx / fullLength) * state.duration);
       },
-      [start, setStart, fullLength, state.duration],
+      [start, fullLength, state.duration],
     ),
     onDrop,
   );
@@ -39,7 +44,7 @@ export function RangeTrack() {
           Math.min(state.duration, end) + (dx / fullLength) * state.duration,
         );
       },
-      [end, setEnd, fullLength, state.duration],
+      [end, fullLength, state.duration],
     ),
     onDrop,
   );
@@ -52,7 +57,7 @@ export function RangeTrack() {
           Math.min(state.duration, end) + (dx / fullLength) * state.duration,
         );
       },
-      [start, end, fullLength, state.duration, setStart, setEnd],
+      [start, end, fullLength, state.duration],
     ),
     onDrop,
   );
@@ -62,11 +67,19 @@ export function RangeTrack() {
     setEnd(state.endFrame);
   }, [state.startFrame, state.endFrame]);
 
+  let normalizedStart = start;
+  let normalizedEnd = end;
+  if (start > end) {
+    normalizedStart = end;
+    normalizedEnd = start;
+  }
+
   return (
     <div
       style={{
-        left: `${(Math.max(0, start) / state.duration) * 100}%`,
-        right: `${100 - Math.min(1, (end + 1) / state.duration) * 100}%`,
+        flexDirection: start > end ? 'row-reverse' : 'row',
+        left: `${(Math.max(0, normalizedStart) / state.duration) * 100}%`,
+        right: `${100 - Math.min(1, (normalizedEnd + 1) / state.duration) * 100}%`,
       }}
       className={styles.range}
       onMouseDown={event => {

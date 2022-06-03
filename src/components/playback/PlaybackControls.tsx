@@ -2,10 +2,10 @@ import styles from './Playback.module.scss';
 
 import {IconType, IconButton, IconCheckbox} from '../controls';
 import {useDocumentEvent, usePlayer, usePlayerState} from '../../hooks';
-import {Select} from '../controls/Select';
-import {Input} from '../controls/Input';
+import {Select, Input} from '../controls';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
+import {classes} from '../../utils';
 
 export function PlaybackControls() {
   const player = usePlayer();
@@ -26,7 +26,7 @@ export function PlaybackControls() {
             player.requestNextFrame();
             break;
           case 'm':
-            player.updateState({muted: !state.muted});
+            player.toggleAudio();
             break;
           case 'l':
             player.updateState({loop: !state.loop});
@@ -38,7 +38,7 @@ export function PlaybackControls() {
   );
 
   return (
-    <div className={styles.controls}>
+    <div className={classes(styles.controls, [styles.disabled, state.render])}>
       <Select
         options={[
           {value: 0.25, text: 'x0.25'},

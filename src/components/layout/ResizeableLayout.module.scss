@@ -6,6 +6,16 @@
 
   &.vertical {
     flex-direction: column;
+
+    > .left {
+      max-height: 100%;
+    }
+  }
+
+  &:not(.vertical) {
+    > .left {
+      max-width: 100%;
+    }
   }
 }
 

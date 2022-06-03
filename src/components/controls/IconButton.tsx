@@ -11,7 +11,7 @@ interface IconButtonProps {
 export function IconButton({icon, onClick}: IconButtonProps) {
   return (
     <button
-      className={classes(styles.button, styles.icon, styles[icon])}
+      className={classes(styles.iconButton, styles.icon, styles[icon])}
       type="button"
       onClick={onClick}
     />

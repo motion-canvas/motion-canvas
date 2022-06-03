@@ -216,12 +216,17 @@
   border-bottom: 1px solid var(--theme);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .handle {
   cursor: pointer;
   padding: 8px 2px;
+
+  &:first-child {
+    margin-right: auto;
+  }
+
   &:after {
     background-color: rgba(255, 255, 255, 0);
   }

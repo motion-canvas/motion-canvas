@@ -18,7 +18,7 @@ export function ResizeableLayout({
   start,
   end,
   vertical = false,
-  size = 540,
+  size = 0.3,
   id = null,
   resizeable = true,
 }: ResizeableLayoutProps) {
@@ -29,7 +29,9 @@ export function ResizeableLayout({
     useCallback(
       (dx, dy, x, y) => {
         const rect = containerRef.current.getBoundingClientRect();
-        setSize(vertical ? y - rect.y : x - rect.x);
+        setSize(
+          vertical ? (y - rect.y) / rect.height : (x - rect.x) / rect.width,
+        );
       },
       [vertical, setSize],
     ),
@@ -38,19 +40,20 @@ export function ResizeableLayout({
   const style = useMemo<JSX.CSSProperties>(() => {
     if (!resizeable) return {};
     return vertical
-      ? {height: `${currentSize}px`}
-      : {width: `${currentSize}px`};
+      ? {height: `${currentSize * 100}%`}
+      : {width: `${currentSize * 100}%`};
   }, [currentSize, vertical, resizeable]);
 
   return (
     <div
+      ref={containerRef}
       className={classes(
         styles.root,
         [styles.vertical, vertical],
         [styles.resizeable, resizeable],
       )}
     >
-      <div ref={containerRef} className={styles.left} style={style}>
+      <div className={styles.left} style={style}>
         {start}
       </div>
       <div onMouseDown={handleDrag} className={styles.separator} />

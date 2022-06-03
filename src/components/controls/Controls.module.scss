@@ -22,17 +22,20 @@
   height: 24px;
   display: block;
   cursor: pointer;
-  opacity: 0.54;
-  &.main {
-    opacity: 1;
+
+  &::after {
+    background-color: rgba(255, 255, 255, 0.54);
   }
 
-  .iconInput + &:hover {
-    opacity: 1 !important;
+  &.main::after {
+    background-color: #fff;
+  }
+
+  .iconInput + &:hover::after {
+    background-color: #fff;
   }
 
   .iconInput:checked + & {
-    opacity: 1;
     &:after {
       background: var(--theme);
     }
@@ -42,31 +45,82 @@
   }
 }
 
-.button {
+.iconButton {
   -webkit-appearance: none;
   width: 24px;
   height: 24px;
   display: block;
   cursor: pointer;
   border: 0;
-  opacity: 0.54;
   background: transparent;
   padding: 0;
   margin: 0;
 
-  &:hover {
-    opacity: 1;
+  &::after {
+    background-color: rgba(255, 255, 255, 0.54);
+  }
+
+  &:hover::after {
+    background-color: #fff;
   }
 }
 
+.group {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.label {
+  flex-basis: 40%;
+  flex-grow: 0;
+  flex-shrink: 0;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .select,
-.input {
+.input,
+.button {
   background: #404040;
   color: rgba(255, 255, 255, 0.6);
   border: 0;
   border-radius: 4px;
   padding: 0 8px;
   font-size: 14px;
+  height: 24px;
+  flex-shrink: 1;
+  flex-grow: 1;
+  flex-basis: 100%;
+  min-width: 0;
+
+  &:hover {
+    background-color: #333;
+  }
+
+  &.main {
+    background-color: var(--theme);
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: 700;
+
+    &:hover {
+      box-shadow: 0 0 0 2px white inset;
+    }
+  }
+}
+
+.input[type='number'] {
+  text-align: right;
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+}
+
+.select,
+.button {
+  cursor: pointer;
 }
 
 .pause:after {
