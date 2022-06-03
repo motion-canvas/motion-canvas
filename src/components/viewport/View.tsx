@@ -1,7 +1,15 @@
 import styles from './Viewport.module.scss';
-
-import {useDocumentEvent, useDrag, usePlayer, useStorage} from '../../hooks';
-import {useCallback, useEffect, useRef} from 'preact/hooks';
+import {
+  useDocumentEvent,
+  useDrag,
+  usePlayer,
+  useSize,
+  useStorage,
+} from '../../hooks';
+import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
+import {Grid} from './Grid';
+import {Debug} from './Debug';
+import {ViewportContext, ViewportState} from './ViewportContext';
 
 const ZOOM_SPEED = 0.1;
 const konvaContainer = document.getElementById('konva');
@@ -10,13 +18,26 @@ export function View() {
   const player = usePlayer();
   const containerRef = useRef<HTMLDivElement>();
   const viewportRef = useRef<HTMLDivElement>();
+  const overlayRef = useRef<HTMLDivElement>();
+  const size = useSize(containerRef);
+  const [node, setNode] = useState<any>(null);
 
-  const [state, setState] = useStorage('viewport', {
+  const [state, setState] = useStorage<ViewportState>('viewport', {
+    width: 1920,
+    height: 1080,
     x: 0,
     y: 0,
     zoom: 1,
     grid: false,
   });
+
+  useEffect(() => {
+    setState({
+      ...state,
+      width: size.width,
+      height: size.height,
+    });
+  }, [size]);
 
   const [handleDrag, isDragging] = useDrag(
     useCallback(
@@ -40,6 +61,29 @@ export function View() {
     return () => konvaContainer.remove();
   }, [viewportRef.current]);
 
+  useEffect(() => {
+    const animation = () =>
+      overlayRef.current.animate(
+        [
+          {
+            boxShadow: '0 0 0px 0 #ccc inset',
+            easing: 'cubic-bezier(0.33, 1, 0.68, 1)',
+          },
+          {
+            boxShadow: '0 0 0px 4px #ccc inset',
+            easing: 'cubic-bezier(0.32, 0, 0.67, 0)',
+          },
+          {boxShadow: '0 0 0px 0 #ccc inset'},
+        ],
+        {
+          duration: 300,
+        },
+      );
+
+    player.Reloaded.subscribe(animation);
+    return () => player.Reloaded.unsubscribe(animation);
+  });
+
   useDocumentEvent(
     'keydown',
     useCallback(
@@ -62,43 +106,79 @@ export function View() {
             break;
           case "'":
             setState({...state, grid: !state.grid});
-            this.update();
+            break;
+          case "ArrowUp":
+            if (node?.parent) {
+              setNode(node.parent);
+            }
+            break;
+          case "ArrowDown":
+            if (node?.children?.length) {
+              setNode(node.children.at(-1));
+            }
             break;
         }
       },
-      [setState, state],
+      [setState, state, node],
     ),
   );
 
   return (
-    <div
-      className={styles.viewport}
-      ref={containerRef}
-      onMouseDown={handleDrag}
-      onWheel={event => {
-        if (isDragging) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        const pointer = {
-          x: event.x - rect.x - rect.width / 2,
-          y: event.y - rect.y - rect.height / 2,
-        };
-
-        const ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
-        setState({
-          ...state,
-          zoom: state.zoom * ratio,
-          x: pointer.x + (state.x - pointer.x) * ratio,
-          y: pointer.y + (state.y - pointer.y) * ratio,
-        });
-      }}
-    >
+    <ViewportContext.Provider value={state}>
       <div
-        style={{
-          transform: `translate(${state.x}px, ${state.y}px) scale(${state.zoom})`,
+        className={styles.viewport}
+        ref={containerRef}
+        onMouseDown={event => {
+          if (event.button === 0) {
+            const position = {
+              x: event.x - size.x,
+              y: event.y - size.y,
+            };
+
+            position.x -= state.x + size.width / 2;
+            position.y -= state.y + size.height / 2;
+            position.x /= state.zoom;
+            position.y /= state.zoom;
+            position.x += player.project.width() / 2;
+            position.y += player.project.height() / 2;
+
+            player.project.listening(true);
+            player.project.master.drawHit();
+            const node = player.project.master.getIntersection(position);
+            player.project.listening(false);
+            setNode(node);
+          } else {
+            handleDrag(event);
+          }
         }}
-        id={'viewport'}
-        ref={viewportRef}
-      />
-    </div>
+        onWheel={event => {
+          if (isDragging) return;
+          const rect = containerRef.current.getBoundingClientRect();
+          const pointer = {
+            x: event.x - rect.x - rect.width / 2,
+            y: event.y - rect.y - rect.height / 2,
+          };
+
+          const ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
+          setState({
+            ...state,
+            zoom: state.zoom * ratio,
+            x: pointer.x + (state.x - pointer.x) * ratio,
+            y: pointer.y + (state.y - pointer.y) * ratio,
+          });
+        }}
+      >
+        <div
+          style={{
+            transform: `translate(${state.x}px, ${state.y}px) scale(${state.zoom})`,
+          }}
+          id={'viewport'}
+          ref={viewportRef}
+        />
+        <Grid />
+        <Debug node={node} setNode={setNode} />
+        <div ref={overlayRef} className={styles.overlay} />
+      </div>
+    </ViewportContext.Provider>
   );
 }
