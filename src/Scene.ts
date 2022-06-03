@@ -134,7 +134,7 @@ export class Scene extends Group {
         const value = await result.value;
         result = this.runner.next(value);
       } else {
-        console.log('Invalid value: ', result.value);
+        console.warn('Invalid value: ', result.value);
         result = this.runner.next();
       }
       this.updateLayout();

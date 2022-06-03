@@ -14,11 +14,11 @@ Konva.autoDrawEnabled = false;
 
 export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
-}
+};
 
 interface ProjectConfig extends Partial<StageConfig> {
-  scenes: SceneRunner[],
-  background: string | false,
+  scenes: SceneRunner[];
+  background: string | false;
 }
 
 export class Project extends Stage {
@@ -30,7 +30,6 @@ export class Project extends Stage {
   public readonly master: Layer;
   public readonly center: Vector2d;
   public threadsCallback: ThreadsCallback;
-  public framesPerSeconds = 30;
   public frame: number = 0;
 
   public get time(): number {
@@ -45,15 +44,27 @@ export class Project extends Stage {
     return this.currentThread;
   }
 
+  public get framerate(): number {
+    return this.framesPerSeconds;
+  }
+
+  public set framerate(value: number) {
+    this.framesPerSeconds = value;
+    this.reloadAll();
+  }
+
+  public set resolutionScale(value: number) {
+    this.master.canvas.setPixelRatio(value);
+  }
+
+  private framesPerSeconds = 30;
   private readonly scenesChanged = new SimpleEventDispatcher<Scene[]>();
   private readonly sceneLookup: Record<string, Scene> = {};
   private previousScene: Scene = null;
   private currentScene: Scene = null;
   private currentThread: Thread = null;
 
-  public constructor(
-    config: ProjectConfig,
-  ) {
+  public constructor(config: ProjectConfig) {
     const {scenes, ...rest} = config;
     super({
       listening: false,
@@ -78,7 +89,6 @@ export class Project extends Stage {
     });
 
     this.master = new Layer({name: 'master'});
-    this.master.canvas.pixelRatio = 1;
     this.master.add(this.background);
     this.add(this.master);
 
@@ -112,6 +122,12 @@ export class Project extends Stage {
   public reload(runners: SceneRunner[]) {
     for (const runner of runners) {
       this.sceneLookup[runner.name]?.reload(runner);
+    }
+  }
+
+  public reloadAll() {
+    for (const scene of Object.values(this.sceneLookup)) {
+      scene.reload();
     }
   }
 

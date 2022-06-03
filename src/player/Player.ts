@@ -18,6 +18,8 @@ export interface PlayerState {
   speed: number;
   render: boolean;
   muted: boolean;
+  fps: number;
+  scale: number;
 }
 
 export interface PlayerTime {
@@ -95,6 +97,8 @@ export class Player {
     speed: 1,
     render: false,
     muted: true,
+    fps: 30,
+    scale: 1,
   };
 
   private frame: number = 0;
@@ -108,9 +112,6 @@ export class Player {
   public updateState(newState: Partial<PlayerState>) {
     let changed = false;
     for (const prop in newState) {
-      if (prop === 'frame') {
-        continue;
-      }
       // @ts-ignore
       if (newState[prop] !== this.state[prop]) {
         changed = true;
@@ -155,13 +156,14 @@ export class Player {
     const savedState = localStorage.getItem(STORAGE_KEY);
     if (savedState) {
       const state = JSON.parse(savedState) as PlayerState;
-      this.state.paused = state.paused;
-      this.state.startFrame = state.startFrame;
-      this.state.endFrame = state.endFrame ?? Infinity;
-      this.state.loop = state.loop;
-      this.state.speed = state.speed;
-      this.state.muted = state.muted;
+      for (const key in this.state) {
+        //@ts-ignore
+        this.state[key] = state[key] ?? this.state[key];
+      }
     }
+
+    this.project.framerate = this.state.fps;
+    this.project.resolutionScale = this.state.scale;
 
     if (audio) {
       this.audioElement = new Audio(audio.src);
@@ -184,6 +186,24 @@ export class Player {
     this.audio.meta = meta;
   }
 
+  public setFramerate(fps: number) {
+    const ratio = fps / this.state.fps;
+    this.project.framerate = fps;
+    this.updateState({
+      fps,
+      startFrame: Math.floor(this.state.startFrame * ratio),
+      endFrame: Math.floor(this.state.endFrame * ratio),
+    });
+    this.requestSeek(Math.floor(this.frame * ratio));
+    this.reload();
+  }
+
+  public setScale(scale: number) {
+    this.project.resolutionScale = scale;
+    this.updateState({scale});
+    this.project.draw();
+  }
+
   public requestNextFrame(): void {
     this.commands.seek = this.frame + 1;
   }
@@ -193,7 +213,7 @@ export class Player {
   }
 
   public requestSeek(value: number): void {
-    this.commands.seek = this.inRange(value, this.state);
+    this.commands.seek = this.clampRange(value, this.state);
   }
 
   public togglePlayback(value: boolean = this.state.paused): void {
@@ -226,7 +246,8 @@ export class Player {
       const startTime = performance.now();
       await this.project.recalculate();
       const duration = this.project.frame;
-      const finished = await this.project.seek(this.frame);
+      const frame = commands.seek < 0 ? this.frame : commands.seek;
+      const finished = await this.project.seek(frame);
       this.project.draw();
       this.updateState({
         duration,
@@ -289,7 +310,7 @@ export class Player {
     // Seek to the given frame
     if (commands.seek >= 0 || !this.isInRange(this.project.frame, state)) {
       const seekFrame = commands.seek < 0 ? this.project.frame : commands.seek;
-      const clampedFrame = this.inRange(seekFrame, state);
+      const clampedFrame = this.clampRange(seekFrame, state);
       console.time('seek time');
       state.finished = await this.project.seek(clampedFrame, state.speed);
       console.timeEnd('seek time');
@@ -342,7 +363,7 @@ export class Player {
     this.request();
   }
 
-  private inRange(frame: number, state: PlayerState): number {
+  private clampRange(frame: number, state: PlayerState): number {
     return frame > state.endFrame
       ? state.endFrame
       : frame < state.startFrame
@@ -374,7 +395,7 @@ export class Player {
 
   private request() {
     this.requestId = requestAnimationFrame(async time => {
-      if (time - this.renderTime >= 990 / this.project.framesPerSeconds) {
+      if (time - this.renderTime >= 990 / this.state.fps) {
         this.renderTime = time;
         try {
           await this.run();
