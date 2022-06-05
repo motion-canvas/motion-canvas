@@ -26,7 +26,7 @@ export interface TweenProvider<T> {
   ): ThreadGenerator;
 }
 
-export class Animator<Type, This extends Node> {
+export class Animator<Type, This> {
   private valueFrom: Type = null;
   private lastValue: Type;
   private keys: (() => ThreadGenerator)[] = [];
@@ -152,10 +152,12 @@ export class Animator<Type, This extends Node> {
 
   @threadable('animatorRunner')
   private *runner(): ThreadGenerator {
+    const valueFrom = this.valueFrom;
     for (let loop = 0; loop < this.loops; loop++) {
       for (let i = 0; i < this.keys.length; i++) {
         yield* this.keys[i]();
       }
+      this.valueFrom = valueFrom;
     }
   }
 
