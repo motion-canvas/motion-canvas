@@ -1,15 +1,20 @@
-import { PlayerState } from "@motion-canvas/core/player/Player";
-import { usePlayer } from "./usePlayer";
-import { useEffect, useState } from "preact/hooks";
+import {PlayerState} from '@motion-canvas/core/player/Player';
+import {usePlayer} from './usePlayer';
+import {useEventState} from './useEventState';
+
+const player = usePlayer();
+const storageKey = `${player.project.name()}-player-state`;
+const savedState = localStorage.getItem(storageKey);
+if (savedState) {
+  const state = JSON.parse(savedState) as PlayerState;
+  player.updateState(state);
+}
+
+player.StateChanged.subscribe(state => {
+  localStorage.setItem(storageKey, JSON.stringify(state));
+});
 
 export function usePlayerState(): PlayerState {
   const player = usePlayer();
-  const [state, setState] = useState<PlayerState>(player.getState());
-  useEffect(() => {
-    setState(player.getState());
-    player.StateChanged.subscribe(setState);
-    return () => player.StateChanged.unsubscribe(setState);
-  }, [player]);
-
-  return state;
+  return useEventState(player.StateChanged, () => player.getState());
 }

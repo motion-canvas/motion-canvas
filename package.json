@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "preact": "^10.7.1"
+    "preact": "^10.7.1",
+    "strongly-typed-events": "^3.0.2"
   },
   "devDependencies": {
     "@types/wicg-file-system-access": "^2020.9.5",

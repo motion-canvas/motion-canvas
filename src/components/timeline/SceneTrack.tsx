@@ -25,10 +25,7 @@ export function SceneTrack() {
           onMouseUp={event => {
             if (event.button === 1) {
               event.stopPropagation();
-              player.updateState({
-                startFrame: scene.firstFrame,
-                endFrame: scene.lastFrame - 1,
-              });
+              player.setRange(scene.firstFrame, scene.lastFrame - 1);
             }
           }}
         >

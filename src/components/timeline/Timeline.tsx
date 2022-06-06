@@ -45,16 +45,15 @@ export function Timeline() {
 
   const state = useMemo<TimelineState>(() => {
     const fullLength = rect.width * scale;
-    const power = Math.pow(
-      2,
-      Math.round(Math.log2(duration / scale / rect.width)),
-    );
-    const density = Math.max(1, Math.floor(128 * power));
+    const density = Math.pow(2, Math.round(Math.log2(duration / fullLength)));
+    const segmentDensity = Math.max(1, Math.floor(128 * density));
     const startFrame =
-      Math.floor(((offset / fullLength) * duration) / density) * density;
+      Math.floor(((offset / fullLength) * duration) / segmentDensity) *
+      segmentDensity;
     const endFrame =
-      Math.ceil((((offset + rect.width) / fullLength) * duration) / density) *
-      density;
+      Math.ceil(
+        (((offset + rect.width) / fullLength) * duration) / segmentDensity,
+      ) * segmentDensity;
 
     return {
       scale,
@@ -64,6 +63,7 @@ export function Timeline() {
       startFrame,
       endFrame,
       density,
+      segmentDensity,
       duration,
     };
   }, [rect.width, scale, duration, offset]);
@@ -127,12 +127,18 @@ export function Timeline() {
             const pointer = offset + event.x - rect.x;
             const newTrackSize = rect.width * newScale;
             const maxOffset = newTrackSize - rect.width;
-            const newOffset = clamp(0, maxOffset, offset - pointer + pointer * ratio);
+            const newOffset = clamp(
+              0,
+              maxOffset,
+              offset - pointer + pointer * ratio,
+            );
 
             containerRef.current.scrollLeft = newOffset;
             setScale(newScale);
             setOffset(newOffset);
-            playheadRef.current.style.left = `${event.x - rect.x + newOffset}px`;
+            playheadRef.current.style.left = `${
+              event.x - rect.x + newOffset
+            }px`;
           }}
           onMouseUp={event => {
             if (event.button === 0) {
@@ -155,7 +161,7 @@ export function Timeline() {
             <TimestampTrack />
             <SceneTrack />
             <LabelTrack />
-            {player.audio && <AudioTrack />}
+            <AudioTrack />
           </div>
           <div ref={playheadRef} className={styles.playheadPreview} />
           <Playhead />

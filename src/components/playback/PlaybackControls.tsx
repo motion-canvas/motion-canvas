@@ -29,7 +29,7 @@ export function PlaybackControls() {
             player.toggleAudio();
             break;
           case 'l':
-            player.updateState({loop: !state.loop});
+            player.toggleLoop();
             break;
         }
       },
@@ -48,7 +48,7 @@ export function PlaybackControls() {
           {value: 2, text: 'x2'},
         ]}
         value={state.speed}
-        onChange={speed => player.updateState({speed})}
+        onChange={speed => player.setSpeed(speed)}
       />
       <IconCheckbox
         id={'audio'}
@@ -78,7 +78,7 @@ export function PlaybackControls() {
         iconOn={IconType.repeat}
         iconOff={IconType.repeat}
         checked={state.loop}
-        onChange={value => player.updateState({loop: value})}
+        onChange={() => player.toggleLoop()}
       />
       <Framerate
         render={framerate => (

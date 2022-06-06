@@ -3,7 +3,7 @@ import styles from './Sidebar.module.scss';
 import type {PlayerRenderEvent} from '@motion-canvas/core/player/Player';
 import {IconType} from '../controls';
 import {Tabs} from '../tabs/Tabs';
-import {usePlayer, usePlayerState} from '../../hooks';
+import { useEventEffect, usePlayer, usePlayerState } from "../../hooks";
 import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
 import {Thread} from '@motion-canvas/core/threading';
 import {GeneratorHelper} from '@motion-canvas/core/helpers';
@@ -53,23 +53,22 @@ function Rendering() {
     ];
   }, [width, height]);
 
-  const handleRender = useCallback(async ({frame, data}: PlayerRenderEvent) => {
-    try {
-      const name = frame.toString().padStart(6, '0');
-      await fetch(`/render/frame${name}.png`, {
-        method: 'POST',
-        body: data,
-      });
-    } catch (e) {
-      console.error(e);
-      player.toggleRendering(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    player.RenderChanged.subscribe(handleRender);
-    return () => player.RenderChanged.unsubscribe(handleRender);
-  }, [handleRender]);
+  useEventEffect(
+    player.FrameRendered,
+    async ({frame, data}: PlayerRenderEvent) => {
+      try {
+        const name = frame.toString().padStart(6, '0');
+        await fetch(`/render/frame${name}.png`, {
+          method: 'POST',
+          body: data,
+        });
+      } catch (e) {
+        console.error(e);
+        player.toggleRendering(false);
+      }
+    },
+    []
+  );
 
   return (
     <div className={styles.pane}>
@@ -82,9 +81,7 @@ function Rendering() {
           type={'number'}
           value={state.startFrame}
           onChange={event => {
-            player.updateState({
-              startFrame: parseInt((event.target as HTMLInputElement).value),
-            });
+            player.setRange(parseInt((event.target as HTMLInputElement).value));
           }}
         />
         <Input
@@ -94,9 +91,7 @@ function Rendering() {
           value={Math.min(state.duration, state.endFrame)}
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
-            player.updateState({
-              endFrame: value >= state.duration ? Infinity : value,
-            });
+            player.setRange(undefined, value);
           }}
         />
       </Group>

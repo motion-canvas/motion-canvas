@@ -1,19 +1,13 @@
 import type {Scene} from '@motion-canvas/core/Scene';
-import {useEffect, useState} from 'preact/hooks';
 import {Label} from './Label';
+import {useEventState} from '../../hooks';
 
 interface LabelGroupProps {
   scene: Scene;
 }
 
 export function LabelGroup({scene}: LabelGroupProps) {
-  const [events, setEvents] = useState(scene.timeEvents);
-
-  useEffect(() => {
-    setEvents(scene.timeEvents);
-    scene.TimeEventsChanged.subscribe(setEvents);
-    return () => scene.TimeEventsChanged.unsubscribe(setEvents);
-  }, [scene]);
+  const events = useEventState(scene.TimeEventsChanged, () => scene.timeEvents);
 
   return (
     <>

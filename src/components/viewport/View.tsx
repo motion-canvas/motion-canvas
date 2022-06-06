@@ -2,6 +2,7 @@ import styles from './Viewport.module.scss';
 import {
   useDocumentEvent,
   useDrag,
+  useEventEffect,
   usePlayer,
   useSize,
   useStorage,
@@ -61,8 +62,9 @@ export function View() {
     return () => konvaContainer.remove();
   }, [viewportRef.current]);
 
-  useEffect(() => {
-    const animation = () =>
+  useEventEffect(
+    player.Reloaded,
+    () =>
       overlayRef.current.animate(
         [
           {
@@ -78,11 +80,9 @@ export function View() {
         {
           duration: 300,
         },
-      );
-
-    player.Reloaded.subscribe(animation);
-    return () => player.Reloaded.unsubscribe(animation);
-  });
+      ),
+    [],
+  );
 
   useDocumentEvent(
     'keydown',
@@ -107,12 +107,12 @@ export function View() {
           case "'":
             setState({...state, grid: !state.grid});
             break;
-          case "ArrowUp":
+          case 'ArrowUp':
             if (node?.parent) {
               setNode(node.parent);
             }
             break;
-          case "ArrowDown":
+          case 'ArrowDown':
             if (node?.children?.length) {
               setNode(node.children.at(-1));
             }

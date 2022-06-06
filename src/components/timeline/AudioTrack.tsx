@@ -2,55 +2,56 @@ import styles from './Timeline.module.scss';
 
 import {useContext, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
-import {usePlayer} from '../../hooks';
+import {usePlayer, useEventState} from '../../hooks';
 
 const HEIGHT = 48;
 
 export function AudioTrack() {
   const ref = useRef<HTMLCanvasElement>();
-  const player = usePlayer();
+  const {project, audio} = usePlayer();
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
   const {viewLength, startFrame, endFrame, duration, density} =
     useContext(TimelineContext);
 
+  const audioData = useEventState(audio.DataChanged, () => audio.getData());
+
   useLayoutEffect(() => {
     if (!context) return;
+    context.clearRect(0, 0, viewLength, HEIGHT * 2);
+    if (!audioData) return;
 
-    const audio = player.audio.meta;
-    const samplesPerSeconds = audio.sample_rate / audio.samples_per_pixel;
-    const step = Math.ceil(density / 256);
-    const start = Math.floor(
-      (player.project.framesToSeconds(startFrame) + player.audio.offset) *
-        samplesPerSeconds,
-    );
-    const end = Math.floor(
-      (player.project.framesToSeconds(endFrame) + player.audio.offset) *
-        samplesPerSeconds,
-    );
-
-    context.clearRect(0, 0, viewLength, 64);
     context.strokeStyle = 'white';
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(0, HEIGHT);
 
+    const start =
+      audio.toRelativeTime(project.framesToSeconds(startFrame)) *
+      audioData.sampleRate;
+    const end =
+      audio.toRelativeTime(project.framesToSeconds(endFrame)) *
+      audioData.sampleRate;
+
+    const flooredStart = ~~start;
+    const padding = flooredStart - start;
     const length = end - start;
-    for (let offset = 0; offset < length; offset += step) {
-      const sample = (start + offset) * 2;
-      if (sample >= audio.data.length) break;
+    const step = Math.ceil(density);
+    for (let offset = 0; offset < length; offset += step * 2) {
+      const sample = flooredStart + offset;
+      if (sample >= audioData.peaks.length) break;
 
       context.lineTo(
-        (offset / length) * viewLength,
-        (audio.data[sample] / 32767) * HEIGHT + HEIGHT,
+        ((padding + offset) / length) * viewLength,
+        (audioData.peaks[sample] / audioData.absoluteMax) * HEIGHT + HEIGHT,
       );
       context.lineTo(
-        ((offset + 0.5) / length) * viewLength,
-        (audio.data[sample + 1] / 32767) * HEIGHT + HEIGHT,
+        ((padding + offset + step) / length) * viewLength,
+        (audioData.peaks[sample + 1] / audioData.absoluteMax) * HEIGHT + HEIGHT,
       );
     }
 
     context.stroke();
-  }, [context, density, viewLength, startFrame, endFrame]);
+  }, [context, audioData, density, viewLength, startFrame, endFrame]);
 
   const style = useMemo(
     () => ({
@@ -65,7 +66,7 @@ export function AudioTrack() {
     <canvas
       style={style}
       width={viewLength}
-      height={64}
+      height={HEIGHT * 2}
       ref={ref}
       className={styles.audioTrack}
     />

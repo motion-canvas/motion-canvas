@@ -223,10 +223,6 @@
   cursor: pointer;
   padding: 8px 2px;
 
-  &:first-child {
-    margin-right: auto;
-  }
-
   &:after {
     background-color: rgba(255, 255, 255, 0);
   }
@@ -243,6 +239,12 @@
   margin-top: 4px;
 }
 
+.handleSpacer {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
 .audioTrack {
   opacity: 0.16;
+  margin: 24px 0;
 }
