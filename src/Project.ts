@@ -171,9 +171,9 @@ export class Project extends Stage {
         this.frame = scene.lastFrame;
       } else {
         this.currentScene = scene;
-        await scene.reset();
         scene.firstFrame = this.frame;
         scene.transitionDuration = -1;
+        await scene.reset();
         while (!scene.canTransitionOut()) {
           if (scene.transitionDuration < 0 && scene.isAfterTransitionIn()) {
             scene.transitionDuration = this.frame - scene.firstFrame;

@@ -73,6 +73,10 @@ const compiler = webpack({
         type: 'asset',
       },
       {
+        test: /\.wav$/i,
+        type: 'asset',
+      },
+      {
         test: /\.csv$/,
         loader: 'csv-loader',
         options: {
@@ -102,23 +106,6 @@ const compiler = webpack({
         use: [
           {
             loader: 'sprite-loader',
-          },
-        ],
-      },
-      {
-        oneOf: [
-          {
-            test: /\.wav$/i,
-            resourceQuery: /meta/,
-            use: [
-              {
-                loader: 'wav-loader',
-              },
-            ],
-          },
-          {
-            test: /\.wav$/i,
-            type: 'asset',
           },
         ],
       },

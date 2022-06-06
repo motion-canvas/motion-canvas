@@ -1,5 +1,5 @@
 import type {Project} from '../Project';
-import type {Waveform} from '../types';
+import {AudioManager} from '../audio/AudioManager';
 import {
   PromiseSimpleEventDispatcher,
   SimpleEventDispatcher,
@@ -41,8 +41,6 @@ export interface PlayerRenderEvent {
   data: Blob;
 }
 
-const STORAGE_KEY = 'player-state';
-
 export class Player {
   public get StateChanged() {
     return this.stateChanged.asEvent();
@@ -52,8 +50,8 @@ export class Player {
     return this.timeChanged.asEvent();
   }
 
-  public get RenderChanged() {
-    return this.renderChanged.asEvent();
+  public get FrameRendered() {
+    return this.frameRendered.asEvent();
   }
 
   public get Reloaded() {
@@ -62,29 +60,20 @@ export class Player {
 
   private readonly stateChanged = new SimpleEventDispatcher<PlayerState>();
   private readonly timeChanged = new SimpleEventDispatcher<PlayerTime>();
-  private readonly renderChanged =
+  private readonly frameRendered =
     new PromiseSimpleEventDispatcher<PlayerRenderEvent>();
   private readonly reloaded = new SimpleEventDispatcher<number>();
 
-  private readonly audioElement: HTMLAudioElement = null;
   private startTime: number;
   private renderTime: number = 0;
   private requestId: number = null;
-  private audioError = false;
+  private frame: number = 0;
 
-  public getState(): PlayerState {
-    return {...this.state};
-  }
-
-  public getTime(): PlayerTime {
-    return {
-      frame: this.frame,
-      time: this.project.framesToSeconds(this.frame),
-      duration: this.state.duration,
-      durationTime: this.project.framesToSeconds(this.state.duration),
-      completion: this.frame / this.state.duration,
-    };
-  }
+  private commands: PlayerCommands = {
+    reset: true,
+    seek: -1,
+    recalculate: true,
+  };
 
   private state: PlayerState = {
     duration: Infinity,
@@ -101,13 +90,30 @@ export class Player {
     scale: 1,
   };
 
-  private frame: number = 0;
+  public constructor(
+    public readonly project: Project,
+    public readonly audio: AudioManager,
+  ) {
+    this.startTime = performance.now();
+    this.project.framerate = this.state.fps;
+    this.project.resolutionScale = this.state.scale;
 
-  private commands: PlayerCommands = {
-    reset: true,
-    seek: -1,
-    recalculate: true,
-  };
+    this.request();
+  }
+
+  public getState(): PlayerState {
+    return {...this.state};
+  }
+
+  public getTime(): PlayerTime {
+    return {
+      frame: this.frame,
+      time: this.project.framesToSeconds(this.frame),
+      duration: this.state.duration,
+      durationTime: this.project.framesToSeconds(this.state.duration),
+      completion: this.frame / this.state.duration,
+    };
+  }
 
   public updateState(newState: Partial<PlayerState>) {
     let changed = false;
@@ -125,7 +131,6 @@ export class Player {
         ...newState,
       };
       this.stateChanged.dispatch(this.state);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
     }
   }
 
@@ -143,35 +148,6 @@ export class Player {
     return commands;
   }
 
-  public constructor(
-    public readonly project: Project,
-    public readonly audio?: {
-      src: string;
-      meta: Waveform;
-      offset: number;
-    },
-  ) {
-    this.startTime = performance.now();
-
-    const savedState = localStorage.getItem(STORAGE_KEY);
-    if (savedState) {
-      const state = JSON.parse(savedState) as PlayerState;
-      for (const key in this.state) {
-        //@ts-ignore
-        this.state[key] = state[key] ?? this.state[key];
-      }
-    }
-
-    this.project.framerate = this.state.fps;
-    this.project.resolutionScale = this.state.scale;
-
-    if (audio) {
-      this.audioElement = new Audio(audio.src);
-    }
-
-    this.request();
-  }
-
   public reload() {
     this.commands.recalculate = true;
     if (this.requestId === null) {
@@ -179,11 +155,39 @@ export class Player {
     }
   }
 
-  public reloadAudio(src: string, meta: Waveform) {
-    this.audioElement.src = src;
-    this.audio.src = src;
-    // FIXME UI should be notified about this change
-    this.audio.meta = meta;
+  public setRange(
+    startFrame = this.state.startFrame,
+    endFrame = this.state.endFrame,
+  ) {
+    if (startFrame === undefined) {
+      throw new Error('Bruh');
+    }
+
+    if (endFrame >= this.state.duration) {
+      endFrame = Infinity;
+    }
+
+    if (startFrame < 0) {
+      startFrame = 0;
+    }
+
+    if (startFrame > endFrame) {
+      [startFrame, endFrame] = [endFrame, startFrame];
+    }
+
+    if (endFrame - startFrame < 1) {
+      if (startFrame !== 0) {
+        startFrame--;
+      } else {
+        endFrame++;
+      }
+    }
+
+    this.updateState({startFrame, endFrame});
+  }
+
+  public setSpeed(value: number) {
+    this.updateState({speed: value});
   }
 
   public setFramerate(fps: number) {
@@ -193,6 +197,7 @@ export class Player {
       fps,
       startFrame: Math.floor(this.state.startFrame * ratio),
       endFrame: Math.floor(this.state.endFrame * ratio),
+      duration: Math.floor(this.state.duration * ratio),
     });
     this.requestSeek(Math.floor(this.frame * ratio));
     this.reload();
@@ -216,22 +221,20 @@ export class Player {
     this.commands.seek = this.clampRange(value, this.state);
   }
 
+  public toggleLoop(value: boolean = !this.state.loop) {
+    this.updateState({loop: value});
+  }
+
   public togglePlayback(value: boolean = this.state.paused): void {
-    this.updateState({
-      paused: !value,
-    });
+    this.updateState({paused: !value});
   }
 
   public toggleRendering(value: boolean = !this.state.render): void {
-    this.updateState({
-      render: value,
-    });
+    this.updateState({render: value});
   }
 
   public toggleAudio(value: boolean = this.state.muted): void {
-    this.updateState({
-      muted: !value,
-    });
+    this.updateState({muted: !value});
   }
 
   private async run() {
@@ -266,32 +269,21 @@ export class Player {
     }
 
     // Pause / play audio.
-    const audioPaused = state.paused || state.finished || state.render;
-    if (this.audioElement && this.audioElement.paused !== audioPaused) {
-      if (audioPaused) {
-        this.audioElement.pause();
-      } else {
-        try {
-          await this.audioElement.play();
-          this.syncAudio(-3);
-          this.audioError = false;
-        } catch (e) {
-          if (!this.audioError) {
-            console.error(e);
-          }
-          this.audioError = true;
-        }
-      }
+    const audioPaused =
+      state.paused ||
+      state.finished ||
+      state.render ||
+      !this.audio.isInRange(this.project.time);
+    if (await this.audio.setPaused(audioPaused)) {
+      this.syncAudio(-3);
     }
-    if (this.audioElement) {
-      this.audioElement.muted = state.muted;
-    }
+    this.audio.setMuted(state.muted);
 
     // Rendering
     if (state.render) {
       state.finished = await this.project.next();
       this.project.draw();
-      await this.renderChanged.dispatchAsync({
+      await this.frameRendered.dispatchAsync({
         frame: this.project.frame,
         data: await this.project.getBlob(),
       });
@@ -320,19 +312,21 @@ export class Player {
     else if (
       state.paused ||
       (state.speed === 1 &&
-        this.hasAudio() &&
-        this.audioTime() < this.project.time)
+        this.audio.isReady() &&
+        this.audio.isInRange(this.project.time) &&
+        this.audio.getTime() < this.project.time)
     ) {
       this.request();
       return;
     }
     // Seek to synchronize animation with audio.
     else if (
-      this.hasAudio() &&
+      this.audio.isReady() &&
       state.speed === 1 &&
-      this.project.time < this.audioTime() - MAX_AUDIO_DESYNC
+      this.audio.isInRange(this.project.time) &&
+      this.project.time < this.audio.getTime() - MAX_AUDIO_DESYNC
     ) {
-      const seekFrame = this.project.secondsToFrames(this.audioTime());
+      const seekFrame = this.project.secondsToFrames(this.audio.getTime());
       state.finished = await this.project.seek(seekFrame, state.speed);
     }
     // Simply move forward one frame
@@ -375,22 +369,10 @@ export class Player {
     return frame >= state.startFrame && frame <= state.endFrame;
   }
 
-  private hasAudio(): boolean {
-    return this.audioElement && !this.audioError;
-  }
-
   private syncAudio(frameOffset: number = 0) {
-    if (!this.audioElement) return;
-
-    this.audioElement.currentTime = Math.max(
-      0,
-      this.project.framesToSeconds(this.project.frame + frameOffset) +
-        this.audio.offset,
+    this.audio.setTime(
+      this.project.framesToSeconds(this.project.frame + frameOffset),
     );
-  }
-
-  private audioTime(): number {
-    return (this.audioElement?.currentTime ?? 0) - this.audio.offset;
   }
 
   private request() {
