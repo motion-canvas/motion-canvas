@@ -1,21 +1,15 @@
 {
   "compilerOptions": {
-    "rootDir": "../",
-    "baseUrl": "./src",
-    "outDir": "./dist/",
+    "baseUrl": "src",
+    "outDir": "lib",
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
     "target": "esnext",
     "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-    "paths": {
-      "@motion-canvas/core/*": ["../../core/src/*"]
-    }
+    "jsxImportSource": "preact"
   }
 }

@@ -1,12 +1,12 @@
 import styles from './Sidebar.module.scss';
 
-import type {PlayerRenderEvent} from '@motion-canvas/core/player/Player';
+import type {PlayerRenderEvent} from '@motion-canvas/core/lib/player/Player';
+import type {Thread} from '@motion-canvas/core/lib/threading';
 import {IconType} from '../controls';
 import {Tabs} from '../tabs/Tabs';
-import { useEventEffect, usePlayer, usePlayerState } from "../../hooks";
+import {useEventEffect, usePlayer, usePlayerState} from '../../hooks';
 import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
-import {Thread} from '@motion-canvas/core/threading';
-import {GeneratorHelper} from '@motion-canvas/core/helpers';
+import { GeneratorHelper } from "@motion-canvas/core/lib/helpers";
 import {Button, Label, Input, Group, Select} from '../controls';
 
 interface SidebarProps {
@@ -67,7 +67,7 @@ function Rendering() {
         player.toggleRendering(false);
       }
     },
-    []
+    [],
   );
 
   return (

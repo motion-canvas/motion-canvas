@@ -1,6 +1,5 @@
-import { Player } from "@motion-canvas/core/player/Player";
+import type {Player} from '@motion-canvas/core/lib/player/Player';
 
 export function usePlayer(): Player {
-  //@ts-ignore
-  return window.player;
+  return (<any>window).player;
 }

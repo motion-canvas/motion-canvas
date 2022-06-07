@@ -1,4 +1,4 @@
-import type {Scene} from '@motion-canvas/core/Scene';
+import type {Scene} from '@motion-canvas/core/lib/Scene';
 import {Label} from './Label';
 import {useEventState} from '../../hooks';
 

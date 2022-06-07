@@ -13,7 +13,6 @@ import {Debug} from './Debug';
 import {ViewportContext, ViewportState} from './ViewportContext';
 
 const ZOOM_SPEED = 0.1;
-const konvaContainer = document.getElementById('konva');
 
 export function View() {
   const player = usePlayer();
@@ -56,10 +55,8 @@ export function View() {
 
   useEffect(() => {
     const {current} = viewportRef;
-    current.appendChild(konvaContainer);
-    konvaContainer.hidden = false;
-
-    return () => konvaContainer.remove();
+    current.appendChild(player.project.container());
+    return () => player.project.container().remove();
   }, [viewportRef.current]);
 
   useEventEffect(

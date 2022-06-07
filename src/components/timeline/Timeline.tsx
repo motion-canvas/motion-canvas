@@ -19,7 +19,7 @@ import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
 import {RangeTrack} from './RangeTrack';
 import {TimelineContext, TimelineState} from './TimelineContext';
-import {clamp} from '@motion-canvas/core/tweening';
+import {clamp} from '@motion-canvas/core/lib/tweening';
 import {AudioTrack} from './AudioTrack';
 
 const ZOOM_SPEED = 0.1;

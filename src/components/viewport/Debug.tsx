@@ -2,7 +2,7 @@ import styles from './Viewport.module.scss';
 import {usePlayer, usePlayerTime} from '../../hooks';
 import {useContext, useLayoutEffect, useRef} from 'preact/hooks';
 import {ViewportContext} from './ViewportContext';
-import {NODE_ID} from '@motion-canvas/core/symbols';
+import {NODE_ID} from '@motion-canvas/core/lib/symbols';
 
 interface DebugProps {
   node: any;

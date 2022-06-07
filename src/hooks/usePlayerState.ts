@@ -1,4 +1,4 @@
-import {PlayerState} from '@motion-canvas/core/player/Player';
+import type {PlayerState} from '@motion-canvas/core/lib/player/Player';
 import {usePlayer} from './usePlayer';
 import {useEventState} from './useEventState';
 
@@ -7,7 +7,7 @@ const storageKey = `${player.project.name()}-player-state`;
 const savedState = localStorage.getItem(storageKey);
 if (savedState) {
   const state = JSON.parse(savedState) as PlayerState;
-  player.updateState(state);
+  player.loadState(state);
 }
 
 player.StateChanged.subscribe(state => {

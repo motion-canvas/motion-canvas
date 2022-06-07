@@ -1,4 +1,4 @@
-import {PlayerTime} from '@motion-canvas/core/player/Player';
+import type {PlayerTime} from '@motion-canvas/core/lib/player/Player';
 import {usePlayer} from './usePlayer';
 import {useEventState} from './useEventState';
 
