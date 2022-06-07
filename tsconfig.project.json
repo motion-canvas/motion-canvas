@@ -10,12 +10,6 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@motion-canvas/core",
-    "paths": {
-      "MC/*": ["../../core/src/*"],
-      "@motion-canvas/core/*": ["../../core/src/*"],
-      "*": ["../../core/node_modules/*", "../../core/node_modules/@types/*"]
-    },
-    "typeRoots": ["../../core/node_modules/@types", "./node_modules/@types"]
+    "jsxImportSource": "@motion-canvas/core/lib"
   }
 }

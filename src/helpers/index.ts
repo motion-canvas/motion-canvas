@@ -1,2 +1,2 @@
-export {CanvasHelper} from './CanvasHelper';
-export {GeneratorHelper} from './GeneratorHelper';
+export * from './CanvasHelper';
+export * from './GeneratorHelper';

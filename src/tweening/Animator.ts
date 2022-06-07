@@ -1,4 +1,3 @@
-import type {Node} from 'konva/lib/Node';
 import {
   colorTween,
   easeInOutCubic,
@@ -30,7 +29,7 @@ export class Animator<Type, This> {
   private valueFrom: Type = null;
   private lastValue: Type;
   private keys: (() => ThreadGenerator)[] = [];
-  private mapper: TweenFunction<any> = map;
+  private tweenFunction: TweenFunction<any> = map;
   private loops: number = 1;
   private readonly setter: string;
   private readonly getter: string;
@@ -74,7 +73,7 @@ export class Animator<Type, This> {
               // @ts-ignore
               this.object[this.setter](
                 mapper === undefined
-                  ? this.mapper(this.valueFrom, value, interpolation(v))
+                  ? this.tweenFunction(this.valueFrom, value, interpolation(v))
                   : mapper(this.valueFrom, value, interpolation(v), ...args),
               );
             },
@@ -174,10 +173,10 @@ export class Animator<Type, This> {
 
   private inferProperties() {
     this.valueFrom ??= this.getValueFrom();
-    this.mapper = Animator.inferMapper(this.valueFrom);
+    this.tweenFunction = Animator.inferTweenFunction(this.valueFrom);
   }
 
-  public static inferMapper<T>(value: T): TweenFunction<T> {
+  public static inferTweenFunction<T>(value: T): TweenFunction<T> {
     let tween: TweenFunction<any> = map;
 
     if (typeof value === 'string') {

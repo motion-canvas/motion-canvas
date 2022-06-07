@@ -115,7 +115,12 @@ export class Player {
     };
   }
 
-  public updateState(newState: Partial<PlayerState>) {
+  public loadState(state: Partial<PlayerState>) {
+    this.updateState(state);
+    this.setRange(state.startFrame, state.endFrame);
+  }
+
+  private updateState(newState: Partial<PlayerState>) {
     let changed = false;
     for (const prop in newState) {
       // @ts-ignore
@@ -159,11 +164,7 @@ export class Player {
     startFrame = this.state.startFrame,
     endFrame = this.state.endFrame,
   ) {
-    if (startFrame === undefined) {
-      throw new Error('Bruh');
-    }
-
-    if (endFrame >= this.state.duration) {
+    if (endFrame >= this.state.duration || !endFrame) {
       endFrame = Infinity;
     }
 

@@ -8,7 +8,7 @@ import {Konva} from 'konva/lib/Global';
 import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
-import {Origin, Size} from './types';
+import {Origin} from './types';
 
 Konva.autoDrawEnabled = false;
 
@@ -68,7 +68,7 @@ export class Project extends Stage {
     const {scenes, ...rest} = config;
     super({
       listening: false,
-      container: 'konva',
+      container: document.createElement('div'),
       ...ProjectSize.FullHD,
       ...rest,
     });

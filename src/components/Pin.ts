@@ -4,7 +4,6 @@ import {Center, flipOrigin, getOriginDelta, Origin} from '../types';
 import {GetSet, IRect} from 'konva/lib/types';
 import {getset, KonvaNode} from '../decorators';
 import {Node} from 'konva/lib/Node';
-import {bind} from '../decorators/bind';
 import {useScene} from '../utils';
 
 export interface PinConfig extends ContainerConfig {

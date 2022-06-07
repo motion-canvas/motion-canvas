@@ -1,5 +1,4 @@
 import {MP4Demuxer} from './MP4Demuxer';
-import {useScene} from '../utils';
 
 const videos = new WeakMap<object, ImageBitmap[]>();
 const keys: Record<string, object> = {};

@@ -5,14 +5,20 @@ import fs from 'fs';
 import {fileURLToPath} from 'url';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import meow from 'meow';
+import UIPlugin from './plugins/UIPlugin.mjs';
 
 const cli = meow({
   importMeta: import.meta,
   flags: {
-    ui: {
+    uiServer: {
       type: 'boolean',
       default: false,
+    },
+    uiPath: {
+      type: 'string',
+      default: '',
     },
     output: {
       type: 'string',
@@ -22,47 +28,23 @@ const cli = meow({
   },
 });
 
+cli.flags.uiPath ||= cli.flags.uiServer
+  ? 'http://localhost:9001/main.js'
+  : './node_modules/@motion-canvas/ui/dist';
+
 const projectFile = path.resolve(process.cwd(), cli.input[0]);
 const renderOutput = path.resolve(process.cwd(), cli.flags.output);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const compiler = webpack({
-  entry: cli.flags.ui
-    ? {
-        index: projectFile,
-        ui: path.resolve(__dirname, '../../ui/src/index.ts'),
-      }
-    : {
-        index: projectFile,
-      },
+  entry: {project: projectFile},
   mode: 'development',
   devtool: 'inline-source-map',
   module: {
     rules: [
       {
-        test: /\.scss$/,
-        use: [
-          {loader: 'style-loader'},
-          {loader: 'css-loader', options: {modules: true}},
-          {loader: 'sass-loader'},
-        ],
-      },
-      {
         test: /\.tsx?$/,
-        include: path.resolve(__dirname, '../../ui/'),
         loader: 'ts-loader',
-        options: {
-          configFile: path.resolve(__dirname, '../../ui/tsconfig.json'),
-          instance: 'ui',
-        },
-      },
-      {
-        test: /\.tsx?$/,
-        exclude: path.resolve(__dirname, '../../ui/'),
-        loader: 'ts-loader',
-        options: {
-          instance: 'project',
-        },
       },
       {
         test: /\.glsl$/i,
@@ -86,14 +68,6 @@ const compiler = webpack({
         },
       },
       {
-        test: /\.label$/i,
-        use: [
-          {
-            loader: 'label-loader',
-          },
-        ],
-      },
-      {
         test: /\.anim$/i,
         use: [
           {
@@ -113,47 +87,38 @@ const compiler = webpack({
   },
   resolveLoader: {
     modules: [
-      'node_modules',
+      path.resolve(process.cwd(), './node_modules'),
       path.resolve(__dirname, '../node_modules'),
       path.resolve(__dirname, './loaders'),
     ],
   },
   resolve: {
-    modules: ['node_modules', path.resolve(__dirname, '../node_modules')],
+    modules: [
+      path.resolve(process.cwd(), './node_modules'),
+      path.resolve(__dirname, '../node_modules'),
+    ],
     extensions: ['.js', '.ts', '.tsx'],
-    alias: {
-      MC: path.resolve(__dirname, '../src'),
-      '@motion-canvas/core': path.resolve(__dirname, '../src'),
-    },
-  },
-  optimization: {
-    runtimeChunk: {
-      name: 'runtime',
-    },
   },
   output: {
     filename: `[name].js`,
     path: __dirname,
-    uniqueName: 'motion-canvas',
-  },
-  experiments: {
-    topLevelAwait: true,
   },
   plugins: [
     new webpack.ProvidePlugin({
       // Required to load additional languages for Prism
       Prism: 'prismjs',
     }),
+    new HtmlWebpackPlugin({title: 'Motion Canvas'}),
+    new UIPlugin(cli.flags),
   ],
 });
 
 const server = new WebpackDevServer(
   {
-    static: path.resolve(__dirname, '../public'),
     compress: true,
     port: 9000,
     hot: true,
-    setupMiddlewares: (middlewares, devServer) => {
+    setupMiddlewares: middlewares => {
       middlewares.unshift({
         name: 'render',
         path: '/render/:name',
@@ -166,6 +131,21 @@ const server = new WebpackDevServer(
           req.on('end', () => res.end());
         },
       });
+
+      if (!cli.flags.uiServer) {
+        const ui = path.resolve(process.cwd(), cli.flags.uiPath);
+        middlewares.unshift({
+          name: 'ui',
+          path: '/ui/:name',
+          middleware: (req, res) => {
+            fs.createReadStream(path.join(ui, req.params.name), {
+              encoding: 'utf8',
+            })
+              .on('error', () => res.sendStatus(404))
+              .pipe(res);
+          },
+        });
+      }
 
       return middlewares;
     },

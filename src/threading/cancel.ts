@@ -1,7 +1,7 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from './ThreadGenerator';
 
-export const THREAD_CANCEL = Symbol('Thread cancel command');
+export const THREAD_CANCEL = Symbol.for('THREAD_CANCEL');
 
 export interface CancelYieldResult {
   [THREAD_CANCEL]: ThreadGenerator[];

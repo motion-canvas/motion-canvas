@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
-    "baseUrl": "src",
-    "outDir": "lib",
-    "composite": true,
     "sourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
@@ -11,15 +7,20 @@
     "allowJs": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/core/lib",
     "paths": {
-      "@motion-canvas/core/lib/jsx-runtime": ["jsx-runtime.ts"]
-    }
-  },
-  "include": ["src"]
+      "*": [
+        "../node_modules/*",
+        "../node_modules/@motion-canvas/core/node_modules/*",
+        "../node_modules/@motion-canvas/core/node_modules/@types/*"
+      ]
+    },
+    "typeRoots": [
+      "../node_modules/@motion-canvas/core/node_modules/@types",
+      "../node_modules/@types"
+    ]
+  }
 }

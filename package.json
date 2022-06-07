@@ -1,56 +1,58 @@
 {
   "name": "@motion-canvas/core",
-  "version": "1.2.0",
-  "description": "Canvas-based tool for creating motion graphics",
-  "main": "index.js",
-  "author": "aarthificial",
-  "license": "ISC",
+  "version": "0.1.0",
+  "description": "Web-based tool for creating animations programmatically",
+  "main": "lib/bootstrap.js",
+  "author": "motion-canvas",
+  "license": "MIT",
   "scripts": {
-    "build": "webpack",
-    "watch": "tsc -w"
+    "build": "tsc",
+    "watch": "tsc -w",
+    "release": "semantic-release"
   },
-  "types": "dist/global.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/motion-canvas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/motion-canvas/core.git"
+  },
+  "bin": {
+    "motion-canvas": "bin/index.mjs"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "tsconfig.project.json"
+  ],
   "dependencies": {
-    "@types/dom-webcodecs": "^0.1.4",
-    "@types/wicg-file-system-access": "^2020.9.5",
-    "canvas": "^2.9.1",
-    "csv-loader": "^3.0.3",
+    "@types/prismjs": "^1.26.0",
+    "@types/three": "^0.141.0",
+    "@types/webpack-env": "^1.17.0",
+    "html-webpack-plugin": "^5.5.0",
     "image-size": "^1.0.1",
-    "konva": "^8.3.2",
+    "konva": "^8.3.9",
     "meow": "^10.1.2",
     "mix-color": "^1.1.2",
     "mp4box": "^0.5.2",
-    "preact": "^10.7.1",
     "prismjs": "^1.28.0",
-    "strongly-typed-events": "^3.0.1",
-    "three": "^0.138.3",
-    "ts-loader": "^9.2.6",
-    "typescript": "^4.6.4",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.68.0",
-    "webpack-dev-server": "^4.7.4"
+    "strongly-typed-events": "^3.0.2",
+    "three": "^0.141.0",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.2"
   },
-  "bin": {
-    "mc-serve": "./tools/serve.mjs",
-    "mc-render": "./tools/render.mjs",
-    "mc-image": "./tools/image.mjs"
-  },
-  "files": [
-    "dist/**/*",
-    "public/**/*",
-    "tsconfig.project.json"
-  ],
   "devDependencies": {
-    "@types/node-sass": "^4.11.2",
-    "@types/prismjs": "^1.26.0",
-    "@types/three": "^0.138.0",
-    "@types/webpack-env": "^1.17.0",
-    "css-loader": "^6.7.1",
-    "node-loader": "^2.0.0",
-    "node-sass": "^7.0.1",
-    "prettier": "^2.5.1",
-    "sass-loader": "^12.6.0",
-    "style-loader": "^3.3.1",
-    "webpack-cli": "^4.9.2"
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/commit-analyzer": "^9.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^8.0.4",
+    "@semantic-release/npm": "^9.0.1",
+    "@semantic-release/release-notes-generator": "^10.0.3",
+    "@types/dom-webcodecs": "^0.1.4",
+    "prettier": "^2.6.2",
+    "semantic-release": "^19.0.2"
   }
 }

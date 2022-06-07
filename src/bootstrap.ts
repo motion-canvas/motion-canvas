@@ -1,9 +1,10 @@
+import './globals';
 import type {Size} from './types';
 import type {SceneRunner} from './Scene';
 import {Project, ProjectSize} from './Project';
-import {Player} from './player/Player';
+import {Player} from './player';
 import {hot} from './hot';
-import {AudioManager} from './audio/AudioManager';
+import {AudioManager} from './audio';
 
 interface BootstrapConfig {
   name: string;
@@ -32,6 +33,6 @@ export function bootstrap(config: BootstrapConfig) {
   (<any>window).player = player;
 
   //@ts-ignore
-  const parent = require.cache[module.parents[0]];
+  const parent = __webpack_require__.c[module.parents[0]];
   hot(player, parent);
 }

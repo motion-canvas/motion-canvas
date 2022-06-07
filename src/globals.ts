@@ -28,11 +28,6 @@ declare module '*.csv' {
   export = value;
 }
 
-declare module '*.wav?meta' {
-  const value: import('./types/Waveform').Waveform;
-  export = value;
-}
-
 declare module '*.mp4' {
   const value: string;
   export = value;

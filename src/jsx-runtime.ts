@@ -1,25 +1,31 @@
-import type {Scene} from './Scene';
-import {Node, NodeConfig} from 'konva/lib/Node';
+import type {NodeConfig} from 'konva/lib/Node';
+import type {Shape} from 'konva/lib/Shape';
+import type {Reference} from './utils';
 import {Container} from 'konva/lib/Container';
 import {Surface} from './components';
-import {Shape} from 'konva/lib/Shape';
 
 function isConstructor(fn: Function): fn is new (...args: any[]) => any {
   return !!fn.prototype?.name;
 }
 
-export const Fragment = Symbol.for('mc.fragment');
+type ChildrenConfig = {
+  [key in keyof JSX.ElementChildrenAttribute]:
+  | JSX.ElementClass
+  | JSX.ElementClass[];
+};
+
+type ReferenceConfig = {
+  ref?: Reference<JSX.ElementClass>;
+};
+
+export const Fragment = Symbol.for('Fragment');
 export function jsx(
   type:
-    | (new (config?: NodeConfig) => Node)
-    | ((config: NodeConfig) => Node)
+    | (new (config?: NodeConfig) => JSX.ElementClass)
+    | ((config: NodeConfig) => JSX.ElementClass)
     | typeof Fragment,
-  config: NodeConfig & {
-    children?: Node | Node[];
-    ref?: {value: Node} | [any, string];
-  },
-  maybeKey: string,
-): Node | Node[] {
+  config: NodeConfig & ChildrenConfig & ReferenceConfig,
+): JSX.ElementClass | JSX.ElementClass[] {
   const {children, ref, ...rest} = config;
   const flatChildren = Array.isArray(children) ? children.flat() : [children];
 
@@ -41,11 +47,7 @@ export function jsx(
   }
 
   if (ref) {
-    if (Array.isArray(ref)) {
-      ref[0][ref[1]] = node;
-    } else {
-      ref.value = node;
-    }
+    ref.value = node;
   }
 
   return node;

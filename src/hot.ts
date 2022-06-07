@@ -1,4 +1,4 @@
-import type {Player} from './player/Player';
+import type {Player} from './player';
 
 export function hot(player: Player, root: NodeModule) {
   const updateScenes = async (modules: string[]) => {

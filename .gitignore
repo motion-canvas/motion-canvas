@@ -1,5 +1,5 @@
 node_modules
-output
-dist
+lib
 test
 .idea
+tsconfig.tsbuildinfo

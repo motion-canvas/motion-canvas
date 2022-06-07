@@ -1,2 +1,2 @@
-export * from './CodeTheme';
 export * from './Code';
+export * from './CodeTheme';

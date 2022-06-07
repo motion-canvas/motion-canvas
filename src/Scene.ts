@@ -1,13 +1,11 @@
 import type {Project} from './Project';
-import {Layer, LayerConfig} from 'konva/lib/Layer';
+import {LayerConfig} from 'konva/lib/Layer';
 import {
   isPromise,
   ThreadGenerator,
   threads,
   ThreadsCallback,
 } from './threading';
-import {Debug} from './components';
-import {Node} from 'konva/lib/Node';
 import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
 import {SceneTransition} from './transitions';

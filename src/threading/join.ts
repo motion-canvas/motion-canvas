@@ -1,7 +1,7 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from './ThreadGenerator';
 
-export const THREAD_JOIN = Symbol('Thread join command');
+export const THREAD_JOIN = Symbol.for('THREAD_JOIN');
 
 export interface JoinYieldResult {
   [THREAD_JOIN]: ThreadGenerator[];
