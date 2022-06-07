@@ -7,6 +7,10 @@ module.exports = (env, argv) => ({
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+      },
+      {
         test: /\.svg$/,
         type: 'asset',
       },
@@ -17,10 +21,6 @@ module.exports = (env, argv) => ({
           {loader: 'css-loader', options: {modules: true}},
           {loader: 'sass-loader'},
         ],
-      },
-      {
-        test: /\.tsx?$/,
-        loader: 'ts-loader',
       },
     ],
   },
@@ -33,7 +33,7 @@ module.exports = (env, argv) => ({
   devServer: {
     port: 9001,
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      'Access-Control-Allow-Origin': '*',
     },
   },
 });
