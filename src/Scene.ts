@@ -71,6 +71,8 @@ export class Scene extends Group {
   ) {
     super({
       name: runnerFactory.name,
+      width: project.width(),
+      height: project.height(),
       ...config,
     });
     decorate(runnerFactory, threadable());

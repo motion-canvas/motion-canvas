@@ -10,8 +10,8 @@ function isConstructor(fn: Function): fn is new (...args: any[]) => any {
 
 type ChildrenConfig = {
   [key in keyof JSX.ElementChildrenAttribute]:
-  | JSX.ElementClass
-  | JSX.ElementClass[];
+    | JSX.ElementClass
+    | JSX.ElementClass[];
 };
 
 type ReferenceConfig = {
@@ -47,7 +47,12 @@ export function jsx(
   }
 
   if (ref) {
-    ref.value = node;
+    if (Array.isArray(ref)) {
+      console.warn('Reference arrays are deprecated. Use makeRef() instead.');
+      ref[0][ref[1]] = node;
+    } else {
+      ref.value = node;
+    }
   }
 
   return node;

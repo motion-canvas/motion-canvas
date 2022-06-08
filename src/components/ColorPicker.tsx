@@ -8,7 +8,7 @@ import {Origin} from '../types';
 import {Style} from '../styles';
 import {GetSet} from 'konva/lib/types';
 import {clampRemap} from '../tweening';
-import {useScene} from '../utils';
+import {makeRef} from '../utils';
 
 export interface ColorPickerConfig extends LinearLayoutConfig {
   previewColor?: string;
@@ -48,22 +48,22 @@ export class ColorPicker extends Surface {
     this.setChild(
       <LinearLayout origin={Origin.Top}>
         <Rect
-          ref={[this, 'preview']}
+          ref={makeRef(this, 'preview')}
           width={360}
           height={200}
           fill={'yellow'}
           cornerRadius={[8, 8, 0, 0]}
         />
         <Range
-          ref={[this, 'r']}
+          ref={makeRef(this, 'r')}
           {...colorRangeConfig}
           label={'R:'}
           margin={[40, 40, 10]}
         />
-        <Range ref={[this, 'g']} {...colorRangeConfig} label={'G:'} />
-        <Range ref={[this, 'b']} {...colorRangeConfig} label={'B:'} />
+        <Range ref={makeRef(this, 'g')} {...colorRangeConfig} label={'G:'} />
+        <Range ref={makeRef(this, 'b')} {...colorRangeConfig} label={'B:'} />
         <Range
-          ref={[this, 'a']}
+          ref={makeRef(this, 'a')}
           {...colorRangeConfig}
           label={'A:'}
           margin={[10, 40, 40]}

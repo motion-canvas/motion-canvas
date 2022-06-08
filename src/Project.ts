@@ -8,7 +8,7 @@ import {Konva} from 'konva/lib/Global';
 import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
-import {Origin} from './types';
+import {KonvaNode} from './decorators';
 
 Konva.autoDrawEnabled = false;
 
@@ -21,6 +21,7 @@ interface ProjectConfig extends Partial<StageConfig> {
   background: string | false;
 }
 
+@KonvaNode()
 export class Project extends Stage {
   public get ScenesChanged() {
     return this.scenesChanged.asEvent();
@@ -73,6 +74,11 @@ export class Project extends Stage {
       ...rest,
     });
 
+    this.offset({
+      x: this.width() / -2,
+      y: this.height() / -2,
+    });
+
     this.center = {
       x: this.width() / 2,
       y: this.height() / 2,
@@ -83,7 +89,6 @@ export class Project extends Stage {
       y: 0,
       width: this.width(),
       height: this.height(),
-      origin: Origin.TopLeft,
       fill: config.background || '#ff00ff',
       visible: config.background !== false,
     });
