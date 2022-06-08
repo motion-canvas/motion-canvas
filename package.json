@@ -2,7 +2,7 @@
   "name": "@motion-canvas/ui",
   "version": "1.0.0",
   "description": "User Interface for Motion Canvas",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "author": "motion-canvas",
   "license": "MIT",
   "scripts": {
