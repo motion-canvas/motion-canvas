@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/motion-canvas/ui/compare/v1.0.0...v1.1.0) (2022-06-08)
+
+
+### Features
+
+* create new release ([20282e9](https://github.com/motion-canvas/ui/commit/20282e9745a42c5bf62d104afe65fa71fbd973a2))
+
 # 1.0.0 (2022-06-08)
 
 
