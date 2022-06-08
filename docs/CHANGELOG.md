@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/motion-canvas/core/compare/v1.0.0...v1.1.0) (2022-06-08)
+
+
+### Bug Fixes
+
+* add missing canvas package ([26c8f4f](https://github.com/motion-canvas/core/commit/26c8f4ff9947841b38f123466b7efd7f43706ffb))
+
+
+### Features
+
+* add support for npm workspaces ([741567f](https://github.com/motion-canvas/core/commit/741567f8af4185a2b1bc5284064514d96e75f5f2))
+
 # 1.0.0 (2022-06-08)
 
 
