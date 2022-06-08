@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "User Interface for Motion Canvas",
   "main": "dist/index.js",
   "author": "motion-canvas",
