@@ -29,6 +29,7 @@
     "@types/prismjs": "^1.26.0",
     "@types/three": "^0.141.0",
     "@types/webpack-env": "^1.17.0",
+    "canvas": "^2.9.1",
     "html-webpack-plugin": "^5.5.0",
     "image-size": "^1.0.1",
     "konva": "^8.3.9",
