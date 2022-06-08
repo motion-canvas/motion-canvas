@@ -2,4 +2,3 @@ node_modules
 lib
 test
 .idea
-tsconfig.tsbuildinfo

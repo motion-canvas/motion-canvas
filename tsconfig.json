@@ -1,10 +1,8 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
     "baseUrl": "src",
     "outDir": "lib",
-    "composite": true,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "noImplicitAny": true,
     "module": "esnext",
     "target": "es2020",

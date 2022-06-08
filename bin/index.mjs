@@ -8,6 +8,7 @@ import WebpackDevServer from 'webpack-dev-server';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import meow from 'meow';
 import UIPlugin from './plugins/UIPlugin.mjs';
+import {createRequire} from 'module';
 
 const cli = meow({
   importMeta: import.meta,
@@ -28,9 +29,16 @@ const cli = meow({
   },
 });
 
-cli.flags.uiPath ||= cli.flags.uiServer
-  ? 'http://localhost:9001/main.js'
-  : './node_modules/@motion-canvas/ui/dist';
+if (cli.flags.uiServer) {
+  cli.flags.uiPath ||= 'http://localhost:9001/main.js';
+} else {
+  if (cli.flags.uiPath) {
+    cli.flags.uiPath = path.resolve(process.cwd(), cli.flags.uiPath);
+  } else {
+    const require = createRequire(import.meta.url);
+    cli.flags.uiPath = path.dirname(require.resolve('@motion-canvas/ui'));
+  }
+}
 
 const projectFile = path.resolve(process.cwd(), cli.input[0]);
 const renderOutput = path.resolve(process.cwd(), cli.flags.output);
@@ -87,16 +95,11 @@ const compiler = webpack({
   },
   resolveLoader: {
     modules: [
-      path.resolve(process.cwd(), './node_modules'),
-      path.resolve(__dirname, '../node_modules'),
+      'node_modules',
       path.resolve(__dirname, './loaders'),
     ],
   },
   resolve: {
-    modules: [
-      path.resolve(process.cwd(), './node_modules'),
-      path.resolve(__dirname, '../node_modules'),
-    ],
     extensions: ['.js', '.ts', '.tsx'],
   },
   output: {
@@ -133,12 +136,11 @@ const server = new WebpackDevServer(
       });
 
       if (!cli.flags.uiServer) {
-        const ui = path.resolve(process.cwd(), cli.flags.uiPath);
         middlewares.unshift({
           name: 'ui',
           path: '/ui/:name',
           middleware: (req, res) => {
-            fs.createReadStream(path.join(ui, req.params.name), {
+            fs.createReadStream(path.join(cli.flags.uiPath, req.params.name), {
               encoding: 'utf8',
             })
               .on('error', () => res.sendStatus(404))
