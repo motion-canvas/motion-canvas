@@ -2,6 +2,12 @@
 
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
+## Disclaimer
+
+The API is a subject to change and may vary drastically in newer versions.
+
+Documentation is still lacking and will be expanded in the following weeks.
+
 ## Using Motion Canvas
 
 Make sure that [Node.js](https://nodejs.org/) is installed on your machine.
@@ -60,7 +66,7 @@ node -v
      }
    }
    ```
-6. Create a simple scene in `src/scenes/example.scene.ts`:
+6. Create a simple scene in `src/scenes/example.scene.tsx`:
    ```ts
    import type {Scene} from '@motion-canvas/core/lib/Scene';
    import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -88,9 +94,10 @@ node -v
    ```text
    my-project/
    ├─ node_modules/        <- Generated automatically
+   ├─ output/              <- Create this folder to render your animation
    ├─ src/
    │  ├─ scenes/
-   │  │  └─ example.scene.ts
+   │  │  └─ example.scene.tsx
    │  └─ project.ts
    ├─ .npmrc
    ├─ package.json         <- Generated automatically
