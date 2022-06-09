@@ -44,6 +44,9 @@ node -v
 
 ### Set up a project
 
+You can use [the project template](https://github.com/motion-canvas/project-template#using-the-template) to quickly bootstrap your project.
+Otherwise, below are the steps to set it up manually:
+
 1. Create a directory for your project and open it in a terminal.
 2. Initialize a new npm package inside:
    ```shell
