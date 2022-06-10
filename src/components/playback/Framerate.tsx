@@ -3,7 +3,7 @@ import {useMemo, useRef} from 'preact/hooks';
 import {usePlayerState, usePlayerTime} from '../../hooks';
 
 interface FramerateProps {
-  render: (framerate: number) => VNode<any>;
+  render: (framerate: number) => VNode<unknown>;
 }
 
 export function Framerate({render}: FramerateProps) {

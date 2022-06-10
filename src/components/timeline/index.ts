@@ -1,2 +1,2 @@
 export * from './Timeline';
-export { Playhead } from "./Playhead";
+export {Playhead} from './Playhead';

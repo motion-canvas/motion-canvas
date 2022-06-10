@@ -8,7 +8,7 @@ import {useStorage} from '../../hooks';
 
 interface TabsProps {
   children: {icon: IconType; pane: ComponentChildren}[];
-  onToggle?: (tab: number) => any;
+  onToggle?: (tab: number) => void;
   id?: string;
 }
 
@@ -29,7 +29,7 @@ export function Tabs({children, onToggle, id}: TabsProps) {
     <div className={styles.root}>
       <div className={styles.panes}>{children[tab]?.pane}</div>
       <div className={styles.tabs}>
-        {children.map(({icon, pane}, index) => (
+        {children.map(({icon}, index) => (
           <Icon
             type={icon}
             onClick={() => toggleTab(index)}

@@ -1,3 +1,4 @@
+import type {Node} from 'konva/lib/Node';
 import styles from './Viewport.module.scss';
 import {usePlayer, usePlayerTime} from '../../hooks';
 import {useContext, useLayoutEffect, useRef} from 'preact/hooks';
@@ -5,8 +6,8 @@ import {ViewportContext} from './ViewportContext';
 import {NODE_ID} from '@motion-canvas/core/lib/symbols';
 
 interface DebugProps {
-  node: any;
-  setNode: (value: any) => void;
+  node: Node;
+  setNode: (value: Node) => void;
 }
 
 export function Debug({node, setNode}: DebugProps) {
@@ -25,7 +26,9 @@ export function Debug({node, setNode}: DebugProps) {
     }
     if (!node.getLayer()) {
       const id = node.attrs[NODE_ID];
-      setNode(player.project.findOne((node: any) => node.attrs[NODE_ID] === id));
+      setNode(
+        player.project.findOne((node: Node) => node.attrs[NODE_ID] === id),
+      );
       return;
     }
 
@@ -74,7 +77,13 @@ export function Debug({node, setNode}: DebugProps) {
     ctx.fill('evenodd');
 
     ctx.beginPath();
-    ctx.arc(position.x + offset.x, position.y + offset.y, 5 / state.zoom, 0, Math.PI * 2);
+    ctx.arc(
+      position.x + offset.x,
+      position.y + offset.y,
+      5 / state.zoom,
+      0,
+      Math.PI * 2,
+    );
     ctx.closePath();
     ctx.fillStyle = 'rgba(255, 255, 255, 1)';
     ctx.fill();

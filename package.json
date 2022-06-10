@@ -10,6 +10,10 @@
     "serve": "webpack serve",
     "build": "webpack --mode=production",
     "watch": "webpack -w",
+    "lint": "eslint \"src/**/*.ts?(x)\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
+    "prettier": "prettier --check \"src/**/*.ts?(x)\"",
+    "prettier:fix": "prettier --write \"src/**/*.ts?(x)\"",
     "release": "semantic-release"
   },
   "publishConfig": {
@@ -30,7 +34,10 @@
     "@semantic-release/github": "^8.0.4",
     "@semantic-release/npm": "^9.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
     "css-loader": "^6.7.1",
+    "eslint": "^8.17.0",
     "preact": "^10.7.1",
     "prettier": "^2.6.2",
     "sass": "^1.52.2",

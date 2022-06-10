@@ -1,9 +1,9 @@
 import styles from './Controls.module.scss';
 
 interface SelectProps<T> {
-  options: {value: T, text: string}[];
+  options: {value: T; text: string}[];
   value: T;
-  onChange: (value: T) => any;
+  onChange: (value: T) => void;
 }
 
 export function Select<T>({options, value, onChange}: SelectProps<T>) {

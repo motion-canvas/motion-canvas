@@ -6,11 +6,11 @@ import {IconType} from '../controls';
 import {Tabs} from '../tabs/Tabs';
 import {useEventEffect, usePlayer, usePlayerState} from '../../hooks';
 import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
-import { GeneratorHelper } from "@motion-canvas/core/lib/helpers";
+import {GeneratorHelper} from '@motion-canvas/core/lib/helpers';
 import {Button, Label, Input, Group, Select} from '../controls';
 
 interface SidebarProps {
-  setOpen?: (value: boolean) => any;
+  setOpen?: (value: boolean) => void;
 }
 
 export function Sidebar({setOpen}: SidebarProps) {

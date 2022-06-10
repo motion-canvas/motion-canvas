@@ -6,9 +6,7 @@ export function useSize<T extends Element>(
   const [rect, setRect] = useState<DOMRect>(new DOMRect());
   const observer = useMemo(
     () =>
-      new ResizeObserver(() =>
-        setRect(ref.current.getBoundingClientRect()),
-      ),
+      new ResizeObserver(() => setRect(ref.current.getBoundingClientRect())),
     [],
   );
   useEffect(() => {

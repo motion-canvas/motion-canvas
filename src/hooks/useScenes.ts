@@ -1,14 +1,14 @@
-import {usePlayer} from "./usePlayer";
-import {useEffect, useState} from "preact/hooks";
+import {usePlayer} from './usePlayer';
+import {useEffect, useState} from 'preact/hooks';
 
 export function useScenes() {
-    const player = usePlayer();
-    const [scenes, setScenes] = useState(player.project.scenes);
-    useEffect(() => {
-        setScenes(player.project.scenes);
-        player.project.ScenesChanged.subscribe(setScenes);
-        return () => player.project.ScenesChanged.unsubscribe(setScenes);
-    }, [player, setScenes]);
+  const player = usePlayer();
+  const [scenes, setScenes] = useState(player.project.scenes);
+  useEffect(() => {
+    setScenes(player.project.scenes);
+    player.project.ScenesChanged.subscribe(setScenes);
+    return () => player.project.ScenesChanged.unsubscribe(setScenes);
+  }, [player, setScenes]);
 
-    return scenes;
+  return scenes;
 }

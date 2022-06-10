@@ -1,7 +1,7 @@
 import {ISubscribable} from 'strongly-typed-events';
 import {Inputs, useEffect} from 'preact/hooks';
 
-export function useEventEffect<THandler extends Function>(
+export function useEventEffect<THandler>(
   subscribable: ISubscribable<THandler>,
   callback: THandler,
   inputs: Inputs,

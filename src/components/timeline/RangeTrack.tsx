@@ -88,7 +88,7 @@ export function RangeTrack() {
         className={styles.handle}
         type={IconType.dragIndicator}
       />
-      <div class={styles.handleSpacer}/>
+      <div class={styles.handleSpacer} />
       <Icon
         onMouseDown={handleDragEnd}
         onDblClick={console.log}

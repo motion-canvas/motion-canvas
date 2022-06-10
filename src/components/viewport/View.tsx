@@ -1,3 +1,5 @@
+import type {Node} from 'konva/lib/Node';
+import type {Container} from 'konva/lib/Container';
 import styles from './Viewport.module.scss';
 import {
   useDocumentEvent,
@@ -20,7 +22,7 @@ export function View() {
   const viewportRef = useRef<HTMLDivElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
-  const [node, setNode] = useState<any>(null);
+  const [node, setNode] = useState<Node>(null);
 
   const [state, setState] = useStorage<ViewportState>('viewport', {
     width: 1920,
@@ -86,7 +88,7 @@ export function View() {
     useCallback(
       event => {
         switch (event.key) {
-          case '0':
+          case '0': {
             const rect = containerRef.current.getBoundingClientRect();
             const size = player.project.size();
             let zoom = rect.height / size.height;
@@ -95,6 +97,7 @@ export function View() {
             }
             setState({...state, zoom, x: 0, y: 0});
             break;
+          }
           case '=':
             setState({...state, zoom: state.zoom * (1 + ZOOM_SPEED)});
             break;
@@ -109,11 +112,13 @@ export function View() {
               setNode(node.parent);
             }
             break;
-          case 'ArrowDown':
-            if (node?.children?.length) {
-              setNode(node.children.at(-1));
+          case 'ArrowDown': {
+            const container = node as Container;
+            if (container?.children?.length) {
+              setNode(container.children.at(-1));
             }
             break;
+          }
         }
       },
       [setState, state, node],

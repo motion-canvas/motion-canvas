@@ -24,7 +24,7 @@ import {AudioTrack} from './AudioTrack';
 
 const ZOOM_SPEED = 0.1;
 
-function useStateChange<T>(state: T, onChange: (prev: T, next: T) => any) {
+function useStateChange<T>(state: T, onChange: (prev: T, next: T) => void) {
   const [cached, setCached] = useState(state);
   useLayoutEffect(() => {
     if (state !== cached) {
