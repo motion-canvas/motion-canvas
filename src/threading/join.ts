@@ -8,7 +8,7 @@ export interface JoinYieldResult {
   all: boolean;
 }
 
-export function isJoinYieldResult(value: any): value is JoinYieldResult {
+export function isJoinYieldResult(value: unknown): value is JoinYieldResult {
   return typeof value === 'object' && THREAD_JOIN in value;
 }
 

@@ -7,7 +7,7 @@ export interface CancelYieldResult {
   [THREAD_CANCEL]: ThreadGenerator[];
 }
 
-export function isCancelYieldResult(value: any): value is CancelYieldResult {
+export function isCancelYieldResult(value: unknown): value is CancelYieldResult {
   return typeof value === 'object' && THREAD_CANCEL in value;
 }
 

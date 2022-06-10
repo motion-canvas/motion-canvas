@@ -1,7 +1,7 @@
 import {Text, TextConfig} from 'konva/lib/shapes/Text';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
-import {Origin, Size, PossibleSpacing, Spacing, getOriginOffset} from '../types';
+import {Origin, Size, Spacing, getOriginOffset} from '../types';
 import {Animator, tween, textTween, InterpolationFunction} from '../tweening';
 import {getset, threadable} from '../decorators';
 
@@ -92,7 +92,7 @@ export class LayoutText extends Text {
     text: string,
     time: number,
     interpolation: InterpolationFunction,
-    onEnd: Function,
+    onEnd: Callback,
   ) {
     const fromWidth = this.getLayoutSize({text: fromText, minWidth: 0}).width;
     const toWidth = this.getLayoutSize({text, minWidth: 0}).width;

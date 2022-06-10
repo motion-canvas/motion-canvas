@@ -36,7 +36,7 @@ export function surfaceFrom(fromSurface: Surface) {
     const fromDelta = fromSurface.getOriginDelta(target.getOrigin());
     target.show();
 
-    let ratio =
+    const ratio =
       (calculateRatio(fromSurface.getPosition(), toPos) +
         calculateRatio(from, to)) /
       2;

@@ -37,7 +37,7 @@ export class AudioManager {
     this.offsetChanged.dispatch(value);
   }
 
-  public async setMuted(isMuted: boolean) {
+  public setMuted(isMuted: boolean) {
     this.audioElement.muted = isMuted;
   }
 
@@ -83,8 +83,8 @@ export class AudioManager {
       } else {
         try {
           await this.audioElement.play();
-          return true;
           this.error = false;
+          return true;
         } catch (e) {
           if (!this.error) {
             console.error(e);

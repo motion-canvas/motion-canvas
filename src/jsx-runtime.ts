@@ -4,7 +4,8 @@ import type {Reference} from './utils';
 import {Container} from 'konva/lib/Container';
 import {Surface} from './components';
 
-function isConstructor(fn: Function): fn is new (...args: any[]) => any {
+// eslint-disable-next-line @typescript-eslint/ban-types
+function isConstructor(fn: Function): fn is new (...args: unknown[]) => unknown {
   return !!fn.prototype?.name;
 }
 

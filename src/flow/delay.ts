@@ -5,7 +5,7 @@ import {isThreadGenerator, ThreadGenerator} from '../threading';
 decorate(delay, threadable());
 export function* delay(
   time: number,
-  task: ThreadGenerator | Function,
+  task: ThreadGenerator | Callback,
 ): ThreadGenerator {
   yield* waitFor(time);
   if (isThreadGenerator(task)) {

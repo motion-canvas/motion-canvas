@@ -1,11 +1,10 @@
 import {Group} from 'konva/lib/Group';
-import {GetSet, IRect} from 'konva/lib/types';
+import {GetSet} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
-import {Center, getOriginOffset, Origin, Size, Spacing} from '../types';
-import {Container, ContainerConfig} from 'konva/lib/Container';
+import {Center, getOriginOffset, Origin, Size} from '../types';
+import {ContainerConfig} from 'konva/lib/Container';
 import {getset, KonvaNode} from '../decorators';
 import {Node} from 'konva/lib/Node';
-import {Rect} from 'konva/lib/shapes/Rect';
 
 export interface LinearLayoutConfig extends ContainerConfig {
   direction?: Center;
@@ -18,11 +17,11 @@ export class LinearLayout extends Group {
 
   private contentSize: Size;
 
-  constructor(config?: LinearLayoutConfig) {
+  public constructor(config?: LinearLayoutConfig) {
     super(config);
   }
 
-  getLayoutSize(): Size {
+  public getLayoutSize(): Size {
     return this.getPadd().expand({
       width: this.contentSize?.width ?? 0,
       height: this.contentSize?.height ?? 0,
@@ -30,7 +29,7 @@ export class LinearLayout extends Group {
   }
 
   //TODO Recalculate upon removing children as well.
-  add(...children: (Group | Shape)[]): this {
+  public add(...children: (Group | Shape)[]): this {
     super.add(...children);
     this.recalculateLayout();
     return this;

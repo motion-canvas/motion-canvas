@@ -1,6 +1,5 @@
 import {Node} from 'konva/lib/Node';
 import {Shape, ShapeGetClientRectConfig} from 'konva/lib/Shape';
-import {IRect} from 'konva/lib/types';
 
 declare module 'konva/lib/Shape' {
   export interface Shape {

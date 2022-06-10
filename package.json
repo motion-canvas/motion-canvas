@@ -8,6 +8,8 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "lint": "eslint \"src/**/*.ts?(x)\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
     "release": "semantic-release"
   },
   "publishConfig": {
@@ -53,6 +55,9 @@
     "@semantic-release/npm": "^9.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "@types/dom-webcodecs": "^0.1.4",
+    "@typescript-eslint/eslint-plugin": "^5.27.1",
+    "@typescript-eslint/parser": "^5.27.1",
+    "eslint": "^8.17.0",
     "prettier": "^2.6.2",
     "semantic-release": "^19.0.2"
   }

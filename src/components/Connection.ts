@@ -38,7 +38,7 @@ export class Connection extends Group {
   public readonly crossing: Node = null;
   public readonly arrow: Arrow;
 
-  constructor(config?: ConnectionConfig) {
+  public constructor(config?: ConnectionConfig) {
     super(config);
 
     this.start = config?.start ?? new Pin();

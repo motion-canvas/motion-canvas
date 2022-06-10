@@ -1,8 +1,6 @@
-import type {Node} from 'konva/lib/Node';
-
 export type Reference<TValue> = TValue extends (config: {
   ref: infer TReference;
-}) => any
+}) => void
   ? TReference
   : {value: TValue};
 

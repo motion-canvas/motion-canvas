@@ -1,10 +1,10 @@
 import {Factory} from 'konva/lib/Factory';
 import {TweenProvider} from '../tweening';
 
-export function getset(
-  defaultValue?: any,
-  after?: () => void,
-  tween?: TweenProvider<any>,
+export function getset<T = unknown>(
+  defaultValue?: T,
+  after?: Callback,
+  tween?: TweenProvider<T>,
 ): PropertyDecorator {
   return function (target, propertyKey) {
     Factory.addGetter(target.constructor, propertyKey, defaultValue);

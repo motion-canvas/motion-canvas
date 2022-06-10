@@ -31,7 +31,7 @@ export class Project extends Stage {
   public readonly master: Layer;
   public readonly center: Vector2d;
   public threadsCallback: ThreadsCallback;
-  public frame: number = 0;
+  public frame = 0;
 
   public get time(): number {
     return this.framesToSeconds(this.frame);
@@ -136,7 +136,7 @@ export class Project extends Stage {
     }
   }
 
-  public async next(speed: number = 1): Promise<boolean> {
+  public async next(speed = 1): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
       if (!this.currentScene || this.currentScene.isAfterTransitionIn()) {
@@ -198,7 +198,7 @@ export class Project extends Stage {
     this.scenesChanged.dispatch(this.scenes);
   }
 
-  public async seek(frame: number, speed: number = 1): Promise<boolean> {
+  public async seek(frame: number, speed = 1): Promise<boolean> {
     if (
       frame <= this.frame ||
       !this.currentScene ||

@@ -70,7 +70,7 @@ export function showSurface(surface: Surface): ThreadGenerator {
 decorate(showCircle, threadable());
 export function showCircle(
   surface: Surface,
-  duration: number = 0.6,
+  duration = 0.6,
   origin?: Origin | Vector2d,
 ): ThreadGenerator {
   const position =

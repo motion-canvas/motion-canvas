@@ -63,7 +63,7 @@ export class Sprite extends Shape {
   private readonly computeCanvas: HTMLCanvasElement;
   private readonly context: CanvasRenderingContext2D;
 
-  constructor(config?: SpriteConfig) {
+  public constructor(config?: SpriteConfig) {
     super(config);
     this.computeCanvas = Util.createCanvasElement();
     this.computeCanvas.width = COMPUTE_CANVAS_SIZE;
@@ -73,7 +73,7 @@ export class Sprite extends Shape {
     this.recalculate();
   }
 
-  _sceneFunc(context: Context) {
+  public _sceneFunc(context: Context) {
     const size = this.getSize();
     context.save();
     context._context.imageSmoothingEnabled = false;

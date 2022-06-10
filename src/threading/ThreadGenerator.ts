@@ -8,6 +8,6 @@ export type ThreadGenerator = Generator<
   ThreadGenerator | Project | any
 >;
 
-export function isThreadGenerator(value: any): value is ThreadGenerator {
+export function isThreadGenerator(value: unknown): value is ThreadGenerator {
   return typeof value === 'object' && Symbol.iterator in value;
 }

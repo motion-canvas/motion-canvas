@@ -38,7 +38,7 @@ export function move(
   }
 
   const positionFrom = node.position();
-  let positionTo = config.absolute
+  const positionTo = config.absolute
     ? delta
     : {x: delta.x + positionFrom.x, y: delta.y + positionFrom.y};
 

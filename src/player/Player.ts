@@ -1,5 +1,5 @@
 import type {Project} from '../Project';
-import {AudioManager} from '../audio/AudioManager';
+import {AudioManager} from '../audio';
 import {
   PromiseSimpleEventDispatcher,
   SimpleEventDispatcher,
@@ -7,7 +7,7 @@ import {
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
-export interface PlayerState {
+export interface PlayerState extends Record<string, unknown> {
   duration: number;
   startFrame: number;
   endFrame: number;
@@ -65,9 +65,9 @@ export class Player {
   private readonly reloaded = new SimpleEventDispatcher<number>();
 
   private startTime: number;
-  private renderTime: number = 0;
+  private renderTime = 0;
   private requestId: number = null;
-  private frame: number = 0;
+  private frame = 0;
 
   private commands: PlayerCommands = {
     reset: true,
@@ -123,7 +123,6 @@ export class Player {
   private updateState(newState: Partial<PlayerState>) {
     let changed = false;
     for (const prop in newState) {
-      // @ts-ignore
       if (newState[prop] !== this.state[prop]) {
         changed = true;
         break;
@@ -222,7 +221,7 @@ export class Player {
     this.commands.seek = this.clampRange(value, this.state);
   }
 
-  public toggleLoop(value: boolean = !this.state.loop) {
+  public toggleLoop(value = !this.state.loop) {
     this.updateState({loop: value});
   }
 
@@ -230,7 +229,7 @@ export class Player {
     this.updateState({paused: !value});
   }
 
-  public toggleRendering(value: boolean = !this.state.render): void {
+  public toggleRendering(value = !this.state.render): void {
     this.updateState({render: value});
   }
 
@@ -239,8 +238,8 @@ export class Player {
   }
 
   private async run() {
-    let commands = this.consumeCommands();
-    let state = {...this.state};
+    const commands = this.consumeCommands();
+    const state = {...this.state};
     if (state.finished && state.loop && commands.seek < 0) {
       commands.seek = state.startFrame;
     }
@@ -370,7 +369,7 @@ export class Player {
     return frame >= state.startFrame && frame <= state.endFrame;
   }
 
-  private syncAudio(frameOffset: number = 0) {
+  private syncAudio(frameOffset = 0) {
     this.audio.setTime(
       this.project.framesToSeconds(this.project.frame + frameOffset),
     );

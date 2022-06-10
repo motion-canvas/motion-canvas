@@ -1,4 +1,4 @@
-import {Node} from 'konva/lib/Node';
+import type {Node} from 'konva/lib/Node';
 import {parseColor} from 'mix-color';
 
 export interface Style {
@@ -23,7 +23,6 @@ export function getStyle(node: Node): Style {
   let mergedStyle = {};
 
   do {
-    //@ts-ignore
     const style = node.style?.() ?? null;
     if (style) {
       mergedStyle = {

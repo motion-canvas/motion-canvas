@@ -64,7 +64,7 @@ export class ThreeView extends Shape {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly context: WebGLRenderingContext;
 
-  private renderedFrames: number = 0;
+  private renderedFrames = 0;
 
   public constructor(config?: ThreeViewConfig) {
     super(config);
@@ -74,7 +74,7 @@ export class ThreeView extends Shape {
     this.handleCanvasSizeChange();
   }
 
-  setBackground(value: string): this {
+  public setBackground(value: string): this {
     const scene = this.scene();
     if (scene) {
       scene.background = new THREE.Color(value);
@@ -83,14 +83,14 @@ export class ThreeView extends Shape {
     return this;
   }
 
-  getBackground(): string {
+  public getBackground(): string {
     const background = this.scene()?.background;
     return background instanceof THREE.Color
       ? background.getHexString()
       : '#000000';
   }
 
-  destroy(): this {
+  public destroy(): this {
     rendererPool.dispose(this.renderer);
 
     return super.destroy();
@@ -121,11 +121,11 @@ export class ThreeView extends Shape {
     this.markDirty();
   }
 
-  getLayoutSize(): Size {
+  public getLayoutSize(): Size {
     return this.canvasSize();
   }
 
-  _sceneFunc(context: Context) {
+  public _sceneFunc(context: Context) {
     const scale = this.quality();
     const size = {...this.canvasSize()};
 

@@ -1,5 +1,3 @@
-import type {Project} from '../Project';
-import type {Scene} from '../Scene';
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
 import {useProject, useScene} from '../utils';

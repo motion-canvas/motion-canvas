@@ -32,7 +32,7 @@ export class Video extends Shape {
     super(config);
   }
 
-  _sceneFunc(context: Context) {
+  public _sceneFunc(context: Context) {
     const frames = this.frames();
     context._context.clip(
       CanvasHelper.roundRectPath(

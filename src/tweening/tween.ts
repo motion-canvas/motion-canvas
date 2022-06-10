@@ -1,5 +1,4 @@
 import {decorate, threadable} from '../decorators';
-import type {Project} from '../Project';
 import {ThreadGenerator} from '../threading';
 import { useProject } from "../utils";
 
@@ -11,7 +10,7 @@ export function* tween(
 ): ThreadGenerator {
   const project = useProject();
   const frames = project.secondsToFrames(duration);
-  let startFrame = project.frame;
+  const startFrame = project.frame;
   let value = 0;
   while (project.frame - startFrame < frames) {
     const time = project.framesToSeconds(project.frame - startFrame);

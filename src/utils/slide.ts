@@ -6,7 +6,7 @@ export function slide(container: Container, x: number, y?: number): void;
 export function slide(
   container: Container,
   offset: number | Vector2d,
-  y: number = 0,
+  y = 0,
 ): void {
   if (typeof offset === 'number') {
     offset = {x: offset, y};

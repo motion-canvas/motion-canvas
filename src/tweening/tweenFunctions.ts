@@ -2,7 +2,7 @@ import mixColor from 'mix-color';
 import {IRect, Vector2d} from 'konva/lib/types';
 import {PossibleSpacing, Spacing} from '../types';
 
-export interface TweenFunction<T, Rest extends any[] = any[]> {
+export interface TweenFunction<T, Rest extends unknown[] = unknown[]> {
   (from: T, to: T, value: number, ...args: Rest): T;
 }
 
@@ -26,7 +26,7 @@ export function textTween(from: string, to: string, value: number) {
   else {
     const current = Math.round(from.length * (1 - value));
     const currentLength = Math.floor(map(from.length + 1, to.length, value));
-    let text = [];
+    const text = [];
     for (let i = from.length - 1; i >= 0; i--) {
       if (i < current) {
         text.unshift(from[i]);

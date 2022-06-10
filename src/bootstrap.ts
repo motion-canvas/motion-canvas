@@ -30,9 +30,8 @@ export function bootstrap(config: BootstrapConfig) {
     audio.setOffset(config.audioOffset);
   }
   const player = new Player(project, audio);
-  (<any>window).player = player;
+  window.player = player;
 
-  //@ts-ignore
   const parent = __webpack_require__.c[module.parents[0]];
   hot(player, parent);
 }

@@ -1,32 +1,24 @@
+import type {Style} from '../styles';
 import {Node, NodeConfig} from 'konva/lib/Node';
-import {
-  Origin,
-  PossibleSpacing,
-  Size,
-  Spacing,
-  getOriginDelta,
-  getOriginOffset,
-} from '../types';
+import {Origin, PossibleSpacing, Size, Spacing, getOriginDelta} from '../types';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
-import {Rect} from 'konva/lib/shapes/Rect';
 import {Container} from 'konva/lib/Container';
-import {Transform} from 'konva/lib/Util';
-import {Konva} from 'konva/lib/Global';
 import {NODE_ID} from '../symbols';
 import {useScene} from '../utils';
 
 declare module 'konva/lib/Node' {
   export interface Node {
     _centroid: boolean;
+    style?: GetSet<Partial<Style>, this>;
     padd: GetSet<PossibleSpacing, this>;
     margin: GetSet<PossibleSpacing, this>;
     origin: GetSet<Origin, this>;
     drawOrigin: GetSet<Origin, this>;
     setX(value: number): this;
     setY(value: number): this;
-    setWidth(width: any): void;
-    setHeight(height: any): void;
+    setWidth(width: number): void;
+    setHeight(height: number): void;
     setPadd(value: PossibleSpacing): this;
     setMargin(value: PossibleSpacing): this;
     setOrigin(value: Origin): this;
@@ -70,7 +62,7 @@ declare module 'konva/lib/Node' {
 
     subscribe(event: string, handler: () => void): () => void;
 
-    _clearCache(attr?: string | Function): void;
+    _clearCache(attr?: string | Callback): void;
   }
 
   export interface NodeConfig {
@@ -142,9 +134,11 @@ Node.prototype.updateLayout = function (this: Node): void {
   }
 };
 
-Node.prototype.recalculateLayout = function (this: Node): void {};
+Node.prototype.recalculateLayout = function (this: Node): void {
+  // do nothing
+};
 
-Node.prototype.markDirty = function (this: Node, force: boolean = false): void {
+Node.prototype.markDirty = function (this: Node, force = false): void {
   this.attrs.dirty = true;
   if (
     force ||
@@ -240,7 +234,7 @@ Node.prototype._getTransform = function (this: Node) {
 };
 
 const super_setAttrs = Node.prototype.setAttrs;
-Node.prototype.setAttrs = function (this: Node, config: any) {
+Node.prototype.setAttrs = function (this: Node, config: unknown) {
   if (!(NODE_ID in this.attrs)) {
     const scene = useScene();
     if (scene) {
@@ -252,7 +246,7 @@ Node.prototype.setAttrs = function (this: Node, config: any) {
 };
 
 const super__clearCache = Node.prototype._clearCache;
-Node.prototype._clearCache = function (this: Node, attr?: string | Function) {
+Node.prototype._clearCache = function (this: Node, attr?: string | Callback) {
   if (typeof attr === 'function') {
     if (attr.prototype?.cachedKey) {
       this._cache.delete(attr.prototype.cachedKey);

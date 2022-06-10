@@ -3,14 +3,14 @@ import {ThreadGenerator} from './ThreadGenerator';
 
 export class Thread {
   public children: Thread[] = [];
-  public value: any;
+  public value: unknown;
   private parent: Thread = null;
 
   public get canceled(): boolean {
     return this._canceled || (this.parent?.canceled ?? false);
   }
 
-  private _canceled: boolean = false;
+  private _canceled = false;
 
   public constructor(public readonly runner: ThreadGenerator) {}
 

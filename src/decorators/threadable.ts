@@ -1,6 +1,6 @@
 export function threadable(customName?: string): MethodDecorator {
   return function (
-    target: any,
+    target: unknown,
     propertyKey: string,
     descriptor: PropertyDescriptor,
   ) {

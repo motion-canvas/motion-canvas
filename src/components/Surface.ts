@@ -49,7 +49,7 @@ export class Surface extends Group {
   private surfaceMask: SurfaceMask | null = null;
   private circleMask: CircleMask | null = null;
   private layoutData: Size;
-  private rippleTween: number = 0;
+  private rippleTween = 0;
 
   public constructor(config?: SurfaceConfig) {
     super(config);
@@ -80,7 +80,7 @@ export class Surface extends Group {
     return this.circleMask ?? null;
   }
 
-  public clone(obj?: any): this {
+  public clone(obj?: unknown): this {
     const child = this.child();
     this.child(null);
     const clone: this = Node.prototype.clone.call(this, obj);
@@ -97,7 +97,7 @@ export class Surface extends Group {
     return clone;
   }
 
-  getLayoutSize(custom?: SurfaceConfig): Size {
+  public getLayoutSize(): Size {
     return {
       width: this.surfaceMask?.width ?? this.layoutData?.width ?? 0,
       height: this.surfaceMask?.height ?? this.layoutData?.height ?? 0,
@@ -268,7 +268,7 @@ export class Surface extends Group {
   public getAbsoluteCircleMask(custom?: SurfaceConfig): CircleMask {
     const mask = custom?.circleMask ?? this.circleMask ?? null;
     if (mask === null) return null;
-    const size = this.getLayoutSize(custom);
+    const size = this.getLayoutSize();
     const position = {
       x: (size.width * mask.x) / 2,
       y: (size.height * mask.y) / 2,

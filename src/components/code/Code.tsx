@@ -8,8 +8,6 @@ import {easeInExpo, easeOutExpo, tween} from '../../tweening';
 import {CodeTheme, CodeTokens} from './CodeTheme';
 import {JS_CODE_THEME} from '../../themes';
 import {ThreadGenerator} from '../../threading';
-import {useScene} from '../../utils';
-import {Node} from 'konva/lib/Node';
 
 type CodePoint = [number, number];
 type CodeRange = [CodePoint, CodePoint];
@@ -39,7 +37,7 @@ export class Code extends Text {
   private readonly selectionCanvas: HTMLCanvasElement;
   private readonly selectionCtx: CanvasRenderingContext2D;
 
-  private outline: number = 0;
+  private outline = 0;
   private unselectedOpacity = 1;
 
   public constructor(config?: CodeConfig) {
@@ -66,7 +64,7 @@ export class Code extends Text {
     }
   }
 
-  public setText(text: any): this {
+  public setText(text: string): this {
     super.setText(text);
     this.markDirty();
 
@@ -76,8 +74,8 @@ export class Code extends Text {
     return this;
   }
 
-  public setLanguage(langauge: string): this {
-    this.attrs.language = langauge;
+  public setLanguage(language: string): this {
+    this.attrs.language = language;
     this._clearCache(this.getTokens);
     return this;
   }
@@ -165,7 +163,7 @@ export class Code extends Text {
 
     context.beginPath();
     for (const range of selection) {
-      let [[startLine, startColumn], [endLine, endColumn]] = range;
+      const [[startLine, startColumn], [endLine, endColumn]] = range;
       let offset =
         startLine === endLine
           ? endColumn * letterWidth

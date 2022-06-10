@@ -41,7 +41,7 @@ interface IconConfig extends ShapeConfig {
 export class Icon extends Shape {
   private readonly paths: Path2D[];
 
-  constructor(config?: IconConfig) {
+  public constructor(config?: IconConfig) {
     super(config);
 
     switch (config?.type ?? IconType.Fill) {
@@ -66,7 +66,7 @@ export class Icon extends Shape {
     };
   }
 
-  _sceneFunc(context: Context) {
+  public _sceneFunc(context: Context) {
     context.fillShape(this);
   }
 }

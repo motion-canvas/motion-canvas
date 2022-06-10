@@ -10,12 +10,22 @@ import {
 import {ThreadGenerator} from '../threading';
 import {Vector2d} from 'konva/lib/types';
 
+declare module 'konva/lib/Factory' {
+  export interface Factory {
+    addOverloadedGetterSetter(
+      constructor: new (...args: unknown[]) => unknown,
+      attr: string,
+      tween?: TweenProvider<unknown>,
+    ): void;
+  }
+}
+
 declare module 'konva/lib/types' {
   export interface GetSet<Type, This extends Node> {
     (): Type;
     (value: Type): This;
     (value: typeof ANIMATE): Animator<Type, This>;
-    <Rest extends any[]>(
+    <Rest extends unknown[]>(
       value: Type,
       time: number,
       interpolation?: InterpolationFunction,
@@ -26,26 +36,26 @@ declare module 'konva/lib/types' {
 }
 
 Factory.addOverloadedGetterSetter = function addOverloadedGetterSetter(
-  constructor: Function,
+  constructor: new (...args: unknown[]) => unknown,
   attr: string,
-  tween?: TweenProvider<any>,
+  tween?: TweenProvider<unknown>,
 ) {
   const capitalizedAttr = attr.charAt(0).toUpperCase() + attr.slice(1);
   const setter = 'set' + capitalizedAttr;
   const getter = 'get' + capitalizedAttr;
 
-  constructor.prototype[attr] = function <Rest extends any[]>(
+  constructor.prototype[attr] = function <Rest extends unknown[]>(
     value?: Vector2d | typeof ANIMATE,
     time?: number,
     interpolation?: InterpolationFunction,
-    mapper?: TweenFunction<any, Rest>,
+    mapper?: TweenFunction<unknown, Rest>,
     ...rest: Rest
   ) {
     if (value === ANIMATE) {
-      return new Animator<any, Node>(this, attr, tween);
+      return new Animator<unknown, Node>(this, attr, tween);
     }
     if (time !== undefined) {
-      return new Animator<any, Node>(this, attr, tween)
+      return new Animator<unknown, Node>(this, attr, tween)
         .key(value, time, interpolation, mapper, ...rest)
         .run();
     }

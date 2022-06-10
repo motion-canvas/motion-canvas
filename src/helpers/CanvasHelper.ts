@@ -1,8 +1,8 @@
 import {Context} from 'konva/lib/Context';
-import {PossibleSpacing, Spacing} from "../types";
+import {PossibleSpacing, Spacing} from '../types';
 
-export namespace CanvasHelper {
-  export function roundRect<T extends CanvasRenderingContext2D | Context>(
+export const CanvasHelper = {
+  roundRect<T extends CanvasRenderingContext2D | Context>(
     ctx: T,
     x: number,
     y: number,
@@ -11,15 +11,13 @@ export namespace CanvasHelper {
     radius: PossibleSpacing,
   ): T {
     ctx.beginPath();
-    roundRectPath(ctx, x, y, width, height, radius);
+    this.roundRectPath(ctx, x, y, width, height, radius);
     ctx.closePath();
 
     return ctx;
-  }
+  },
 
-  export function roundRectPath<
-    T extends CanvasRenderingContext2D | Context | Path2D,
-  >(
+  roundRectPath<T extends CanvasRenderingContext2D | Context | Path2D>(
     ctx: T,
     x: number,
     y: number,
@@ -36,5 +34,5 @@ export namespace CanvasHelper {
     ctx.arcTo(x, y, x + width, y, spacing.left);
 
     return ctx;
-  }
-}
+  },
+};

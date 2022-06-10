@@ -21,7 +21,7 @@ export interface TweenProvider<T> {
     to: T,
     time: number,
     interpolation: InterpolationFunction,
-    onEnd: Function,
+    onEnd: Callback,
   ): ThreadGenerator;
 }
 
@@ -30,7 +30,7 @@ export class Animator<Type, This> {
   private lastValue: Type;
   private keys: (() => ThreadGenerator)[] = [];
   private tweenFunction: TweenFunction<any> = map;
-  private loops: number = 1;
+  private loops = 1;
   private readonly setter: string;
   private readonly getter: string;
 
@@ -49,7 +49,7 @@ export class Animator<Type, This> {
     return this;
   }
 
-  public key<Rest extends any[]>(
+  public key<Rest extends unknown[]>(
     value: Type,
     time: number,
     interpolation: InterpolationFunction = easeInOutCubic,
@@ -86,7 +86,7 @@ export class Animator<Type, This> {
     return this;
   }
 
-  public do(callback: Function): this {
+  public do(callback: Callback): this {
     this.keys.push(function* (): ThreadGenerator {
       callback();
     });
@@ -94,7 +94,7 @@ export class Animator<Type, This> {
     return this;
   }
 
-  public diff<Rest extends any[]>(
+  public diff<Rest extends unknown[]>(
     value: Type,
     time: number,
     interpolation: InterpolationFunction = easeInOutCubic,
@@ -117,7 +117,7 @@ export class Animator<Type, This> {
     return this.key(next, time, interpolation, mapper, ...args);
   }
 
-  public back<Rest extends any[]>(
+  public back<Rest extends unknown[]>(
     time: number,
     interpolation: InterpolationFunction = easeInOutCubic,
     mapper?: TweenFunction<Type, Rest>,
@@ -177,7 +177,7 @@ export class Animator<Type, This> {
   }
 
   public static inferTweenFunction<T>(value: T): TweenFunction<T> {
-    let tween: TweenFunction<any> = map;
+    let tween: TweenFunction<unknown> = map;
 
     if (typeof value === 'string') {
       if (value.startsWith('#') || value.startsWith('rgb')) {

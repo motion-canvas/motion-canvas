@@ -2,7 +2,7 @@ import {ThreadGenerator} from '../threading';
 import {decorate, threadable} from '../decorators';
 import { useProject } from "../utils";
 
-export function every(seconds: number, callback: (frame: number) => any) {
+export function every(seconds: number, callback: (frame: number) => void) {
   let changed = false;
   decorate(everyRunner, threadable('every'));
   function* everyRunner(): ThreadGenerator {
@@ -32,7 +32,7 @@ export function every(seconds: number, callback: (frame: number) => any) {
       seconds = value;
       changed = false;
     },
-    setCallback(value: (frame: number) => any) {
+    setCallback(value: (frame: number) => void) {
       callback = value;
       changed = false;
     },

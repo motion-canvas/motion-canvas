@@ -1,13 +1,7 @@
 import {Node} from 'konva/lib/Node';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
-import {_registerNode} from 'konva/lib/Global';
 import {Context} from 'konva/lib/Context';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {Factory} from 'konva/lib/Factory';
-import {
-  getNumberArrayValidator,
-  getNumberValidator,
-} from 'konva/lib/Validators';
 import {clamp} from 'three/src/math/MathUtils';
 import {getset, KonvaNode} from '../decorators';
 
@@ -30,10 +24,6 @@ abstract class Segment {
   ): [Vector2d, Vector2d, Vector2d, Vector2d];
 
   public abstract get arcLength(): number;
-
-  public getOffset(from: number): number {
-    return 0;
-  }
 }
 
 class LineSegment extends Segment {
@@ -56,15 +46,15 @@ class LineSegment extends Segment {
     };
   }
 
-  get arcLength(): number {
+  public get arcLength(): number {
     return this.length;
   }
 
   public draw(
     context: Context,
-    start: number = 0,
-    end: number = 1,
-    move: boolean = false,
+    start = 0,
+    end = 1,
+    move = false,
   ): [Vector2d, Vector2d, Vector2d, Vector2d] {
     const from = {
       x: this.from.x + this.vector.x * start,
@@ -105,15 +95,14 @@ class CircleSegment extends Segment {
     this.length = Math.abs(this.delta * radius);
   }
 
-  get arcLength(): number {
+  public get arcLength(): number {
     return this.length;
   }
 
-  draw(
+  public draw(
     context: Context,
     from: number,
     to: number,
-    move: boolean,
   ): [Vector2d, Vector2d, Vector2d, Vector2d] {
     const startAngle = this.startAngle + this.delta * from;
     const endAngle = this.startAngle + this.delta * to;
@@ -159,11 +148,6 @@ class CircleSegment extends Segment {
           },
     ];
   }
-
-  public getOffset(from: number): number {
-    // May wanna go back to (-from * 1.045 * this.delta * this.radius) / 2
-    return 0;
-  }
 }
 
 @KonvaNode()
@@ -180,16 +164,15 @@ export class Arrow extends Shape<ArrowConfig> {
   public arrowSize: GetSet<number, this>;
 
   private segments: Segment[] = [];
-  private arcLength: number = 0;
+  private arcLength = 0;
 
-  _sceneFunc(context: Context) {
+  public _sceneFunc(context: Context) {
     let start = this.start() * this.arcLength;
     let end = this.end() * this.arcLength;
     if (start > end) {
       [start, end] = [end, start];
     }
-    let offset = start;
-
+    const offset = start;
     const distance = end - start;
     const arrowSize = this.arrowSize();
     const arrowScale =
@@ -215,7 +198,6 @@ export class Arrow extends Shape<ArrowConfig> {
         relativeEnd > 1 ? 1 : relativeEnd < 0 ? 0 : relativeEnd;
 
       if (length < start) {
-        offset -= segment.getOffset(clampedStart);
         continue;
       }
 
@@ -225,7 +207,6 @@ export class Arrow extends Shape<ArrowConfig> {
         clampedEnd,
         firstPoint === null,
       );
-      offset -= segment.getOffset(clampedStart);
 
       if (firstPoint === null) {
         firstPoint = first;
