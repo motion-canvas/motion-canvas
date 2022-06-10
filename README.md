@@ -12,35 +12,37 @@ Documentation is still lacking and will be expanded in the following weeks.
 
 Make sure that [Node.js](https://nodejs.org/) is installed on your machine.
 The recommended version is 16. You can check the currently installed version using:
+
 ```shell
 node -v
 ```
 
-### Authenticate to GitHub Packages 
+### Authenticate to GitHub Packages
+
 [Detailed information on how to authenticate](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token).
-    
+
 1. Generate a PAT (Personal Access Token).
-    1. On [github.com](https://github.com), go to `Settings` > `Developer settings` > `Personal access tokens`.
-    2. Click `Generate new token`.
-    3. Enter the note for your token, for instance `npm`.
-    4. Choose `read:packages` from the available scopes.
-    5. Click `Generate token`
-    6. Copy the generated token.
+   1. On [github.com](https://github.com), go to `Settings` > `Developer settings` > `Personal access tokens`.
+   2. Click `Generate new token`.
+   3. Enter the note for your token, for instance `npm`.
+   4. Choose `read:packages` from the available scopes.
+   5. Click `Generate token`
+   6. Copy the generated token.
 2. Log in using npm
-    1. In your terminal, enter the following command:
-       ```shell
-       npm login --scope=@motion-canvas --registry=https://npm.pkg.github.com       
-       ```  
-    2. Answer the prompt.
-       `Username` is your GitHub username,
-       `Password` is the token you just generated.
-       `Email` is your GitHub email address.
-       For instace:
-       ```text
-       > Username: Jacob
-       > Password: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-       > Email: jacob@mail.com
-       ```
+   1. In your terminal, enter the following command:
+      ```shell
+      npm login --scope=@motion-canvas --registry=https://npm.pkg.github.com
+      ```
+   2. Answer the prompt.
+      `Username` is your GitHub username,
+      `Password` is the token you just generated.
+      `Email` is your GitHub email address.
+      For instace:
+      ```text
+      > Username: Jacob
+      > Password: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      > Email: jacob@mail.com
+      ```
 
 ### Set up a project
 
@@ -70,29 +72,33 @@ Otherwise, below are the steps to set it up manually:
    }
    ```
 6. Create a simple scene in `src/scenes/example.scene.tsx`:
+
    ```ts
    import type {Scene} from '@motion-canvas/core/lib/Scene';
    import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
    import {waitFor} from '@motion-canvas/core/lib/animations';
-   
+
    export default function* example(scene: Scene): ThreadGenerator {
      yield* scene.transition();
-     
+
      yield* waitFor(5);
      scene.canFinish();
    }
    ```
+
 7. Initialize the project with your scene in `src/project.ts`:
+
    ```ts
    import {bootstrap} from '@motion-canvas/core/lib/bootstrap';
-   
+
    import example from './scenes/example.scene';
-   
+
    bootstrap({
      name: 'my-project',
      scenes: [example],
    });
    ```
+
 8. So far, your project structure should look like this:
    ```text
    my-project/
@@ -114,18 +120,22 @@ Otherwise, below are the steps to set it up manually:
        "serve": "motion-canvas src/project.ts"
      }
    }
-   ``` 
+   ```
 
 ### Run Motion Canvas
+
 Start your project using the `serve` script:
+
 ```shell
 npm run serve
 ```
+
 You can now open Motion Canvas in your browser by visiting [http://localhost:9000/](http://localhost:9000/).
 
 In case of any problems, please visit [our discord server](https://www.patreon.com/posts/53003221).
 
 ## Developing Motion Canvas locally
+
 I recommend using [npm workspaces](https://docs.npmjs.com/cli/v7/using-npm/workspaces) for local development.
 
 1. Set up the following directory structure:
@@ -161,31 +171,41 @@ I recommend using [npm workspaces](https://docs.npmjs.com/cli/v7/using-npm/works
 5. Run `build:core` and `build:ui` to generate the necessary files.
 
 ### Developing Core
+
 When developing the core, start both `watch:core` and `serve:example`.
 
-This will pick up any changes you make to the core package, 
+This will pick up any changes you make to the core package,
 automatically rebuild the `example` project and refresh the page.
 
 ### Developing UI
-If you want to develop the UI, create a new npm script in the `example` project:  
-   ```json
-   {
-     "scripts": {
-       "ui": "motion-canvas src/project.ts --ui-server"
-     }
-   }
-   ```
+
+If you want to develop the UI, create a new npm script in the `example` project:
+
+```json
+{
+  "scripts": {
+    "ui": "motion-canvas src/project.ts --ui-server"
+  }
+}
+```
+
 And add it in your root `package.json`:
-   ```json
-   {
-     "scripts": {
-       "ui:example": "npm run ui -w packages/example"
-     }
-   }
-   ```
+
+```json
+{
+  "scripts": {
+    "ui:example": "npm run ui -w packages/example"
+  }
+}
+```
+
 You can now start both `serve:ui` and `ui:example`.
 
 `serve:ui` will start another webpack dev server specifically for the UI.
-Meanwhile, the `--ui-server` flag will instruct your project to load the UI from said server instead of a static file. 
+Meanwhile, the `--ui-server` flag will instruct your project to load the UI from said server instead of a static file.
 
 You can combine it with `watch:core` to develop everything at once.
+
+## Contributing
+
+Read through our [Contribution Guide](./CONTRIBUTING.md) to learn how you can help make Motion Canvas better.
