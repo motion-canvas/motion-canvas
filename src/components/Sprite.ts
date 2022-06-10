@@ -256,7 +256,7 @@ export class Sprite extends Shape {
       g: this.imageData.data[id + 1],
       b: this.imageData.data[id + 2],
       a: this.imageData.data[id + 3],
-    }
+    };
   }
 
   public positionToId(position: Vector2d): number {

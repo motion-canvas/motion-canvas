@@ -10,6 +10,8 @@
     "watch": "tsc -w",
     "lint": "eslint \"src/**/*.ts?(x)\"",
     "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
+    "prettier": "prettier --check \"src/**/*\"",
+    "prettier:fix": "prettier --write \"src/**/*\"",
     "release": "semantic-release"
   },
   "publishConfig": {

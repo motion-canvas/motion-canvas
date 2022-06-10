@@ -41,8 +41,8 @@ export class Video extends Shape {
         0,
         this.width(),
         this.height(),
-        this.radius()
-      )
+        this.radius(),
+      ),
     );
     if (frames.length) {
       context.drawImage(frames[this.frame() % frames.length], 0, 0);

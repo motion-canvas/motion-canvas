@@ -13,7 +13,7 @@ class MP4Source {
       let mp4File = this.file;
 
       function appendBuffers({done, value}) {
-        if(done) {
+        if (done) {
           mp4File.flush();
           return;
         }
@@ -29,7 +29,7 @@ class MP4Source {
       }
 
       return reader.read().then(appendBuffers);
-    })
+    });
 
     this.info = null;
     this._info_resolver = null;
@@ -46,15 +46,16 @@ class MP4Source {
   }
 
   getInfo() {
-    if (this.info)
-      return Promise.resolve(this.info);
+    if (this.info) return Promise.resolve(this.info);
 
-    return new Promise((resolver) => { this._info_resolver = resolver; });
+    return new Promise(resolver => {
+      this._info_resolver = resolver;
+    });
   }
 
   getAvccBox() {
     // TODO: make sure this is coming from the right track.
-    return this.file.moov.traks[0].mdia.minf.stbl.stsd.entries[0].avcC
+    return this.file.moov.traks[0].mdia.minf.stbl.stsd.entries[0].avcC;
   }
 
   start(track, onChunk) {
@@ -65,13 +66,13 @@ class MP4Source {
 
   onSamples(track_id, ref, samples) {
     for (const sample of samples) {
-      const type = sample.is_sync ? "key" : "delta";
+      const type = sample.is_sync ? 'key' : 'delta';
 
       const chunk = new EncodedVideoChunk({
         type: type,
         timestamp: sample.cts,
         duration: sample.duration,
-        data: sample.data
+        data: sample.data,
       });
 
       this._onChunk(chunk);
@@ -87,8 +88,8 @@ class Writer {
   }
 
   getData() {
-    if(this.idx != this.size)
-      throw "Mismatch between size reserved and sized used"
+    if (this.idx != this.size)
+      throw 'Mismatch between size reserved and sized used';
 
     return this.data.slice(0, this.idx);
   }
@@ -104,7 +105,7 @@ class Writer {
     arr[0] = value;
     var buffer = new Uint8Array(arr.buffer);
     this.data.set([buffer[1], buffer[0]], this.idx);
-    this.idx +=2;
+    this.idx += 2;
   }
 
   writeUint8Array(value) {
@@ -123,11 +124,11 @@ export class MP4Demuxer {
     var size = 7;
     for (i = 0; i < avccBox.SPS.length; i++) {
       // nalu length is encoded as a uint16.
-      size+= 2 + avccBox.SPS[i].length;
+      size += 2 + avccBox.SPS[i].length;
     }
     for (i = 0; i < avccBox.PPS.length; i++) {
       // nalu length is encoded as a uint16.
-      size+= 2 + avccBox.PPS[i].length;
+      size += 2 + avccBox.PPS[i].length;
     }
 
     var writer = new Writer(size);
@@ -136,9 +137,9 @@ export class MP4Demuxer {
     writer.writeUint8(avccBox.AVCProfileIndication);
     writer.writeUint8(avccBox.profile_compatibility);
     writer.writeUint8(avccBox.AVCLevelIndication);
-    writer.writeUint8(avccBox.lengthSizeMinusOne + (63<<2));
+    writer.writeUint8(avccBox.lengthSizeMinusOne + (63 << 2));
 
-    writer.writeUint8(avccBox.nb_SPS_nalus + (7<<5));
+    writer.writeUint8(avccBox.nb_SPS_nalus + (7 << 5));
     for (i = 0; i < avccBox.SPS.length; i++) {
       writer.writeUint16(avccBox.SPS[i].length);
       writer.writeUint8Array(avccBox.SPS[i].nalu);
@@ -164,7 +165,7 @@ export class MP4Demuxer {
       codedHeight: this.track.video.height,
       codedWidth: this.track.video.width,
       description: extradata,
-    }
+    };
 
     return Promise.resolve(config);
   }

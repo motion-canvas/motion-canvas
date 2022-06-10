@@ -1,4 +1,4 @@
-import {Vector2d} from "konva/lib/types";
+import {Vector2d} from 'konva/lib/types';
 import {Size} from './Size';
 
 export enum Center {
@@ -50,7 +50,11 @@ export function flipOrigin(
   return origin;
 }
 
-export function originPosition(origin: Origin | Direction, width = 1 , height = 1): Vector2d {
+export function originPosition(
+  origin: Origin | Direction,
+  width = 1,
+  height = 1,
+): Vector2d {
   const position: Vector2d = {x: 0, y: 0};
 
   if (origin === Origin.Middle) {

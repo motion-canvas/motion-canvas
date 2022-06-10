@@ -152,7 +152,12 @@ export class Connection extends Group {
   }
 
   public isDirty(): boolean {
-    return this.attrs.dirty || this.start.wasDirty() || this.end.wasDirty() || this.crossing?.wasDirty();
+    return (
+      this.attrs.dirty ||
+      this.start.wasDirty() ||
+      this.end.wasDirty() ||
+      this.crossing?.wasDirty()
+    );
   }
 
   public updateLayout() {

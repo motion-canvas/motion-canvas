@@ -3,7 +3,7 @@ import {Util} from 'konva/lib/Util';
 import {Context} from 'konva/lib/Context';
 import * as THREE from 'three';
 import {CanvasHelper} from '../helpers';
-import {GetSet} from "konva/lib/types";
+import {GetSet} from 'konva/lib/types';
 import {getset, KonvaNode} from '../decorators';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
@@ -47,19 +47,19 @@ const rendererPool = new RendererPool();
 @KonvaNode()
 export class ThreeView extends Shape {
   @getset(null)
-  public scene: GetSet<ThreeViewConfig['scene'], this>
+  public scene: GetSet<ThreeViewConfig['scene'], this>;
   @getset(null)
-  public camera: GetSet<ThreeViewConfig['camera'], this>
+  public camera: GetSet<ThreeViewConfig['camera'], this>;
   @getset({width: 0, height: 0}, ThreeView.prototype.handleCanvasSizeChange)
-  public canvasSize: GetSet<ThreeViewConfig['canvasSize'], this>
+  public canvasSize: GetSet<ThreeViewConfig['canvasSize'], this>;
   @getset(1, ThreeView.prototype.handleCanvasSizeChange)
-  public cameraScale: GetSet<ThreeViewConfig['cameraScale'], this>
+  public cameraScale: GetSet<ThreeViewConfig['cameraScale'], this>;
   @getset(1, ThreeView.prototype.handleCanvasSizeChange)
-  public quality: GetSet<ThreeViewConfig['quality'], this>
+  public quality: GetSet<ThreeViewConfig['quality'], this>;
   @getset(0)
-  public skipFrames: GetSet<ThreeViewConfig['skipFrames'], this>
+  public skipFrames: GetSet<ThreeViewConfig['skipFrames'], this>;
   @getset(0)
-  public radius: GetSet<ThreeViewConfig['radius'], this>
+  public radius: GetSet<ThreeViewConfig['radius'], this>;
 
   private readonly renderer: THREE.WebGLRenderer;
   private readonly context: WebGLRenderingContext;

@@ -1,4 +1,4 @@
-import { Animator } from "../tweening";
+import {Animator} from '../tweening';
 
 export function useAnimator<T>(initial: T, onUpdate: (value: T) => void) {
   const object = {

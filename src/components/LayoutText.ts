@@ -38,13 +38,13 @@ export class LayoutText extends Text {
       size = {
         width: this.textWidth,
         height: this.textHeight,
-      }
+      };
       this.text(text);
     } else {
       size = {
         width: this.textWidth,
         height: this.textHeight,
-      }
+      };
     }
 
     return {

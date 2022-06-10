@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import { useProject } from "../utils";
+import {useProject} from '../utils';
 
 decorate(tween, threadable());
 export function* tween(

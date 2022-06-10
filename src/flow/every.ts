@@ -1,6 +1,6 @@
 import {ThreadGenerator} from '../threading';
 import {decorate, threadable} from '../decorators';
-import { useProject } from "../utils";
+import {useProject} from '../utils';
 
 export function every(seconds: number, callback: (frame: number) => void) {
   let changed = false;
