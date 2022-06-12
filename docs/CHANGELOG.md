@@ -1,3 +1,23 @@
+# [2.0.0](https://github.com/motion-canvas/core/compare/v1.1.0...v2.0.0) (2022-06-12)
+
+
+### Bug Fixes
+
+* restrict the corner radius of a rectangle ([#9](https://github.com/motion-canvas/core/issues/9)) ([cc86a4a](https://github.com/motion-canvas/core/commit/cc86a4a6d5b44e75ed02a1bdf90b588450a663b2)), closes [#8](https://github.com/motion-canvas/core/issues/8)
+
+
+### Features
+
+* add basic documentation structure ([#10](https://github.com/motion-canvas/core/issues/10)) ([1e46433](https://github.com/motion-canvas/core/commit/1e46433af37e8fec18dec6efc7dc1e3b70d9a869)), closes [#2](https://github.com/motion-canvas/core/issues/2)
+* add eslint ([658f468](https://github.com/motion-canvas/core/commit/658f468318c8ad88088bd5230172fb4d0bc2af00))
+
+
+### BREAKING CHANGES
+
+* `waitFor` and `waitUntil` were moved
+
+They should be imported from `@motion-canvas/core/lib/flow`.
+
 # [1.1.0](https://github.com/motion-canvas/core/compare/v1.0.0...v1.1.0) (2022-06-08)
 
 
