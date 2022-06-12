@@ -3,6 +3,12 @@ import {decorate, threadable} from '../decorators';
 import {join, ThreadGenerator} from '../threading';
 
 decorate(sequence, threadable());
+/**
+ * Run
+ *
+ * @param delay
+ * @param sequences
+ */
 export function* sequence(
   delay: number,
   ...sequences: ThreadGenerator[]

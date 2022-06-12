@@ -2,7 +2,49 @@ import {ThreadGenerator} from '../threading';
 import {decorate, threadable} from '../decorators';
 import {useProject} from '../utils';
 
-export function every(seconds: number, callback: (frame: number) => void) {
+/**
+ * A callback called by {@link EveryTimer} every N seconds.
+ */
+export interface EveryCallback {
+  /**
+   * @param tick The amount of times the timer has ticked.
+   */
+  (tick: number): void;
+}
+
+export interface EveryTimer {
+  /**
+   * The generator responsible for running this timer.
+   */
+  runner: ThreadGenerator;
+  setInterval(value: number): void;
+  setCallback(value: EveryCallback): void;
+
+  /**
+   * Wait until the timer ticks.
+   */
+  sync(): ThreadGenerator;
+}
+
+/**
+ * Call the given callback every N seconds.
+ *
+ * Example:
+ * ```ts
+ * const timer = every(2, time => console.log(time));
+ * yield timer.runner;
+ *
+ * // current time: 0s
+ * yield* waitFor(5);
+ * // current time: 5s
+ * yield* timer.sync();
+ * // current time: 6s
+ * ```
+ *
+ * @param interval
+ * @param callback
+ */
+export function every(interval: number, callback: EveryCallback): EveryTimer {
   let changed = false;
   decorate(everyRunner, threadable('every'));
   function* everyRunner(): ThreadGenerator {
@@ -13,7 +55,7 @@ export function every(seconds: number, callback: (frame: number) => void) {
     changed = true;
 
     while (true) {
-      if (acc >= project.secondsToFrames(seconds)) {
+      if (acc >= project.secondsToFrames(interval)) {
         acc = 0;
         tick++;
         callback(tick);
@@ -28,15 +70,15 @@ export function every(seconds: number, callback: (frame: number) => void) {
 
   return {
     runner: everyRunner(),
-    setSeconds(value: number) {
-      seconds = value;
+    setInterval(value) {
+      interval = value;
       changed = false;
     },
-    setCallback(value: (frame: number) => void) {
+    setCallback(value) {
       callback = value;
       changed = false;
     },
-    *sync(): ThreadGenerator {
+    *sync() {
       while (!changed) {
         yield;
       }

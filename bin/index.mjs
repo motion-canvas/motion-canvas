@@ -121,6 +121,13 @@ const server = new WebpackDevServer(
     compress: true,
     port: 9000,
     hot: true,
+    static: [
+      {
+        directory: path.join(__dirname, '../api'),
+        publicPath: '/api',
+        watch: false,
+      }
+    ],
     setupMiddlewares: middlewares => {
       middlewares.unshift({
         name: 'render',

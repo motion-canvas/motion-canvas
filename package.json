@@ -12,6 +12,8 @@
     "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
     "prettier": "prettier --check \"src/**/*\"",
     "prettier:fix": "prettier --write \"src/**/*\"",
+    "docs": "typedoc",
+    "docs:watch": "typedoc --watch",
     "release": "semantic-release"
   },
   "publishConfig": {
@@ -27,6 +29,7 @@
   "files": [
     "lib",
     "bin",
+    "api",
     "tsconfig.project.json"
   ],
   "dependencies": {
@@ -61,6 +64,7 @@
     "@typescript-eslint/parser": "^5.27.1",
     "eslint": "^8.17.0",
     "prettier": "^2.6.2",
-    "semantic-release": "^19.0.2"
+    "semantic-release": "^19.0.2",
+    "typedoc": "^0.22.17"
   }
 }

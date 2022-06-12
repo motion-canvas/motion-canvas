@@ -13,6 +13,7 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: npm ci
       - run: npm run build
+      - run: npm run docs
       - run: npm run release
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

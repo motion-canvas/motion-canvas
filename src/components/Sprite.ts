@@ -1,7 +1,7 @@
 import {Context} from 'konva/lib/Context';
 import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
-import {waitFor} from '../animations';
+import {waitFor} from '../flow';
 import {getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {InterpolationFunction, map, tween} from '../tweening';

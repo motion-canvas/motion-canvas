@@ -1,7 +1,8 @@
-import {Surface} from '../components';
+import type {Vector2d} from 'konva/lib/types';
+import type {ThreadGenerator} from '../threading';
+import type {Surface, SurfaceMask} from '../components';
 import {
   calculateRatio,
-  clampRemap,
   colorTween,
   easeInOutCubic,
   easeInOutQuint,
@@ -9,73 +10,87 @@ import {
   tween,
 } from '../tweening';
 import {decorate, threadable} from '../decorators';
-import {ThreadGenerator} from '../threading';
 
+/**
+ * Configuration for {@link surfaceFrom}.
+ */
 export interface SurfaceFromConfig {
+  /**
+   * Whether the transition arc should be reversed.
+   *
+   * See {@link rectArcTween} from more detail.
+   */
   reverse?: boolean;
-  onOpacityChange?: (
-    surface: Surface,
-    value: number,
-    relativeValue: number,
-  ) => boolean | void;
-  transitionTime?: number;
+  /**
+   * A function called when the initial surface is updated.
+   *
+   * @param surface The initial surface.
+   * @param value Completion of the entire transition.
+   *
+   * @return `true` if the default changes made by {@link surfaceFrom}
+   *         should be prevented.
+   */
+  onUpdate?: (surface: Surface, value: number) => boolean | void;
+  duration?: number;
 }
 
 decorate(surfaceFrom, threadable());
-export function surfaceFrom(fromSurface: Surface) {
-  const from = fromSurface.getMask();
+/**
+ * Animate the mask of the surface from the initial state to its current state.
+ *
+ * @param surface
+ * @param mask The initial mask
+ * @param position The initial position
+ * @param config
+ */
+export function* surfaceFrom(
+  surface: Surface,
+  mask: Partial<SurfaceMask> = {width: 0, height: 0},
+  position?: Vector2d,
+  config: SurfaceFromConfig = {},
+): ThreadGenerator {
+  const toMask = surface.getMask();
+  const fromMask = {...toMask, ...mask};
+  const toPosition = surface.getPosition();
 
-  decorate(surfaceTransitionExecutor, threadable());
-  function* surfaceTransitionExecutor(
-    target: Surface,
-    config: SurfaceFromConfig = {},
-  ): ThreadGenerator {
-    const transitionTime = config.transitionTime ?? 1 / 3;
-    const to = target.getMask();
-    const toPos = target.getPosition();
-    const fromDelta = fromSurface.getOriginDelta(target.getOrigin());
-    target.show();
+  if (position) {
+    surface.position(position);
+  }
+  surface.show().setMask(fromMask);
 
-    const ratio =
-      (calculateRatio(fromSurface.getPosition(), toPos) +
-        calculateRatio(from, to)) /
-      2;
+  const ratio =
+    (calculateRatio(surface.getPosition(), toPosition) +
+      calculateRatio(fromMask, toMask)) /
+    2;
 
-    yield* tween(0.6, value => {
-      const relativeValue = clampRemap(transitionTime, 1, 0, 1, value);
-      const fromPos = fromSurface.getPosition();
-      const fromNewPos = {
-        x: fromPos.x + fromDelta.x,
-        y: fromPos.y + fromDelta.y,
-      };
-
-      target.setMask({
-        ...from,
-        ...rectArcTween(from, to, easeInOutQuint(value), config.reverse, ratio),
-        radius: easeInOutCubic(value, from.radius, target.radius()),
-        color: colorTween(
-          from.color,
-          target.background(),
-          easeInOutQuint(value),
-        ),
-      });
-      target.setPosition(
+  yield* tween(config.duration ?? 0.6, value => {
+    surface.setMask({
+      ...fromMask,
+      ...rectArcTween(
+        fromMask,
+        toMask,
+        easeInOutQuint(value),
+        config.reverse,
+        ratio,
+      ),
+      radius: easeInOutCubic(value, fromMask.radius, toMask.radius),
+      color: colorTween(fromMask.color, toMask.color, easeInOutQuint(value)),
+    });
+    if (position) {
+      surface.setPosition(
         rectArcTween(
-          fromNewPos,
-          toPos,
+          position,
+          toPosition,
           easeInOutQuint(value),
           config.reverse,
           ratio,
         ),
       );
-      if (!config.onOpacityChange?.(target, value, relativeValue)) {
-        target.getChild().opacity(relativeValue);
-      }
-    });
+    }
+    if (!config.onUpdate?.(surface, value)) {
+      surface.getChild().opacity(value);
+    }
+  });
 
-    target.setMask(null);
-    target.show();
-  }
-
-  return surfaceTransitionExecutor;
+  surface.setMask(null);
 }

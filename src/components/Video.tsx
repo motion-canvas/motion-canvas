@@ -3,7 +3,7 @@ import {getset, threadable} from '../decorators';
 import {Context} from 'konva/lib/Context';
 import {GetSet} from 'konva/lib/types';
 import {cancel, ThreadGenerator} from '../threading';
-import {waitFor} from '../animations';
+import {waitFor} from '../flow';
 import {CanvasHelper, GeneratorHelper} from '../helpers';
 
 interface VideoConfig extends ShapeConfig {

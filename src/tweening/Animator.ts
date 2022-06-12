@@ -11,7 +11,7 @@ import {
   vector2dTween,
 } from './index';
 import {threadable} from '../decorators';
-import {waitFor, waitUntil} from '../animations';
+import {waitFor, waitUntil} from '../flow';
 import {ThreadGenerator} from '../threading';
 import {GeneratorHelper} from '../helpers';
 

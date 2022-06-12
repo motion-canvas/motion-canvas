@@ -1,0 +1,21 @@
+{
+  "out": "api",
+  "entryPoints": [
+    "src",
+    "src/animations",
+    "src/audio",
+    "src/components",
+    "src/decorators",
+    "src/flow",
+    "src/helpers",
+    "src/player",
+    "src/styles",
+    "src/themes",
+    "src/threading",
+    "src/transitions",
+    "src/tweening",
+    "src/types",
+    "src/utils",
+    "src/video"
+  ]
+}
