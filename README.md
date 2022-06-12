@@ -76,7 +76,7 @@ Otherwise, below are the steps to set it up manually:
    ```ts
    import type {Scene} from '@motion-canvas/core/lib/Scene';
    import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-   import {waitFor} from '@motion-canvas/core/lib/animations';
+   import {waitFor} from '@motion-canvas/core/lib/flow';
 
    export default function* example(scene: Scene): ThreadGenerator {
      yield* scene.transition();
