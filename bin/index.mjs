@@ -94,10 +94,7 @@ const compiler = webpack({
     ],
   },
   resolveLoader: {
-    modules: [
-      'node_modules',
-      path.resolve(__dirname, './loaders'),
-    ],
+    modules: ['node_modules', path.resolve(__dirname, './loaders')],
   },
   resolve: {
     extensions: ['.js', '.ts', '.tsx'],
@@ -126,17 +123,19 @@ const server = new WebpackDevServer(
         directory: path.join(__dirname, '../api'),
         publicPath: '/api',
         watch: false,
-      }
+      },
     ],
     setupMiddlewares: middlewares => {
       middlewares.unshift({
         name: 'render',
         path: '/render/:name',
         middleware: (req, res) => {
-          const stream = fs.createWriteStream(
-            path.join(renderOutput, req.params.name),
-            {encoding: 'base64'},
-          );
+          const file = path.join(renderOutput, req.params.name);
+          const directory = path.dirname(file);
+          if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, {recursive: true});
+          }
+          const stream = fs.createWriteStream(file, {encoding: 'base64'});
           req.pipe(stream);
           req.on('end', () => res.end());
         },
