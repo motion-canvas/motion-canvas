@@ -230,6 +230,10 @@ export class Player {
   }
 
   public toggleRendering(value = !this.state.render): void {
+    if (value) {
+      this.requestSeek(0);
+      this.reload();
+    }
     this.updateState({render: value});
   }
 
