@@ -42,7 +42,7 @@ export class Code extends Text {
 
   public constructor(config?: CodeConfig) {
     super({
-      fontFamily: 'JetBrains Mono',
+      fontFamily: 'JetBrains Mono, monospace',
       fontSize: 28,
       lineHeight: 2,
       ...config,
