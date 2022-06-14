@@ -209,6 +209,10 @@ export class Player {
     this.project.draw();
   }
 
+  public requestPreviousFrame(): void {
+    this.commands.seek = this.frame - 1;
+  }
+
   public requestNextFrame(): void {
     this.commands.seek = this.frame + 1;
   }
