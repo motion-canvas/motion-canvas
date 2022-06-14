@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/motion-canvas/ui/compare/v1.1.0...v1.2.0) (2022-06-14)
+
+
+### Bug Fixes
+
+* remove inconsistency in playhead controls ([#1](https://github.com/motion-canvas/ui/issues/1)) ([58cdb4a](https://github.com/motion-canvas/ui/commit/58cdb4a26144f9933dba64d687fa63d442f115bd))
+
+
+### Features
+
+* add pull request verification ([d91bab5](https://github.com/motion-canvas/ui/commit/d91bab55832fed3e494842e9e17eed5281efecbb))
+
 # [1.1.0](https://github.com/motion-canvas/ui/compare/v1.0.0...v1.1.0) (2022-06-08)
 
 
