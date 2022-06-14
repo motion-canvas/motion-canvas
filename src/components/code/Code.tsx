@@ -95,7 +95,15 @@ export class Code extends Text {
   private getTokens(): (PrismJS.Token | string)[] {
     const language = this.language();
     if (language in PrismJS.languages) {
-      return PrismJS.tokenize(this.text(), PrismJS.languages[language]);
+      const env = {
+        code: this.text(),
+        grammar: PrismJS.languages[language],
+        language: language,
+        tokens: PrismJS.tokenize(this.text(), PrismJS.languages[language]),
+      };
+      // the after-tokenize hook will update env tokens for the jsx language
+      PrismJS.hooks.run('after-tokenize', env);
+      return env.tokens;
     } else {
       console.warn(
         `Missing language: ${language}.`,
