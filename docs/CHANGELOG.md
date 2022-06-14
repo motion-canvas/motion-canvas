@@ -1,3 +1,16 @@
+# [2.1.0](https://github.com/motion-canvas/core/compare/v2.0.0...v2.1.0) (2022-06-14)
+
+
+### Bug Fixes
+
+* create missing output directories ([#13](https://github.com/motion-canvas/core/issues/13)) ([17f1e3f](https://github.com/motion-canvas/core/commit/17f1e3fd37ec89998d67b22bd6762fc85b4778a2)), closes [#4](https://github.com/motion-canvas/core/issues/4)
+
+
+### Features
+
+* force rendering to restart seek time ([#14](https://github.com/motion-canvas/core/issues/14)) ([e94027a](https://github.com/motion-canvas/core/commit/e94027a36fe2a0b11f3aa42bb3fa869c10fbe1ea)), closes [#6](https://github.com/motion-canvas/core/issues/6)
+* move back playhead by a frame ([#18](https://github.com/motion-canvas/core/issues/18)) ([b944cd7](https://github.com/motion-canvas/core/commit/b944cd71c075e10622bd7bc81de90024c73438b7))
+
 # [2.0.0](https://github.com/motion-canvas/core/compare/v1.1.0...v2.0.0) (2022-06-12)
 
 
