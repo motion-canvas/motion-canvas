@@ -20,7 +20,12 @@ export function PlaybackControls() {
             player.togglePlayback();
             break;
           case 'ArrowLeft':
-            player.requestReset();
+            if (event.shiftKey) {
+              player.requestReset();
+              return;
+            }
+
+            player.requestPreviousFrame();
             break;
           case 'ArrowRight':
             player.requestNextFrame();
@@ -59,7 +64,7 @@ export function PlaybackControls() {
       />
       <IconButton
         icon={IconType.skipPrevious}
-        onClick={() => player.requestReset()}
+        onClick={() => player.requestPreviousFrame()}
       />
       <IconCheckbox
         id={'play'}
