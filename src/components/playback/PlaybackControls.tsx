@@ -20,6 +20,7 @@ export function PlaybackControls() {
             player.togglePlayback();
             break;
           case 'ArrowLeft':
+            event.preventDefault();
             if (event.shiftKey) {
               player.requestReset();
               return;
@@ -28,6 +29,7 @@ export function PlaybackControls() {
             player.requestPreviousFrame();
             break;
           case 'ArrowRight':
+            event.preventDefault();
             player.requestNextFrame();
             break;
           case 'm':
