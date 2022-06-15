@@ -13,10 +13,10 @@ jobs:
           registry-url: https://npm.pkg.github.com/
       - run: echo "//npm.pkg.github.com/:_authToken=${NPM_AUTH_TOKEN}" >> .npmrc
         env:
-          NPM_AUTH_TOKEN: ${{secrets.GH_TOKEN}}
+          NPM_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
       - run: npm ci
       - run: npm run build
       - run: npm run release
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GH_TOKEN}}
-          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
