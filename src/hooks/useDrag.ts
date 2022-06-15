@@ -12,7 +12,7 @@ interface DropCallback {
 export function useDrag(
   onMove: MoveCallback,
   onDrop?: DropCallback,
-  button = 0,
+  button: number | null = 0,
 ): [(event: MouseEvent) => void, boolean] {
   const [isDragging, setDragging] = useState(false);
   const [startPosition, setStartPosition] = useState({x: 0, y: 0});
@@ -51,7 +51,7 @@ export function useDrag(
 
   const handleDrag = useCallback(
     (event: MouseEvent) => {
-      if (event.button !== button) return;
+      if (button !== null && event.button !== button) return;
       event.preventDefault();
       event.stopPropagation();
       setStartPosition({x: event.x, y: event.y});

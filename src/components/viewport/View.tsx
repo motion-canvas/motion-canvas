@@ -52,7 +52,7 @@ export function View() {
       [setState, state],
     ),
     undefined,
-    1,
+    null,
   );
 
   useEffect(() => {
@@ -131,7 +131,7 @@ export function View() {
         className={styles.viewport}
         ref={containerRef}
         onMouseDown={event => {
-          if (event.button === 0) {
+          if (event.button === 0 && !event.shiftKey) {
             const position = {
               x: event.x - size.x,
               y: event.y - size.y,
