@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/motion-canvas/ui/compare/v1.2.0...v1.3.0) (2022-06-15)
+
+
+### Bug Fixes
+
+* prevent scrolling timeline with arrow keys ([#4](https://github.com/motion-canvas/ui/issues/4)) ([dfc8108](https://github.com/motion-canvas/ui/commit/dfc8108976f5c20a4b4a44bee788ee71011769c6))
+
+
+### Features
+
+* pan with shift and left click ([#7](https://github.com/motion-canvas/ui/issues/7)) ([4ff8241](https://github.com/motion-canvas/ui/commit/4ff82419bd0066c8efa2675b196c273b7105a7ca)), closes [#5](https://github.com/motion-canvas/ui/issues/5)
+
 # [1.2.0](https://github.com/motion-canvas/ui/compare/v1.1.0...v1.2.0) (2022-06-14)
 
 
