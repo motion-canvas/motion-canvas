@@ -32,6 +32,21 @@ export function bootstrap(config: BootstrapConfig) {
   const player = new Player(project, audio);
   window.player = player;
 
-  const parent = __webpack_require__.c[module.parents[0]];
-  hot(player, parent);
+  let root: NodeModule = null;
+  const queue = [...module.parents];
+  while (queue.length > 0) {
+    const path = queue.shift();
+    const current = __webpack_require__.c[path];
+    if (!path.endsWith('lib/index.js')) {
+      root = current;
+      break;
+    }
+    queue.push(...current.parents);
+  }
+
+  if (root) {
+    hot(player, root);
+  } else {
+    console.warn('Root module not found. Hot reload will not work.');
+  }
 }

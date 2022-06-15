@@ -41,7 +41,7 @@ declare interface Window {
 
 declare namespace NodeJS {
   interface Module {
-    parents: Record<string, string>;
+    parents: string[];
   }
 }
 
