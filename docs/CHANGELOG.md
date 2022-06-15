@@ -1,3 +1,12 @@
+## [2.1.1](https://github.com/motion-canvas/core/compare/v2.1.0...v2.1.1) (2022-06-15)
+
+
+### Bug Fixes
+
+* add monospace font fallback in case JetBrains Mono is missing ([#24](https://github.com/motion-canvas/core/issues/24)) ([276a310](https://github.com/motion-canvas/core/commit/276a310d63a4ea128a3640d6e0871045514c1c01)), closes [#16](https://github.com/motion-canvas/core/issues/16)
+* code will trigger PrismJS such that JSX is correctly highlighted ([#20](https://github.com/motion-canvas/core/issues/20)) ([b323231](https://github.com/motion-canvas/core/commit/b32323184b5f479bc09950fdf9c570b5276ea600)), closes [#17](https://github.com/motion-canvas/core/issues/17)
+* fix hot reload ([#26](https://github.com/motion-canvas/core/issues/26)) ([2ad746e](https://github.com/motion-canvas/core/commit/2ad746e1eff705c2eb29ea9c83ad9810eeb54b05))
+
 # [2.1.0](https://github.com/motion-canvas/core/compare/v2.0.0...v2.1.0) (2022-06-14)
 
 
