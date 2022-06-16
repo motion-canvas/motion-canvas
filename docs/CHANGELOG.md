@@ -1,3 +1,15 @@
+# [2.2.0](https://github.com/motion-canvas/core/compare/v2.1.1...v2.2.0) (2022-06-16)
+
+
+### Bug Fixes
+
+* load project state correctly ([#27](https://github.com/motion-canvas/core/issues/27)) ([8ae0233](https://github.com/motion-canvas/core/commit/8ae02335d71858413bffb265573bd83a1e38d89e))
+
+
+### Features
+
+* add ease back interp functions ([#30](https://github.com/motion-canvas/core/issues/30)) ([c11046d](https://github.com/motion-canvas/core/commit/c11046d939bf5a29e28bda0ef97feabe2f985a0f))
+
 ## [2.1.1](https://github.com/motion-canvas/core/compare/v2.1.0...v2.1.1) (2022-06-15)
 
 
