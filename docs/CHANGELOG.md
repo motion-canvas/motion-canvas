@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/motion-canvas/ui/compare/v1.3.0...v1.4.0) (2022-06-16)
+
+
+### Features
+
+* add support for meta files ([#11](https://github.com/motion-canvas/ui/issues/11)) ([456790a](https://github.com/motion-canvas/ui/commit/456790ab8c88bf28baa4843078013ff881c1a439))
+
 # [1.3.0](https://github.com/motion-canvas/ui/compare/v1.2.0...v1.3.0) (2022-06-15)
 
 
