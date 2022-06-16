@@ -28,7 +28,7 @@ export class Meta<T extends Metadata = Metadata> {
   private changed = new SimpleEventDispatcher<T>();
 
   private constructor() {
-    this.data = <T>{version: Meta.currentVersion};
+    this.data = <T>{version: META_VERSION};
   }
 
   public getData(): T {
@@ -62,7 +62,6 @@ export class Meta<T extends Metadata = Metadata> {
     }
   }
 
-  private static currentVersion = 1;
   private static metaLookup: Record<string, Meta> = {};
 
   /**
@@ -101,7 +100,7 @@ export class Meta<T extends Metadata = Metadata> {
       return;
     }
 
-    data.version ??= Meta.currentVersion;
+    data.version ??= META_VERSION;
     meta.source = source;
     meta.data = data;
     meta.changed.dispatch(data);

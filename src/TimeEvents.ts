@@ -150,13 +150,13 @@ export class TimeEvents {
       }
 
       const offset = Math.max(0, event.targetTime - event.initialTime);
-      if (!this.preserveTiming && event.offset !== offset) {
+      if (this.preserveTiming && event.offset !== offset) {
         event.offset = offset;
         changed = true;
       }
 
       const target = event.initialTime + event.offset;
-      if (this.preserveTiming && event.targetTime !== target) {
+      if (!this.preserveTiming && event.targetTime !== target) {
         event.targetTime = target;
         changed = true;
       }

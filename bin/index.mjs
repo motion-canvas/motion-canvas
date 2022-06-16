@@ -41,6 +41,8 @@ if (cli.flags.uiServer) {
   }
 }
 
+const META_VERSION = 1;
+
 const projectFile = path.resolve(cli.input[0]);
 const renderOutput = path.resolve(cli.flags.output);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,7 +64,7 @@ const compiler = webpack({
             before: [
               metaImportTransformer({
                 project: projectFile,
-                version: packageJSON.version,
+                version: META_VERSION,
               }),
             ],
           }),
@@ -129,6 +131,7 @@ const compiler = webpack({
     new webpack.DefinePlugin({
       PROJECT_FILE_NAME: `'${path.parse(projectFile).name}'`,
       CORE_VERSION: `'${packageJSON.version}'`,
+      META_VERSION,
     }),
     new HtmlWebpackPlugin({title: 'Motion Canvas'}),
     new UIPlugin(cli.flags),
