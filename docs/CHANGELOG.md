@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/motion-canvas/core/compare/v2.2.0...v3.0.0) (2022-06-16)
+
+
+### Features
+
+* add meta files ([#28](https://github.com/motion-canvas/core/issues/28)) ([e29f7d0](https://github.com/motion-canvas/core/commit/e29f7d0ed01c7fb84f0931be5485fdde1aa0a5c2)), closes [#7](https://github.com/motion-canvas/core/issues/7)
+
+
+### BREAKING CHANGES
+
+* change time events API
+
 # [2.2.0](https://github.com/motion-canvas/core/compare/v2.1.1...v2.2.0) (2022-06-16)
 
 
