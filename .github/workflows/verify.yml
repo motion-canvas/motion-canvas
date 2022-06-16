@@ -15,6 +15,7 @@ jobs:
         env:
           NPM_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
       - run: npm ci
+      - run: echo "@motion-canvas:registry=https://npm.pkg.github.com" > .npmrc
       - run: npm run lint
       - run: npm run prettier
       - run: npm run build
