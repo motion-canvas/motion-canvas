@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/motion-canvas/core/compare/v3.0.0...v3.0.1) (2022-06-16)
+
+
+### Bug Fixes
+
+* fix meta file version and timing ([#32](https://github.com/motion-canvas/core/issues/32)) ([a369610](https://github.com/motion-canvas/core/commit/a36961007eb7ac238b87ade3a03da101a1940800))
+
 # [3.0.0](https://github.com/motion-canvas/core/compare/v2.2.0...v3.0.0) (2022-06-16)
 
 
