@@ -47,7 +47,7 @@ export function* waitUntil(
   const scene = useScene();
   const frames =
     typeof targetTime === 'string'
-      ? scene.getFrameEvent(targetTime)
+      ? scene.timeEvents.register(targetTime)
       : scene.project.secondsToFrames(targetTime);
 
   while (scene.project.frame < frames) {

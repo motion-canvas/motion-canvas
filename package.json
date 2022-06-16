@@ -44,6 +44,7 @@
     "mix-color": "^1.1.2",
     "mp4box": "^0.5.2",
     "prismjs": "^1.28.0",
+    "source-map": "^0.7.4",
     "strongly-typed-events": "^3.0.2",
     "three": "^0.141.0",
     "ts-loader": "^9.3.0",

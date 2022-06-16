@@ -10,8 +10,9 @@ import {Group} from 'konva/lib/Group';
 import {Shape} from 'konva/lib/Shape';
 import {SceneTransition} from './transitions';
 import {decorate, KonvaNode, threadable} from './decorators';
-import {SimpleEventDispatcher} from 'strongly-typed-events';
 import {setScene} from './utils';
+import {Meta, Metadata} from './Meta';
+import {SavedTimeEvent, TimeEvents} from './TimeEvents';
 
 export interface SceneRunner {
   (layer: Scene, project: Project): ThreadGenerator;
@@ -24,11 +25,8 @@ export enum SceneState {
   Finished,
 }
 
-export interface TimeEvent {
-  name: string;
-  initialTime: number;
-  targetTime: number;
-  offset: number;
+export interface SceneMetadata extends Metadata {
+  timeEvents: SavedTimeEvent[];
 }
 
 @KonvaNode()
@@ -37,6 +35,8 @@ export class Scene extends Group {
   public firstFrame = 0;
   public transitionDuration = 0;
   public duration = 0;
+  public readonly meta: Meta<SceneMetadata>;
+  public readonly timeEvents: TimeEvents;
 
   public get lastFrame() {
     return this.firstFrame + this.duration;
@@ -45,23 +45,10 @@ export class Scene extends Group {
     this.duration = value - this.firstFrame;
   }
 
-  public get timeEvents(): TimeEvent[] {
-    return Object.values(this.timeEventLookup);
-  }
-
-  public get TimeEventsChanged() {
-    return this.timeEventsChanged.asEvent();
-  }
-
-  private readonly storageKey: string;
-  private readonly timeEventsChanged = new SimpleEventDispatcher<TimeEvent[]>();
-  private timeEventLookup: Record<string, TimeEvent> = {};
-  private storedEventLookup: Record<string, TimeEvent> = {};
   private previousScene: Scene = null;
   private runner: ThreadGenerator;
   private state: SceneState = SceneState.Initial;
   private cached = false;
-  private preserveEvents = false;
   private counters: Record<string, number> = {};
 
   public constructor(
@@ -77,22 +64,17 @@ export class Scene extends Group {
     });
     decorate(runnerFactory, threadable());
 
-    this.storageKey = `scene-${this.project.name()}-${this.name()}`;
-    const storedEvents = localStorage.getItem(this.storageKey);
-    if (storedEvents) {
-      for (const event of Object.values<TimeEvent>(JSON.parse(storedEvents))) {
-        this.storedEventLookup[event.name] = event;
-      }
-    }
+    this.meta = Meta.getMetaFor(`${this.name()}.scene`);
+    this.timeEvents = new TimeEvents(this);
+  }
+
+  public invalidate() {
+    this.cached = false;
   }
 
   public markAsCached() {
     this.cached = true;
-    this.preserveEvents = false;
-    localStorage.setItem(
-      this.storageKey,
-      JSON.stringify(this.storedEventLookup),
-    );
+    this.timeEvents.preserveTiming = true;
   }
 
   public isMarkedAsCached() {
@@ -104,12 +86,6 @@ export class Scene extends Group {
       this.runnerFactory = runnerFactory;
     }
     this.cached = false;
-    this.storedEventLookup = {
-      ...this.storedEventLookup,
-      ...this.timeEventLookup,
-    };
-    this.timeEventLookup = {};
-    this.timeEventsChanged.dispatch([]);
   }
 
   public async reset(previousScene: Scene = null) {
@@ -219,70 +195,5 @@ export class Scene extends Group {
     }
 
     return `${this.name()}.${type}.${id}`;
-  }
-
-  public getFrameEvent(name: string): number {
-    const initialTime = this.project.framesToSeconds(
-      this.project.frame - this.firstFrame,
-    );
-    if (this.timeEventLookup[name] === undefined) {
-      const event: TimeEvent = {
-        name,
-        initialTime,
-        targetTime: this.storedEventLookup[name]?.targetTime ?? initialTime,
-        offset: this.storedEventLookup[name]?.offset ?? 0,
-      };
-
-      if (this.storedEventLookup[name]) {
-        if (this.preserveEvents) {
-          event.targetTime = event.initialTime + event.offset;
-        } else {
-          event.offset = Math.max(0, event.targetTime - event.initialTime);
-        }
-      }
-
-      this.timeEventLookup[name] = event;
-      this.timeEventsChanged.dispatch(this.timeEvents);
-    } else if (this.timeEventLookup[name].initialTime !== initialTime) {
-      const event: TimeEvent = {
-        ...this.timeEventLookup[name],
-        initialTime,
-      };
-
-      if (this.preserveEvents) {
-        event.targetTime = event.initialTime + event.offset;
-      } else {
-        event.offset = Math.max(0, event.targetTime - event.initialTime);
-      }
-
-      this.timeEventLookup[name] = event;
-      this.storedEventLookup[name] = event;
-      this.timeEventsChanged.dispatch(this.timeEvents);
-    }
-
-    return (
-      this.firstFrame +
-      this.project.secondsToFrames(
-        this.timeEventLookup[name].initialTime +
-          this.timeEventLookup[name].offset,
-      )
-    );
-  }
-
-  public setFrameEvent(name: string, offset: number, preserve = true) {
-    if (
-      !this.timeEventLookup[name] ||
-      this.timeEventLookup[name].offset === offset
-    ) {
-      return;
-    }
-    this.cached = false;
-    this.preserveEvents = preserve;
-    this.storedEventLookup[name] = this.timeEventLookup[name] = {
-      ...this.timeEventLookup[name],
-      targetTime: this.timeEventLookup[name].initialTime + offset,
-      offset,
-    };
-    this.timeEventsChanged.dispatch(this.timeEvents);
   }
 }

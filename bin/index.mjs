@@ -9,6 +9,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import meow from 'meow';
 import UIPlugin from './plugins/UIPlugin.mjs';
 import {createRequire} from 'module';
+import {metaImportTransformer} from './transformers/metaImportTransformer.mjs';
 
 const cli = meow({
   importMeta: import.meta,
@@ -33,16 +34,19 @@ if (cli.flags.uiServer) {
   cli.flags.uiPath ||= 'http://localhost:9001/main.js';
 } else {
   if (cli.flags.uiPath) {
-    cli.flags.uiPath = path.resolve(process.cwd(), cli.flags.uiPath);
+    cli.flags.uiPath = path.resolve(cli.flags.uiPath);
   } else {
     const require = createRequire(import.meta.url);
     cli.flags.uiPath = path.dirname(require.resolve('@motion-canvas/ui'));
   }
 }
 
-const projectFile = path.resolve(process.cwd(), cli.input[0]);
-const renderOutput = path.resolve(process.cwd(), cli.flags.output);
+const projectFile = path.resolve(cli.input[0]);
+const renderOutput = path.resolve(cli.flags.output);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageJSON = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, '../package.json'), 'utf8'),
+);
 
 const compiler = webpack({
   entry: {project: projectFile},
@@ -53,6 +57,16 @@ const compiler = webpack({
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
+        options: {
+          getCustomTransformers: () => ({
+            before: [
+              metaImportTransformer({
+                project: projectFile,
+                version: packageJSON.version,
+              }),
+            ],
+          }),
+        },
       },
       {
         test: /\.glsl$/i,
@@ -61,6 +75,10 @@ const compiler = webpack({
       {
         test: /\.mp4/i,
         type: 'asset',
+      },
+      {
+        test: /\.meta/i,
+        loader: 'meta-loader',
       },
       {
         test: /\.wav$/i,
@@ -108,6 +126,10 @@ const compiler = webpack({
       // Required to load additional languages for Prism
       Prism: 'prismjs',
     }),
+    new webpack.DefinePlugin({
+      PROJECT_FILE_NAME: `'${path.parse(projectFile).name}'`,
+      CORE_VERSION: `'${packageJSON.version}'`,
+    }),
     new HtmlWebpackPlugin({title: 'Motion Canvas'}),
     new UIPlugin(cli.flags),
   ],
@@ -136,6 +158,19 @@ const server = new WebpackDevServer(
             fs.mkdirSync(directory, {recursive: true});
           }
           const stream = fs.createWriteStream(file, {encoding: 'base64'});
+          req.pipe(stream);
+          req.on('end', () => res.end());
+        },
+      });
+
+      middlewares.unshift({
+        name: 'meta',
+        path: '/meta/:source',
+        middleware: (req, res) => {
+          const stream = fs.createWriteStream(
+            path.join(compiler.context, req.params.source),
+            {encoding: 'utf8'},
+          );
           req.pipe(stream);
           req.on('end', () => res.end());
         },

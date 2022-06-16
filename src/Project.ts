@@ -9,6 +9,7 @@ import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
 import {SimpleEventDispatcher} from 'strongly-typed-events';
 import {KonvaNode} from './decorators';
+import {Meta, Metadata} from './Meta';
 
 Konva.autoDrawEnabled = false;
 
@@ -16,10 +17,12 @@ export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
 };
 
-interface ProjectConfig extends Partial<StageConfig> {
+export interface ProjectConfig extends Partial<StageConfig> {
   scenes: SceneRunner[];
   background: string | false;
 }
+
+export type ProjectMetadata = Metadata;
 
 @KonvaNode()
 export class Project extends Stage {
@@ -27,6 +30,8 @@ export class Project extends Stage {
     return this.scenesChanged.asEvent();
   }
 
+  public readonly version = CORE_VERSION;
+  public readonly meta: Meta<ProjectMetadata>;
   public readonly background: Rect;
   public readonly master: Layer;
   public readonly center: Vector2d;
@@ -74,6 +79,7 @@ export class Project extends Stage {
       ...rest,
     });
 
+    this.meta = Meta.getMetaFor(PROJECT_FILE_NAME);
     this.offset({
       x: this.width() / -2,
       y: this.height() / -2,

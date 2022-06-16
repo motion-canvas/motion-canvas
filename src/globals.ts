@@ -53,3 +53,7 @@ declare namespace JSX {
 }
 
 declare type Callback = (...args: unknown[]) => void;
+
+declare const PROJECT_FILE_NAME: string;
+
+declare const CORE_VERSION: string;
