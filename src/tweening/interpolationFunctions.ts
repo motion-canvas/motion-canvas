@@ -59,3 +59,38 @@ export function easeInOutQuint(value: number, from = 0, to = 1) {
       : 1 - Math.pow(-2 * value + 2, 5) / 2;
   return map(from, to, value);
 }
+
+export function createEaseInBack(s = 1.70158): InterpolationFunction {
+  return (value: number, from = 0, to = 1) => {
+    return map(from, to, value * value * ((s + 1) * value - s));
+  };
+}
+
+export function createEaseOutBack(s = 1.70158): InterpolationFunction {
+  return (value: number, from = 0, to = 1) => {
+    return map(
+      from,
+      to,
+      1 + (value - 1) * (value - 1) * ((s + 1) * (value - 1) + s),
+    );
+  };
+}
+
+export function createEaseInOutBack(s = 1.70158): InterpolationFunction {
+  return (value: number, from = 0, to = 1) => {
+    value = value * 2;
+    if (value < 1) {
+      return map(from, to, (value * value * ((s + 1) * value - s)) / 2);
+    }
+    value -= 2;
+    return map(
+      from,
+      to,
+      (1 + (value - 1) * (value - 1) * ((s + 1) * (value - 1) + s)) / 2,
+    );
+  };
+}
+
+export const easeInBack: InterpolationFunction = createEaseInBack();
+export const easeOutBack: InterpolationFunction = createEaseOutBack();
+export const easeInOutBack: InterpolationFunction = createEaseInOutBack();
