@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/motion-canvas/ui/compare/v1.4.0...v1.4.1) (2022-06-16)
+
+
+### Reverts
+
+* chore(release): 1.4.0 [skip ci] ([d6121ae](https://github.com/motion-canvas/ui/commit/d6121ae946e9e79e1e6ddee4b8b0dd839d122c55))
+
 # [1.3.0](https://github.com/motion-canvas/ui/compare/v1.2.0...v1.3.0) (2022-06-15)
 
 
