@@ -1,9 +1,10 @@
-import type {Project} from '../Project';
-import {AudioManager} from '../audio';
 import {
   PromiseSimpleEventDispatcher,
   SimpleEventDispatcher,
 } from 'strongly-typed-events';
+
+import {AudioManager} from '../audio';
+import type {Project} from '../Project';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
@@ -117,6 +118,8 @@ export class Player {
 
   public loadState(state: Partial<PlayerState>) {
     this.updateState(state);
+    this.project.framerate = state.fps;
+    this.project.resolutionScale = state.scale;
     this.setRange(state.startFrame, state.endFrame);
   }
 
