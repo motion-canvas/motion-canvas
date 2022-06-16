@@ -2,6 +2,7 @@ export * from './useDocumentEvent';
 export * from './useDrag';
 export * from './useEventEffect';
 export * from './useEventState';
+export * from './useMeta';
 export * from './usePlayer';
 export * from './usePlayerState';
 export * from './usePlayerTime';

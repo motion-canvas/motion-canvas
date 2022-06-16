@@ -7,7 +7,9 @@ interface LabelGroupProps {
 }
 
 export function LabelGroup({scene}: LabelGroupProps) {
-  const events = useEventState(scene.TimeEventsChanged, () => scene.timeEvents);
+  const events = useEventState(scene.timeEvents.Changed, () =>
+    scene.timeEvents.toArray(),
+  );
 
   return (
     <>

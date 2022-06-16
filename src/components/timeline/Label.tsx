@@ -1,6 +1,7 @@
 import styles from './Timeline.module.scss';
 
-import type {Scene, TimeEvent} from '@motion-canvas/core/lib/Scene';
+import type {Scene} from '@motion-canvas/core/lib/Scene';
+import type {TimeEvent} from '@motion-canvas/core/lib/TimeEvents';
 import {useDrag, usePlayer} from '../../hooks';
 import {useCallback, useContext, useLayoutEffect, useState} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
@@ -26,7 +27,7 @@ export function Label({event, scene}: LabelProps) {
       e => {
         const newFrame = Math.max(0, eventTime);
         if (event.offset !== newFrame) {
-          scene.setFrameEvent(event.name, newFrame, !e.shiftKey);
+          scene.timeEvents.set(event.name, newFrame, e.shiftKey);
           player.reload();
         }
       },
