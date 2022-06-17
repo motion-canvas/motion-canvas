@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/motion-canvas/core/compare/v3.0.1...v3.0.2) (2022-06-17)
+
+
+### Bug Fixes
+
+* save time events only if they're actively used ([#35](https://github.com/motion-canvas/core/issues/35)) ([bd78c89](https://github.com/motion-canvas/core/commit/bd78c8967ba395beeb352006b5f33768b4a4c498)), closes [#33](https://github.com/motion-canvas/core/issues/33) [#34](https://github.com/motion-canvas/core/issues/34)
+
 ## [3.0.1](https://github.com/motion-canvas/core/compare/v3.0.0...v3.0.1) (2022-06-16)
 
 
