@@ -16,7 +16,7 @@ function metaLoader(source) {
       source: this.resourcePath,
       generated: {
         line: i + 5,
-        column: 3,
+        column: i === 0 ? 4 : 3,
       },
       original: {
         line: i + 1,
@@ -29,8 +29,8 @@ function metaLoader(source) {
   const content = `import {Meta} from '@motion-canvas/core/lib';
 Meta.register(
   '${name}', 
-  '${encodeURI(relative)}', 
-  ${source}
+  '${encodeURIComponent(relative)}',
+  \`${source}\`
 );
 module.hot.accept(console.error);`;
   this.callback(null, content, map);

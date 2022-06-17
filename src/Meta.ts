@@ -23,12 +23,13 @@ export class Meta<T extends Metadata = Metadata> {
   }
 
   private data: T;
+  private rawData: string;
   private source: string;
-  private ignoreReload = false;
   private changed = new SimpleEventDispatcher<T>();
 
   private constructor() {
     this.data = <T>{version: META_VERSION};
+    this.rawData = JSON.stringify(this.data, undefined, 2);
   }
 
   public getData(): T {
@@ -51,11 +52,11 @@ export class Meta<T extends Metadata = Metadata> {
       ...this.data,
       ...data,
     };
+    this.rawData = JSON.stringify(this.data, undefined, 2);
     this.changed.dispatch(this.data);
-    this.ignoreReload = true;
     const response = await fetch(`/meta/${this.source}`, {
       method: 'POST',
-      body: JSON.stringify(this.data, undefined, 2),
+      body: this.rawData,
     });
     if (!response.ok) {
       throw new Error(response.statusText);
@@ -89,20 +90,27 @@ export class Meta<T extends Metadata = Metadata> {
    *
    * @param name Name of the entity this metadata refers to.
    * @param source Path to the source file relative to the compilation context.
-   * @param data New metadata.
+   * @param rawData New metadata as JSON.
    *
    * @internal
    */
-  public static register(name: string, source: string, data: Metadata) {
+  public static register(name: string, source: string, rawData: string) {
     const meta = Meta.getMetaFor(name);
-    if (meta.ignoreReload) {
-      meta.ignoreReload = false;
+    meta.source = source;
+
+    if (meta.rawData === rawData) {
       return;
     }
 
-    data.version ??= META_VERSION;
-    meta.source = source;
-    meta.data = data;
-    meta.changed.dispatch(data);
+    try {
+      const data: Metadata = JSON.parse(rawData);
+      data.version ??= META_VERSION;
+      meta.data = data;
+      meta.rawData = rawData;
+      meta.changed.dispatch(data);
+    } catch (e) {
+      console.error(`Error when parsing ${decodeURIComponent(source)}:`);
+      console.error(e);
+    }
   }
 }

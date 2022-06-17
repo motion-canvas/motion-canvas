@@ -49,29 +49,21 @@ export class TimeEvents {
     return this.changed.asEvent();
   }
 
-  /**
-   * Whether the timing of events should be preserved.
-   *
-   * When set to `true` the offsets of events will be adjusted to keep them in
-   * place.
-   *
-   * @internal
-   */
-  public preserveTiming = true;
-
   private readonly changed = new SimpleEventDispatcher<TimeEvent[]>();
+  private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
   private previousReference: SavedTimeEvent[];
+  private ignoreSave = false;
+  private preserveTiming = true;
 
   public constructor(private readonly scene: Scene) {
     const storageKey = `scene-${scene.project.name()}-${scene.name()}`;
     const storedEvents = localStorage.getItem(storageKey);
     if (storedEvents) {
-      console.info('Migrating localStorage to meta files');
+      console.warn('Migrating localStorage to meta files');
       localStorage.setItem(`${storageKey}-backup`, storedEvents);
       localStorage.removeItem(storageKey);
       this.load(Object.values<TimeEvent>(JSON.parse(storedEvents)));
-      this.save();
     } else {
       this.load(scene.meta.getData().timeEvents ?? []);
     }
@@ -82,6 +74,7 @@ export class TimeEvents {
       // this event.
       if (event.timeEvents === this.previousReference) return;
       this.previousReference = event.timeEvents;
+      this.ignoreSave = true;
 
       this.load(event.timeEvents ?? []);
       scene.reload();
@@ -90,11 +83,11 @@ export class TimeEvents {
   }
 
   public toArray(): TimeEvent[] {
-    return Object.values(this.lookup);
+    return Object.values(this.registeredEvents);
   }
 
   public get(name: string) {
-    return this.lookup[name] ?? null;
+    return this.registeredEvents[name] ?? null;
   }
 
   /**
@@ -103,21 +96,22 @@ export class TimeEvents {
    * @param name Name of the event.
    * @param offset Time offset in seconds.
    * @param preserve Whether the timing of the consecutive events should be
-   *                 preserved. See {@link TimeEvents.preserveTiming}.
+   *                 preserved. When set to `true` their offsets will be
+   *                 adjusted to keep them in place.
    */
   public set(name: string, offset: number, preserve = true) {
     if (!this.lookup[name] || this.lookup[name].offset === offset) {
       return;
     }
-    this.scene.invalidate();
     this.preserveTiming = preserve;
     this.lookup[name] = {
       ...this.lookup[name],
       targetTime: this.lookup[name].initialTime + offset,
       offset,
     };
+    this.registeredEvents[name] = this.lookup[name];
     this.changed.dispatch(this.toArray());
-    this.save();
+    this.scene.reload();
   }
 
   /**
@@ -140,7 +134,6 @@ export class TimeEvents {
         targetTime: initialTime,
         offset: 0,
       };
-      this.changed.dispatch(this.toArray());
     } else {
       let changed = false;
       const event = {...this.lookup[name]};
@@ -163,9 +156,10 @@ export class TimeEvents {
 
       if (changed) {
         this.lookup[name] = event;
-        this.changed.dispatch(this.toArray());
       }
     }
+
+    this.registeredEvents[name] = this.lookup[name];
 
     return (
       this.scene.firstFrame +
@@ -173,20 +167,44 @@ export class TimeEvents {
     );
   }
 
+  /**
+   * Called when the parent scene gets reloaded.
+   */
+  public onReload() {
+    this.registeredEvents = {};
+  }
+
+  /**
+   * Called when the parent scene gets cached.
+   */
+  public onCache() {
+    this.preserveTiming = true;
+    this.changed.dispatch(this.toArray());
+
+    if (this.ignoreSave) {
+      this.ignoreSave = false;
+      return;
+    }
+
+    this.save();
+  }
+
   private save() {
-    this.scene.meta.setDataSync({
-      timeEvents: Object.values(this.lookup).map(event => ({
+    this.previousReference = Object.values(this.registeredEvents).map(
+      event => ({
         name: event.name,
         targetTime: event.targetTime,
-      })),
+      }),
+    );
+
+    this.scene.meta.setDataSync({
+      timeEvents: this.previousReference,
     });
   }
 
   private load(events: SavedTimeEvent[]) {
-    const previousEvents = this.lookup;
-    this.lookup = {};
     for (const event of events) {
-      const previous = previousEvents[event.name] ?? {
+      const previous = this.lookup[event.name] ?? {
         name: event.name,
         initialTime: 0,
         offset: 0,

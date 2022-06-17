@@ -68,13 +68,9 @@ export class Scene extends Group {
     this.timeEvents = new TimeEvents(this);
   }
 
-  public invalidate() {
-    this.cached = false;
-  }
-
   public markAsCached() {
     this.cached = true;
-    this.timeEvents.preserveTiming = true;
+    this.timeEvents.onCache();
   }
 
   public isMarkedAsCached() {
@@ -86,6 +82,7 @@ export class Scene extends Group {
       this.runnerFactory = runnerFactory;
     }
     this.cached = false;
+    this.timeEvents.onReload();
   }
 
   public async reset(previousScene: Scene = null) {
