@@ -288,7 +288,11 @@ export class Code extends Text {
           context.fillText(line, x * letterWidth, (y + 0.5) * lineHeight);
           x += line.length;
         }
-      } else if (typeof token.content === 'string') {
+      } else if (
+        typeof token.content === 'string' &&
+        // FIXME Handle newlines no matter the token type
+        token.type !== 'plain-text'
+      ) {
         if (!(token.type in colors)) {
           console.warn(`Unstyled token type:`, token.type);
         }
