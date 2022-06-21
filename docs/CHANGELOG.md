@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/motion-canvas/core/compare/v3.0.2...v3.0.3) (2022-06-21)
+
+
+### Bug Fixes
+
+* display newlines in Code correctly ([#38](https://github.com/motion-canvas/core/issues/38)) ([df8f390](https://github.com/motion-canvas/core/commit/df8f390848d7a8e03193d64e460142e00ed95031))
+
 ## [3.0.2](https://github.com/motion-canvas/core/compare/v3.0.1...v3.0.2) (2022-06-17)
 
 
