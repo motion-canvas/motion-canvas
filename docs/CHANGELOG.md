@@ -1,3 +1,18 @@
+# [4.0.0](https://github.com/motion-canvas/core/compare/v3.0.3...v4.0.0) (2022-06-22)
+
+
+### Features
+
+* simplify the process of importing images ([#39](https://github.com/motion-canvas/core/issues/39)) ([0c2341f](https://github.com/motion-canvas/core/commit/0c2341fe255ee1702181e04f4cd2024a9eeabce5)), closes [#19](https://github.com/motion-canvas/core/issues/19)
+
+
+### BREAKING CHANGES
+
+* change how images are imported
+
+By default, importing images will now return their urls instead of a SpriteData object.
+This behavior can be adjusted using the `?img` and `?anim` queries.
+
 ## [3.0.3](https://github.com/motion-canvas/core/compare/v3.0.2...v3.0.3) (2022-06-21)
 
 
