@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/motion-canvas/ui/compare/v1.5.0...v1.5.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* make panes scrollable ([#14](https://github.com/motion-canvas/ui/issues/14)) ([dc9fd38](https://github.com/motion-canvas/ui/commit/dc9fd380285c9dfcc6d8503cca87c32e01f11381))
+
 # [1.5.0](https://github.com/motion-canvas/ui/compare/v1.4.1...v1.5.0) (2022-06-22)
 
 
