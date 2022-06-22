@@ -1,5 +1,6 @@
 {
   "out": "api",
+  "excludeExternals": true,
   "entryPoints": [
     "src",
     "src/animations",

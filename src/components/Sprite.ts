@@ -1,88 +1,97 @@
 import {Context} from 'konva/lib/Context';
-import {Util} from 'konva/lib/Util';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {waitFor} from '../flow';
-import {getset, KonvaNode, threadable} from '../decorators';
+import {cached, getset, KonvaNode, threadable} from '../decorators';
 import {GeneratorHelper} from '../helpers';
 import {InterpolationFunction, map, tween} from '../tweening';
 import {cancel, ThreadGenerator} from '../threading';
 import {parseColor} from 'mix-color';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
+import {getImageData, ImageDataSource} from '../media';
 
-export interface SpriteData {
-  fileName: string;
-  src: string;
-  data: number[];
-  width: number;
-  height: number;
-}
+export const SPRITE_CHANGE_EVENT = 'spriteChange';
 
 export interface SpriteConfig extends ShapeConfig {
-  animation: SpriteData[];
-  skin?: SpriteData;
-  mask?: SpriteData;
+  animation: ImageDataSource[];
+  skin?: ImageDataSource;
+  mask?: ImageDataSource;
   playing?: boolean;
   fps?: number;
   maskBlend?: number;
   frame?: number;
 }
 
-export const SPRITE_CHANGE_EVENT = 'spriteChange';
-
-const COMPUTE_CANVAS_SIZE = 64;
-
+/**
+ * A class for animated sprites.
+ *
+ * Allows to use custom alpha masks and skins.
+ */
 @KonvaNode()
 export class Sprite extends Shape {
-  @getset(null, Sprite.prototype.recalculate)
+  @getset(null, Sprite.prototype.updateAnimation)
   public animation: GetSet<SpriteConfig['animation'], this>;
-  @getset(null, Sprite.prototype.recalculate)
-  public skin: GetSet<SpriteConfig['skin'], this>;
-  @getset(null, Sprite.prototype.recalculate, Sprite.prototype.maskTween)
-  public mask: GetSet<SpriteConfig['mask'], this>;
+  @getset(0, Sprite.prototype.updateAnimation)
+  public frame: GetSet<SpriteConfig['frame'], this>;
   @getset(false)
   public playing: GetSet<SpriteConfig['playing'], this>;
   @getset(10)
   public fps: GetSet<SpriteConfig['fps'], this>;
-  @getset(0, Sprite.prototype.recalculate)
-  public maskBlend: GetSet<SpriteConfig['maskBlend'], this>;
-  @getset(0, Sprite.prototype.recalculate)
-  public frame: GetSet<SpriteConfig['frame'], this>;
 
-  private spriteData: SpriteData = {
-    height: 0,
-    width: 0,
-    src: '',
-    data: [],
-    fileName: '',
-  };
+  /**
+   * An image used for 2D UV mapping.
+   */
+  @getset(null, Sprite.prototype.updateSkin)
+  public skin: GetSet<SpriteConfig['skin'], this>;
+
+  /**
+   * An image that defines which parts of the sprite should be visible.
+   *
+   * The red channel is used for sampling.
+   */
+  @getset(null, Sprite.prototype.updateMask, Sprite.prototype.maskTween)
+  public mask: GetSet<SpriteConfig['mask'], this>;
+
+  /**
+   * The blend between the original opacity and the opacity calculated using the
+   * mask.
+   */
+  @getset(0, Sprite.prototype.updateFrame)
+  public maskBlend: GetSet<SpriteConfig['maskBlend'], this>;
+
   private task: ThreadGenerator | null = null;
-  private imageData: ImageData;
-  private baseMask: SpriteData;
+  private baseMask: ImageDataSource;
   private baseMaskBlend = 0;
+  private synced = false;
 
   private readonly computeCanvas: HTMLCanvasElement;
   private readonly context: CanvasRenderingContext2D;
 
   public constructor(config?: SpriteConfig) {
     super(config);
-    this.computeCanvas = Util.createCanvasElement();
-    this.computeCanvas.width = COMPUTE_CANVAS_SIZE;
-    this.computeCanvas.height = COMPUTE_CANVAS_SIZE;
+    this.computeCanvas = document.createElement('canvas');
     this.context = this.computeCanvas.getContext('2d');
-
-    this.recalculate();
   }
 
-  public _sceneFunc(context: Context) {
+  protected _sceneFunc(context: Context) {
     const size = this.getSize();
+    let source: ImageDataSource = this.computeCanvas;
+    if (this.requiresProcessing()) {
+      // Make sure the compute canvas is up-to-date
+      this.getFrameData();
+    } else {
+      const animation = this.animation();
+      const frame = this.frame();
+      source = animation[frame % animation.length];
+    }
+
     context.save();
     context._context.imageSmoothingEnabled = false;
     context.drawImage(
-      this.computeCanvas,
+      source,
       0,
       0,
-      this.spriteData.width,
-      this.spriteData.height,
+      source.width,
+      source.height,
       size.width / -2,
       size.height / -2,
       size.width,
@@ -91,63 +100,124 @@ export class Sprite extends Shape {
     context.restore();
   }
 
-  private recalculate() {
+  private updateSkin() {
+    this._clearCache(this.getSkinData);
+    this.updateFrame();
+  }
+
+  private updateAnimation() {
+    this._clearCache(this.getRawFrameData);
+    this.updateFrame();
+  }
+
+  private updateMask() {
+    this._clearCache(this.getMaskData);
+    this.updateFrame();
+  }
+
+  private updateFrame() {
+    this._clearCache(this.getFrameData);
+  }
+
+  @cached('Sprite.skinData')
+  private getSkinData() {
     const skin = this.skin();
+    return skin ? getImageData(skin) : null;
+  }
+
+  @cached('Sprite.maskData')
+  private getMaskData() {
+    const mask = this.mask();
+    return mask ? getImageData(mask) : null;
+  }
+
+  @cached('Sprite.baseMaskData')
+  private getBaseMaskData() {
+    return this.baseMask ? getImageData(this.baseMask) : null;
+  }
+
+  @cached('Sprite.rawFrameData')
+  private getRawFrameData() {
     const animation = this.animation();
+    const frameId = this.frame() % animation.length;
+    return getImageData(animation[frameId]);
+  }
+
+  @cached('Sprite.frameData')
+  private getFrameData() {
+    if (!this.requiresProcessing()) {
+      return this.getRawFrameData();
+    }
+
+    const skin = this.skin();
     const mask = this.mask();
     const blend = this.maskBlend();
-    if (!this.context || !animation || animation.length === 0) return;
+    const rawFrameData = this.getRawFrameData();
+    const frameData = this.context.createImageData(rawFrameData);
 
-    const frameId = this.frame() % animation.length;
-    this.spriteData = animation[frameId];
-    this.offset(this.getOriginOffset());
-
-    this.imageData = this.context.createImageData(
-      this.spriteData.width,
-      this.spriteData.height,
-    );
+    this.computeCanvas.width = rawFrameData.width;
+    this.computeCanvas.height = rawFrameData.height;
 
     if (skin) {
-      for (let y = 0; y < this.spriteData.height; y++) {
-        for (let x = 0; x < this.spriteData.width; x++) {
+      const skinData = this.getSkinData();
+      for (let y = 0; y < rawFrameData.height; y++) {
+        for (let x = 0; x < rawFrameData.width; x++) {
           const id = this.positionToId({x, y});
-          const skinX = this.spriteData.data[id];
-          const skinY = this.spriteData.data[id + 1];
+          const skinX = rawFrameData.data[id];
+          const skinY = rawFrameData.data[id + 1];
           const skinId = ((skin.height - 1 - skinY) * skin.width + skinX) * 4;
 
-          this.imageData.data[id] = skin.data[skinId];
-          this.imageData.data[id + 1] = skin.data[skinId + 1];
-          this.imageData.data[id + 2] = skin.data[skinId + 2];
-          this.imageData.data[id + 3] = Math.round(
-            (this.spriteData.data[id + 3] / 255) *
-              (skin.data[skinId + 3] / 255) *
+          frameData.data[id] = skinData.data[skinId];
+          frameData.data[id + 1] = skinData.data[skinId + 1];
+          frameData.data[id + 2] = skinData.data[skinId + 2];
+          frameData.data[id + 3] = Math.round(
+            (rawFrameData.data[id + 3] / 255) *
+              (skinData.data[skinId + 3] / 255) *
               255,
           );
         }
       }
     } else {
-      this.imageData.data.set(this.spriteData.data);
+      frameData.data.set(rawFrameData.data);
     }
 
     if (mask || this.baseMask) {
-      for (let y = 0; y < this.spriteData.height; y++) {
-        for (let x = 0; x < this.spriteData.width; x++) {
+      const maskData = this.getMaskData();
+      const baseMaskData = this.getBaseMaskData();
+      for (let y = 0; y < rawFrameData.height; y++) {
+        for (let x = 0; x < rawFrameData.width; x++) {
           const id = this.positionToId({x, y});
           const maskValue = map(
-            mask?.data[id] ?? 255,
-            this.baseMask?.data[id] ?? 255,
+            maskData?.data[id] ?? 255,
+            baseMaskData?.data[id] ?? 255,
             this.baseMaskBlend,
           );
-          this.imageData.data[id + 3] *= map(1, maskValue / 255, blend);
+          frameData.data[id + 3] *= map(1, maskValue / 255, blend);
         }
       }
     }
 
-    this.context.putImageData(this.imageData, 0, 0);
+    this.context.putImageData(frameData, 0, 0);
     this.fire(SPRITE_CHANGE_EVENT);
-    this.markDirty();
+
+    return frameData;
   }
 
+  private requiresProcessing(): boolean {
+    return !!(this.skin() || this.mask() || this.baseMask);
+  }
+
+  /**
+   * A generator that runs this sprite's animation.
+   *
+   * For the animation to actually play, the {@link Sprite.playing} value has to
+   * be set to `true`.
+   *
+   * Should be run concurrently:
+   * ```ts
+   * yield sprite.play();
+   * ```
+   */
   public play(): ThreadGenerator {
     const runTask = this.playRunner();
     if (this.task) {
@@ -164,10 +234,17 @@ export class Sprite extends Shape {
     return this.task;
   }
 
+  /**
+   * Play the given animation once.
+   *
+   * @param animation The animation to play.
+   * @param next An optional animation that should be switched to next. If not
+   *             present the sprite will go back to the previous animation.
+   */
   @threadable()
   public *playOnce(
-    animation: SpriteData[],
-    next: SpriteData[] = null,
+    animation: ImageDataSource[],
+    next: ImageDataSource[] = null,
   ): ThreadGenerator {
     next ??= this.animation();
     this.animation(animation);
@@ -178,6 +255,11 @@ export class Sprite extends Shape {
     this.animation(next);
   }
 
+  /**
+   * Cancel the current {@link Sprite.play()} generator.
+   *
+   * Should be used instead of manually canceling the generator.
+   */
   @threadable()
   public *stop() {
     if (this.task) {
@@ -185,8 +267,6 @@ export class Sprite extends Shape {
       this.task = null;
     }
   }
-
-  private synced = false;
 
   @threadable('spriteAnimationRunner')
   private *playRunner(): ThreadGenerator {
@@ -202,6 +282,11 @@ export class Sprite extends Shape {
     }
   }
 
+  /**
+   * Wait until the given frame is shown.
+   *
+   * @param frame
+   */
   @threadable()
   public *waitForFrame(frame: number): ThreadGenerator {
     let limit = 1000;
@@ -221,45 +306,52 @@ export class Sprite extends Shape {
 
   @threadable()
   private *maskTween(
-    from: SpriteData,
-    to: SpriteData,
+    from: ImageDataSource,
+    to: ImageDataSource,
     time: number,
     interpolation: InterpolationFunction,
     onEnd: () => void,
   ): ThreadGenerator {
     this.baseMask = from;
+    this._clearCache(this.getBaseMaskData);
+
     this.baseMaskBlend = 1;
     this.mask(to);
 
     yield* tween(time, value => {
       this.baseMaskBlend = interpolation(1 - value);
-      this.recalculate();
+      this.updateFrame();
     });
+    this.baseMask = null;
+    this.baseMaskBlend = 0;
     onEnd();
   }
 
   public getColorAt(position: Vector2d): string {
     const id = this.positionToId(position);
-    return `rgba(${this.imageData.data[id]
+    const frameData = this.getFrameData();
+    return `rgba(${frameData.data[id]
       .toString()
-      .padStart(3, ' ')}, ${this.imageData.data[id + 1]
+      .padStart(3, ' ')}, ${frameData.data[id + 1]
       .toString()
-      .padStart(3, ' ')}, ${this.imageData.data[id + 2]
+      .padStart(3, ' ')}, ${frameData.data[id + 2]
       .toString()
-      .padStart(3, ' ')}, ${this.imageData.data[id + 3] / 255})`;
+      .padStart(3, ' ')}, ${frameData.data[id + 3] / 255})`;
   }
 
   public getParsedColorAt(position: Vector2d): ReturnType<typeof parseColor> {
     const id = this.positionToId(position);
+    const frameData = this.getFrameData();
     return {
-      r: this.imageData.data[id],
-      g: this.imageData.data[id + 1],
-      b: this.imageData.data[id + 2],
-      a: this.imageData.data[id + 3],
+      r: frameData.data[id],
+      g: frameData.data[id + 1],
+      b: frameData.data[id + 2],
+      a: frameData.data[id + 3],
     };
   }
 
   public positionToId(position: Vector2d): number {
-    return (position.y * this.imageData.width + position.x) * 4;
+    const frameData = this.getRawFrameData();
+    return (position.y * frameData.width + position.x) * 4;
   }
 }

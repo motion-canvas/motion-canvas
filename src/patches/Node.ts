@@ -9,24 +9,129 @@ import {useScene} from '../utils';
 
 declare module 'konva/lib/Node' {
   export interface Node {
+    /**
+     * @internal
+     */
     _centroid: boolean;
+
     style?: GetSet<Partial<Style>, this>;
+
+    /**
+     * The empty space between the borders of this node and its content.
+     *
+     * Analogous to CSS padding.
+     */
     padd: GetSet<PossibleSpacing, this>;
+
+    /**
+     * The empty space between the borders of this node and surrounding nodes.
+     *
+     * Analogous to CSS margin.
+     */
     margin: GetSet<PossibleSpacing, this>;
+
+    /**
+     * The origin of this node.
+     *
+     * By default, each node has its origin in the middle.
+     *
+     * Analogous to CSS margin.
+     */
     origin: GetSet<Origin, this>;
-    drawOrigin: GetSet<Origin, this>;
+
+    /**
+     * @param value
+     * @ignore
+     */
     setX(value: number): this;
+
+    /**
+     * @param value
+     * @ignore
+     */
     setY(value: number): this;
+
+    /**
+     * @param width
+     * @ignore
+     */
     setWidth(width: number): void;
+
+    /**
+     * @param height
+     * @ignore
+     */
     setHeight(height: number): void;
+
+    /**
+     * @param value
+     * @ignore
+     */
     setPadd(value: PossibleSpacing): this;
+
+    /**
+     * @param value
+     * @ignore
+     */
     setMargin(value: PossibleSpacing): this;
+
+    /**
+     * @param value
+     * @ignore
+     */
     setOrigin(value: Origin): this;
+
+    /**
+     * @ignore
+     */
     getPadd(): Spacing;
+
+    /**
+     * @ignore
+     */
     getMargin(): Spacing;
+
+    /**
+     * @ignore
+     */
     getOrigin(): Origin;
+
+    /**
+     * Get the size of this node used for layout calculations.
+     *
+     * The returned size should include the padding.
+     * A node can use the size of its children to derive its own dimensions.
+     *
+     * @param custom Custom node configuration to use during the calculations.
+     *               When present, the method will return the layout size that
+     *               the node would have, if it had these options configured.
+     */
     getLayoutSize(custom?: NodeConfig): Size;
+
+    /**
+     * Get the vector from the local origin of this node to its current origin.
+     *
+     * The local origin is the center of coordinates of the canvas when drawing
+     * the node. Centroid nodes will have their local origin at the center.
+     * Other shapes will have it in the top left corner.
+     *
+     * The current origin is configured via {@link Node.origin}.
+     *
+     * @param custom Custom node configuration to use during the calculations.
+     *               When present, the method will return the origin offset that
+     *               the node would have, if it had these options configured.
+     */
     getOriginOffset(custom?: NodeConfig): Vector2d;
+
+    /**
+     * Get the vector from the current origin of this node to the `newOrigin`.
+     *
+     * @param newOrigin The origin to which the delta should be calculated.
+     *
+     * @param custom Custom node configuration to use during the calculations.
+     *               When present, the method will return the origin offset that
+     *               the node would have, if it had these options configured.
+     */
     getOriginDelta(newOrigin: Origin, custom?: NodeConfig): Vector2d;
 
     /**

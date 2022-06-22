@@ -71,20 +71,28 @@ const compiler = webpack({
         },
       },
       {
-        test: /\.glsl$/i,
-        type: 'asset/source',
-      },
-      {
-        test: /\.mp4/i,
-        type: 'asset',
-      },
-      {
         test: /\.meta/i,
         loader: 'meta-loader',
       },
       {
-        test: /\.wav$/i,
+        test: /\.(wav|mp3|ogg|mp4)$/i,
         type: 'asset',
+      },
+      {
+        test: /\.(png|jpe?g)$/i,
+        oneOf: [
+          {
+            resourceQuery: /img/,
+            loader: 'image-loader',
+          },
+          {
+            resourceQuery: /anim/,
+            loader: 'animation-loader',
+          },
+          {
+            type: 'asset',
+          },
+        ],
       },
       {
         test: /\.csv$/,
@@ -96,20 +104,8 @@ const compiler = webpack({
         },
       },
       {
-        test: /\.anim$/i,
-        use: [
-          {
-            loader: 'animation-loader',
-          },
-        ],
-      },
-      {
-        test: /\.png$/i,
-        use: [
-          {
-            loader: 'sprite-loader',
-          },
-        ],
+        test: /\.glsl$/i,
+        type: 'asset/source',
       },
     ],
   },

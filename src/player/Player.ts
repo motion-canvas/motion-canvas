@@ -3,7 +3,7 @@ import {
   SimpleEventDispatcher,
 } from 'strongly-typed-events';
 
-import {AudioManager} from '../audio';
+import {AudioManager} from '../media';
 import type {Project} from '../Project';
 
 const MAX_AUDIO_DESYNC = 1 / 50;

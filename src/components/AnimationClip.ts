@@ -1,14 +1,15 @@
 import {getset, KonvaNode} from '../decorators';
-import {Sprite, SpriteData} from './Sprite';
+import {Sprite} from './Sprite';
 import {GetSet} from 'konva/lib/types';
 import {LinearLayout} from './LinearLayout';
 import {Center} from '../types';
 import {Surface, SurfaceConfig} from './Surface';
 import {getStyle, Style} from '../styles';
+import {ImageDataSource} from '../media';
 
 export interface AnimationClipConfig extends SurfaceConfig {
-  animation: SpriteData[];
-  skin?: SpriteData;
+  animation: ImageDataSource[];
+  skin?: ImageDataSource;
   frame?: number;
   style?: Partial<Style>;
 }

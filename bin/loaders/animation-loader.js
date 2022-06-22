@@ -1,9 +1,8 @@
 const path = require('path');
 const {readdirSync} = require('fs');
-const loadImage = require('../utils/load-image');
-const nameRegex = /[^\d]*(\d+)\.png$/;
+const nameRegex = /\D*(\d+)\.png$/;
 
-function loader() {
+function animationLoader() {
   const callback = this.async();
   const directoryPath = path.dirname(this.resourcePath);
 
@@ -16,20 +15,16 @@ function loader() {
     )
     .map(([file]) => path.resolve(directoryPath, file));
 
-  files.forEach(file => this.addDependency(file));
-
-  loadAnimation(files)
-    .then(result => callback(null, result))
+  loadAnimation(files, this.importModule)
+    .then(code => callback(null, code))
     .catch(error => callback(error));
 }
 
-async function loadAnimation(files) {
-  const frames = [];
-  for (const file of files) {
-    frames.push(await loadImage(file));
-  }
+async function loadAnimation(files, importModule) {
+  const urls = await Promise.all(files.map(file => importModule(file)));
 
-  return `export default ${JSON.stringify(frames)};`;
+  return `import {loadAnimation} from '@motion-canvas/core/lib/media';
+export default loadAnimation(${JSON.stringify(urls)});`;
 }
 
-module.exports = loader;
+module.exports = animationLoader;

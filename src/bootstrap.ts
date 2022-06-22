@@ -4,7 +4,7 @@ import type {SceneRunner} from './Scene';
 import {Project, ProjectSize} from './Project';
 import {Player} from './player';
 import {hot} from './hot';
-import {AudioManager} from './audio';
+import {AudioManager} from './media';
 
 interface BootstrapConfig {
   name: string;
