@@ -1,13 +1,14 @@
-import styles from './Sidebar.module.scss';
+import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
 
+import {GeneratorHelper} from '@motion-canvas/core/lib/helpers';
 import type {PlayerRenderEvent} from '@motion-canvas/core/lib/player/Player';
 import type {Thread} from '@motion-canvas/core/lib/threading';
-import {IconType} from '../controls';
-import {Tabs} from '../tabs/Tabs';
+
 import {useEventEffect, usePlayer, usePlayerState} from '../../hooks';
-import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
-import {GeneratorHelper} from '@motion-canvas/core/lib/helpers';
-import {Button, Label, Input, Group, Select} from '../controls';
+import {Button, Group, IconType, Input, Label, Select} from '../controls';
+import {Tabs} from '../tabs/Tabs';
+import {Properties} from './Properties';
+import styles from './Sidebar.module.scss';
 
 interface SidebarProps {
   setOpen?: (value: boolean) => void;
@@ -29,14 +30,6 @@ export function Sidebar({setOpen}: SidebarProps) {
         pane: <Threads />,
       }}
     </Tabs>
-  );
-}
-
-function Properties() {
-  return (
-    <div className={styles.pane}>
-      <div className={styles.header}>Properties</div>
-    </div>
   );
 }
 

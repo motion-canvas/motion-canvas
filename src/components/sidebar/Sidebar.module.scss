@@ -15,3 +15,23 @@
   font-weight: bold;
   margin-bottom: 16px;
 }
+
+.copied {
+  margin-top: 10px;
+  text-align: center;
+  font-style: italic;
+  opacity: 0;
+
+  @keyframes fadeOut {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  &.visible {
+    animation: fadeOut 0.75s linear;
+  }
+}

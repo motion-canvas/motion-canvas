@@ -1,9 +1,8 @@
-import styles from './Controls.module.scss';
 import type {JSX} from 'preact';
 
-type GroupProps = JSX.HTMLAttributes<HTMLDivElement>;
+import styles from './Controls.module.scss';
 
-export function Group(props: GroupProps) {
+export function Group(props: JSX.HTMLAttributes<HTMLDivElement>) {
   return (
     <div className={styles.group} {...props}>
       {props.children}

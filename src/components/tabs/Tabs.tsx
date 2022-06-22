@@ -2,9 +2,10 @@ import styles from './Tabs.module.scss';
 
 import {Icon, IconType} from '../controls';
 import {ComponentChildren} from 'preact';
-import {useCallback, useEffect} from 'preact/hooks';
+import {useCallback, useContext, useEffect} from 'preact/hooks';
 import {classes} from '../../utils';
 import {useStorage} from '../../hooks';
+import {AppContext} from '../../AppContext';
 
 interface TabsProps {
   children: {icon: IconType; pane: ComponentChildren}[];
@@ -24,6 +25,13 @@ export function Tabs({children, onToggle, id}: TabsProps) {
   useEffect(() => {
     onToggle?.(tab);
   }, [onToggle, tab]);
+
+  const {selectedNode} = useContext(AppContext);
+  useEffect(() => {
+    if (selectedNode && tab !== -1) {
+      setTab(0);
+    }
+  }, [selectedNode]);
 
   return (
     <div className={styles.root}>

@@ -1,25 +1,27 @@
-import styles from './Viewport.module.scss';
-
-import {PlaybackControls, PlaybackProgress} from '../playback';
-import {View} from './View';
-import {CurrentTime} from '../playback/CurrentTime';
 import {usePlayer, usePlayerState} from '../../hooks';
+import {PlaybackControls, PlaybackProgress} from '../playback';
+import {CurrentTime} from '../playback/CurrentTime';
+import {View} from './View';
+import styles from './Viewport.module.scss';
 
 export function Viewport() {
   const player = usePlayer();
   const state = usePlayerState();
+
   return (
     <div className={styles.root}>
       <View />
       <PlaybackProgress />
       <div className={styles.playback}>
         <CurrentTime
-          render={time => (
-            <div className={styles.time}>
-              {formatFrames(player.project.framesToSeconds(time))}
-              <span className={styles.frames}>[{time}]</span>
-            </div>
-          )}
+          render={time => {
+            return (
+              <div className={styles.time}>
+                {formatFrames(player.project.framesToSeconds(time))}
+                <span className={styles.frames}>[{time}]</span>
+              </div>
+            );
+          }}
         />
         <PlaybackControls />
         <div className={styles.duration}>

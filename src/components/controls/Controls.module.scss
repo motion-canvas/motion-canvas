@@ -1,3 +1,12 @@
+.colorPreview {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+
+  margin: 4px;
+}
+
 .icon {
   &:after {
     width: 24px;
@@ -67,6 +76,7 @@
 
 .group {
   display: flex;
+  align-items: center;
   gap: 8px;
   padding: 4px 0;
 }
@@ -82,7 +92,8 @@
 
 .select,
 .input,
-.button {
+.button,
+.value {
   background: #404040;
   color: rgba(255, 255, 255, 0.6);
   border: 0;
@@ -90,6 +101,7 @@
   padding: 0 8px;
   font-size: 14px;
   height: 24px;
+  line-height: 24px;
   flex-shrink: 1;
   flex-grow: 1;
   flex-basis: 100%;
@@ -118,8 +130,32 @@
   }
 }
 
+.value {
+  &::before {
+    content: attr(data-value);
+  }
+
+  &[data-full]:hover::before {
+    content: attr(data-full);
+  }
+
+  .colorPreview + & {
+    padding-left: 24px;
+  }
+}
+
+.valueWrapper {
+  position: relative;
+  display: flex;
+
+  flex-shrink: 1;
+  flex-grow: 1;
+  flex-basis: 100%;
+}
+
 .select,
-.button {
+.button,
+.value.pointerCursor {
   cursor: pointer;
 }
 

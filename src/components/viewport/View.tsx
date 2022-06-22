@@ -1,6 +1,7 @@
-import type {Node} from 'konva/lib/Node';
 import type {Container} from 'konva/lib/Container';
-import styles from './Viewport.module.scss';
+import {useCallback, useContext, useEffect, useRef} from 'preact/hooks';
+import {AppContext} from '../../AppContext';
+
 import {
   useDocumentEvent,
   useDrag,
@@ -9,9 +10,9 @@ import {
   useSize,
   useStorage,
 } from '../../hooks';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
-import {Grid} from './Grid';
 import {Debug} from './Debug';
+import {Grid} from './Grid';
+import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
 
 const ZOOM_SPEED = 0.1;
@@ -22,7 +23,6 @@ export function View() {
   const viewportRef = useRef<HTMLDivElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
-  const [node, setNode] = useState<Node>(null);
 
   const [state, setState] = useStorage<ViewportState>('viewport', {
     width: 1920,
@@ -32,6 +32,7 @@ export function View() {
     zoom: 1,
     grid: false,
   });
+  const {selectedNode, setSelectedNode} = useContext(AppContext);
 
   useEffect(() => {
     setState({
@@ -108,20 +109,20 @@ export function View() {
             setState({...state, grid: !state.grid});
             break;
           case 'ArrowUp':
-            if (node?.parent) {
-              setNode(node.parent);
+            if (selectedNode?.parent) {
+              setSelectedNode(selectedNode.parent);
             }
             break;
           case 'ArrowDown': {
-            const container = node as Container;
+            const container = selectedNode as Container;
             if (container?.children?.length) {
-              setNode(container.children.at(-1));
+              setSelectedNode(container.children.at(-1));
             }
             break;
           }
         }
       },
-      [setState, state, node],
+      [setState, state, selectedNode],
     ),
   );
 
@@ -148,7 +149,7 @@ export function View() {
             player.project.master.drawHit();
             const node = player.project.master.getIntersection(position);
             player.project.listening(false);
-            setNode(node);
+            setSelectedNode(node);
           } else {
             handleDrag(event);
           }
@@ -178,7 +179,7 @@ export function View() {
           ref={viewportRef}
         />
         <Grid />
-        <Debug node={node} setNode={setNode} />
+        <Debug node={selectedNode} setNode={setSelectedNode} />
         <div ref={overlayRef} className={styles.overlay} />
       </div>
     </ViewportContext.Provider>
