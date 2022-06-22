@@ -117,6 +117,7 @@ const compiler = webpack({
   },
   output: {
     filename: `[name].js`,
+    publicPath: '/',
     path: __dirname,
   },
   plugins: [
