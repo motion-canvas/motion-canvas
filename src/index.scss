@@ -5,7 +5,19 @@
 
 * {
   box-sizing: border-box;
-  font-family: "JetBrains Mono", sans-serif;
+  font-family: 'JetBrains Mono', sans-serif;
+
+  &::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+    background-color: #242424;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.24);
+    border: 6px solid #242424;
+    border-radius: 8px;
+  }
 }
 
 html,

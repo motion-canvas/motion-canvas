@@ -67,6 +67,11 @@ function YesNodeSelected({node}: {node: Node}) {
           })`;
         }
 
+        // Temporary padding and margin support
+        if (typeof value === 'object' && 'left' in value) {
+          value = `${value.top}, ${value.right}, ${value.bottom}, ${value.left}`;
+        }
+
         return (
           <Group>
             <Label>{key}</Label>

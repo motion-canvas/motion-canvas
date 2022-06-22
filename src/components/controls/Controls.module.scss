@@ -131,8 +131,12 @@
 }
 
 .value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
   &::before {
     content: attr(data-value);
+    white-space: nowrap;
   }
 
   &[data-full]:hover::before {
