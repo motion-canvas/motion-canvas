@@ -1,3 +1,10 @@
+## [4.0.1](https://github.com/motion-canvas/core/compare/v4.0.0...v4.0.1) (2022-06-22)
+
+
+### Bug Fixes
+
+* add missing public path ([#40](https://github.com/motion-canvas/core/issues/40)) ([48213de](https://github.com/motion-canvas/core/commit/48213de087d6bb35f29919f5588e3a4517e080b6))
+
 # [4.0.0](https://github.com/motion-canvas/core/compare/v3.0.3...v4.0.0) (2022-06-22)
 
 
