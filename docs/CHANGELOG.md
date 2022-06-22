@@ -1,3 +1,11 @@
+# [4.1.0](https://github.com/motion-canvas/core/compare/v4.0.1...v4.1.0) (2022-06-22)
+
+
+### Features
+
+* improve surface clipping ([#41](https://github.com/motion-canvas/core/issues/41)) ([003b7d5](https://github.com/motion-canvas/core/commit/003b7d58d6490170cea81b2d1b37cf59b4d698cf))
+* make surfaces transparent by default ([#42](https://github.com/motion-canvas/core/issues/42)) ([cd71285](https://github.com/motion-canvas/core/commit/cd712857579ec45b3e6f40d0e48fce80fefed5b9)), closes [#25](https://github.com/motion-canvas/core/issues/25)
+
 ## [4.0.1](https://github.com/motion-canvas/core/compare/v4.0.0...v4.0.1) (2022-06-22)
 
 
