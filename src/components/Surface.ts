@@ -31,6 +31,7 @@ export interface SurfaceConfig extends ContainerConfig {
   child?: Node;
   rescaleChild?: boolean;
   shadow?: boolean;
+  overflow?: boolean;
 }
 
 @KonvaNode()
@@ -45,6 +46,8 @@ export class Surface extends Group {
   public rescaleChild: GetSet<SurfaceConfig['rescaleChild'], this>;
   @getset(false)
   public shadow: GetSet<SurfaceConfig['shadow'], this>;
+  @getset(false)
+  public overflow: GetSet<SurfaceConfig['overflow'], this>;
 
   private surfaceMask: SurfaceMask | null = null;
   private circleMask: CircleMask | null = null;
@@ -192,10 +195,11 @@ export class Surface extends Group {
     const opacity = this.getAbsoluteOpacity();
 
     const size = this.surfaceMask ?? this.layoutData;
+    const radius = this.surfaceMask?.radius ?? this.radius();
     if (this.rippleTween > 0) {
       const width = size.width + easeOutExpo(this.rippleTween, 0, 100);
       const height = size.height + easeOutExpo(this.rippleTween, 0, 100);
-      const radius = this.radius() + easeOutExpo(this.rippleTween, 0, 50);
+      const rippleRadius = radius + easeOutExpo(this.rippleTween, 0, 50);
 
       context.save();
       context._context.fillStyle = this.surfaceMask?.color ?? this.background();
@@ -206,7 +210,7 @@ export class Surface extends Group {
         -height / 2,
         width,
         height,
-        radius,
+        rippleRadius,
       );
       context._context.fill();
       context.restore();
@@ -233,28 +237,20 @@ export class Surface extends Group {
       context._context.shadowOffsetY = 10;
       context._context.shadowBlur = 40;
     }
-    CanvasHelper.roundRect(
-      context._context,
+
+    const path = CanvasHelper.roundRectPath(
+      new Path2D(),
       -size.width / 2,
       -size.height / 2,
       size.width,
       size.height,
-      this.surfaceMask?.radius ?? this.radius(),
+      radius,
     );
-    context._context.fill();
+    context._context.fill(path);
     context.restore();
 
-    if (this.surfaceMask) {
-      context._context.clip(
-        CanvasHelper.roundRectPath(
-          new Path2D(),
-          -size.width / 2,
-          -size.height / 2,
-          size.width,
-          size.height,
-          this.surfaceMask.radius,
-        ),
-      );
+    if (!this.overflow() || this.surfaceMask) {
+      context._context.clip(path);
     }
 
     m = transform.copy().invert().getMatrix();
