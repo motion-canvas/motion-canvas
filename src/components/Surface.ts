@@ -38,7 +38,7 @@ export interface SurfaceConfig extends ContainerConfig {
 export class Surface extends Group {
   @getset(8)
   public radius: GetSet<SurfaceConfig['radius'], this>;
-  @getset('#FF00FF')
+  @getset('#00000000')
   public background: GetSet<SurfaceConfig['background'], this>;
   @getset(null)
   public child: GetSet<SurfaceConfig['child'], this>;
