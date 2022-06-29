@@ -1,28 +1,22 @@
 import {AudioData} from './AudioData';
-import {SimpleEventDispatcher} from 'strongly-typed-events';
+import {ValueDispatcher} from '../events';
 
 export class AudioManager {
-  public get DataChanged() {
-    return this.dataChanged.asEvent();
+  public get onDataChanged() {
+    return this.data.subscribable;
   }
+  private readonly data = new ValueDispatcher<AudioData>(null);
 
-  public get OffsetChanged() {
-    return this.dataChanged.asEvent();
+  public get onOffsetChanged() {
+    return this.offset.subscribable;
   }
+  private readonly offset = new ValueDispatcher(0);
 
   private static readonly context = new AudioContext();
   private readonly audioElement: HTMLAudioElement = new Audio();
   private source: string = null;
-  private offset = 0;
   private error = false;
-  private data: AudioData = null;
-  private dataChanged = new SimpleEventDispatcher<AudioData>();
-  private offsetChanged = new SimpleEventDispatcher<number>();
   private abortController: AbortController = null;
-
-  public getData() {
-    return this.data;
-  }
 
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);
@@ -33,8 +27,7 @@ export class AudioManager {
   }
 
   public setOffset(value: number) {
-    this.offset = value;
-    this.offsetChanged.dispatch(value);
+    this.offset.current = value;
   }
 
   public setMuted(isMuted: boolean) {
@@ -54,15 +47,15 @@ export class AudioManager {
   }
 
   public isInRange(time: number) {
-    return time >= this.offset && time < this.audioElement.duration;
+    return time >= this.offset.current && time < this.audioElement.duration;
   }
 
   public toRelativeTime(time: number) {
-    return Math.max(0, time - this.offset);
+    return Math.max(0, time - this.offset.current);
   }
 
   public toAbsoluteTime(time: number) {
-    return time + this.offset;
+    return time + this.offset.current;
   }
 
   public isReady() {
@@ -98,8 +91,7 @@ export class AudioManager {
   }
 
   private async loadData(signal: AbortSignal) {
-    this.data = null;
-    this.dataChanged.dispatch(this.data);
+    this.data.current = null;
 
     const response = await fetch(this.source, {signal});
     const rawBuffer = await response.arrayBuffer();
@@ -151,13 +143,12 @@ export class AudioManager {
       }
     }
 
-    this.data = {
+    this.data.current = {
       peaks,
       absoluteMax,
       length: samples,
       sampleRate: (audioBuffer.sampleRate / sampleSize) * 2,
     };
-    this.dataChanged.dispatch(this.data);
   }
 
   private decodeAudioData(buffer: ArrayBuffer): Promise<AudioBuffer> {

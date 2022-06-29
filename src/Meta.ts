@@ -1,4 +1,4 @@
-import {SimpleEventDispatcher} from 'strongly-typed-events';
+import {ValueDispatcher} from './events';
 
 /**
  * Represents the contents of a meta file.
@@ -18,22 +18,20 @@ export class Meta<T extends Metadata = Metadata> {
    *
    * @event T
    */
-  public get Changed() {
-    return this.changed.asEvent();
+  public get onDataChanged() {
+    return this.data.subscribable;
   }
+  private readonly data = new ValueDispatcher(<T>{version: META_VERSION});
 
-  private data: T;
   private rawData: string;
   private source: string;
-  private changed = new SimpleEventDispatcher<T>();
 
   private constructor() {
-    this.data = <T>{version: META_VERSION};
-    this.rawData = JSON.stringify(this.data, undefined, 2);
+    this.rawData = JSON.stringify(this.data.current, undefined, 2);
   }
 
-  public getData(): T {
-    return this.data;
+  public getData() {
+    return this.data.current;
   }
 
   /**
@@ -48,12 +46,11 @@ export class Meta<T extends Metadata = Metadata> {
   }
 
   public async setData(data: Partial<T>) {
-    this.data = {
-      ...this.data,
+    this.data.current = {
+      ...this.data.current,
       ...data,
     };
-    this.rawData = JSON.stringify(this.data, undefined, 2);
-    this.changed.dispatch(this.data);
+    this.rawData = JSON.stringify(this.data.current, undefined, 2);
     const response = await fetch(`/meta/${this.source}`, {
       method: 'POST',
       body: this.rawData,
@@ -105,9 +102,8 @@ export class Meta<T extends Metadata = Metadata> {
     try {
       const data: Metadata = JSON.parse(rawData);
       data.version ??= META_VERSION;
-      meta.data = data;
+      meta.data.current = data;
       meta.rawData = rawData;
-      meta.changed.dispatch(data);
     } catch (e) {
       console.error(`Error when parsing ${decodeURIComponent(source)}:`);
       console.error(e);

@@ -7,9 +7,9 @@ import {Vector2d} from 'konva/lib/types';
 import {Konva} from 'konva/lib/Global';
 import {Thread, ThreadsCallback} from './threading';
 import {Scene, SceneRunner} from './Scene';
-import {SimpleEventDispatcher} from 'strongly-typed-events';
 import {KonvaNode} from './decorators';
 import {Meta, Metadata} from './Meta';
+import {ValueDispatcher} from './events';
 
 Konva.autoDrawEnabled = false;
 
@@ -26,9 +26,10 @@ export type ProjectMetadata = Metadata;
 
 @KonvaNode()
 export class Project extends Stage {
-  public get ScenesChanged() {
-    return this.scenesChanged.asEvent();
+  public get onScenesChanged() {
+    return this.scenes.subscribable;
   }
+  private readonly scenes = new ValueDispatcher<Scene[]>([]);
 
   public readonly version = CORE_VERSION;
   public readonly meta: Meta<ProjectMetadata>;
@@ -40,10 +41,6 @@ export class Project extends Stage {
 
   public get time(): number {
     return this.framesToSeconds(this.frame);
-  }
-
-  public get scenes(): Scene[] {
-    return Object.values(this.sceneLookup);
   }
 
   public get thread(): Thread {
@@ -64,7 +61,6 @@ export class Project extends Stage {
   }
 
   private framesPerSeconds = 30;
-  private readonly scenesChanged = new SimpleEventDispatcher<Scene[]>();
   private readonly sceneLookup: Record<string, Scene> = {};
   private previousScene: Scene = null;
   private currentScene: Scene = null;
@@ -176,7 +172,8 @@ export class Project extends Stage {
 
     this.frame = 0;
     let offset = 0;
-    for (const scene of this.scenes) {
+    const scenes = Object.values(this.sceneLookup);
+    for (const scene of scenes) {
       if (scene.isMarkedAsCached()) {
         scene.firstFrame += offset;
         this.frame = scene.lastFrame;
@@ -201,7 +198,7 @@ export class Project extends Stage {
     }
 
     this.currentScene = initialScene;
-    this.scenesChanged.dispatch(this.scenes);
+    this.scenes.current = scenes;
   }
 
   public async seek(frame: number, speed = 1): Promise<boolean> {

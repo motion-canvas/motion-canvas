@@ -1,5 +1,5 @@
 import type {Scene} from './Scene';
-import {SimpleEventDispatcher} from 'strongly-typed-events';
+import {ValueDispatcher} from './events';
 
 /**
  * Represents a time event at runtime.
@@ -45,11 +45,11 @@ export class TimeEvents {
    *
    * @event TimeEvent[]
    */
-  public get Changed() {
-    return this.changed.asEvent();
+  public get onChanged() {
+    return this.events.subscribable;
   }
+  private readonly events = new ValueDispatcher<TimeEvent[]>([]);
 
-  private readonly changed = new SimpleEventDispatcher<TimeEvent[]>();
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
   private previousReference: SavedTimeEvent[];
@@ -68,7 +68,7 @@ export class TimeEvents {
       this.load(scene.meta.getData().timeEvents ?? []);
     }
 
-    scene.meta.Changed.subscribe(event => {
+    scene.meta.onDataChanged.subscribe(event => {
       // Ignore the event if `timeEvents` hasn't changed.
       // This may happen when another part of metadata has changed triggering
       // this event.
@@ -79,11 +79,7 @@ export class TimeEvents {
       this.load(event.timeEvents ?? []);
       scene.reload();
       window.player.reload();
-    });
-  }
-
-  public toArray(): TimeEvent[] {
-    return Object.values(this.registeredEvents);
+    }, false);
   }
 
   public get(name: string) {
@@ -110,7 +106,7 @@ export class TimeEvents {
       offset,
     };
     this.registeredEvents[name] = this.lookup[name];
-    this.changed.dispatch(this.toArray());
+    this.events.current = Object.values(this.registeredEvents);
     this.scene.reload();
   }
 
@@ -179,7 +175,7 @@ export class TimeEvents {
    */
   public onCache() {
     this.preserveTiming = true;
-    this.changed.dispatch(this.toArray());
+    this.events.current = Object.values(this.registeredEvents);
 
     if (this.ignoreSave) {
       this.ignoreSave = false;

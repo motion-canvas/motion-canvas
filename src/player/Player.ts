@@ -1,10 +1,10 @@
-import {
-  PromiseSimpleEventDispatcher,
-  SimpleEventDispatcher,
-} from 'strongly-typed-events';
-
 import {AudioManager} from '../media';
 import type {Project} from '../Project';
+import {
+  AsyncEventDispatcher,
+  EventDispatcher,
+  ValueDispatcher,
+} from '../events';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
@@ -23,60 +23,22 @@ export interface PlayerState extends Record<string, unknown> {
   scale: number;
 }
 
-export interface PlayerTime {
-  duration: number;
-  durationTime: number;
-  frame: number;
-  completion: number;
-  time: number;
-}
-
 interface PlayerCommands {
   reset: boolean;
   seek: number;
   recalculate: boolean;
 }
 
-export interface PlayerRenderEvent {
+export interface RenderData {
   frame: number;
   data: Blob;
 }
 
 export class Player {
-  public get StateChanged() {
-    return this.stateChanged.asEvent();
+  public get onStateChanged() {
+    return this.state.subscribable;
   }
-
-  public get TimeChanged() {
-    return this.timeChanged.asEvent();
-  }
-
-  public get FrameRendered() {
-    return this.frameRendered.asEvent();
-  }
-
-  public get Reloaded() {
-    return this.reloaded.asEvent();
-  }
-
-  private readonly stateChanged = new SimpleEventDispatcher<PlayerState>();
-  private readonly timeChanged = new SimpleEventDispatcher<PlayerTime>();
-  private readonly frameRendered =
-    new PromiseSimpleEventDispatcher<PlayerRenderEvent>();
-  private readonly reloaded = new SimpleEventDispatcher<number>();
-
-  private startTime: number;
-  private renderTime = 0;
-  private requestId: number = null;
-  private frame = 0;
-
-  private commands: PlayerCommands = {
-    reset: true,
-    seek: -1,
-    recalculate: true,
-  };
-
-  private state: PlayerState = {
+  private readonly state = new ValueDispatcher<PlayerState>({
     duration: Infinity,
     startFrame: 0,
     endFrame: Infinity,
@@ -89,6 +51,31 @@ export class Player {
     muted: true,
     fps: 30,
     scale: 1,
+  });
+
+  public get onFrameChanged() {
+    return this.frame.subscribable;
+  }
+  private readonly frame = new ValueDispatcher(0);
+
+  public get onFrameRendered() {
+    return this.frameRendered.subscribable;
+  }
+  private readonly frameRendered = new AsyncEventDispatcher<RenderData>();
+
+  public get onReloaded() {
+    return this.reloaded.subscribable;
+  }
+  private readonly reloaded = new EventDispatcher<number>();
+
+  private startTime: number;
+  private renderTime = 0;
+  private requestId: number = null;
+
+  private commands: PlayerCommands = {
+    reset: true,
+    seek: -1,
+    recalculate: true,
   };
 
   public constructor(
@@ -96,24 +83,10 @@ export class Player {
     public readonly audio: AudioManager,
   ) {
     this.startTime = performance.now();
-    this.project.framerate = this.state.fps;
-    this.project.resolutionScale = this.state.scale;
+    this.project.framerate = this.state.current.fps;
+    this.project.resolutionScale = this.state.current.scale;
 
     this.request();
-  }
-
-  public getState(): PlayerState {
-    return {...this.state};
-  }
-
-  public getTime(): PlayerTime {
-    return {
-      frame: this.frame,
-      time: this.project.framesToSeconds(this.frame),
-      duration: this.state.duration,
-      durationTime: this.project.framesToSeconds(this.state.duration),
-      completion: this.frame / this.state.duration,
-    };
   }
 
   public loadState(state: Partial<PlayerState>) {
@@ -126,24 +99,18 @@ export class Player {
   private updateState(newState: Partial<PlayerState>) {
     let changed = false;
     for (const prop in newState) {
-      if (newState[prop] !== this.state[prop]) {
+      if (newState[prop] !== this.state.current[prop]) {
         changed = true;
         break;
       }
     }
 
     if (changed) {
-      this.state = {
-        ...this.state,
+      this.state.current = {
+        ...this.state.current,
         ...newState,
       };
-      this.stateChanged.dispatch(this.state);
     }
-  }
-
-  private updateFrame(value: number) {
-    this.frame = value;
-    this.timeChanged.dispatch(this.getTime());
   }
 
   private consumeCommands(): PlayerCommands {
@@ -163,10 +130,10 @@ export class Player {
   }
 
   public setRange(
-    startFrame = this.state.startFrame,
-    endFrame = this.state.endFrame,
+    startFrame = this.state.current.startFrame,
+    endFrame = this.state.current.endFrame,
   ) {
-    if (endFrame >= this.state.duration || !endFrame) {
+    if (endFrame >= this.state.current.duration || !endFrame) {
       endFrame = Infinity;
     }
 
@@ -194,15 +161,15 @@ export class Player {
   }
 
   public setFramerate(fps: number) {
-    const ratio = fps / this.state.fps;
+    const ratio = fps / this.state.current.fps;
     this.project.framerate = fps;
     this.updateState({
       fps,
-      startFrame: Math.floor(this.state.startFrame * ratio),
-      endFrame: Math.floor(this.state.endFrame * ratio),
-      duration: Math.floor(this.state.duration * ratio),
+      startFrame: Math.floor(this.state.current.startFrame * ratio),
+      endFrame: Math.floor(this.state.current.endFrame * ratio),
+      duration: Math.floor(this.state.current.duration * ratio),
     });
-    this.requestSeek(Math.floor(this.frame * ratio));
+    this.requestSeek(Math.floor(this.frame.current * ratio));
     this.reload();
   }
 
@@ -213,11 +180,11 @@ export class Player {
   }
 
   public requestPreviousFrame(): void {
-    this.commands.seek = this.frame - 1;
+    this.commands.seek = this.frame.current - 1;
   }
 
   public requestNextFrame(): void {
-    this.commands.seek = this.frame + 1;
+    this.commands.seek = this.frame.current + 1;
   }
 
   public requestReset(): void {
@@ -225,18 +192,18 @@ export class Player {
   }
 
   public requestSeek(value: number): void {
-    this.commands.seek = this.clampRange(value, this.state);
+    this.commands.seek = this.clampRange(value, this.state.current);
   }
 
-  public toggleLoop(value = !this.state.loop) {
+  public toggleLoop(value = !this.state.current.loop) {
     this.updateState({loop: value});
   }
 
-  public togglePlayback(value: boolean = this.state.paused): void {
+  public togglePlayback(value: boolean = this.state.current.paused): void {
     this.updateState({paused: !value});
   }
 
-  public toggleRendering(value = !this.state.render): void {
+  public toggleRendering(value = !this.state.current.render): void {
     if (value) {
       this.requestSeek(0);
       this.reload();
@@ -244,13 +211,13 @@ export class Player {
     this.updateState({render: value});
   }
 
-  public toggleAudio(value: boolean = this.state.muted): void {
+  public toggleAudio(value: boolean = this.state.current.muted): void {
     this.updateState({muted: !value});
   }
 
   private async run() {
     const commands = this.consumeCommands();
-    const state = {...this.state};
+    const state = {...this.state.current};
     if (state.finished && state.loop && commands.seek < 0) {
       commands.seek = state.startFrame;
     }
@@ -260,7 +227,7 @@ export class Player {
       const startTime = performance.now();
       await this.project.recalculate();
       const duration = this.project.frame;
-      const frame = commands.seek < 0 ? this.frame : commands.seek;
+      const frame = commands.seek < 0 ? this.frame.current : commands.seek;
       const finished = await this.project.seek(frame);
       this.project.draw();
       this.updateState({
@@ -271,8 +238,8 @@ export class Player {
             ? duration
             : state.endFrame,
       });
-      if (this.frame + 1 !== this.project.frame) {
-        this.updateFrame(this.project.frame);
+      if (this.frame.current + 1 !== this.project.frame) {
+        this.frame.current = this.project.frame;
       }
       this.request();
       this.reloaded.dispatch(performance.now() - startTime);
@@ -294,7 +261,7 @@ export class Player {
     if (state.render) {
       state.finished = await this.project.next();
       this.project.draw();
-      await this.frameRendered.dispatchAsync({
+      await this.frameRendered.dispatch({
         frame: this.project.frame,
         data: await this.project.getBlob(),
       });
@@ -305,7 +272,7 @@ export class Player {
       this.updateState({
         finished: state.finished,
       });
-      this.updateFrame(this.project.frame);
+      this.frame.current = this.project.frame;
       this.request();
       return;
     }
@@ -363,7 +330,7 @@ export class Player {
     this.updateState({
       finished: state.finished || this.project.frame >= state.endFrame,
     });
-    this.updateFrame(this.project.frame);
+    this.frame.current = this.project.frame;
 
     this.request();
   }
@@ -388,7 +355,7 @@ export class Player {
 
   private request() {
     this.requestId = requestAnimationFrame(async time => {
-      if (time - this.renderTime >= 990 / this.state.fps) {
+      if (time - this.renderTime >= 990 / this.state.current.fps) {
         this.renderTime = time;
         try {
           await this.run();

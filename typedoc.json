@@ -4,11 +4,12 @@
   "entryPoints": [
     "src",
     "src/animations",
-    "src/audio",
     "src/components",
     "src/decorators",
+    "src/events",
     "src/flow",
     "src/helpers",
+    "src/media",
     "src/player",
     "src/styles",
     "src/themes",
@@ -16,7 +17,6 @@
     "src/transitions",
     "src/tweening",
     "src/types",
-    "src/utils",
-    "src/video"
+    "src/utils"
   ]
 }
