@@ -27,7 +27,7 @@
     "dist/main.js"
   ],
   "devDependencies": {
-    "@motion-canvas/core": "^3.0.0",
+    "@motion-canvas/core": "^5.0.0",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",

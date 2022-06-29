@@ -12,6 +12,7 @@ import {
   usePlayer,
   usePlayerState,
   useSize,
+  useStateChange,
 } from '../../hooks';
 import {Playhead} from './Playhead';
 import {TimestampTrack} from './TimestampTrack';
@@ -23,16 +24,6 @@ import {clamp} from '@motion-canvas/core/lib/tweening';
 import {AudioTrack} from './AudioTrack';
 
 const ZOOM_SPEED = 0.1;
-
-function useStateChange<T>(state: T, onChange: (prev: T, next: T) => void) {
-  const [cached, setCached] = useState(state);
-  useLayoutEffect(() => {
-    if (state !== cached) {
-      onChange(cached, state);
-      setCached(state);
-    }
-  }, [cached, state, onChange]);
-}
 
 export function Timeline() {
   const player = usePlayer();
@@ -69,23 +60,17 @@ export function Timeline() {
   }, [rect.width, scale, duration, offset]);
 
   useStateChange(
-    duration,
-    useCallback(
-      (prev, next) => setScale(Math.max(1, (scale / prev) * next)),
-      [scale],
-    ),
-  );
-
-  useStateChange(
-    rect.width,
-    useCallback(
-      (prev, next) => {
-        if (next !== 0 && prev !== 0) {
-          setScale(Math.max(1, (scale / next) * prev));
-        }
-      },
-      [scale],
-    ),
+    ([prevDuration, prevWidth]) => {
+      let newScale = scale;
+      if (prevDuration !== 0 && duration !== 0) {
+        newScale *= duration / prevDuration;
+      }
+      if (prevWidth !== 0 && rect.width !== 0) {
+        newScale *= prevWidth / rect.width;
+      }
+      setScale(Math.max(1, newScale));
+    },
+    [duration, rect.width],
   );
 
   useDocumentEvent(
@@ -93,9 +78,9 @@ export function Timeline() {
     useCallback(
       event => {
         if (event.key !== 'f') return;
-        const time = player.getTime();
+        const frame = player.onFrameChanged.current;
         const maxOffset = state.fullLength - rect.width;
-        const playheadPosition = state.fullLength * time.completion;
+        const playheadPosition = (state.fullLength * frame) / duration;
         const scrollLeft = playheadPosition - rect.width / 2;
         const newOffset = clamp(0, maxOffset, scrollLeft);
         containerRef.current.scrollLeft = newOffset;

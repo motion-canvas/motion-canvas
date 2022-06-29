@@ -1,10 +1,9 @@
 import {useCallback, useEffect, useMemo, useState} from 'preact/hooks';
 
 import {GeneratorHelper} from '@motion-canvas/core/lib/helpers';
-import type {PlayerRenderEvent} from '@motion-canvas/core/lib/player/Player';
 import type {Thread} from '@motion-canvas/core/lib/threading';
 
-import {useEventEffect, usePlayer, usePlayerState} from '../../hooks';
+import {useSubscribable, usePlayer, usePlayerState} from '../../hooks';
 import {Button, Group, IconType, Input, Label, Select} from '../controls';
 import {Tabs} from '../tabs/Tabs';
 import {Properties} from './Properties';
@@ -46,9 +45,9 @@ function Rendering() {
     ];
   }, [width, height]);
 
-  useEventEffect(
-    player.FrameRendered,
-    async ({frame, data}: PlayerRenderEvent) => {
+  useSubscribable(
+    player.onFrameRendered,
+    async ({frame, data}) => {
       try {
         const name = frame.toString().padStart(6, '0');
         await fetch(`/render/frame${name}.png`, {

@@ -1,15 +1,13 @@
 import type {Scene} from '@motion-canvas/core/lib/Scene';
 import {Label} from './Label';
-import {useEventState} from '../../hooks';
+import {useSubscribableValue} from '../../hooks';
 
 interface LabelGroupProps {
   scene: Scene;
 }
 
 export function LabelGroup({scene}: LabelGroupProps) {
-  const events = useEventState(scene.timeEvents.Changed, () =>
-    scene.timeEvents.toArray(),
-  );
+  const events = useSubscribableValue(scene.timeEvents.onChanged);
 
   return (
     <>

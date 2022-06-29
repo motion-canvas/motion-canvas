@@ -5,10 +5,10 @@ import {AppContext} from '../../AppContext';
 import {
   useDocumentEvent,
   useDrag,
-  useEventEffect,
   usePlayer,
   useSize,
   useStorage,
+  useSubscribable,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
@@ -62,8 +62,8 @@ export function View() {
     return () => player.project.container().remove();
   }, [viewportRef.current]);
 
-  useEventEffect(
-    player.Reloaded,
+  useSubscribable(
+    player.onReloaded,
     () =>
       overlayRef.current.animate(
         [

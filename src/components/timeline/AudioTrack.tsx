@@ -2,7 +2,7 @@ import styles from './Timeline.module.scss';
 
 import {useContext, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
-import {usePlayer, useEventState} from '../../hooks';
+import {usePlayer, useSubscribableValue} from '../../hooks';
 
 const HEIGHT = 48;
 
@@ -13,7 +13,7 @@ export function AudioTrack() {
   const {viewLength, startFrame, endFrame, duration, density} =
     useContext(TimelineContext);
 
-  const audioData = useEventState(audio.DataChanged, () => audio.getData());
+  const audioData = useSubscribableValue(audio.onDataChanged);
 
   useLayoutEffect(() => {
     if (!context) return;

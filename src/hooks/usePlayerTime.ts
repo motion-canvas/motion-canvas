@@ -1,8 +1,19 @@
-import type {PlayerTime} from '@motion-canvas/core/lib/player/Player';
-import {usePlayer} from './usePlayer';
-import {useEventState} from './useEventState';
+import {useMemo} from 'preact/hooks';
+import {usePlayerState} from './usePlayerState';
+import {useCurrentFrame} from './useCurrentFrame';
 
-export function usePlayerTime(): PlayerTime {
-  const player = usePlayer();
-  return useEventState(player.TimeChanged, () => player.getTime());
+export function usePlayerTime() {
+  const state = usePlayerState();
+  const frame = useCurrentFrame();
+
+  return useMemo(
+    () => ({
+      frame,
+      time: frame / state.fps,
+      duration: state.duration,
+      durationTime: state.duration / state.fps,
+      completion: frame / state.duration,
+    }),
+    [state, frame],
+  );
 }

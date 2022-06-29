@@ -1,7 +1,7 @@
 import {Meta, Metadata} from '@motion-canvas/core/lib';
 import {useCallback} from 'preact/hooks';
 import {usePlayer} from './usePlayer';
-import {useEventState} from './useEventState';
+import {useSubscribableValue} from './useSubscribable';
 
 /**
  * Get a stateful value representing the contents of the given meta file and
@@ -12,7 +12,7 @@ import {useEventState} from './useEventState';
 export function useMeta<T extends Metadata>(
   meta: Meta<T>,
 ): [T, (value: Partial<T>) => void] {
-  const data = useEventState(meta.Changed, () => meta.getData());
+  const data = useSubscribableValue(meta.onDataChanged);
   const setter = useCallback(
     (value: Partial<T>) => meta.setDataSync(value),
     [meta],
