@@ -1,3 +1,23 @@
+# [5.0.0](https://github.com/motion-canvas/core/compare/v4.1.0...v5.0.0) (2022-06-29)
+
+
+### Bug Fixes
+
+* marked index.mjs as executable such that the cli will run on linux ([#47](https://github.com/motion-canvas/core/issues/47)) ([722d5eb](https://github.com/motion-canvas/core/commit/722d5eb72b8f4659ff93f57737d70f2650b91f81)), closes [#46](https://github.com/motion-canvas/core/issues/46)
+
+
+### Features
+
+* remove strongly-typed-events ([#48](https://github.com/motion-canvas/core/issues/48)) ([41947b5](https://github.com/motion-canvas/core/commit/41947b5ab6a2ec69d963f3445d1ea65d835c73ff))
+
+
+### BREAKING CHANGES
+
+* change event naming convention
+
+The names of all public events now use the following pattern: "on[WhatHappened]".
+Example: "onValueChanged".
+
 # [4.1.0](https://github.com/motion-canvas/core/compare/v4.0.1...v4.1.0) (2022-06-22)
 
 
