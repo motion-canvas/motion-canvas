@@ -1,3 +1,10 @@
+## [6.0.1](https://github.com/motion-canvas/core/compare/v6.0.0...v6.0.1) (2022-07-01)
+
+
+### Bug Fixes
+
+* re-render the scene when canvas changes ([#55](https://github.com/motion-canvas/core/issues/55)) ([191f96d](https://github.com/motion-canvas/core/commit/191f96da1441bc37d6e61e1acdcfde6994a7f9f3))
+
 # [6.0.0](https://github.com/motion-canvas/core/compare/v5.0.0...v6.0.0) (2022-07-01)
 
 
