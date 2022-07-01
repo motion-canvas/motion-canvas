@@ -1,3 +1,17 @@
+# [6.0.0](https://github.com/motion-canvas/core/compare/v5.0.0...v6.0.0) (2022-07-01)
+
+
+### Features
+
+* decouple Konva from core ([#54](https://github.com/motion-canvas/core/issues/54)) ([02b5c75](https://github.com/motion-canvas/core/commit/02b5c75dba482dcf90a626142c8952f29009e299)), closes [#49](https://github.com/motion-canvas/core/issues/49) [#31](https://github.com/motion-canvas/core/issues/31)
+
+
+### BREAKING CHANGES
+
+* change the type exported by scene files
+
+Scene files need to export a special `SceneDescription` object instead of a simple generator function.
+
 # [5.0.0](https://github.com/motion-canvas/core/compare/v4.1.0...v5.0.0) (2022-06-29)
 
 
