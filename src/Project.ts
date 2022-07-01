@@ -1,50 +1,42 @@
 import './patches';
 
-import {Stage, StageConfig} from 'konva/lib/Stage';
-import {Rect} from 'konva/lib/shapes/Rect';
-import {Layer} from 'konva/lib/Layer';
-import {Vector2d} from 'konva/lib/types';
-import {Konva} from 'konva/lib/Global';
-import {Thread, ThreadsCallback} from './threading';
-import {Scene, SceneRunner} from './Scene';
-import {KonvaNode} from './decorators';
+import {Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {ValueDispatcher} from './events';
-
-Konva.autoDrawEnabled = false;
+import {Size} from './types';
 
 export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
 };
 
-export interface ProjectConfig extends Partial<StageConfig> {
-  scenes: SceneRunner[];
-  background: string | false;
+export interface ProjectConfig {
+  name: string;
+  scenes: SceneDescription[];
+  canvas?: HTMLCanvasElement;
+  background?: string | false;
+  width?: number;
+  height?: number;
 }
 
 export type ProjectMetadata = Metadata;
 
-@KonvaNode()
-export class Project extends Stage {
+export class Project {
   public get onScenesChanged() {
     return this.scenes.subscribable;
   }
   private readonly scenes = new ValueDispatcher<Scene[]>([]);
 
+  public get onCurrentSceneChanged() {
+    return this.currentScene.subscribable;
+  }
+  private readonly currentScene = new ValueDispatcher<Scene>(null);
+
   public readonly version = CORE_VERSION;
   public readonly meta: Meta<ProjectMetadata>;
-  public readonly background: Rect;
-  public readonly master: Layer;
-  public readonly center: Vector2d;
-  public threadsCallback: ThreadsCallback;
   public frame = 0;
 
   public get time(): number {
     return this.framesToSeconds(this.frame);
-  }
-
-  public get thread(): Thread {
-    return this.currentThread;
   }
 
   public get framerate(): number {
@@ -57,78 +49,120 @@ export class Project extends Stage {
   }
 
   public set resolutionScale(value: number) {
-    this.master.canvas.setPixelRatio(value);
+    this._resolutionScale = value;
+    this.updateCanvas();
   }
 
-  private framesPerSeconds = 30;
-  private readonly sceneLookup: Record<string, Scene> = {};
-  private previousScene: Scene = null;
-  private currentScene: Scene = null;
-  private currentThread: Thread = null;
-
-  public constructor(config: ProjectConfig) {
-    const {scenes, ...rest} = config;
-    super({
-      listening: false,
-      container: document.createElement('div'),
-      ...ProjectSize.FullHD,
-      ...rest,
-    });
-
-    this.meta = Meta.getMetaFor(PROJECT_FILE_NAME);
-    this.offset({
-      x: this.width() / -2,
-      y: this.height() / -2,
-    });
-
-    this.center = {
-      x: this.width() / 2,
-      y: this.height() / 2,
-    };
-
-    this.background = new Rect({
-      x: 0,
-      y: 0,
-      width: this.width(),
-      height: this.height(),
-      fill: config.background || '#ff00ff',
-      visible: config.background !== false,
-    });
-
-    this.master = new Layer({name: 'master'});
-    this.master.add(this.background);
-    this.add(this.master);
-
-    for (const scene of scenes) {
-      if (
-        scene.name === undefined ||
-        scene.name === '__WEBPACK_DEFAULT_EXPORT__'
-      ) {
-        console.warn('Runner without a name: ', scene);
-      }
-      const handle = new Scene(this, scene);
-      if (this.sceneLookup[scene.name]) {
-        console.warn('Duplicated scene name: ', scene.name);
-        handle.name(scene.name + Math.random());
-      }
-      this.sceneLookup[handle.name()] = handle;
-      handle.threadsCallback = thread => {
-        if (this.currentScene === handle) {
-          this.currentThread = thread;
-          this.threadsCallback?.(thread);
-        }
-      };
+  private updateCanvas() {
+    if (this.canvas) {
+      this.canvas.width = this.width * this._resolutionScale;
+      this.canvas.height = this.height * this._resolutionScale;
     }
   }
 
-  public draw(): this {
-    this.master.drawScene();
-    return this;
+  public setCanvas(value: HTMLCanvasElement) {
+    this.canvas = value;
+    this.context = value?.getContext('2d');
+    this.updateCanvas();
   }
 
-  public reload(runners: SceneRunner[]) {
+  public setSize(size: Size): void;
+  public setSize(width: number, height: number): void;
+  public setSize(value: Size | number, height?: number): void {
+    if (typeof value === 'object') {
+      this.width = value.width;
+      this.height = value.height;
+    } else {
+      this.width = value;
+      this.height = height;
+    }
+    this.updateCanvas();
+  }
+
+  public getSize(): Size {
+    return {
+      width: this.width,
+      height: this.height,
+    };
+  }
+
+  public readonly name: string;
+  private _resolutionScale = 1;
+  private framesPerSeconds = 30;
+  private readonly sceneLookup: Record<string, Scene> = {};
+  private previousScene: Scene = null;
+  private background: string | false;
+  private canvas: HTMLCanvasElement;
+  private context: CanvasRenderingContext2D;
+
+  private width: number;
+  private height: number;
+
+  public constructor(config: ProjectConfig) {
+    this.setCanvas(config.canvas ?? null);
+    this.setSize(
+      config.width ?? ProjectSize.FullHD.width,
+      config.height ?? ProjectSize.FullHD.height,
+    );
+    this.name = config.name;
+    this.background = config.background ?? false;
+    this.meta = Meta.getMetaFor(PROJECT_FILE_NAME);
+
+    for (const scene of config.scenes) {
+      if (this.sceneLookup[scene.name]) {
+        console.error('Duplicated scene name: ', scene.name);
+        continue;
+      }
+
+      this.sceneLookup[scene.name] = new scene.klass(
+        this,
+        scene.name,
+        scene.config,
+      );
+    }
+  }
+
+  public transformCanvas(context: CanvasRenderingContext2D) {
+    context.setTransform(
+      this._resolutionScale,
+      0,
+      0,
+      this._resolutionScale,
+      (this.width * this._resolutionScale) / 2,
+      (this.height * this._resolutionScale) / 2,
+    );
+  }
+
+  public render() {
+    if (!this.canvas) return;
+
+    this.transformCanvas(this.context);
+    if (this.background) {
+      this.context.save();
+      this.context.fillStyle = this.background;
+      this.context.fillRect(
+        this.width / -2,
+        this.height / -2,
+        this.width,
+        this.height,
+      );
+      this.context.restore();
+    } else {
+      this.context.clearRect(
+        this.width / -2,
+        this.height / -2,
+        this.width,
+        this.height,
+      );
+    }
+
+    this.previousScene?.render(this.context, this.canvas);
+    this.currentScene.current?.render(this.context, this.canvas);
+  }
+
+  public reload(runners: SceneDescription[]) {
     for (const runner of runners) {
-      this.sceneLookup[runner.name]?.reload(runner);
+      this.sceneLookup[runner.name]?.reload(runner.config);
     }
   }
 
@@ -141,88 +175,66 @@ export class Project extends Stage {
   public async next(speed = 1): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
-      if (!this.currentScene || this.currentScene.isAfterTransitionIn()) {
-        this.previousScene.remove();
+      if (
+        !this.currentScene.current ||
+        this.currentScene.current.isAfterTransitionIn()
+      ) {
         this.previousScene = null;
       }
     }
 
     this.frame += speed;
 
-    if (this.currentScene) {
-      await this.currentScene.next();
-      if (this.currentScene.canTransitionOut()) {
-        this.previousScene = this.currentScene;
-        this.currentScene = this.getNextScene(this.previousScene);
-        if (this.currentScene) {
-          await this.currentScene.reset(this.previousScene);
-          this.master.add(this.currentScene);
+    if (this.currentScene.current) {
+      await this.currentScene.current.next();
+      if (this.currentScene.current.canTransitionOut()) {
+        this.previousScene = this.currentScene.current;
+        this.currentScene.current = this.getNextScene(this.previousScene);
+        if (this.currentScene.current) {
+          await this.currentScene.current.reset(this.previousScene);
         }
       }
     }
 
-    return !this.currentScene || this.currentScene.isFinished();
+    return !this.currentScene.current || this.currentScene.current.isFinished();
   }
 
   public async recalculate() {
-    const initialScene = this.currentScene;
-    this.previousScene?.remove();
     this.previousScene = null;
-    this.currentScene = null;
 
     this.frame = 0;
-    let offset = 0;
     const scenes = Object.values(this.sceneLookup);
     for (const scene of scenes) {
-      if (scene.isMarkedAsCached()) {
-        scene.firstFrame += offset;
-        this.frame = scene.lastFrame;
-      } else {
-        this.currentScene = scene;
-        scene.firstFrame = this.frame;
-        scene.transitionDuration = -1;
-        await scene.reset();
-        while (!scene.canTransitionOut()) {
-          if (scene.transitionDuration < 0 && scene.isAfterTransitionIn()) {
-            scene.transitionDuration = this.frame - scene.firstFrame;
-          }
-          this.frame++;
-          await scene.next();
-        }
-        offset += this.frame - scene.lastFrame;
-        scene.lastFrame = this.frame;
-        scene.markAsCached();
-
-        await new Promise(resolve => setTimeout(resolve, 0));
-      }
+      await scene.recalculate();
     }
-
-    this.currentScene = initialScene;
     this.scenes.current = scenes;
   }
 
   public async seek(frame: number, speed = 1): Promise<boolean> {
+    if (this.currentScene.current && !this.currentScene.current.isCached()) {
+      console.warn(
+        'Attempting to seek a project with an invalidated scene:',
+        this.currentScene.current.name,
+      );
+    }
+
     if (
       frame <= this.frame ||
-      !this.currentScene ||
-      (this.currentScene.isMarkedAsCached() &&
-        this.currentScene.lastFrame < frame)
+      !this.currentScene.current ||
+      (this.currentScene.current.isCached() &&
+        this.currentScene.current.lastFrame < frame)
     ) {
       const scene = this.findBestScene(frame);
-      if (scene !== this.currentScene) {
-        this.previousScene?.remove();
+      if (scene !== this.currentScene.current) {
         this.previousScene = null;
-        this.currentScene?.remove();
-        this.currentScene = scene;
+        this.currentScene.current = scene;
 
-        this.frame = this.currentScene.firstFrame;
-        this.master.add(this.currentScene);
-        await this.currentScene.reset();
+        this.frame = this.currentScene.current.firstFrame;
+        await this.currentScene.current.reset();
       } else if (this.frame >= frame) {
-        this.previousScene?.remove();
         this.previousScene = null;
-        this.frame = this.currentScene.firstFrame;
-        await this.currentScene.reset();
+        this.frame = this.currentScene.current.firstFrame;
+        await this.currentScene.current.reset();
       }
     }
 
@@ -237,7 +249,14 @@ export class Project extends Stage {
   private findBestScene(frame: number): Scene {
     let lastScene = null;
     for (const scene of Object.values(this.sceneLookup)) {
-      if (!scene.isMarkedAsCached() || scene.lastFrame > frame) {
+      if (!scene.isCached()) {
+        console.warn(
+          'Attempting to seek a project with an invalidated scene:',
+          scene.name,
+        );
+        return scene;
+      }
+      if (scene.lastFrame > frame) {
         return scene;
       }
       lastScene = scene;
@@ -269,7 +288,7 @@ export class Project extends Stage {
 
   public async getBlob(): Promise<Blob> {
     return new Promise<Blob>(resolve =>
-      this.master.getNativeCanvasElement().toBlob(resolve, 'image/png'),
+      this.canvas.toBlob(resolve, 'image/png'),
     );
   }
 }

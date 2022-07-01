@@ -1,5 +1,5 @@
-import type {Scene} from './Scene';
-import {ValueDispatcher} from './events';
+import type {Scene, SceneMetadata} from './Scene';
+import {ValueDispatcher} from '../events';
 
 /**
  * Represents a time event at runtime.
@@ -52,12 +52,12 @@ export class TimeEvents {
 
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
-  private previousReference: SavedTimeEvent[];
-  private ignoreSave = false;
+  private previousReference: SavedTimeEvent[] = [];
+  private didEventsChange = false;
   private preserveTiming = true;
 
   public constructor(private readonly scene: Scene) {
-    const storageKey = `scene-${scene.project.name()}-${scene.name()}`;
+    const storageKey = `scene-${scene.project.name}-${scene.name}`;
     const storedEvents = localStorage.getItem(storageKey);
     if (storedEvents) {
       console.warn('Migrating localStorage to meta files');
@@ -65,21 +65,13 @@ export class TimeEvents {
       localStorage.removeItem(storageKey);
       this.load(Object.values<TimeEvent>(JSON.parse(storedEvents)));
     } else {
-      this.load(scene.meta.getData().timeEvents ?? []);
+      this.previousReference = scene.meta.getData().timeEvents ?? [];
+      this.load(this.previousReference);
     }
 
-    scene.meta.onDataChanged.subscribe(event => {
-      // Ignore the event if `timeEvents` hasn't changed.
-      // This may happen when another part of metadata has changed triggering
-      // this event.
-      if (event.timeEvents === this.previousReference) return;
-      this.previousReference = event.timeEvents;
-      this.ignoreSave = true;
-
-      this.load(event.timeEvents ?? []);
-      scene.reload();
-      window.player.reload();
-    }, false);
+    scene.onReloaded.subscribe(this.handleReload);
+    scene.onRecalculated.subscribe(this.handleRecalculated);
+    scene.meta.onDataChanged.subscribe(this.handleMetaChanged, false);
   }
 
   public get(name: string) {
@@ -107,6 +99,7 @@ export class TimeEvents {
     };
     this.registeredEvents[name] = this.lookup[name];
     this.events.current = Object.values(this.registeredEvents);
+    this.didEventsChange = true;
     this.scene.reload();
   }
 
@@ -124,6 +117,7 @@ export class TimeEvents {
       this.scene.project.frame - this.scene.firstFrame,
     );
     if (!this.lookup[name]) {
+      this.didEventsChange = true;
       this.lookup[name] = {
         name,
         initialTime,
@@ -146,6 +140,7 @@ export class TimeEvents {
 
       const target = event.initialTime + event.offset;
       if (!this.preserveTiming && event.targetTime !== target) {
+        this.didEventsChange = true;
         event.targetTime = target;
         changed = true;
       }
@@ -166,37 +161,47 @@ export class TimeEvents {
   /**
    * Called when the parent scene gets reloaded.
    */
-  public onReload() {
+  private handleReload = () => {
     this.registeredEvents = {};
-  }
+  };
 
   /**
-   * Called when the parent scene gets cached.
+   * Called when the parent scene gets recalculated.
    */
-  public onCache() {
+  private handleRecalculated = () => {
     this.preserveTiming = true;
     this.events.current = Object.values(this.registeredEvents);
 
-    if (this.ignoreSave) {
-      this.ignoreSave = false;
-      return;
+    if (
+      this.didEventsChange ||
+      this.previousReference.length !== this.events.current.length
+    ) {
+      this.didEventsChange = false;
+      this.previousReference = Object.values(this.registeredEvents).map(
+        event => ({
+          name: event.name,
+          targetTime: event.targetTime,
+        }),
+      );
+      this.scene.meta.setDataSync({
+        timeEvents: this.previousReference,
+      });
     }
+  };
 
-    this.save();
-  }
-
-  private save() {
-    this.previousReference = Object.values(this.registeredEvents).map(
-      event => ({
-        name: event.name,
-        targetTime: event.targetTime,
-      }),
-    );
-
-    this.scene.meta.setDataSync({
-      timeEvents: this.previousReference,
-    });
-  }
+  /**
+   * Called when the meta of the parent scene changes.
+   */
+  private handleMetaChanged = (data: SceneMetadata) => {
+    // Ignore the event if `timeEvents` hasn't changed.
+    // This may happen when another part of metadata has changed triggering
+    // this event.
+    if (data.timeEvents === this.previousReference) return;
+    this.previousReference = data.timeEvents;
+    this.load(data.timeEvents ?? []);
+    this.scene.reload();
+    window.player.reload();
+  };
 
   private load(events: SavedTimeEvent[]) {
     for (const event of events) {

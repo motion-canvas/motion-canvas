@@ -341,8 +341,8 @@ Node.prototype._getTransform = function (this: Node) {
 const super_setAttrs = Node.prototype.setAttrs;
 Node.prototype.setAttrs = function (this: Node, config: unknown) {
   if (!(NODE_ID in this.attrs)) {
-    const scene = useScene();
-    if (scene) {
+    const scene: any = useScene();
+    if (scene && 'generateNodeId' in scene) {
       const type = this.className;
       this.attrs[NODE_ID] = scene.generateNodeId(type);
     }

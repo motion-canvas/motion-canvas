@@ -74,16 +74,16 @@ Otherwise, below are the steps to set it up manually:
 6. Create a simple scene in `src/scenes/example.scene.tsx`:
 
    ```ts
-   import type {Scene} from '@motion-canvas/core/lib/Scene';
-   import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+   import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
    import {waitFor} from '@motion-canvas/core/lib/flow';
 
-   export default function* example(scene: Scene): ThreadGenerator {
+   export default makeKonvaScene(function* example(view) {
      yield* scene.transition();
-
+   
+     // animation code goes here
+   
      yield* waitFor(5);
-     scene.canFinish();
-   }
+   });
    ```
 
 7. Initialize the project with your scene in `src/project.ts`:
@@ -131,6 +131,8 @@ npm run serve
 ```
 
 You can now open Motion Canvas in your browser by visiting [http://localhost:9000/](http://localhost:9000/).
+
+The API documentation is available at [http://localhost:9000/api/](http://localhost:9000/api/).
 
 In case of any problems, please visit [our discord server](https://www.patreon.com/posts/53003221).
 

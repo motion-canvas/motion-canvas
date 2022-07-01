@@ -1,4 +1,4 @@
-import {Context} from 'konva/lib/Context';
+import type {Context} from 'konva/lib/Context';
 import {PossibleSpacing, Spacing} from '../types';
 
 export const CanvasHelper = {

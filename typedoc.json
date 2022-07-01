@@ -11,6 +11,7 @@
     "src/helpers",
     "src/media",
     "src/player",
+    "src/scenes",
     "src/styles",
     "src/themes",
     "src/threading",

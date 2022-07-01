@@ -176,7 +176,7 @@ export class Player {
   public setScale(scale: number) {
     this.project.resolutionScale = scale;
     this.updateState({scale});
-    this.project.draw();
+    this.project.render();
   }
 
   public requestPreviousFrame(): void {
@@ -229,7 +229,7 @@ export class Player {
       const duration = this.project.frame;
       const frame = commands.seek < 0 ? this.frame.current : commands.seek;
       const finished = await this.project.seek(frame);
-      this.project.draw();
+      this.project.render();
       this.updateState({
         duration,
         finished,
@@ -260,7 +260,7 @@ export class Player {
     // Rendering
     if (state.render) {
       state.finished = await this.project.next();
-      this.project.draw();
+      this.project.render();
       await this.frameRendered.dispatch({
         frame: this.project.frame,
         data: await this.project.getBlob(),
@@ -318,7 +318,7 @@ export class Player {
     }
 
     // Draw the project
-    this.project.draw();
+    this.project.render();
 
     // handle finishing
     if (state.finished) {

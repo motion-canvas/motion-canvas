@@ -6,7 +6,7 @@ import {Group} from 'konva/lib/Group';
 import {ContainerConfig} from 'konva/lib/Container';
 import {Arrow} from './Arrow';
 import {map} from '../tweening';
-import {useScene} from '../utils';
+import {useKonvaView} from '../scenes';
 
 export interface ConnectionConfig extends ContainerConfig {
   start?: Pin;
@@ -180,17 +180,17 @@ export class Connection extends Group {
       return;
     }
 
-    const scene = useScene();
+    const view = useKonvaView();
     const crossing = this.crossing
-      ? this.crossing.getAbsolutePosition(scene)
+      ? this.crossing.getAbsolutePosition(view)
       : {x: 0.5, y: 0.5};
 
-    const fromRect = this.start.getClientRect({relativeTo: scene});
+    const fromRect = this.start.getClientRect({relativeTo: view});
     fromRect.width /= 2;
     fromRect.height /= 2;
     fromRect.x += fromRect.width;
     fromRect.y += fromRect.height;
-    const toRect = this.end.getClientRect({relativeTo: scene});
+    const toRect = this.end.getClientRect({relativeTo: view});
 
     toRect.width /= 2;
     toRect.height /= 2;

@@ -1,18 +1,14 @@
-import type {SceneTransition} from './SceneTransition';
+import type {SceneTransition} from '../scenes';
 import {Direction, originPosition} from '../types';
 import {easeInOutCubic, tween, vector2dTween} from '../tweening';
-import {useProject} from '../utils';
+import {useScene} from '../utils';
 
 export function slideTransition(
   direction: Direction = Direction.Top,
 ): SceneTransition {
   return (next, previous) => {
-    const project = useProject();
-    const position = originPosition(
-      direction,
-      project.width(),
-      project.height(),
-    );
+    const size = useScene().getSize();
+    const position = originPosition(direction, size.width, size.height);
     return tween(0.6, value => {
       previous?.position(
         vector2dTween(
@@ -21,6 +17,7 @@ export function slideTransition(
           easeInOutCubic(value),
         ),
       );
+
       next.position(
         vector2dTween(position, {x: 0, y: 0}, easeInOutCubic(value)),
       );

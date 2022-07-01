@@ -1,5 +1,5 @@
-import {Vector2d} from 'konva/lib/types';
-import {Size} from './Size';
+import type {Vector2} from './Vector';
+import type {Size} from './Size';
 
 export enum Center {
   Vertical = 1,
@@ -54,8 +54,8 @@ export function originPosition(
   origin: Origin | Direction,
   width = 1,
   height = 1,
-): Vector2d {
-  const position: Vector2d = {x: 0, y: 0};
+): Vector2 {
+  const position: Vector2 = {x: 0, y: 0};
 
   if (origin === Origin.Middle) {
     return position;
@@ -76,7 +76,7 @@ export function originPosition(
   return position;
 }
 
-export function getOriginOffset(size: Size, origin: Origin): Vector2d {
+export function getOriginOffset(size: Size, origin: Origin): Vector2 {
   return originPosition(origin, size.width / 2, size.height / 2);
 }
 

@@ -9,5 +9,6 @@ export * from './chain';
 export * from './delay';
 export * from './every';
 export * from './loop';
+export * from './noop';
 export * from './scheduling';
 export * from './sequence';

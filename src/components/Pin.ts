@@ -4,7 +4,7 @@ import {Center, flipOrigin, getOriginDelta, Origin} from '../types';
 import {GetSet, IRect} from 'konva/lib/types';
 import {getset, KonvaNode} from '../decorators';
 import {Node} from 'konva/lib/Node';
-import {useScene} from '../utils';
+import {useKonvaView} from '../scenes';
 
 export interface PinConfig extends ContainerConfig {
   target?: Node;
@@ -40,7 +40,9 @@ export class Pin extends Group {
     const attach = this.attach();
     if (attach) {
       const attachDirection = flipOrigin(attach.getOrigin(), this.direction());
-      const rect = this.getClientRect({relativeTo: useScene()});
+      const rect = this.getClientRect({
+        relativeTo: useKonvaView(),
+      });
       const offset = getOriginDelta(rect, Origin.TopLeft, attachDirection);
       attach.position({
         x: rect.x + offset.x,

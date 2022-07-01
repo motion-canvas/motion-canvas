@@ -1,6 +1,5 @@
 import mixColor from 'mix-color';
-import {IRect, Vector2d} from 'konva/lib/types';
-import {PossibleSpacing, Spacing} from '../types';
+import type {Rect, Vector2, PossibleSpacing, Spacing} from '../types';
 
 export interface TweenFunction<T, Rest extends unknown[] = unknown[]> {
   (from: T, to: T, value: number, ...args: Rest): T;
@@ -43,7 +42,7 @@ export function colorTween(from: string, to: string, value: number) {
   return mixColor(from, to, value);
 }
 
-export function vector2dTween(from: Vector2d, to: Vector2d, value: number) {
+export function vector2dTween(from: Vector2, to: Vector2, value: number) {
   return {
     x: map(from.x, to.x, value),
     y: map(from.y, to.y, value),
@@ -64,8 +63,8 @@ export function spacingTween(
 }
 
 export function rectArcTween(
-  from: Partial<IRect>,
-  to: Partial<IRect>,
+  from: Partial<Rect>,
+  to: Partial<Rect>,
   value: number,
   reverse?: boolean,
   ratio?: number,
@@ -96,10 +95,7 @@ export function rectArcTween(
   };
 }
 
-export function calculateRatio(
-  from: Partial<IRect>,
-  to: Partial<IRect>,
-): number {
+export function calculateRatio(from: Partial<Rect>, to: Partial<Rect>): number {
   let numberOfValues = 0;
   let ratio = 0;
   if (from.x) {

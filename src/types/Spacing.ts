@@ -1,5 +1,6 @@
-import {Size} from './Size';
-import {IRect, Vector2d} from 'konva/lib/types';
+import type {Size} from './Size';
+import type {Rect} from './Rect';
+import type {Vector2} from './Vector';
 
 interface ISpacing {
   top: number;
@@ -67,7 +68,7 @@ export class Spacing implements ISpacing {
     return this;
   }
 
-  public expand<T extends Size | IRect>(value: T): T {
+  public expand<T extends Size | Rect>(value: T): T {
     const result = {...value};
 
     result.width += this.x;
@@ -80,7 +81,7 @@ export class Spacing implements ISpacing {
     return result;
   }
 
-  public shrink<T extends Size | IRect>(value: T): T {
+  public shrink<T extends Size | Rect>(value: T): T {
     const result = {...value};
 
     result.width -= this.x;
@@ -93,7 +94,7 @@ export class Spacing implements ISpacing {
     return result;
   }
 
-  public scale(scale: Vector2d): Spacing {
+  public scale(scale: Vector2): Spacing {
     return new Spacing([
       this.top * scale.y,
       this.right * scale.x,

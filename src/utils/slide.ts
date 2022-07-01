@@ -1,11 +1,11 @@
-import {Container} from 'konva/lib/Container';
-import {Vector2d} from 'konva/lib/types';
+import type {Container} from 'konva/lib/Container';
+import type {Vector2} from '../types';
 
-export function slide(container: Container, offset: Vector2d): void;
+export function slide(container: Container, offset: Vector2): void;
 export function slide(container: Container, x: number, y?: number): void;
 export function slide(
   container: Container,
-  offset: number | Vector2d,
+  offset: number | Vector2,
   y = 0,
 ): void {
   if (typeof offset === 'number') {

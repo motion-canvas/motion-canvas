@@ -4,25 +4,6 @@ import {useProject, useScene} from '../utils';
 
 decorate(waitUntil, threadable());
 /**
- * Wait until the given time.
- *
- * Example:
- * ```ts
- * // current time: 0s
- * yield waitUntil(2);
- * // current time: 2s
- * yield waitUntil(3);
- * // current time: 3s
- * ```
- *
- * @param time Absolute time in seconds.
- * @param after
- */
-export function waitUntil(
-  time: number,
-  after?: ThreadGenerator,
-): ThreadGenerator;
-/**
  * Wait until the given time event.
  *
  * Time events are displayed on the timeline and can be edited to adjust the
@@ -36,19 +17,12 @@ export function waitUntil(
  * @param event Name of the time event.
  * @param after
  */
-export function waitUntil(
-  event: string,
-  after?: ThreadGenerator,
-): ThreadGenerator;
 export function* waitUntil(
-  targetTime: number | string = 0,
+  event: string,
   after?: ThreadGenerator,
 ): ThreadGenerator {
   const scene = useScene();
-  const frames =
-    typeof targetTime === 'string'
-      ? scene.timeEvents.register(targetTime)
-      : scene.project.secondsToFrames(targetTime);
+  const frames = scene.timeEvents.register(event);
 
   while (scene.project.frame < frames) {
     yield;

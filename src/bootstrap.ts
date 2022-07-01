@@ -1,6 +1,6 @@
 import './globals';
 import type {Size} from './types';
-import type {SceneRunner} from './Scene';
+import type {SceneDescription} from './scenes';
 import {Project, ProjectSize} from './Project';
 import {Player} from './player';
 import {hot} from './hot';
@@ -8,7 +8,7 @@ import {AudioManager} from './media';
 
 interface BootstrapConfig {
   name: string;
-  scenes: SceneRunner[];
+  scenes: SceneDescription[];
   size?: Size;
   background?: string | false;
   audio?: string;

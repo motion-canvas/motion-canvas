@@ -1,4 +1,4 @@
-import {Scene} from '../Scene';
+import type {Scene} from '../scenes';
 
 let currentScene: Scene = null;
 

@@ -1,4 +1,3 @@
-export * from './pop';
 export * from './slide';
 export * from './useAnimator';
 export * from './useProject';

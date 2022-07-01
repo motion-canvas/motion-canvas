@@ -8,7 +8,7 @@ decorate(any, threadable());
  * Example:
  * ```
  * // current time: 0s
- * yield* all(
+ * yield* any(
  *   rect.fill('#ff0000', 2),
  *   rect.opacity(1, 1),
  * );
