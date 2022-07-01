@@ -26,12 +26,12 @@ export function Tabs({children, onToggle, id}: TabsProps) {
     onToggle?.(tab);
   }, [onToggle, tab]);
 
-  const {selectedNode} = useContext(AppContext);
+  const {inspectedElement} = useContext(AppContext);
   useEffect(() => {
-    if (selectedNode && tab !== -1) {
+    if (inspectedElement && tab !== -1) {
       setTab(0);
     }
-  }, [selectedNode]);
+  }, [inspectedElement]);
 
   return (
     <div className={styles.root}>

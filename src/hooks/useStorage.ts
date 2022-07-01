@@ -5,7 +5,7 @@ export function useStorage<T>(
   id: string,
   initialState: T = null,
 ): [T, (newState: T) => void] {
-  const name = usePlayer().project.name();
+  const name = usePlayer().project.name;
   const key = `${name}-${id}`;
   const savedState = useMemo(() => {
     const savedState = localStorage.getItem(key);

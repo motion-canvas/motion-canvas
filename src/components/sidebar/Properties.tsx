@@ -1,36 +1,51 @@
-import type {Node} from 'konva/lib/Node';
 import {parseColor} from 'mix-color';
-import {useContext, useState} from 'preact/hooks';
+import {useContext, useMemo, useState} from 'preact/hooks';
 import {AppContext} from '../../AppContext';
 
-import {usePlayerTime} from '../../hooks';
+import {useCurrentScene, useCurrentFrame} from '../../hooks';
 import {classes} from '../../utils';
 import {Group, Label} from '../controls';
 import {Value} from '../controls/Value';
 import styles from './Sidebar.module.scss';
+import type {InspectedAttributes} from '@motion-canvas/core/lib/scenes';
+import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
+import {Pane} from '../tabs';
 
 export function Properties() {
-  const {selectedNode} = useContext(AppContext);
+  const {inspectedElement} = useContext(AppContext);
+  const scene = useCurrentScene();
+
+  const {attributes, supportsInspection} = useMemo(
+    () => ({
+      supportsInspection: scene && isInspectable(scene),
+      attributes:
+        inspectedElement && scene && isInspectable(scene)
+          ? scene.inspectAttributes(inspectedElement)
+          : null,
+    }),
+    [inspectedElement, scene],
+  );
 
   return (
-    <div className={styles.pane}>
-      <div className={styles.header}>Properties</div>
-      {selectedNode ? (
-        <YesNodeSelected node={selectedNode} />
+    <Pane title="Properties">
+      {attributes ? (
+        <PropertiesView attrs={attributes} />
+      ) : supportsInspection ? (
+        "Click on an element to view it's properties."
       ) : (
-        <NoNodeSelected />
+        "The current scene doesn't support inspecting."
       )}
-    </div>
+    </Pane>
   );
 }
 
 const ALWAYS_HAVE_KEYS = ['x', 'y', 'width', 'height'];
 const REMOVE_KEYS = ['dirty', 'wasDirty'];
-function YesNodeSelected({node}: {node: Node}) {
+function PropertiesView({attrs}: {attrs: InspectedAttributes}) {
   // Force rerender every frame when playing
-  usePlayerTime();
+  useCurrentFrame();
 
-  const attrKeys = Object.keys(node.attrs)
+  const attrKeys = Object.keys(attrs)
     .filter(
       key =>
         // Filter out keys that we're displaying at the top no matter what
@@ -48,9 +63,9 @@ function YesNodeSelected({node}: {node: Node}) {
         let value =
           // If value is undefined but it's x/y/width/height,
           // then it's a 0.
-          node.attrs[key] === undefined && keyIndex < ALWAYS_HAVE_KEYS.length
+          attrs[key] === undefined && keyIndex < ALWAYS_HAVE_KEYS.length
             ? 0
-            : node.attrs[key];
+            : attrs[key];
         const isColor =
           typeof value === 'string' &&
           /^(#[0-9a-f]{3,4}|#[0-9a-f]{6}|#[0-9a-f]{8}|rgba?(\d,\d,\d(,\d)?))$/i.test(
@@ -106,10 +121,6 @@ function YesNodeSelected({node}: {node: Node}) {
       <CopiedText visible={copied} />
     </div>
   );
-}
-
-function NoNodeSelected() {
-  return <div>No node selected.</div>;
 }
 
 function CopiedText({visible}: {visible: boolean}) {

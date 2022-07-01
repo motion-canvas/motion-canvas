@@ -1,47 +1,67 @@
 import styles from './Timeline.module.scss';
 
-import {usePlayer, usePlayerState, useScenes} from '../../hooks';
+import type {Scene} from '@motion-canvas/core/lib/scenes';
+import {
+  usePlayer,
+  usePlayerState,
+  useScenes,
+  useSubscribableValue,
+} from '../../hooks';
 
 export function SceneTrack() {
   const scenes = useScenes();
-  const player = usePlayer();
-  const state = usePlayerState();
 
   return (
     <div className={styles.sceneTrack}>
       {scenes.map(scene => (
-        <div
-          className={styles.sceneClip}
-          data-name={scene.name()}
-          style={{
-            width: `${(scene.duration / state.duration) * 100}%`,
-            left: `${(scene.firstFrame / state.duration) * 100}%`,
-          }}
-          onMouseDown={event => {
-            if (event.button === 1) {
-              event.preventDefault();
-            }
-          }}
-          onMouseUp={event => {
-            if (event.button === 1) {
-              event.stopPropagation();
-              player.setRange(scene.firstFrame, scene.lastFrame - 1);
-            }
-          }}
-        >
-          <div className={styles.scene}>
-            <div className={styles.sceneName}>{scene.name()}</div>
-          </div>
-          {scene.transitionDuration > 0 && (
-            <div
-              style={{
-                width: `${(scene.transitionDuration / scene.duration) * 100}%`,
-              }}
-              className={styles.transition}
-            />
-          )}
-        </div>
+        <SceneClip scene={scene} />
       ))}
+    </div>
+  );
+}
+
+interface SceneClipProps {
+  scene: Scene;
+}
+
+function SceneClip({scene}: SceneClipProps) {
+  const player = usePlayer();
+  const state = usePlayerState();
+  const cachedData = useSubscribableValue(scene.onCacheChanged);
+
+  return (
+    <div
+      className={styles.sceneClip}
+      data-name={scene.name}
+      style={{
+        width: `${(cachedData.duration / state.duration) * 100}%`,
+        left: `${(cachedData.firstFrame / state.duration) * 100}%`,
+      }}
+      onMouseDown={event => {
+        if (event.button === 1) {
+          event.preventDefault();
+        }
+      }}
+      onMouseUp={event => {
+        if (event.button === 1) {
+          event.stopPropagation();
+          player.setRange(cachedData.firstFrame, cachedData.lastFrame - 1);
+        }
+      }}
+    >
+      <div className={styles.scene}>
+        <div className={styles.sceneName}>{scene.name}</div>
+      </div>
+      {cachedData.transitionDuration > 0 && (
+        <div
+          style={{
+            width: `${
+              (cachedData.transitionDuration / cachedData.duration) * 100
+            }%`,
+          }}
+          className={styles.transition}
+        />
+      )}
     </div>
   );
 }

@@ -1,34 +1,27 @@
-import type {Node} from 'konva/lib/Node';
 import styles from './Viewport.module.scss';
-import {usePlayer, usePlayerTime} from '../../hooks';
+import {useCurrentScene, usePlayerTime} from '../../hooks';
 import {useContext, useLayoutEffect, useRef} from 'preact/hooks';
 import {ViewportContext} from './ViewportContext';
-import {NODE_ID} from '@motion-canvas/core/lib/symbols';
+import {AppContext} from '../../AppContext';
+import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 
-interface DebugProps {
-  node: Node;
-  setNode: (value: Node) => void;
-}
-
-export function Debug({node, setNode}: DebugProps) {
-  const player = usePlayer();
+export function Debug() {
   const time = usePlayerTime();
+  const scene = useCurrentScene();
   const canvasRef = useRef<HTMLCanvasElement>();
   const contextRef = useRef<CanvasRenderingContext2D>();
   const state = useContext(ViewportContext);
+  const {inspectedElement, setInspectedElement} = useContext(AppContext);
 
   useLayoutEffect(() => {
     contextRef.current ??= canvasRef.current.getContext('2d');
     const ctx = contextRef.current;
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    if (!node) {
-      return;
-    }
-    if (!node.getLayer()) {
-      const id = node.attrs[NODE_ID];
-      setNode(
-        player.project.findOne((node: Node) => node.attrs[NODE_ID] === id),
-      );
+    if (!isInspectable(scene)) return;
+
+    const element = scene.validateInspection(inspectedElement);
+    if (!element || element !== inspectedElement) {
+      setInspectedElement(element);
       return;
     }
 
@@ -38,65 +31,61 @@ export function Debug({node, setNode}: DebugProps) {
       state.y + canvasRef.current.height / 2,
     );
     ctx.scale(state.zoom, state.zoom);
-    ctx.translate(player.project.width() / -2, player.project.height() / -2);
+    const {rect, position, contentRect, marginRect} =
+      scene.inspectBoundingBox(element);
 
-    const rect = node.getClientRect();
-    const padding = node.getPadd();
-    const margin = node.getMargin();
-    const position = node.getAbsolutePosition();
-    const offset = node.getOriginOffset();
-    const scale = node.getAbsoluteScale();
+    if (contentRect && rect) {
+      ctx.beginPath();
+      ctx.rect(
+        contentRect.x,
+        contentRect.y,
+        contentRect.width,
+        contentRect.height,
+      );
+      ctx.rect(rect.x, rect.y, rect.width, rect.height);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(180,255,147,0.6)';
+      ctx.fill('evenodd');
+    }
 
-    const contentRect = padding.scale(scale).shrink(rect);
-    const marginRect = margin.scale(scale).expand(rect);
+    if (rect) {
+      ctx.beginPath();
+      ctx.rect(rect.x, rect.y, rect.width, rect.height);
+      ctx.closePath();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+      ctx.lineWidth = 2 / state.zoom;
+      ctx.stroke();
+    }
 
-    ctx.beginPath();
-    ctx.rect(
-      contentRect.x,
-      contentRect.y,
-      contentRect.width,
-      contentRect.height,
-    );
-    ctx.rect(rect.x, rect.y, rect.width, rect.height);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(180,255,147,0.6)';
-    ctx.fill('evenodd');
+    if (marginRect && rect) {
+      ctx.beginPath();
+      ctx.rect(rect.x, rect.y, rect.width, rect.height);
+      ctx.rect(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(255,193,125,0.6)';
+      ctx.fill('evenodd');
+    }
 
-    ctx.beginPath();
-    ctx.rect(rect.x, rect.y, rect.width, rect.height);
-    ctx.closePath();
-    ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
-    ctx.lineWidth = 2 / state.zoom;
-    ctx.stroke();
+    if (position) {
+      ctx.beginPath();
+      ctx.arc(position.x, position.y, 5 / state.zoom, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+      ctx.fill();
+    }
 
-    ctx.beginPath();
-    ctx.rect(rect.x, rect.y, rect.width, rect.height);
-    ctx.rect(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(255,193,125,0.6)';
-    ctx.fill('evenodd');
-
-    ctx.beginPath();
-    ctx.arc(
-      position.x + offset.x,
-      position.y + offset.y,
-      5 / state.zoom,
-      0,
-      Math.PI * 2,
-    );
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-    ctx.fill();
-
-    ctx.font = `${16 / state.zoom}px JetBrains Mono`;
-    ctx.fillText(
-      `${Math.floor(rect.width)} x ${Math.floor(rect.height)}`,
-      rect.x + 8 / state.zoom,
-      rect.y - 8 / state.zoom,
-    );
+    if (rect) {
+      ctx.font = `${16 / state.zoom}px JetBrains Mono`;
+      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+      ctx.fillText(
+        `${Math.floor(rect.width)} x ${Math.floor(rect.height)}`,
+        rect.x + 8 / state.zoom,
+        rect.y - 8 / state.zoom,
+      );
+    }
 
     ctx.restore();
-  }, [state, node, time]);
+  }, [state, scene, inspectedElement, time]);
 
   return (
     <canvas

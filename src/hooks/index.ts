@@ -1,3 +1,4 @@
+export * from './useCurrentFrame';
 export * from './useDocumentEvent';
 export * from './useDrag';
 export * from './useMeta';

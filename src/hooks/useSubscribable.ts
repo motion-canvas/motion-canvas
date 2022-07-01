@@ -1,4 +1,4 @@
-import {
+import type {
   EventHandler,
   Subscribable,
   SubscribableValueEvent,
@@ -16,7 +16,7 @@ export function useSubscribable<TValue, THandler extends EventHandler<TValue>>(
 export function useSubscribableValue<TValue>(
   value: SubscribableValueEvent<TValue>,
 ) {
-  const [state, setState] = useState(value.current);
-  useEffect(() => value.subscribe(setState), [value]);
+  const [state, setState] = useState(value?.current);
+  useEffect(() => value && value.subscribe(setState), [value]);
   return state;
 }

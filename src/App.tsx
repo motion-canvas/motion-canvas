@@ -5,19 +5,20 @@ import {Timeline} from './components/timeline';
 import {Viewport} from './components/viewport';
 import {ResizeableLayout} from './components/layout';
 import {useState, useMemo} from 'preact/hooks';
-import type {Node} from 'konva/lib/Node';
 import {AppContext} from './AppContext';
+import type {InspectedElement} from '@motion-canvas/core/lib/scenes';
 
 export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [inspectedElement, setInspectedElement] =
+    useState<InspectedElement | null>(null);
 
   const contextState = useMemo(
     () => ({
-      selectedNode,
-      setSelectedNode,
+      inspectedElement,
+      setInspectedElement,
     }),
-    [selectedNode],
+    [inspectedElement],
   );
 
   return (

@@ -1,8 +1,8 @@
-import type {Container} from 'konva/lib/Container';
 import {useCallback, useContext, useEffect, useRef} from 'preact/hooks';
 import {AppContext} from '../../AppContext';
 
 import {
+  useCurrentScene,
   useDocumentEvent,
   useDrag,
   usePlayer,
@@ -14,13 +14,15 @@ import {Debug} from './Debug';
 import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
+import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 
 const ZOOM_SPEED = 0.1;
 
 export function View() {
   const player = usePlayer();
+  const scene = useCurrentScene();
   const containerRef = useRef<HTMLDivElement>();
-  const viewportRef = useRef<HTMLDivElement>();
+  const viewportRef = useRef<HTMLCanvasElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
 
@@ -32,7 +34,7 @@ export function View() {
     zoom: 1,
     grid: false,
   });
-  const {selectedNode, setSelectedNode} = useContext(AppContext);
+  const {inspectedElement, setInspectedElement} = useContext(AppContext);
 
   useEffect(() => {
     setState({
@@ -57,9 +59,7 @@ export function View() {
   );
 
   useEffect(() => {
-    const {current} = viewportRef;
-    current.appendChild(player.project.container());
-    return () => player.project.container().remove();
+    player.project.setCanvas(viewportRef.current);
   }, [viewportRef.current]);
 
   useSubscribable(
@@ -91,10 +91,10 @@ export function View() {
         switch (event.key) {
           case '0': {
             const rect = containerRef.current.getBoundingClientRect();
-            const size = player.project.size();
-            let zoom = rect.height / size.height;
-            if (size.width * zoom > rect.width) {
-              zoom = rect.width / size.width;
+            const {width, height} = player.project.getSize();
+            let zoom = rect.height / height;
+            if (width * zoom > rect.width) {
+              zoom = rect.width / width;
             }
             setState({...state, zoom, x: 0, y: 0});
             break;
@@ -109,20 +109,15 @@ export function View() {
             setState({...state, grid: !state.grid});
             break;
           case 'ArrowUp':
-            if (selectedNode?.parent) {
-              setSelectedNode(selectedNode.parent);
-            }
+            // TODO Support hierarchy traversal.
             break;
           case 'ArrowDown': {
-            const container = selectedNode as Container;
-            if (container?.children?.length) {
-              setSelectedNode(container.children.at(-1));
-            }
+            // TODO Support hierarchy traversal.
             break;
           }
         }
       },
-      [setState, state, selectedNode],
+      [setState, state, inspectedElement],
     ),
   );
 
@@ -133,23 +128,22 @@ export function View() {
         ref={containerRef}
         onMouseDown={event => {
           if (event.button === 0 && !event.shiftKey) {
+            if (!isInspectable(scene)) return;
+
             const position = {
               x: event.x - size.x,
               y: event.y - size.y,
             };
 
+            const projectSize = player.project.getSize();
             position.x -= state.x + size.width / 2;
             position.y -= state.y + size.height / 2;
             position.x /= state.zoom;
             position.y /= state.zoom;
-            position.x += player.project.width() / 2;
-            position.y += player.project.height() / 2;
+            position.x += projectSize.width / 2;
+            position.y += projectSize.height / 2;
 
-            player.project.listening(true);
-            player.project.master.drawHit();
-            const node = player.project.master.getIntersection(position);
-            player.project.listening(false);
-            setSelectedNode(node);
+            setInspectedElement(scene.inspectPosition(position.x, position.y));
           } else {
             handleDrag(event);
           }
@@ -176,10 +170,11 @@ export function View() {
             transform: `translate(${state.x}px, ${state.y}px) scale(${state.zoom})`,
           }}
           id={'viewport'}
-          ref={viewportRef}
-        />
+        >
+          <canvas ref={viewportRef} />
+        </div>
         <Grid />
-        <Debug node={selectedNode} setNode={setSelectedNode} />
+        <Debug />
         <div ref={overlayRef} className={styles.overlay} />
       </div>
     </ViewportContext.Provider>

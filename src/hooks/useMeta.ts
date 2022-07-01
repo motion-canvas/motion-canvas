@@ -1,4 +1,4 @@
-import {Meta, Metadata} from '@motion-canvas/core/lib';
+import type {Meta, Metadata} from '@motion-canvas/core/lib';
 import {useCallback} from 'preact/hooks';
 import {usePlayer} from './usePlayer';
 import {useSubscribableValue} from './useSubscribable';

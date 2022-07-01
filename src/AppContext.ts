@@ -1,14 +1,14 @@
 import {createContext} from 'preact';
-import {Node} from 'konva/lib/Node';
+import type {InspectedElement} from '@motion-canvas/core/lib/scenes';
 
 export interface AppState {
-  selectedNode: Node | null;
-  setSelectedNode: (node: Node | null) => void;
+  inspectedElement: InspectedElement | null;
+  setInspectedElement: (element: InspectedElement | null) => void;
 }
 
 const AppContext = createContext<AppState>({
-  selectedNode: null,
-  setSelectedNode: () => {
+  inspectedElement: null,
+  setInspectedElement: () => {
     throw new Error('setSelectedNode not implemented');
   },
 });

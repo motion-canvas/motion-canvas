@@ -18,6 +18,10 @@
     border: 6px solid #242424;
     border-radius: 8px;
   }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
 }
 
 html,
