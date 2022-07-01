@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/motion-canvas/ui/compare/v1.5.1...v1.6.0) (2022-07-01)
+
+
+### Features
+
+* update core to 6.0.0 ([#17](https://github.com/motion-canvas/ui/issues/17)) ([f8d453b](https://github.com/motion-canvas/ui/commit/f8d453b22beb5250ea822d274ed2ab6bfea5c39c))
+
 ## [1.5.1](https://github.com/motion-canvas/ui/compare/v1.5.0...v1.5.1) (2022-06-22)
 
 
