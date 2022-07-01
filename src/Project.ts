@@ -57,6 +57,7 @@ export class Project {
     if (this.canvas) {
       this.canvas.width = this.width * this._resolutionScale;
       this.canvas.height = this.height * this._resolutionScale;
+      this.render();
     }
   }
 
