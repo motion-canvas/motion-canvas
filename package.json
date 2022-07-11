@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
+    "test": "jest --passWithNoTests",
     "lint": "eslint \"src/**/*.ts?(x)\"",
     "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
     "prettier": "prettier --check \"src/**/*\"",
@@ -59,11 +60,17 @@
     "@semantic-release/npm": "^9.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "@types/dom-webcodecs": "^0.1.4",
+    "@types/jest": "^28.1.4",
     "@typescript-eslint/eslint-plugin": "^5.27.1",
     "@typescript-eslint/parser": "^5.27.1",
+    "canvas-5-polyfill": "^0.1.5",
     "eslint": "^8.17.0",
+    "jest": "^28.1.2",
+    "jest-canvas-mock": "^2.4.0",
+    "jest-environment-jsdom": "^28.1.2",
     "prettier": "^2.6.2",
     "semantic-release": "^19.0.2",
+    "ts-jest": "^28.0.5",
     "typedoc": "^0.22.17"
   }
 }
