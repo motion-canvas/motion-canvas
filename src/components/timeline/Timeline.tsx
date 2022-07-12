@@ -125,14 +125,12 @@ export function Timeline() {
               event.x - rect.x + newOffset
             }px`;
           }}
-          onMouseUp={event => {
-            if (event.button === 0) {
-              player.requestSeek(
-                Math.floor(
-                  ((offset + event.x - rect.x) / state.fullLength) * duration,
-                ),
-              );
-            }
+          onClick={event => {
+            player.requestSeek(
+              Math.floor(
+                ((offset + event.x - rect.x) / state.fullLength) * duration,
+              ),
+            );
           }}
           onMouseMove={event => {
             playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
