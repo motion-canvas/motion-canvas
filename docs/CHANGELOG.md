@@ -1,3 +1,28 @@
+# [7.0.0](https://github.com/motion-canvas/core/compare/v6.0.1...v7.0.0) (2022-07-14)
+
+
+### Features
+
+* added useContext and useContextAfter hooks ([#63](https://github.com/motion-canvas/core/issues/63)) ([352e131](https://github.com/motion-canvas/core/commit/352e13104361389e81d96eadeb41a680eaafafdb)), closes [#58](https://github.com/motion-canvas/core/issues/58)
+* framerate-independent timing ([#64](https://github.com/motion-canvas/core/issues/64)) ([6891f59](https://github.com/motion-canvas/core/commit/6891f5974145878bc18f200e70cff5117ac32bd3)), closes [#57](https://github.com/motion-canvas/core/issues/57)
+
+
+### BREAKING CHANGES
+
+* Konva patches are not imported by default
+
+Projects using `KonvaScene`s should import the patches manually at the very top of the file project:
+```ts
+import '@motion-canvas/core/lib/patches'
+// ...
+bootstrap(...);
+```
+
+`getset` import path has changed:
+```ts
+import {getset} from '@motion-canvas/core/lib/decorators/getset';
+```
+
 ## [6.0.1](https://github.com/motion-canvas/core/compare/v6.0.0...v6.0.1) (2022-07-01)
 
 
