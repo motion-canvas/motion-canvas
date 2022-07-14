@@ -1,5 +1,3 @@
-import './patches';
-
 import {Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {ValueDispatcher} from './events';
@@ -40,7 +38,7 @@ export class Project {
   }
 
   public get framerate(): number {
-    return this.framesPerSeconds;
+    return this.framesPerSeconds / this._speed;
   }
 
   public set framerate(value: number) {
@@ -51,6 +49,11 @@ export class Project {
   public set resolutionScale(value: number) {
     this._resolutionScale = value;
     this.updateCanvas();
+  }
+
+  public set speed(value: number) {
+    this._speed = value;
+    this.reloadAll();
   }
 
   private updateCanvas() {
@@ -89,6 +92,7 @@ export class Project {
 
   public readonly name: string;
   private _resolutionScale = 1;
+  private _speed = 1;
   private framesPerSeconds = 30;
   private readonly sceneLookup: Record<string, Scene> = {};
   private previousScene: Scene = null;
@@ -177,7 +181,7 @@ export class Project {
     }
   }
 
-  public async next(speed = 1): Promise<boolean> {
+  public async next(): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
       if (
@@ -188,7 +192,7 @@ export class Project {
       }
     }
 
-    this.frame += speed;
+    this.frame += this._speed;
 
     if (this.currentScene.current) {
       await this.currentScene.current.next();
@@ -207,15 +211,18 @@ export class Project {
   public async recalculate() {
     this.previousScene = null;
 
+    const speed = this._speed;
+    this._speed = 1;
     this.frame = 0;
     const scenes = Object.values(this.sceneLookup);
     for (const scene of scenes) {
       await scene.recalculate();
     }
+    this._speed = speed;
     this.scenes.current = scenes;
   }
 
-  public async seek(frame: number, speed = 1): Promise<boolean> {
+  public async seek(frame: number): Promise<boolean> {
     if (this.currentScene.current && !this.currentScene.current.isCached()) {
       console.warn(
         'Attempting to seek a project with an invalidated scene:',
@@ -245,7 +252,7 @@ export class Project {
 
     let finished = false;
     while (this.frame < frame && !finished) {
-      finished = await this.next(speed);
+      finished = await this.next();
     }
 
     return finished;

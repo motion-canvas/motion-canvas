@@ -3,7 +3,8 @@ import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
 import {Origin, Size, Spacing, getOriginOffset} from '../types';
 import {Animator, tween, textTween, InterpolationFunction} from '../tweening';
-import {getset, threadable} from '../decorators';
+import {threadable} from '../decorators';
+import {getset} from '../decorators/getset';
 
 export interface LayoutTextConfig extends TextConfig {
   minWidth?: number;

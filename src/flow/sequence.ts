@@ -4,19 +4,31 @@ import {join, ThreadGenerator} from '../threading';
 
 decorate(sequence, threadable());
 /**
- * Run
+ * Start all tasks one after another with a constant delay between.
+ *
+ * The function doesn't wait until the previous task in the sequence has
+ * finished. Once the delay has passed, the next task will start event if
+ * the previous is still running.
+ *
+ * @example
+ * ```ts
+ * yield* sequence(
+ *   0.1,
+ *   ...rects.map(rect => rect.x(100, 1))
+ * );
+ * ```
  *
  * @param delay
- * @param sequences
+ * @param tasks
  */
 export function* sequence(
   delay: number,
-  ...sequences: ThreadGenerator[]
+  ...tasks: ThreadGenerator[]
 ): ThreadGenerator {
-  for (const sequence1 of sequences) {
-    yield sequence1;
+  for (const task of tasks) {
+    yield task;
     yield* waitFor(delay);
   }
 
-  yield* join(...sequences);
+  yield* join(...tasks);
 }

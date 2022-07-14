@@ -1,7 +1,8 @@
 import {Context} from 'konva/lib/Context';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {waitFor} from '../flow';
-import {cached, getset, KonvaNode, threadable} from '../decorators';
+import {cached, KonvaNode, threadable} from '../decorators';
+import {getset} from '../decorators/getset';
 import {GeneratorHelper} from '../helpers';
 import {InterpolationFunction, map, tween} from '../tweening';
 import {cancel, ThreadGenerator} from '../threading';
@@ -223,7 +224,7 @@ export class Sprite extends Shape {
     if (this.task) {
       const previousTask = this.task;
       this.task = (function* (): ThreadGenerator {
-        yield* cancel(previousTask);
+        cancel(previousTask);
         yield* runTask;
       })();
       GeneratorHelper.makeThreadable(this.task, runTask);
@@ -263,7 +264,7 @@ export class Sprite extends Shape {
   @threadable()
   public *stop() {
     if (this.task) {
-      yield* cancel(this.task);
+      cancel(this.task);
       this.task = null;
     }
   }

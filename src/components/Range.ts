@@ -1,5 +1,6 @@
 import {Context} from 'konva/lib/Context';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {CanvasHelper} from '../helpers';
 import {GetSet} from 'konva/lib/types';
 import {getFontColor, getStyle, Style} from '../styles';

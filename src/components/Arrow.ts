@@ -3,7 +3,8 @@ import {Shape, ShapeConfig} from 'konva/lib/Shape';
 import {Context} from 'konva/lib/Context';
 import {GetSet, Vector2d} from 'konva/lib/types';
 import {clamp} from 'three/src/math/MathUtils';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 
 export interface ArrowConfig extends ShapeConfig {
   radius?: number;

@@ -1,4 +1,5 @@
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {Sprite} from './Sprite';
 import {GetSet} from 'konva/lib/types';
 import {LinearLayout} from './LinearLayout';

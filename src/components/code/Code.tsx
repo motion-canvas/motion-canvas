@@ -1,4 +1,5 @@
-import {cached, getset, KonvaNode, threadable} from '../../decorators';
+import {cached, KonvaNode, threadable} from '../../decorators';
+import {getset} from '../../decorators/getset';
 import {GetSet} from 'konva/lib/types';
 import PrismJS from 'prismjs';
 import {Context} from 'konva/lib/Context';

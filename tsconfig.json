@@ -19,6 +19,5 @@
       "@motion-canvas/core/lib/jsx-runtime": ["jsx-runtime.ts"]
     }
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.*"]
+  "include": ["src"]
 }

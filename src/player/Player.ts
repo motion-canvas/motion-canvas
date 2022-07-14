@@ -91,6 +91,7 @@ export class Player {
 
   public loadState(state: Partial<PlayerState>) {
     this.updateState(state);
+    this.project.speed = state.speed;
     this.project.framerate = state.fps;
     this.project.resolutionScale = state.scale;
     this.setRange(state.startFrame, state.endFrame);
@@ -157,7 +158,9 @@ export class Player {
   }
 
   public setSpeed(value: number) {
+    this.project.speed = value;
     this.updateState({speed: value});
+    this.reload();
   }
 
   public setFramerate(fps: number) {
@@ -180,11 +183,11 @@ export class Player {
   }
 
   public requestPreviousFrame(): void {
-    this.commands.seek = this.frame.current - 1;
+    this.commands.seek = this.frame.current - this.state.current.speed;
   }
 
   public requestNextFrame(): void {
-    this.commands.seek = this.frame.current + 1;
+    this.commands.seek = this.frame.current + this.state.current.speed;
   }
 
   public requestReset(): void {
@@ -282,7 +285,7 @@ export class Player {
       const seekFrame = commands.seek < 0 ? this.project.frame : commands.seek;
       const clampedFrame = this.clampRange(seekFrame, state);
       console.time('seek time');
-      state.finished = await this.project.seek(clampedFrame, state.speed);
+      state.finished = await this.project.seek(clampedFrame);
       console.timeEnd('seek time');
       this.syncAudio(-3);
     }
@@ -305,11 +308,11 @@ export class Player {
       this.project.time < this.audio.getTime() - MAX_AUDIO_DESYNC
     ) {
       const seekFrame = this.project.secondsToFrames(this.audio.getTime());
-      state.finished = await this.project.seek(seekFrame, state.speed);
+      state.finished = await this.project.seek(seekFrame);
     }
     // Simply move forward one frame
     else if (this.project.frame < state.endFrame) {
-      state.finished = await this.project.next(state.speed);
+      state.finished = await this.project.next();
 
       // Synchronize audio.
       if (state.speed !== 1) {

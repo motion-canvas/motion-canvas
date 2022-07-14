@@ -2,7 +2,8 @@ import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
 import {Center, flipOrigin, getOriginDelta, Origin} from '../types';
 import {GetSet, IRect} from 'konva/lib/types';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {Node} from 'konva/lib/Node';
 import {useKonvaView} from '../scenes';
 

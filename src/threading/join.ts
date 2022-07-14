@@ -1,33 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from './ThreadGenerator';
-
-/**
- * @internal
- */
-export const THREAD_JOIN = Symbol.for('THREAD_JOIN');
-
-/**
- * An instruction passed to the {@link threads} generator to join tasks.
- */
-export interface JoinYieldResult {
-  /**
-   * Tasks to join.
-   */
-  [THREAD_JOIN]: ThreadGenerator[];
-  /**
-   * Whether we should wait for all tasks or for at least one.
-   */
-  all: boolean;
-}
-
-/**
- * Check if the given value is a {@link JoinYieldResult}.
- *
- * @param value A possible {@link JoinYieldResult}.
- */
-export function isJoinYieldResult(value: unknown): value is JoinYieldResult {
-  return typeof value === 'object' && THREAD_JOIN in value;
-}
+import {useThread} from '../utils';
 
 decorate(join, threadable());
 /**
@@ -77,5 +50,25 @@ export function* join(
     tasks.push(first);
   }
 
-  yield* yield {[THREAD_JOIN]: tasks, all};
+  const parent = useThread();
+  const threads = tasks
+    .map(task => parent.children.find(thread => thread.runner === task))
+    .filter(thread => thread);
+
+  const startTime = parent.time;
+  let childTime;
+  if (all) {
+    while (threads.find(thread => !thread.canceled)) {
+      yield;
+    }
+    childTime = Math.max(...threads.map(thread => thread.time));
+  } else {
+    while (!threads.find(thread => thread.canceled)) {
+      yield;
+    }
+    const canceled = threads.filter(thread => thread.canceled);
+    childTime = Math.min(...canceled.map(thread => thread.time));
+  }
+
+  parent.time = Math.max(startTime, childTime);
 }

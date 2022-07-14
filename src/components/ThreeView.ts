@@ -4,7 +4,8 @@ import {Context} from 'konva/lib/Context';
 import * as THREE from 'three';
 import {CanvasHelper} from '../helpers';
 import {GetSet} from 'konva/lib/types';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 
 export interface ThreeViewConfig extends ShapeConfig {

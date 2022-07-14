@@ -1,7 +1,8 @@
 import {LinearLayout, LinearLayoutConfig} from './LinearLayout';
 import {Rect} from 'konva/lib/shapes/Rect';
 import {Range, RangeConfig} from './Range';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {parseColor} from 'mix-color';
 import {Surface} from './Surface';
 import {Origin} from '../types';

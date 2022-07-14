@@ -1,6 +1,7 @@
 import {Context} from 'konva/lib/Context';
 import {GetSet} from 'konva/lib/types';
-import {KonvaNode, getset} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {CanvasHelper} from '../helpers';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
 

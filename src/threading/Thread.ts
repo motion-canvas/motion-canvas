@@ -1,5 +1,6 @@
 import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
+import {setThread, useProject} from '../utils';
 
 /**
  * A class representing an individual thread.
@@ -17,35 +18,58 @@ export class Thread {
   public value: unknown;
 
   /**
+   * The current time of this thread.
+   *
+   * Used by {@link waitFor} and other time-based functions to properly support
+   * durations shorter than one frame.
+   */
+  public time = 0;
+
+  /**
    * Check if this thread or any of its ancestors has been canceled.
    */
   public get canceled(): boolean {
-    return this._canceled || (this.parent?.canceled ?? false);
+    return this.isCanceled || (this.parent?.canceled ?? false);
   }
 
-  private parent: Thread = null;
-  private _canceled = false;
+  public parent: Thread = null;
+  private isCanceled = false;
+  private readonly frameDuration: number;
 
   public constructor(
     /**
      * The generator wrapped by this thread.
      */
     public readonly runner: ThreadGenerator,
-  ) {}
+  ) {
+    const project = useProject();
+    this.frameDuration = project.framesToSeconds(1);
+    this.time = project.time;
+  }
 
   /**
    * Progress the wrapped generator once.
    */
   public next() {
+    setThread(this);
     const result = this.runner.next(this.value);
     this.value = null;
     return result;
   }
 
+  /**
+   * Prepare the thread for the next update cycle.
+   */
+  public update() {
+    this.time += useProject().framesToSeconds(1);
+    this.children = this.children.filter(child => !child.canceled);
+  }
+
   public add(child: Thread) {
     child.cancel();
     child.parent = this;
-    child._canceled = false;
+    child.isCanceled = false;
+    child.time = this.time;
     this.children.push(child);
 
     if (!Object.getPrototypeOf(child.runner).threadable) {
@@ -58,9 +82,7 @@ export class Thread {
   }
 
   public cancel() {
-    if (!this.parent) return;
-    this.parent.children = this.parent.children.filter(child => child !== this);
+    this.isCanceled = true;
     this.parent = null;
-    this._canceled = true;
   }
 }

@@ -3,7 +3,8 @@ import {GetSet} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
 import {Center, getOriginOffset, Origin, Size} from '../types';
 import {ContainerConfig} from 'konva/lib/Container';
-import {getset, KonvaNode} from '../decorators';
+import {KonvaNode} from '../decorators';
+import {getset} from '../decorators/getset';
 import {Node} from 'konva/lib/Node';
 
 export interface LinearLayoutConfig extends ContainerConfig {

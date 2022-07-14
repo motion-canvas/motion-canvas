@@ -4,7 +4,7 @@ import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
-import {setScene} from '../utils';
+import {setProject, setScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata} from './Scene';
 import {
   isTransitionable,
@@ -157,6 +157,7 @@ export abstract class GeneratorScene<T>
 
   public async next() {
     setScene(this);
+    setProject(this.project);
     let result = this.runner.next();
     this.update();
     while (result.value) {

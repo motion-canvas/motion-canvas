@@ -1,5 +1,4 @@
-import {JoinYieldResult} from './join';
-import {CancelYieldResult} from './cancel';
+import {Thread} from './Thread';
 
 /**
  * The main generator type produced by all generator functions in Motion Canvas.
@@ -29,9 +28,9 @@ import {CancelYieldResult} from './cancel';
  * [promise]: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/promise
  */
 export type ThreadGenerator = Generator<
-  ThreadGenerator | JoinYieldResult | CancelYieldResult | Promise<any>,
+  ThreadGenerator | Promise<any>,
   void,
-  ThreadGenerator | any
+  Thread | any
 >;
 
 /**

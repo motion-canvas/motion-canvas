@@ -6,9 +6,9 @@
   "author": "motion-canvas",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "test": "jest --passWithNoTests",
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json -w",
+    "test": "jest",
     "lint": "eslint \"src/**/*.ts?(x)\"",
     "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
     "prettier": "prettier --check \"src/**/*\"",
