@@ -89,6 +89,7 @@ Otherwise, below are the steps to set it up manually:
 7. Initialize the project with your scene in `src/project.ts`:
 
    ```ts
+   import '@motion-canvas/core/lib/patches';
    import {bootstrap} from '@motion-canvas/core/lib';
 
    import example from './scenes/example.scene';
