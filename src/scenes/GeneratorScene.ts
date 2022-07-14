@@ -64,6 +64,23 @@ export abstract class GeneratorScene<T>
   }
   private readonly thread = new ValueDispatcher<Thread>(null);
 
+  public get onBeforeRendered() {
+    return this.beforeRendered.subscribable;
+  }
+  protected readonly beforeRendered =
+    new EventDispatcher<CanvasRenderingContext2D>();
+
+  public get onAfterRendered() {
+    return this.afterRendered.subscribable;
+  }
+  protected readonly afterRendered =
+    new EventDispatcher<CanvasRenderingContext2D>();
+
+  public get onReset() {
+    return this.afterReset.subscribable;
+  }
+  private readonly afterReset = new EventDispatcher<void>();
+
   private previousScene: Scene = null;
   private runner: ThreadGenerator;
   private state: SceneState = SceneState.Initial;
@@ -168,7 +185,7 @@ export abstract class GeneratorScene<T>
       },
     );
     this.state = SceneState.Initial;
-    setScene(this);
+    this.afterReset.dispatch();
     await this.next();
   }
 

@@ -109,6 +109,27 @@ export interface Scene<T = unknown> {
   get onRecalculated(): SubscribableEvent<void>;
 
   /**
+   * Triggered before the scene is rendered with the Context2D.
+   *
+   * @event CanvasRenderingContext2D
+   */
+  get onBeforeRendered(): SubscribableEvent<CanvasRenderingContext2D>;
+
+  /**
+   * Triggered after the scene is rendered with the Context2D.
+   *
+   * @event CanvasRenderingContext2D
+   */
+  get onAfterRendered(): SubscribableEvent<CanvasRenderingContext2D>;
+
+  /**
+   * Triggered when the scene is reset.
+   *
+   * @event void
+   */
+  get onReset(): SubscribableEvent<void>;
+
+  /**
    * Render the scene onto a canvas.
    *
    * @param context

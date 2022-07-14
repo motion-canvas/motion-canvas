@@ -125,7 +125,9 @@ export class KonvaScene
       sceneCanvas.getContext()._context = context;
     }
 
+    this.beforeRendered.dispatch(context);
     this.view.drawScene(sceneCanvas);
+    this.afterRendered.dispatch(context);
   }
 
   public reset(previousScene: Scene = null) {

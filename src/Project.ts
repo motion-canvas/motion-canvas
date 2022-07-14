@@ -157,8 +157,12 @@ export class Project {
       );
     }
 
+    this.context.save();
     this.previousScene?.render(this.context, this.canvas);
+    this.context.restore();
+    this.context.save();
     this.currentScene.current?.render(this.context, this.canvas);
+    this.context.restore();
   }
 
   public reload(runners: SceneDescription[]) {
