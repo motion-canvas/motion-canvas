@@ -82,11 +82,11 @@ export function createEaseInOutBack(s = 1.70158): InterpolationFunction {
     if (value < 1) {
       return map(from, to, (value * value * ((s + 1) * value - s)) / 2);
     }
-    value -= 2;
+    value -= 1;
     return map(
       from,
       to,
-      (1 + (value - 1) * (value - 1) * ((s + 1) * (value - 1) + s)) / 2,
+      (1 + (value - 1) * (value - 1) * ((s + 1) * (value - 1) + s)) / 2 + 0.5,
     );
   };
 }
