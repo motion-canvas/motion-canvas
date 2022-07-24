@@ -5,13 +5,8 @@ import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
 import {setProject, setScene} from '../utils';
-import {CachedSceneData, Scene, SceneMetadata} from './Scene';
-import {
-  isTransitionable,
-  SceneTransition,
-  Transitionable,
-  TransitionContext,
-} from './Transitionable';
+import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
+import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
 import {Size} from '../types';
 import {SceneState} from './SceneState';
@@ -26,7 +21,7 @@ export interface ThreadGeneratorFactory<T> {
  * Uses generators to control the animation.
  */
 export abstract class GeneratorScene<T>
-  implements Scene<ThreadGeneratorFactory<T>>, Transitionable, Threadable
+  implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
   public readonly timeEvents: TimeEvents;
   public readonly meta: Meta<SceneMetadata>;
@@ -64,22 +59,23 @@ export abstract class GeneratorScene<T>
   }
   private readonly thread = new ValueDispatcher<Thread>(null);
 
-  public get onBeforeRendered() {
-    return this.beforeRendered.subscribable;
+  public get onRenderLifecycle() {
+    return this.renderLifecycle.subscribable;
   }
-  protected readonly beforeRendered =
-    new EventDispatcher<CanvasRenderingContext2D>();
-
-  public get onAfterRendered() {
-    return this.afterRendered.subscribable;
-  }
-  protected readonly afterRendered =
-    new EventDispatcher<CanvasRenderingContext2D>();
+  protected readonly renderLifecycle = new EventDispatcher<
+    [SceneRenderEvent, CanvasRenderingContext2D]
+  >();
 
   public get onReset() {
     return this.afterReset.subscribable;
   }
   private readonly afterReset = new EventDispatcher<void>();
+
+  public readonly LifecycleEvents: LifecycleEvents = new LifecycleEvents(this);
+
+  public get previous() {
+    return this.previousScene;
+  }
 
   private previousScene: Scene = null;
   private runner: ThreadGenerator;
@@ -139,11 +135,18 @@ export abstract class GeneratorScene<T>
     cached.transitionDuration = -1;
     await this.reset();
     while (!this.canTransitionOut()) {
-      if (cached.transitionDuration < 0 && this.isAfterTransitionIn()) {
+      if (
+        cached.transitionDuration < 0 &&
+        this.state === SceneState.AfterTransitionIn
+      ) {
         cached.transitionDuration = this.project.frame - cached.firstFrame;
       }
       this.project.frame++;
       await this.next();
+    }
+
+    if (cached.transitionDuration === -1) {
+      cached.transitionDuration = 0;
     }
 
     cached.lastFrame = this.project.frame;
@@ -185,7 +188,11 @@ export abstract class GeneratorScene<T>
         this.thread.current = thread;
       },
     );
-    this.state = SceneState.Initial;
+    if (this.cache.current.transitionDuration === 0) {
+      this.state = SceneState.AfterTransitionIn;
+    } else {
+      this.state = SceneState.Initial;
+    }
     this.afterReset.dispatch();
     await this.next();
   }
@@ -209,23 +216,26 @@ export abstract class GeneratorScene<T>
     return this.state === SceneState.Finished;
   }
 
-  public enterCanTransitionOut() {
-    if (this.state === SceneState.AfterTransitionIn) {
-      this.state = SceneState.CanTransitionOut;
-    } else {
-      console.warn(
-        `Scene ${this.name} was marked as finished in an unexpected state: `,
-        this.state,
-      );
-    }
-  }
-
   public enterAfterTransitionIn() {
     if (this.state === SceneState.Initial) {
       this.state = SceneState.AfterTransitionIn;
     } else {
       console.warn(
         `Scene ${this.name} transitioned in an unexpected state: `,
+        this.state,
+      );
+    }
+  }
+
+  public enterCanTransitionOut() {
+    if (
+      this.state === SceneState.AfterTransitionIn ||
+      this.state === SceneState.Initial // only on recalculate
+    ) {
+      this.state = SceneState.CanTransitionOut;
+    } else {
+      console.warn(
+        `Scene ${this.name} was marked as finished in an unexpected state: `,
         this.state,
       );
     }
@@ -245,26 +255,4 @@ export abstract class GeneratorScene<T>
 
     return `${this.name}.${type}.${id}`;
   }
-
-  //#region Transitionable Interface
-
-  @threadable()
-  public *transition(transitionRunner?: SceneTransition): ThreadGenerator {
-    const previous = isTransitionable(this.previousScene)
-      ? this.previousScene.getTransitionContext()
-      : null;
-
-    if (!transitionRunner) {
-      previous?.visible(false);
-      this.enterAfterTransitionIn();
-      return;
-    }
-
-    yield* transitionRunner(this.getTransitionContext(), previous);
-    this.enterAfterTransitionIn();
-  }
-
-  public abstract getTransitionContext(): TransitionContext;
-
-  //#endregion
 }

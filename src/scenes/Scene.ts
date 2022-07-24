@@ -3,6 +3,7 @@ import {Meta, Metadata} from '../Meta';
 import {SavedTimeEvent, TimeEvents} from './TimeEvents';
 import {SubscribableEvent, SubscribableValueEvent} from '../events';
 import {Size} from '../types';
+import {LifecycleEvents} from './LifecycleEvents';
 
 export interface SceneMetadata extends Metadata {
   timeEvents: SavedTimeEvent[];
@@ -51,6 +52,28 @@ export interface CachedSceneData {
   lastFrame: number;
   transitionDuration: number;
   duration: number;
+}
+
+/**
+ * Signifies the various stages of a {@link Scene}'s render lifecycle.
+ */
+export enum SceneRenderEvent {
+  /**
+   * Occurs before the render starts when the Scene transitions are applied.
+   */
+  BeforeRender,
+  /**
+   * Occurs at the beginning of a render when the Scene's `useContext` handlers are applied.
+   */
+  BeginRender,
+  /**
+   * Occurs at the end of a render when the Scene's `useContextAfter` handlers are applied.
+   */
+  FinishRender,
+  /**
+   * Occurs after a render ends.
+   */
+  AfterRender,
 }
 
 /**
@@ -109,18 +132,18 @@ export interface Scene<T = unknown> {
   get onRecalculated(): SubscribableEvent<void>;
 
   /**
-   * Triggered before the scene is rendered with the Context2D.
-   *
-   * @event CanvasRenderingContext2D
+   * The scene's {@link LifecycleEvents}.
    */
-  get onBeforeRendered(): SubscribableEvent<CanvasRenderingContext2D>;
+  get LifecycleEvents(): LifecycleEvents;
 
   /**
-   * Triggered after the scene is rendered with the Context2D.
+   * Triggered at various stages of the render lifecycle with an event title and a Context2D.
    *
-   * @event CanvasRenderingContext2D
+   * @event [SceneRenderEvent, CanvasRenderingContext2D]
    */
-  get onAfterRendered(): SubscribableEvent<CanvasRenderingContext2D>;
+  get onRenderLifecycle(): SubscribableEvent<
+    [SceneRenderEvent, CanvasRenderingContext2D]
+  >;
 
   /**
    * Triggered when the scene is reset.
@@ -128,6 +151,11 @@ export interface Scene<T = unknown> {
    * @event void
    */
   get onReset(): SubscribableEvent<void>;
+
+  /**
+   * The scene directly before this scene, or null if omitted for performance.
+   */
+  get previous(): Scene;
 
   /**
    * Render the scene onto a canvas.
@@ -198,7 +226,12 @@ export interface Scene<T = unknown> {
   isFinished(): boolean;
 
   /**
-   * Enter the {@link SceneState.CanTransitionOut} state?
+   * Enter the {@link SceneState.AfterTransitionIn} state.
+   */
+  enterAfterTransitionIn(): void;
+
+  /**
+   * Enter the {@link SceneState.CanTransitionOut} state.
    */
   enterCanTransitionOut(): void;
 

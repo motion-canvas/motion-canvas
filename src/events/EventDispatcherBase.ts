@@ -32,6 +32,13 @@ export abstract class EventDispatcherBase<
     this.subscribers.delete(handler);
   }
 
+  /**
+   * Unsubscribe all subscribers from the event.
+   */
+  public clear() {
+    this.subscribers.clear();
+  }
+
   protected notifySubscribers(value: TValue): ReturnType<THandler>[] {
     return [...this.subscribers].map(handler => handler(value));
   }

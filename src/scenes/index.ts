@@ -5,4 +5,4 @@ export * from './Scene';
 export * from './SceneState';
 export * from './Threadable';
 export * from './TimeEvents';
-export * from './Transitionable';
+export * from './LifecycleEvents';

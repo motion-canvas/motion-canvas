@@ -78,8 +78,6 @@ Otherwise, below are the steps to set it up manually:
    import {waitFor} from '@motion-canvas/core/lib/flow';
 
    export default makeKonvaScene(function* example(view) {
-     yield* scene.transition();
-   
      // animation code goes here
    
      yield* waitFor(5);

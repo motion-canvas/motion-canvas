@@ -161,12 +161,8 @@ export class Project {
       );
     }
 
-    this.context.save();
     this.previousScene?.render(this.context, this.canvas);
-    this.context.restore();
-    this.context.save();
     this.currentScene.current?.render(this.context, this.canvas);
-    this.context.restore();
   }
 
   public reload(runners: SceneDescription[]) {
@@ -184,10 +180,7 @@ export class Project {
   public async next(): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
-      if (
-        !this.currentScene.current ||
-        this.currentScene.current.isAfterTransitionIn()
-      ) {
+      if (!this.currentScene.current) {
         this.previousScene = null;
       }
     }
@@ -196,6 +189,12 @@ export class Project {
 
     if (this.currentScene.current) {
       await this.currentScene.current.next();
+      if (
+        this.previousScene &&
+        this.currentScene.current.isAfterTransitionIn()
+      ) {
+        this.previousScene = null;
+      }
       if (this.currentScene.current.canTransitionOut()) {
         this.previousScene = this.currentScene.current;
         this.currentScene.current = this.getNextScene(this.previousScene);

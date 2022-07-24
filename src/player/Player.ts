@@ -24,7 +24,6 @@ export interface PlayerState extends Record<string, unknown> {
 }
 
 interface PlayerCommands {
-  reset: boolean;
   seek: number;
   recalculate: boolean;
 }
@@ -73,7 +72,6 @@ export class Player {
   private requestId: number = null;
 
   private commands: PlayerCommands = {
-    reset: true,
     seek: -1,
     recalculate: true,
   };
@@ -116,7 +114,6 @@ export class Player {
 
   private consumeCommands(): PlayerCommands {
     const commands = {...this.commands};
-    this.commands.reset = false;
     this.commands.seek = -1;
     this.commands.recalculate = false;
 

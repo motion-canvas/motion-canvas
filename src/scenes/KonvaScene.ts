@@ -1,11 +1,10 @@
 import {Container} from 'konva/lib/Container';
-import {Scene, SceneDescription} from './Scene';
+import {Scene, SceneDescription, SceneRenderEvent} from './Scene';
 import {HitCanvas, SceneCanvas} from 'konva/lib/Canvas';
 import {Shape, shapes} from 'konva/lib/Shape';
 import {Group} from 'konva/lib/Group';
 import {GeneratorScene, ThreadGeneratorFactory} from './GeneratorScene';
 import {useScene} from '../utils';
-import {SceneTransition, TransitionContext} from './Transitionable';
 import {
   Inspectable,
   InspectedElement,
@@ -16,7 +15,6 @@ import {Util} from 'konva/lib/Util';
 import {Node} from 'konva/lib/Node';
 import {Konva} from 'konva/lib/Global';
 import {NODE_ID} from '../symbols';
-import {ThreadGenerator} from '../threading';
 
 Konva.autoDrawEnabled = false;
 
@@ -55,7 +53,7 @@ export function makeKonvaScene(
   };
 }
 
-class KonvaView extends Container implements TransitionContext {
+class KonvaView extends Container {
   public constructor(private readonly scene: KonvaScene) {
     super();
   }
@@ -65,13 +63,6 @@ class KonvaView extends Container implements TransitionContext {
    */
   public canFinish() {
     this.scene.enterCanTransitionOut();
-  }
-
-  /**
-   * @inheritDoc Transitionable.transition
-   */
-  public transition(transitionRunner?: SceneTransition): ThreadGenerator {
-    return this.scene.transition(transitionRunner);
   }
 
   public updateLayout() {
@@ -125,19 +116,21 @@ export class KonvaScene
       sceneCanvas.getContext()._context = context;
     }
 
-    this.beforeRendered.dispatch(context);
+    context.save();
+    this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
+    context.save();
+    this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
     this.view.drawScene(sceneCanvas);
-    this.afterRendered.dispatch(context);
+    this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
+    context.restore();
+    this.renderLifecycle.dispatch([SceneRenderEvent.AfterRender, context]);
+    context.restore();
   }
 
   public reset(previousScene: Scene = null) {
     this.view.x(0).y(0).opacity(1).show();
     this.view.destroyChildren();
     return super.reset(previousScene);
-  }
-
-  public getTransitionContext(): TransitionContext {
-    return this.view;
   }
 
   //#region Inspectable Interface
