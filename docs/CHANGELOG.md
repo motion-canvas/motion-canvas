@@ -1,3 +1,31 @@
+# [8.0.0](https://github.com/motion-canvas/core/compare/v7.0.0...v8.0.0) (2022-07-24)
+
+
+### Bug Fixes
+
+* bug with createEaseInOutBack in interpolationFunctions.ts ([#69](https://github.com/motion-canvas/core/issues/69)) ([2b95876](https://github.com/motion-canvas/core/commit/2b958768a6d01f81e4fde51a018209e0fe800f8f))
+
+
+### Features
+
+* replaced `scene.transition` with `useTransition` ([#68](https://github.com/motion-canvas/core/issues/68)) ([f521115](https://github.com/motion-canvas/core/commit/f521115889a7f341e03b4e7ee7530a70f37760d8)), closes [#56](https://github.com/motion-canvas/core/issues/56)
+
+
+### BREAKING CHANGES
+
+* `scene.transition()` has been replaced by `useTransition`
+
+Any use of slide transition must be updated from
+```ts
+yield* scene.transition(slideTransition());
+```
+to
+```ts
+yield* slideTranstion();
+```
+
+Any transitions must be rewritten to utilize `useTransition`.
+
 # [7.0.0](https://github.com/motion-canvas/core/compare/v6.0.1...v7.0.0) (2022-07-14)
 
 
