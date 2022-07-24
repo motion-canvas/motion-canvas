@@ -8,11 +8,11 @@ export function Rendering() {
   const state = usePlayerState();
   const {width, height} = player.project.getSize();
 
-  const resolutions = useMemo(() => {
+  const scales = useMemo(() => {
     return [
-      {value: 0.5, text: `${width / 2}x${height / 2} (Half)`},
-      {value: 1, text: `${width}x${height} (Full)`},
-      {value: 2, text: `${width * 2}x${height * 2} (Double)`},
+      {value: 0.5, text: `0.5x (Half)`},
+      {value: 1, text: `1.0x (Full)`},
+      {value: 2, text: `2.0x (Double)`},
     ];
   }, [width, height]);
 
@@ -59,19 +59,46 @@ export function Rendering() {
       </Group>
       <Group>
         <Label>FPS</Label>
-        <Select
-          options={[
-            {value: 30, text: '30 FPS'},
-            {value: 60, text: '60 FPS'},
-          ]}
+        <Input
+          type="number"
+          min={1}
           value={state.fps}
-          onChange={value => player.setFramerate(value)}
+          onChange={event => {
+            const value = parseInt((event.target as HTMLInputElement).value);
+            player.setFramerate(value);
+          }}
         />
       </Group>
       <Group>
         <Label>Resolution</Label>
+        <Input
+          type="number"
+          min={1}
+          value={width}
+          onChange={event => {
+            const value = parseInt((event.target as HTMLInputElement).value);
+            player.project.setSize(value, height);
+            player.project.reloadAll();
+            player.reload();
+          }}
+        />
+        X
+        <Input
+          type="number"
+          min={1}
+          value={height}
+          onChange={event => {
+            const value = parseInt((event.target as HTMLInputElement).value);
+            player.project.setSize(width, value);
+            player.project.reloadAll();
+            player.reload();
+          }}
+        />
+      </Group>
+      <Group>
+        <Label>Scale</Label>
         <Select
-          options={resolutions}
+          options={scales}
           value={state.scale}
           onChange={value => player.setScale(value)}
         />
