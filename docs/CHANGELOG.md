@@ -1,3 +1,15 @@
+# [1.7.0](https://github.com/motion-canvas/ui/compare/v1.6.0...v1.7.0) (2022-07-24)
+
+
+### Bug Fixes
+
+* timeline will no longer seek when scrolling using the scrollbar ([#19](https://github.com/motion-canvas/ui/issues/19)) ([c1b1680](https://github.com/motion-canvas/ui/commit/c1b168065814edfe7dc4283366a98826c7d93d88))
+
+
+### Features
+
+* added custom resolution inputs to the rendering pane ([#20](https://github.com/motion-canvas/ui/issues/20)) ([1f799b6](https://github.com/motion-canvas/ui/commit/1f799b695e54f6cf3a16ede61a82a53be2e0c803))
+
 # [1.6.0](https://github.com/motion-canvas/ui/compare/v1.5.1...v1.6.0) (2022-07-01)
 
 
