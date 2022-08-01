@@ -12,9 +12,6 @@ export enum SceneState {
    *
    * Informs the Project that the previous scene is no longer necessary and can
    * be disposed of.
-   *
-   * If a scene doesn't implement the {@link Transitionable} interface, it
-   * should enter this state immediately, instead of {@link Initial}.
    */
   AfterTransitionIn,
 

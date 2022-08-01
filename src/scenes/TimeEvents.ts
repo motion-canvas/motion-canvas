@@ -13,8 +13,8 @@ export interface TimeEvent {
    * Time in seconds, relative to the beginning of the scene, at which the event
    * was registered.
    *
-   * In other words, the moment at which {@link waitUntil} for this event was
-   * invoked.
+   * In other words, the moment at which {@link flow!waitUntil} for this event
+   * was invoked.
    */
   initialTime: number;
   /**

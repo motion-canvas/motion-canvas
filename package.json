@@ -71,6 +71,6 @@
     "prettier": "^2.6.2",
     "semantic-release": "^19.0.2",
     "ts-jest": "^28.0.5",
-    "typedoc": "^0.22.17"
+    "typedoc": "^0.23.10"
   }
 }
