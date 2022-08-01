@@ -4,7 +4,7 @@ import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
-import {setProject, setScene} from '../utils';
+import {endScene, setProject, startScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
@@ -159,7 +159,7 @@ export abstract class GeneratorScene<T>
   }
 
   public async next() {
-    setScene(this);
+    startScene(this);
     setProject(this.project);
     let result = this.runner.next();
     this.update();
@@ -173,6 +173,7 @@ export abstract class GeneratorScene<T>
       }
       this.update();
     }
+    endScene(this);
 
     if (result.done) {
       this.state = SceneState.Finished;

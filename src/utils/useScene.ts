@@ -1,11 +1,20 @@
 import type {Scene} from '../scenes';
 
-let currentScene: Scene = null;
+const sceneStack: Scene[] = [];
 
+/**
+ * Get a reference to the current scene.
+ */
 export function useScene(): Scene {
-  return currentScene;
+  return sceneStack.at(-1);
 }
 
-export function setScene(scene: Scene) {
-  currentScene = scene;
+export function startScene(scene: Scene) {
+  sceneStack.push(scene);
+}
+
+export function endScene(scene: Scene) {
+  if (sceneStack.pop() !== scene) {
+    throw new Error('startScene/endScene was called out of order');
+  }
 }

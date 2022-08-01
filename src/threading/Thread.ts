@@ -1,6 +1,6 @@
 import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
-import {setThread, useProject} from '../utils';
+import {endThread, startThread, useProject} from '../utils';
 
 /**
  * A class representing an individual thread.
@@ -51,8 +51,9 @@ export class Thread {
    * Progress the wrapped generator once.
    */
   public next() {
-    setThread(this);
+    startThread(this);
     const result = this.runner.next(this.value);
+    endThread(this);
     this.value = null;
     return result;
   }
