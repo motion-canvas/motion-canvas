@@ -26,7 +26,7 @@ export class Meta<T extends Metadata = Metadata> {
   private rawData: string;
   private source: string;
 
-  private constructor() {
+  private constructor(private readonly name: string) {
     this.rawData = JSON.stringify(this.data.current, undefined, 2);
   }
 
@@ -51,12 +51,19 @@ export class Meta<T extends Metadata = Metadata> {
       ...data,
     };
     this.rawData = JSON.stringify(this.data.current, undefined, 2);
-    const response = await fetch(`/meta/${this.source}`, {
-      method: 'POST',
-      body: this.rawData,
-    });
-    if (!response.ok) {
-      throw new Error(response.statusText);
+    if (this.source) {
+      const response = await fetch(`/meta/${this.source}`, {
+        method: 'POST',
+        body: this.rawData,
+      });
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+    } else {
+      console.warn(
+        `The meta file for ${this.name} is missing\n`,
+        `Make sure the file containing your scene is called "${this.name}.ts to match the generator function name`,
+      );
     }
   }
 
@@ -75,7 +82,7 @@ export class Meta<T extends Metadata = Metadata> {
   public static getMetaFor<T extends Metadata = Metadata>(
     name: string,
   ): Meta<T> {
-    this.metaLookup[name] ??= new Meta<T>();
+    this.metaLookup[name] ??= new Meta<T>(name);
     return <Meta<T>>this.metaLookup[name];
   }
 
