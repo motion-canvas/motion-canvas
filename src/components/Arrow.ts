@@ -161,6 +161,10 @@ export class Arrow extends Shape<ArrowConfig> {
   public start: GetSet<number, this>;
   @getset(1)
   public end: GetSet<number, this>;
+  @getset(false)
+  public startArrow: GetSet<boolean, this>;
+  @getset(false)
+  public endArrow: GetSet<boolean, this>;
   @getset(16)
   public arrowSize: GetSet<number, this>;
 
