@@ -3,7 +3,7 @@ name: Feature request
 about: Suggest an idea for Motion Canvas
 title: ''
 labels: enhancement
-assignees: ''
+assignees: aarthificial
 
 ---
 

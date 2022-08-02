@@ -22,9 +22,20 @@ filling out the necessary information.
 If you intend to change the public API, or make any non-trivial changes to
 the implementation, make sure to [create an issue][new-feature] first. This
 will let us discuss a proposal before you put significant effort into it.
+After a proposal has been discussed it may receive the [accepted][label-accepted]
+label indicating that it's ready to be implemented.
 
-If you're only fixing a bug, it's fine to submit a pull request right away but
-make sure it contains a clear and concise description of said bug.
+If you're only fixing a bug, it's fine to submit a pull request right away
+without creating an issue but make sure it contains a clear and concise
+description of said bug.
+
+## Working on Issues
+
+Before you start working on an issue make sure that no one is assigned to it.
+Otherwise, you may duplicate other people's efforts.
+If somebody claims an issue but doesn't follow up for more than two weeks, it’s
+fine to take it over, but you should still leave a comment.
+You should also assign yourself to any issue you're working on, to let others know.
 
 ## Semantic Versioning
 
@@ -44,7 +55,7 @@ the public release to npm, the version will be reset back to `1.0.0`.
 3. Update the code.
 4. Format your code with prettier (`npm run prettier:fix`).
 5. Make sure your code lints (`npm run lint:fix`)
-6. Commit your changes using a descriptive commit message that follows
+6. Commit your changes using a **descriptive commit message** that follows
    [Angular Commit Message Conventions][commit-format].
    ```shell
    git commit --all
@@ -53,7 +64,8 @@ the public release to npm, the version will be reset back to `1.0.0`.
    ```shell
    git push origin my-fix-branch
    ```
-8. In GitHub, send a pull request to [the master branch][master].
+8. In GitHub, send a pull request to [the master branch][master] 
+   and **request a review** from [aarthificial](https://github.com/aarthificial).
 
 ### Addressing review feedback
 
@@ -80,3 +92,4 @@ This Contribution Guide was partially inspired by [React][react] and
 [commit-format]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
 [angular]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md
 [react]: https://reactjs.org/docs/how-to-contribute.html
+[label-accepted]: https://github.com/motion-canvas/core/labels/accepted
