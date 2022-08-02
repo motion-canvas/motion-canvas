@@ -1,0 +1,61 @@
+{
+  "name": "@motion-canvas/core",
+  "version": "9.0.0",
+  "description": "Web-based tool for creating animations programmatically",
+  "main": "lib/bootstrap.js",
+  "author": "motion-canvas",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "watch": "tsc -p tsconfig.build.json -w",
+    "test": "jest",
+    "lint": "eslint \"src/**/*.ts?(x)\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
+    "prettier": "prettier --check \"src/**/*\"",
+    "prettier:fix": "prettier --write \"src/**/*\""
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/aarthificial"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aarthificial/motion-canvas.git"
+  },
+  "bin": {
+    "motion-canvas": "bin/index.mjs"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "tsconfig.project.json"
+  ],
+  "dependencies": {
+    "@types/prismjs": "^1.26.0",
+    "@types/three": "^0.141.0",
+    "@types/webpack-env": "^1.17.0",
+    "colorjs.io": "^0.3.0",
+    "html-webpack-plugin": "^5.5.0",
+    "image-size": "^1.0.1",
+    "konva": "^8.3.9",
+    "meow": "^10.1.2",
+    "mix-color": "^1.1.2",
+    "mp4box": "^0.5.2",
+    "prismjs": "^1.28.0",
+    "source-map": "^0.7.4",
+    "three": "^0.141.0",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.3",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.2"
+  },
+  "devDependencies": {
+    "@types/dom-webcodecs": "^0.1.4",
+    "@types/jest": "^28.1.4",
+    "canvas-5-polyfill": "^0.1.5",
+    "jest": "^28.1.2",
+    "jest-canvas-mock": "^2.4.0",
+    "jest-environment-jsdom": "^28.1.2",
+    "ts-jest": "^28.0.5"
+  }
+}

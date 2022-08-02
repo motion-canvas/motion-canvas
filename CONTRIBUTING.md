@@ -53,18 +53,16 @@ the public release to npm, the version will be reset back to `1.0.0`.
    git checkout -b my-fix-branch master
    ```
 3. Update the code.
-4. Format your code with prettier (`npm run prettier:fix`).
-5. Make sure your code lints (`npm run lint:fix`)
-6. Commit your changes using a **descriptive commit message** that follows
+4. Commit your changes using a **descriptive commit message** that follows
    [Angular Commit Message Conventions][commit-format].
    ```shell
    git commit --all
    ```
-7. Push your branch to GitHub:
+5. Push your branch to GitHub:
    ```shell
    git push origin my-fix-branch
    ```
-8. In GitHub, send a pull request to [the master branch][master] 
+6. In GitHub, send a pull request to [the master branch][master]
    and **request a review** from [aarthificial](https://github.com/aarthificial).
 
 ### Addressing review feedback

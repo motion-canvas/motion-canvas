@@ -1,9 +1,13 @@
-name: Release Package to GitHub
+name: Publish Packages to GitHub
 
 on: workflow_dispatch
 
+env:
+  HUSKY: 0
+
 jobs:
   publish:
+    name: Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -11,10 +15,12 @@ jobs:
         with:
           node-version: 18
           registry-url: https://npm.pkg.github.com/
+          cache: npm
+      - run: git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - run: git config --global user.name "github-actions[bot]"
       - run: npm ci
-      - run: npm run build
-      - run: npm run docs
-      - run: npm run release
+      - run: npx lerna run build
+      - run: npx lerna publish --yes
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}

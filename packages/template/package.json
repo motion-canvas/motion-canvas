@@ -1,0 +1,17 @@
+{
+  "name": "@motion-canvas/template",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Basic project template for Motion Canvas",
+  "author": "motion-canvas",
+  "license": "MIT",
+  "main": "src/project.ts",
+  "scripts": {
+    "serve": "motion-canvas src/project.ts",
+    "ui": "motion-canvas src/project.ts --ui-server"
+  },
+  "dependencies": {
+    "@motion-canvas/core": "*",
+    "@motion-canvas/ui": "*"
+  }
+}

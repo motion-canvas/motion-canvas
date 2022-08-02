@@ -1,18 +1,31 @@
-name: Test and Build the Package
+name: Verify Pull Request
 
 on:
   pull_request: {}
 
+env:
+  HUSKY: 0
+
 jobs:
-  build:
+  verification:
+    name: Verification
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run prettier
-      - run: npm run test
-      - run: npm run build
+      - name: Commit name
+        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
+      - name: ESLint
+        run: npx lerna run lint
+      - name: Prettier
+        run: npx lerna run prettier
+      - name: Tests
+        run: npx lerna run test
+      - name: Build
+        run: npx lerna run build

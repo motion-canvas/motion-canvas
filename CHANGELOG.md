@@ -48,6 +48,8 @@ yield* slideTranstion();
 
 Any transitions must be rewritten to utilize `useTransition`.
 
+
+
 # [7.0.0](https://github.com/motion-canvas/core/compare/v6.0.1...v7.0.0) (2022-07-14)
 
 
@@ -73,12 +75,16 @@ bootstrap(...);
 import {getset} from '@motion-canvas/core/lib/decorators/getset';
 ```
 
+
+
 ## [6.0.1](https://github.com/motion-canvas/core/compare/v6.0.0...v6.0.1) (2022-07-01)
 
 
 ### Bug Fixes
 
 * re-render the scene when canvas changes ([#55](https://github.com/motion-canvas/core/issues/55)) ([191f96d](https://github.com/motion-canvas/core/commit/191f96da1441bc37d6e61e1acdcfde6994a7f9f3))
+
+
 
 # [6.0.0](https://github.com/motion-canvas/core/compare/v5.0.0...v6.0.0) (2022-07-01)
 
@@ -93,6 +99,8 @@ import {getset} from '@motion-canvas/core/lib/decorators/getset';
 * change the type exported by scene files
 
 Scene files need to export a special `SceneDescription` object instead of a simple generator function.
+
+
 
 # [5.0.0](https://github.com/motion-canvas/core/compare/v4.1.0...v5.0.0) (2022-06-29)
 
@@ -114,6 +122,8 @@ Scene files need to export a special `SceneDescription` object instead of a simp
 The names of all public events now use the following pattern: "on[WhatHappened]".
 Example: "onValueChanged".
 
+
+
 # [4.1.0](https://github.com/motion-canvas/core/compare/v4.0.1...v4.1.0) (2022-06-22)
 
 
@@ -122,12 +132,16 @@ Example: "onValueChanged".
 * improve surface clipping ([#41](https://github.com/motion-canvas/core/issues/41)) ([003b7d5](https://github.com/motion-canvas/core/commit/003b7d58d6490170cea81b2d1b37cf59b4d698cf))
 * make surfaces transparent by default ([#42](https://github.com/motion-canvas/core/issues/42)) ([cd71285](https://github.com/motion-canvas/core/commit/cd712857579ec45b3e6f40d0e48fce80fefed5b9)), closes [#25](https://github.com/motion-canvas/core/issues/25)
 
+
+
 ## [4.0.1](https://github.com/motion-canvas/core/compare/v4.0.0...v4.0.1) (2022-06-22)
 
 
 ### Bug Fixes
 
 * add missing public path ([#40](https://github.com/motion-canvas/core/issues/40)) ([48213de](https://github.com/motion-canvas/core/commit/48213de087d6bb35f29919f5588e3a4517e080b6))
+
+
 
 # [4.0.0](https://github.com/motion-canvas/core/compare/v3.0.3...v4.0.0) (2022-06-22)
 
@@ -144,12 +158,16 @@ Example: "onValueChanged".
 By default, importing images will now return their urls instead of a SpriteData object.
 This behavior can be adjusted using the `?img` and `?anim` queries.
 
+
+
 ## [3.0.3](https://github.com/motion-canvas/core/compare/v3.0.2...v3.0.3) (2022-06-21)
 
 
 ### Bug Fixes
 
 * display newlines in Code correctly ([#38](https://github.com/motion-canvas/core/issues/38)) ([df8f390](https://github.com/motion-canvas/core/commit/df8f390848d7a8e03193d64e460142e00ed95031))
+
+
 
 ## [3.0.2](https://github.com/motion-canvas/core/compare/v3.0.1...v3.0.2) (2022-06-17)
 
@@ -158,12 +176,16 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 
 * save time events only if they're actively used ([#35](https://github.com/motion-canvas/core/issues/35)) ([bd78c89](https://github.com/motion-canvas/core/commit/bd78c8967ba395beeb352006b5f33768b4a4c498)), closes [#33](https://github.com/motion-canvas/core/issues/33) [#34](https://github.com/motion-canvas/core/issues/34)
 
+
+
 ## [3.0.1](https://github.com/motion-canvas/core/compare/v3.0.0...v3.0.1) (2022-06-16)
 
 
 ### Bug Fixes
 
 * fix meta file version and timing ([#32](https://github.com/motion-canvas/core/issues/32)) ([a369610](https://github.com/motion-canvas/core/commit/a36961007eb7ac238b87ade3a03da101a1940800))
+
+
 
 # [3.0.0](https://github.com/motion-canvas/core/compare/v2.2.0...v3.0.0) (2022-06-16)
 
@@ -177,6 +199,8 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 
 * change time events API
 
+
+
 # [2.2.0](https://github.com/motion-canvas/core/compare/v2.1.1...v2.2.0) (2022-06-16)
 
 
@@ -189,6 +213,8 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 
 * add ease back interp functions ([#30](https://github.com/motion-canvas/core/issues/30)) ([c11046d](https://github.com/motion-canvas/core/commit/c11046d939bf5a29e28bda0ef97feabe2f985a0f))
 
+
+
 ## [2.1.1](https://github.com/motion-canvas/core/compare/v2.1.0...v2.1.1) (2022-06-15)
 
 
@@ -197,6 +223,8 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 * add monospace font fallback in case JetBrains Mono is missing ([#24](https://github.com/motion-canvas/core/issues/24)) ([276a310](https://github.com/motion-canvas/core/commit/276a310d63a4ea128a3640d6e0871045514c1c01)), closes [#16](https://github.com/motion-canvas/core/issues/16)
 * code will trigger PrismJS such that JSX is correctly highlighted ([#20](https://github.com/motion-canvas/core/issues/20)) ([b323231](https://github.com/motion-canvas/core/commit/b32323184b5f479bc09950fdf9c570b5276ea600)), closes [#17](https://github.com/motion-canvas/core/issues/17)
 * fix hot reload ([#26](https://github.com/motion-canvas/core/issues/26)) ([2ad746e](https://github.com/motion-canvas/core/commit/2ad746e1eff705c2eb29ea9c83ad9810eeb54b05))
+
+
 
 # [2.1.0](https://github.com/motion-canvas/core/compare/v2.0.0...v2.1.0) (2022-06-14)
 
@@ -210,6 +238,8 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 
 * force rendering to restart seek time ([#14](https://github.com/motion-canvas/core/issues/14)) ([e94027a](https://github.com/motion-canvas/core/commit/e94027a36fe2a0b11f3aa42bb3fa869c10fbe1ea)), closes [#6](https://github.com/motion-canvas/core/issues/6)
 * move back playhead by a frame ([#18](https://github.com/motion-canvas/core/issues/18)) ([b944cd7](https://github.com/motion-canvas/core/commit/b944cd71c075e10622bd7bc81de90024c73438b7))
+
+
 
 # [2.0.0](https://github.com/motion-canvas/core/compare/v1.1.0...v2.0.0) (2022-06-12)
 
@@ -231,6 +261,8 @@ This behavior can be adjusted using the `?img` and `?anim` queries.
 
 They should be imported from `@motion-canvas/core/lib/flow`.
 
+
+
 # [1.1.0](https://github.com/motion-canvas/core/compare/v1.0.0...v1.1.0) (2022-06-08)
 
 
@@ -243,7 +275,9 @@ They should be imported from `@motion-canvas/core/lib/flow`.
 
 * add support for npm workspaces ([741567f](https://github.com/motion-canvas/core/commit/741567f8af4185a2b1bc5284064514d96e75f5f2))
 
-# 1.0.0 (2022-06-08)
+
+
+# [1.0.0](https://github.com/motion-canvas/core/compare/49254fc36cc03c8f8557c14ff86ab38f56229b04...v1.0.0) (2022-06-08)
 
 
 ### Bug Fixes
@@ -301,3 +335,6 @@ They should be imported from `@motion-canvas/core/lib/flow`.
 * use Web Audio API for waveform generation ([817e244](https://github.com/motion-canvas/core/commit/817e244bb2187532df7142199917412ccfe8d218))
 * useAnimator utility ([ad32e8a](https://github.com/motion-canvas/core/commit/ad32e8a0add494021d4c5c9fe5b3915189f00a08))
 * waveform data ([400a756](https://github.com/motion-canvas/core/commit/400a756ebf7ee174d8cbaf03f1f74eddd1b75925))
+
+
+

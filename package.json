@@ -1,77 +1,32 @@
 {
-  "name": "@motion-canvas/core",
-  "version": "9.0.0",
-  "description": "Web-based tool for creating animations programmatically",
-  "main": "lib/bootstrap.js",
-  "author": "motion-canvas",
-  "license": "MIT",
-  "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json -w",
-    "test": "jest",
-    "lint": "eslint \"src/**/*.ts?(x)\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
-    "prettier": "prettier --check \"src/**/*\"",
-    "prettier:fix": "prettier --write \"src/**/*\"",
-    "docs": "typedoc",
-    "docs:watch": "typedoc --watch",
-    "release": "semantic-release"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/motion-canvas"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/motion-canvas/core.git"
-  },
-  "bin": {
-    "motion-canvas": "bin/index.mjs"
-  },
-  "files": [
-    "lib",
-    "bin",
-    "api",
-    "tsconfig.project.json"
+  "name": "motion-canvas",
+  "private": true,
+  "workspaces": [
+    "packages/*"
   ],
-  "dependencies": {
-    "@types/prismjs": "^1.26.0",
-    "@types/three": "^0.141.0",
-    "@types/webpack-env": "^1.17.0",
-    "colorjs.io": "^0.3.0",
-    "html-webpack-plugin": "^5.5.0",
-    "image-size": "^1.0.1",
-    "konva": "^8.3.9",
-    "meow": "^10.1.2",
-    "mix-color": "^1.1.2",
-    "mp4box": "^0.5.2",
-    "prismjs": "^1.28.0",
-    "source-map": "^0.7.4",
-    "three": "^0.141.0",
-    "ts-loader": "^9.3.0",
-    "typescript": "^4.7.3",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.2"
+  "scripts": {
+    "prepare": "husky install",
+    "core:build": "npm run build -w packages/core",
+    "core:watch": "npm run watch -w packages/core",
+    "core:test": "npm run test -w packages/core",
+    "ui:build": "npm run build -w packages/ui",
+    "ui:serve": "npm run serve -w packages/ui",
+    "template:serve": "npm run serve -w packages/template",
+    "template:ui": "npm run ui -w packages/template"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/commit-analyzer": "^9.0.2",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^8.0.4",
-    "@semantic-release/npm": "^9.0.1",
-    "@semantic-release/release-notes-generator": "^10.0.3",
-    "@types/dom-webcodecs": "^0.1.4",
-    "@types/jest": "^28.1.4",
-    "@typescript-eslint/eslint-plugin": "^5.27.1",
-    "@typescript-eslint/parser": "^5.27.1",
-    "canvas-5-polyfill": "^0.1.5",
-    "eslint": "^8.17.0",
-    "jest": "^28.1.2",
-    "jest-canvas-mock": "^2.4.0",
-    "jest-environment-jsdom": "^28.1.2",
-    "prettier": "^2.6.2",
-    "semantic-release": "^19.0.2",
-    "ts-jest": "^28.0.5",
-    "typedoc": "^0.23.10"
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-conventional": "^17.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.32.0",
+    "@typescript-eslint/parser": "^5.32.0",
+    "eslint": "^8.21.0",
+    "husky": "^8.0.0",
+    "lerna": "^5.3.0",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": "eslint --fix",
+    "*.{ts,tsx,md,scss}": "prettier --write"
   }
 }
