@@ -1,5 +1,5 @@
 import {Direction, originPosition} from '../types';
-import {easeInOutCubic, tween, vector2dTween} from '../tweening';
+import {easeInOutCubic, tween, deepTween} from '../tweening';
 import {useScene} from '../utils';
 import {useTransition} from './';
 
@@ -15,13 +15,13 @@ export function slideTransition(direction: Direction = Direction.Top) {
   return tween(
     0.6,
     value => {
-      ppos = vector2dTween(
+      ppos = deepTween(
         {x: 0, y: 0},
         {x: -position.x, y: -position.y},
         easeInOutCubic(value),
       );
 
-      cpos = vector2dTween(position, {x: 0, y: 0}, easeInOutCubic(value));
+      cpos = deepTween(position, {x: 0, y: 0}, easeInOutCubic(value));
     },
     endTransition,
   );

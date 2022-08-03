@@ -99,3 +99,8 @@ declare const PROJECT_FILE_NAME: string;
 declare const CORE_VERSION: string;
 
 declare const META_VERSION: number;
+
+declare module 'colorjs.io' {
+  const noTypesYet: any;
+  export default noTypesYet;
+}

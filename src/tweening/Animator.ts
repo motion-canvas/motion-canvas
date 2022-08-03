@@ -3,12 +3,10 @@ import {
   easeInOutCubic,
   InterpolationFunction,
   map,
-  rectArcTween,
-  spacingTween,
   textTween,
   tween,
   TweenFunction,
-  vector2dTween,
+  deepTween,
 } from './index';
 import {threadable} from '../decorators';
 import {waitFor, waitUntil} from '../flow';
@@ -183,15 +181,7 @@ export class Animator<Type, This> {
         tween = textTween;
       }
     } else if (value && typeof value === 'object') {
-      if ('x' in value) {
-        if ('width' in value) {
-          tween = rectArcTween;
-        } else {
-          tween = vector2dTween;
-        }
-      } else if ('left' in value) {
-        tween = spacingTween;
-      }
+      tween = deepTween;
     }
 
     return tween as TweenFunction<T>;

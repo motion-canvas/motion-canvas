@@ -37,6 +37,7 @@
     "@types/prismjs": "^1.26.0",
     "@types/three": "^0.141.0",
     "@types/webpack-env": "^1.17.0",
+    "colorjs.io": "^0.3.0",
     "html-webpack-plugin": "^5.5.0",
     "image-size": "^1.0.1",
     "konva": "^8.3.9",
