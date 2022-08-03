@@ -1,3 +1,4 @@
+export * from './Canvas';
 export * from './Origin';
 export * from './Rect';
 export * from './Size';

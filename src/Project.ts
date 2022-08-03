@@ -1,7 +1,7 @@
 import {Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {ValueDispatcher} from './events';
-import {Size} from './types';
+import {Size, CanvasColorSpace} from './types';
 
 export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
@@ -51,6 +51,11 @@ export class Project {
     this.updateCanvas();
   }
 
+  public set colorSpace(value: CanvasColorSpace) {
+    this._colorSpace = value;
+    this.updateCanvas();
+  }
+
   public set speed(value: number) {
     this._speed = value;
     this.reloadAll();
@@ -58,6 +63,9 @@ export class Project {
 
   private updateCanvas() {
     if (this.canvas) {
+      this.context = this.canvas.getContext('2d', {
+        colorSpace: this._colorSpace,
+      });
       this.canvas.width = this.width * this._resolutionScale;
       this.canvas.height = this.height * this._resolutionScale;
       this.render();
@@ -66,7 +74,6 @@ export class Project {
 
   public setCanvas(value: HTMLCanvasElement) {
     this.canvas = value;
-    this.context = value?.getContext('2d');
     this.updateCanvas();
   }
 
@@ -92,6 +99,7 @@ export class Project {
 
   public readonly name: string;
   private _resolutionScale = 1;
+  private _colorSpace: CanvasColorSpace = 'srgb';
   private _speed = 1;
   private framesPerSeconds = 30;
   private readonly sceneLookup: Record<string, Scene> = {};

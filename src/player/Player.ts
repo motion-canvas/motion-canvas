@@ -5,6 +5,7 @@ import {
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
+import type {CanvasColorSpace} from '../types';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
@@ -21,6 +22,7 @@ export interface PlayerState extends Record<string, unknown> {
   muted: boolean;
   fps: number;
   scale: number;
+  colorSpace: CanvasColorSpace;
 }
 
 interface PlayerCommands {
@@ -50,6 +52,7 @@ export class Player {
     muted: true,
     fps: 30,
     scale: 1,
+    colorSpace: 'srgb',
   });
 
   public get onFrameChanged() {
@@ -83,6 +86,7 @@ export class Player {
     this.startTime = performance.now();
     this.project.framerate = this.state.current.fps;
     this.project.resolutionScale = this.state.current.scale;
+    this.project.colorSpace = this.state.current.colorSpace;
 
     this.request();
   }
@@ -92,6 +96,7 @@ export class Player {
     this.project.speed = state.speed;
     this.project.framerate = state.fps;
     this.project.resolutionScale = state.scale;
+    this.project.colorSpace = state.colorSpace;
     this.setRange(state.startFrame, state.endFrame);
   }
 
@@ -176,6 +181,12 @@ export class Player {
   public setScale(scale: number) {
     this.project.resolutionScale = scale;
     this.updateState({scale});
+    this.project.render();
+  }
+
+  public setColorSpace(colorSpace: CanvasColorSpace) {
+    this.project.colorSpace = colorSpace;
+    this.updateState({colorSpace});
     this.project.render();
   }
 
