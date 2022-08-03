@@ -10,6 +10,7 @@ export enum SceneState {
   /**
    * The scene has finished transitioning in.
    *
+   * @remarks
    * Informs the Project that the previous scene is no longer necessary and can
    * be disposed of.
    */
@@ -18,8 +19,9 @@ export enum SceneState {
   /**
    * The scene is ready to transition out.
    *
+   * @remarks
    * Informs the project that the next scene can begin.
-   * The {@link Scene.next()} method will still be invoked until the next scene
+   * The {@link Scene.next} method will still be invoked until the next scene
    * enters {@link AfterTransitionIn}.
    */
   CanTransitionOut,
@@ -27,7 +29,8 @@ export enum SceneState {
   /**
    * The scene has finished.
    *
-   * Invoking {@link Scene.next()} won't have any effect.
+   * @remarks
+   * Invoking {@link Scene.next} won't have any effect.
    */
   Finished,
 }

@@ -65,9 +65,9 @@ export class AudioManager {
   /**
    * Pause/resume the audio.
    *
-   * @param isPaused
+   * @param isPaused - Whether the audio should be paused or resumed.
    *
-   * @return `true` if the audio successfully started playing.
+   * @returns `true` if the audio successfully started playing.
    */
   public async setPaused(isPaused: boolean): Promise<boolean> {
     if (this.source && this.audioElement.paused !== isPaused) {

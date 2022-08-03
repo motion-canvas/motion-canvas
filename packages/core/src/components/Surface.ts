@@ -109,7 +109,7 @@ export class Surface extends Group {
   }
 
   /**
-   * @deprecated
+   * @deprecated Use {@link ripple} instead.
    */
   public doRipple() {
     return this.ripple();

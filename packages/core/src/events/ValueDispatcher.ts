@@ -7,10 +7,11 @@ import {
 /**
  * Dispatches a {@link SubscribableValueEvent}
  *
+ * @remarks
  * Changing the value stored by a value dispatcher will immediately notify all
  * its subscribers.
  *
- * Example:
+ * @example
  * ```ts
  * class Example {
  *   // expose the event to external classes
@@ -27,7 +28,7 @@ import {
  * }
  * ```
  *
- * @template T Type of the value passed to subscribers.
+ * @typeParam T - The type of the value passed to subscribers.
  */
 export class ValueDispatcher<T> extends EventDispatcherBase<T> {
   public readonly subscribable: SubscribableValueEvent<T> =
@@ -36,9 +37,10 @@ export class ValueDispatcher<T> extends EventDispatcherBase<T> {
   /**
    * Set the current value of this dispatcher.
    *
+   * @remarks
    * Setting the value will immediately notify all subscribers.
    *
-   * @param value
+   * @param value - The new value.
    */
   public set current(value: T) {
     this.value = value;
@@ -46,21 +48,21 @@ export class ValueDispatcher<T> extends EventDispatcherBase<T> {
   }
 
   /**
-   * @inheritDoc SubscribableValueEvent.current
+   * {@inheritDoc SubscribableValueEvent.current}
    */
   public get current() {
     return this.value;
   }
 
   /**
-   * @param value Initial value.
+   * @param value - The initial value.
    */
   public constructor(private value: T) {
     super();
   }
 
   /**
-   * @inheritDoc SubscribableValueEvent.subscribe
+   * {@inheritDoc SubscribableValueEvent.subscribe}
    */
   public subscribe(handler: EventHandler<T>, dispatchImmediately = true) {
     const unsubscribe = super.subscribe(handler);
@@ -74,10 +76,11 @@ export class ValueDispatcher<T> extends EventDispatcherBase<T> {
 /**
  * Provides safe access to the public interface of {@link ValueDispatcher}.
  *
+ * @remarks
  * External classes can use it to subscribe to an event without being able to
  * dispatch it.
  *
- * @template T Type of the value passed to subscribers.
+ * @typeParam T - The type of the value passed to subscribers.
  */
 export class SubscribableValueEvent<T> extends Subscribable<
   T,
@@ -95,11 +98,11 @@ export class SubscribableValueEvent<T> extends Subscribable<
    *
    * Subscribing will immediately invoke the handler with the most recent value.
    *
-   * @param handler
-   * @param dispatchImmediately Whether the handler should be immediately
-   *                            invoked with the most recent value.
+   * @param handler - The handler to invoke when the event occurs.
+   * @param dispatchImmediately - Whether the handler should be immediately
+   *                              invoked with the most recent value.
    *
-   * @return Callback function that cancels the subscription.
+   * @returns Callback function that cancels the subscription.
    */
   public subscribe(
     handler: EventHandler<T>,

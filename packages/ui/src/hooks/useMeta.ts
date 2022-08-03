@@ -7,7 +7,7 @@ import {useSubscribableValue} from './useSubscribable';
  * Get a stateful value representing the contents of the given meta file and
  * a function to update it.
  *
- * @param meta
+ * @param meta - The meta object to extract data from.
  */
 export function useMeta<T extends Metadata>(
   meta: Meta<T>,

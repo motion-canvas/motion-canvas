@@ -12,7 +12,8 @@
     "ui:build": "npm run build -w packages/ui",
     "ui:serve": "npm run serve -w packages/ui",
     "template:serve": "npm run serve -w packages/template",
-    "template:ui": "npm run ui -w packages/template"
+    "template:ui": "npm run ui -w packages/template",
+    "eslint": "eslint --fix \"**/*.ts?(x)\""
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
@@ -20,6 +21,7 @@
     "@typescript-eslint/eslint-plugin": "^5.32.0",
     "@typescript-eslint/parser": "^5.32.0",
     "eslint": "^8.21.0",
+    "eslint-plugin-tsdoc": "^0.2.16",
     "husky": "^8.0.0",
     "lerna": "^5.3.0",
     "lint-staged": "^13.0.3",

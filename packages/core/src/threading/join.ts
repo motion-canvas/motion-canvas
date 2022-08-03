@@ -6,7 +6,7 @@ decorate(join, threadable());
 /**
  * Pause the current generator until all listed tasks are finished.
  *
- * Example:
+ * @example
  * ```ts
  * const task = yield generatorFunction();
  *
@@ -15,13 +15,13 @@ decorate(join, threadable());
  * yield* join(task);
  * ```
  *
- * @param tasks
+ * @param tasks - A list of tasks to join.
  */
 export function join(...tasks: ThreadGenerator[]): ThreadGenerator;
 /**
  * Pause the current generator until listed tasks are finished.
  *
- * Example
+ * @example
  * ```ts
  * const taskA = yield generatorFunctionA();
  * const taskB = yield generatorFunctionB();
@@ -32,8 +32,8 @@ export function join(...tasks: ThreadGenerator[]): ThreadGenerator;
  * yield* join(false, taskA, taskB);
  * ```
  *
- * @param all Whether we should wait for all tasks or for at least one.
- * @param tasks
+ * @param all - Whether we should wait for all tasks or for at least one.
+ * @param tasks - A list of tasks to join.
  */
 export function join(
   all: boolean,

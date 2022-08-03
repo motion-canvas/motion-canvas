@@ -3,6 +3,7 @@ import {Thread} from './Thread';
 /**
  * The main generator type produced by all generator functions in Motion Canvas.
  *
+ * @example
  * Yielded values can be used to control the flow of animation:
  *
  * - Progress to the next frame:
@@ -36,7 +37,7 @@ export type ThreadGenerator = Generator<
 /**
  * Check if the given value is a {@link ThreadGenerator}.
  *
- * @param value A possible thread {@link ThreadGenerator}.
+ * @param value - A possible thread {@link ThreadGenerator}.
  */
 export function isThreadGenerator(value: unknown): value is ThreadGenerator {
   return typeof value === 'object' && Symbol.iterator in value;

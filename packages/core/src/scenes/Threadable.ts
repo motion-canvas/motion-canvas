@@ -5,13 +5,14 @@ import {Thread} from '../threading';
  * Scenes can implement this interface to display their thread hierarchy in the
  * UI.
  *
+ * @remarks
  * This interface is only useful when a scene uses thread generators to run.
  */
 export interface Threadable {
   /**
    * Triggered when the main thread changes.
    *
-   * @event Thread
+   * @eventProperty
    */
   get onThreadChanged(): SubscribableValueEvent<Thread>;
 }

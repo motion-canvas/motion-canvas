@@ -12,11 +12,13 @@ export interface SceneMetadata extends Metadata {
 /**
  * The constructor used when creating new scenes.
  *
+ * @remarks
  * Each class implementing the {@link Scene} interface should have a matching
  * constructor.
  *
- * @template T The type of the configuration object. This object will be passed
- *             to the constructor from {@link SceneDescription.config}.
+ * @typeParam T - The type of the configuration object. This object will be
+ *                passed to the constructor from
+ *                {@link SceneDescription.config}.
  */
 export interface SceneConstructor<T> {
   new (project: Project, name: string, config: T): Scene;
@@ -25,7 +27,7 @@ export interface SceneConstructor<T> {
 /**
  * Describes a scene exposed by a `*.scene.tsx` file.
  *
- * @template T The type of the configuration object.
+ * @typeParam T - The type of the configuration object.
  */
 export interface SceneDescription<T = unknown> {
   /**
@@ -33,8 +35,9 @@ export interface SceneDescription<T = unknown> {
    */
   klass: SceneConstructor<T>;
   /**
-   * Name of the scene.
+   * The name of the scene.
    *
+   * @remarks
    * Should match the first portion of the file name (`[name].scene.ts`).
    */
   name: string;
@@ -79,21 +82,24 @@ export enum SceneRenderEvent {
 /**
  * The main interface for scenes.
  *
+ * @remarks
  * Any class implementing this interface should have a constructor matching
  * {@link SceneConstructor}.
  *
- * @template T The type of the configuration object.
+ * @typeParam T - The type of the configuration object.
  */
 export interface Scene<T = unknown> {
   /**
    * Name of the scene.
    *
+   * @remarks
    * Will be passed as the second argument to the constructor.
    */
   readonly name: string;
   /**
    * Reference to the project.
    *
+   * @remarks
    * Will be passed as the first argument to the constructor.
    */
   readonly project: Project;
@@ -113,21 +119,21 @@ export interface Scene<T = unknown> {
   /**
    * Triggered when the cached data changes.
    *
-   * @event CachedSceneData
+   * @eventProperty
    */
   get onCacheChanged(): SubscribableValueEvent<CachedSceneData>;
 
   /**
    * Triggered when the scene is reloaded.
    *
-   * @event void
+   * @eventProperty
    */
   get onReloaded(): SubscribableEvent<void>;
 
   /**
    * Triggered after scene is recalculated.
    *
-   * @event void
+   * @eventProperty
    */
   get onRecalculated(): SubscribableEvent<void>;
 
@@ -139,7 +145,7 @@ export interface Scene<T = unknown> {
   /**
    * Triggered at various stages of the render lifecycle with an event title and a Context2D.
    *
-   * @event [SceneRenderEvent, CanvasRenderingContext2D]
+   * @eventProperty
    */
   get onRenderLifecycle(): SubscribableEvent<
     [SceneRenderEvent, CanvasRenderingContext2D]
@@ -148,7 +154,7 @@ export interface Scene<T = unknown> {
   /**
    * Triggered when the scene is reset.
    *
-   * @event void
+   * @eventProperty
    */
   get onReset(): SubscribableEvent<void>;
 
@@ -160,26 +166,28 @@ export interface Scene<T = unknown> {
   /**
    * Render the scene onto a canvas.
    *
-   * @param context
-   * @param canvas
+   * @param context - The context to used when rendering.
+   * @param canvas - The canvas onto which the scene should be rendered.
    */
   render(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void;
 
   /**
    * Reload the scene.
    *
+   * @remarks
    * This method is called whenever something related to this scene has changed:
    * time events, source code, metadata, etc.
    *
    * Should trigger {@link onReloaded}.
    *
-   * @param config If present, a new configuration object.
+   * @param config - If present, a new configuration object.
    */
   reload(config?: T): void;
 
   /**
    * Recalculate the scene.
    *
+   * @remarks
    * The task of this method is to calculate new timings stored in the cache.
    * When this method is invoked, `this.project.frame` is set to the frame at
    * which this scene should start ({@link firstFrame}).
@@ -199,7 +207,7 @@ export interface Scene<T = unknown> {
   /**
    * Reset this scene to its initial state.
    *
-   * @param previous If present, the previous scene.
+   * @param previous - If present, the previous scene.
    */
   reset(previous?: Scene): Promise<void>;
 

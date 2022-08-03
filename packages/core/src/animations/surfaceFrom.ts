@@ -18,17 +18,18 @@ export interface SurfaceFromConfig {
   /**
    * Whether the transition arc should be reversed.
    *
-   * See {@link rectArcTween} from more detail.
+   * @remarks
+   * See {@link rectArcTween} for more detail.
    */
   reverse?: boolean;
   /**
    * A function called when the initial surface is updated.
    *
-   * @param surface The initial surface.
-   * @param value Completion of the entire transition.
+   * @param surface - The initial surface.
+   * @param value - Completion of the entire transition.
    *
-   * @return `true` if the default changes made by {@link surfaceFrom}
-   *         should be prevented.
+   * @returns `true` if the default changes made by {@link surfaceFrom}
+   *          should be prevented.
    */
   onUpdate?: (surface: Surface, value: number) => boolean | void;
   duration?: number;
@@ -38,10 +39,10 @@ decorate(surfaceFrom, threadable());
 /**
  * Animate the mask of the surface from the initial state to its current state.
  *
- * @param surface
- * @param mask The initial mask
- * @param position The initial position
- * @param config
+ * @param surface - The surface to animate.
+ * @param mask - The initial mask.
+ * @param position - The initial position.
+ * @param config - Additional configuration.
  */
 export function* surfaceFrom(
   surface: Surface,

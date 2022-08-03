@@ -7,10 +7,11 @@ export interface AsyncEventHandler<T> {
 /**
  * Dispatches an asynchronous {@link SubscribableEvent}.
  *
+ * @remarks
  * The {@link dispatch} method returns a promise that resolves when all the
  * handlers resolve.
  *
- * Example:
+ * @example
  * ```ts
  * class Example {
  *   // expose the event to external classes
@@ -27,7 +28,7 @@ export interface AsyncEventHandler<T> {
  * }
  * ```
  *
- * @template T Type of the argument passed to subscribers.
+ * @typeParam T - The type of the argument passed to subscribers.
  */
 export class AsyncEventDispatcher<T> extends EventDispatcherBase<
   T,
@@ -41,9 +42,10 @@ export class AsyncEventDispatcher<T> extends EventDispatcherBase<
 /**
  * Provides safe access to the public interface of {@link AsyncEventDispatcher}.
  *
+ * @remarks
  * External classes can use it to subscribe to an event without being able to
  * dispatch it.
  *
- * @template T Type of the argument passed to subscribers.
+ * @typeParam T - The type of the argument passed to subscribers.
  */
 export type SubscribableAsyncEvent<T> = Subscribable<T, AsyncEventHandler<T>>;

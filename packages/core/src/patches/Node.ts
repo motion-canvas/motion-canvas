@@ -40,43 +40,36 @@ declare module 'konva/lib/Node' {
     origin: GetSet<Origin, this>;
 
     /**
-     * @param value
      * @ignore
      */
     setX(value: number): this;
 
     /**
-     * @param value
      * @ignore
      */
     setY(value: number): this;
 
     /**
-     * @param width
      * @ignore
      */
     setWidth(width: number): void;
 
     /**
-     * @param height
      * @ignore
      */
     setHeight(height: number): void;
 
     /**
-     * @param value
      * @ignore
      */
     setPadd(value: PossibleSpacing): this;
 
     /**
-     * @param value
      * @ignore
      */
     setMargin(value: PossibleSpacing): this;
 
     /**
-     * @param value
      * @ignore
      */
     setOrigin(value: Origin): this;
@@ -99,45 +92,51 @@ declare module 'konva/lib/Node' {
     /**
      * Get the size of this node used for layout calculations.
      *
+     * @remarks
      * The returned size should include the padding.
      * A node can use the size of its children to derive its own dimensions.
      *
-     * @param custom Custom node configuration to use during the calculations.
-     *               When present, the method will return the layout size that
-     *               the node would have, if it had these options configured.
+     * @param custom - Custom node configuration to use during the calculations.
+     *                 When present, the method will return the layout size that
+     *                 the node would have, if it had these options configured.
      */
     getLayoutSize(custom?: NodeConfig): Size;
 
     /**
      * Get the vector from the local origin of this node to its current origin.
      *
+     * @remarks
      * The local origin is the center of coordinates of the canvas when drawing
      * the node. Centroid nodes will have their local origin at the center.
      * Other shapes will have it in the top left corner.
      *
      * The current origin is configured via {@link Node.origin}.
      *
-     * @param custom Custom node configuration to use during the calculations.
-     *               When present, the method will return the origin offset that
-     *               the node would have, if it had these options configured.
+     * @param custom - Custom node configuration to use during the calculations.
+     *                 When present, the method will return the origin offset
+     *                 that the node would have, if it had these options
+     *                 configured.
      */
     getOriginOffset(custom?: NodeConfig): Vector2d;
 
     /**
      * Get the vector from the current origin of this node to the `newOrigin`.
      *
-     * @param newOrigin The origin to which the delta should be calculated.
+     * @param newOrigin - The origin to which the delta should be calculated.
      *
-     * @param custom Custom node configuration to use during the calculations.
-     *               When present, the method will return the origin offset that
-     *               the node would have, if it had these options configured.
+     * @param custom - Custom node configuration to use during the calculations.
+     *                 When present, the method will return the origin offset
+     *                 that the node would have, if it had these options
+     *                 configured.
      */
     getOriginDelta(newOrigin: Origin, custom?: NodeConfig): Vector2d;
 
     /**
      * Update the layout of this node and all its children.
      *
-     * If the node is considered dirty the {@see recalculateLayout} method will be called.
+     * @remarks
+     * If the node is considered dirty the {@link recalculateLayout} method will
+     * be called.
      */
     updateLayout(): void;
 
@@ -149,7 +148,9 @@ declare module 'konva/lib/Node' {
     /**
      * Mark this node as dirty.
      *
-     * It will cause the layout of this node and all its ancestors to be recalculated before drawing the next frame.
+     * @remarks
+     * It will cause the layout of this node and all its ancestors to be
+     * recalculated before drawing the next frame.
      */
     markDirty(force?: boolean): void;
 
@@ -159,8 +160,10 @@ declare module 'konva/lib/Node' {
     isDirty(): boolean;
 
     /**
-     * Check if the layout of this node has been recalculated during the current layout process.
+     * Check if the layout of this node has been recalculated during the current
+     * layout process.
      *
+     * @remarks
      * Containers can use this method to check if their children has changed.
      */
     wasDirty(): boolean;

@@ -17,7 +17,7 @@ decorate(showTop, threadable());
 /**
  * Show the given node by sliding it up.
  *
- * @param node
+ * @param node - The node to animate.
  */
 export function* showTop(node: Node): ThreadGenerator {
   const to = node.offsetY();
@@ -38,7 +38,7 @@ decorate(showSurfaceVertically, threadable());
 /**
  * Show the given surface by expanding its mask vertically.
  *
- * @param surface
+ * @param surface - The surface to animate.
  */
 export function* showSurfaceVertically(surface: Surface): ThreadGenerator {
   const mask = surface.getMask();
@@ -57,9 +57,9 @@ decorate(showCircle, threadable());
 /**
  * Show the given surface using a circle mask.
  *
- * @param surface
- * @param duration
- * @param origin The center of the circle mask.
+ * @param surface - The surface to animate.
+ * @param duration - The duration of the animation.
+ * @param origin - The center of the circle mask.
  */
 export function* showCircle(
   surface: Surface,

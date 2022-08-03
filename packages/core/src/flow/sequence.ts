@@ -6,6 +6,7 @@ decorate(sequence, threadable());
 /**
  * Start all tasks one after another with a constant delay between.
  *
+ * @remarks
  * The function doesn't wait until the previous task in the sequence has
  * finished. Once the delay has passed, the next task will start event if
  * the previous is still running.
@@ -18,8 +19,8 @@ decorate(sequence, threadable());
  * );
  * ```
  *
- * @param delay
- * @param tasks
+ * @param delay - The delay between each of the tasks.
+ * @param tasks - A list of tasks to be run in a sequence.
  */
 export function* sequence(
   delay: number,
