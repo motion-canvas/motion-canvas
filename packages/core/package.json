@@ -8,18 +8,14 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "watch": "tsc -p tsconfig.build.json -w",
-    "test": "jest",
-    "lint": "eslint \"src/**/*.ts?(x)\"",
-    "lint:fix": "eslint --fix \"src/**/*.ts?(x)\"",
-    "prettier": "prettier --check \"src/**/*\"",
-    "prettier:fix": "prettier --write \"src/**/*\""
+    "test": "jest"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/aarthificial"
+    "registry": "https://npm.pkg.github.com/motion-canvas"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/aarthificial/motion-canvas.git"
+    "url": "https://github.com/motion-canvas/motion-canvas.git"
   },
   "bin": {
     "motion-canvas": "bin/index.mjs"

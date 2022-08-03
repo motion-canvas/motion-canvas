@@ -20,6 +20,7 @@ jobs:
       - run: git config --global user.name "github-actions[bot]"
       - run: npm ci
       - run: npx lerna run build
+      - run: git diff
       - run: npx lerna publish --yes
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

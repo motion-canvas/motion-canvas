@@ -1,0 +1,39 @@
+:root {
+  --theme: #33a6ff;
+  --theme-overlay: rgba(51, 166, 255, 0.24);
+}
+
+* {
+  box-sizing: border-box;
+  font-family: 'JetBrains Mono', sans-serif;
+
+  &::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+    background-color: #242424;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.24);
+    border: 6px solid #242424;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+}
+
+html,
+body {
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  background-color: #000000;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+main {
+  width: 100vw;
+  height: 100vh;
+}

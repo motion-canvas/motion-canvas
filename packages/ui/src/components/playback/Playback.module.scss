@@ -1,0 +1,20 @@
+.progress {
+  height: 2px;
+  background-color: #080808;
+}
+
+.progressFill {
+  height: 2px;
+  background-color: var(--theme);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+
+  &.disabled {
+    opacity: 0.54;
+    pointer-events: none;
+  }
+}

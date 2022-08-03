@@ -1,0 +1,238 @@
+.root {
+  background-color: #242424;
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.timeline {
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-grow: 1;
+  position: relative;
+}
+
+.track {
+  position: relative;
+  padding-top: 16px;
+  overflow: hidden;
+}
+
+.timestampTrack {
+  position: relative;
+  width: 100%;
+  height: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.24);
+  user-select: none;
+  pointer-events: none;
+}
+
+.timestamp {
+  color: rgba(255, 255, 255, 0.54);
+  font-size: 12px;
+  position: absolute;
+  padding: 0 4px;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.24);
+}
+
+.sceneTrack {
+  position: relative;
+  height: 48px;
+  padding: 4px 0;
+}
+
+.sceneClip {
+  $padding: 4px;
+
+  position: absolute;
+  height: 48px;
+
+  .scene {
+    position: absolute;
+    top: $padding;
+    bottom: $padding;
+    left: $padding;
+    right: $padding;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.16);
+
+    .sceneName {
+      line-height: 24px;
+      pointer-events: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 8px 12px;
+    }
+  }
+
+  .transition {
+    pointer-events: none;
+    position: absolute;
+    top: $padding;
+    bottom: $padding;
+    left: $padding;
+    border-radius: 4px 0 0 4px;
+    background: linear-gradient(
+      90deg,
+      rgba(36, 36, 36, 1) 0%,
+      rgba(36, 36, 36, 0) 100%
+    );
+  }
+}
+
+.labelTrack {
+  position: relative;
+  height: 32px;
+  padding: 4px 0;
+}
+
+.labelClip {
+  position: absolute;
+  height: 32px;
+  padding: 4px;
+  cursor: pointer;
+
+  &::before {
+    content: attr(data-name);
+    display: block;
+    line-height: 24px;
+    border-radius: 0 12px 12px 12px;
+    padding: 0 8px;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: var(--theme);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.54);
+  }
+
+  &:hover,
+  &:active {
+    &::before {
+      box-shadow: 0 0 0 2px white inset;
+    }
+    z-index: 1;
+  }
+}
+
+.labelClipStart {
+  box-sizing: content-box;
+  position: absolute;
+  height: 24px;
+  margin-top: 4px;
+  margin-left: 4px;
+  padding-right: 24px;
+  cursor: pointer;
+  border-radius: 12px 0 12px 12px;
+  background-color: var(--theme-overlay);
+  pointer-events: none;
+}
+
+.labelClipTarget {
+  .labelClip:hover + & {
+    display: block;
+  }
+
+  .labelClip:active + & {
+    display: none;
+  }
+
+  box-sizing: content-box;
+  position: absolute;
+  height: 16px;
+  margin-top: 4px;
+  margin-left: -16px;
+  padding-right: 16px;
+  cursor: pointer;
+  border-radius: 12px 0 12px 12px;
+  background-color: white;
+  pointer-events: none;
+  display: none;
+
+  z-index: 1;
+}
+
+.playhead {
+  position: absolute;
+  width: 2px;
+  top: 0;
+  bottom: 0;
+  background-color: var(--theme);
+  pointer-events: none;
+
+  &::before {
+    position: absolute;
+    content: '';
+    display: block;
+    left: -8px;
+    top: 0;
+    width: 16px;
+    height: 8px;
+    border-radius: 0 0 4px 4px;
+    background-color: var(--theme);
+  }
+}
+
+.playheadPreview {
+  position: absolute;
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  background-color: white;
+  opacity: 0;
+  pointer-events: none;
+
+  .timeline:hover & {
+    opacity: 0.24;
+  }
+}
+
+.range {
+  cursor: move;
+  position: absolute;
+  top: 0;
+  height: 40px;
+  background-color: var(--theme-overlay);
+  border-bottom: 1px solid var(--theme);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.handle {
+  cursor: pointer;
+  padding: 8px 2px;
+
+  &:after {
+    background-color: rgba(255, 255, 255, 0);
+  }
+
+  .range:hover > &:after {
+    background-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .range > &:hover:after,
+  .range > &:active:after {
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+
+  margin-top: 4px;
+}
+
+.handleSpacer {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.audioTrack {
+  opacity: 0.16;
+  margin: 24px 0;
+}
