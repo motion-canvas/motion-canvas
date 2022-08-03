@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "9.0.0",
+  "version": "9.1.0",
   "description": "User Interface for Motion Canvas",
   "main": "dist/main.js",
   "author": "motion-canvas",
@@ -22,7 +22,7 @@
     "dist/main.js"
   ],
   "devDependencies": {
-    "@motion-canvas/core": "*",
+    "@motion-canvas/core": "^9.1.0",
     "css-loader": "^6.7.1",
     "preact": "^10.7.1",
     "sass": "^1.52.2",

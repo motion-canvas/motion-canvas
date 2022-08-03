@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 9.1.0 (2022-08-03)
+
+
+### Features
+
+* merge with ui ([5fe2407](https://github.com/motion-canvas/motion-canvas/commit/5fe2407923e1a53691b753f952d7977a85fccbf6))
+
+
+
+
+
 # [9.0.0](https://github.com/motion-canvas/core/compare/v8.0.0...v9.0.0) (2022-08-03)
 
 
@@ -335,6 +351,3 @@ They should be imported from `@motion-canvas/core/lib/flow`.
 * use Web Audio API for waveform generation ([817e244](https://github.com/motion-canvas/core/commit/817e244bb2187532df7142199917412ccfe8d218))
 * useAnimator utility ([ad32e8a](https://github.com/motion-canvas/core/commit/ad32e8a0add494021d4c5c9fe5b3915189f00a08))
 * waveform data ([400a756](https://github.com/motion-canvas/core/commit/400a756ebf7ee174d8cbaf03f1f74eddd1b75925))
-
-
-

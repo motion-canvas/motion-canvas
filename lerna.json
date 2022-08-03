@@ -3,8 +3,11 @@
   "useNx": true,
   "useWorkspaces": true,
   "private": false,
-  "version": "9.0.0",
-  "ignoreChanges": ["**/*.test.ts", "**/*.md"],
+  "version": "9.1.0",
+  "ignoreChanges": [
+    "**/*.test.ts",
+    "**/*.md"
+  ],
   "message": "ci(release): %v [skip ci]",
   "conventionalCommits": true,
   "createRelease": "github"
