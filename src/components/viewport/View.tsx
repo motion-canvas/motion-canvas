@@ -9,6 +9,7 @@ import {
   useSize,
   useStorage,
   useSubscribable,
+  usePlayerState,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
@@ -25,6 +26,7 @@ export function View() {
   const viewportRef = useRef<HTMLCanvasElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
+  const playerState = usePlayerState();
 
   const [state, setState] = useStorage<ViewportState>('viewport', {
     width: 1920,
@@ -60,7 +62,7 @@ export function View() {
 
   useEffect(() => {
     player.project.setCanvas(viewportRef.current);
-  }, [viewportRef.current]);
+  }, [playerState.colorSpace]);
 
   useSubscribable(
     player.onReloaded,
@@ -171,7 +173,7 @@ export function View() {
           }}
           id={'viewport'}
         >
-          <canvas ref={viewportRef} />
+          <canvas key={playerState.colorSpace} ref={viewportRef} />
         </div>
         <Grid />
         <Debug />
