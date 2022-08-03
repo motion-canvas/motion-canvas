@@ -1,3 +1,25 @@
+# [9.0.0](https://github.com/motion-canvas/core/compare/v8.0.0...v9.0.0) (2022-08-03)
+
+
+### Bug Fixes
+
+* add missing Arrow setters ([#82](https://github.com/motion-canvas/core/issues/82)) ([49843c9](https://github.com/motion-canvas/core/commit/49843c9d38ee75de50ffc241d2a615be78f9e1f5))
+* detect missing meta files ([#83](https://github.com/motion-canvas/core/issues/83)) ([d1e2193](https://github.com/motion-canvas/core/commit/d1e219361c7f61673073b377917c88d82f0e5d9e)), closes [#79](https://github.com/motion-canvas/core/issues/79)
+* support nested threads ([#84](https://github.com/motion-canvas/core/issues/84)) ([4a4a95f](https://github.com/motion-canvas/core/commit/4a4a95f5891b5ec674f67f6b889abe4e855509ac))
+
+
+### Features
+
+* added color space option to Project and Player ([#89](https://github.com/motion-canvas/core/issues/89)) ([e1e2ac4](https://github.com/motion-canvas/core/commit/e1e2ac44ea35a9280b31e57fb365a227c7d2bba0)), closes [#80](https://github.com/motion-canvas/core/issues/80)
+* added deepTween function and rewrote colorTween to use colorjs.io ([#88](https://github.com/motion-canvas/core/issues/88)) ([eb7ca3c](https://github.com/motion-canvas/core/commit/eb7ca3c8974ab2b2c905338a01e900c8938805b5)), closes [#73](https://github.com/motion-canvas/core/issues/73) [#78](https://github.com/motion-canvas/core/issues/78)
+
+
+### BREAKING CHANGES
+
+* Animator.inferTweenFunction now returns deepTween,
+which does not work exactly as before, though should be a viable
+replacement in most cases.
+
 # [8.0.0](https://github.com/motion-canvas/core/compare/v7.0.0...v8.0.0) (2022-07-24)
 
 
