@@ -24,7 +24,7 @@
   "devDependencies": {
     "@motion-canvas/core": "*",
     "css-loader": "^6.7.1",
-    "preact": "^10.7.1",
+    "preact": "^10.7.3",
     "sass": "^1.52.2",
     "sass-loader": "^13.0.0",
     "strongly-typed-events": "^3.0.2",
