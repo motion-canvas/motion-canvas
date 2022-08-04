@@ -4,11 +4,10 @@ about: Suggest an idea for Motion Canvas
 title: ''
 labels: enhancement
 assignees: aarthificial
-
 ---
 
 **Description**
-A clear and concise description of why the feature is needed. 
+A clear and concise description of why the feature is needed.
 What problem does it aim to fix?
 What benefits does it bring?
 

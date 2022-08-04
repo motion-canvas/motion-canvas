@@ -4,7 +4,6 @@ about: Report an issue or suggest improvements for documentation
 title: ''
 labels: documentation
 assignees: aarthificial
-
 ---
 
 **Description**

@@ -1,0 +1,10 @@
+node_modules
+lib
+dist
+static
+.git
+.docusaurus
+.github
+package.json
+package-lock.json
+CHANGELOG.md
