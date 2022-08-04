@@ -2,6 +2,9 @@ name: Deploy Documentation to GitHub Pages
 
 on: workflow_dispatch
 
+env:
+  HUSKY: 0
+
 jobs:
   deploy:
     name: Deploy
