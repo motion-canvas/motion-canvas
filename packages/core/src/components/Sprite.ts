@@ -25,6 +25,7 @@ export interface SpriteConfig extends ShapeConfig {
 /**
  * A class for animated sprites.
  *
+ * @remarks
  * Allows to use custom alpha masks and skins.
  */
 @KonvaNode()
@@ -47,6 +48,7 @@ export class Sprite extends Shape {
   /**
    * An image that defines which parts of the sprite should be visible.
    *
+   * @remarks
    * The red channel is used for sampling.
    */
   @getset(null, Sprite.prototype.updateMask, Sprite.prototype.maskTween)
@@ -211,6 +213,7 @@ export class Sprite extends Shape {
   /**
    * A generator that runs this sprite's animation.
    *
+   * @remarks
    * For the animation to actually play, the {@link Sprite.playing} value has to
    * be set to `true`.
    *
@@ -238,9 +241,9 @@ export class Sprite extends Shape {
   /**
    * Play the given animation once.
    *
-   * @param animation The animation to play.
-   * @param next An optional animation that should be switched to next. If not
-   *             present the sprite will go back to the previous animation.
+   * @param animation - The animation to play.
+   * @param next - An optional animation that should be switched to next. If not
+   *               present the sprite will go back to the previous animation.
    */
   @threadable()
   public *playOnce(
@@ -257,8 +260,9 @@ export class Sprite extends Shape {
   }
 
   /**
-   * Cancel the current {@link Sprite.play()} generator.
+   * Cancel the current {@link Sprite.play} generator.
    *
+   * @remarks
    * Should be used instead of manually canceling the generator.
    */
   @threadable()
@@ -286,7 +290,7 @@ export class Sprite extends Shape {
   /**
    * Wait until the given frame is shown.
    *
-   * @param frame
+   * @param frame - The frame to wait for.
    */
   @threadable()
   public *waitForFrame(frame: number): ThreadGenerator {

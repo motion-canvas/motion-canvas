@@ -10,13 +10,13 @@ export interface Metadata {
 /**
  * Represents the meta file of a given entity.
  *
- * @template T Type of the data stored in the meta file.
+ * @typeParam T - The type of the data stored in the meta file.
  */
 export class Meta<T extends Metadata = Metadata> {
   /**
    * Triggered when metadata changes.
    *
-   * @event T
+   * @eventProperty
    */
   public get onDataChanged() {
     return this.data.subscribable;
@@ -37,9 +37,10 @@ export class Meta<T extends Metadata = Metadata> {
   /**
    * Set data without waiting for confirmation.
    *
+   * @remarks
    * Any possible errors will be logged to the console.
    *
-   * @param data
+   * @param data - New data.
    */
   public setDataSync(data: Partial<T>) {
     this.setData(data).catch(console.error);
@@ -72,10 +73,11 @@ export class Meta<T extends Metadata = Metadata> {
   /**
    * Get the {@link Meta} object for the given entity.
    *
-   * @param name Name of the entity the metadata refers to.
-   * @template T Concrete type of the metadata. Depends on the entity.
-   *           See {@link SceneMetadata} and {@link ProjectMetadata} for sample
-   *           types.
+   * @param name - The name of the entity the metadata refers to.
+   *
+   * @typeParam T - The concrete type of the metadata. Depends on the entity.
+   *                See {@link SceneMetadata} and {@link ProjectMetadata} for
+   *                sample types.
    *
    * @internal
    */
@@ -89,12 +91,14 @@ export class Meta<T extends Metadata = Metadata> {
   /**
    * Register a new version of metadata.
    *
+   * @remarks
    * Called directly by meta files themselves.
    * Occurs during the initial load as well as during hot reloads.
    *
-   * @param name Name of the entity this metadata refers to.
-   * @param source Path to the source file relative to the compilation context.
-   * @param rawData New metadata as JSON.
+   * @param name - The Name of the entity this metadata refers to.
+   * @param source - The path to the source file relative to the compilation
+   *                 context.
+   * @param rawData - New metadata as JSON.
    *
    * @internal
    */

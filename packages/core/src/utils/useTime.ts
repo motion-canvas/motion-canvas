@@ -3,8 +3,9 @@ import {useThread} from './useThread';
 /**
  * Get the real time since the start of the animation.
  *
+ * @remarks
  * The returned value accounts for offsets caused by functions such as
- * {@link waitFor()}.
+ * {@link waitFor}.
  *
  * @example
  * ```ts

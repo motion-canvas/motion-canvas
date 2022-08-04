@@ -13,7 +13,8 @@ export interface TimeEvent {
    * Time in seconds, relative to the beginning of the scene, at which the event
    * was registered.
    *
-   * In other words, the moment at which {@link flow!waitUntil} for this event
+   * @remarks
+   * In other words, the moment at which {@link waitUntil} for this event
    * was invoked.
    */
   initialTime: number;
@@ -43,7 +44,7 @@ export class TimeEvents {
   /**
    * Triggered when time events change.
    *
-   * @event TimeEvent[]
+   * @eventProperty
    */
   public get onChanged() {
     return this.events.subscribable;
@@ -81,11 +82,11 @@ export class TimeEvents {
   /**
    * Change the time offset of the given event.
    *
-   * @param name Name of the event.
-   * @param offset Time offset in seconds.
-   * @param preserve Whether the timing of the consecutive events should be
-   *                 preserved. When set to `true` their offsets will be
-   *                 adjusted to keep them in place.
+   * @param name - The name of the event.
+   * @param offset - The time offset in seconds.
+   * @param preserve - Whether the timing of the consecutive events should be
+   *                   preserved. When set to `true` their offsets will be
+   *                   adjusted to keep them in place.
    */
   public set(name: string, offset: number, preserve = true) {
     if (!this.lookup[name] || this.lookup[name].offset === offset) {
@@ -106,9 +107,9 @@ export class TimeEvents {
   /**
    * Register a time event.
    *
-   * @param name Name of the event.
+   * @param name - The name of the event.
    *
-   * @return The absolute frame at which the event should occur.
+   * @returns The absolute frame at which the event should occur.
    *
    * @internal
    */

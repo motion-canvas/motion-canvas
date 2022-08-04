@@ -5,7 +5,7 @@ decorate(all, threadable());
 /**
  * Run all tasks concurrently and wait for all of them to finish.
  *
- * Example:
+ * @example
  * ```
  * // current time: 0s
  * yield* all(
@@ -15,7 +15,7 @@ decorate(all, threadable());
  * // current time: 2s
  * ```
  *
- * @param tasks
+ * @param tasks - A list of tasks to run.
  */
 export function* all(...tasks: ThreadGenerator[]): ThreadGenerator {
   for (const task of tasks) {

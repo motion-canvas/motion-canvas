@@ -14,6 +14,7 @@ import {ThreadGenerator} from '../threading';
 /**
  * Configuration for {@link surfaceTransition}.
  *
+ * @remarks
  * For {@link SurfaceTransitionConfig.onInitialSurfaceUpdate | `onInitialSurfaceUpdate`}
  * and {@link SurfaceTransitionConfig.onTargetSurfaceUpdate | `onTargetSurfaceUpdate`}
  * callbacks, the `value` and `relativeValue` arguments represent the absolute
@@ -32,24 +33,25 @@ export interface SurfaceTransitionConfig {
   /**
    * Whether the transition arc should be reversed.
    *
-   * See {@link rectArcTween} from more detail.
+   * @remarks
+   * See {@link rectArcTween} for more detail.
    */
   reverse?: boolean;
   /**
    * A function called when the currently displayed surface changes.
    *
-   * @param surface
+   * @param surface - The new surface.
    */
   onSurfaceChange?: (surface: Surface) => void;
   /**
    * A function called when the initial surface is updated.
    *
-   * @param surface The initial surface.
-   * @param value Completion of the entire transition.
-   * @param relativeValue Relative completion of the transition.
+   * @param surface - The initial surface.
+   * @param value - Completion of the entire transition.
+   * @param relativeValue - Relative completion of the transition.
    *
-   * @return `true` if the default changes made by {@link surfaceTransition}
-   *         should be prevented
+   * @returns `true` if the default changes made by {@link surfaceTransition}
+   *          should be prevented
    */
   onInitialSurfaceUpdate?: (
     surface: Surface,
@@ -59,12 +61,12 @@ export interface SurfaceTransitionConfig {
   /**
    * A function called when the target surface is updated.
    *
-   * @param surface The target surface.
-   * @param value Completion of the entire transition.
-   * @param relativeValue Relative completion of the transition.
+   * @param surface - The target surface.
+   * @param value - Completion of the entire transition.
+   * @param relativeValue - Relative completion of the transition.
    *
-   * @return `true` if the default changes made by {@link surfaceTransition}
-   *         should be prevented
+   * @returns `true` if the default changes made by {@link surfaceTransition}
+   *          should be prevented
    */
   onTargetSurfaceUpdate?: (
     surface: Surface,
@@ -82,9 +84,9 @@ decorate(surfaceTransition, threadable());
 /**
  * Morph one surface into another.
  *
- * @param initial
- * @param target
- * @param config
+ * @param initial - The initial surface.
+ * @param target - The target surface.
+ * @param config - Additional configuration.
  */
 export function* surfaceTransition(
   initial: Surface,

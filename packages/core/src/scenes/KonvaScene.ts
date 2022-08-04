@@ -41,7 +41,7 @@ export function useKonvaView(): KonvaView {
  * });
  * ```
  *
- * @param factory
+ * @param factory - The generator function for this scene.
  */
 export function makeKonvaScene(
   factory: ThreadGeneratorFactory<KonvaView>,

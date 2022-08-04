@@ -3,7 +3,7 @@ import {EventDispatcherBase, Subscribable} from './EventDispatcherBase';
 /**
  * Dispatches a {@link SubscribableEvent}.
  *
- * Example:
+ * @example
  * ```ts
  * class Example {
  *   // expose the event to external classes
@@ -20,7 +20,7 @@ import {EventDispatcherBase, Subscribable} from './EventDispatcherBase';
  * }
  * ```
  *
- * @template T Type of the value argument to subscribers.
+ * @typeParam T - The type of the value argument to subscribers.
  */
 export class EventDispatcher<T> extends EventDispatcherBase<T> {
   public dispatch(value: T) {
@@ -31,9 +31,10 @@ export class EventDispatcher<T> extends EventDispatcherBase<T> {
 /**
  * Provides safe access to the public interface of {@link EventDispatcher}.
  *
+ * @remarks
  * External classes can use it to subscribe to an event without being able to
  * dispatch it.
  *
- * @template T Type of the argument passed to subscribers.
+ * @typeParam T - The type of the argument passed to subscribers.
  */
 export type SubscribableEvent<T> = Subscribable<T>;

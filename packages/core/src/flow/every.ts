@@ -7,7 +7,7 @@ import {useProject} from '../utils';
  */
 export interface EveryCallback {
   /**
-   * @param tick The amount of times the timer has ticked.
+   * @param tick - The amount of times the timer has ticked.
    */
   (tick: number): void;
 }
@@ -29,7 +29,7 @@ export interface EveryTimer {
 /**
  * Call the given callback every N seconds.
  *
- * Example:
+ * @example
  * ```ts
  * const timer = every(2, time => console.log(time));
  * yield timer.runner;
@@ -41,8 +41,8 @@ export interface EveryTimer {
  * // current time: 6s
  * ```
  *
- * @param interval
- * @param callback
+ * @param interval - The interval between subsequent calls.
+ * @param callback - The callback to be called.
  */
 export function every(interval: number, callback: EveryCallback): EveryTimer {
   let changed = false;

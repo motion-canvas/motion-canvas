@@ -6,7 +6,7 @@ decorate(delay, threadable());
 /**
  * Run the given generator or callback after a specific amount of time.
  *
- * Example:
+ * @example
  * ```ts
  * yield* delay(1, rect.fill('#ff0000', 2));
  * ```
@@ -26,8 +26,8 @@ decorate(delay, threadable());
  * );
  * ```
  *
- * @param time Delay in seconds
- * @param task
+ * @param time - The delay in seconds
+ * @param task - The task or callback to run after the delay.
  */
 export function* delay(
   time: number,

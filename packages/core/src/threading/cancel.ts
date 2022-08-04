@@ -13,7 +13,7 @@ import {useThread} from '../utils';
  * yield* cancel(task);
  * ```
  *
- * @param tasks
+ * @param tasks - A list of tasks to cancel.
  */
 export function cancel(...tasks: ThreadGenerator[]) {
   const thread = useThread();

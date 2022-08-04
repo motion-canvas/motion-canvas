@@ -6,7 +6,7 @@ import {isThreadGenerator, ThreadGenerator} from './ThreadGenerator';
 /**
  * Check if the given value is a [Promise][promise].
  *
- * @param value A possible [Promise][promise].
+ * @param value - A possible [Promise][promise].
  *
  * [promise]: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/promise
  */
@@ -29,11 +29,12 @@ decorate(threads, threadable());
 /**
  * Create a context in which generators can be run concurrently.
  *
+ * @remarks
  * From the perspective of the external generator, `threads` is executed
  * synchronously. By default, each scene generator is wrapped in its own
  * `threads` generator.
  *
- * Example:
+ * @example
  * ```ts
  * // first
  *
@@ -46,9 +47,9 @@ decorate(threads, threadable());
  * // third
  * ```
  *
- * @param factory
- * @param callback Called whenever threads are created, canceled or finished.
- *                 Used for debugging purposes.
+ * @param factory - A function that returns the generator to run.
+ * @param callback - Called whenever threads are created, canceled or finished.
+ *                   Used for debugging purposes.
  */
 export function* threads(
   factory: ThreadsFactory,

@@ -5,8 +5,8 @@ export interface EventHandler<T> {
 /**
  * A base for dispatching {@link Subscribable}s.
  *
- * @template TValue Type of the argument passed to subscribers.
- * @template THandler Type of the callback function.
+ * @typeParam TValue - The type of the argument passed to subscribers.
+ * @typeParam THandler - The type of the callback function.
  */
 export abstract class EventDispatcherBase<
   TValue,
@@ -18,7 +18,7 @@ export abstract class EventDispatcherBase<
   private subscribers = new Set<THandler>();
 
   /**
-   * @inheritDoc SubscribableEvent.subscribe
+   * {@inheritDoc SubscribableEvent.subscribe}
    */
   public subscribe(handler: THandler) {
     this.subscribers.add(handler);
@@ -26,7 +26,7 @@ export abstract class EventDispatcherBase<
   }
 
   /**
-   * @inheritDoc SubscribableEvent.unsubscribe
+   * {@inheritDoc SubscribableEvent.unsubscribe}
    */
   public unsubscribe(handler: THandler) {
     this.subscribers.delete(handler);
@@ -47,11 +47,12 @@ export abstract class EventDispatcherBase<
 /**
  * Provides safe access to the public interface of {@link EventDispatcherBase}.
  *
+ * @remarks
  * External classes can use it to subscribe to an event without being able to
  * dispatch it.
  *
- * @template TValue Type of the argument passed to subscribers.
- * @template THandler Type of the callback function.
+ * @typeParam TValue - The type of the argument passed to subscribers.
+ * @typeParam THandler - The type of the callback function.
  */
 export class Subscribable<
   TValue,
@@ -64,9 +65,9 @@ export class Subscribable<
   /**
    * Subscribe to the event.
    *
-   * @param handler
+   * @param handler - The handler to invoke when the event occurs.
    *
-   * @return Callback function that cancels the subscription.
+   * @returns A callback function that cancels the subscription.
    */
   public subscribe(handler: THandler) {
     return this.dispatcher.subscribe(handler);
@@ -75,7 +76,7 @@ export class Subscribable<
   /**
    * Unsubscribe from the event.
    *
-   * @param handler
+   * @param handler - The handler to unsubscribe.
    */
   public unsubscribe(handler: THandler) {
     this.dispatcher.unsubscribe(handler);

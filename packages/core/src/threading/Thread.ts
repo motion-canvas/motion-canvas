@@ -5,6 +5,7 @@ import {endThread, startThread, useProject} from '../utils';
 /**
  * A class representing an individual thread.
  *
+ * @remarks
  * Thread is a wrapper for a generator that can be executed concurrently.
  *
  * Aside from the main thread, all threads need to have a parent.
@@ -20,7 +21,8 @@ export class Thread {
   /**
    * The current time of this thread.
    *
-   * Used by {@link flow!waitFor} and other time-based functions to properly
+   * @remarks
+   * Used by {@link waitFor} and other time-based functions to properly
    * support durations shorter than one frame.
    */
   public time = 0;

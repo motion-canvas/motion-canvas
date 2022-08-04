@@ -6,7 +6,7 @@ import {ThreadGenerator} from '../threading';
  */
 export interface LoopCallback {
   /**
-   * @param i The current iteration index.
+   * @param i - The current iteration index.
    */
   (i: number): ThreadGenerator | void;
 }
@@ -15,9 +15,10 @@ decorate(loop, threadable());
 /**
  * Run the given generator N times.
  *
+ * @remarks
  * Each time iteration waits until the previous one is completed.
  *
- * Example:
+ * @example
  * ```ts
  * const colors = [
  *   '#ff6470',
@@ -32,9 +33,9 @@ decorate(loop, threadable());
  * });
  * ```
  *
- * @param iterations Number of iterations.
- * @param factory A function creating the generator to run. Because generators
- *                can't be reset, a new generator is created each iteration.
+ * @param iterations - The number of iterations.
+ * @param factory - A function creating the generator to run. Because generators
+ *                can't be reset, a new generator is created on each iteration.
  */
 export function* loop(
   iterations: number,

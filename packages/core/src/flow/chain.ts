@@ -5,7 +5,7 @@ decorate(chain, threadable());
 /**
  * Run tasks one after another.
  *
- * Example:
+ * @example
  * ```ts
  * // current time: 0s
  * yield* chain(
@@ -33,7 +33,7 @@ decorate(chain, threadable());
  * );
  * ```
  *
- * @param tasks
+ * @param tasks - A list of tasks to run.
  */
 export function* chain(
   ...tasks: (ThreadGenerator | Callback)[]

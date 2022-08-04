@@ -11,7 +11,7 @@ import {GeneratorHelper} from '../helpers';
  * });
  * ```
  *
- * @param runner A generator function or a factory that creates the generator.
+ * @param runner - A generator function or a factory that creates the generator.
  */
 export function run(runner: () => ThreadGenerator): ThreadGenerator;
 /**
@@ -24,8 +24,8 @@ export function run(runner: () => ThreadGenerator): ThreadGenerator;
  * });
  * ```
  *
- * @param runner A generator function or a factory that creates the generator.
- * @param name An optional name used when displaying this generator in the UI.
+ * @param runner - A generator function or a factory that creates the generator.
+ * @param name - An optional name used when displaying this generator in the UI.
  */
 export function run(
   name: string,

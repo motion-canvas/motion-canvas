@@ -39,14 +39,19 @@ export function textTween(from: string, to: string, value: number) {
 }
 
 /**
- * Interpolate between any two Records, including objects and Maps, even with mismatched keys.
- * Any old key that is missing in `to` will be removed immediately once value is not 0.
- * Any new key that is missing in `from` will be added once value reaches 1.
+ * Interpolate between any two Records, including objects and Maps, even with
+ * mismatched keys.
  *
- * @param from - the input to favor when value is 0
- * @param to - the input to favor when value is 1
- * @param value - on a scale between 0 and 1, how closely to favor from vs to
- * @returns a value matching the structure of from and to
+ * @remarks
+ * Any old key that is missing in `to` will be removed immediately once value is
+ * not 0. Any new key that is missing in `from` will be added once value reaches
+ * 1.
+ *
+ * @param from - The input to favor when value is 0.
+ * @param to - The input to favor when value is 1.
+ * @param value - On a scale between 0 and 1, how closely to favor from vs to.
+ *
+ * @returns A value matching the structure of from and to.
  */
 export function deepTween<
   TFrom extends Record<any, unknown>,
@@ -55,10 +60,11 @@ export function deepTween<
 /**
  * Interpolate between any two values, including objects, arrays, and Maps.
  *
- * @param from - the input to favor when value is 0
- * @param to - the input to favor when value is 1
- * @param value - on a scale between 0 and 1, how closely to favor from vs to
- * @returns a value matching the structure of from and to
+ * @param from - The input to favor when value is 0.
+ * @param to - The input to favor when value is 1.
+ * @param value - On a scale between 0 and 1, how closely to favor from vs to.
+ *
+ * @returns A value matching the structure of from and to.
  */
 export function deepTween<T>(from: T, to: T, value: number): T;
 export function deepTween(from: any, to: any, value: number): any {
@@ -115,22 +121,24 @@ export function deepTween(from: any, to: any, value: number): any {
 
 interface ColorTweenOptions {
   /**
-   * the space to use during interpolation, affecting the intermediate colors
+   * The space to use during interpolation, affecting the intermediate colors
    */
-  space: string;
+  space?: string;
   /**
-   * the format in which to return values
+   * The format in which to return values
    */
-  outputSpace: string;
+  outputSpace?: string;
 }
 
 /**
  * Mix two colors together.
  *
- * @param from - the value to use at 0
- * @param to - the value to use at 1
- * @param value - how much of each color to use, on a scale of 0 to 1
- * @returns an srgb string, or one of the input values if value is 0 or 1
+ * @param from - The value to use at 0.
+ * @param to - The value to use at 1.
+ * @param value - How much of each color to use, on a scale of 0 to 1.
+ * @param options - Additional configuration.
+ *
+ * @returns An srgb string, or one of the input values if value is 0 or 1.
  */
 export function colorTween(
   from: string | typeof Color,

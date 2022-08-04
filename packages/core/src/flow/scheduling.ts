@@ -6,16 +6,17 @@ decorate(waitUntil, threadable());
 /**
  * Wait until the given time event.
  *
+ * @remarks
  * Time events are displayed on the timeline and can be edited to adjust the
  * delay. By default, an event happens immediately - without any delay.
  *
- * Example:
+ * @example
  * ```ts
  * yield waitUntil('event');
  * ```
  *
- * @param event Name of the time event.
- * @param after
+ * @param event - The name of the time event.
+ * @param after - An optional task to be run after the function completes.
  */
 export function* waitUntil(
   event: string,
@@ -37,7 +38,7 @@ decorate(waitFor, threadable());
 /**
  * Wait for the given amount of time.
  *
- * Example:
+ * @example
  * ```ts
  * // current time: 0s
  * yield waitFor(2);
@@ -46,8 +47,8 @@ decorate(waitFor, threadable());
  * // current time: 5s
  * ```
  *
- * @param seconds Relative time in seconds.
- * @param after
+ * @param seconds - The relative time in seconds.
+ * @param after - An optional task to be run after the function completes.
  */
 export function* waitFor(
   seconds = 0,
