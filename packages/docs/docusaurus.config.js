@@ -27,6 +27,7 @@ const config = {
         logo: {
           alt: 'Motion Canvas Logo',
           src: 'img/logo.svg',
+          srcDark: 'img/logo_dark.svg',
         },
         items: [
           {
@@ -113,6 +114,7 @@ const config = {
       {
         routeBasePath: '/',
         sidebarPath: 'sidebars.js',
+        exclude: ['**/api/*.md'],
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
       },
@@ -151,7 +153,7 @@ const config = {
           '../core/src/types',
           '../core/src/utils',
         ],
-        tsconfig: '../core/tsconfig.json',
+        tsconfig: '../core/tsconfig.build.json',
       },
     ],
   ],
