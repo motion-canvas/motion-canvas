@@ -1,6 +1,14 @@
 {
   "extends": "@motion-canvas/core/tsconfig.project.json",
   "compilerOptions": {
-    "baseUrl": "src"
+    "baseUrl": "src",
+    "types": [
+      "node",
+      "prismjs",
+      "three",
+      "webpack-env",
+      "dom-webcodecs",
+      "jest"
+    ]
   }
 }

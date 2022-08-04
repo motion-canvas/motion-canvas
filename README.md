@@ -146,6 +146,7 @@ The project is maintained as one monorepo containing the following packages:
 | `core`     | All logic related to running and rendering animations.   |
 | `ui`       | The user interface used for editing.                     |
 | `template` | A template project included for developer's convenience. |
+| `docs`     | [Our documentation website.][docs]                       |
 
 After cloning the repo, run `npm install` in the root of the project to install
 all necessary dependencies.

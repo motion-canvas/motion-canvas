@@ -13,7 +13,10 @@
     "ui:serve": "npm run serve -w packages/ui",
     "template:serve": "npm run serve -w packages/template",
     "template:ui": "npm run ui -w packages/template",
-    "eslint": "eslint --fix \"**/*.ts?(x)\""
+    "docs:start": "npm run start -w packages/docs",
+    "docs:build": "npm run build -w packages/docs",
+    "eslint": "eslint --fix \"**/*.ts?(x)\"",
+    "prettier": "prettier --write ."
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.3",
@@ -29,6 +32,6 @@
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",
-    "*.{ts,tsx,md,scss}": "prettier --write"
+    "*.{js,jsx,ts,tsx,md,scss}": "prettier --write"
   }
 }
