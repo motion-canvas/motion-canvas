@@ -33,6 +33,15 @@ export function useDrag(
   );
 
   useDocumentEvent(
+    'click',
+    useCallback(event => {
+      event.stopPropagation();
+    }, []),
+    isDragging,
+    true,
+  );
+
+  useDocumentEvent(
     'mousemove',
     useCallback(
       event => {
