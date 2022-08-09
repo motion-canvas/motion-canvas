@@ -1,5 +1,6 @@
 import {AudioData} from './AudioData';
 import {ValueDispatcher} from '../events';
+import {ifHot} from '../utils';
 
 export class AudioManager {
   public get onDataChanged() {
@@ -17,6 +18,16 @@ export class AudioManager {
   private source: string = null;
   private error = false;
   private abortController: AbortController = null;
+
+  public constructor() {
+    ifHot(hot => {
+      hot.on('motion-canvas:assets', ({urls}) => {
+        if (urls.includes(this.source)) {
+          this.setSource(this.source);
+        }
+      });
+    });
+  }
 
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);

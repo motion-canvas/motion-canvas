@@ -1,5 +1,5 @@
 import {useSubscribableValue} from './useSubscribable';
-import {usePlayer} from './usePlayer';
+import {usePlayer} from '../contexts';
 
 export function useCurrentFrame() {
   const player = usePlayer();

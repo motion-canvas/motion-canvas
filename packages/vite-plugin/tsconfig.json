@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "lib",
+    "strict": true,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es2021",
+    "moduleResolution": "node",
+    "declaration": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src"]
+}

@@ -9,7 +9,6 @@ import {
 } from 'preact/hooks';
 import {
   useDocumentEvent,
-  usePlayer,
   usePlayerState,
   useSize,
   useStateChange,
@@ -22,6 +21,7 @@ import {RangeTrack} from './RangeTrack';
 import {TimelineContext, TimelineState} from './TimelineContext';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {AudioTrack} from './AudioTrack';
+import {usePlayer} from '../../contexts';
 
 const ZOOM_SPEED = 0.1;
 
@@ -68,7 +68,9 @@ export function Timeline() {
       if (prevWidth !== 0 && rect.width !== 0) {
         newScale *= prevWidth / rect.width;
       }
-      setScale(Math.max(1, newScale));
+      if (!isNaN(newScale)) {
+        setScale(Math.max(1, newScale));
+      }
     },
     [duration, rect.width],
   );
@@ -119,8 +121,12 @@ export function Timeline() {
             );
 
             containerRef.current.scrollLeft = newOffset;
-            setScale(newScale);
-            setOffset(newOffset);
+            if (!isNaN(newScale)) {
+              setScale(newScale);
+            }
+            if (!isNaN(newOffset)) {
+              setOffset(newOffset);
+            }
             playheadRef.current.style.left = `${
               event.x - rect.x + newOffset
             }px`;

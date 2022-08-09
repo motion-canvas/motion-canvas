@@ -6,3 +6,4 @@ export * from './useScene';
 export * from './useThread';
 export * from './useTime';
 export * from './useContext';
+export * from './ifHot';

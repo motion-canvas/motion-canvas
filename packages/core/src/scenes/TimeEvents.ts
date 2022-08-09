@@ -201,7 +201,6 @@ export class TimeEvents {
     this.previousReference = data.timeEvents;
     this.load(data.timeEvents ?? []);
     this.scene.reload();
-    window.player.reload();
   };
 
   private load(events: SavedTimeEvent[]) {

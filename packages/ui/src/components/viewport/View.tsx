@@ -5,7 +5,6 @@ import {
   useCurrentScene,
   useDocumentEvent,
   useDrag,
-  usePlayer,
   useSize,
   useStorage,
   useSubscribable,
@@ -16,6 +15,7 @@ import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
+import {usePlayer} from '../../contexts';
 
 const ZOOM_SPEED = 0.1;
 

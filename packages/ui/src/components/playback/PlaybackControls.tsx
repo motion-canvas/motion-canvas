@@ -1,11 +1,12 @@
 import styles from './Playback.module.scss';
 
 import {IconType, IconButton, IconCheckbox} from '../controls';
-import {useDocumentEvent, usePlayer, usePlayerState} from '../../hooks';
+import {useDocumentEvent, usePlayerState} from '../../hooks';
 import {Select, Input} from '../controls';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {classes} from '../../utils';
+import {usePlayer} from '../../contexts';
 
 export function PlaybackControls() {
   const player = usePlayer();

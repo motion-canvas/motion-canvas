@@ -1,15 +1,16 @@
 {
   "name": "@motion-canvas/ui",
   "version": "9.1.2",
-  "description": "User Interface for Motion Canvas",
+  "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
+  "types": "types/main.d.ts",
   "author": "motion-canvas",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "dev": "webpack",
-    "serve": "webpack serve",
-    "build": "webpack --mode=production",
-    "watch": "webpack -w"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/motion-canvas"
@@ -19,20 +20,18 @@
     "url": "https://github.com/motion-canvas/motion-canvas.git"
   },
   "files": [
-    "dist/main.js"
+    "dist",
+    "types",
+    "editor.html"
   ],
+  "peerDependencies": {
+    "@motion-canvas/core": "*"
+  },
   "devDependencies": {
     "@motion-canvas/core": "^9.1.2",
-    "css-loader": "^6.7.1",
-    "preact": "^10.7.3",
-    "sass": "^1.52.2",
-    "sass-loader": "^13.0.0",
-    "strongly-typed-events": "^3.0.2",
-    "style-loader": "^3.3.1",
-    "ts-loader": "^9.3.0",
-    "typescript": "^4.6.3",
-    "webpack": "^5.73.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.9.1"
+    "@preact/preset-vite": "^2.3.0",
+    "preact": "10.7.3",
+    "typescript": "^4.6.4",
+    "vite": "^3.0.4"
   }
 }

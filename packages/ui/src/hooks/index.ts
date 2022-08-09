@@ -2,7 +2,6 @@ export * from './useCurrentFrame';
 export * from './useDocumentEvent';
 export * from './useDrag';
 export * from './useMeta';
-export * from './usePlayer';
 export * from './usePlayerState';
 export * from './usePlayerTime';
 export * from './useScenes';

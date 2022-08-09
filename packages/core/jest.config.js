@@ -1,12 +1,11 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
   rootDir: 'src',
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/js-with-ts-esm',
   testEnvironment: 'jsdom',
-  setupFiles: ['jest-canvas-mock'],
+  setupFiles: ['jest-canvas-mock', './setup.test.ts'],
+  testPathIgnorePatterns: ['setup.test.ts'],
   globals: {
-    CORE_VERSION: '1.0.0',
     PROJECT_FILE_NAME: 'tests',
-    META_VERSION: 1,
   },
 };

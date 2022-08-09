@@ -1,12 +1,8 @@
 import styles from './Timeline.module.scss';
 
 import type {Scene} from '@motion-canvas/core/lib/scenes';
-import {
-  usePlayer,
-  usePlayerState,
-  useScenes,
-  useSubscribableValue,
-} from '../../hooks';
+import {usePlayerState, useScenes, useSubscribableValue} from '../../hooks';
+import {usePlayer} from '../../contexts';
 
 export function SceneTrack() {
   const scenes = useScenes();

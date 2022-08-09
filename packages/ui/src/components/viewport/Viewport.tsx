@@ -1,8 +1,9 @@
-import {usePlayer, usePlayerState} from '../../hooks';
+import {usePlayerState} from '../../hooks';
 import {PlaybackControls, PlaybackProgress} from '../playback';
 import {CurrentTime} from '../playback/CurrentTime';
 import {View} from './View';
 import styles from './Viewport.module.scss';
+import {usePlayer} from '../../contexts';
 
 export function Viewport() {
   const player = usePlayer();
