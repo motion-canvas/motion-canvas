@@ -1,4 +1,3 @@
-import '@motion-canvas/core/lib/patches';
 import {Project} from '@motion-canvas/core/lib';
 
 import example from './scenes/example.scene';

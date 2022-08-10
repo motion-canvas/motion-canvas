@@ -156,7 +156,14 @@ export default ({
         const metaFile = `${name}.meta`;
         await createMeta(path.join(dir, metaFile));
 
-        return `import './${metaFile}';${code}`;
+        const imports =
+          `import '@motion-canvas/core/lib/patches/Factory';` +
+          `import '@motion-canvas/core/lib/patches/Node';` +
+          `import '@motion-canvas/core/lib/patches/Shape';` +
+          `import '@motion-canvas/core/lib/patches/Container';` +
+          `import './${metaFile}';`;
+
+        return imports + code;
       }
 
       if (name.endsWith('.scene')) {
@@ -234,9 +241,8 @@ export default ({
     config() {
       return {
         esbuild: {
-          jsxFactory: '_jsx',
-          jsxInject:
-            'import { jsx as _jsx } from "@motion-canvas/core/lib/jsx-runtime";',
+          jsx: 'automatic',
+          jsxImportSource: '@motion-canvas/core/lib',
         },
         define: {
           PROJECT_FILE_NAME: `'${projectName}'`,
