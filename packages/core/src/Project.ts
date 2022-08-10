@@ -38,7 +38,7 @@ export class Project {
   private readonly currentScene = new ValueDispatcher<Scene>(null);
 
   /**
-   * Triggered after any of the scenes was reloaded.
+   * Triggered after any of the scenes were reloaded.
    */
   public get onReloaded() {
     return this.reloaded;
