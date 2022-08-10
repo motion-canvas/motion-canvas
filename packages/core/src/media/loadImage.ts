@@ -8,8 +8,13 @@ export type ImageDataSource = CanvasImageSource & Size;
 export function loadImage(source: string): Promise<HTMLImageElement> {
   const image = new Image();
   image.src = source;
-  return new Promise(resolve => {
-    image.onload = () => resolve(image);
+  return new Promise((resolve, reject) => {
+    if (image.complete) {
+      resolve(image);
+    } else {
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    }
   });
 }
 

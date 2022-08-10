@@ -178,7 +178,7 @@ export default ({
     },
     handleHotUpdate(ctx) {
       const now = Date.now();
-      const assets = [];
+      const urls = [];
       const modules = [];
 
       for (const module of ctx.modules) {
@@ -189,15 +189,13 @@ export default ({
         ) {
           continue;
         }
-        if (module.file?.endsWith('.wav')) {
-          assets.push(module.url);
-        } else {
-          modules.push(module);
-        }
+
+        urls.push(module.url);
+        modules.push(module);
       }
 
-      if (assets.length > 0) {
-        ctx.server.ws.send('motion-canvas:assets', {urls: assets});
+      if (urls.length > 0) {
+        ctx.server.ws.send('motion-canvas:assets', {urls});
       }
 
       return modules;
@@ -248,9 +246,6 @@ export default ({
             entry: project,
             formats: ['es'],
           },
-        },
-        server: {
-          cors: false,
         },
       };
     },
