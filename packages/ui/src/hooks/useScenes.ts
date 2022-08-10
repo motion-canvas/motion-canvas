@@ -1,5 +1,5 @@
-import {usePlayer} from './usePlayer';
 import {useSubscribableValue} from './useSubscribable';
+import {usePlayer} from '../contexts';
 
 export function useScenes() {
   const player = usePlayer();

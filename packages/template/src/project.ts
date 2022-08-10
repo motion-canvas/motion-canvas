@@ -1,9 +1,9 @@
-import '@motion-canvas/core/lib/patches';
-import {bootstrap} from '@motion-canvas/core/lib/bootstrap';
+import {Project} from '@motion-canvas/core/lib';
 
 import example from './scenes/example.scene';
 
-bootstrap({
-  name: 'base-project',
+export default new Project({
+  name: 'project',
   scenes: [example],
+  background: '#141414',
 });

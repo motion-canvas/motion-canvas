@@ -2,18 +2,19 @@ import styles from './Timeline.module.scss';
 
 import {useContext, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {TimelineContext} from './TimelineContext';
-import {usePlayer, useSubscribableValue} from '../../hooks';
+import {useSubscribableValue} from '../../hooks';
+import {useProject} from '../../contexts';
 
 const HEIGHT = 48;
 
 export function AudioTrack() {
   const ref = useRef<HTMLCanvasElement>();
-  const {project, audio} = usePlayer();
+  const project = useProject();
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
   const {viewLength, startFrame, endFrame, duration, density} =
     useContext(TimelineContext);
 
-  const audioData = useSubscribableValue(audio.onDataChanged);
+  const audioData = useSubscribableValue(project.audio.onDataChanged);
 
   useLayoutEffect(() => {
     if (!context) return;
@@ -26,10 +27,10 @@ export function AudioTrack() {
     context.moveTo(0, HEIGHT);
 
     const start =
-      audio.toRelativeTime(project.framesToSeconds(startFrame)) *
+      project.audio.toRelativeTime(project.framesToSeconds(startFrame)) *
       audioData.sampleRate;
     const end =
-      audio.toRelativeTime(project.framesToSeconds(endFrame)) *
+      project.audio.toRelativeTime(project.framesToSeconds(endFrame)) *
       audioData.sampleRate;
 
     const flooredStart = ~~start;

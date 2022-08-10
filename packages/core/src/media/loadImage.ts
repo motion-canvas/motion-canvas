@@ -1,20 +1,21 @@
 import {Size} from '../types';
 
-const imageLookup: Record<string, HTMLImageElement> = {};
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
 
 export type ImageDataSource = CanvasImageSource & Size;
 
-export async function loadImage(source: string): Promise<HTMLImageElement> {
-  if (!imageLookup[source]) {
-    const image = new Image();
-    imageLookup[source] = image;
-    image.src = source;
-    await new Promise(resolve => (image.onload = resolve));
-  }
-
-  return imageLookup[source];
+export function loadImage(source: string): Promise<HTMLImageElement> {
+  const image = new Image();
+  image.src = source;
+  return new Promise((resolve, reject) => {
+    if (image.complete) {
+      resolve(image);
+    } else {
+      image.onload = () => resolve(image);
+      image.onerror = reject;
+    }
+  });
 }
 
 export function loadAnimation(sources: string[]): Promise<HTMLImageElement[]> {

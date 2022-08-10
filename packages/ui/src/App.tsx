@@ -39,5 +39,3 @@ export function App() {
     />
   );
 }
-
-export const AppNode = <App />;

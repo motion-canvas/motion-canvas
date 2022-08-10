@@ -1,9 +1,10 @@
 import styles from './Timeline.module.scss';
 
-import {useDrag, usePlayer, usePlayerState} from '../../hooks';
+import {useDrag, usePlayerState} from '../../hooks';
 import {useCallback, useContext, useEffect, useState} from 'preact/hooks';
 import {Icon, IconType} from '../controls';
 import {TimelineContext} from './TimelineContext';
+import {usePlayer} from '../../contexts';
 
 export function RangeTrack() {
   const {fullLength} = useContext(TimelineContext);

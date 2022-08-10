@@ -1,7 +1,8 @@
 import {Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
-import {ValueDispatcher} from './events';
+import {EventDispatcher, ValueDispatcher} from './events';
 import {Size, CanvasColorSpace} from './types';
+import {AudioManager} from './media';
 
 export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
@@ -10,26 +11,40 @@ export const ProjectSize = {
 export interface ProjectConfig {
   name: string;
   scenes: SceneDescription[];
+  audio?: string;
+  audioOffset?: number;
   canvas?: HTMLCanvasElement;
+  size?: Size;
   background?: string | false;
-  width?: number;
-  height?: number;
 }
 
 export type ProjectMetadata = Metadata;
 
 export class Project {
+  /**
+   * Triggered after the scenes were recalculated.
+   */
   public get onScenesChanged() {
     return this.scenes.subscribable;
   }
   private readonly scenes = new ValueDispatcher<Scene[]>([]);
 
+  /**
+   * Triggered when the current scene changes.
+   */
   public get onCurrentSceneChanged() {
     return this.currentScene.subscribable;
   }
   private readonly currentScene = new ValueDispatcher<Scene>(null);
 
-  public readonly version = CORE_VERSION;
+  /**
+   * Triggered after any of the scenes were reloaded.
+   */
+  public get onReloaded() {
+    return this.reloaded;
+  }
+  private readonly reloaded = new EventDispatcher<void>();
+
   public readonly meta: Meta<ProjectMetadata>;
   public frame = 0;
 
@@ -88,6 +103,7 @@ export class Project {
       this.height = height;
     }
     this.updateCanvas();
+    this.reloadAll();
   }
 
   public getSize(): Size {
@@ -98,6 +114,7 @@ export class Project {
   }
 
   public readonly name: string;
+  public readonly audio = new AudioManager();
   private _resolutionScale = 1;
   private _colorSpace: CanvasColorSpace = 'srgb';
   private _speed = 1;
@@ -111,27 +128,37 @@ export class Project {
   private width: number;
   private height: number;
 
-  public constructor(config: ProjectConfig) {
-    this.setCanvas(config.canvas ?? null);
-    this.setSize(
-      config.width ?? ProjectSize.FullHD.width,
-      config.height ?? ProjectSize.FullHD.height,
-    );
-    this.name = config.name;
-    this.background = config.background ?? false;
+  public constructor({
+    name,
+    scenes,
+    audio,
+    audioOffset,
+    canvas,
+    size = ProjectSize.FullHD,
+    background = false,
+  }: ProjectConfig) {
+    this.setCanvas(canvas);
+    this.setSize(size);
+    this.name = name;
+    this.background = background;
     this.meta = Meta.getMetaFor(PROJECT_FILE_NAME);
 
-    for (const scene of config.scenes) {
+    if (audio) {
+      this.audio.setSource(audio);
+    }
+    if (audioOffset) {
+      this.audio.setOffset(audioOffset);
+    }
+
+    for (const scene of scenes) {
       if (this.sceneLookup[scene.name]) {
         console.error('Duplicated scene name: ', scene.name);
         continue;
       }
 
-      this.sceneLookup[scene.name] = new scene.klass(
-        this,
-        scene.name,
-        scene.config,
-      );
+      const instance = new scene.klass(this, scene.name, scene.config);
+      instance.onReloaded.subscribe(() => this.reloaded.dispatch());
+      this.sceneLookup[scene.name] = instance;
     }
   }
 
@@ -173,13 +200,7 @@ export class Project {
     this.currentScene.current?.render(this.context, this.canvas);
   }
 
-  public reload(runners: SceneDescription[]) {
-    for (const runner of runners) {
-      this.sceneLookup[runner.name]?.reload(runner.config);
-    }
-  }
-
-  public reloadAll() {
+  private reloadAll() {
     for (const scene of Object.values(this.sceneLookup)) {
       scene.reload();
     }
@@ -263,6 +284,14 @@ export class Project {
     }
 
     return finished;
+  }
+
+  public syncAudio(frameOffset = 0) {
+    this.audio.setTime(this.framesToSeconds(this.frame + frameOffset));
+  }
+
+  public updateScene(description: SceneDescription) {
+    this.sceneLookup[description.name]?.reload(description.config);
   }
 
   private findBestScene(frame: number): Scene {

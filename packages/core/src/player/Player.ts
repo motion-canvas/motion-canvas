@@ -1,4 +1,3 @@
-import {AudioManager} from '../media';
 import type {Project} from '../Project';
 import {
   AsyncEventDispatcher,
@@ -79,25 +78,24 @@ export class Player {
     recalculate: true,
   };
 
-  public constructor(
-    public readonly project: Project,
-    public readonly audio: AudioManager,
-  ) {
+  public constructor(public readonly project: Project) {
     this.startTime = performance.now();
     this.project.framerate = this.state.current.fps;
     this.project.resolutionScale = this.state.current.scale;
     this.project.colorSpace = this.state.current.colorSpace;
+    // TODO Recalculation should be handled by the project.
+    this.project.onReloaded.subscribe(() => this.reload());
 
     this.request();
   }
 
   public loadState(state: Partial<PlayerState>) {
     this.updateState(state);
-    this.project.speed = state.speed;
-    this.project.framerate = state.fps;
-    this.project.resolutionScale = state.scale;
-    this.project.colorSpace = state.colorSpace;
-    this.setRange(state.startFrame, state.endFrame);
+    this.project.speed = this.state.current.speed;
+    this.project.framerate = this.state.current.fps;
+    this.project.resolutionScale = this.state.current.scale;
+    this.project.colorSpace = this.state.current.colorSpace;
+    this.setRange(this.state.current.startFrame, this.state.current.endFrame);
   }
 
   private updateState(newState: Partial<PlayerState>) {
@@ -125,7 +123,7 @@ export class Player {
     return commands;
   }
 
-  public reload() {
+  private reload() {
     this.commands.recalculate = true;
     if (this.requestId === null) {
       this.request();
@@ -262,11 +260,11 @@ export class Player {
       state.paused ||
       state.finished ||
       state.render ||
-      !this.audio.isInRange(this.project.time);
-    if (await this.audio.setPaused(audioPaused)) {
-      this.syncAudio(-3);
+      !this.project.audio.isInRange(this.project.time);
+    if (await this.project.audio.setPaused(audioPaused)) {
+      this.project.syncAudio(-3);
     }
-    this.audio.setMuted(state.muted);
+    this.project.audio.setMuted(state.muted);
 
     // Rendering
     if (state.render) {
@@ -295,27 +293,29 @@ export class Player {
       console.time('seek time');
       state.finished = await this.project.seek(clampedFrame);
       console.timeEnd('seek time');
-      this.syncAudio(-3);
+      this.project.syncAudio(-3);
     }
     // Do nothing if paused or is ahead of the audio.
     else if (
       state.paused ||
       (state.speed === 1 &&
-        this.audio.isReady() &&
-        this.audio.isInRange(this.project.time) &&
-        this.audio.getTime() < this.project.time)
+        this.project.audio.isReady() &&
+        this.project.audio.isInRange(this.project.time) &&
+        this.project.audio.getTime() < this.project.time)
     ) {
       this.request();
       return;
     }
     // Seek to synchronize animation with audio.
     else if (
-      this.audio.isReady() &&
+      this.project.audio.isReady() &&
       state.speed === 1 &&
-      this.audio.isInRange(this.project.time) &&
-      this.project.time < this.audio.getTime() - MAX_AUDIO_DESYNC
+      this.project.audio.isInRange(this.project.time) &&
+      this.project.time < this.project.audio.getTime() - MAX_AUDIO_DESYNC
     ) {
-      const seekFrame = this.project.secondsToFrames(this.audio.getTime());
+      const seekFrame = this.project.secondsToFrames(
+        this.project.audio.getTime(),
+      );
       state.finished = await this.project.seek(seekFrame);
     }
     // Simply move forward one frame
@@ -324,7 +324,7 @@ export class Player {
 
       // Synchronize audio.
       if (state.speed !== 1) {
-        this.syncAudio();
+        this.project.syncAudio();
       }
     }
 
@@ -356,12 +356,6 @@ export class Player {
 
   private isInRange(frame: number, state: PlayerState): boolean {
     return frame >= state.startFrame && frame <= state.endFrame;
-  }
-
-  private syncAudio(frameOffset = 0) {
-    this.audio.setTime(
-      this.project.framesToSeconds(this.project.frame + frameOffset),
-    );
   }
 
   private request() {

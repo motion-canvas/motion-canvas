@@ -1,4 +1,7 @@
 import {ValueDispatcher} from './events';
+import {ifHot} from './utils';
+
+const META_VERSION = 1;
 
 /**
  * Represents the contents of a meta file.
@@ -23,12 +26,9 @@ export class Meta<T extends Metadata = Metadata> {
   }
   private readonly data = new ValueDispatcher(<T>{version: META_VERSION});
 
-  private rawData: string;
-  private source: string;
+  private source: string | false;
 
-  private constructor(private readonly name: string) {
-    this.rawData = JSON.stringify(this.data.current, undefined, 2);
-  }
+  private constructor(private readonly name: string) {}
 
   public getData() {
     return this.data.current;
@@ -51,24 +51,52 @@ export class Meta<T extends Metadata = Metadata> {
       ...this.data.current,
       ...data,
     };
-    this.rawData = JSON.stringify(this.data.current, undefined, 2);
-    if (this.source) {
-      const response = await fetch(`/meta/${this.source}`, {
-        method: 'POST',
-        body: this.rawData,
-      });
-      if (!response.ok) {
-        throw new Error(response.statusText);
+    await ifHot(async hot => {
+      if (this.source === false) {
+        return;
       }
-    } else {
-      console.warn(
-        `The meta file for ${this.name} is missing\n`,
-        `Make sure the file containing your scene is called "${this.name}.ts to match the generator function name`,
-      );
-    }
+
+      if (!this.source) {
+        console.warn(
+          `The meta file for ${this.name} is missing\n`,
+          `Make sure the file containing your scene is called "${this.name}.ts" to match the generator function name`,
+        );
+        return;
+      }
+
+      if (Meta.sourceLookup[this.source]) {
+        console.warn(`Metadata for ${this.name} is already being updated`);
+        return;
+      }
+
+      const source = this.source;
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          delete Meta.sourceLookup[source];
+          reject(`Connection timeout when updating metadata for ${this.name}`);
+        }, 1000);
+        Meta.sourceLookup[source] = () => {
+          delete Meta.sourceLookup[source];
+          resolve();
+        };
+        hot.send('motion-canvas:meta', {
+          source,
+          data: this.data.current,
+        });
+      });
+    });
   }
 
   private static metaLookup: Record<string, Meta> = {};
+  private static sourceLookup: Record<string, Callback> = {};
+
+  static {
+    ifHot(hot => {
+      hot.on('motion-canvas:meta-ack', ({source}) => {
+        this.sourceLookup[source]?.();
+      });
+    });
+  }
 
   /**
    * Get the {@link Meta} object for the given entity.
@@ -96,27 +124,25 @@ export class Meta<T extends Metadata = Metadata> {
    * Occurs during the initial load as well as during hot reloads.
    *
    * @param name - The Name of the entity this metadata refers to.
-   * @param source - The path to the source file relative to the compilation
-   *                 context.
+   * @param source - The absolute path to the source file.
    * @param rawData - New metadata as JSON.
    *
    * @internal
    */
-  public static register(name: string, source: string, rawData: string) {
+  public static register(
+    name: string,
+    source: string | false,
+    rawData: string,
+  ) {
     const meta = Meta.getMetaFor(name);
     meta.source = source;
 
-    if (meta.rawData === rawData) {
-      return;
-    }
-
     try {
       const data: Metadata = JSON.parse(rawData);
-      data.version ??= META_VERSION;
+      data.version ||= META_VERSION;
       meta.data.current = data;
-      meta.rawData = rawData;
     } catch (e) {
-      console.error(`Error when parsing ${decodeURIComponent(source)}:`);
+      console.error(`Error when parsing ${source}:`);
       console.error(e);
     }
   }

@@ -1,6 +1,7 @@
-import {usePlayer, usePlayerState, useSubscribable} from '../../hooks';
+import {usePlayerState, useSubscribable} from '../../hooks';
 import {Button, Group, Input, Label, Select} from '../controls';
 import {Pane} from '../tabs';
+import {usePlayer} from '../../contexts';
 import type {CanvasColorSpace} from '@motion-canvas/core/lib/types';
 
 export function Rendering() {
@@ -81,8 +82,6 @@ export function Rendering() {
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
             player.project.setSize(value, height);
-            player.project.reloadAll();
-            player.reload();
           }}
         />
         X
@@ -93,8 +92,6 @@ export function Rendering() {
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
             player.project.setSize(width, value);
-            player.project.reloadAll();
-            player.reload();
           }}
         />
       </Group>

@@ -1,7 +1,7 @@
 import type {Meta, Metadata} from '@motion-canvas/core/lib';
 import {useCallback} from 'preact/hooks';
-import {usePlayer} from './usePlayer';
 import {useSubscribableValue} from './useSubscribable';
+import {usePlayer} from '../contexts';
 
 /**
  * Get a stateful value representing the contents of the given meta file and

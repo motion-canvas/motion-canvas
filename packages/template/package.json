@@ -7,11 +7,15 @@
   "license": "MIT",
   "main": "src/project.ts",
   "scripts": {
-    "serve": "motion-canvas src/project.ts",
-    "ui": "motion-canvas src/project.ts --ui-server"
+    "serve": "vite",
+    "build": "tsc && vite build"
   },
   "dependencies": {
-    "@motion-canvas/core": "*",
-    "@motion-canvas/ui": "*"
+    "@motion-canvas/core": "*"
+  },
+  "devDependencies": {
+    "@motion-canvas/ui": "*",
+    "@motion-canvas/vite-plugin": "*",
+    "vite": "^3.0.5"
   }
 }

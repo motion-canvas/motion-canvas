@@ -1,0 +1,32 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "tagDefinitions": [
+    {
+      "tagName": "@module",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@ignore",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@default",
+      "syntaxKind": "modifier"
+    }
+  ],
+  "supportForTags": {
+    "@module": true,
+    "@param": true,
+    "@deprecated": true,
+    "@returns": true,
+    "@remarks": true,
+    "@example": true,
+    "@link": true,
+    "@internal": true,
+    "@eventProperty": true,
+    "@typeParam": true,
+    "@ignore": true,
+    "@inheritDoc": true,
+    "@default": true
+  }
+}
