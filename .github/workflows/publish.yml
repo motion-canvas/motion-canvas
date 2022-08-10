@@ -1,6 +1,16 @@
 name: Publish Packages to GitHub
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        type: choice
+        description: Release type
+        required: true
+        options:
+          - release
+          - prerelease
+          - graduate
 
 env:
   HUSKY: 0
@@ -9,6 +19,9 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -20,8 +33,9 @@ jobs:
       - run: git config --global user.name "github-actions[bot]"
       - run: npm ci
       - run: npx lerna run build
-      - run: git diff
-      - run: npx lerna publish --yes
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - if: ${{ inputs.releaseType == 'release' }}
+        run: npx lerna publish --yes
+      - if: ${{ inputs.releaseType == 'prerelease' }}
+        run: npx lerna publish --yes --conventional-prerelease
+      - if: ${{ inputs.releaseType == 'graduate' }}
+        run: npx lerna publish --yes --conventional-graduate
