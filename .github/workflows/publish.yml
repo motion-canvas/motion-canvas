@@ -36,6 +36,6 @@ jobs:
       - if: ${{ inputs.releaseType == 'release' }}
         run: npx lerna publish --yes
       - if: ${{ inputs.releaseType == 'prerelease' }}
-        run: npx lerna publish --yes --conventional-prerelease
+        run: npx lerna publish --yes --conventional-prerelease --dist-tag alpha
       - if: ${{ inputs.releaseType == 'graduate' }}
         run: npx lerna publish --yes --conventional-graduate
