@@ -51,7 +51,7 @@ const MANIFEST = JSON.parse(
       validate: value =>
         isValidPackageName(value)
           ? true
-          : 'Project name must be a valid package name.',
+          : 'Project name must be a valid npm package name.',
     },
     {
       type: 'select',
@@ -71,7 +71,7 @@ const MANIFEST = JSON.parse(
   ]);
 
   if (!response.language) {
-    console.log('Scaffolding aborted.');
+    console.log('Scaffolding aborted by the user.');
     return;
   }
 
@@ -109,7 +109,6 @@ const MANIFEST = JSON.parse(
     console.log(`  ${manager} install`);
     console.log(`  ${manager} run serve`);
   }
-  console.log(`\nto start Motion Canvas.`);
 })();
 
 function isValidPackageName(projectName) {
