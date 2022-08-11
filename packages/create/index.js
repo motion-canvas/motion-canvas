@@ -98,7 +98,7 @@ const MANIFEST = JSON.parse(
   );
 
   const manager = getPackageManager();
-  console.log(`\nScaffolding complete. You can now run:\n`);
+  console.log(`\nScaffolding complete. You can now run:`);
   if (response.path !== process.cwd()) {
     console.log(`  cd ${path.relative(process.cwd(), response.path)}`);
   }
