@@ -253,6 +253,9 @@ export default ({
             formats: ['es'],
           },
         },
+        server: {
+          port: 9000,
+        },
       };
     },
   };
