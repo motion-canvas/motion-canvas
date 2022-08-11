@@ -4,6 +4,7 @@ import prompts from 'prompts';
 import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'node:url';
+import kleur from 'kleur';
 
 const FILES_TO_MODIFY = {
   gitignore: '.gitignore',
@@ -21,10 +22,25 @@ const MANIFEST = JSON.parse(
   const response = await prompts([
     {
       type: 'text',
+      name: 'name',
+      message: 'Project name',
+      initial: 'my-animation',
+      validate: value =>
+        isValidPackageName(value)
+          ? true
+          : 'Project name must be a valid npm package name.',
+    },
+    {
+      type: 'text',
       name: 'path',
-      message: 'Project path (Leave empty to use the current directory)',
+      message: 'Project path',
+
+      initial: value => {
+        return path.normalize(value.replace('@', ''));
+      },
+
       validate: value => {
-        let dir = value.trim() || '.';
+        let dir = path.normalize(value.trim());
         if (!fs.existsSync(dir)) {
           return true;
         }
@@ -39,19 +55,6 @@ const MANIFEST = JSON.parse(
         return true;
       },
       format: value => path.resolve(value),
-    },
-    {
-      type: 'text',
-      name: 'name',
-      message: 'Project name',
-      initial: value => {
-        const base = path.parse(value).base;
-        return isValidPackageName(base) ? base : 'my-project';
-      },
-      validate: value =>
-        isValidPackageName(value)
-          ? true
-          : 'Project name must be a valid npm package name.',
     },
     {
       type: 'select',
@@ -71,7 +74,7 @@ const MANIFEST = JSON.parse(
   ]);
 
   if (!response.language) {
-    console.log('Scaffolding aborted by the user.');
+    console.log(kleur.red('× Scaffolding aborted by the user.\n'));
     return;
   }
 
@@ -98,17 +101,21 @@ const MANIFEST = JSON.parse(
   );
 
   const manager = getPackageManager();
-  console.log(`\nScaffolding complete. You can now run:`);
+  console.log(kleur.green('\n√ Scaffolding complete. You can now run:'));
   if (response.path !== process.cwd()) {
-    console.log(`  cd ${path.relative(process.cwd(), response.path)}`);
+    console.log(
+      `  ${kleur.bold('cd')} ${path.relative(process.cwd(), response.path)}`,
+    );
   }
+  const boldManager = kleur.bold(manager);
   if (manager === 'yarn') {
-    console.log('  yarn');
-    console.log('  yarn serve');
+    console.log(`  ${boldManager}`);
+    console.log(`  ${boldManager} serve`);
   } else {
-    console.log(`  ${manager} install`);
-    console.log(`  ${manager} run serve`);
+    console.log(`  ${boldManager} install`);
+    console.log(`  ${boldManager} run serve`);
   }
+  console.log();
 })();
 
 function isValidPackageName(projectName) {
