@@ -3,7 +3,12 @@
     "browser": true,
     "es2021": true
   },
-  "ignorePatterns": ["**/*.js", "**/*.d.ts", "packages/template"],
+  "ignorePatterns": [
+    "**/*.js",
+    "**/*.d.ts",
+    "packages/template",
+    "packages/create/template-*"
+  ],
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {

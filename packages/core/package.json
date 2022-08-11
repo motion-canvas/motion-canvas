@@ -2,7 +2,7 @@
   "name": "@motion-canvas/core",
   "version": "9.1.2",
   "description": "Web-based tool for creating animations programmatically",
-  "main": "lib/bootstrap.js",
+  "main": "lib/index.js",
   "author": "motion-canvas",
   "license": "MIT",
   "scripts": {
