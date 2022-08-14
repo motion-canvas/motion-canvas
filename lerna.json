@@ -3,7 +3,7 @@
   "useNx": true,
   "useWorkspaces": true,
   "private": false,
-  "version": "9.1.2",
+  "version": "9.1.3",
   "ignoreChanges": [
     "**/*.test.ts",
     "**/*.md"

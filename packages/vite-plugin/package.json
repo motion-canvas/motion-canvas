@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "9.1.1",
+  "version": "9.1.3",
   "description": "A Vite plugin for Motion Canvas projects",
   "main": "lib/main.js",
   "author": "motion-canvas",
