@@ -49,80 +49,11 @@ node -v
 
 ### Set up a project
 
-You can use [the project template][template] to quickly bootstrap your
-project. Otherwise, below are the steps to set it up manually:
+Run the following command in order to scaffold a new Motion Canvas project:
 
-1. Create a directory for your project and open it in a terminal.
-2. Initialize a new npm package inside:
-   ```shell
-   npm init
-   ```
-3. Create a `.npmrc` file with the following content:
-   ```text
-   @motion-canvas:registry=https://npm.pkg.github.com
-   ```
-4. Install Motion Canvas
-   ```shell
-   npm i @motion-canvas/core @motion-canvas/ui
-   ```
-5. Create a `tsconfig.json` file with the following content:
-   ```json
-   {
-     "extends": "@motion-canvas/core/tsconfig.project.json",
-     "compilerOptions": {
-       "baseUrl": "src"
-     }
-   }
-   ```
-6. Create a simple scene in `src/scenes/example.scene.tsx`:
-
-   ```ts
-   import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
-   import {waitFor} from '@motion-canvas/core/lib/flow';
-
-   export default makeKonvaScene(function* example(view) {
-     // animation code goes here
-
-     yield* waitFor(5);
-   });
-   ```
-
-7. Initialize the project with your scene in `src/project.ts`:
-
-   ```ts
-   import '@motion-canvas/core/lib/patches';
-   import {bootstrap} from '@motion-canvas/core/lib';
-
-   import example from './scenes/example.scene';
-
-   bootstrap({
-     name: 'my-project',
-     scenes: [example],
-   });
-   ```
-
-8. So far, your project structure should look like this:
-   ```text
-   my-project/
-   ├─ node_modules/        <- Generated automatically
-   ├─ output/              <- Create this folder to render your animation
-   ├─ src/
-   │  ├─ scenes/
-   │  │  └─ example.scene.tsx
-   │  └─ project.ts
-   ├─ .npmrc
-   ├─ package.json         <- Generated automatically
-   ├─ package-lock.json    <- Generated automatically
-   └─ tsconfig.json
-   ```
-9. Add a `serve` script to your `package.json`:
-   ```json
-   {
-     "scripts": {
-       "serve": "motion-canvas src/project.ts"
-     }
-   }
-   ```
+```bash
+npm init @motion-canvas
+```
 
 ### Run Motion Canvas
 
@@ -141,12 +72,13 @@ In case of any problems, please visit [our discord server][discord].
 
 The project is maintained as one monorepo containing the following packages:
 
-| Name       | Description                                              |
-| ---------- | -------------------------------------------------------- |
-| `core`     | All logic related to running and rendering animations.   |
-| `ui`       | The user interface used for editing.                     |
-| `template` | A template project included for developer's convenience. |
-| `docs`     | [Our documentation website.][docs]                       |
+| Name          | Description                                                    |
+| ------------- | -------------------------------------------------------------- |
+| `core`        | All logic related to running and rendering animations.         |
+| `ui`          | The user interface used for editing.                           |
+| `template`    | A template project included for developer's convenience.       |
+| `docs`        | [Our documentation website.][docs]                             |
+| `vite-plugin` | A plugin for Vite used for developing and bundling animations. |
 
 After cloning the repo, run `npm install` in the root of the project to install
 all necessary dependencies.
