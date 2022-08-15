@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [10.0.1](https://github.com/motion-canvas/motion-canvas/compare/v10.0.0...v10.0.1) (2022-08-15)
+
+
+### Bug Fixes
+
+* **create:** fix package type ([#40](https://github.com/motion-canvas/motion-canvas/issues/40)) ([f07aa5d](https://github.com/motion-canvas/motion-canvas/commit/f07aa5d8f6c3485464ed3158187340c7db7d5af7))
+
+
+
+
+
 # [10.0.0](https://github.com/motion-canvas/motion-canvas/compare/v9.1.2...v10.0.0) (2022-08-14)
 
 
