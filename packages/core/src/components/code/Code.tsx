@@ -16,7 +16,7 @@ type CodeRange = [CodePoint, CodePoint];
 interface CodeConfig extends TextConfig {
   selection?: CodeRange[];
   theme?: CodeTheme;
-  numbers?: boolean;
+  numbers?: boolean | number;
   language?: string;
 }
 
@@ -60,7 +60,7 @@ export class Code extends Text {
     context.translate(padding.left, padding.right);
     this.drawSelection(context._context);
     this.drawText(context._context);
-    if (this.numbers()) {
+    if (this.numbers() !== false) {
       this.drawLineNumbers(context._context);
     }
   }
@@ -323,6 +323,7 @@ export class Code extends Text {
 
   private drawLineNumbers(context: CanvasRenderingContext2D) {
     const theme = this.theme();
+    const numbers = this.numbers();
     const lines = this.getLines();
     const lineHeight = this.fontSize() * this.lineHeight();
 
@@ -331,7 +332,8 @@ export class Code extends Text {
     context.globalAlpha = this.getAbsoluteOpacity();
     context.textAlign = 'right';
     for (let i = 0; i < lines.length; i++) {
-      context.fillText(i.toString(), -20, (i + 0.5) * lineHeight);
+      const number = typeof numbers === 'number' ? numbers + i : i;
+      context.fillText(number.toString(), -20, (i + 0.5) * lineHeight);
     }
     context.restore();
   }
