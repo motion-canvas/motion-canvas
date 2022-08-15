@@ -1,4 +1,4 @@
-import {usePlayerState, useSubscribable} from '../../hooks';
+import {usePlayerState} from '../../hooks';
 import {Button, Group, Input, Label, Select} from '../controls';
 import {Pane} from '../tabs';
 import {usePlayer} from '../../contexts';
@@ -19,23 +19,6 @@ export function Rendering() {
     {value: 'srgb', text: 'sRGB'},
     {value: 'display-p3', text: 'DCI-P3'},
   ];
-
-  useSubscribable(
-    player.onFrameRendered,
-    async ({frame, data}) => {
-      try {
-        const name = frame.toString().padStart(6, '0');
-        await fetch(`/render/frame${name}.png`, {
-          method: 'POST',
-          body: data,
-        });
-      } catch (e) {
-        console.error(e);
-        player.toggleRendering(false);
-      }
-    },
-    [],
-  );
 
   return (
     <Pane title="Rendering">

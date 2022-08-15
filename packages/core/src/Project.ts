@@ -3,6 +3,7 @@ import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {Size, CanvasColorSpace} from './types';
 import {AudioManager} from './media';
+import {ifHot} from './utils';
 
 export const ProjectSize = {
   FullHD: {width: 1920, height: 1080},
@@ -115,6 +116,7 @@ export class Project {
 
   public readonly name: string;
   public readonly audio = new AudioManager();
+  private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
   private _colorSpace: CanvasColorSpace = 'srgb';
   private _speed = 1;
@@ -160,6 +162,12 @@ export class Project {
       instance.onReloaded.subscribe(() => this.reloaded.dispatch());
       this.sceneLookup[scene.name] = instance;
     }
+
+    ifHot(hot => {
+      hot.on('motion-canvas:export-ack', ({frame}) => {
+        this.renderLookup[frame]?.();
+      });
+    });
   }
 
   public transformCanvas(context: CanvasRenderingContext2D) {
@@ -286,6 +294,34 @@ export class Project {
     return finished;
   }
 
+  public async export() {
+    const frame = this.frame;
+
+    if (this.renderLookup[frame]) {
+      console.warn(`Frame no. ${frame} is already being exported`);
+      return;
+    }
+
+    await ifHot(
+      hot =>
+        new Promise<void>((resolve, reject) => {
+          setTimeout(() => {
+            delete this.renderLookup[frame];
+            reject(`Connection timeout when exporting frame no. ${frame}`);
+          }, 1000);
+          this.renderLookup[frame] = () => {
+            delete this.renderLookup[frame];
+            resolve();
+          };
+          hot.send('motion-canvas:export', {
+            frame,
+            data: this.canvas.toDataURL('image/png'),
+            mimeType: 'image/png',
+          });
+        }),
+    );
+  }
+
   public syncAudio(frameOffset = 0) {
     this.audio.setTime(this.framesToSeconds(this.frame + frameOffset));
   }
@@ -332,11 +368,5 @@ export class Project {
 
   public framesToSeconds(frames: number) {
     return frames / this.framesPerSeconds;
-  }
-
-  public async getBlob(): Promise<Blob> {
-    return new Promise<Blob>(resolve =>
-      this.canvas.toBlob(resolve, 'image/png'),
-    );
   }
 }
