@@ -2,6 +2,7 @@ import type {Plugin, ResolvedConfig} from 'vite';
 import path from 'path';
 import fs from 'fs';
 import {Readable} from 'stream';
+import mime from 'mime-types';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -14,6 +15,12 @@ export interface MotionCanvasPluginConfig {
    * @default './src/project.ts'
    */
   project?: string;
+  /**
+   * A directory path to which the animation will be rendered.
+   *
+   * @default './output'
+   */
+  output?: string;
   /**
    * Defines which assets should be buffered before being sent to the browser.
    *
@@ -53,6 +60,7 @@ export interface MotionCanvasPluginConfig {
 
 export default ({
   project = './src/project.ts',
+  output = './output',
   bufferedAssets = /\.(wav|mp3|ogg)$/,
   editor: {
     styles = '@motion-canvas/ui/dist/style.css',
@@ -64,6 +72,7 @@ export default ({
   const resolvedEditorId = '\0' + editorId;
   const timeStamps: Record<string, number> = {};
   const projectName = path.parse(project).name;
+  const outputPath = path.resolve(output);
 
   let viteConfig: ResolvedConfig;
 
@@ -237,6 +246,25 @@ export default ({
         );
         client.send('motion-canvas:meta-ack', {source});
       });
+      server.ws.on(
+        'motion-canvas:export',
+        async ({frame, mimeType, data}, client) => {
+          const name = frame.toString().padStart(6, '0');
+          const extension = mime.extension(mimeType);
+          const file = path.join(outputPath, name + '.' + extension);
+
+          const directory = path.dirname(file);
+          if (!fs.existsSync(directory)) {
+            fs.mkdirSync(directory, {recursive: true});
+          }
+
+          const base64Data = data.slice(data.indexOf(',') + 1);
+          await fs.promises.writeFile(file, base64Data, {
+            encoding: 'base64',
+          });
+          client.send('motion-canvas:export-ack', {frame});
+        },
+      );
     },
     config() {
       return {

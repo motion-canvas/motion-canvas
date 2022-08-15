@@ -1,9 +1,5 @@
 import type {Project} from '../Project';
-import {
-  AsyncEventDispatcher,
-  EventDispatcher,
-  ValueDispatcher,
-} from '../events';
+import {EventDispatcher, ValueDispatcher} from '../events';
 import type {CanvasColorSpace} from '../types';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
@@ -27,11 +23,6 @@ export interface PlayerState extends Record<string, unknown> {
 interface PlayerCommands {
   seek: number;
   recalculate: boolean;
-}
-
-export interface RenderData {
-  frame: number;
-  data: Blob;
 }
 
 export class Player {
@@ -58,11 +49,6 @@ export class Player {
     return this.frame.subscribable;
   }
   private readonly frame = new ValueDispatcher(0);
-
-  public get onFrameRendered() {
-    return this.frameRendered.subscribable;
-  }
-  private readonly frameRendered = new AsyncEventDispatcher<RenderData>();
 
   public get onReloaded() {
     return this.reloaded.subscribable;
@@ -270,10 +256,13 @@ export class Player {
     if (state.render) {
       state.finished = await this.project.next();
       this.project.render();
-      await this.frameRendered.dispatch({
-        frame: this.project.frame,
-        data: await this.project.getBlob(),
-      });
+      try {
+        await this.project.export();
+      } catch (e) {
+        console.error(e);
+        this.toggleRendering(false);
+      }
+
       if (state.finished || this.project.frame >= state.endFrame) {
         this.toggleRendering(false);
       }
