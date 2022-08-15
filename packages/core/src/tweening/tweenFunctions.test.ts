@@ -77,6 +77,10 @@ describe('deepTween', () => {
     expect(deepTween({foo: 5}, {}, 0)).toEqual({foo: 5});
   });
 
+  test('retains properties with falsy values', () => {
+    expect(deepTween({x: 0, y: 10}, {x: 0, y: 20}, 0.5)).toEqual({x: 0, y: 15});
+  });
+
   test('waits to add new values to a map until a value of 1', () => {
     expect(deepTween({}, {foo: 5}, 3 / 5)).toEqual({});
     expect(deepTween({}, {foo: 5}, 0)).toEqual({});

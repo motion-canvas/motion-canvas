@@ -108,7 +108,7 @@ export function deepTween(from: any, to: any, value: number): any {
         const result = new Map();
         for (const key of new Set([...from.keys(), ...to.keys()])) {
           const inter = deepTween(from.get(key), to.get(key), value);
-          if (inter) result.set(key, inter);
+          if (inter !== undefined) result.set(key, inter);
         }
         return toObject ? Object.fromEntries(result) : result;
       }
