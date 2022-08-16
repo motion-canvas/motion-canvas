@@ -2,9 +2,8 @@ import styles from './Timeline.module.scss';
 
 import type {Scene, TimeEvent} from '@motion-canvas/core/lib/scenes';
 import {useDrag} from '../../hooks';
-import {useCallback, useContext, useLayoutEffect, useState} from 'preact/hooks';
-import {TimelineContext} from './TimelineContext';
-import {usePlayer} from '../../contexts';
+import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
+import {usePlayer, useProject, useTimelineContext} from '../../contexts';
 
 interface LabelProps {
   event: TimeEvent;
@@ -12,16 +11,16 @@ interface LabelProps {
 }
 
 export function Label({event, scene}: LabelProps) {
-  const {fullLength, duration} = useContext(TimelineContext);
+  const {framesToPercents, pixelsToFrames} = useTimelineContext();
   const player = usePlayer();
-  const durationSeconds = player.project.framesToSeconds(duration);
+  const project = useProject();
   const [eventTime, setEventTime] = useState(event.offset);
   const [handleDrag] = useDrag(
     useCallback(
       dx => {
-        setEventTime(eventTime + (dx / fullLength) * durationSeconds);
+        setEventTime(eventTime + project.framesToSeconds(pixelsToFrames(dx)));
       },
-      [eventTime, fullLength, durationSeconds],
+      [eventTime, project, pixelsToFrames],
     ),
     useCallback(
       e => {
@@ -57,40 +56,32 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClip}
         data-name={event.name}
         style={{
-          left: `${
-            ((scene.firstFrame +
+          left: `${framesToPercents(
+            scene.firstFrame +
               scene.project.secondsToFrames(
                 event.initialTime + Math.max(0, eventTime),
-              )) /
-              duration) *
-            100
-          }%`,
+              ),
+          )}%`,
         }}
       />
       <div
         className={styles.labelClipTarget}
         style={{
-          left: `${
-            ((scene.firstFrame +
-              scene.project.secondsToFrames(event.targetTime)) /
-              duration) *
-            100
-          }%`,
+          left: `${framesToPercents(
+            scene.firstFrame + scene.project.secondsToFrames(event.targetTime),
+          )}%`,
         }}
       />
       <div
         className={styles.labelClipStart}
         style={{
-          left: `${
-            ((scene.firstFrame +
-              scene.project.secondsToFrames(event.initialTime)) /
-              duration) *
-            100
-          }%`,
-          width: `${
-            (Math.max(0, scene.project.secondsToFrames(eventTime)) / duration) *
-            100
-          }%`,
+          left: `${framesToPercents(
+            scene.firstFrame + scene.project.secondsToFrames(event.initialTime),
+          )}%`,
+          width: `${Math.max(
+            0,
+            framesToPercents(scene.project.secondsToFrames(eventTime)),
+          )}%`,
         }}
       />
     </>

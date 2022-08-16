@@ -61,6 +61,7 @@ export function useDrag(
   const handleDrag = useCallback(
     (event: MouseEvent) => {
       if (button !== null && event.button !== button) return;
+      // FIXME Calling this in Firefox prevents elements from receiving the `:active` pseudo class.
       event.preventDefault();
       event.stopPropagation();
       setStartPosition({x: event.x, y: event.y});

@@ -1,9 +1,8 @@
 import styles from './Timeline.module.scss';
 
-import {useContext, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
-import {TimelineContext} from './TimelineContext';
+import {useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {useSubscribableValue} from '../../hooks';
-import {useProject} from '../../contexts';
+import {useProject, useTimelineContext} from '../../contexts';
 
 const HEIGHT = 48;
 
@@ -11,8 +10,13 @@ export function AudioTrack() {
   const ref = useRef<HTMLCanvasElement>();
   const project = useProject();
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
-  const {viewLength, startFrame, endFrame, duration, density} =
-    useContext(TimelineContext);
+  const {
+    viewLength,
+    firstVisibleFrame,
+    lastVisibleFrame,
+    density,
+    framesToPercents,
+  } = useTimelineContext();
 
   const audioData = useSubscribableValue(project.audio.onDataChanged);
 
@@ -21,23 +25,25 @@ export function AudioTrack() {
     context.clearRect(0, 0, viewLength, HEIGHT * 2);
     if (!audioData) return;
 
-    context.strokeStyle = 'white';
+    context.strokeStyle = '#444';
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(0, HEIGHT);
 
     const start =
-      project.audio.toRelativeTime(project.framesToSeconds(startFrame)) *
+      (project.framesToSeconds(firstVisibleFrame) -
+        project.audio.onOffsetChanged.current) *
       audioData.sampleRate;
     const end =
-      project.audio.toRelativeTime(project.framesToSeconds(endFrame)) *
+      project.audio.toRelativeTime(project.framesToSeconds(lastVisibleFrame)) *
       audioData.sampleRate;
 
-    const flooredStart = ~~start;
+    const flooredStart = Math.floor(start);
     const padding = flooredStart - start;
     const length = end - start;
     const step = Math.ceil(density);
-    for (let offset = 0; offset < length; offset += step * 2) {
+    for (let index = start; index < end; index += step * 2) {
+      const offset = index - start;
       const sample = flooredStart + offset;
       if (sample >= audioData.peaks.length) break;
 
@@ -52,15 +58,22 @@ export function AudioTrack() {
     }
 
     context.stroke();
-  }, [context, audioData, density, viewLength, startFrame, endFrame]);
+  }, [
+    context,
+    audioData,
+    density,
+    viewLength,
+    firstVisibleFrame,
+    lastVisibleFrame,
+  ]);
 
   const style = useMemo(
     () => ({
-      marginLeft: `${(startFrame / duration) * 100}%`,
-      width: `${((endFrame - startFrame) / duration) * 100}%`,
+      marginLeft: `${framesToPercents(firstVisibleFrame)}%`,
+      width: `${framesToPercents(lastVisibleFrame - firstVisibleFrame)}%`,
       height: `${HEIGHT * 2}px`,
     }),
-    [startFrame, endFrame, duration],
+    [firstVisibleFrame, lastVisibleFrame, framesToPercents],
   );
 
   return (

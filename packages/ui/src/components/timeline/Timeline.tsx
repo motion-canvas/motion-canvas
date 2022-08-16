@@ -14,16 +14,22 @@ import {
   useStateChange,
 } from '../../hooks';
 import {Playhead} from './Playhead';
-import {TimestampTrack} from './TimestampTrack';
+import {Timestamps} from './Timestamps';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
-import {RangeTrack} from './RangeTrack';
-import {TimelineContext, TimelineState} from './TimelineContext';
+import {RangeSelector} from './RangeSelector';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {AudioTrack} from './AudioTrack';
-import {usePlayer} from '../../contexts';
+import {
+  usePlayer,
+  TimelineContextProvider,
+  TimelineState,
+} from '../../contexts';
 
 const ZOOM_SPEED = 0.1;
+const ZOOM_MIN = 0.5;
+const TIMESTAMP_SPACING = 32;
+const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
   const player = usePlayer();
@@ -34,30 +40,58 @@ export function Timeline() {
   const [offset, setOffset] = useState(0);
   const [scale, setScale] = useState(1);
 
+  const sizes = useMemo(
+    () => ({
+      viewLength: rect.width,
+      paddingLeft: rect.width / 2,
+      fullLength: rect.width * scale + rect.width,
+      playableLength: rect.width * scale,
+    }),
+    [rect.width, scale],
+  );
+
+  const ZOOM_MAX = (MAX_FRAME_SIZE / sizes.viewLength) * duration;
+
+  const conversion = useMemo(
+    () => ({
+      framesToPixels: (value: number) =>
+        (value / duration) * sizes.playableLength,
+      framesToPercents: (value: number) => (value / duration) * 100,
+      pixelsToFrames: (value: number) =>
+        (value / sizes.playableLength) * duration,
+    }),
+    [duration, sizes],
+  );
+
   const state = useMemo<TimelineState>(() => {
-    const fullLength = rect.width * scale;
-    const density = Math.pow(2, Math.round(Math.log2(duration / fullLength)));
-    const segmentDensity = Math.max(1, Math.floor(128 * density));
-    const startFrame =
-      Math.floor(((offset / fullLength) * duration) / segmentDensity) *
-      segmentDensity;
-    const endFrame =
+    const density = Math.pow(
+      2,
+      Math.round(Math.log2(duration / sizes.playableLength)),
+    );
+    const segmentDensity = Math.floor(TIMESTAMP_SPACING * density);
+    const clampedSegmentDensity = Math.max(1, segmentDensity);
+    const relativeOffset = offset - sizes.paddingLeft;
+    const firstVisibleFrame =
+      Math.floor(
+        conversion.pixelsToFrames(relativeOffset) / clampedSegmentDensity,
+      ) * clampedSegmentDensity;
+    const lastVisibleFrame =
       Math.ceil(
-        (((offset + rect.width) / fullLength) * duration) / segmentDensity,
-      ) * segmentDensity;
+        conversion.pixelsToFrames(
+          relativeOffset + sizes.viewLength + TIMESTAMP_SPACING,
+        ) / clampedSegmentDensity,
+      ) * clampedSegmentDensity;
 
     return {
-      scale,
-      offset,
-      fullLength,
-      viewLength: rect.width,
-      startFrame,
-      endFrame,
+      viewLength: sizes.viewLength,
+      offset: relativeOffset,
+      firstVisibleFrame,
+      lastVisibleFrame,
       density,
       segmentDensity,
-      duration,
+      ...conversion,
     };
-  }, [rect.width, scale, duration, offset]);
+  }, [sizes, conversion, duration, offset]);
 
   useStateChange(
     ([prevDuration, prevWidth]) => {
@@ -69,7 +103,7 @@ export function Timeline() {
         newScale *= prevWidth / rect.width;
       }
       if (!isNaN(newScale)) {
-        setScale(Math.max(1, newScale));
+        setScale(clamp(ZOOM_MIN, ZOOM_MAX, newScale));
       }
     },
     [duration, rect.width],
@@ -81,14 +115,14 @@ export function Timeline() {
       event => {
         if (event.key !== 'f') return;
         const frame = player.onFrameChanged.current;
-        const maxOffset = state.fullLength - rect.width;
-        const playheadPosition = (state.fullLength * frame) / duration;
-        const scrollLeft = playheadPosition - rect.width / 2;
+        const maxOffset = sizes.fullLength - sizes.viewLength;
+        const playheadPosition = state.framesToPixels(frame);
+        const scrollLeft = playheadPosition - sizes.viewLength / 2;
         const newOffset = clamp(0, maxOffset, scrollLeft);
         containerRef.current.scrollLeft = newOffset;
         setOffset(newOffset);
       },
-      [state.fullLength, rect, scale],
+      [sizes],
     ),
   );
 
@@ -97,10 +131,10 @@ export function Timeline() {
   }, [scale]);
 
   return (
-    <TimelineContext.Provider value={state}>
+    <TimelineContextProvider state={state}>
       <div className={styles.root}>
         <div
-          className={styles.timeline}
+          className={styles.timelineWrapper}
           ref={containerRef}
           onScroll={event =>
             setOffset((event.target as HTMLElement).scrollLeft)
@@ -108,11 +142,22 @@ export function Timeline() {
           onWheel={event => {
             if (event.shiftKey) return;
 
-            const ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
-            const newScale = scale * ratio < 1 ? 1 : scale * ratio;
+            let ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
+            let newScale = scale * ratio;
+            if (newScale < ZOOM_MIN) {
+              newScale = ZOOM_MIN;
+              ratio = newScale / scale;
+            }
+            if (newScale > ZOOM_MAX) {
+              newScale = ZOOM_MAX;
+              ratio = newScale / scale;
+            }
+            if (newScale === scale) {
+              return;
+            }
 
-            const pointer = offset + event.x - rect.x;
-            const newTrackSize = rect.width * newScale;
+            const pointer = offset - sizes.paddingLeft + event.x - rect.x;
+            const newTrackSize = rect.width * newScale * +rect.width;
             const maxOffset = newTrackSize - rect.width;
             const newOffset = clamp(
               0,
@@ -131,31 +176,45 @@ export function Timeline() {
               event.x - rect.x + newOffset
             }px`;
           }}
-          onClick={event => {
-            player.requestSeek(
-              Math.floor(
-                ((offset + event.x - rect.x) / state.fullLength) * duration,
-              ),
-            );
-          }}
           onMouseMove={event => {
             playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
           }}
         >
           <div
-            className={styles.track}
-            style={{width: `${state.fullLength}px`}}
+            className={styles.timeline}
+            style={{width: `${sizes.fullLength}px`}}
+            onMouseUp={event => {
+              if (event.button === 0) {
+                player.requestSeek(
+                  Math.floor(
+                    state.pixelsToFrames(
+                      offset - sizes.paddingLeft + event.x - rect.x,
+                    ),
+                  ),
+                );
+              }
+            }}
           >
-            <RangeTrack />
-            <TimestampTrack />
-            <SceneTrack />
-            <LabelTrack />
-            <AudioTrack />
+            <div
+              className={styles.timelineContent}
+              style={{
+                width: `${sizes.playableLength}px`,
+                left: `${sizes.paddingLeft}px`,
+              }}
+            >
+              <RangeSelector />
+              <Timestamps />
+              <div className={styles.trackContainer}>
+                <SceneTrack />
+                <LabelTrack />
+                <AudioTrack />
+              </div>
+              <Playhead />
+            </div>
           </div>
           <div ref={playheadRef} className={styles.playheadPreview} />
-          <Playhead />
         </div>
       </div>
-    </TimelineContext.Provider>
+    </TimelineContextProvider>
   );
 }

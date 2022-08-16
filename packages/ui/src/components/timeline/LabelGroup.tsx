@@ -1,19 +1,19 @@
 import type {Scene} from '@motion-canvas/core/lib/scenes';
 import {Label} from './Label';
 import {useSubscribableValue} from '../../hooks';
-import {useContext} from 'preact/hooks';
-import {TimelineContext} from './TimelineContext';
+import {useTimelineContext} from '../../contexts';
 
 interface LabelGroupProps {
   scene: Scene;
 }
 
 export function LabelGroup({scene}: LabelGroupProps) {
-  const {startFrame, endFrame} = useContext(TimelineContext);
+  const {firstVisibleFrame, lastVisibleFrame} = useTimelineContext();
   const events = useSubscribableValue(scene.timeEvents.onChanged);
   const cached = useSubscribableValue(scene.onCacheChanged);
   const isVisible =
-    cached.lastFrame >= startFrame && cached.firstFrame <= endFrame;
+    cached.lastFrame >= firstVisibleFrame &&
+    cached.firstFrame <= lastVisibleFrame;
 
   return (
     <>

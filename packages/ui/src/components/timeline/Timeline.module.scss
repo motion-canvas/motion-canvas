@@ -14,80 +14,109 @@
   flex-grow: 0;
 }
 
-.timeline {
-  overflow-x: auto;
+.timelineWrapper {
+  overflow-x: scroll;
   overflow-y: hidden;
   flex-grow: 1;
   position: relative;
-}
-
-.track {
-  position: relative;
-  padding-top: 16px;
-  overflow: hidden;
-}
-
-.timestampTrack {
-  position: relative;
+  background-color: #181818;
   width: 100%;
-  height: 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.24);
-  user-select: none;
-  pointer-events: none;
+}
+
+.timeline {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.timelineContent {
+  position: relative;
+  overflow: visible;
+  height: 100%;
+}
+
+.trackContainer {
+  width: 100%;
+  height: 100%;
+  background-color: #242424;
+
+  &::before {
+    width: 100%;
+    height: 32px;
+    display: block;
+    content: '';
+    background-color: #181818;
+  }
 }
 
 .timestamp {
-  color: rgba(255, 255, 255, 0.54);
-  font-size: 12px;
+  user-select: none;
+  pointer-events: none;
   position: absolute;
-  padding: 0 4px;
-  top: 0;
+  top: 32px;
   bottom: 0;
-  border-left: 1px solid rgba(255, 255, 255, 0.24);
+  border-left: 1px solid #0003;
+  border-right: 1px solid #0003;
+  width: 0;
+  display: flex;
+  justify-content: center;
+
+  &.odd {
+    opacity: 0.5;
+
+    &::after {
+      display: none;
+    }
+  }
+
+  &::after {
+    font-size: 12px;
+    line-height: 32px;
+    margin-top: -32px;
+    text-align: center;
+    display: block;
+    content: attr(data-frame);
+    color: rgba(255, 255, 255, 0.54);
+  }
 }
 
 .sceneTrack {
-  position: relative;
   height: 48px;
   padding: 4px 0;
+  display: flex;
 }
 
 .sceneClip {
-  $padding: 4px;
-
-  position: absolute;
   height: 48px;
+  padding: 4px;
 
   .scene {
-    position: absolute;
-    top: $padding;
-    bottom: $padding;
-    left: $padding;
-    right: $padding;
+    position: relative;
     border-radius: 4px;
-    background-color: rgba(255, 255, 255, 0.16);
+    background-color: #444;
+    overflow: hidden;
+
+    .transition {
+      position: absolute;
+      pointer-events: none;
+      top: 0;
+      bottom: 0;
+      left: -4px;
+      background: linear-gradient(
+        90deg,
+        rgba(36, 36, 36, 1) 0%,
+        rgba(36, 36, 36, 0) 100%
+      );
+    }
 
     .sceneName {
+      position: relative;
       line-height: 24px;
       pointer-events: none;
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 8px 12px;
     }
-  }
-
-  .transition {
-    pointer-events: none;
-    position: absolute;
-    top: $padding;
-    bottom: $padding;
-    left: $padding;
-    border-radius: 4px 0 0 4px;
-    background: linear-gradient(
-      90deg,
-      rgba(36, 36, 36, 1) 0%,
-      rgba(36, 36, 36, 0) 100%
-    );
   }
 }
 
@@ -163,21 +192,24 @@
 .playhead {
   position: absolute;
   width: 2px;
-  top: 0;
+  top: 6px;
   bottom: 0;
   background-color: var(--theme);
   pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 
   &::before {
-    position: absolute;
-    content: '';
     display: block;
-    left: -8px;
-    top: 0;
-    width: 16px;
-    height: 8px;
-    border-radius: 0 0 4px 4px;
+    padding: 0 4px;
+    border-radius: 4px;
     background-color: var(--theme);
+    font-size: 12px;
+    line-height: 20px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 1);
+    content: attr(data-frame);
   }
 }
 
@@ -190,18 +222,18 @@
   opacity: 0;
   pointer-events: none;
 
-  .timeline:hover & {
+  .root:hover & {
     opacity: 0.24;
   }
 }
 
 .range {
+  border-radius: 4px;
   cursor: move;
   position: absolute;
-  top: 0;
-  height: 40px;
+  height: 32px;
   background-color: var(--theme-overlay);
-  border-bottom: 1px solid var(--theme);
+  border-bottom: 2px solid var(--theme);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -209,7 +241,7 @@
 
 .handle {
   cursor: pointer;
-  padding: 8px 2px;
+  margin-top: 2px;
 
   &:after {
     background-color: rgba(255, 255, 255, 0);
@@ -223,8 +255,6 @@
   .range > &:active:after {
     background-color: rgba(255, 255, 255, 0.6);
   }
-
-  margin-top: 4px;
 }
 
 .handleSpacer {
@@ -233,6 +263,7 @@
 }
 
 .audioTrack {
-  opacity: 0.16;
+  position: relative;
+  width: 100%;
   margin: 24px 0;
 }
