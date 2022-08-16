@@ -40,7 +40,7 @@ node -v
       `Username` is your GitHub username,
       `Password` is the token you just generated.
       `Email` is your GitHub email address.
-      For instace:
+      For instance:
       ```text
       > Username: Jacob
       > Password: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

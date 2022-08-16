@@ -1,0 +1,222 @@
+---
+sidebar_position: 2
+---
+
+import ReactPlayer from 'react-player'
+
+# Creating an Animation
+
+In this guide, we will start a new Motion Canvas project and create an animation
+in it.  Make sure that you are first authenticated on GitHub by following [the
+installation guide][installation].
+
+### Creating a new project
+
+Run the following command in order to scaffold a new Motion Canvas project:
+
+```bash
+npm init @motion-canvas
+```
+
+Answer the prompts to name your project and select which language you would like
+to use, either TypeScript or plain JavaScript. We recommend using TypeScript in
+your first project, as our Guides will be written for TypeScript. You will then
+receive instructions to navigate to your new project directory and start the
+Motion Canvas server.
+
+### Starting the Motion Canvas App
+
+From your new Motion Canvas project directory, run
+
+```shell
+npm run serve
+```
+
+This will start the Motion Canvas server, and you may then open the web app in
+your browser by visiting [http://localhost:9000/](http://localhost:9000/).
+
+We will use this app to preview our animation, but for now there is nothing to
+preview. To do that, we must add an element to our scene.
+
+### Programming an animation
+
+The scaffolding command will create several files for you, but for now we're
+going to focus on `/scenes/example.scene.tsx`, which is where we can add our
+animations. Open `example.scene.tsx` in a text editor, and replace all code in
+the file with the following snippet.
+
+```tsx
+import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {Circle} from 'konva/lib/shapes/Circle';
+import {useRef} from '@motion-canvas/core/lib/utils';
+
+export default makeKonvaScene(function* example(view) {
+  const myCircle = useRef();
+
+  view.add(
+    <Circle
+      position={{x: -300, y: 0}}
+      ref={myCircle}
+      width={240}
+      height={240}
+      fill="#ccc"
+    />
+  );
+
+  yield* myCircle.value.position({x: 300, y: 0}, 1);
+});
+```
+
+Now save the file. Motion Canvas will detect the change to the file and reload
+the animation in the web app preview. You should see a gray circle in the
+preview pane at the top right of the web application. Press the play button to
+see the circle animate across the screen.
+
+<ReactPlayer loop controls url='/video/animation.mp4' />
+
+Depending on the size of your browser, you may want to zoom the preview out by
+scrolling down on your mouse wheel while hovering over the preview panel.
+
+### Explanation
+
+Motion Canvas is designed to work with different HTML canvas libraries, though
+it currently only ships with [Konva](https://konvajs.org/) integration. To
+create a new konva scene, we need to call `makeKonvaScene` with a generator
+function.
+
+```tsx
+import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+// ...
+
+export default makeKonvaScene(function* example(view) {
+  // animation code
+});
+```
+
+The generator function is passed a `view` argument, which we will use to add
+components to the scene.
+
+If you aren't familiar with generator functions from JavaScript, declared with
+`function*`, you can read the MDN documentation on them [here][generators],
+though a thorough understanding of them is not necessary to start using Motion
+Canvas.
+
+In order to create an animation, we needed something to animate. For that, we
+used the Konva Circle component.
+
+```tsx
+import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {Circle} from 'konva/lib/shapes/Circle';
+// ...
+
+export default makeKonvaScene(function* example(view) {
+  view.add(
+    <Circle
+      // ...
+      width={240}
+      height={240}
+      fill="#ccc"
+    />
+  );
+
+  // ...
+});
+```
+
+Here we create a new circle instance with `<Circle />` and add it to the scene
+using `view.add()`. This code alone will show a gray circle in the middle of the
+screen, though it won't move.
+
+To animate the circle, we needed to store a reference to it. This is the purpose
+of the `useRef` call.
+
+```tsx
+import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {Circle} from 'konva/lib/shapes/Circle';
+import {useRef} from '@motion-canvas/core/lib/utils';
+
+export default makeKonvaScene(function* example(view) {
+  const myCircle = useRef();
+
+  view.add(
+    <Circle
+      ref={myCircle}
+      // ...
+    />
+  );
+
+  // ...
+});
+```
+
+Once the `Circle` is created with `ref={myCircle}`, it may be accessed from
+`myCircle.value`, which we can use to edit the circle's properties. In Konva,
+properties are read using `property()`, and written using `property(value)`. To
+update the circles position, for instance, we use
+
+```tsx
+myCircle.value.position({x: 300, y: 0});
+```
+
+When we edit the properties of a component, however, the changes are immediate.
+In order to _transition_ to a new value over time, we must change our call in
+two ways. We must specify the duration of the transition in seconds to create an
+animation, `position(value, duration)`, and we must `yield*` to the animation.
+
+```tsx
+yield* myCircle.value.position({x: 300, y: 0}, 1);
+```
+
+The `yield*` is important. Calling `position({...}, 1)` alone will not run the
+animation; it simply returns a value called a thread, which represents the
+animation.
+
+```tsx
+const transitionThread = myCircle.value.position({x: 300, y: 0}, 1);
+```
+
+Yielding a thread prompts motion canvas to run it.  Using `yield*` waits for the
+animation to complete before continuing the scene function, and using `yield`
+plays the animation but continues the scene function immediately.
+
+```tsx
+yield* myCircle.value.position({x: 300, y: 0}, 1);
+// this line will run after the animation has ended
+```
+```tsx
+yield myCircle.value.position({x: 300, y: 0}, 1);
+// this line will run immediately while the animation plays
+```
+
+In our example, we used `yield*` so that the scene wouldn't end until the
+animation was completed.
+
+```tsx
+import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {Circle} from 'konva/lib/shapes/Circle';
+import {useRef} from '@motion-canvas/core/lib/utils';
+
+// make a new konva scene and pass it the scene function
+export default makeKonvaScene(function* example(view) {
+  // create a reference to store the circle
+  const myCircle = useRef();
+
+  // create a circle and add it to the scene's view
+  view.add(
+    <Circle
+      position={{x: -300, y: 0}} // set an initial position
+      ref={myCircle} // assign the circle instance to the myCircle ref
+      width={240}
+      height={240}
+      fill="#ccc"
+    />
+  );
+
+  // animate to a new position over 1 second and
+  // wait for it to finish before continuing
+  yield* myCircle.value.position({x: 300, y: 0}, 1);
+});
+```
+
+[installation]: /guides/getting-started/installation
+[generators]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
