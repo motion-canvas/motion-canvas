@@ -20,8 +20,8 @@ precise details of your animation in code, but adjust them manually to match the
 imprecise timing of a recorded voice over.
 
 Motion Canvas is not intended to be a full-sale replacement for a video editor
-like Adobe Premier Pro or DaVinci Resolve, but it may improve your workflow when
-combined with these other tools.
+like Adobe Premiere Pro or DaVinci Resolve, but it may improve your workflow
+when combined with these other tools.
 
 Motion Canvas is Open Source, and relies on your feedback to inform its
 development. If you would like to report a bug or request a feature, you may
