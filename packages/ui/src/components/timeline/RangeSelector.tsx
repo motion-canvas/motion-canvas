@@ -1,13 +1,12 @@
 import styles from './Timeline.module.scss';
 
 import {useDrag, usePlayerState} from '../../hooks';
-import {useCallback, useContext, useEffect, useState} from 'preact/hooks';
+import {useCallback, useEffect, useState} from 'preact/hooks';
 import {Icon, IconType} from '../controls';
-import {TimelineContext} from './TimelineContext';
-import {usePlayer} from '../../contexts';
+import {usePlayer, useTimelineContext} from '../../contexts';
 
-export function RangeTrack() {
-  const {fullLength} = useContext(TimelineContext);
+export function RangeSelector() {
+  const {pixelsToFrames, framesToPercents} = useTimelineContext();
 
   const player = usePlayer();
   const state = usePlayerState();
@@ -21,9 +20,9 @@ export function RangeTrack() {
   const [handleDragStart] = useDrag(
     useCallback(
       dx => {
-        setStart(start + (dx / fullLength) * state.duration);
+        setStart(start + pixelsToFrames(dx));
       },
-      [start, fullLength, state.duration],
+      [start, pixelsToFrames],
     ),
     onDrop,
   );
@@ -31,11 +30,9 @@ export function RangeTrack() {
   const [handleDragEnd] = useDrag(
     useCallback(
       dx => {
-        setEnd(
-          Math.min(state.duration, end) + (dx / fullLength) * state.duration,
-        );
+        setEnd(Math.min(state.duration, end) + pixelsToFrames(dx));
       },
-      [end, fullLength, state.duration],
+      [end, pixelsToFrames, state.duration],
     ),
     onDrop,
   );
@@ -43,12 +40,10 @@ export function RangeTrack() {
   const [handleDrag] = useDrag(
     useCallback(
       dx => {
-        setStart(start + (dx / fullLength) * state.duration);
-        setEnd(
-          Math.min(state.duration, end) + (dx / fullLength) * state.duration,
-        );
+        setStart(start + pixelsToFrames(dx));
+        setEnd(Math.min(state.duration, end) + pixelsToFrames(dx));
       },
-      [start, end, fullLength, state.duration],
+      [start, end, state.duration, pixelsToFrames],
     ),
     onDrop,
   );
@@ -69,9 +64,9 @@ export function RangeTrack() {
     <div
       style={{
         flexDirection: start > end ? 'row-reverse' : 'row',
-        left: `${(Math.max(0, normalizedStart) / state.duration) * 100}%`,
+        left: `${framesToPercents(Math.max(0, normalizedStart))}%`,
         right: `${
-          100 - Math.min(1, (normalizedEnd + 1) / state.duration) * 100
+          100 - framesToPercents(Math.min(state.duration, normalizedEnd + 1))
         }%`,
       }}
       className={styles.range}
@@ -92,7 +87,6 @@ export function RangeTrack() {
       <div class={styles.handleSpacer} />
       <Icon
         onMouseDown={handleDragEnd}
-        onDblClick={console.log}
         className={styles.handle}
         type={IconType.dragIndicator}
       />

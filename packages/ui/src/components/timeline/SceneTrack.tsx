@@ -1,8 +1,9 @@
 import styles from './Timeline.module.scss';
 
 import type {Scene} from '@motion-canvas/core/lib/scenes';
-import {usePlayerState, useScenes, useSubscribableValue} from '../../hooks';
-import {usePlayer} from '../../contexts';
+import {useScenes, useSubscribableValue} from '../../hooks';
+import {usePlayer, useTimelineContext} from '../../contexts';
+import {useMemo} from 'preact/hooks';
 
 export function SceneTrack() {
   const scenes = useScenes();
@@ -22,16 +23,22 @@ interface SceneClipProps {
 
 function SceneClip({scene}: SceneClipProps) {
   const player = usePlayer();
-  const state = usePlayerState();
+  const {framesToPercents, framesToPixels, offset} = useTimelineContext();
   const cachedData = useSubscribableValue(scene.onCacheChanged);
+
+  const nameStyle = useMemo(() => {
+    const sceneOffset = framesToPixels(cachedData.firstFrame);
+    return offset > sceneOffset
+      ? {paddingLeft: `${offset - sceneOffset}px`}
+      : {};
+  }, [offset, cachedData.firstFrame, framesToPixels]);
 
   return (
     <div
       className={styles.sceneClip}
       data-name={scene.name}
       style={{
-        width: `${(cachedData.duration / state.duration) * 100}%`,
-        left: `${(cachedData.firstFrame / state.duration) * 100}%`,
+        width: `${framesToPercents(cachedData.duration)}%`,
       }}
       onMouseDown={event => {
         if (event.button === 1) {
@@ -46,18 +53,20 @@ function SceneClip({scene}: SceneClipProps) {
       }}
     >
       <div className={styles.scene}>
-        <div className={styles.sceneName}>{scene.name}</div>
+        {cachedData.transitionDuration > 0 && (
+          <div
+            style={{
+              width: `${
+                (cachedData.transitionDuration / cachedData.duration) * 100
+              }%`,
+            }}
+            className={styles.transition}
+          />
+        )}
+        <div className={styles.sceneName} style={nameStyle}>
+          {scene.name}
+        </div>
       </div>
-      {cachedData.transitionDuration > 0 && (
-        <div
-          style={{
-            width: `${
-              (cachedData.transitionDuration / cachedData.duration) * 100
-            }%`,
-          }}
-          className={styles.transition}
-        />
-      )}
     </div>
   );
 }

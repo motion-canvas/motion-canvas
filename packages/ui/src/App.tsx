@@ -24,6 +24,7 @@ export function App() {
   return (
     <ResizeableLayout
       id={'main-timeline'}
+      size={0.7}
       vertical
       start={
         <AppContext.Provider value={contextState}>

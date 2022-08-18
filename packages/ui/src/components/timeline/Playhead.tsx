@@ -1,17 +1,17 @@
 import styles from './Timeline.module.scss';
 
 import {usePlayerTime} from '../../hooks';
-import {useContext} from 'preact/hooks';
-import {TimelineContext} from './TimelineContext';
+import {useTimelineContext} from '../../contexts';
 
 export function Playhead() {
-  const {fullLength} = useContext(TimelineContext);
+  const {framesToPixels} = useTimelineContext();
   const time = usePlayerTime();
   return (
     <div
       className={styles.playhead}
+      data-frame={time.frame}
       style={{
-        left: `${fullLength * time.completion}px`,
+        left: `${framesToPixels(time.frame)}px`,
       }}
     />
   );
