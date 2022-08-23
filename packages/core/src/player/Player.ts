@@ -1,6 +1,6 @@
 import type {Project} from '../Project';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import type {CanvasColorSpace} from '../types';
+import type {CanvasColorSpace, CanvasOutputMimeType} from '../types';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
@@ -18,6 +18,8 @@ export interface PlayerState extends Record<string, unknown> {
   fps: number;
   scale: number;
   colorSpace: CanvasColorSpace;
+  fileType: CanvasOutputMimeType;
+  quality: number;
 }
 
 interface PlayerCommands {
@@ -43,6 +45,8 @@ export class Player {
     fps: 30,
     scale: 1,
     colorSpace: 'srgb',
+    fileType: 'image/png',
+    quality: 1,
   });
 
   public get onFrameChanged() {
@@ -172,6 +176,16 @@ export class Player {
     this.project.colorSpace = colorSpace;
     this.updateState({colorSpace});
     this.project.render();
+  }
+
+  public setFileType(fileType: CanvasOutputMimeType) {
+    this.project.fileType = fileType;
+    this.updateState({fileType});
+  }
+
+  public setQuality(quality: number) {
+    this.project.quality = quality;
+    this.updateState({quality});
   }
 
   public requestPreviousFrame(): void {
