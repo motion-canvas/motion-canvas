@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [10.2.0](https://github.com/motion-canvas/motion-canvas/compare/v10.1.0...v10.2.0) (2022-08-25)
+
+
+### Features
+
+* added file type and quality options to rendering panel ([#50](https://github.com/motion-canvas/motion-canvas/issues/50)) ([bee71ef](https://github.com/motion-canvas/motion-canvas/commit/bee71ef2673c269db47a4433831720b7ad0fb4e8)), closes [#24](https://github.com/motion-canvas/motion-canvas/issues/24)
+* **ui:** timeline overhaul ([#47](https://github.com/motion-canvas/motion-canvas/issues/47)) ([4232a60](https://github.com/motion-canvas/motion-canvas/commit/4232a6072540b54451e99e18c1001db0175bb93f)), closes [#20](https://github.com/motion-canvas/motion-canvas/issues/20)
+
+
+
+
+
 # [10.1.0](https://github.com/motion-canvas/motion-canvas/compare/v10.0.2...v10.1.0) (2022-08-15)
 
 
