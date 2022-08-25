@@ -7,7 +7,7 @@ sidebar_position: 2
 To render an animation, open the Rendering panel in the top left of the screen
 using the button with the icon below.
 
-![](/img/rendering_icon.svg)
+![The icon used to identify the rendering panel tab.](/img/rendering_icon.svg)
 
 You should see a panel titled "RENDERING" with several fields and a Render
 button. The default settings are sufficient to render the animation, but we will
@@ -46,13 +46,43 @@ resolution densities or to adjust your output resolution after completing an
 animation.
 
 ##### Color Space
+
 The HTML Canvas color space to use when previewing or rendering the animation.
 Current options include sRGB, a common color space for images and video, and
 DCI-P3, a wide-gamut color space.
 
+##### File Type
+
+The type of image file to which Motion Canvas will convert the frames. Current
+options are PNG, JPEG, and WebP. Note that Motion Canvas depends on the
+capabilities of your browser to generate image files, and so WebP may not work
+on Safari or older browsers.
+
+##### Quality
+
+The quality target for compression from 0 to 1, where a lower setting will
+result in smaller file sizes but might degrade image quality. A setting of 1
+will result in lossless images, such that no detail is lost, but lower settings
+will often produce no discernible difference. Note that output to a file type of
+PNG does not allow for different quality settings, so this option will be
+ignored when outputting to PNG.
+
 ### The Output
 
 After clicking the Render button, Motion Canvas will play through the animation
-and save each frame as an image to `/output` in your project directory. From
-there, you may import your animation as frames into a video editor of your
-choice, or convert the frames directly to a video using a tool like `ffmpeg`.
+and save each frame as an image to `/output` in your project directory. The
+target output direction may be configured in `vite.config.js`, however, by
+setting the `output` property in the `motionCanvas` plugin options.
+
+```js
+export default defineConfig({
+  plugins: [
+    motionCanvas({
+      output: './custom',
+    }),
+  ],
+});
+```
+
+You may then import your animation as frames into a video editor of your choice,
+or convert the frames directly to a video using a tool like `ffmpeg`.
