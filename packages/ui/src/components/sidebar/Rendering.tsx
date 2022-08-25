@@ -2,7 +2,10 @@ import {usePlayerState} from '../../hooks';
 import {Button, Group, Input, Label, Select} from '../controls';
 import {Pane} from '../tabs';
 import {usePlayer} from '../../contexts';
-import type {CanvasColorSpace} from '@motion-canvas/core/lib/types';
+import type {
+  CanvasColorSpace,
+  CanvasOutputMimeType,
+} from '@motion-canvas/core/lib/types';
 
 export function Rendering() {
   const player = usePlayer();
@@ -18,6 +21,12 @@ export function Rendering() {
   const colorSpaces = [
     {value: 'srgb', text: 'sRGB'},
     {value: 'display-p3', text: 'DCI-P3'},
+  ];
+
+  const fileTypes = [
+    {value: 'image/png', text: 'png'},
+    {value: 'image/jpeg', text: 'jpeg'},
+    {value: 'image/webp', text: 'webp'},
   ];
 
   return (
@@ -92,6 +101,27 @@ export function Rendering() {
           options={colorSpaces}
           value={state.colorSpace}
           onChange={value => player.setColorSpace(value as CanvasColorSpace)}
+        />
+      </Group>
+      <Group>
+        <Label>File Type</Label>
+        <Select
+          options={fileTypes}
+          value={state.fileType}
+          onChange={value => player.setFileType(value as CanvasOutputMimeType)}
+        />
+      </Group>
+      <Group>
+        <Label>Quality</Label>
+        <Input
+          type="number"
+          min={0}
+          max={1}
+          value={state.quality}
+          onChange={event => {
+            const value = parseFloat((event.target as HTMLInputElement).value);
+            player.setQuality(value);
+          }}
         />
       </Group>
       <Group>

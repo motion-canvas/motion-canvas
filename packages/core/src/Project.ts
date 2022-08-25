@@ -1,7 +1,7 @@
 import {Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
-import {Size, CanvasColorSpace} from './types';
+import {Size, CanvasColorSpace, CanvasOutputMimeType} from './types';
 import {AudioManager} from './media';
 import {ifHot} from './utils';
 
@@ -72,6 +72,14 @@ export class Project {
     this.updateCanvas();
   }
 
+  public set fileType(value: CanvasOutputMimeType) {
+    this._fileType = value;
+  }
+
+  public set quality(value: number) {
+    this._quality = value;
+  }
+
   public set speed(value: number) {
     this._speed = value;
     this.reloadAll();
@@ -119,6 +127,8 @@ export class Project {
   private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
   private _colorSpace: CanvasColorSpace = 'srgb';
+  private _fileType: CanvasOutputMimeType = 'image/png';
+  private _quality = 1;
   private _speed = 1;
   private framesPerSeconds = 30;
   private readonly sceneLookup: Record<string, Scene> = {};
@@ -315,8 +325,8 @@ export class Project {
           };
           hot.send('motion-canvas:export', {
             frame,
-            data: this.canvas.toDataURL('image/png'),
-            mimeType: 'image/png',
+            data: this.canvas.toDataURL(this._fileType, this._quality),
+            mimeType: this._fileType,
           });
         }),
     );
