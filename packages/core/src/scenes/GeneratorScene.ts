@@ -24,7 +24,7 @@ export abstract class GeneratorScene<T>
   implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
   public readonly timeEvents: TimeEvents;
-  public readonly meta: Meta<SceneMetadata>;
+  public project: Project;
 
   public get firstFrame() {
     return this.cache.current.firstFrame;
@@ -84,13 +84,11 @@ export abstract class GeneratorScene<T>
   private counters: Record<string, number> = {};
 
   public constructor(
-    public readonly project: Project,
     public readonly name: string,
+    public readonly meta: Meta<SceneMetadata>,
     private runnerFactory: ThreadGeneratorFactory<T>,
   ) {
     decorate(this.runnerFactory, threadable(name));
-
-    this.meta = Meta.getMetaFor(`${name}.scene`);
     this.timeEvents = new TimeEvents(this);
   }
 

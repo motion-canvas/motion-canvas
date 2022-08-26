@@ -26,9 +26,10 @@ export class Meta<T extends Metadata = Metadata> {
   }
   private readonly data = new ValueDispatcher(<T>{version: META_VERSION});
 
-  private source: string | false;
-
-  private constructor(private readonly name: string) {}
+  public constructor(
+    private readonly name: string,
+    private source: string | false = false,
+  ) {}
 
   public getData() {
     return this.data.current;
@@ -87,7 +88,16 @@ export class Meta<T extends Metadata = Metadata> {
     });
   }
 
-  private static metaLookup: Record<string, Meta> = {};
+  /**
+   * Load new metadata from a file.
+   *
+   * @param data - New metadata.
+   */
+  public async loadData(data: T) {
+    data.version ||= META_VERSION;
+    this.data.current = data;
+  }
+
   private static sourceLookup: Record<string, Callback> = {};
 
   static {
@@ -96,54 +106,5 @@ export class Meta<T extends Metadata = Metadata> {
         this.sourceLookup[source]?.();
       });
     });
-  }
-
-  /**
-   * Get the {@link Meta} object for the given entity.
-   *
-   * @param name - The name of the entity the metadata refers to.
-   *
-   * @typeParam T - The concrete type of the metadata. Depends on the entity.
-   *                See {@link SceneMetadata} and {@link ProjectMetadata} for
-   *                sample types.
-   *
-   * @internal
-   */
-  public static getMetaFor<T extends Metadata = Metadata>(
-    name: string,
-  ): Meta<T> {
-    this.metaLookup[name] ??= new Meta<T>(name);
-    return <Meta<T>>this.metaLookup[name];
-  }
-
-  /**
-   * Register a new version of metadata.
-   *
-   * @remarks
-   * Called directly by meta files themselves.
-   * Occurs during the initial load as well as during hot reloads.
-   *
-   * @param name - The Name of the entity this metadata refers to.
-   * @param source - The absolute path to the source file.
-   * @param rawData - New metadata as JSON.
-   *
-   * @internal
-   */
-  public static register(
-    name: string,
-    source: string | false,
-    rawData: string,
-  ) {
-    const meta = Meta.getMetaFor(name);
-    meta.source = source;
-
-    try {
-      const data: Metadata = JSON.parse(rawData);
-      data.version ||= META_VERSION;
-      meta.data.current = data;
-    } catch (e) {
-      console.error(`Error when parsing ${source}:`);
-      console.error(e);
-    }
   }
 }

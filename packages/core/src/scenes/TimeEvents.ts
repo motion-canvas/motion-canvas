@@ -58,17 +58,8 @@ export class TimeEvents {
   private preserveTiming = true;
 
   public constructor(private readonly scene: Scene) {
-    const storageKey = `scene-${scene.project.name}-${scene.name}`;
-    const storedEvents = localStorage.getItem(storageKey);
-    if (storedEvents) {
-      console.warn('Migrating localStorage to meta files');
-      localStorage.setItem(`${storageKey}-backup`, storedEvents);
-      localStorage.removeItem(storageKey);
-      this.load(Object.values<TimeEvent>(JSON.parse(storedEvents)));
-    } else {
-      this.previousReference = scene.meta.getData().timeEvents ?? [];
-      this.load(this.previousReference);
-    }
+    this.previousReference = scene.meta.getData().timeEvents ?? [];
+    this.load(this.previousReference);
 
     scene.onReloaded.subscribe(this.handleReload);
     scene.onRecalculated.subscribe(this.handleRecalculated);

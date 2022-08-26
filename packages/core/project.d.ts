@@ -25,6 +25,11 @@ declare module '*.glsl' {
   export = value;
 }
 
+declare module '*?scene' {
+  const value: import('./lib/scenes/Scene').Scene;
+  export = value;
+}
+
 declare namespace JSX {
   type ElementClass = import('konva/lib/Node').Node;
   interface ElementChildrenAttribute {
@@ -38,5 +43,3 @@ declare module 'colorjs.io' {
 }
 
 declare type Callback = (...args: unknown[]) => void;
-
-declare const PROJECT_FILE_NAME: string;

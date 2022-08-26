@@ -51,16 +51,16 @@ must add an element to our scene.
 ### Programming an animation
 
 The scaffolding command will create several files for you, but for now we're
-going to focus on `src/scenes/example.scene.tsx`, which is where we can add our
-animations. Open `example.scene.tsx` in a text editor, and replace all code in
+going to focus on `src/scenes/example.tsx`, which is where we can add our
+animations. Open `example.tsx` in a text editor, and replace all code in
 the file with the following snippet.
 
-```tsx
+```tsx title="src/scenes/example.tsx"
 import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
 import {Circle} from 'konva/lib/shapes/Circle';
 import {useRef} from '@motion-canvas/core/lib/utils';
 
-export default makeKonvaScene(function* example(view) {
+export default makeKonvaScene(function* (view) {
   const myCircle = useRef();
 
   view.add(
@@ -99,7 +99,7 @@ function.
 import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
 
 // highlight-next-line
-export default makeKonvaScene(function* example(view) {
+export default makeKonvaScene(function* (view) {
   // animation code
 });
 ```
@@ -122,7 +122,7 @@ import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
 // highlight-next-line
 import {Circle} from 'konva/lib/shapes/Circle';
 
-export default makeKonvaScene(function* example(view) {
+export default makeKonvaScene(function* (view) {
   // highlight-start
   view.add(
     <Circle
@@ -148,7 +148,7 @@ import {Circle} from 'konva/lib/shapes/Circle';
 // highlight-next-line
 import {useRef} from '@motion-canvas/core/lib/utils';
 
-export default makeKonvaScene(function* example(view) {
+export default makeKonvaScene(function* (view) {
   // highlight-next-line
   const myCircle = useRef();
 
@@ -214,7 +214,7 @@ import {Circle} from 'konva/lib/shapes/Circle';
 import {useRef} from '@motion-canvas/core/lib/utils';
 
 // make a new konva scene and pass it the scene function
-export default makeKonvaScene(function* example(view) {
+export default makeKonvaScene(function* (view) {
   // create a reference to store the circle
   const myCircle = useRef();
 

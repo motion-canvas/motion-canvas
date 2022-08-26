@@ -21,7 +21,7 @@ export interface SceneMetadata extends Metadata {
  *                {@link SceneDescription.config}.
  */
 export interface SceneConstructor<T> {
-  new (project: Project, name: string, config: T): Scene;
+  new (name: string, meta: Meta, config: T): Scene;
 }
 
 /**
@@ -34,13 +34,6 @@ export interface SceneDescription<T = unknown> {
    * The class used to instantiate the scene.
    */
   klass: SceneConstructor<T>;
-  /**
-   * The name of the scene.
-   *
-   * @remarks
-   * Should match the first portion of the file name (`[name].scene.ts`).
-   */
-  name: string;
   /**
    * Configuration object.
    */
@@ -98,11 +91,8 @@ export interface Scene<T = unknown> {
   readonly name: string;
   /**
    * Reference to the project.
-   *
-   * @remarks
-   * Will be passed as the first argument to the constructor.
    */
-  readonly project: Project;
+  project: Project;
   readonly timeEvents: TimeEvents;
   readonly meta: Meta<SceneMetadata>;
 
