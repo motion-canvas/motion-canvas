@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.0.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v10.2.0...v11.0.0-alpha.0) (2022-08-26)
+
+
+### Features
+
+* make scenes independent of names ([#53](https://github.com/motion-canvas/motion-canvas/issues/53)) ([417617e](https://github.com/motion-canvas/motion-canvas/commit/417617eb5f0af771e7413c9ce4c7e9b998e3e490)), closes [#25](https://github.com/motion-canvas/motion-canvas/issues/25)
+
+
+### BREAKING CHANGES
+
+* change the way scenes are imported
+
+Scene files no longer need to follow the pattern: `[name].scene.tsx`.
+When importing scenes in the project file, a dedicated `?scene` query param should be used:
+```ts
+import example from './scenes/example?scene';
+
+export default new Project({
+  name: 'project',
+  scenes: [example],
+});
+```
+
+
+
+
+
 # [10.2.0](https://github.com/motion-canvas/motion-canvas/compare/v10.1.0...v10.2.0) (2022-08-25)
 
 **Note:** Version bump only for package @motion-canvas/create
