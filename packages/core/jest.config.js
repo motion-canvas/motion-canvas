@@ -5,7 +5,4 @@ module.exports = {
   testEnvironment: 'jsdom',
   setupFiles: ['jest-canvas-mock', './setup.test.ts'],
   testPathIgnorePatterns: ['setup.test.ts'],
-  globals: {
-    PROJECT_FILE_NAME: 'tests',
-  },
 };

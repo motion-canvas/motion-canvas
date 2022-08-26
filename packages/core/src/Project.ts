@@ -1,4 +1,4 @@
-import {Scene, SceneDescription} from './scenes';
+import {Scene} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {Size, CanvasColorSpace, CanvasOutputMimeType} from './types';
@@ -11,7 +11,7 @@ export const ProjectSize = {
 
 export interface ProjectConfig {
   name: string;
-  scenes: SceneDescription[];
+  scenes: Scene[];
   audio?: string;
   audioOffset?: number;
   canvas?: HTMLCanvasElement;
@@ -131,7 +131,6 @@ export class Project {
   private _quality = 1;
   private _speed = 1;
   private framesPerSeconds = 30;
-  private readonly sceneLookup: Record<string, Scene> = {};
   private previousScene: Scene = null;
   private background: string | false;
   private canvas: HTMLCanvasElement;
@@ -153,7 +152,6 @@ export class Project {
     this.setSize(size);
     this.name = name;
     this.background = background;
-    this.meta = Meta.getMetaFor(PROJECT_FILE_NAME);
 
     if (audio) {
       this.audio.setSource(audio);
@@ -163,15 +161,10 @@ export class Project {
     }
 
     for (const scene of scenes) {
-      if (this.sceneLookup[scene.name]) {
-        console.error('Duplicated scene name: ', scene.name);
-        continue;
-      }
-
-      const instance = new scene.klass(this, scene.name, scene.config);
-      instance.onReloaded.subscribe(() => this.reloaded.dispatch());
-      this.sceneLookup[scene.name] = instance;
+      scene.project = this;
+      scene.onReloaded.subscribe(() => this.reloaded.dispatch());
     }
+    this.scenes.current = [...scenes];
 
     ifHot(hot => {
       hot.on('motion-canvas:export-ack', ({frame}) => {
@@ -219,7 +212,7 @@ export class Project {
   }
 
   private reloadAll() {
-    for (const scene of Object.values(this.sceneLookup)) {
+    for (const scene of this.scenes.current) {
       scene.reload();
     }
   }
@@ -260,7 +253,7 @@ export class Project {
     const speed = this._speed;
     this._speed = 1;
     this.frame = 0;
-    const scenes = Object.values(this.sceneLookup);
+    const scenes = [...this.scenes.current];
     for (const scene of scenes) {
       await scene.recalculate();
     }
@@ -336,13 +329,9 @@ export class Project {
     this.audio.setTime(this.framesToSeconds(this.frame + frameOffset));
   }
 
-  public updateScene(description: SceneDescription) {
-    this.sceneLookup[description.name]?.reload(description.config);
-  }
-
   private findBestScene(frame: number): Scene {
     let lastScene = null;
-    for (const scene of Object.values(this.sceneLookup)) {
+    for (const scene of this.scenes.current) {
       if (!scene.isCached()) {
         console.warn(
           'Attempting to seek a project with an invalidated scene:',
@@ -360,7 +349,7 @@ export class Project {
   }
 
   private getNextScene(scene?: Scene): Scene {
-    const scenes = Object.values(this.sceneLookup);
+    const scenes = this.scenes.current;
     if (!scene) {
       return scenes[0];
     }

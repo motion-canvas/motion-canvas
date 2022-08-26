@@ -71,7 +71,6 @@ export default ({
   const editorId = 'virtual:editor';
   const resolvedEditorId = '\0' + editorId;
   const timeStamps: Record<string, number> = {};
-  const projectName = path.parse(project).name;
   const outputPath = path.resolve(output);
 
   let viteConfig: ResolvedConfig;
@@ -100,14 +99,62 @@ export default ({
         return resolvedEditorId;
       }
     },
-    load(id) {
+    async load(id) {
       if (id === resolvedEditorId) {
         return source(
           `import '${styles}';`,
           `import editor from '${factory}';`,
-          `import project from '${project}';`,
+          `import project from '${project}?project';`,
           `editor(project);`,
         );
+      }
+
+      const [base, query] = id.split('?');
+      const {name, dir} = path.posix.parse(base);
+
+      if (query) {
+        const params = new URLSearchParams(query);
+        if (params.has('scene')) {
+          const metaFile = `${name}.meta`;
+          await createMeta(path.join(dir, metaFile));
+          const sceneFile = `${name}`;
+
+          return source(
+            `import meta from './${metaFile}';`,
+            `import description from './${sceneFile}';`,
+            `let scene;`,
+            `if (import.meta.hot) {`,
+            `  scene = import.meta.hot.data.scene;`,
+            `}`,
+            `scene ??= new description.klass('${name}', meta, description.config);`,
+            `if (import.meta.hot) {`,
+            `  import.meta.hot.accept();`,
+            `  if (import.meta.hot.data.scene) {`,
+            `    scene.reload(description.config);`,
+            `  } else {`,
+            `    import.meta.hot.data.scene = scene;`,
+            `  }`,
+            `}`,
+            `export default scene;`,
+          );
+        }
+
+        if (params.has('project')) {
+          const metaFile = `${name}.meta`;
+          await createMeta(path.join(dir, metaFile));
+          const projectFile = `${name}`;
+
+          return source(
+            `import '@motion-canvas/core/lib/patches/Factory';`,
+            `import '@motion-canvas/core/lib/patches/Node';`,
+            `import '@motion-canvas/core/lib/patches/Shape';`,
+            `import '@motion-canvas/core/lib/patches/Container';`,
+            `import meta from './${metaFile}';`,
+            `import project from './${projectFile}';`,
+            `project.meta = meta`,
+            `export default project;`,
+          );
+        }
       }
     },
     async transform(code, id) {
@@ -148,48 +195,21 @@ export default ({
       }
 
       if (ext === '.meta') {
+        const sourceFile = viteConfig.command === 'build' ? false : `'${id}'`;
         return source(
           `import {Meta} from '@motion-canvas/core/lib';`,
-          `Meta.register(`,
-          `  '${name}',`,
-          `  ${viteConfig.command === 'build' ? false : `'${id}'`},`,
-          `  \`${code}\``,
-          `);`,
+          `let meta;`,
+          `if (import.meta.hot) {`,
+          `  meta = import.meta.hot.data.meta;`,
+          `}`,
+          `meta ??= new Meta('${name}', ${sourceFile}, ${code});`,
           `if (import.meta.hot) {`,
           `  import.meta.hot.accept();`,
+          `  import.meta.hot.data.meta = meta;`,
           `}`,
+          `meta.loadData(${code});`,
+          `export default meta;`,
         );
-      }
-
-      if (name === projectName && (await this.resolve(project))?.id === id) {
-        const metaFile = `${name}.meta`;
-        await createMeta(path.join(dir, metaFile));
-
-        const imports =
-          `import '@motion-canvas/core/lib/patches/Factory';` +
-          `import '@motion-canvas/core/lib/patches/Node';` +
-          `import '@motion-canvas/core/lib/patches/Shape';` +
-          `import '@motion-canvas/core/lib/patches/Container';` +
-          `import './${metaFile}';`;
-
-        return imports + code;
-      }
-
-      if (name.endsWith('.scene')) {
-        const metaFile = `${name}.meta`;
-        await createMeta(path.join(dir, metaFile));
-
-        const imports =
-          `import './${metaFile}';` +
-          `import {useProject as __useProject} from '@motion-canvas/core/lib/utils';`;
-        const hmr = source(
-          `if (import.meta.hot) {`,
-          `  import.meta.hot.accept(module => {`,
-          `    __useProject()?.updateScene(module.default);`,
-          `  });`,
-          `}`,
-        );
-        return imports + code + '\n' + hmr;
       }
     },
     handleHotUpdate(ctx) {
@@ -272,12 +292,9 @@ export default ({
           jsx: 'automatic',
           jsxImportSource: '@motion-canvas/core/lib',
         },
-        define: {
-          PROJECT_FILE_NAME: `'${projectName}'`,
-        },
         build: {
           lib: {
-            entry: project,
+            entry: `${project}?project`,
             formats: ['es'],
           },
         },

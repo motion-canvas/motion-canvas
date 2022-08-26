@@ -47,7 +47,6 @@ export function makeKonvaScene(
   factory: ThreadGeneratorFactory<KonvaView>,
 ): SceneDescription {
   return {
-    name: factory.name,
     config: factory,
     klass: KonvaScene,
   };
