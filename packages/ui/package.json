@@ -21,8 +21,7 @@
   },
   "files": [
     "dist",
-    "types",
-    "editor.html"
+    "types"
   ],
   "peerDependencies": {
     "@motion-canvas/core": "*"

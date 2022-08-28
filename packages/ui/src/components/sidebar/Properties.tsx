@@ -1,6 +1,5 @@
 import {parseColor} from 'mix-color';
-import {useContext, useMemo, useState} from 'preact/hooks';
-import {AppContext} from '../../AppContext';
+import {useMemo, useState} from 'preact/hooks';
 
 import {useCurrentScene, useCurrentFrame} from '../../hooks';
 import {classes} from '../../utils';
@@ -10,9 +9,10 @@ import styles from './Sidebar.module.scss';
 import type {InspectedAttributes} from '@motion-canvas/core/lib/scenes';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {Pane} from '../tabs';
+import {useInspection} from '../../contexts';
 
 export function Properties() {
-  const {inspectedElement} = useContext(AppContext);
+  const {inspectedElement} = useInspection();
   const scene = useCurrentScene();
 
   const {attributes, supportsInspection} = useMemo(

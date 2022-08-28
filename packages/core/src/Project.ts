@@ -10,7 +10,7 @@ export const ProjectSize = {
 };
 
 export interface ProjectConfig {
-  name: string;
+  name?: string;
   scenes: Scene[];
   audio?: string;
   audioOffset?: number;
@@ -140,7 +140,6 @@ export class Project {
   private height: number;
 
   public constructor({
-    name,
     scenes,
     audio,
     audioOffset,
@@ -150,7 +149,6 @@ export class Project {
   }: ProjectConfig) {
     this.setCanvas(canvas);
     this.setSize(size);
-    this.name = name;
     this.background = background;
 
     if (audio) {
@@ -320,6 +318,7 @@ export class Project {
             frame,
             data: this.canvas.toDataURL(this._fileType, this._quality),
             mimeType: this._fileType,
+            project: this.name,
           });
         }),
     );

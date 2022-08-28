@@ -13,7 +13,7 @@
     height: 24px;
     display: block;
     content: '';
-    background: #ffffff;
+    background: var(--icon-color);
   }
 }
 
@@ -37,11 +37,11 @@
   }
 
   &.main::after {
-    background-color: #fff;
+    background-color: var(--icon-color);
   }
 
   .iconInput + &:hover::after {
-    background-color: #fff;
+    background-color: var(--icon-color);
   }
 
   .iconInput:checked + & {
@@ -49,7 +49,7 @@
       background: var(--theme);
     }
     &.main:after {
-      background: #ffffff;
+      background: var(--icon-color);
     }
   }
 }
@@ -70,7 +70,7 @@
   }
 
   &:hover::after {
-    background-color: #fff;
+    background-color: var(--icon-color);
   }
 }
 
@@ -88,13 +88,14 @@
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .select,
 .input,
 .button,
 .value {
-  background: #404040;
+  background: var(--surface-color-light);
   color: rgba(255, 255, 255, 0.6);
   border: 0;
   border-radius: 4px;
@@ -108,13 +109,13 @@
   min-width: 0;
 
   &:hover {
-    background-color: #333;
+    background-color: var(--surface-color-hover);
   }
 
   &.main {
     background-color: var(--theme);
     color: rgba(0, 0, 0, 0.87);
-    font-weight: 700;
+    font-weight: bold;
 
     &:hover {
       box-shadow: 0 0 0 2px white inset;
@@ -165,6 +166,9 @@
   cursor: pointer;
 }
 
+.motionCanvas:after {
+  -webkit-mask-image: url('../../img/icons/motion_canvas.svg');
+}
 .pause:after {
   -webkit-mask-image: url('../../img/icons/pause.svg');
 }

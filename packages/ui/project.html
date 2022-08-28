@@ -13,13 +13,9 @@
   </head>
   <body>
     <script type="module">
-      import {index} from '/src/main.tsx';
-      index([
-        {name: 'project.html', url: './src/project.ts'},
-        {name: 'exampleA', url: './src/exampleA.ts'},
-        {name: 'exampleB', url: './src/exampleB.ts'},
-        {name: 'exampleC', url: './src/exampleC.ts'},
-      ]);
+      import project from '@motion-canvas/template/dist/projectA';
+      import {editor} from '/src/main.tsx';
+      editor(project);
     </script>
   </body>
 </html>

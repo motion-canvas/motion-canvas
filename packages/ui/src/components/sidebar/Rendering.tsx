@@ -32,7 +32,7 @@ export function Rendering() {
   return (
     <Pane title="Rendering">
       <Group>
-        <Label>Range</Label>
+        <Label>range</Label>
         <Input
           min={0}
           max={state.endFrame}
@@ -54,7 +54,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>FPS</Label>
+        <Label>frame rate</Label>
         <Input
           type="number"
           min={1}
@@ -66,7 +66,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>Resolution</Label>
+        <Label>resolution</Label>
         <Input
           type="number"
           min={1}
@@ -76,7 +76,7 @@ export function Rendering() {
             player.project.setSize(value, height);
           }}
         />
-        X
+        x
         <Input
           type="number"
           min={1}
@@ -88,7 +88,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>Scale</Label>
+        <Label>scale</Label>
         <Select
           options={scales}
           value={state.scale}
@@ -96,7 +96,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>Color Space</Label>
+        <Label>color space</Label>
         <Select
           options={colorSpaces}
           value={state.colorSpace}
@@ -104,7 +104,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>File Type</Label>
+        <Label>file type</Label>
         <Select
           options={fileTypes}
           value={state.fileType}
@@ -112,7 +112,7 @@ export function Rendering() {
         />
       </Group>
       <Group>
-        <Label>Quality</Label>
+        <Label>quality</Label>
         <Input
           type="number"
           min={0}

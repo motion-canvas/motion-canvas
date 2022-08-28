@@ -1,5 +1,5 @@
 .root {
-  background-color: #242424;
+  background-color: var(--surface-color);
 }
 
 .copied {
@@ -48,7 +48,7 @@
     display: block;
     content: '';
     margin-bottom: 4px;
-    background-color: #444;
+    background-color: var(--surface-color-light);
   }
 
   .threadList {
@@ -67,7 +67,7 @@
       width: 16px;
       height: 2px;
       margin-right: 4px;
-      background-color: #444;
+      background-color: var(--surface-color-light);
     }
   }
 }

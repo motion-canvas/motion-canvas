@@ -1,21 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
 :root {
   --theme: #33a6ff;
   --theme-overlay: rgba(51, 166, 255, 0.24);
+  --icon-color: #ffffff;
+  --background-color: #181818;
+  --background-color-dark: #141414;
+  --surface-color: #242424;
+  --surface-color-light: #444444;
+  --surface-color-hover: #333333;
 }
 
 * {
   box-sizing: border-box;
   font-family: 'JetBrains Mono', sans-serif;
+  font-size: 14px;
 
   &::-webkit-scrollbar {
     width: 16px;
     height: 16px;
-    background-color: #242424;
+    background-color: var(--surface-color);
   }
 
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.24);
-    border: 6px solid #242424;
+    border: 6px solid var(--surface-color);
     border-radius: 8px;
   }
 
@@ -29,11 +38,14 @@ body {
   overflow: hidden;
   padding: 0;
   margin: 0;
-  background-color: #000000;
+  background-color: var(--background-color);
   color: rgba(255, 255, 255, 0.6);
 }
 
 main {
   width: 100vw;
   height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

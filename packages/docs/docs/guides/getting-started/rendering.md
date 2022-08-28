@@ -22,13 +22,13 @@ the entire length of the video, it will only render a portion of the frames in
 your animation. This can be useful for quickly rendering small changes in your
 animation.
 
-##### FPS (Frames Per Second)
+##### Frame rate
 
 The frame rate at which the preview plays and the number of frames that will
 render per one second of runtime. The most common values are 24, 30, and 60,
 though any whole integer value is allowed. Motion Canvas animations are
 resilient to changes in frame rate, so most animations will not be affected by
-changing the FPS.
+changing it.
 
 ##### Resolution
 

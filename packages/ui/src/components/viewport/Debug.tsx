@@ -2,8 +2,8 @@ import styles from './Viewport.module.scss';
 import {useCurrentScene, usePlayerTime} from '../../hooks';
 import {useContext, useLayoutEffect, useRef} from 'preact/hooks';
 import {ViewportContext} from './ViewportContext';
-import {AppContext} from '../../AppContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
+import {useInspection} from '../../contexts';
 
 export function Debug() {
   const time = usePlayerTime();
@@ -11,7 +11,7 @@ export function Debug() {
   const canvasRef = useRef<HTMLCanvasElement>();
   const contextRef = useRef<CanvasRenderingContext2D>();
   const state = useContext(ViewportContext);
-  const {inspectedElement, setInspectedElement} = useContext(AppContext);
+  const {inspectedElement, setInspectedElement} = useInspection();
 
   useLayoutEffect(() => {
     contextRef.current ??= canvasRef.current.getContext('2d');

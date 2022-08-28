@@ -1,5 +1,6 @@
 import {defineConfig} from 'vite';
 import preact from '@preact/preset-vite';
+import * as fs from 'fs';
 
 export default defineConfig({
   build: {
@@ -12,5 +13,17 @@ export default defineConfig({
       external: ['@motion-canvas/core'],
     },
   },
-  plugins: [preact()],
+  plugins: [
+    preact(),
+    {
+      name: 'copy-files',
+      async buildStart() {
+        this.emitFile({
+          type: 'asset',
+          fileName: 'editor.html',
+          source: await fs.promises.readFile('./editor.html'),
+        });
+      },
+    },
+  ],
 });
