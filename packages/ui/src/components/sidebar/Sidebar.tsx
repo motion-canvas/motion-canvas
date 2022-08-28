@@ -14,7 +14,7 @@ export function Sidebar({setOpen}: SidebarProps) {
       <Tabs onToggle={tab => setOpen(tab >= 0)} id="sidebar">
         {{
           type: TabType.Link,
-          icon: IconType.list,
+          icon: IconType.motionCanvas,
           url: window.location.pathname === '/' ? undefined : '/',
         }}
         {{
