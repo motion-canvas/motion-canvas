@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "lib",
+    "inlineSourceMap": true,
+    "noImplicitAny": true,
+    "module": "esnext",
+    "target": "es2020",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@motion-canvas/legacy/lib",
+    "paths": {
+      "@motion-canvas/legacy/lib/jsx-runtime": ["jsx-runtime.ts"]
+    },
+    "types": ["node", "prismjs", "three"]
+  },
+  "include": ["src"]
+}

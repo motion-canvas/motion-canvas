@@ -26,14 +26,9 @@
     "vite": "^3.0.5"
   },
   "dependencies": {
-    "@types/prismjs": "^1.26.0",
-    "@types/three": "^0.141.0",
     "colorjs.io": "^0.3.0",
-    "konva": "^8.3.9",
     "mix-color": "^1.1.2",
-    "mp4box": "^0.5.2",
-    "prismjs": "^1.28.0",
-    "three": "^0.141.0"
+    "mp4box": "^0.5.2"
   },
   "devDependencies": {
     "@types/dom-webcodecs": "^0.1.4",

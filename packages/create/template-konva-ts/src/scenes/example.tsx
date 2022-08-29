@@ -1,4 +1,4 @@
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 import {waitFor} from '@motion-canvas/core/lib/flow';
 
 export default makeKonvaScene(function* (view) {

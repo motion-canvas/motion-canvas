@@ -11,7 +11,8 @@
     "build": "tsc && vite build"
   },
   "dependencies": {
-    "@motion-canvas/core": "*"
+    "@motion-canvas/core": "*",
+    "@motion-canvas/legacy": "*"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",

@@ -183,10 +183,6 @@ export default ({
           await createMeta(path.join(dir, metaFile));
 
           return source(
-            `import '@motion-canvas/core/lib/patches/Factory';`,
-            `import '@motion-canvas/core/lib/patches/Node';`,
-            `import '@motion-canvas/core/lib/patches/Shape';`,
-            `import '@motion-canvas/core/lib/patches/Container';`,
             `import meta from './${metaFile}';`,
             `import project from './${name}';`,
             `project.meta = meta`,
@@ -329,10 +325,6 @@ export default ({
     },
     config() {
       return {
-        esbuild: {
-          jsx: 'automatic',
-          jsxImportSource: '@motion-canvas/core/lib',
-        },
         build: {
           assetsDir: './',
           rollupOptions: {
