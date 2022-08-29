@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.1.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v11.0.0...v11.1.0-alpha.0) (2022-08-29)
+
+
+### Features
+
+* support for multiple projects ([#57](https://github.com/motion-canvas/motion-canvas/issues/57)) ([573752d](https://github.com/motion-canvas/motion-canvas/commit/573752dd4d79d62a1a30958f1ed550d2cf22c344)), closes [#141414](https://github.com/motion-canvas/motion-canvas/issues/141414)
+
+
+
+
+
 # [11.0.0](https://github.com/motion-canvas/motion-canvas/compare/v11.0.0-alpha.0...v11.0.0) (2022-08-26)
 
 **Note:** Version bump only for package @motion-canvas/create
