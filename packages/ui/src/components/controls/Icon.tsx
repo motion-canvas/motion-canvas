@@ -4,13 +4,22 @@ import {IconType} from './IconType';
 import {classes} from '../../utils';
 import {JSX} from 'preact';
 
-interface IconProps extends JSX.HTMLAttributes<HTMLDivElement> {
+type IntrinsicTag = keyof JSX.IntrinsicElements;
+
+type IconProps<T extends IntrinsicTag> = JSX.IntrinsicElements[T] & {
   type: IconType;
   className?: string;
-}
+  as?: T;
+};
 
-export function Icon({type, className, ...rest}: IconProps) {
+export function Icon<T extends IntrinsicTag = 'div'>({
+  type,
+  className,
+  as = 'div' as T,
+  ...rest
+}: IconProps<T>) {
+  const As = as as string;
   return (
-    <div className={classes(styles.icon, styles[type], className)} {...rest} />
+    <As className={classes(styles.icon, styles[type], className)} {...rest} />
   );
 }

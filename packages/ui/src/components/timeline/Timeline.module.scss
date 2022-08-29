@@ -1,5 +1,5 @@
 .root {
-  background-color: #242424;
+  background-color: var(--surface-color);
   width: 100%;
   height: 100%;
 
@@ -19,7 +19,7 @@
   overflow-y: hidden;
   flex-grow: 1;
   position: relative;
-  background-color: #181818;
+  background-color: var(--background-color);
   width: 100%;
 }
 
@@ -38,14 +38,14 @@
 .trackContainer {
   width: 100%;
   height: 100%;
-  background-color: #242424;
+  background-color: var(--surface-color);
 
   &::before {
     width: 100%;
     height: 32px;
     display: block;
     content: '';
-    background-color: #181818;
+    background-color: var(--background-color);
   }
 }
 
@@ -93,7 +93,7 @@
   .scene {
     position: relative;
     border-radius: 4px;
-    background-color: #444;
+    background-color: var(--surface-color-light);
     overflow: hidden;
 
     .transition {
@@ -208,7 +208,7 @@
     font-size: 12px;
     line-height: 20px;
     font-weight: bold;
-    color: rgba(0, 0, 0, 1);
+    color: #000000;
     content: attr(data-frame);
   }
 }

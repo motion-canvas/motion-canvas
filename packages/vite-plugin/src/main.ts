@@ -6,15 +6,25 @@ import mime from 'mime-types';
 
 export interface MotionCanvasPluginConfig {
   /**
-   * The import path of the project file.
+   * The import path of the project file or an array of paths.
    *
    * @remarks
-   * The file must contain a default export exposing an instance of the
+   * Each file must contain a default export exposing an instance of the
    * {@link Project} class.
+   *
+   * @example
+   * ```ts
+   * motionCanvas({
+   *   project: [
+   *     './src/firstProject.ts',
+   *     './src/secondProject.ts',
+   *   ]
+   * })
+   * ```
    *
    * @default './src/project.ts'
    */
-  project?: string;
+  project?: string | string[];
   /**
    * A directory path to which the animation will be rendered.
    *
@@ -37,41 +47,57 @@ export interface MotionCanvasPluginConfig {
    * @default /\.(wav|mp3|ogg)$/
    */
   bufferedAssets?: RegExp;
-  editor?: {
-    /**
-     * The import path of the editor factory file.
-     *
-     * @remarks
-     * The file must contain a default export exposing a factory function.
-     * This function will be called with the project as its first argument.
-     * Its task is to create the user interface.
-     *
-     * @default '\@motion-canvas/ui'
-     */
-    factory?: string;
-    /**
-     * The import path of the editor styles.
-     *
-     * @default '\@motion-canvas/ui/dist/style.css'
-     */
-    styles?: string;
-  };
+  /**
+   * The import path of the editor package.
+   *
+   * @remarks
+   * This path will be resolved using Node.js module resolution rules.
+   * It should lead to a directory containing the following files:
+   * - `editor.html` - The HTML template for the editor.
+   * - `styles.css` - The editor styles.
+   * - `main.js` - A module exporting necessary factory functions.
+   *
+   * `main.js` should export the following functions:
+   * - `editor` - Receives the project as its first argument and creates the
+   *              user interface.
+   * - `index` - Receives a list of all projects as its first argument and
+   *             creates the initial page for selecting a project.
+   *
+   * @default '\@motion-canvas/ui'
+   */
+  editor?: string;
+}
+
+interface ProjectData {
+  name: string;
+  url: string;
 }
 
 export default ({
   project = './src/project.ts',
   output = './output',
   bufferedAssets = /\.(wav|mp3|ogg)$/,
-  editor: {
-    styles = '@motion-canvas/ui/dist/style.css',
-    factory = '@motion-canvas/ui',
-  } = {},
+  editor = '@motion-canvas/ui',
 }: MotionCanvasPluginConfig = {}): Plugin => {
-  const editorPath = path.dirname(require.resolve('@motion-canvas/ui'));
-  const editorId = 'virtual:editor';
-  const resolvedEditorId = '\0' + editorId;
+  const editorPath = path.dirname(require.resolve(editor));
+  const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
+  const htmlParts = editorFile
+    .toString()
+    .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
+    .split('{{source}}');
+  const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
+
+  const resolvedEditorId = '\0virtual:editor';
   const timeStamps: Record<string, number> = {};
   const outputPath = path.resolve(output);
+  const projects: ProjectData[] = [];
+  const projectLookup: Record<string, ProjectData> = {};
+  for (const url of typeof project === 'string' ? [project] : project) {
+    const {name} = path.parse(url);
+    const data = {name, url};
+    projects.push(data);
+    projectLookup[name] = data;
+  }
 
   let viteConfig: ResolvedConfig;
 
@@ -94,23 +120,36 @@ export default ({
     async configResolved(resolvedConfig) {
       viteConfig = resolvedConfig;
     },
-    resolveId(id) {
-      if (id === editorId) {
-        return resolvedEditorId;
-      }
-    },
     async load(id) {
-      if (id === resolvedEditorId) {
-        return source(
-          `import '${styles}';`,
-          `import editor from '${factory}';`,
-          `import project from '${project}?project';`,
-          `editor(project);`,
-        );
-      }
-
       const [base, query] = id.split('?');
       const {name, dir} = path.posix.parse(base);
+
+      if (id.startsWith(resolvedEditorId)) {
+        if (projects.length === 1) {
+          return source(
+            `import {editor} from '${editor}';`,
+            `import project from '${projects[0].url}?project';`,
+            `editor(project);`,
+          );
+        }
+
+        if (query) {
+          const params = new URLSearchParams(query);
+          const name = params.get('project');
+          if (name && name in projectLookup) {
+            return source(
+              `import {editor} from '${editor}';`,
+              `import project from '${projectLookup[name].url}?project';`,
+              `editor(project);`,
+            );
+          }
+        }
+
+        return source(
+          `import {index} from '${editor}';`,
+          `index(${JSON.stringify(projects)});`,
+        );
+      }
 
       if (query) {
         const params = new URLSearchParams(query);
@@ -142,7 +181,6 @@ export default ({
         if (params.has('project')) {
           const metaFile = `${name}.meta`;
           await createMeta(path.join(dir, metaFile));
-          const projectFile = `${name}`;
 
           return source(
             `import '@motion-canvas/core/lib/patches/Factory';`,
@@ -150,8 +188,9 @@ export default ({
             `import '@motion-canvas/core/lib/patches/Shape';`,
             `import '@motion-canvas/core/lib/patches/Container';`,
             `import meta from './${metaFile}';`,
-            `import project from './${projectFile}';`,
+            `import project from './${name}';`,
             `project.meta = meta`,
+            `project.name = '${name}'`,
             `export default project;`,
           );
         }
@@ -242,16 +281,18 @@ export default ({
           const file = fs.readFileSync(
             path.resolve(viteConfig.root, req.url.slice(1)),
           );
-          const stream = Readable.from(file);
-          stream.on('end', console.log).pipe(res);
+          Readable.from(file).pipe(res);
           return;
         }
 
         if (req.url === '/') {
-          const stream = fs.createReadStream(
-            path.resolve(editorPath, '../editor.html'),
-          );
-          stream.pipe(res);
+          res.end(createHtml('/@id/__x00__virtual:editor'));
+          return;
+        }
+
+        const name = req.url?.slice(1);
+        if (name && name in projectLookup) {
+          res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
           return;
         }
 
@@ -268,10 +309,10 @@ export default ({
       });
       server.ws.on(
         'motion-canvas:export',
-        async ({frame, mimeType, data}, client) => {
+        async ({frame, mimeType, data, project}, client) => {
           const name = frame.toString().padStart(6, '0');
           const extension = mime.extension(mimeType);
-          const file = path.join(outputPath, name + '.' + extension);
+          const file = path.join(outputPath, project, name + '.' + extension);
 
           const directory = path.dirname(file);
           if (!fs.existsSync(directory)) {
@@ -293,9 +334,12 @@ export default ({
           jsxImportSource: '@motion-canvas/core/lib',
         },
         build: {
-          lib: {
-            entry: `${project}?project`,
-            formats: ['es'],
+          assetsDir: './',
+          rollupOptions: {
+            preserveEntrySignatures: 'strict',
+            input: Object.fromEntries(
+              projects.map(project => [project.name, project.url + '?project']),
+            ),
           },
         },
         server: {

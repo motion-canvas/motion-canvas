@@ -1,0 +1,52 @@
+.root {
+  background-color: var(--surface-color);
+  border-radius: 4px;
+  width: 100%;
+  margin: 16px;
+  max-width: 480px;
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  font-size: 16px;
+  line-height: 24px;
+  text-transform: uppercase;
+  font-weight: bold;
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 4px 4px 0 0;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--background-color-dark);
+}
+
+.list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.element {
+  text-decoration: none;
+  display: block;
+  padding: 8px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+}
+
+.title {
+  padding-bottom: 4px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.32);
+}

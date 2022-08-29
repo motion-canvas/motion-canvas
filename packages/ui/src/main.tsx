@@ -1,20 +1,32 @@
+import './index.scss';
+
 import type {Project} from '@motion-canvas/core/lib';
 import {Player} from '@motion-canvas/core/lib/player';
-import {render} from 'preact';
-import {App} from './App';
-import {PlayerProvider, ProjectProvider} from './contexts';
+import {ComponentChild, render} from 'preact';
+import {Editor} from './Editor';
+import {Index, ProjectData} from './Index';
+import {InspectionProvider, PlayerProvider, ProjectProvider} from './contexts';
 
-export default (project: Project) => {
-  const app = document.createElement('main');
+function renderRoot(vnode: ComponentChild) {
+  const root = document.createElement('main');
+  document.body.appendChild(root);
+  render(vnode, root);
+}
+
+export function editor(project: Project) {
   const player = new Player(project);
-  document.body.appendChild(app);
   document.title = `${project.name} | Motion Canvas`;
-  render(
+  renderRoot(
     <PlayerProvider player={player}>
       <ProjectProvider project={project}>
-        <App />
+        <InspectionProvider>
+          <Editor />
+        </InspectionProvider>
       </ProjectProvider>
     </PlayerProvider>,
-    app,
   );
-};
+}
+
+export function index(projects: ProjectData[]) {
+  renderRoot(<Index projects={projects} />);
+}

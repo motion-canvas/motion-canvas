@@ -1,5 +1,4 @@
-import {useCallback, useContext, useEffect, useRef} from 'preact/hooks';
-import {AppContext} from '../../AppContext';
+import {useCallback, useEffect, useRef} from 'preact/hooks';
 
 import {
   useCurrentScene,
@@ -15,7 +14,7 @@ import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
-import {usePlayer} from '../../contexts';
+import {useInspection, usePlayer} from '../../contexts';
 
 const ZOOM_SPEED = 0.1;
 
@@ -36,7 +35,7 @@ export function View() {
     zoom: 1,
     grid: false,
   });
-  const {inspectedElement, setInspectedElement} = useContext(AppContext);
+  const {inspectedElement, setInspectedElement} = useInspection();
 
   useEffect(() => {
     setState({
