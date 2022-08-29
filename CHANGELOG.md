@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.1.0](https://github.com/motion-canvas/motion-canvas/compare/v11.1.0-alpha.0...v11.1.0) (2022-08-29)
+
+**Note:** Version bump only for package motion-canvas
+
+
+
+
+
 # [11.1.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v11.0.0...v11.1.0-alpha.0) (2022-08-29)
 
 
