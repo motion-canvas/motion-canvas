@@ -1,4 +1,9 @@
 {
   "version": 1,
-  "timeEvents": []
+  "timeEvents": [
+    {
+      "name": "circle",
+      "targetTime": 3
+    }
+  ]
 }

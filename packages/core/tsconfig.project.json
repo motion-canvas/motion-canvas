@@ -10,7 +10,5 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
-    "jsx": "react-jsx",
-    "jsxImportSource": "@motion-canvas/core/lib"
   }
 }

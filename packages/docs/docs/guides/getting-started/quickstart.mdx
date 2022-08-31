@@ -56,7 +56,7 @@ animations. Open `example.tsx` in a text editor, and replace all code in
 the file with the following snippet.
 
 ```tsx title="src/scenes/example.tsx"
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 import {Circle} from 'konva/lib/shapes/Circle';
 import {useRef} from '@motion-canvas/core/lib/utils';
 
@@ -96,7 +96,7 @@ function.
 
 ```tsx
 // highlight-next-line
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 
 // highlight-next-line
 export default makeKonvaScene(function* (view) {
@@ -118,7 +118,7 @@ In order to create an animation, we needed something to animate. For that, we
 used the Konva Circle component.
 
 ```tsx
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 // highlight-next-line
 import {Circle} from 'konva/lib/shapes/Circle';
 
@@ -143,7 +143,7 @@ To animate the circle, we needed to store a reference to it. This is the purpose
 of the `useRef` call.
 
 ```tsx
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 import {Circle} from 'konva/lib/shapes/Circle';
 // highlight-next-line
 import {useRef} from '@motion-canvas/core/lib/utils';
@@ -209,7 +209,7 @@ In our example, we used `yield*` so that the scene wouldn't end until the
 animation was completed.
 
 ```tsx
-import {makeKonvaScene} from '@motion-canvas/core/lib/scenes';
+import {makeKonvaScene} from '@motion-canvas/legacy/lib/scenes';
 import {Circle} from 'konva/lib/shapes/Circle';
 import {useRef} from '@motion-canvas/core/lib/utils';
 

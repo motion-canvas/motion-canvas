@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars,@typescript-eslint/no-namespace */
 /// <reference types="vite/client" />
-/// <reference types="@motion-canvas/core/lib/patches/Factory" />
-/// <reference types="@motion-canvas/core/lib/patches/Node" />
-/// <reference types="@motion-canvas/core/lib/patches/Shape" />
-/// <reference types="@motion-canvas/core/lib/patches/Container" />
 
 declare module '*?img' {
   const value: Promise<HTMLImageElement>;
@@ -28,13 +24,6 @@ declare module '*.glsl' {
 declare module '*?scene' {
   const value: import('./lib/scenes/Scene').Scene;
   export = value;
-}
-
-declare namespace JSX {
-  type ElementClass = import('konva/lib/Node').Node;
-  interface ElementChildrenAttribute {
-    children: unknown;
-  }
 }
 
 declare module 'colorjs.io' {

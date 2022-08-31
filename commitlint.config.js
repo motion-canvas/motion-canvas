@@ -5,7 +5,7 @@ module.exports = {
     'scope-enum': [
       2,
       'always',
-      ['core', 'create', 'docs', 'ui', 'vite-plugin'],
+      ['core', 'create', 'docs', 'legacy', 'ui', 'vite-plugin'],
     ],
   },
 };
