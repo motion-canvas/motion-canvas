@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/legacy",
-  "version": "12.0.0-alpha.0",
+  "version": "12.0.0-alpha.1",
   "description": "The legacy Motion Canvas renderer based on the Konva library",
   "main": "lib/scenes/index.js",
   "author": "motion-canvas",
