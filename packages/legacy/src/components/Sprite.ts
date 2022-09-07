@@ -4,11 +4,7 @@ import {waitFor} from '@motion-canvas/core/lib/flow';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {cached, KonvaNode, getset} from '../decorators';
 import {GeneratorHelper} from '@motion-canvas/core/lib/helpers';
-import {
-  InterpolationFunction,
-  map,
-  tween,
-} from '@motion-canvas/core/lib/tweening';
+import {TimingFunction, map, tween} from '@motion-canvas/core/lib/tweening';
 import {cancel, ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {parseColor} from 'mix-color';
 import {Shape, ShapeConfig} from 'konva/lib/Shape';
@@ -318,7 +314,7 @@ export class Sprite extends Shape {
     from: ImageDataSource,
     to: ImageDataSource,
     time: number,
-    interpolation: InterpolationFunction,
+    timingFunction: TimingFunction,
     onEnd: () => void,
   ): ThreadGenerator {
     this.baseMask = from;
@@ -328,7 +324,7 @@ export class Sprite extends Shape {
     this.mask(to);
 
     yield* tween(time, value => {
-      this.baseMaskBlend = interpolation(1 - value);
+      this.baseMaskBlend = timingFunction(1 - value);
       this.updateFrame();
     });
     this.baseMask = null;

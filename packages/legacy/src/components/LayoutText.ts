@@ -10,8 +10,8 @@ import {
 import {
   Animator,
   tween,
-  textTween,
-  InterpolationFunction,
+  textLerp,
+  TimingFunction,
 } from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {getset} from '../decorators';
@@ -102,7 +102,7 @@ export class LayoutText extends Text {
     fromText: string,
     text: string,
     time: number,
-    interpolation: InterpolationFunction,
+    timingFunction: TimingFunction,
     onEnd: Callback,
   ) {
     const fromWidth = this.getLayoutSize({text: fromText, minWidth: 0}).width;
@@ -110,8 +110,8 @@ export class LayoutText extends Text {
 
     this.overrideWidth = fromWidth;
     yield* tween(time, value => {
-      this.overrideWidth = interpolation(value, fromWidth, toWidth);
-      this.setText(textTween(fromText, text, interpolation(value)));
+      this.overrideWidth = timingFunction(value, fromWidth, toWidth);
+      this.setText(textLerp(fromText, text, timingFunction(value)));
     });
     this.overrideWidth = null;
 

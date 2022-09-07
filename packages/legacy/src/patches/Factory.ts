@@ -3,8 +3,8 @@ import {Factory} from 'konva/lib/Factory';
 import {ANIMATE} from '@motion-canvas/core/lib';
 import {
   Animator,
+  TimingFunction,
   InterpolationFunction,
-  TweenFunction,
   TweenProvider,
 } from '@motion-canvas/core/lib/tweening';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -28,8 +28,8 @@ declare module 'konva/lib/types' {
     <Rest extends unknown[]>(
       value: Type,
       time: number,
-      interpolation?: InterpolationFunction,
-      mapper?: TweenFunction<Type, Rest>,
+      timingFunction?: TimingFunction,
+      interpolationFunction?: InterpolationFunction<Type, Rest>,
       ...rest: Rest
     ): ThreadGenerator;
   }
@@ -47,8 +47,8 @@ Factory.addOverloadedGetterSetter = function addOverloadedGetterSetter(
   constructor.prototype[attr] = function <Rest extends unknown[]>(
     value?: Vector2d | typeof ANIMATE,
     time?: number,
-    interpolation?: InterpolationFunction,
-    mapper?: TweenFunction<unknown, Rest>,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<unknown, Rest>,
     ...rest: Rest
   ) {
     if (value === ANIMATE) {
@@ -56,7 +56,7 @@ Factory.addOverloadedGetterSetter = function addOverloadedGetterSetter(
     }
     if (time !== undefined) {
       return new Animator<unknown, Node>(this, attr, tween)
-        .key(value, time, interpolation, mapper, ...rest)
+        .key(value, time, timingFunction, interpolationFunction, ...rest)
         .run();
     }
     return value === undefined ? this[getter]() : this[setter](value);
