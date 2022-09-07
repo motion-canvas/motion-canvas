@@ -9,6 +9,8 @@
     "core:build": "npm run build -w packages/core",
     "core:watch": "npm run watch -w packages/core",
     "core:test": "npm run test -w packages/core",
+    "2d:build": "npm run build -w packages/2d",
+    "2d:watch": "npm run watch -w packages/2d",
     "ui:build": "npm run build -w packages/ui",
     "ui:dev": "npm run dev -w packages/ui",
     "template:serve": "npm run serve -w packages/template",
