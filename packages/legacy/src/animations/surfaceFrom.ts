@@ -3,10 +3,10 @@ import type {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import type {Surface, SurfaceMask} from '../components';
 import {
   calculateRatio,
-  colorTween,
+  colorLerp,
   easeInOutCubic,
   easeInOutQuint,
-  rectArcTween,
+  rectArcLerp,
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
@@ -19,7 +19,7 @@ export interface SurfaceFromConfig {
    * Whether the transition arc should be reversed.
    *
    * @remarks
-   * See {@link rectArcTween} for more detail.
+   * See {@link rectArcLerp} for more detail.
    */
   reverse?: boolean;
   /**
@@ -67,7 +67,7 @@ export function* surfaceFrom(
   yield* tween(config.duration ?? 0.6, value => {
     surface.setMask({
       ...fromMask,
-      ...rectArcTween(
+      ...rectArcLerp(
         fromMask,
         toMask,
         easeInOutQuint(value),
@@ -75,11 +75,11 @@ export function* surfaceFrom(
         ratio,
       ),
       radius: easeInOutCubic(value, fromMask.radius, toMask.radius),
-      color: colorTween(fromMask.color, toMask.color, easeInOutQuint(value)),
+      color: colorLerp(fromMask.color, toMask.color, easeInOutQuint(value)),
     });
     if (position) {
       surface.setPosition(
-        rectArcTween(
+        rectArcLerp(
           position,
           toPosition,
           easeInOutQuint(value),

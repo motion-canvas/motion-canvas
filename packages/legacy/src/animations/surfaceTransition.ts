@@ -2,10 +2,10 @@ import {Surface} from '../components';
 import {
   calculateRatio,
   clampRemap,
-  colorTween,
+  colorLerp,
   easeInOutCubic,
   easeInOutQuint,
-  rectArcTween,
+  rectArcLerp,
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
@@ -34,7 +34,7 @@ export interface SurfaceTransitionConfig {
    * Whether the transition arc should be reversed.
    *
    * @remarks
-   * See {@link rectArcTween} for more detail.
+   * See {@link rectArcLerp} for more detail.
    */
   reverse?: boolean;
   /**
@@ -128,16 +128,16 @@ export function* surfaceTransition(
       }
       target.setMask({
         ...from,
-        ...rectArcTween(from, to, easeInOutQuint(value), config.reverse, ratio),
+        ...rectArcLerp(from, to, easeInOutQuint(value), config.reverse, ratio),
         radius: easeInOutCubic(value, from.radius, target.radius()),
-        color: colorTween(
+        color: colorLerp(
           from.color,
           target.background(),
           easeInOutQuint(value),
         ),
       });
       target.setPosition(
-        rectArcTween(
+        rectArcLerp(
           fromNewPos,
           toPos,
           easeInOutQuint(value),
@@ -157,16 +157,16 @@ export function* surfaceTransition(
       relativeValue = clampRemap(0, transitionTime, 1, 0, value);
       initial.setMask({
         ...from,
-        ...rectArcTween(from, to, easeInOutQuint(value), config.reverse, ratio),
+        ...rectArcLerp(from, to, easeInOutQuint(value), config.reverse, ratio),
         radius: easeInOutCubic(value, from.radius, target.radius()),
-        color: colorTween(
+        color: colorLerp(
           from.color,
           target.background(),
           easeInOutQuint(value),
         ),
       });
       initial.setPosition(
-        rectArcTween(
+        rectArcLerp(
           fromPos,
           toNewPos,
           easeInOutQuint(value),

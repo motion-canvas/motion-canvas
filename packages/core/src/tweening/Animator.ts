@@ -1,12 +1,12 @@
 import {
-  colorTween,
+  colorLerp,
   easeInOutCubic,
-  InterpolationFunction,
+  TimingFunction,
   map,
-  textTween,
+  textLerp,
   tween,
-  TweenFunction,
-  deepTween,
+  InterpolationFunction,
+  deepLerp,
 } from './index';
 import {threadable} from '../decorators';
 import {waitFor, waitUntil} from '../flow';
@@ -18,7 +18,7 @@ export interface TweenProvider<T> {
     from: T,
     to: T,
     time: number,
-    interpolation: InterpolationFunction,
+    timingFunction: TimingFunction,
     onEnd: Callback,
   ): ThreadGenerator;
 }
@@ -27,7 +27,7 @@ export class Animator<Type, This> {
   private valueFrom: Type = null;
   private lastValue: Type;
   private keys: (() => ThreadGenerator)[] = [];
-  private tweenFunction: TweenFunction<any> = map;
+  private interpolationFunction: InterpolationFunction<any> = map;
   private loops = 1;
   private readonly setter: string;
   private readonly getter: string;
@@ -50,8 +50,8 @@ export class Animator<Type, This> {
   public key<Rest extends unknown[]>(
     value: Type,
     time: number,
-    interpolation: InterpolationFunction = easeInOutCubic,
-    mapper?: TweenFunction<Type, Rest>,
+    timingFunction: TimingFunction = easeInOutCubic,
+    interpolationFunction?: InterpolationFunction<Type, Rest>,
     ...args: Rest
   ): this {
     this.lastValue = value;
@@ -62,7 +62,7 @@ export class Animator<Type, This> {
             this.valueFrom,
             value,
             time,
-            interpolation,
+            timingFunction,
             () => (this.valueFrom = value),
           )
         : tween(
@@ -70,9 +70,18 @@ export class Animator<Type, This> {
             v => {
               // @ts-ignore
               this.object[this.setter](
-                mapper === undefined
-                  ? this.tweenFunction(this.valueFrom, value, interpolation(v))
-                  : mapper(this.valueFrom, value, interpolation(v), ...args),
+                interpolationFunction === undefined
+                  ? this.interpolationFunction(
+                      this.valueFrom,
+                      value,
+                      timingFunction(v),
+                    )
+                  : interpolationFunction(
+                      this.valueFrom,
+                      value,
+                      timingFunction(v),
+                      ...args,
+                    ),
               );
             },
             () => {
@@ -95,8 +104,8 @@ export class Animator<Type, This> {
   public diff<Rest extends unknown[]>(
     value: Type,
     time: number,
-    interpolation: InterpolationFunction = easeInOutCubic,
-    mapper?: TweenFunction<Type, Rest>,
+    timingFunction: TimingFunction = easeInOutCubic,
+    interpolationFunction?: InterpolationFunction<Type, Rest>,
     ...args: Rest
   ): this {
     let next: any = value;
@@ -112,16 +121,22 @@ export class Animator<Type, This> {
       next += last;
     }
 
-    return this.key(next, time, interpolation, mapper, ...args);
+    return this.key(next, time, timingFunction, interpolationFunction, ...args);
   }
 
   public back<Rest extends unknown[]>(
     time: number,
-    interpolation: InterpolationFunction = easeInOutCubic,
-    mapper?: TweenFunction<Type, Rest>,
+    timingFunction: TimingFunction = easeInOutCubic,
+    interpolationFunction?: InterpolationFunction<Type, Rest>,
     ...args: Rest
   ): this {
-    return this.key(this.getValueFrom(), time, interpolation, mapper, ...args);
+    return this.key(
+      this.getValueFrom(),
+      time,
+      timingFunction,
+      interpolationFunction,
+      ...args,
+    );
   }
 
   public waitFor(time: number): this {
@@ -168,22 +183,26 @@ export class Animator<Type, This> {
 
   private inferProperties() {
     this.valueFrom ??= this.getValueFrom();
-    this.tweenFunction = Animator.inferTweenFunction(this.valueFrom);
+    this.interpolationFunction = Animator.inferInterpolationFunction(
+      this.valueFrom,
+    );
   }
 
-  public static inferTweenFunction<T>(value: T): TweenFunction<T> {
-    let tween: TweenFunction<unknown> = map;
+  public static inferInterpolationFunction<T>(
+    value: T,
+  ): InterpolationFunction<T> {
+    let interpolationFunction: InterpolationFunction<unknown> = map;
 
     if (typeof value === 'string') {
       if (value.startsWith('#') || value.startsWith('rgb')) {
-        tween = colorTween;
+        interpolationFunction = colorLerp;
       } else {
-        tween = textTween;
+        interpolationFunction = textLerp;
       }
     } else if (value && typeof value === 'object') {
-      tween = deepTween;
+      interpolationFunction = deepLerp;
     }
 
-    return tween as TweenFunction<T>;
+    return interpolationFunction as InterpolationFunction<T>;
   }
 }
