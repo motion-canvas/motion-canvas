@@ -17,7 +17,7 @@ export interface Signal<TValue, TReturn = void> {
   (): TValue;
   (value: SignalValue<TValue>): TReturn;
   (
-    value: TValue,
+    value: SignalValue<TValue>,
     time: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<TValue>,
@@ -47,7 +47,7 @@ export function isReactive<T>(value: SignalValue<T>): value is () => T {
 
 export function useSignal<TValue, TReturn = void>(
   initial?: SignalValue<TValue>,
-  defaultInterpolation?: InterpolationFunction<TValue>,
+  defaultInterpolation: InterpolationFunction<TValue> = deepLerp,
   setterReturn?: TReturn,
 ): Signal<TValue, TReturn> {
   let current: SignalValue<TValue>;
@@ -100,10 +100,10 @@ export function useSignal<TValue, TReturn = void>(
 
   const handler = <Signal<TValue, TReturn>>(
     function handler(
-      value?: TValue | (() => TValue),
+      value?: SignalValue<TValue>,
       duration?: number,
       timingFunction: TimingFunction = easeInOutCubic,
-      customInterpolation?: InterpolationFunction<TValue>,
+      interpolationFunction: InterpolationFunction<TValue> = defaultInterpolation,
     ) {
       // Getter
       if (value === undefined) {
@@ -118,10 +118,14 @@ export function useSignal<TValue, TReturn = void>(
 
       // Tween
       const from = get();
-      const lerp =
-        customInterpolation ?? defaultInterpolation ?? deepLerp<TValue>;
       return tween(duration, v => {
-        set(lerp(from, isReactive(value) ? value() : value, timingFunction(v)));
+        set(
+          interpolationFunction(
+            from,
+            isReactive(value) ? value() : value,
+            timingFunction(v),
+          ),
+        );
       });
     }
   );

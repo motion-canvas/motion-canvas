@@ -24,14 +24,14 @@ export function createCompoundProperty<
   node: TNode,
   propertyKeys: TProperties[],
   initial?: TValue,
-  mapper?: InterpolationFunction<TValue>,
+  defaultInterpolation: InterpolationFunction<TValue> = deepLerp,
 ): Signal<TValue, TNode> {
   const handler = <Signal<TValue, TNode>>(
     function (
       newValue?: SignalValue<TValue>,
       duration?: number,
-      interpolation: TimingFunction = easeInOutCubic,
-      customMapper?: InterpolationFunction<TValue>,
+      timingFunction: TimingFunction = easeInOutCubic,
+      interpolationFunction: InterpolationFunction<TValue> = defaultInterpolation,
     ) {
       if (duration !== undefined && newValue !== undefined) {
         const from = <TValue>(
@@ -39,10 +39,10 @@ export function createCompoundProperty<
         );
 
         return tween(duration, value => {
-          const interpolatedValue = (customMapper ?? mapper ?? deepLerp)(
+          const interpolatedValue = interpolationFunction(
             from,
             isReactive(newValue) ? newValue() : newValue,
-            interpolation(value),
+            timingFunction(value),
           );
           for (const key of propertyKeys) {
             node[key](interpolatedValue[key]);
