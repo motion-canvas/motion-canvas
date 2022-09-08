@@ -56,11 +56,10 @@ describe('useSignal()', () => {
     const handler = jest.fn();
     const c = useSignal(0);
 
-    expect(handler.mock.calls.length).toBe(0);
-
     c(1);
 
     c.onChanged.subscribe(handler);
+    expect(handler.mock.calls.length).toBe(1);
 
     c(2);
     c(3);

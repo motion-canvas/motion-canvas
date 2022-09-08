@@ -26,7 +26,7 @@ import {
  *
  *   private dispatchExample() {
  *     // setting the flag will notify all subscribers
- *     this.flag.setFlag();
+ *     this.flag.raise();
  *   }
  * }
  * ```
