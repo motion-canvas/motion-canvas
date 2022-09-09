@@ -1,3 +1,3 @@
-export * from './compundProperty';
+export * from './compoundProperty';
 export * from './initializers';
 export * from './property';

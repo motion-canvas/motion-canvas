@@ -1,4 +1,4 @@
-import {FlagDispatcher, Subscribable} from '../events';
+import {EventHandler, FlagDispatcher, Subscribable} from '../events';
 import {
   deepLerp,
   easeInOutCubic,
@@ -8,8 +8,7 @@ import {
 } from '../tweening';
 import {ThreadGenerator} from '../threading';
 
-// TODO Consider switching to a Set
-type Dependencies = Subscribable<any>[];
+type DependencyContext = [Set<Subscribable<void>>, EventHandler<void>];
 
 export type SignalValue<TValue> = TValue | (() => TValue);
 
@@ -25,20 +24,24 @@ export interface Signal<TValue, TReturn = void> {
   get onChanged(): Subscribable<void>;
 }
 
-const collectionStack: Dependencies[] = [];
+const collectionStack: DependencyContext[] = [];
 
-export function startCollecting(deps: Dependencies) {
-  collectionStack.push(deps);
+export function startCollecting(context: DependencyContext) {
+  collectionStack.push(context);
 }
 
-export function finishCollecting(deps: Dependencies) {
-  if (collectionStack.pop() !== deps) {
+export function finishCollecting(context: DependencyContext) {
+  if (collectionStack.pop()[0] !== context[0]) {
     throw new Error('collectStart/collectEnd was called out of order');
   }
 }
 
-export function collect(subscribable: Subscribable<any>) {
-  collectionStack.at(-1)?.push(subscribable);
+export function collect(subscribable: Subscribable<void>) {
+  if (collectionStack.length > 0) {
+    const [set, handler] = collectionStack.at(-1);
+    set.add(subscribable);
+    subscribable.subscribe(handler);
+  }
 }
 
 export function isReactive<T>(value: SignalValue<T>): value is () => T {
@@ -52,8 +55,7 @@ export function useSignal<TValue, TReturn = void>(
 ): Signal<TValue, TReturn> {
   let current: SignalValue<TValue>;
   let last: TValue;
-  let currentDeps: Dependencies = [];
-  let updateDeps = false;
+  const dependencies = new Set<Subscribable<void>>();
   const event = new FlagDispatcher();
 
   function set(value: SignalValue<TValue>) {
@@ -64,30 +66,21 @@ export function useSignal<TValue, TReturn = void>(
     current = value;
     markDirty();
 
-    if (isReactive(value)) {
-      updateDeps = true;
-    } else {
-      currentDeps.forEach(dep => dep.unsubscribe(markDirty));
-      currentDeps = [];
-      updateDeps = false;
+    if (dependencies.size > 0) {
+      dependencies.forEach(dep => dep.unsubscribe(markDirty));
+      dependencies.clear();
+    }
+
+    if (!isReactive(value)) {
       last = value;
     }
   }
 
   function get(): TValue {
     if (event.isRaised() && isReactive(current)) {
-      const deps: Dependencies = [];
-      startCollecting(deps);
+      startCollecting([dependencies, markDirty]);
       last = current();
-      finishCollecting(deps);
-
-      // TODO Consider removing this check to always update dependencies.
-      if (updateDeps) {
-        currentDeps.forEach(dep => dep.unsubscribe(markDirty));
-        currentDeps = deps;
-        currentDeps.forEach(dep => dep.subscribe(markDirty));
-        updateDeps = false;
-      }
+      finishCollecting([dependencies, markDirty]);
     }
     event.reset();
     collect(event.subscribable);

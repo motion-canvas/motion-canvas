@@ -23,15 +23,23 @@ describe('useSignal()', () => {
 
   test('Value is updated when its dependencies change', () => {
     const a = useSignal(1);
-    const b = useSignal(2);
-    const c = useSignal(() => a() + b());
+    const b = useSignal(true);
+    const c = useSignal(2);
+    const d = useSignal(() => (b() ? a() : c()));
 
-    expect(c()).toBe(3);
+    expect(d()).toBe(1);
 
     a(3);
-    b(7);
 
-    expect(c()).toBe(10);
+    expect(d()).toBe(3);
+
+    b(false);
+
+    expect(d()).toBe(2);
+
+    c(4);
+
+    expect(d()).toBe(4);
   });
 
   test('Value is cached and recalculated only when necessary', () => {

@@ -55,6 +55,10 @@ export class Layout {
     });
   }
 
+  public toPixels(value: number) {
+    return `${value}px`;
+  }
+
   public getComputedLayout(): Rect {
     const rect = this.element.getBoundingClientRect();
     return {
@@ -86,7 +90,7 @@ export class Layout {
     } else if (typeof width === 'string') {
       this.element.style.width = width;
     } else {
-      this.element.style.width = `${width}px`;
+      this.element.style.width = this.toPixels(width);
     }
 
     const height = this.height();
@@ -95,13 +99,13 @@ export class Layout {
     } else if (typeof height === 'string') {
       this.element.style.height = height;
     } else {
-      this.element.style.height = `${height}px`;
+      this.element.style.height = this.toPixels(height);
     }
 
-    this.element.style.marginTop = this.marginTop().toString();
-    this.element.style.marginBottom = this.marginBottom().toString();
-    this.element.style.marginLeft = this.marginLeft().toString();
-    this.element.style.marginRight = this.marginRight().toString();
+    this.element.style.marginTop = this.toPixels(this.marginTop());
+    this.element.style.marginBottom = this.toPixels(this.marginBottom());
+    this.element.style.marginLeft = this.toPixels(this.marginLeft());
+    this.element.style.marginRight = this.toPixels(this.marginRight());
     this.element.style.flexDirection = this.direction();
     this.element.style.aspectRatio = this.ratio();
     this.element.style.justifyContent = this.justifyContent();
