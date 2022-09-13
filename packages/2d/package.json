@@ -1,0 +1,33 @@
+{
+  "name": "@motion-canvas/2d",
+  "version": "12.0.0-alpha.2",
+  "description": "2D plugin for Motion Canvas",
+  "author": "motion-canvas",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/scenes/index.js",
+  "types": "./lib/scenes/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/motion-canvas"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/motion-canvas/motion-canvas.git"
+  },
+  "files": [
+    "lib",
+    "src",
+    "tsconfig.project.json"
+  ],
+  "peerDependencies": {
+    "@motion-canvas/core": "*"
+  },
+  "devDependencies": {
+    "@motion-canvas/core": "^12.0.0-alpha.2",
+    "typescript": "^4.7.4"
+  }
+}

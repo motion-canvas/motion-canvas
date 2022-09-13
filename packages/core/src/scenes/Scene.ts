@@ -21,7 +21,7 @@ export interface SceneMetadata extends Metadata {
  *                {@link SceneDescription.config}.
  */
 export interface SceneConstructor<T> {
-  new (name: string, meta: Meta, config: T): Scene;
+  new (name: string, meta: Meta<SceneMetadata>, config: T): Scene;
 }
 
 /**
@@ -39,6 +39,10 @@ export interface SceneDescription<T = unknown> {
    */
   config: T;
 }
+
+export type DescriptionOf<TScene> = TScene extends Scene<infer TConfig>
+  ? SceneDescription<TConfig>
+  : never;
 
 /**
  * Describes cached information about the timing of a scene.

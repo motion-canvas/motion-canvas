@@ -2,6 +2,7 @@ export * from './useAnimator';
 export * from './useProject';
 export * from './useRef';
 export * from './useScene';
+export * from './useSignal';
 export * from './useThread';
 export * from './useTime';
 export * from './useContext';
