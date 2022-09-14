@@ -1,8 +1,19 @@
-import {compoundProperty, initialize, property} from '../decorators';
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {Reference, Signal, useSignal} from '@motion-canvas/core/lib/utils';
+import {compoundProperty, computed, initialize, property} from '../decorators';
+import {
+  Vector2,
+  transformPoint,
+  transformAngle,
+  Rect,
+} from '@motion-canvas/core/lib/types';
+import {
+  createSignal,
+  isReactive,
+  Reference,
+  Signal,
+  SignalValue,
+} from '@motion-canvas/core/lib/utils';
 import {vector2dLerp} from '@motion-canvas/core/lib/tweening';
-import {Layout, LayoutMode, LayoutProps} from '../layout';
+import {Layout, LayoutProps} from '../layout';
 import {ComponentChild, ComponentChildren} from './types';
 
 export interface NodeProps {
@@ -56,33 +67,119 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @compoundProperty(['x', 'y'], vector2dLerp)
   public declare readonly position: Signal<Vector2, this>;
 
-  public readonly absolutePosition = useSignal(() => {
-    const matrix = this.globalMatrix();
-    return {x: matrix.e, y: matrix.f};
-  });
+  @property(undefined, vector2dLerp)
+  public declare readonly absolutePosition: Signal<Vector2, this>;
 
-  protected readonly globalMatrix = useSignal(() => this.localMatrix());
+  protected getAbsolutePosition() {
+    const matrix = this.localToWorld();
+    return {x: matrix.m41, y: matrix.m42};
+  }
 
-  protected readonly localMatrix = useSignal(() => {
-    const matrix = new DOMMatrix();
-    matrix.translateSelf(this.x(), this.y());
-    matrix.rotateSelf(0, 0, this.rotation());
-    matrix.scaleSelf(this.scaleX(), this.scaleY());
-    matrix.translateSelf(
-      (this.width() / -2) * this.offsetX(),
-      (this.height() / -2) * this.offsetY(),
-    );
+  protected setAbsolutePosition(value: SignalValue<Vector2>) {
+    if (isReactive(value)) {
+      this.position(() => transformPoint(value(), this.worldToLocal()));
+    } else {
+      this.position(transformPoint(value, this.worldToLocal()));
+    }
+  }
 
-    return matrix;
-  });
+  @property()
+  public declare readonly absoluteRotation: Signal<Vector2, this>;
 
-  protected children: Node[] = [];
-  protected parent: Node | null = null;
+  protected getAbsoluteRotation() {
+    const matrix = this.localToWorld();
+    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
+  }
+
+  protected setAbsoluteRotation(value: SignalValue<number>) {
+    if (isReactive(value)) {
+      this.rotation(() => transformAngle(value(), this.worldToLocal()));
+    } else {
+      this.rotation(transformAngle(value, this.worldToLocal()));
+    }
+  }
+
+  protected children = createSignal<Node[]>([]);
+  protected parent = createSignal<Node | null>(null);
 
   public constructor({children, layout, ...rest}: TProps) {
     initialize(this, {defaults: rest});
     this.layout = new Layout(layout ?? {});
     this.append(children);
+  }
+
+  @computed()
+  protected localToWorld(): DOMMatrix {
+    const parent = this.parent();
+    return parent
+      ? parent.localToWorld().multiply(this.localToParent())
+      : new DOMMatrix();
+  }
+
+  @computed()
+  protected worldToLocal(): DOMMatrix {
+    const parent = this.parent();
+    return parent ? parent.localToWorld().inverse() : new DOMMatrix();
+  }
+
+  @computed()
+  protected localToParent(): DOMMatrix {
+    const rect = this.clientRect();
+    const matrix = new DOMMatrix();
+    matrix.translateSelf(rect.x, rect.y);
+    matrix.rotateSelf(0, 0, this.rotation());
+    matrix.scaleSelf(this.scaleX(), this.scaleY());
+    matrix.translateSelf(
+      (rect.width / -2) * this.offsetX(),
+      (rect.height / -2) * this.offsetY(),
+    );
+
+    return matrix;
+  }
+
+  @computed()
+  protected computedLayout(): Rect {
+    this.requestLayoutUpdate();
+    const rect = this.layout.getComputedLayout();
+    return {
+      x: rect.x,
+      y: rect.y,
+      width: rect.width,
+      height: rect.height,
+    };
+  }
+
+  /**
+   * Find the closest layout root and apply any new layout changes.
+   */
+  @computed()
+  protected requestLayoutUpdate() {
+    const mode = this.layout.mode();
+    const parent = this.parent();
+    if (mode === 'disabled' || mode === 'root' || !parent) {
+      this.updateLayout();
+    } else {
+      parent.requestLayoutUpdate();
+    }
+  }
+
+  /**
+   * Apply any new layout changes to this node and its children.
+   */
+  @computed()
+  protected updateLayout() {
+    this.applyLayoutChanges();
+    this.layout.apply();
+    for (const child of this.children()) {
+      child.updateLayout();
+    }
+  }
+
+  /**
+   * Apply any custom layout changes to this node.
+   */
+  protected applyLayoutChanges() {
+    // do nothing
   }
 
   public append(node: ComponentChildren) {
@@ -99,46 +196,34 @@ export class Node<TProps extends NodeProps = NodeProps> {
   }
 
   protected moveTo(parent: Node | null) {
-    if (this.parent === parent) {
+    const current = this.parent();
+    if (current === parent) {
       return;
     }
 
-    if (this.parent) {
-      this.globalMatrix(() => this.localMatrix());
-      this.parent.layout.element.removeChild(this.layout.element);
-      this.parent.children = this.parent.children.filter(
-        child => child !== this,
-      );
-      this.parent = null;
+    if (current) {
+      current.layout.element.removeChild(this.layout.element);
+      current.children(current.children().filter(child => child !== this));
     }
 
     if (parent) {
-      this.globalMatrix(() =>
-        parent.globalMatrix().multiply(this.localMatrix()),
-      );
       parent.layout.element.append(this.layout.element);
-      parent.children.push(this);
-      this.parent = parent;
+      parent.children([...parent.children(), this]);
     }
+
+    this.parent(parent);
   }
 
   public removeChildren() {
-    for (const node of this.children) {
+    for (const node of this.children()) {
       node.moveTo(null);
     }
   }
 
-  public updateLayout(): boolean {
-    let isDirty = this.layout.updateIfNecessary();
-
-    for (const child of this.children) {
-      isDirty ||= child.updateLayout();
-    }
-
-    return isDirty;
-  }
-
-  public handleLayoutChange(parentMode?: LayoutMode) {
+  @computed()
+  public realMode() {
+    const parent = this.parent();
+    const parentMode = parent?.realMode();
     let mode = this.layout.mode();
 
     if (mode === null) {
@@ -149,45 +234,61 @@ export class Node<TProps extends NodeProps = NodeProps> {
       }
     }
 
-    if (mode === 'enabled' && this.parent) {
-      //TODO Cache this call or pass it as an argument
-      const parentLayout = this.parent.layout.getComputedLayout();
-      const thisLayout = this.layout.getComputedLayout();
+    return mode;
+  }
+
+  @computed()
+  public clientRect() {
+    const mode = this.realMode();
+    const parent = this.parent();
+
+    const rect = {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+    };
+
+    if (mode === 'enabled' && parent) {
+      const parentLayout = parent.computedLayout();
+      const thisLayout = this.computedLayout();
 
       const offsetX = (thisLayout.width / 2) * this.offsetX();
       const offsetY = (thisLayout.height / 2) * this.offsetY();
 
-      this.x(
+      rect.x =
         thisLayout.x -
-          parentLayout.x -
-          (parentLayout.width - thisLayout.width) / 2 +
-          offsetX,
-      );
-      this.y(
+        parentLayout.x -
+        (parentLayout.width - thisLayout.width) / 2 +
+        offsetX;
+      rect.y =
         thisLayout.y -
-          parentLayout.y -
-          (parentLayout.height - thisLayout.height) / 2 +
-          offsetY,
-      );
-      this.width(thisLayout.width);
-      this.height(thisLayout.height);
-    }
-    if (mode === 'pop' || mode === 'root') {
-      const thisLayout = this.layout.getComputedLayout();
-      this.width(thisLayout.width);
-      this.height(thisLayout.height);
+        parentLayout.y -
+        (parentLayout.height - thisLayout.height) / 2 +
+        offsetY;
+      rect.width = thisLayout.width;
+      rect.height = thisLayout.height;
+    } else if (mode === 'pop' || mode === 'root') {
+      const thisLayout = this.computedLayout();
+      rect.x = this.x();
+      rect.y = this.y();
+      rect.width = thisLayout.width;
+      rect.height = thisLayout.height;
+    } else {
+      rect.x = this.x();
+      rect.y = this.y();
+      rect.width = this.width();
+      rect.height = this.height();
     }
 
-    for (const child of this.children) {
-      child.handleLayoutChange(mode);
-    }
+    return rect;
   }
 
   public render(context: CanvasRenderingContext2D) {
     context.save();
     this.transformContext(context);
 
-    for (const child of this.children) {
+    for (const child of this.children()) {
       child.render(context);
     }
 
@@ -195,7 +296,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
   }
 
   protected transformContext(context: CanvasRenderingContext2D) {
-    const matrix = this.localMatrix();
+    const matrix = this.localToParent();
     context.transform(
       matrix.a,
       matrix.b,

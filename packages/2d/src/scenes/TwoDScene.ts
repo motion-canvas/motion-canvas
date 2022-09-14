@@ -8,10 +8,6 @@ export class TwoDScene extends GeneratorScene<TwoDView> {
     return this.view;
   }
 
-  public update() {
-    this.view.updateLayout();
-  }
-
   public render(
     context: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,

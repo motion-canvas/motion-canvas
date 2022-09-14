@@ -1,5 +1,5 @@
-import {initialize, property} from '../decorators';
-import {Signal, useSignal} from '@motion-canvas/core/lib/utils';
+import {computed, initialize, property} from '../decorators';
+import {Signal} from '@motion-canvas/core/lib/utils';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {AlignItems, FlexDirection, JustifyContent, LayoutMode} from './types';
 
@@ -11,6 +11,10 @@ export interface LayoutProps {
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  paddingTop?: number;
+  paddingBottom?: number;
+  paddingLeft?: number;
+  paddingRight?: number;
   direction?: FlexDirection;
   justifyContent?: JustifyContent;
   alignItems?: AlignItems;
@@ -32,6 +36,14 @@ export class Layout {
   public declare readonly marginLeft: Signal<number, this>;
   @property(0)
   public declare readonly marginRight: Signal<number, this>;
+  @property(0)
+  public declare readonly paddingTop: Signal<number, this>;
+  @property(0)
+  public declare readonly paddingBottom: Signal<number, this>;
+  @property(0)
+  public declare readonly paddingLeft: Signal<number, this>;
+  @property(0)
+  public declare readonly paddingRight: Signal<number, this>;
   @property('row')
   public declare readonly direction: Signal<FlexDirection, this>;
   @property('none')
@@ -43,16 +55,12 @@ export class Layout {
 
   public readonly element: HTMLDivElement;
 
-  private isDirty = true;
-
   public constructor(props: LayoutProps) {
     this.element = document.createElement('div');
     this.element.style.display = 'flex';
+    this.element.style.boxSizing = 'border-box';
 
     initialize(this, {defaults: props});
-    this.update.onChanged.subscribe(() => {
-      this.isDirty = true;
-    });
   }
 
   public toPixels(value: number) {
@@ -69,17 +77,8 @@ export class Layout {
     };
   }
 
-  public updateIfNecessary(): boolean {
-    if (this.isDirty) {
-      this.update();
-      this.isDirty = false;
-      return true;
-    }
-
-    return false;
-  }
-
-  private readonly update = useSignal(() => {
+  @computed()
+  public apply() {
     const mode = this.mode();
     this.element.style.position =
       mode === 'disabled' || mode === 'root' ? 'absolute' : '';
@@ -106,9 +105,13 @@ export class Layout {
     this.element.style.marginBottom = this.toPixels(this.marginBottom());
     this.element.style.marginLeft = this.toPixels(this.marginLeft());
     this.element.style.marginRight = this.toPixels(this.marginRight());
+    this.element.style.paddingTop = this.toPixels(this.paddingTop());
+    this.element.style.paddingBottom = this.toPixels(this.paddingBottom());
+    this.element.style.paddingLeft = this.toPixels(this.paddingLeft());
+    this.element.style.paddingRight = this.toPixels(this.paddingRight());
     this.element.style.flexDirection = this.direction();
     this.element.style.aspectRatio = this.ratio();
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
-  });
+  }
 }

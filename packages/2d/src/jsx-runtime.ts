@@ -28,7 +28,7 @@ export function jsx(
   config: JSXProps,
 ): ComponentChildren {
   const {ref, children, ...rest} = config;
-  const flatChildren = Array.isArray(children) ? children.flat() : [children];
+  const flatChildren = Array.isArray(children) ? children.flat() : children;
 
   if (type === Fragment) {
     return flatChildren;

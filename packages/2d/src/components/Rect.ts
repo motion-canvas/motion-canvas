@@ -16,15 +16,14 @@ export class Rect extends Node<RectProps> {
     context.save();
     this.transformContext(context);
 
-    const width = this.width();
-    const height = this.height();
+    const {width, height} = this.clientRect();
 
     context.save();
     context.fillStyle = this.fill();
     context.fillRect(-width / 2, -height / 2, width, height);
     context.restore();
 
-    for (const child of this.children) {
+    for (const child of this.children()) {
       child.render(context);
     }
 

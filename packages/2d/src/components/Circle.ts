@@ -16,23 +16,17 @@ export class Circle extends Node<CircleProps> {
     context.save();
     this.transformContext(context);
 
+    const {width, height} = this.clientRect();
+
     context.save();
     context.fillStyle = this.fill();
     context.beginPath();
-    context.ellipse(
-      0,
-      0,
-      this.width() / 2,
-      this.height() / 2,
-      0,
-      0,
-      Math.PI * 2,
-    );
+    context.ellipse(0, 0, width / 2, height / 2, 0, 0, Math.PI * 2);
     context.closePath();
     context.fill();
     context.restore();
 
-    for (const child of this.children) {
+    for (const child of this.children()) {
       child.render(context);
     }
 

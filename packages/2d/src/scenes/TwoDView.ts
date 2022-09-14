@@ -27,19 +27,8 @@ export class TwoDView extends Node<any> {
     }
   }
 
-  public updateLayout(): boolean {
-    let isDirty = super.updateLayout();
-    let limit = 10;
-    while (isDirty && limit > 0) {
-      limit--;
-      this.handleLayoutChange();
-      isDirty = super.updateLayout();
-    }
-
-    if (limit === 0) {
-      console.warn('Layout iteration limit exceeded');
-    }
-
-    return false;
+  public override render(context: CanvasRenderingContext2D) {
+    this.clientRect();
+    super.render(context);
   }
 }

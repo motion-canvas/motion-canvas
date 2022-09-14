@@ -1,8 +1,8 @@
-import {useSignal} from './useSignal';
+import {createSignal} from './createSignal';
 
-describe('useSignal()', () => {
+describe('createSignal()', () => {
   test('Works correctly with plain values', () => {
-    const signal = useSignal(7);
+    const signal = createSignal(7);
 
     expect(signal()).toBe(7);
 
@@ -12,7 +12,7 @@ describe('useSignal()', () => {
   });
 
   test('Works correctly with computed values', () => {
-    const signal = useSignal(() => 7);
+    const signal = createSignal(() => 7);
 
     expect(signal()).toBe(7);
 
@@ -22,10 +22,10 @@ describe('useSignal()', () => {
   });
 
   test('Value is updated when its dependencies change', () => {
-    const a = useSignal(1);
-    const b = useSignal(true);
-    const c = useSignal(2);
-    const d = useSignal(() => (b() ? a() : c()));
+    const a = createSignal(1);
+    const b = createSignal(true);
+    const c = createSignal(2);
+    const d = createSignal(() => (b() ? a() : c()));
 
     expect(d()).toBe(1);
 
@@ -43,10 +43,10 @@ describe('useSignal()', () => {
   });
 
   test('Value is cached and recalculated only when necessary', () => {
-    const a = useSignal(1);
+    const a = createSignal(1);
 
     const value = jest.fn(() => a() * 2);
-    const c = useSignal(value);
+    const c = createSignal(value);
 
     expect(value.mock.calls.length).toBe(0);
 
@@ -58,20 +58,5 @@ describe('useSignal()', () => {
     c();
 
     expect(value.mock.calls.length).toBe(1);
-  });
-
-  test('onChanged events are dispatched only once per handler', () => {
-    const handler = jest.fn();
-    const c = useSignal(0);
-
-    c(1);
-
-    c.onChanged.subscribe(handler);
-    expect(handler.mock.calls.length).toBe(1);
-
-    c(2);
-    c(3);
-
-    expect(handler.mock.calls.length).toBe(1);
   });
 });
