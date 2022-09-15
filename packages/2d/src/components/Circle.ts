@@ -16,7 +16,8 @@ export class Circle extends Node<CircleProps> {
     context.save();
     this.transformContext(context);
 
-    const {width, height} = this.clientRect();
+    const width = this.width();
+    const height = this.height();
 
     context.save();
     context.fillStyle = this.fill();

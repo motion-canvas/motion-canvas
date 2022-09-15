@@ -16,7 +16,7 @@ import {
   SignalTween,
 } from '@motion-canvas/core/lib/utils';
 
-function capitalize<T extends string>(value: T): Capitalize<T> {
+export function capitalize<T extends string>(value: T): Capitalize<T> {
   return <Capitalize<T>>(value[0].toUpperCase() + value.slice(1));
 }
 
@@ -49,8 +49,9 @@ export function createProperty<
     );
   }
 
+  let signal: Signal<TValue, TNode> | null = null;
   if (!originalGetter || !originalSetter) {
-    const signal = createSignal(initial, defaultInterpolation, node);
+    signal = createSignal(initial, defaultInterpolation, node);
     if (!tweener) {
       return signal;
     }
@@ -99,6 +100,18 @@ export function createProperty<
       });
     }
   );
+
+  Object.defineProperty(handler, 'reset', {
+    value: signal
+      ? () => signal?.reset()
+      : initial !== undefined
+      ? () => setter(initial)
+      : () => node,
+  });
+
+  Object.defineProperty(handler, 'save', {
+    value: () => setter(getter()),
+  });
 
   if (initial !== undefined && originalSetter) {
     setter(initial);

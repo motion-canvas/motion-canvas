@@ -1,9 +1,10 @@
-import {compoundProperty, computed, initialize, property} from '../decorators';
+import {compound, computed, initialize, property} from '../decorators';
 import {
   Vector2,
   transformPoint,
   transformAngle,
   Rect,
+  Size,
 } from '@motion-canvas/core/lib/types';
 import {
   createSignal,
@@ -12,9 +13,11 @@ import {
   Signal,
   SignalValue,
 } from '@motion-canvas/core/lib/utils';
-import {vector2dLerp} from '@motion-canvas/core/lib/tweening';
+import {map, vector2dLerp, sizeLerp} from '@motion-canvas/core/lib/tweening';
 import {Layout, LayoutProps} from '../layout';
 import {ComponentChild, ComponentChildren} from './types';
+import {threadable} from '@motion-canvas/core/lib/decorators';
+import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 
 export interface NodeProps {
   ref?: Reference<Node>;
@@ -24,11 +27,14 @@ export interface NodeProps {
   position?: Vector2;
   width?: number;
   height?: number;
+  size?: Size;
   rotation?: number;
   offsetX?: number;
   offsetY?: number;
+  offset?: Vector2;
   scaleX?: number;
   scaleY?: number;
+  scale?: Vector2;
   layout?: LayoutProps;
 }
 
@@ -39,15 +45,101 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   @property(0)
   public declare readonly x: Signal<number, this>;
+  protected readonly customX = createSignal(0, map, this);
+
+  protected getX(): number {
+    const mode = this.realMode();
+    const parent = this.parent();
+
+    if (mode === 'enabled' && parent) {
+      const parentLayout = parent.computedLayout();
+      const thisLayout = this.computedLayout();
+
+      const offsetX = (thisLayout.width / 2) * this.offsetX();
+
+      return (
+        thisLayout.x -
+        parentLayout.x -
+        (parentLayout.width - thisLayout.width) / 2 +
+        offsetX
+      );
+    } else {
+      return this.customX();
+    }
+  }
+
+  protected setX(value: SignalValue<number>) {
+    this.customX(value);
+  }
 
   @property(0)
   public declare readonly y: Signal<number, this>;
+  protected readonly customY = createSignal(0, map, this);
+
+  protected getY(): number {
+    const mode = this.realMode();
+    const parent = this.parent();
+
+    if (mode === 'enabled' && parent) {
+      const parentLayout = parent.computedLayout();
+      const thisLayout = this.computedLayout();
+
+      const offsetX = (thisLayout.width / 2) * this.offsetX();
+
+      return (
+        thisLayout.y -
+        parentLayout.y -
+        (parentLayout.height - thisLayout.height) / 2 +
+        offsetX
+      );
+    } else {
+      return this.customY();
+    }
+  }
+
+  protected setY(value: SignalValue<number>) {
+    this.customY(value);
+  }
 
   @property(0)
   public declare readonly width: Signal<number, this>;
+  protected readonly customWidth = createSignal(0, map, this);
+
+  protected getWidth(): number {
+    const mode = this.realMode();
+
+    if (mode === 'disabled') {
+      return this.customWidth();
+    } else {
+      return this.computedLayout().width;
+    }
+  }
+
+  protected setWidth(value: SignalValue<number>) {
+    this.customWidth(value);
+  }
 
   @property(0)
   public declare readonly height: Signal<number, this>;
+  protected readonly customHeight = createSignal(0, map, this);
+
+  protected getHeight(): number {
+    const mode = this.realMode();
+
+    if (mode === 'disabled') {
+      return this.customHeight();
+    } else {
+      return this.computedLayout().height;
+    }
+  }
+
+  protected setHeight(value: SignalValue<number>) {
+    this.customHeight(value);
+  }
+
+  @compound(['width', 'height'])
+  @property(undefined, sizeLerp)
+  public declare readonly size: Signal<Size, this>;
 
   @property(0)
   public declare readonly rotation: Signal<number, this>;
@@ -58,13 +150,22 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @property(1)
   public declare readonly scaleY: Signal<number, this>;
 
+  @compound({x: 'scaleX', y: 'scaleY'})
+  @property(undefined, vector2dLerp)
+  public declare readonly scale: Signal<Vector2, this>;
+
   @property(0)
   public declare readonly offsetX: Signal<number, this>;
 
   @property(0)
   public declare readonly offsetY: Signal<number, this>;
 
-  @compoundProperty(['x', 'y'], vector2dLerp)
+  @compound({x: 'offsetX', y: 'offsetY'})
+  @property(undefined, vector2dLerp)
+  public declare readonly offset: Signal<Vector2, this>;
+
+  @compound(['x', 'y'])
+  @property(undefined, vector2dLerp)
   public declare readonly position: Signal<Vector2, this>;
 
   @property(undefined, vector2dLerp)
@@ -103,8 +204,8 @@ export class Node<TProps extends NodeProps = NodeProps> {
   protected parent = createSignal<Node | null>(null);
 
   public constructor({children, layout, ...rest}: TProps) {
-    initialize(this, {defaults: rest});
     this.layout = new Layout(layout ?? {});
+    initialize(this, {defaults: rest});
     this.append(children);
   }
 
@@ -124,14 +225,13 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   @computed()
   protected localToParent(): DOMMatrix {
-    const rect = this.clientRect();
     const matrix = new DOMMatrix();
-    matrix.translateSelf(rect.x, rect.y);
+    matrix.translateSelf(this.x(), this.y());
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scaleX(), this.scaleY());
     matrix.translateSelf(
-      (rect.width / -2) * this.offsetX(),
-      (rect.height / -2) * this.offsetY(),
+      (this.width() / -2) * this.offsetX(),
+      (this.height() / -2) * this.offsetY(),
     );
 
     return matrix;
@@ -237,53 +337,6 @@ export class Node<TProps extends NodeProps = NodeProps> {
     return mode;
   }
 
-  @computed()
-  public clientRect() {
-    const mode = this.realMode();
-    const parent = this.parent();
-
-    const rect = {
-      x: 0,
-      y: 0,
-      width: 0,
-      height: 0,
-    };
-
-    if (mode === 'enabled' && parent) {
-      const parentLayout = parent.computedLayout();
-      const thisLayout = this.computedLayout();
-
-      const offsetX = (thisLayout.width / 2) * this.offsetX();
-      const offsetY = (thisLayout.height / 2) * this.offsetY();
-
-      rect.x =
-        thisLayout.x -
-        parentLayout.x -
-        (parentLayout.width - thisLayout.width) / 2 +
-        offsetX;
-      rect.y =
-        thisLayout.y -
-        parentLayout.y -
-        (parentLayout.height - thisLayout.height) / 2 +
-        offsetY;
-      rect.width = thisLayout.width;
-      rect.height = thisLayout.height;
-    } else if (mode === 'pop' || mode === 'root') {
-      const thisLayout = this.computedLayout();
-      rect.x = this.x();
-      rect.y = this.y();
-      rect.width = thisLayout.width;
-      rect.height = thisLayout.height;
-    } else {
-      rect.x = this.x();
-      rect.y = this.y();
-      rect.width = this.width();
-      rect.height = this.height();
-    }
-
-    return rect;
-  }
-
   public render(context: CanvasRenderingContext2D) {
     context.save();
     this.transformContext(context);
@@ -305,6 +358,26 @@ export class Node<TProps extends NodeProps = NodeProps> {
       matrix.e,
       matrix.f,
     );
+  }
+
+  @threadable()
+  public *tweenSize(update: (node: this) => void): ThreadGenerator {
+    const mode = this.realMode();
+    const initialSize = this.size();
+
+    if (mode === 'disabled') {
+      update(this);
+      const toSize = this.size();
+      this.size(initialSize);
+      yield* this.size(toSize, 2);
+    } else {
+      this.layout.width(null).height(null);
+      update(this);
+      const toSize = this.size();
+      this.layout.size(initialSize);
+      yield* this.layout.size(toSize, 2);
+      this.layout.width(null).height(null);
+    }
   }
 }
 

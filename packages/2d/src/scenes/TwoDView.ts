@@ -13,11 +13,14 @@ export class TwoDView extends Node<any> {
       frame = document.createElement('iframe');
       frame.id = TwoDView.frameID;
       frame.style.position = 'absolute';
-      frame.style.pointerEvents = 'none';
       frame.style.left = '0';
       frame.style.right = '0';
-      frame.style.opacity = '0';
+      frame.style.width = '1920px';
+      frame.style.height = '1080px';
+      // frame.style.opacity = '0';
+      frame.style.pointerEvents = 'none';
       frame.style.border = 'none';
+      frame.style.zIndex = '100';
 
       document.body.prepend(frame);
     }
@@ -28,7 +31,10 @@ export class TwoDView extends Node<any> {
   }
 
   public override render(context: CanvasRenderingContext2D) {
-    this.clientRect();
+    this.x();
+    this.y();
+    this.width();
+    this.height();
     super.render(context);
   }
 }

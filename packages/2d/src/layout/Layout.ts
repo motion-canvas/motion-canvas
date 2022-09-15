@@ -1,7 +1,8 @@
-import {computed, initialize, property} from '../decorators';
+import {compound, computed, initialize, property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
-import {Rect} from '@motion-canvas/core/lib/types';
+import {Rect, Size} from '@motion-canvas/core/lib/types';
 import {AlignItems, FlexDirection, JustifyContent, LayoutMode} from './types';
+import {sizeLerp} from '@motion-canvas/core/lib/tweening';
 
 export interface LayoutProps {
   mode?: LayoutMode;
@@ -25,9 +26,13 @@ export class Layout {
   @property(null)
   public declare readonly mode: Signal<LayoutMode, this>;
   @property(null)
-  public declare readonly width: Signal<number | `${number}%`, this>;
+  public declare readonly width: Signal<null | number | `${number}%`, this>;
   @property(null)
-  public declare readonly height: Signal<number | `${number}%`, this>;
+  public declare readonly height: Signal<null | number | `${number}%`, this>;
+  @property(undefined, sizeLerp)
+  @compound(['width', 'height'])
+  public declare readonly size: Signal<Size, this>;
+
   @property(0)
   public declare readonly marginTop: Signal<number, this>;
   @property(0)
@@ -36,6 +41,7 @@ export class Layout {
   public declare readonly marginLeft: Signal<number, this>;
   @property(0)
   public declare readonly marginRight: Signal<number, this>;
+
   @property(0)
   public declare readonly paddingTop: Signal<number, this>;
   @property(0)
@@ -44,6 +50,7 @@ export class Layout {
   public declare readonly paddingLeft: Signal<number, this>;
   @property(0)
   public declare readonly paddingRight: Signal<number, this>;
+
   @property('row')
   public declare readonly direction: Signal<FlexDirection, this>;
   @property('none')

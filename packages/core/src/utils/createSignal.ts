@@ -34,7 +34,16 @@ export interface Signal<TValue, TReturn = void>
     SignalGetter<TValue>,
     SignalTween<TValue> {
   /**
-   * Reset the signal to its initial value.
+   * Reset the signal to its initial value (if one has been set).
+   *
+   * @example
+   * ```ts
+   * const signal = createSignal(7);
+   *
+   * signal.reset();
+   * // same as:
+   * signal(7);
+   * ```
    */
   reset(): TReturn;
 
@@ -155,7 +164,7 @@ export function createSignal<TValue, TReturn = void>(
   );
 
   Object.defineProperty(handler, 'reset', {
-    value: () => set(initial),
+    value: initial !== undefined ? () => set(initial) : () => setterReturn,
   });
 
   Object.defineProperty(handler, 'save', {

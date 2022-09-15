@@ -1,5 +1,5 @@
 import Color from 'colorjs.io';
-import type {Rect, Vector2, PossibleSpacing, Spacing} from '../types';
+import type {Rect, Vector2, PossibleSpacing, Spacing, Size} from '../types';
 
 export interface InterpolationFunction<T, Rest extends unknown[] = unknown[]> {
   (from: T, to: T, value: number, ...args: Rest): T;
@@ -159,6 +159,13 @@ export function vector2dLerp(from: Vector2, to: Vector2, value: number) {
   return {
     x: map(from.x, to.x, value),
     y: map(from.y, to.y, value),
+  };
+}
+
+export function sizeLerp(from: Size, to: Size, value: number) {
+  return {
+    width: map(from.width, to.width, value),
+    height: map(from.height, to.height, value),
   };
 }
 
