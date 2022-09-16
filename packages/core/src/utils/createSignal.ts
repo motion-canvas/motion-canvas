@@ -12,16 +12,56 @@ type DependencyContext = [Set<Subscribable<void>>, EventHandler<void>];
 
 export type SignalValue<TValue> = TValue | (() => TValue);
 
-export interface Signal<TValue, TReturn = void> {
-  (): TValue;
+export interface SignalSetter<TValue, TReturn = void> {
   (value: SignalValue<TValue>): TReturn;
+}
+
+export interface SignalGetter<TValue> {
+  (): TValue;
+}
+
+export interface SignalTween<TValue> {
   (
     value: SignalValue<TValue>,
     time: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<TValue>,
   ): ThreadGenerator;
-  get onChanged(): Subscribable<void>;
+}
+
+export interface Signal<TValue, TReturn = void>
+  extends SignalSetter<TValue, TReturn>,
+    SignalGetter<TValue>,
+    SignalTween<TValue> {
+  /**
+   * Reset the signal to its initial value (if one has been set).
+   *
+   * @example
+   * ```ts
+   * const signal = createSignal(7);
+   *
+   * signal.reset();
+   * // same as:
+   * signal(7);
+   * ```
+   */
+  reset(): TReturn;
+
+  /**
+   * Compute the current value of the signal and immediately set it.
+   *
+   * @remarks
+   * This method can be used to stop the signal from updating while keeping its
+   * current value.
+   *
+   * @example
+   * ```ts
+   * signal.save();
+   * // same as:
+   * signal(signal());
+   * ```
+   */
+  save(): TReturn;
 }
 
 const collectionStack: DependencyContext[] = [];
@@ -48,7 +88,7 @@ export function isReactive<T>(value: SignalValue<T>): value is () => T {
   return typeof value === 'function';
 }
 
-export function useSignal<TValue, TReturn = void>(
+export function createSignal<TValue, TReturn = void>(
   initial?: SignalValue<TValue>,
   defaultInterpolation: InterpolationFunction<TValue> = deepLerp,
   setterReturn?: TReturn,
@@ -60,7 +100,7 @@ export function useSignal<TValue, TReturn = void>(
 
   function set(value: SignalValue<TValue>) {
     if (current === value) {
-      return;
+      return setterReturn;
     }
 
     current = value;
@@ -74,10 +114,14 @@ export function useSignal<TValue, TReturn = void>(
     if (!isReactive(value)) {
       last = value;
     }
+
+    return setterReturn;
   }
 
   function get(): TValue {
     if (event.isRaised() && isReactive(current)) {
+      dependencies.forEach(dep => dep.unsubscribe(markDirty));
+      dependencies.clear();
       startCollecting([dependencies, markDirty]);
       last = current();
       finishCollecting([dependencies, markDirty]);
@@ -98,18 +142,14 @@ export function useSignal<TValue, TReturn = void>(
       timingFunction: TimingFunction = easeInOutCubic,
       interpolationFunction: InterpolationFunction<TValue> = defaultInterpolation,
     ) {
-      // Getter
       if (value === undefined) {
         return get();
       }
 
-      // Setter
       if (duration === undefined) {
-        set(value);
-        return setterReturn;
+        return set(value);
       }
 
-      // Tween
       const from = get();
       return tween(duration, v => {
         set(
@@ -123,12 +163,16 @@ export function useSignal<TValue, TReturn = void>(
     }
   );
 
-  Object.defineProperty(handler, 'onChanged', {
-    value: event.subscribable,
+  Object.defineProperty(handler, 'reset', {
+    value: initial !== undefined ? () => set(initial) : () => setterReturn,
+  });
+
+  Object.defineProperty(handler, 'save', {
+    value: () => set(get()),
   });
 
   if (initial !== undefined) {
-    handler(initial);
+    set(initial);
   }
 
   return handler;

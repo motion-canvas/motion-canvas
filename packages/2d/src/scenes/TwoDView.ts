@@ -14,8 +14,8 @@ export class TwoDView extends Node<any> {
       frame.id = TwoDView.frameID;
       frame.style.position = 'absolute';
       frame.style.pointerEvents = 'none';
+      frame.style.top = '0';
       frame.style.left = '0';
-      frame.style.right = '0';
       frame.style.opacity = '0';
       frame.style.border = 'none';
 
@@ -27,19 +27,11 @@ export class TwoDView extends Node<any> {
     }
   }
 
-  public updateLayout(): boolean {
-    let isDirty = super.updateLayout();
-    let limit = 10;
-    while (isDirty && limit > 0) {
-      limit--;
-      this.handleLayoutChange();
-      isDirty = super.updateLayout();
-    }
-
-    if (limit === 0) {
-      console.warn('Layout iteration limit exceeded');
-    }
-
-    return false;
+  public override render(context: CanvasRenderingContext2D) {
+    this.x();
+    this.y();
+    this.width();
+    this.height();
+    super.render(context);
   }
 }
