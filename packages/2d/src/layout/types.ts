@@ -18,4 +18,7 @@ export type AlignItems =
   | 'space-between'
   | 'space-around';
 
-export type LayoutMode = 'disabled' | 'enabled' | 'root' | 'pop' | null;
+export type ResolvedLayoutMode = 'disabled' | 'enabled' | 'root' | 'pop';
+export type LayoutMode = ResolvedLayoutMode | null;
+
+export type Length = number | `${number}%` | null;
