@@ -14,30 +14,41 @@ import {
   SignalGetter,
   SignalSetter,
   SignalTween,
+  SignalUtils,
 } from '@motion-canvas/core/lib/utils';
 
 export function capitalize<T extends string>(value: T): Capitalize<T> {
   return <Capitalize<T>>(value[0].toUpperCase() + value.slice(1));
 }
 
-export type PropertyOwner<TValue> = {
-  [key: `get${Capitalize<string>}`]: SignalGetter<TValue> | undefined;
-  [key: `set${Capitalize<string>}`]: SignalSetter<TValue> | undefined;
-  [key: `tween${Capitalize<string>}`]: SignalTween<TValue> | undefined;
+export interface Property<
+  TSetterValue,
+  TGetterValue extends TSetterValue,
+  TOwner,
+> extends SignalGetter<TGetterValue>,
+    SignalSetter<TSetterValue>,
+    SignalTween<TSetterValue>,
+    SignalUtils<TOwner> {}
+
+export type PropertyOwner<TGetterValue, TSetterValue> = {
+  [key: `get${Capitalize<string>}`]: SignalGetter<TGetterValue> | undefined;
+  [key: `set${Capitalize<string>}`]: SignalSetter<TSetterValue> | undefined;
+  [key: `tween${Capitalize<string>}`]: SignalTween<TSetterValue> | undefined;
 };
 
 export function createProperty<
-  TValue,
-  TNode extends PropertyOwner<TValue>,
+  TSetterValue,
+  TGetterValue extends TSetterValue,
+  TNode extends PropertyOwner<TGetterValue, TSetterValue>,
   TProperty extends string & keyof TNode,
 >(
   node: TNode,
   property: TProperty,
-  initial?: TValue,
-  defaultInterpolation: InterpolationFunction<TValue> = deepLerp,
-): Signal<TValue, TNode> {
-  let getter: () => TValue;
-  let setter: (value: SignalValue<TValue>) => void;
+  initial?: TSetterValue,
+  defaultInterpolation: InterpolationFunction<TSetterValue> = deepLerp,
+): Property<TSetterValue, TGetterValue, TNode> {
+  let getter: SignalGetter<TGetterValue>;
+  let setter: SignalSetter<TSetterValue>;
 
   const originalGetter = node[`get${capitalize(property)}`];
   const originalSetter = node[`set${capitalize(property)}`];
@@ -49,9 +60,11 @@ export function createProperty<
     );
   }
 
-  let signal: Signal<TValue, TNode> | null = null;
+  let signal: Property<TSetterValue, TGetterValue, TNode> | null = null;
   if (!originalGetter || !originalSetter) {
-    signal = createSignal(initial, defaultInterpolation, node);
+    signal = <Property<TSetterValue, TGetterValue, TNode>>(
+      (<unknown>createSignal(initial, defaultInterpolation, node))
+    );
     if (!tweener) {
       return signal;
     }
@@ -63,12 +76,12 @@ export function createProperty<
     setter = originalSetter.bind(node);
   }
 
-  const handler = <Signal<TValue, TNode>>(
+  const handler = <Property<TSetterValue, TGetterValue, TNode>>(
     function (
-      newValue?: SignalValue<TValue>,
+      newValue?: SignalValue<TSetterValue>,
       duration?: number,
       timingFunction: TimingFunction = easeInOutCubic,
-      interpolationFunction: InterpolationFunction<TValue> = defaultInterpolation,
+      interpolationFunction: InterpolationFunction<TSetterValue> = defaultInterpolation,
     ) {
       if (newValue === undefined) {
         return getter();
@@ -113,7 +126,7 @@ export function createProperty<
     value: () => setter(getter()),
   });
 
-  if (initial !== undefined && originalSetter) {
+  if (initial !== undefined && !signal) {
     setter(initial);
   }
 

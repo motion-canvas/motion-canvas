@@ -1,4 +1,10 @@
-import {compound, computed, initialize, property} from '../decorators';
+import {
+  compound,
+  computed,
+  initialize,
+  Property,
+  property,
+} from '../decorators';
 import {
   Vector2,
   transformPoint,
@@ -19,6 +25,7 @@ import {
   InterpolationFunction,
   TimingFunction,
   tween,
+  map,
 } from '@motion-canvas/core/lib/tweening';
 import {Layout, LayoutProps, Length, ResolvedLayoutMode} from '../layout';
 import {ComponentChild, ComponentChildren} from './types';
@@ -51,30 +58,37 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   @property(0)
   public declare readonly x: Signal<number, this>;
-
-  public saveX() {
-    this.x(this.computedX());
-  }
-
-  @computed()
-  protected computedX(): number {
+  protected readonly customX = createSignal(0, map, this);
+  protected getX(): number {
     return this.computedLayout().x;
+  }
+  protected setX(value: SignalValue<number>) {
+    this.customX(value);
   }
 
   @property(0)
   public declare readonly y: Signal<number, this>;
-
-  public saveY() {
-    this.y(this.computedY());
-  }
-
-  @computed()
-  protected computedY(): number {
+  protected readonly customY = createSignal(0, map, this);
+  protected getY(): number {
     return this.computedLayout().y;
+  }
+  protected setY(value: SignalValue<number>) {
+    this.customY(value);
   }
 
   @property(null)
-  public declare readonly width: Signal<Length, this>;
+  public declare readonly width: Property<Length, number, this>;
+  protected readonly customWidth = createSignal<Length, this>(
+    undefined,
+    undefined,
+    this,
+  );
+  protected getWidth(): number {
+    return this.computedLayout().width;
+  }
+  protected setWidth(value: SignalValue<Length>) {
+    this.customWidth(value);
+  }
 
   @threadable()
   protected *tweenWidth(
@@ -83,12 +97,12 @@ export class Node<TProps extends NodeProps = NodeProps> {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Length>,
   ): ThreadGenerator {
-    const width = this.width();
+    const width = this.customWidth();
     let from: number;
     if (typeof width === 'number') {
       from = width;
     } else {
-      from = this.computedWidth();
+      from = this.width();
     }
 
     let to: number;
@@ -96,7 +110,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
       to = value;
     } else {
       this.width(value);
-      to = this.computedWidth();
+      to = this.width();
     }
 
     this.width(from);
@@ -108,16 +122,19 @@ export class Node<TProps extends NodeProps = NodeProps> {
     this.layout.releaseSize();
   }
 
-  public saveWidth() {
-    this.width(this.computedWidth());
-  }
-
-  protected computedWidth(): number {
-    return this.computedLayout().width;
-  }
-
   @property(null)
-  public declare readonly height: Signal<Length, this>;
+  public declare readonly height: Property<Length, number, this>;
+  protected readonly customHeight = createSignal<Length, this>(
+    undefined,
+    undefined,
+    this,
+  );
+  protected getHeight(): number {
+    return this.computedLayout().height;
+  }
+  protected setHeight(value: SignalValue<Length>) {
+    this.customHeight(value);
+  }
 
   @threadable()
   protected *tweenHeight(
@@ -126,12 +143,12 @@ export class Node<TProps extends NodeProps = NodeProps> {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Length>,
   ): ThreadGenerator {
-    const height = this.height();
+    const height = this.customHeight();
     let from: number;
     if (typeof height === 'number') {
       from = height;
     } else {
-      from = this.computedHeight();
+      from = this.height();
     }
 
     let to: number;
@@ -139,7 +156,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
       to = value;
     } else {
       this.height(value);
-      to = this.computedHeight();
+      to = this.height();
     }
 
     this.height(from);
@@ -151,17 +168,21 @@ export class Node<TProps extends NodeProps = NodeProps> {
     this.layout.releaseSize();
   }
 
-  public saveHeight() {
-    this.width(this.computedHeight());
-  }
-
-  protected computedHeight(): number {
-    return this.computedLayout().height;
-  }
-
   @compound(['width', 'height'])
   @property(undefined, sizeLerp)
-  public declare readonly size: Signal<{width: Length; height: Length}, this>;
+  public declare readonly size: Property<
+    {width: Length; height: Length},
+    Size,
+    this
+  >;
+
+  @computed()
+  protected customSize(): {width: Length; height: Length} {
+    return {
+      width: this.customWidth(),
+      height: this.customHeight(),
+    };
+  }
 
   @threadable()
   protected *tweenSize(
@@ -170,10 +191,10 @@ export class Node<TProps extends NodeProps = NodeProps> {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Size>,
   ): ThreadGenerator {
-    const size = this.size();
+    const size = this.customSize();
     let from: Size;
     if (typeof size.height !== 'number' || typeof size.width !== 'number') {
-      from = this.computedSize();
+      from = this.size();
     } else {
       from = <Size>size;
     }
@@ -187,7 +208,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
       to = value;
     } else {
       this.size(value);
-      to = this.computedSize();
+      to = this.size();
     }
 
     this.size(from);
@@ -197,19 +218,6 @@ export class Node<TProps extends NodeProps = NodeProps> {
     );
     this.layout.releaseSize();
     this.size(value);
-  }
-
-  public saveSize() {
-    this.size(this.computedSize());
-  }
-
-  @computed()
-  protected computedSize(): Size {
-    const layout = this.computedLayout();
-    return {
-      height: layout.height,
-      width: layout.width,
-    };
   }
 
   @property(0)
@@ -345,8 +353,8 @@ export class Node<TProps extends NodeProps = NodeProps> {
     const mode = this.mode();
     if (mode !== 'enabled') {
       return {
-        x: this.x(),
-        y: this.y(),
+        x: this.customX(),
+        y: this.customY(),
         width: rect.width,
         height: rect.height,
       };
@@ -389,7 +397,10 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @computed()
   protected updateLayout() {
     this.applyLayoutChanges();
-    this.layout.setWidth(this.width()).setHeight(this.height()).apply();
+    this.layout
+      .setWidth(this.customWidth())
+      .setHeight(this.customHeight())
+      .apply();
     for (const child of this.children()) {
       child.updateLayout();
     }

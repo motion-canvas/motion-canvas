@@ -29,10 +29,7 @@ export interface SignalTween<TValue> {
   ): ThreadGenerator;
 }
 
-export interface Signal<TValue, TReturn = void>
-  extends SignalSetter<TValue, TReturn>,
-    SignalGetter<TValue>,
-    SignalTween<TValue> {
+export interface SignalUtils<TReturn> {
   /**
    * Reset the signal to its initial value (if one has been set).
    *
@@ -63,6 +60,12 @@ export interface Signal<TValue, TReturn = void>
    */
   save(): TReturn;
 }
+
+export interface Signal<TValue, TReturn = void>
+  extends SignalSetter<TValue, TReturn>,
+    SignalGetter<TValue>,
+    SignalTween<TValue>,
+    SignalUtils<TReturn> {}
 
 const collectionStack: DependencyContext[] = [];
 
