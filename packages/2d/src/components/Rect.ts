@@ -16,8 +16,7 @@ export class Rect extends Node<RectProps> {
     context.save();
     this.transformContext(context);
 
-    const width = this.width();
-    const height = this.height();
+    const {width, height} = this.computedLayout();
 
     context.save();
     context.fillStyle = this.fill();

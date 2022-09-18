@@ -1,10 +1,11 @@
 import {Node} from '../components';
 
-export class TwoDView extends Node<any> {
+export class TwoDView extends Node {
   private static frameID = 'motion-canvas-2d-frame';
 
   public constructor() {
-    super({layout: {width: 1920, height: 1080}, mode: 'none'});
+    // TODO Sync with the project size
+    super({width: 1920, height: 1080});
 
     let frame = document.querySelector<HTMLIFrameElement>(
       `#${TwoDView.frameID}`,
@@ -28,10 +29,7 @@ export class TwoDView extends Node<any> {
   }
 
   public override render(context: CanvasRenderingContext2D) {
-    this.x();
-    this.y();
-    this.width();
-    this.height();
+    this.computedLayout();
     super.render(context);
   }
 }

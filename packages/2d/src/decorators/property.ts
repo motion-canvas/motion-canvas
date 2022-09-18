@@ -129,7 +129,7 @@ export function createProperty<
  * The class using this decorator can implement the following methods:
  * - `get[PropertyName]` - A property getter.
  * - `get[PropertyName]` - A property setter.
- * - `tween[PropertyName]` - a tween provider.
+ * - `tween[PropertyName]` - A tween provider.
  *
  * See the {@link PropertyOwner} type for more detailed method signatures.
  *

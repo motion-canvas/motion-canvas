@@ -1,8 +1,13 @@
-import {compound, computed, initialize, property} from '../decorators';
-import {Signal} from '@motion-canvas/core/lib/utils';
-import {Rect, Size} from '@motion-canvas/core/lib/types';
-import {AlignItems, FlexDirection, JustifyContent, LayoutMode} from './types';
-import {sizeLerp} from '@motion-canvas/core/lib/tweening';
+import {computed, initialize, property} from '../decorators';
+import {createSignal, Signal} from '@motion-canvas/core/lib/utils';
+import {Rect} from '@motion-canvas/core/lib/types';
+import {
+  AlignItems,
+  FlexDirection,
+  JustifyContent,
+  LayoutMode,
+  Length,
+} from './types';
 
 export interface LayoutProps {
   mode?: LayoutMode;
@@ -25,13 +30,6 @@ export interface LayoutProps {
 export class Layout {
   @property(null)
   public declare readonly mode: Signal<LayoutMode, this>;
-  @property(null)
-  public declare readonly width: Signal<null | number | `${number}%`, this>;
-  @property(null)
-  public declare readonly height: Signal<null | number | `${number}%`, this>;
-  @property(undefined, sizeLerp)
-  @compound(['width', 'height'])
-  public declare readonly size: Signal<Size, this>;
 
   @property(0)
   public declare readonly marginTop: Signal<number, this>;
@@ -61,6 +59,7 @@ export class Layout {
   public declare readonly alignItems: Signal<AlignItems, this>;
 
   public readonly element: HTMLDivElement;
+  private sizeLockCounter = createSignal(0);
 
   public constructor(props: LayoutProps) {
     this.element = document.createElement('div');
@@ -74,6 +73,14 @@ export class Layout {
     return `${value}px`;
   }
 
+  public lockSize() {
+    this.sizeLockCounter(this.sizeLockCounter() + 1);
+  }
+
+  public releaseSize() {
+    this.sizeLockCounter(this.sizeLockCounter() - 1);
+  }
+
   public getComputedLayout(): Rect {
     const rect = this.element.getBoundingClientRect();
     return {
@@ -84,13 +91,7 @@ export class Layout {
     };
   }
 
-  @computed()
-  public apply() {
-    const mode = this.mode();
-    this.element.style.position =
-      mode === 'disabled' || mode === 'root' ? 'absolute' : '';
-
-    const width = this.width();
+  public setWidth(width: Length): this {
     if (width === null) {
       this.element.style.width = 'auto';
     } else if (typeof width === 'string') {
@@ -99,7 +100,10 @@ export class Layout {
       this.element.style.width = this.toPixels(width);
     }
 
-    const height = this.height();
+    return this;
+  }
+
+  public setHeight(height: Length): this {
     if (height === null) {
       this.element.style.height = 'auto';
     } else if (typeof height === 'string') {
@@ -107,6 +111,15 @@ export class Layout {
     } else {
       this.element.style.height = this.toPixels(height);
     }
+
+    return this;
+  }
+
+  @computed()
+  public apply() {
+    const mode = this.mode();
+    this.element.style.position =
+      mode === 'disabled' || mode === 'root' ? 'absolute' : 'relative';
 
     this.element.style.marginTop = this.toPixels(this.marginTop());
     this.element.style.marginBottom = this.toPixels(this.marginBottom());
@@ -120,5 +133,8 @@ export class Layout {
     this.element.style.aspectRatio = this.ratio();
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
+
+    this.element.style.flexGrow = this.sizeLockCounter() > 0 ? '0' : '';
+    this.element.style.flexShrink = this.sizeLockCounter() > 0 ? '0' : '';
   }
 }
