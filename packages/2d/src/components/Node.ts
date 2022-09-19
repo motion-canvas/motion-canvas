@@ -49,6 +49,8 @@ export interface NodeProps {
   scaleY?: number;
   scale?: Vector2;
   layout?: LayoutProps;
+  opacity?: number;
+  cache?: boolean;
 }
 
 export class Node<TProps extends NodeProps = NodeProps> {
@@ -60,7 +62,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
   public declare readonly x: Signal<number, this>;
   protected readonly customX = createSignal(0, map, this);
   protected getX(): number {
-    return this.computedLayout().x;
+    return this.computedPosition().x;
   }
   protected setX(value: SignalValue<number>) {
     this.customX(value);
@@ -70,7 +72,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
   public declare readonly y: Signal<number, this>;
   protected readonly customY = createSignal(0, map, this);
   protected getY(): number {
-    return this.computedLayout().y;
+    return this.computedPosition().y;
   }
   protected setY(value: SignalValue<number>) {
     this.customY(value);
@@ -84,7 +86,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
     this,
   );
   protected getWidth(): number {
-    return this.computedLayout().width;
+    return this.computedSize().width;
   }
   protected setWidth(value: SignalValue<Length>) {
     this.customWidth(value);
@@ -130,7 +132,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
     this,
   );
   protected getHeight(): number {
-    return this.computedLayout().height;
+    return this.computedSize().height;
   }
   protected setHeight(value: SignalValue<Length>) {
     this.customHeight(value);
@@ -223,6 +225,16 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @property(0)
   public declare readonly rotation: Signal<number, this>;
 
+  @property(0)
+  public declare readonly offsetX: Signal<number, this>;
+
+  @property(0)
+  public declare readonly offsetY: Signal<number, this>;
+
+  @compound({x: 'offsetX', y: 'offsetY'})
+  @property(undefined, vector2dLerp)
+  public declare readonly offset: Signal<Vector2, this>;
+
   @property(1)
   public declare readonly scaleX: Signal<number, this>;
 
@@ -233,15 +245,16 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @property(undefined, vector2dLerp)
   public declare readonly scale: Signal<Vector2, this>;
 
-  @property(0)
-  public declare readonly offsetX: Signal<number, this>;
+  @property(false)
+  public declare readonly cache: Signal<boolean, this>;
 
-  @property(0)
-  public declare readonly offsetY: Signal<number, this>;
+  @property(1)
+  public declare readonly opacity: Signal<number, this>;
 
-  @compound({x: 'offsetX', y: 'offsetY'})
-  @property(undefined, vector2dLerp)
-  public declare readonly offset: Signal<Vector2, this>;
+  @computed()
+  public absoluteOpacity(): number {
+    return (this.parent()?.absoluteOpacity() ?? 1) * this.opacity();
+  }
 
   @compound(['x', 'y'])
   @property(undefined, vector2dLerp)
@@ -279,8 +292,9 @@ export class Node<TProps extends NodeProps = NodeProps> {
     }
   }
 
-  protected children = createSignal<Node[]>([]);
-  protected parent = createSignal<Node | null>(null);
+  protected readonly children = createSignal<Node[]>([]);
+  protected readonly parent = createSignal<Node | null>(null);
+  protected readonly quality = createSignal(false);
 
   public constructor({children, layout, ...rest}: TProps) {
     this.layout = new Layout(layout ?? {});
@@ -331,50 +345,56 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @computed()
   protected localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
-    const layout = this.computedLayout();
-    matrix.translateSelf(layout.x, layout.y);
+    const size = this.computedSize();
+    const position = this.computedPosition();
+    matrix.translateSelf(position.x, position.y);
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scaleX(), this.scaleY());
     matrix.translateSelf(
-      (layout.width / -2) * this.offsetX(),
-      (layout.height / -2) * this.offsetY(),
+      (size.width / -2) * this.offsetX(),
+      (size.height / -2) * this.offsetY(),
     );
 
     return matrix;
   }
 
-  /**
-   * Get the position and size of this node relative to its parent.
-   */
   @computed()
-  protected computedLayout(): Rect {
-    this.requestLayoutUpdate();
-    const rect = this.layout.getComputedLayout();
+  protected computedPosition(): Vector2 {
     const mode = this.mode();
     if (mode !== 'enabled') {
       return {
         x: this.customX(),
         y: this.customY(),
-        width: rect.width,
-        height: rect.height,
       };
     }
 
-    const layout = {
+    this.requestLayoutUpdate();
+    const rect = this.layout.getComputedLayout();
+
+    const position = {
       x: rect.x + (rect.width / 2) * this.offsetX(),
       y: rect.y + (rect.height / 2) * this.offsetY(),
-      width: rect.width,
-      height: rect.height,
     };
 
     const parent = this.parent();
     if (parent) {
       const parentRect = parent.layout.getComputedLayout();
-      layout.x -= parentRect.x + (parentRect.width - rect.width) / 2;
-      layout.y -= parentRect.y + (parentRect.height - rect.height) / 2;
+      position.x -= parentRect.x + (parentRect.width - rect.width) / 2;
+      position.y -= parentRect.y + (parentRect.height - rect.height) / 2;
     }
 
-    return layout;
+    return position;
+  }
+
+  @computed()
+  protected computedSize(): Size {
+    this.requestLayoutUpdate();
+    const rect = this.layout.getComputedLayout();
+
+    return {
+      width: rect.width,
+      height: rect.height,
+    };
   }
 
   /**
@@ -451,15 +471,112 @@ export class Node<TProps extends NodeProps = NodeProps> {
     }
   }
 
+  /**
+   * Whether this node should be cached or not.
+   */
+  protected requiresCache(): boolean {
+    return this.cache() || (this.opacity() < 1 && this.children().length > 0);
+  }
+
+  @computed()
+  protected cacheCanvas(): CanvasRenderingContext2D {
+    const canvas = document.createElement('canvas').getContext('2d');
+    if (!canvas) {
+      throw new Error('Could not create a cache canvas');
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Get a cache canvas with the contents of this node rendered onto it.
+   */
+  @computed()
+  protected cachedCanvas() {
+    const context = this.cacheCanvas();
+    const rect = this.getCacheRect();
+    context.canvas.width = rect.width;
+    context.canvas.height = rect.height;
+    context.resetTransform();
+    context.translate(-rect.x, -rect.y);
+    this.draw(context, true);
+
+    return context;
+  }
+
+  /**
+   * Get a rectangle encapsulating the contents rendered by this node.
+   *
+   * @remarks
+   * The returned rectangle should be in local space.
+   */
+  protected getCacheRect(): Rect {
+    const {width, height} = this.computedSize();
+    return {
+      width,
+      height,
+      x: width / -2,
+      y: height / -2,
+    };
+  }
+
+  /**
+   * Prepare the given context for drawing a cached node onto it.
+   *
+   * @remarks
+   * This method is called before the contents of the cache canvas are drawn
+   * on the screen. It can be used to apply effects to the entire node together
+   * with its children, instead of applying them individually.
+   * Effects such as transparency, shadows, and filters use this technique.
+   *
+   * Whether the node is cached is decided by the {@link requiresCache} method.
+   *
+   * @param context - The context using which the cache will be drawn.
+   */
+  protected setupDrawFromCache(context: CanvasRenderingContext2D) {
+    context.globalAlpha = this.opacity();
+  }
+
+  /**
+   * Render this node onto the given canvas.
+   *
+   * @param context - The context to draw with.
+   */
   public render(context: CanvasRenderingContext2D) {
     context.save();
-    this.transformContext(context);
 
-    for (const child of this.children()) {
-      child.render(context);
+    if (this.requiresCache()) {
+      this.transformContext(context);
+      this.setupDrawFromCache(context);
+      const cached = this.cachedCanvas();
+      const rect = this.getCacheRect();
+      context.drawImage(cached.canvas, rect.x, rect.y);
+    } else {
+      this.transformContext(context);
+      this.draw(context);
     }
 
     context.restore();
+  }
+
+  /**
+   * Draw this node onto the canvas.
+   *
+   * @remarks
+   * This method is used when drawing directly onto the screen as well as onto
+   * the cache canvas.
+   * It assumes that the context have already been transformed to local space.
+   *
+   * @param context - The context to draw with.
+   * @param cache - Whether the node is being drawn onto the cache canvas.
+   *                Certain effects can be omitted when caching and applied
+   *                later when the cache canvas is drawn onto the screen.
+   *                See {@link setupDrawFromCache} for more information.
+   */
+  protected draw(context: CanvasRenderingContext2D, cache = false) {
+    for (const child of this.children()) {
+      child.render(context);
+    }
   }
 
   protected transformContext(context: CanvasRenderingContext2D) {
