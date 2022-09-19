@@ -1,32 +1,10 @@
-import {Node, NodeProps} from './Node';
-import {Signal} from '@motion-canvas/core/lib/utils';
-import {property} from '../decorators';
-import {NodeChildren} from './types';
+import {Shape} from './Shape';
 
-export interface RectProps extends NodeProps {
-  children?: NodeChildren;
-  fill: string;
-}
-
-export class Rect extends Node<RectProps> {
-  @property('#ffffff')
-  public declare readonly fill: Signal<string, this>;
-
-  public override render(context: CanvasRenderingContext2D) {
-    context.save();
-    this.transformContext(context);
-
+export class Rect extends Shape {
+  protected getPath(): Path2D {
+    const path = new Path2D();
     const {width, height} = this.computedLayout();
-
-    context.save();
-    context.fillStyle = this.fill();
-    context.fillRect(-width / 2, -height / 2, width, height);
-    context.restore();
-
-    for (const child of this.children()) {
-      child.render(context);
-    }
-
-    context.restore();
+    path.rect(-width / 2, -height / 2, width, height);
+    return path;
   }
 }
