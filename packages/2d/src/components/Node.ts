@@ -27,7 +27,7 @@ import {
   tween,
   map,
 } from '@motion-canvas/core/lib/tweening';
-import {Layout, LayoutProps, Length, ResolvedLayoutMode} from '../layout';
+import {Layout, LayoutProps, Length, ResolvedLayoutMode} from '../partials';
 import {ComponentChild, ComponentChildren} from './types';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
