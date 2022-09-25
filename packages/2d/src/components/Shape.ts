@@ -2,7 +2,13 @@ import {Node, NodeProps} from './Node';
 import {Gradient, Pattern} from '../partials';
 import {compound, computed, property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
-import {Vector2, Rect, rect} from '@motion-canvas/core/lib/types';
+import {
+  Vector2,
+  Rect,
+  rect,
+  transformVector,
+  transformScalar,
+} from '@motion-canvas/core/lib/types';
 import {vector2dLerp} from '@motion-canvas/core/lib/tweening';
 
 export type CanvasStyle = null | string | Gradient | Pattern;
@@ -16,11 +22,6 @@ export interface ShapeProps extends NodeProps {
   lineCap?: CanvasLineCap;
   lineDash?: number[];
   lineDashOffset?: number;
-  shadowColor?: string;
-  shadowBlur?: number;
-  shadowOffsetX?: number;
-  shadowOffsetY?: number;
-  shadowOffset?: Vector2;
 }
 
 export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
@@ -40,17 +41,6 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
   public declare readonly lineDash: Signal<number[], this>;
   @property(0)
   public declare readonly lineDashOffset: Signal<number, this>;
-  @property('')
-  public declare readonly shadowColor: Signal<string, this>;
-  @property(0)
-  public declare readonly shadowBlur: Signal<number, this>;
-  @property(0)
-  public declare readonly shadowOffsetX: Signal<number, this>;
-  @property(0)
-  public declare readonly shadowOffsetY: Signal<number, this>;
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
-  @property(undefined, vector2dLerp)
-  public declare readonly shadowOffset: Signal<Vector2, this>;
 
   @computed()
   protected hasShadow(): boolean {
@@ -78,14 +68,6 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
     return style.canvasPattern(context) ?? '';
   }
 
-  protected applyShadow(context: CanvasRenderingContext2D) {
-    // TODO Consider accounting for transparency when drawing from cache.
-    context.shadowColor = this.shadowColor();
-    context.shadowBlur = this.shadowBlur();
-    context.shadowOffsetX = this.shadowOffsetX();
-    context.shadowOffsetY = this.shadowOffsetY();
-  }
-
   protected applyStyle(context: CanvasRenderingContext2D) {
     context.fillStyle = this.parseCanvasStyle(this.fill(), context);
     context.strokeStyle = this.parseCanvasStyle(this.stroke(), context);
@@ -96,41 +78,23 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
     context.lineDashOffset = this.lineDashOffset();
   }
 
-  protected override draw(context: CanvasRenderingContext2D, cache = false) {
+  protected override draw(context: CanvasRenderingContext2D) {
     const path = this.getPath();
     context.save();
     this.applyStyle(context);
-    if (!cache) {
-      this.applyShadow(context);
-    }
-    if (this.strokeFirst()) {
+    if (this.lineWidth() <= 0) {
+      context.fill(path);
+    } else if (this.strokeFirst()) {
       context.stroke(path);
       context.fill(path);
     } else {
       context.fill(path);
       context.stroke(path);
     }
+
     context.restore();
 
-    super.draw(context, cache);
-  }
-
-  protected requiresCache(): boolean {
-    const hasCompositeEffect = this.opacity() < 1 || this.hasShadow();
-    let separateComponents = this.children().length;
-    if (this.stroke()) {
-      separateComponents++;
-    }
-    if (this.fill()) {
-      separateComponents++;
-    }
-
-    return this.cache() || (hasCompositeEffect && separateComponents > 1);
-  }
-
-  protected override setupDrawFromCache(context: CanvasRenderingContext2D) {
-    this.applyShadow(context);
-    super.setupDrawFromCache(context);
+    super.draw(context);
   }
 
   protected override getCacheRect(): Rect {

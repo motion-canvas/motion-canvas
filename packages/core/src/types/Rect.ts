@@ -19,10 +19,12 @@ export function rect(
 
 export interface rect {
   fromPoints: (...points: Vector2[]) => Rect;
+  fromRects: (...rects: Rect[]) => Rect;
   topLeft: (rect: Rect) => Vector2;
   topRight: (rect: Rect) => Vector2;
   bottomLeft: (rect: Rect) => Vector2;
   bottomRight: (rect: Rect) => Vector2;
+  corners: (rect: Rect) => Vector2[];
   transform: (rect: Rect, matrix: DOMMatrix) => Rect;
   expand: (rect: Rect, amount: number) => Rect;
 }
@@ -56,6 +58,37 @@ rect.fromPoints = (...points: Vector2[]) => {
   };
 };
 
+rect.fromRects = (...rects: Rect[]) => {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  for (const r of rects) {
+    const right = r.x + r.width;
+    if (right > maxX) {
+      maxX = right;
+    }
+    if (r.x < minX) {
+      minX = r.x;
+    }
+    const bottom = r.y + r.height;
+    if (bottom > maxY) {
+      maxY = bottom;
+    }
+    if (r.y < minY) {
+      minY = r.y;
+    }
+  }
+
+  return {
+    x: minX,
+    y: minY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
+};
+
 rect.topLeft = (rect: Rect) => ({x: rect.x, y: rect.y});
 rect.topRight = (rect: Rect) => ({x: rect.x + rect.width, y: rect.y});
 rect.bottomLeft = (rect: Rect) => ({x: rect.x, y: rect.y + rect.height});
@@ -63,6 +96,12 @@ rect.bottomRight = (rect: Rect) => ({
   x: rect.x + rect.width,
   y: rect.y + rect.height,
 });
+rect.corners = (value: Rect) => [
+  rect.topLeft(value),
+  rect.topRight(value),
+  rect.bottomRight(value),
+  rect.bottomLeft(value),
+];
 
 rect.transform = (rect: Rect, matrix: DOMMatrix) => {
   const position = transformPoint(rect, matrix);

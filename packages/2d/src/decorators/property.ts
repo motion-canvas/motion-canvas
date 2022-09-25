@@ -73,7 +73,10 @@ export function createProperty<
     setter = signal;
   } else {
     getter = originalGetter.bind(node);
-    setter = originalSetter.bind(node);
+    setter = (...args) => {
+      originalSetter.apply(node, args);
+      return node;
+    };
   }
 
   const handler = <Property<TSetterValue, TGetterValue, TNode>>(
