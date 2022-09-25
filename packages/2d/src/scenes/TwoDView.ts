@@ -29,7 +29,8 @@ export class TwoDView extends Node {
   }
 
   public override render(context: CanvasRenderingContext2D) {
-    this.computedLayout();
+    this.computedSize();
+    this.computedPosition();
     super.render(context);
   }
 }
