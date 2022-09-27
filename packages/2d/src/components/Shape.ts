@@ -1,15 +1,8 @@
 import {Node, NodeProps} from './Node';
 import {Gradient, Pattern} from '../partials';
-import {compound, computed, property} from '../decorators';
+import {property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
-import {
-  Vector2,
-  Rect,
-  rect,
-  transformVector,
-  transformScalar,
-} from '@motion-canvas/core/lib/types';
-import {vector2dLerp} from '@motion-canvas/core/lib/tweening';
+import {Rect, rect} from '@motion-canvas/core/lib/types';
 
 export type CanvasStyle = null | string | Gradient | Pattern;
 
@@ -41,16 +34,6 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
   public declare readonly lineDash: Signal<number[], this>;
   @property(0)
   public declare readonly lineDashOffset: Signal<number, this>;
-
-  @computed()
-  protected hasShadow(): boolean {
-    return (
-      !!this.shadowColor() ||
-      !!this.shadowOffsetX() ||
-      !!this.shadowOffsetY() ||
-      !!this.shadowBlur()
-    );
-  }
 
   protected parseCanvasStyle(
     style: CanvasStyle,
@@ -101,5 +84,7 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
     return rect.expand(super.getCacheRect(), this.lineWidth() / 2);
   }
 
-  protected abstract getPath(): Path2D;
+  protected getPath(): Path2D {
+    return new Path2D();
+  }
 }

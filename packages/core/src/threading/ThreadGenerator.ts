@@ -1,5 +1,13 @@
 import {Thread} from './Thread';
 
+export interface Promisable<T> {
+  toPromise(): Promise<T>;
+}
+
+export function isPromisable(value: any): value is Promisable<any> {
+  return value && typeof value === 'object' && 'toPromise' in value;
+}
+
 /**
  * The main generator type produced by all generator functions in Motion Canvas.
  *
@@ -29,7 +37,7 @@ import {Thread} from './Thread';
  * [promise]: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/promise
  */
 export type ThreadGenerator = Generator<
-  ThreadGenerator | Promise<any>,
+  ThreadGenerator | Promise<any> | Promisable<any>,
   void,
   Thread | any
 >;

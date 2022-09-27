@@ -4,6 +4,7 @@ import {
   SceneRenderEvent,
 } from '@motion-canvas/core/lib/scenes';
 import {TwoDView} from './TwoDView';
+import {Node} from '../components';
 
 export class TwoDScene extends GeneratorScene<TwoDView> {
   private readonly view = new TwoDView();
@@ -12,10 +13,7 @@ export class TwoDScene extends GeneratorScene<TwoDView> {
     return this.view;
   }
 
-  public render(
-    context: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement,
-  ): void {
+  public render(context: CanvasRenderingContext2D): void {
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();

@@ -3,6 +3,7 @@
     "baseUrl": "src",
     "outDir": "lib",
     "strict": true,
+    "noImplicitOverride": true,
     "module": "esnext",
     "target": "es2020",
     "moduleResolution": "node",

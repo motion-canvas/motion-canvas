@@ -8,8 +8,10 @@ import {
   LayoutMode,
   Length,
 } from './types';
+import {TwoDView} from '../scenes';
 
 export interface LayoutProps {
+  tagName?: keyof HTMLElementTagNameMap;
   mode?: LayoutMode;
   width?: number;
   height?: number;
@@ -25,6 +27,14 @@ export interface LayoutProps {
   justifyContent?: JustifyContent;
   alignItems?: AlignItems;
   ratio?: string;
+
+  fontFamily?: string;
+  fontSize?: number;
+  fontStyle?: string;
+  fontWeight?: number;
+  lineHeight?: number;
+  letterSpacing?: number;
+  wrap?: boolean;
 }
 
 export class Layout {
@@ -58,11 +68,33 @@ export class Layout {
   @property('auto')
   public declare readonly alignItems: Signal<AlignItems, this>;
 
-  public readonly element: HTMLDivElement;
+  @property(null)
+  public declare readonly fontFamily: Signal<string | null, this>;
+  @property(null)
+  public declare readonly fontSize: Signal<number | null, this>;
+  @property(null)
+  public declare readonly fontStyle: Signal<string | null, this>;
+  @property(null)
+  public declare readonly fontWeight: Signal<number | null, this>;
+  @property(null)
+  public declare readonly lineHeight: Signal<number | null, this>;
+  @property(null)
+  public declare readonly letterSpacing: Signal<number | null, this>;
+  @property(null)
+  public declare readonly wrap: Signal<boolean | null, this>;
+
+  public readonly element: HTMLElement;
+  public readonly styles: CSSStyleDeclaration;
   private sizeLockCounter = createSignal(0);
 
-  public constructor(props: LayoutProps) {
-    this.element = document.createElement('div');
+  public constructor({tagName = 'div', ...props}: LayoutProps) {
+    const frame = document.querySelector<HTMLIFrameElement>(
+      `#${TwoDView.frameID}`,
+    );
+
+    this.element = (frame?.contentDocument ?? document).createElement(tagName);
+    this.styles = getComputedStyle(this.element);
+
     this.element.style.display = 'flex';
     this.element.style.boxSizing = 'border-box';
 
@@ -116,7 +148,7 @@ export class Layout {
   }
 
   @computed()
-  public apply() {
+  public applyFlex() {
     const mode = this.mode();
     this.element.style.position =
       mode === 'disabled' || mode === 'root' ? 'absolute' : 'relative';
@@ -136,5 +168,26 @@ export class Layout {
 
     this.element.style.flexGrow = this.sizeLockCounter() > 0 ? '0' : '';
     this.element.style.flexShrink = this.sizeLockCounter() > 0 ? '0' : '';
+  }
+
+  @computed()
+  public applyFont() {
+    this.element.style.fontFamily = this.fontFamily() ?? '';
+    const fontSize = this.fontSize();
+    this.element.style.fontSize = fontSize ? this.toPixels(fontSize) : '';
+    this.element.style.fontStyle = this.fontStyle() ?? '';
+    const lineHeight = this.lineHeight();
+    this.element.style.lineHeight =
+      lineHeight === null ? '' : this.toPixels(lineHeight);
+    const fontWeight = this.fontWeight();
+    this.element.style.fontWeight =
+      fontWeight === null ? '' : fontWeight.toString();
+    const letterSpacing = this.letterSpacing();
+    this.element.style.letterSpacing = letterSpacing
+      ? this.toPixels(letterSpacing)
+      : '';
+    const wrap = this.wrap();
+    this.element.style.whiteSpace =
+      wrap === null ? '' : wrap ? 'normal' : 'nowrap';
   }
 }
