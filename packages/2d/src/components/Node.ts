@@ -11,6 +11,9 @@ import {
   transformAngle,
   Rect,
   Size,
+  rect,
+  transformScalar,
+  transformVector,
 } from '@motion-canvas/core/lib/types';
 import {
   createSignal,
@@ -50,7 +53,22 @@ export interface NodeProps {
   scale?: Vector2;
   layout?: LayoutProps;
   opacity?: number;
+  blur?: number;
+  brightness?: number;
+  contrast?: number;
+  grayscale?: number;
+  hue?: number;
+  invert?: number;
+  saturate?: number;
+  sepia?: number;
+  shadowColor?: string;
+  shadowBlur?: number;
+  shadowOffsetX?: number;
+  shadowOffsetY?: number;
+  shadowOffset?: Vector2;
+  overflow?: boolean;
   cache?: boolean;
+  composite?: boolean | Node;
 }
 
 export class Node<TProps extends NodeProps = NodeProps> {
@@ -188,7 +206,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   @threadable()
   protected *tweenSize(
-    value: SignalValue<Size>,
+    value: SignalValue<{width: Length; height: Length}>,
     time: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Size>,
@@ -207,7 +225,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
       typeof value.height === 'number' &&
       typeof value.width === 'number'
     ) {
-      to = value;
+      to = <Size>value;
     } else {
       this.size(value);
       to = this.size();
@@ -246,7 +264,13 @@ export class Node<TProps extends NodeProps = NodeProps> {
   public declare readonly scale: Signal<Vector2, this>;
 
   @property(false)
+  public declare readonly overflow: Signal<boolean, this>;
+
+  @property(false)
   public declare readonly cache: Signal<boolean, this>;
+
+  @property(false)
+  public declare readonly composite: Signal<boolean, this>;
 
   @property(1)
   public declare readonly opacity: Signal<number, this>;
@@ -254,6 +278,110 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @computed()
   public absoluteOpacity(): number {
     return (this.parent()?.absoluteOpacity() ?? 1) * this.opacity();
+  }
+
+  @property(0)
+  public declare readonly blur: Signal<number, this>;
+
+  @property(1)
+  public declare readonly brightness: Signal<number, this>;
+
+  @property(1)
+  public declare readonly contrast: Signal<number, this>;
+
+  @property(0)
+  public declare readonly grayscale: Signal<number, this>;
+
+  @property(0)
+  public declare readonly hue: Signal<number, this>;
+
+  @property(0)
+  public declare readonly invert: Signal<number, this>;
+
+  @property(1)
+  public declare readonly saturate: Signal<number, this>;
+
+  @property(0)
+  public declare readonly sepia: Signal<number, this>;
+
+  @property('')
+  public declare readonly shadowColor: Signal<string, this>;
+
+  @property(0)
+  public declare readonly shadowBlur: Signal<number, this>;
+
+  @property(0)
+  public declare readonly shadowOffsetX: Signal<number, this>;
+
+  @property(0)
+  public declare readonly shadowOffsetY: Signal<number, this>;
+
+  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
+  @property(undefined, vector2dLerp)
+  public declare readonly shadowOffset: Signal<Vector2, this>;
+
+  @computed()
+  protected hasFilters() {
+    return (
+      this.blur() !== 0 ||
+      this.brightness() !== 1 ||
+      this.contrast() !== 1 ||
+      this.grayscale() !== 0 ||
+      this.hue() !== 0 ||
+      this.invert() !== 0 ||
+      this.saturate() !== 1 ||
+      this.sepia() !== 0
+    );
+  }
+
+  @computed()
+  protected hasShadow() {
+    return (
+      !!this.shadowColor() &&
+      (this.shadowBlur() > 0 ||
+        this.shadowOffsetX() !== 0 ||
+        this.shadowOffsetY() !== 0)
+    );
+  }
+
+  @computed()
+  protected filterString(): string {
+    let filters = '';
+
+    const blur = this.blur();
+    if (blur !== 0) {
+      filters += ` blur(${transformScalar(blur, this.compositeToWorld())}px)`;
+    }
+    const brightness = this.brightness();
+    if (brightness !== 1) {
+      filters += ` brightness(${brightness * 100}%)`;
+    }
+    const contrast = this.contrast();
+    if (contrast !== 1) {
+      filters += ` contrast(${contrast * 100}%)`;
+    }
+    const grayscale = this.grayscale();
+    if (grayscale !== 0) {
+      filters += ` grayscale(${grayscale * 100}%)`;
+    }
+    const hue = this.hue();
+    if (hue !== 0) {
+      filters += ` hue-rotate(${hue}deg)`;
+    }
+    const invert = this.invert();
+    if (invert !== 0) {
+      filters += ` invert(${invert * 100}%)`;
+    }
+    const saturate = this.saturate();
+    if (saturate !== 1) {
+      filters += ` saturate(${saturate * 100}%)`;
+    }
+    const sepia = this.sepia();
+    if (sepia !== 0) {
+      filters += ` sepia(${sepia * 100}%)`;
+    }
+
+    return filters;
   }
 
   @compound(['x', 'y'])
@@ -270,9 +398,9 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   protected setAbsolutePosition(value: SignalValue<Vector2>) {
     if (isReactive(value)) {
-      this.position(() => transformPoint(value(), this.worldToLocal()));
+      this.position(() => transformPoint(value(), this.worldToParent()));
     } else {
-      this.position(transformPoint(value, this.worldToLocal()));
+      this.position(transformPoint(value, this.worldToParent()));
     }
   }
 
@@ -286,9 +414,9 @@ export class Node<TProps extends NodeProps = NodeProps> {
 
   protected setAbsoluteRotation(value: SignalValue<number>) {
     if (isReactive(value)) {
-      this.rotation(() => transformAngle(value(), this.worldToLocal()));
+      this.rotation(() => transformAngle(value(), this.worldToParent()));
     } else {
-      this.rotation(transformAngle(value, this.worldToLocal()));
+      this.rotation(transformAngle(value, this.worldToParent()));
     }
   }
 
@@ -333,13 +461,17 @@ export class Node<TProps extends NodeProps = NodeProps> {
     const parent = this.parent();
     return parent
       ? parent.localToWorld().multiply(this.localToParent())
-      : new DOMMatrix();
+      : this.localToParent();
   }
 
   @computed()
-  protected worldToLocal(): DOMMatrix {
-    const parent = this.parent();
-    return parent ? parent.localToWorld().inverse() : new DOMMatrix();
+  protected worldToLocal() {
+    return this.localToWorld().inverse();
+  }
+
+  @computed()
+  protected worldToParent(): DOMMatrix {
+    return this.parent()?.worldToLocal() ?? new DOMMatrix();
   }
 
   @computed()
@@ -356,6 +488,62 @@ export class Node<TProps extends NodeProps = NodeProps> {
     );
 
     return matrix;
+  }
+
+  @computed()
+  protected cacheMatrix(): DOMMatrix {
+    const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
+    const requiresCache = this.requiresCache();
+
+    return requiresCache ? parent.multiply(this.worldToLocal()) : parent;
+  }
+
+  @computed()
+  protected compositeMatrix(): DOMMatrix {
+    const requiresCache = this.requiresCache();
+
+    if (this.composite()) {
+      const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
+      return requiresCache ? parent : parent.multiply(this.localToWorld());
+    }
+
+    const parent = this.parent()?.compositeMatrix() ?? new DOMMatrix();
+    return requiresCache ? parent.multiply(this.worldToLocal()) : parent;
+  }
+
+  /**
+   * A matrix mapping composite space to world space.
+   *
+   * @remarks
+   * Certain effects such as blur and shadows ignore the current transformation.
+   * This matrix can be used to transform their parameters so that the effect
+   * appears relative to the closes composite root.
+   */
+  @computed()
+  public compositeToWorld() {
+    if (this.composite()) {
+      const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
+      return parent.multiply(this.localToWorld());
+    }
+
+    return this.parent()?.compositeMatrix() ?? new DOMMatrix();
+  }
+
+  @computed()
+  protected compositeRoot(): Node | null {
+    if (this.composite()) {
+      return this;
+    }
+
+    return this.parent()?.compositeRoot() ?? null;
+  }
+
+  @computed()
+  public compositeToLocal() {
+    const root = this.compositeRoot();
+    return root
+      ? root.localToWorld().multiply(this.worldToLocal())
+      : new DOMMatrix();
   }
 
   @computed()
@@ -475,7 +663,12 @@ export class Node<TProps extends NodeProps = NodeProps> {
    * Whether this node should be cached or not.
    */
   protected requiresCache(): boolean {
-    return this.cache() || (this.opacity() < 1 && this.children().length > 0);
+    return (
+      this.cache() ||
+      this.opacity() < 1 ||
+      this.hasFilters() ||
+      this.hasShadow()
+    );
   }
 
   @computed()
@@ -494,12 +687,12 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @computed()
   protected cachedCanvas() {
     const context = this.cacheCanvas();
-    const rect = this.getCacheRect();
-    context.canvas.width = rect.width;
-    context.canvas.height = rect.height;
+    const cache = this.cacheRect();
+    context.canvas.width = cache.width;
+    context.canvas.height = cache.height;
     context.resetTransform();
-    context.translate(-rect.x, -rect.y);
-    this.draw(context, true);
+    context.translate(-cache.x, -cache.y);
+    this.draw(context);
 
     return context;
   }
@@ -513,11 +706,74 @@ export class Node<TProps extends NodeProps = NodeProps> {
   protected getCacheRect(): Rect {
     const {width, height} = this.computedSize();
     return {
-      width,
-      height,
       x: width / -2,
       y: height / -2,
+      width,
+      height,
     };
+  }
+
+  /**
+   * Get a rectangle encapsulating the contents rendered by this node (including
+   * effects applied after caching).
+   *
+   * @remarks
+   * The returned rectangle should be in local space.
+   */
+  protected getFullCacheRect() {
+    const matrix = this.compositeToLocal();
+    const shadowOffset = transformVector(this.shadowOffset(), matrix);
+    const shadowBlur = transformScalar(this.shadowBlur(), matrix);
+
+    const result = rect.expand(
+      this.getCacheRect(),
+      this.blur() * 2 + shadowBlur,
+    );
+
+    if (shadowOffset.x < 0) {
+      result.x += shadowOffset.x;
+      result.width -= shadowOffset.x;
+    } else {
+      result.width += shadowOffset.x;
+    }
+
+    if (shadowOffset.y < 0) {
+      result.y += shadowOffset.y;
+      result.height -= shadowOffset.y;
+    } else {
+      result.height += shadowOffset.y;
+    }
+
+    return result;
+  }
+
+  /**
+   * Get a rectangle encapsulating the contents rendered by this node as well
+   * as its children.
+   */
+  @computed()
+  protected cacheRect(): Rect {
+    const cache = this.getCacheRect();
+    const children = this.children();
+    if (!this.overflow() || children.length === 0) {
+      return cache;
+    }
+
+    const points: Vector2[] = rect.corners(cache);
+    for (const child of children) {
+      const childCache = child.fullCacheRect();
+      const childMatrix = child.localToParent();
+      points.push(
+        ...rect.corners(childCache).map(r => transformPoint(r, childMatrix)),
+      );
+    }
+
+    return rect.fromPoints(...points);
+  }
+
+  @computed()
+  protected fullCacheRect(): Rect {
+    return rect.fromRects(this.cacheRect(), this.getFullCacheRect());
   }
 
   /**
@@ -535,6 +791,19 @@ export class Node<TProps extends NodeProps = NodeProps> {
    */
   protected setupDrawFromCache(context: CanvasRenderingContext2D) {
     context.globalAlpha = this.opacity();
+    if (this.hasFilters()) {
+      context.filter = this.filterString();
+    }
+    if (this.hasShadow()) {
+      const matrix = this.compositeToWorld();
+      const offset = transformVector(this.shadowOffset(), matrix);
+      const blur = transformScalar(this.shadowBlur(), matrix);
+
+      context.shadowColor = this.shadowColor();
+      context.shadowBlur = blur;
+      context.shadowOffsetX = offset.x;
+      context.shadowOffsetY = offset.y;
+    }
   }
 
   /**
@@ -544,15 +813,14 @@ export class Node<TProps extends NodeProps = NodeProps> {
    */
   public render(context: CanvasRenderingContext2D) {
     context.save();
+    this.transformContext(context);
 
     if (this.requiresCache()) {
-      this.transformContext(context);
       this.setupDrawFromCache(context);
-      const cached = this.cachedCanvas();
-      const rect = this.getCacheRect();
-      context.drawImage(cached.canvas, rect.x, rect.y);
+      const cacheContext = this.cachedCanvas();
+      const cacheRect = this.cacheRect();
+      context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
     } else {
-      this.transformContext(context);
       this.draw(context);
     }
 
@@ -568,12 +836,8 @@ export class Node<TProps extends NodeProps = NodeProps> {
    * It assumes that the context have already been transformed to local space.
    *
    * @param context - The context to draw with.
-   * @param cache - Whether the node is being drawn onto the cache canvas.
-   *                Certain effects can be omitted when caching and applied
-   *                later when the cache canvas is drawn onto the screen.
-   *                See {@link setupDrawFromCache} for more information.
    */
-  protected draw(context: CanvasRenderingContext2D, cache = false) {
+  protected draw(context: CanvasRenderingContext2D) {
     for (const child of this.children()) {
       child.render(context);
     }

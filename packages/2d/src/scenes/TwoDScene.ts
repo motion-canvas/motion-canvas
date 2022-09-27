@@ -1,4 +1,8 @@
-import {GeneratorScene, Scene} from '@motion-canvas/core/lib/scenes';
+import {
+  GeneratorScene,
+  Scene,
+  SceneRenderEvent,
+} from '@motion-canvas/core/lib/scenes';
 import {TwoDView} from './TwoDView';
 
 export class TwoDScene extends GeneratorScene<TwoDView> {
@@ -13,11 +17,17 @@ export class TwoDScene extends GeneratorScene<TwoDView> {
     canvas: HTMLCanvasElement,
   ): void {
     context.save();
+    this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
+    context.save();
+    this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
     this.view.render(context);
+    this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
+    context.restore();
+    this.renderLifecycle.dispatch([SceneRenderEvent.AfterRender, context]);
     context.restore();
   }
 
-  public reset(previousScene?: Scene): Promise<void> {
+  public override reset(previousScene?: Scene): Promise<void> {
     this.view.removeChildren();
     return super.reset(previousScene);
   }

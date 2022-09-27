@@ -22,3 +22,7 @@ export function transformAngle(angle: number, matrix: DOMMatrix) {
   );
   return (Math.atan2(vector.y, vector.x) * 180) / Math.PI;
 }
+
+export function transformScalar(scalar: number, matrix: DOMMatrix) {
+  return Math.sqrt(matrix.m11 * matrix.m11 + matrix.m12 * matrix.m12) * scalar;
+}
