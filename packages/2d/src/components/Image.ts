@@ -44,8 +44,9 @@ export class Image extends Node<ImageProps> {
     const image = this.applySrc();
     if (!image.complete) {
       deps.push(
-        new Promise(resolve => {
-          image.addEventListener('load', () => resolve(this));
+        new Promise((resolve, reject) => {
+          image.addEventListener('load', resolve);
+          image.addEventListener('error', reject);
         }),
       );
     }
