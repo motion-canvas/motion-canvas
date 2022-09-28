@@ -1,4 +1,10 @@
-import {isPromise, Thread, ThreadGenerator, threads} from '../threading';
+import {
+  isPromisable,
+  isPromise,
+  Thread,
+  ThreadGenerator,
+  threads,
+} from '../threading';
 import {Meta} from '../Meta';
 import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
@@ -162,12 +168,13 @@ export abstract class GeneratorScene<T>
     let result = this.runner.next();
     this.update();
     while (result.value) {
-      if (isPromise(result.value)) {
-        const value = await result.value;
-        result = this.runner.next(value);
+      if (isPromisable(result.value)) {
+        result = this.runner.next(await result.value.toPromise());
+      } else if (isPromise(result.value)) {
+        result = this.runner.next(await result.value);
       } else {
         console.warn('Invalid value: ', result.value);
-        result = this.runner.next();
+        result = this.runner.next(result.value);
       }
       this.update();
     }

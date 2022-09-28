@@ -7,7 +7,6 @@ import {
 } from '@motion-canvas/core/lib/tweening';
 import {addInitializer} from './initializers';
 import {
-  Signal,
   SignalValue,
   isReactive,
   createSignal,

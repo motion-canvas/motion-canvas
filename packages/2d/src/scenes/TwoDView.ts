@@ -1,11 +1,22 @@
 import {Node} from '../components';
 
 export class TwoDView extends Node {
-  private static frameID = 'motion-canvas-2d-frame';
+  public static frameID = 'motion-canvas-2d-frame';
 
   public constructor() {
-    // TODO Sync with the project size
-    super({width: 1920, height: 1080, composite: true});
+    super({
+      // TODO Sync with the project size
+      width: 1920,
+      height: 1080,
+      composite: true,
+      layout: {
+        fontFamily: 'Roboto',
+        fontSize: 48,
+        lineHeight: 64,
+        wrap: false,
+        fontStyle: 'normal',
+      },
+    });
 
     let frame = document.querySelector<HTMLIFrameElement>(
       `#${TwoDView.frameID}`,
@@ -61,7 +72,7 @@ export class TwoDView extends Node {
     super.render(context);
   }
 
-  protected transformContext(context: CanvasRenderingContext2D) {
+  protected override transformContext() {
     // do nothing
   }
 }

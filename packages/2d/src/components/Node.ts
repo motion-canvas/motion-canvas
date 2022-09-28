@@ -33,7 +33,7 @@ import {
 import {Layout, LayoutProps, Length, ResolvedLayoutMode} from '../partials';
 import {ComponentChild, ComponentChildren} from './types';
 import {threadable} from '@motion-canvas/core/lib/decorators';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {ThreadGenerator, Promisable} from '@motion-canvas/core/lib/threading';
 
 export interface NodeProps {
   ref?: Reference<Node>;
@@ -71,7 +71,9 @@ export interface NodeProps {
   composite?: boolean | Node;
 }
 
-export class Node<TProps extends NodeProps = NodeProps> {
+export class Node<TProps extends NodeProps = NodeProps>
+  implements Promisable<Node>
+{
   public declare isClass: boolean;
 
   public readonly layout: Layout;
@@ -557,6 +559,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
     }
 
     this.requestLayoutUpdate();
+    this.requestFontUpdate();
     const rect = this.layout.getComputedLayout();
 
     const position = {
@@ -577,6 +580,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
   @computed()
   protected computedSize(): Size {
     this.requestLayoutUpdate();
+    this.requestFontUpdate();
     const rect = this.layout.getComputedLayout();
 
     return {
@@ -594,6 +598,7 @@ export class Node<TProps extends NodeProps = NodeProps> {
     const parent = this.parent();
     if (mode === 'disabled' || mode === 'root' || !parent) {
       this.updateLayout();
+      parent?.requestFontUpdate();
     } else {
       parent.requestLayoutUpdate();
     }
@@ -604,30 +609,58 @@ export class Node<TProps extends NodeProps = NodeProps> {
    */
   @computed()
   protected updateLayout() {
-    this.applyLayoutChanges();
+    this.updateFont();
     this.layout
       .setWidth(this.customWidth())
       .setHeight(this.customHeight())
-      .apply();
+      .applyFlex();
+    this.applyLayoutChanges();
     for (const child of this.children()) {
       child.updateLayout();
     }
   }
 
   /**
-   * Apply any custom layout changes to this node.
+   * Apply any custom layout-related changes to this node.
    */
   protected applyLayoutChanges() {
     // do nothing
   }
 
-  public append(node: ComponentChildren) {
+  /**
+   * Apply any new font changes to this node and all of its ancestors.
+   */
+  @computed()
+  protected requestFontUpdate() {
+    this.parent()?.requestFontUpdate();
+    this.updateFont();
+  }
+
+  /**
+   * Apply any new font changes to this node.
+   */
+  @computed()
+  protected updateFont() {
+    this.layout.applyFont();
+    this.applyFontChanges();
+  }
+
+  /**
+   * Apply any custom font-related changes to this node.
+   */
+  protected applyFontChanges() {
+    // do nothing
+  }
+
+  public append(node: ComponentChildren): this {
     const nodes: ComponentChild[] = Array.isArray(node) ? node : [node];
     for (const node of nodes) {
       if (node instanceof Node) {
         node.moveTo(this);
       }
     }
+
+    return this;
   }
 
   public remove() {
@@ -768,7 +801,14 @@ export class Node<TProps extends NodeProps = NodeProps> {
       );
     }
 
-    return rect.fromPoints(...points);
+    const result = rect.fromPoints(...points);
+
+    return {
+      x: Math.floor(result.x),
+      y: Math.floor(result.y),
+      width: Math.ceil(result.width + 1),
+      height: Math.ceil(result.height + 1),
+    };
   }
 
   @computed()
@@ -853,6 +893,37 @@ export class Node<TProps extends NodeProps = NodeProps> {
       matrix.e,
       matrix.f,
     );
+  }
+
+  /**
+   * Wait for any asynchronous resources that this node or its children have.
+   *
+   * @remarks
+   * Certain resources like images are always loaded asynchronously.
+   * Awaiting this method makes sure that all such resources are done loading
+   * before continuing the animation.
+   */
+  public waitForAsyncResources() {
+    const deps: Promise<any>[] = [];
+    this.collectAsyncResources(deps);
+    return Promise.all(deps);
+  }
+
+  /**
+   * Collect all asynchronous resources used by this node and put them in the
+   * `resources` array.
+   *
+   * @param resources - An array to which resources should be collected.
+   */
+  protected collectAsyncResources(resources: Promise<any>[]) {
+    for (const child of this.children()) {
+      child.collectAsyncResources(resources);
+    }
+  }
+
+  public async toPromise(): Promise<this> {
+    await this.waitForAsyncResources();
+    return this;
   }
 }
 
