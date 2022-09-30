@@ -2,7 +2,7 @@ import {Node, NodeProps} from './Node';
 import {Gradient, Pattern} from '../partials';
 import {property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
-import {Rect, rect} from '@motion-canvas/core/lib/types';
+import {Rect} from '@motion-canvas/core/lib/types';
 
 export type CanvasStyle = null | string | Gradient | Pattern;
 
@@ -81,7 +81,7 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
   }
 
   protected override getCacheRect(): Rect {
-    return rect.expand(super.getCacheRect(), this.lineWidth() / 2);
+    return super.getCacheRect().expand(this.lineWidth() / 2);
   }
 
   protected getPath(): Path2D {

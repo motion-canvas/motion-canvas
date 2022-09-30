@@ -18,6 +18,7 @@ import {Util} from 'konva/lib/Util';
 import {Node} from 'konva/lib/Node';
 import {Konva} from 'konva/lib/Global';
 import {NODE_ID} from '@motion-canvas/core/lib';
+import {Rect, Vector2} from '@motion-canvas/core/lib/types';
 
 Konva.autoDrawEnabled = false;
 

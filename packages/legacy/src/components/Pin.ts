@@ -1,11 +1,7 @@
 import {Group} from 'konva/lib/Group';
 import {Container, ContainerConfig} from 'konva/lib/Container';
-import {
-  Center,
-  flipOrigin,
-  getOriginDelta,
-  Origin,
-} from '@motion-canvas/core/lib/types';
+import {Center, flipOrigin, Origin} from '@motion-canvas/core/lib/types';
+import {getOriginDelta} from '../types';
 import {GetSet, IRect} from 'konva/lib/types';
 import {KonvaNode, getset} from '../decorators';
 import {Node} from 'konva/lib/Node';

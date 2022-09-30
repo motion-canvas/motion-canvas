@@ -1,6 +1,7 @@
 import type {Node} from 'konva/lib/Node';
 import {Surface} from '../components';
-import {Origin, originPosition} from '@motion-canvas/core/lib/types';
+import {Origin} from '@motion-canvas/core/lib/types';
+import {originPosition} from '../types';
 import {all} from '@motion-canvas/core/lib/flow';
 import {Vector2d} from 'konva/lib/types';
 import {

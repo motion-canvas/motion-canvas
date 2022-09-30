@@ -1,5 +1,5 @@
-import {deepLerp, colorLerp, vector2dLerp} from './interpolationFunctions';
-import type {Vector2} from '../types';
+import {deepLerp, colorLerp} from './interpolationFunctions';
+import {Vector2} from '../types';
 
 describe('deepLerp', () => {
   test('falls back to primitive tween for numbers', () => {
@@ -90,13 +90,13 @@ describe('deepLerp', () => {
     expect(deepLerp({}, {foo: 5}, 1)).toEqual({foo: 5});
   });
 
-  test('replaces vector2dLerp', () => {
+  test('invokes native interpolation function', () => {
     const args: [Vector2, Vector2, number] = [
-      {x: 50, y: 65},
-      {x: 10, y: 100},
+      new Vector2(50, 65),
+      new Vector2(10, 100),
       1 / 2,
     ];
-    expect(deepLerp(...args)).toEqual(vector2dLerp(...args));
+    expect(deepLerp(...args)).toEqual(Vector2.lerp(...args));
   });
 });
 

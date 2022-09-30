@@ -1,26 +1,36 @@
 import type {Size} from './Size';
 import type {Rect} from './Rect';
 import type {Vector2} from './Vector';
+import {map} from '../tweening';
 
-interface ISpacing {
+export type SerializedSpacing = {
   top: number;
   right: number;
   bottom: number;
   left: number;
-}
+};
 
 export type PossibleSpacing =
-  | ISpacing
+  | SerializedSpacing
   | number
   | [number, number]
   | [number, number, number]
   | [number, number, number, number];
 
-export class Spacing implements ISpacing {
+export class Spacing {
   public top = 0;
   public right = 0;
   public bottom = 0;
   public left = 0;
+
+  public static lerp(from: Spacing, to: Spacing, value: number): Spacing {
+    return new Spacing(
+      map(from.top, to.top, value),
+      map(from.right, to.right, value),
+      map(from.bottom, to.bottom, value),
+      map(from.left, to.left, value),
+    );
+  }
 
   public get x(): number {
     return this.left + this.right;
@@ -30,76 +40,40 @@ export class Spacing implements ISpacing {
     return this.top + this.bottom;
   }
 
-  public constructor(value?: PossibleSpacing) {
-    if (value !== undefined) {
-      this.set(value);
-    }
-  }
-
-  public set(value: PossibleSpacing): this {
-    if (Array.isArray(value)) {
-      switch (value.length) {
-        case 2:
-          this.top = this.bottom = value[0];
-          this.right = this.left = value[1];
-          break;
-        case 3:
-          this.top = value[0];
-          this.right = this.left = value[1];
-          this.bottom = value[2];
-          break;
-        case 4:
-          this.top = value[0];
-          this.right = value[1];
-          this.bottom = value[2];
-          this.left = value[3];
-          break;
-      }
-    } else if (typeof value === 'object') {
-      this.top = value.top ?? 0;
-      this.right = value.right ?? 0;
-      this.bottom = value.bottom ?? 0;
-      this.left = value.left ?? 0;
-      return this;
-    } else {
-      this.top = this.right = this.bottom = this.left = value;
+  public constructor();
+  public constructor(from: PossibleSpacing);
+  public constructor(all: number);
+  public constructor(vertical: number, horizontal: number);
+  public constructor(top: number, horizontal: number, bottom: number);
+  public constructor(top: number, right: number, bottom: number, left: number);
+  public constructor(
+    one: PossibleSpacing = 0,
+    two?: number,
+    three?: number,
+    four?: number,
+  ) {
+    if (one === undefined || one === null) {
+      return;
     }
 
-    return this;
-  }
-
-  public expand<T extends Size | Rect>(value: T): T {
-    const result = {...value};
-
-    result.width += this.x;
-    result.height += this.y;
-    if ('x' in result) {
-      result.x -= this.left;
-      result.y -= this.top;
+    if (Array.isArray(one)) {
+      four = one[3];
+      three = one[2];
+      two = one[1];
+      one = one[0];
     }
 
-    return result;
-  }
-
-  public shrink<T extends Size | Rect>(value: T): T {
-    const result = {...value};
-
-    result.width -= this.x;
-    result.height -= this.y;
-    if ('x' in result) {
-      result.x += this.left;
-      result.y += this.top;
+    if (typeof one === 'number') {
+      this.top = one;
+      this.right = two !== undefined ? two : one;
+      this.bottom = three !== undefined ? three : one;
+      this.left = four !== undefined ? four : two !== undefined ? two : one;
+      return;
     }
 
-    return result;
-  }
-
-  public scale(scale: Vector2): Spacing {
-    return new Spacing([
-      this.top * scale.y,
-      this.right * scale.x,
-      this.bottom * scale.y,
-      this.left * scale.x,
-    ]);
+    this.top = one.top;
+    this.right = one.right;
+    this.bottom = one.bottom;
+    this.left = one.left;
   }
 }

@@ -1,4 +1,4 @@
-import {Rect, Vector2} from '../types';
+import {SerializedRect, SerializedVector2} from '../types';
 
 /**
  * Represents an element to inspect.
@@ -22,22 +22,22 @@ export interface InspectedSize {
   /**
    * Bounding box of the element (with padding).
    */
-  rect?: Rect;
+  rect?: SerializedRect;
 
   /**
    * Bounding box of the content of this element (without padding).
    */
-  contentRect?: Rect;
+  contentRect?: SerializedRect;
 
   /**
    * Bounding box of the element (with margin).
    */
-  marginRect?: Rect;
+  marginRect?: SerializedRect;
 
   /**
    * The absolute position of the object's origin.
    */
-  position?: Vector2;
+  position?: SerializedVector2;
 }
 
 /**

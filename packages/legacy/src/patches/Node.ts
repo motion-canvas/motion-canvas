@@ -1,12 +1,7 @@
 import type {Style} from '../styles';
 import {Node, NodeConfig} from 'konva/lib/Node';
-import {
-  Origin,
-  PossibleSpacing,
-  Size,
-  Spacing,
-  getOriginDelta,
-} from '@motion-canvas/core/lib/types';
+import {Origin} from '@motion-canvas/core/lib/types';
+import {PossibleSpacing, Size, Spacing, getOriginDelta} from '../types';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {Factory} from 'konva/lib/Factory';
 import {Container} from 'konva/lib/Container';

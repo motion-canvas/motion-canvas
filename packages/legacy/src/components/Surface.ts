@@ -1,5 +1,6 @@
 import {ContainerConfig} from 'konva/lib/Container';
-import {getOriginDelta, Origin, Size} from '@motion-canvas/core/lib/types';
+import {Origin} from '@motion-canvas/core/lib/types';
+import {getOriginDelta, Size} from '../types';
 import {CanvasHelper} from '../helpers';
 import {easeOutExpo, linear, tween} from '@motion-canvas/core/lib/tweening';
 import {GetSet} from 'konva/lib/types';

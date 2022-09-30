@@ -1,5 +1,5 @@
 import type {Container} from 'konva/lib/Container';
-import type {Vector2} from '@motion-canvas/core/lib/types';
+import type {Vector2} from '../types';
 
 export function slide(container: Container, offset: Vector2): void;
 export function slide(container: Container, x: number, y?: number): void;

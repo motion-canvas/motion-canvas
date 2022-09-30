@@ -1,12 +1,9 @@
 import {Text, TextConfig} from 'konva/lib/shapes/Text';
 import {GetSet, IRect, Vector2d} from 'konva/lib/types';
 import {ShapeGetClientRectConfig} from 'konva/lib/Shape';
-import {
-  Origin,
-  Size,
-  Spacing,
-  getOriginOffset,
-} from '@motion-canvas/core/lib/types';
+import {Origin} from '@motion-canvas/core/lib/types';
+import {getOriginOffset} from '../types';
+import {Size, Spacing} from '../types';
 import {
   Animator,
   tween,

@@ -1,5 +1,5 @@
 import type {Context} from 'konva/lib/Context';
-import {PossibleSpacing, Spacing} from '@motion-canvas/core/lib/types';
+import {PossibleSpacing, Spacing} from '../types';
 
 export const CanvasHelper = {
   roundRect<T extends CanvasRenderingContext2D | Context>(
