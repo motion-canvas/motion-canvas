@@ -31,16 +31,16 @@ export class Gradient {
   public declare readonly fromX: Signal<number, this>;
   @property(0)
   public declare readonly fromY: Signal<number, this>;
-  @compound({x: 'fromX', y: 'fromY'}, Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound({x: 'fromX', y: 'fromY'})
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly from: Signal<Vector2, this>;
 
   @property(0)
   public declare readonly toX: Signal<number, this>;
   @property(0)
   public declare readonly toY: Signal<number, this>;
-  @compound({x: 'toX', y: 'toY'}, Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound({x: 'toX', y: 'toY'})
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly to: Signal<Vector2, this>;
 
   @property(0)
