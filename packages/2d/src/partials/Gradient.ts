@@ -1,7 +1,6 @@
 import {compound, computed, initialize, property} from '../decorators';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Signal} from '@motion-canvas/core/lib/utils';
-import {vector2dLerp} from '@motion-canvas/core/lib/tweening';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
 
@@ -32,16 +31,16 @@ export class Gradient {
   public declare readonly fromX: Signal<number, this>;
   @property(0)
   public declare readonly fromY: Signal<number, this>;
-  @compound({x: 'fromX', y: 'fromY'})
-  @property(undefined, vector2dLerp)
+  @compound({x: 'fromX', y: 'fromY'}, Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly from: Signal<Vector2, this>;
 
   @property(0)
   public declare readonly toX: Signal<number, this>;
   @property(0)
   public declare readonly toY: Signal<number, this>;
-  @compound({x: 'toX', y: 'toY'})
-  @property(undefined, vector2dLerp)
+  @compound({x: 'toX', y: 'toY'}, Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly to: Signal<Vector2, this>;
 
   @property(0)

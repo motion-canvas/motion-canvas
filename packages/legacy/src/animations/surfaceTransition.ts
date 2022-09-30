@@ -1,15 +1,14 @@
 import {Surface} from '../components';
 import {
-  calculateRatio,
   clampRemap,
   colorLerp,
   easeInOutCubic,
   easeInOutQuint,
-  rectArcLerp,
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {calculateRatio, rectArcLerp} from './interpolationFunctions';
 
 /**
  * Configuration for {@link surfaceTransition}.

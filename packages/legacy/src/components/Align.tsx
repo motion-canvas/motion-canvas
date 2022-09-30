@@ -1,5 +1,6 @@
 import type {Node} from 'konva/lib/Node';
-import {getOriginDelta, Origin} from '@motion-canvas/core/lib/types';
+import {Origin} from '@motion-canvas/core/lib/types';
+import {getOriginDelta} from '../types';
 import {useScene} from '@motion-canvas/core/lib/utils';
 
 interface AlignConfig {

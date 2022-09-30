@@ -7,13 +7,10 @@ import {
 } from '../decorators';
 import {
   Vector2,
-  transformPoint,
   transformAngle,
   Rect,
   Size,
-  rect,
   transformScalar,
-  transformVector,
 } from '@motion-canvas/core/lib/types';
 import {
   createSignal,
@@ -23,8 +20,6 @@ import {
   SignalValue,
 } from '@motion-canvas/core/lib/utils';
 import {
-  vector2dLerp,
-  sizeLerp,
   InterpolationFunction,
   TimingFunction,
   tween,
@@ -190,8 +185,8 @@ export class Node<TProps extends NodeProps = NodeProps>
     this.layout.releaseSize();
   }
 
-  @compound(['width', 'height'])
-  @property(undefined, sizeLerp)
+  @compound(['width', 'height'], Size)
+  @property(undefined, Size.lerp)
   public declare readonly size: Property<
     {width: Length; height: Length},
     Size,
@@ -251,8 +246,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(0)
   public declare readonly offsetY: Signal<number, this>;
 
-  @compound({x: 'offsetX', y: 'offsetY'})
-  @property(undefined, vector2dLerp)
+  @compound({x: 'offsetX', y: 'offsetY'}, Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly offset: Signal<Vector2, this>;
 
   @property(1)
@@ -261,8 +256,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(1)
   public declare readonly scaleY: Signal<number, this>;
 
-  @compound({x: 'scaleX', y: 'scaleY'})
-  @property(undefined, vector2dLerp)
+  @compound({x: 'scaleX', y: 'scaleY'}, Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly scale: Signal<Vector2, this>;
 
   @property(false)
@@ -318,8 +313,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(0)
   public declare readonly shadowOffsetY: Signal<number, this>;
 
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
-  @property(undefined, vector2dLerp)
+  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'}, Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly shadowOffset: Signal<Vector2, this>;
 
   @computed()
@@ -386,23 +381,23 @@ export class Node<TProps extends NodeProps = NodeProps>
     return filters;
   }
 
-  @compound(['x', 'y'])
-  @property(undefined, vector2dLerp)
+  @compound(['x', 'y'], Vector2)
+  @property(undefined, Vector2.lerp)
   public declare readonly position: Signal<Vector2, this>;
 
-  @property(undefined, vector2dLerp)
+  @property(undefined, Vector2.lerp)
   public declare readonly absolutePosition: Signal<Vector2, this>;
 
-  protected getAbsolutePosition() {
+  protected getAbsolutePosition(): Vector2 {
     const matrix = this.localToWorld();
-    return {x: matrix.m41, y: matrix.m42};
+    return new Vector2(matrix.m41, matrix.m42);
   }
 
   protected setAbsolutePosition(value: SignalValue<Vector2>) {
     if (isReactive(value)) {
-      this.position(() => transformPoint(value(), this.worldToParent()));
+      this.position(() => value().transformAsPoint(this.worldToParent()));
     } else {
-      this.position(transformPoint(value, this.worldToParent()));
+      this.position(value.transformAsPoint(this.worldToParent()));
     }
   }
 
@@ -552,20 +547,17 @@ export class Node<TProps extends NodeProps = NodeProps>
   protected computedPosition(): Vector2 {
     const mode = this.mode();
     if (mode !== 'enabled') {
-      return {
-        x: this.customX(),
-        y: this.customY(),
-      };
+      return new Vector2(this.customX(), this.customY());
     }
 
     this.requestLayoutUpdate();
     this.requestFontUpdate();
     const rect = this.layout.getComputedLayout();
 
-    const position = {
-      x: rect.x + (rect.width / 2) * this.offsetX(),
-      y: rect.y + (rect.height / 2) * this.offsetY(),
-    };
+    const position = new Vector2(
+      rect.x + (rect.width / 2) * this.offsetX(),
+      rect.y + (rect.height / 2) * this.offsetY(),
+    );
 
     const parent = this.parent();
     if (parent) {
@@ -583,10 +575,7 @@ export class Node<TProps extends NodeProps = NodeProps>
     this.requestFontUpdate();
     const rect = this.layout.getComputedLayout();
 
-    return {
-      width: rect.width,
-      height: rect.height,
-    };
+    return new Size(rect);
   }
 
   /**
@@ -737,13 +726,8 @@ export class Node<TProps extends NodeProps = NodeProps>
    * The returned rectangle should be in local space.
    */
   protected getCacheRect(): Rect {
-    const {width, height} = this.computedSize();
-    return {
-      x: width / -2,
-      y: height / -2,
-      width,
-      height,
-    };
+    const size = this.computedSize();
+    return new Rect(size.vector.scale(-0.5), size);
   }
 
   /**
@@ -755,13 +739,10 @@ export class Node<TProps extends NodeProps = NodeProps>
    */
   protected getFullCacheRect() {
     const matrix = this.compositeToLocal();
-    const shadowOffset = transformVector(this.shadowOffset(), matrix);
+    const shadowOffset = this.shadowOffset().transform(matrix);
     const shadowBlur = transformScalar(this.shadowBlur(), matrix);
 
-    const result = rect.expand(
-      this.getCacheRect(),
-      this.blur() * 2 + shadowBlur,
-    );
+    const result = this.getCacheRect().expand(this.blur() * 2 + shadowBlur);
 
     if (shadowOffset.x < 0) {
       result.x += shadowOffset.x;
@@ -789,31 +770,24 @@ export class Node<TProps extends NodeProps = NodeProps>
     const cache = this.getCacheRect();
     const children = this.children();
     if (!this.overflow() || children.length === 0) {
-      return cache;
+      return cache.pixelPerfect;
     }
 
-    const points: Vector2[] = rect.corners(cache);
+    const points: Vector2[] = cache.corners;
     for (const child of children) {
       const childCache = child.fullCacheRect();
       const childMatrix = child.localToParent();
       points.push(
-        ...rect.corners(childCache).map(r => transformPoint(r, childMatrix)),
+        ...childCache.corners.map(r => r.transformAsPoint(childMatrix)),
       );
     }
 
-    const result = rect.fromPoints(...points);
-
-    return {
-      x: Math.floor(result.x),
-      y: Math.floor(result.y),
-      width: Math.ceil(result.width + 1),
-      height: Math.ceil(result.height + 1),
-    };
+    return Rect.fromPoints(...points).pixelPerfect;
   }
 
   @computed()
   protected fullCacheRect(): Rect {
-    return rect.fromRects(this.cacheRect(), this.getFullCacheRect());
+    return Rect.fromRects(this.cacheRect(), this.getFullCacheRect());
   }
 
   /**
@@ -836,7 +810,7 @@ export class Node<TProps extends NodeProps = NodeProps>
     }
     if (this.hasShadow()) {
       const matrix = this.compositeToWorld();
-      const offset = transformVector(this.shadowOffset(), matrix);
+      const offset = this.shadowOffset().transform(matrix);
       const blur = transformScalar(this.shadowBlur(), matrix);
 
       context.shadowColor = this.shadowColor();

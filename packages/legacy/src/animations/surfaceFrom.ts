@@ -2,14 +2,13 @@ import type {Vector2d} from 'konva/lib/types';
 import type {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import type {Surface, SurfaceMask} from '../components';
 import {
-  calculateRatio,
   colorLerp,
   easeInOutCubic,
   easeInOutQuint,
-  rectArcLerp,
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
+import {calculateRatio, rectArcLerp} from './interpolationFunctions';
 
 /**
  * Configuration for {@link surfaceFrom}.

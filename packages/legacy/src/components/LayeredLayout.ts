@@ -1,4 +1,4 @@
-import {Size} from '@motion-canvas/core/lib/types';
+import {Size} from '../types';
 import {Group} from 'konva/lib/Group';
 
 export class LayeredLayout extends Group {

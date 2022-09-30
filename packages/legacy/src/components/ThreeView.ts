@@ -1,4 +1,4 @@
-import {PossibleSpacing, Size} from '@motion-canvas/core/lib/types';
+import {PossibleSpacing, Size} from '../types';
 import {Util} from 'konva/lib/Util';
 import {Context} from 'konva/lib/Context';
 import * as THREE from 'three';

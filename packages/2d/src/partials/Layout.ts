@@ -114,13 +114,7 @@ export class Layout {
   }
 
   public getComputedLayout(): Rect {
-    const rect = this.element.getBoundingClientRect();
-    return {
-      width: rect.width,
-      height: rect.height,
-      x: rect.x,
-      y: rect.y,
-    };
+    return new Rect(this.element.getBoundingClientRect());
   }
 
   public setWidth(width: Length): this {

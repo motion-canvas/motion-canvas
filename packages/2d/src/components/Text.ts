@@ -2,7 +2,7 @@ import {property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
-import {rect, Rect} from '@motion-canvas/core/lib/types';
+import {Rect} from '@motion-canvas/core/lib/types';
 
 export interface TextProps extends ShapeProps {
   children?: string;
@@ -42,7 +42,7 @@ export class Text extends Shape<TextProps> {
     const {width, height} = this.computedSize();
     const range = document.createRange();
     let line = '';
-    const lineRect = rect();
+    const lineRect = new Rect();
     for (const childNode of this.layout.element.childNodes) {
       if (!childNode.textContent) {
         continue;

@@ -1,12 +1,9 @@
 import {Group} from 'konva/lib/Group';
 import {GetSet} from 'konva/lib/types';
 import {Shape} from 'konva/lib/Shape';
-import {
-  Center,
-  getOriginOffset,
-  Origin,
-  Size,
-} from '@motion-canvas/core/lib/types';
+import {Center, Origin} from '@motion-canvas/core/lib/types';
+import {getOriginOffset} from '../types';
+import {Size} from '../types';
 import {ContainerConfig} from 'konva/lib/Container';
 import {KonvaNode, getset} from '../decorators';
 import {Node} from 'konva/lib/Node';

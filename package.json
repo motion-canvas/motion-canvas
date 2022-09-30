@@ -11,6 +11,8 @@
     "core:test": "npm run test -w packages/core",
     "2d:build": "npm run build -w packages/2d",
     "2d:watch": "npm run watch -w packages/2d",
+    "legacy:build": "npm run build -w packages/legacy",
+    "legacy:watch": "npm run watch -w packages/legacy",
     "ui:build": "npm run build -w packages/ui",
     "ui:dev": "npm run dev -w packages/ui",
     "template:serve": "npm run serve -w packages/template",

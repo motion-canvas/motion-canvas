@@ -5,8 +5,8 @@ import {Size, CanvasColorSpace, CanvasOutputMimeType} from './types';
 import {AudioManager} from './media';
 import {ifHot} from './utils';
 
-export const ProjectSize = {
-  FullHD: {width: 1920, height: 1080},
+export const ProjectSize: Record<string, Size> = {
+  FullHD: new Size(1920, 1080),
 };
 
 export interface ProjectConfig {
@@ -116,10 +116,7 @@ export class Project {
   }
 
   public getSize(): Size {
-    return {
-      width: this.width,
-      height: this.height,
-    };
+    return new Size(this.width, this.height);
   }
 
   public readonly name: string;
