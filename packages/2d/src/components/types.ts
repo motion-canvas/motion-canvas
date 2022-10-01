@@ -14,15 +14,21 @@ export type ComponentChild =
 export type ComponentChildren = ComponentChild | ComponentChild[];
 export type NodeChildren = Node | Node[];
 
+export type PropsOf<T> = T extends NodeConstructor<infer P>
+  ? P
+  : T extends FunctionComponent<infer P>
+  ? P
+  : never;
+
 export interface JSXProps {
   children?: ComponentChildren;
   ref?: Reference<Node>;
 }
 
 export interface FunctionComponent<T = any> {
-  (props: T): Node<T> | null;
+  (props: T): Node | null;
 }
 
 export interface NodeConstructor<T = any> {
-  new (props: T): Node<T>;
+  new (props: T): Node;
 }

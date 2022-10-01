@@ -1,12 +1,12 @@
-import {Node, NodeProps} from './Node';
 import {Gradient, Pattern} from '../partials';
 import {property} from '../decorators';
 import {Signal} from '@motion-canvas/core/lib/utils';
 import {Rect} from '@motion-canvas/core/lib/types';
+import {Layout, LayoutProps} from './Layout';
 
 export type CanvasStyle = null | string | Gradient | Pattern;
 
-export interface ShapeProps extends NodeProps {
+export interface ShapeProps extends LayoutProps {
   fill?: CanvasStyle;
   stroke?: CanvasStyle;
   strokeFirst?: boolean;
@@ -17,7 +17,7 @@ export interface ShapeProps extends NodeProps {
   lineDashOffset?: number;
 }
 
-export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
+export abstract class Shape extends Layout {
   @property(null)
   public declare readonly fill: Signal<CanvasStyle, this>;
   @property(null)
@@ -34,6 +34,10 @@ export abstract class Shape<T extends ShapeProps = ShapeProps> extends Node<T> {
   public declare readonly lineDash: Signal<number[], this>;
   @property(0)
   public declare readonly lineDashOffset: Signal<number, this>;
+
+  public constructor(props: ShapeProps) {
+    super(props);
+  }
 
   protected parseCanvasStyle(
     style: CanvasStyle,

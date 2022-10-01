@@ -26,7 +26,7 @@ export class TwoDScene extends GeneratorScene<TwoDView> {
   }
 
   public override reset(previousScene?: Scene): Promise<void> {
-    this.view.removeChildren();
+    this.view.reset();
     return super.reset(previousScene);
   }
 }

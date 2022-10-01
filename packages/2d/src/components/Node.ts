@@ -1,52 +1,13 @@
-import {
-  compound,
-  computed,
-  initialize,
-  Property,
-  property,
-} from '../decorators';
-import {
-  Vector2,
-  transformAngle,
-  Rect,
-  Size,
-  transformScalar,
-} from '@motion-canvas/core/lib/types';
-import {
-  createSignal,
-  isReactive,
-  Reference,
-  Signal,
-  SignalValue,
-} from '@motion-canvas/core/lib/utils';
-import {
-  InterpolationFunction,
-  TimingFunction,
-  tween,
-  map,
-} from '@motion-canvas/core/lib/tweening';
-import {Layout, LayoutProps, Length, ResolvedLayoutMode} from '../partials';
+import {compound, computed, initialize, property} from '../decorators';
+import {Vector2, Rect, transformScalar} from '@motion-canvas/core/lib/types';
+import {createSignal, Reference, Signal} from '@motion-canvas/core/lib/utils';
 import {ComponentChild, ComponentChildren} from './types';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {ThreadGenerator, Promisable} from '@motion-canvas/core/lib/threading';
+import {Promisable} from '@motion-canvas/core/lib/threading';
+import {TwoDView} from '../scenes';
 
 export interface NodeProps {
   ref?: Reference<Node>;
   children?: ComponentChildren;
-  x?: number;
-  y?: number;
-  position?: Vector2;
-  width?: Length;
-  height?: Length;
-  size?: Size;
-  rotation?: number;
-  offsetX?: number;
-  offsetY?: number;
-  offset?: Vector2;
-  scaleX?: number;
-  scaleY?: number;
-  scale?: Vector2;
-  layout?: LayoutProps;
   opacity?: number;
   blur?: number;
   brightness?: number;
@@ -61,207 +22,12 @@ export interface NodeProps {
   shadowOffsetX?: number;
   shadowOffsetY?: number;
   shadowOffset?: Vector2;
-  overflow?: boolean;
   cache?: boolean;
-  composite?: boolean | Node;
+  composite?: boolean;
 }
 
-export class Node<TProps extends NodeProps = NodeProps>
-  implements Promisable<Node>
-{
+export class Node implements Promisable<Node> {
   public declare isClass: boolean;
-
-  public readonly layout: Layout;
-
-  @property(0)
-  public declare readonly x: Signal<number, this>;
-  protected readonly customX = createSignal(0, map, this);
-  protected getX(): number {
-    return this.computedPosition().x;
-  }
-  protected setX(value: SignalValue<number>) {
-    this.customX(value);
-  }
-
-  @property(0)
-  public declare readonly y: Signal<number, this>;
-  protected readonly customY = createSignal(0, map, this);
-  protected getY(): number {
-    return this.computedPosition().y;
-  }
-  protected setY(value: SignalValue<number>) {
-    this.customY(value);
-  }
-
-  @property(null)
-  public declare readonly width: Property<Length, number, this>;
-  protected readonly customWidth = createSignal<Length, this>(
-    undefined,
-    undefined,
-    this,
-  );
-  protected getWidth(): number {
-    return this.computedSize().width;
-  }
-  protected setWidth(value: SignalValue<Length>) {
-    this.customWidth(value);
-  }
-
-  @threadable()
-  protected *tweenWidth(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const width = this.customWidth();
-    let from: number;
-    if (typeof width === 'number') {
-      from = width;
-    } else {
-      from = this.width();
-    }
-
-    let to: number;
-    if (typeof value === 'number') {
-      to = value;
-    } else {
-      this.width(value);
-      to = this.width();
-    }
-
-    this.width(from);
-    this.layout.lockSize();
-    yield* tween(time, value =>
-      this.width(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.width(value);
-    this.layout.releaseSize();
-  }
-
-  @property(null)
-  public declare readonly height: Property<Length, number, this>;
-  protected readonly customHeight = createSignal<Length, this>(
-    undefined,
-    undefined,
-    this,
-  );
-  protected getHeight(): number {
-    return this.computedSize().height;
-  }
-  protected setHeight(value: SignalValue<Length>) {
-    this.customHeight(value);
-  }
-
-  @threadable()
-  protected *tweenHeight(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const height = this.customHeight();
-    let from: number;
-    if (typeof height === 'number') {
-      from = height;
-    } else {
-      from = this.height();
-    }
-
-    let to: number;
-    if (typeof value === 'number') {
-      to = value;
-    } else {
-      this.height(value);
-      to = this.height();
-    }
-
-    this.height(from);
-    this.layout.lockSize();
-    yield* tween(time, value =>
-      this.height(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.height(value);
-    this.layout.releaseSize();
-  }
-
-  @compound(['width', 'height'])
-  @property(undefined, Size.lerp, Size)
-  public declare readonly size: Property<
-    {width: Length; height: Length},
-    Size,
-    this
-  >;
-
-  @computed()
-  protected customSize(): {width: Length; height: Length} {
-    return {
-      width: this.customWidth(),
-      height: this.customHeight(),
-    };
-  }
-
-  @threadable()
-  protected *tweenSize(
-    value: SignalValue<{width: Length; height: Length}>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Size>,
-  ): ThreadGenerator {
-    const size = this.customSize();
-    let from: Size;
-    if (typeof size.height !== 'number' || typeof size.width !== 'number') {
-      from = this.size();
-    } else {
-      from = <Size>size;
-    }
-
-    let to: Size;
-    if (
-      typeof value === 'object' &&
-      typeof value.height === 'number' &&
-      typeof value.width === 'number'
-    ) {
-      to = <Size>value;
-    } else {
-      this.size(value);
-      to = this.size();
-    }
-
-    this.size(from);
-    this.layout.lockSize();
-    yield* tween(time, value =>
-      this.size(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.layout.releaseSize();
-    this.size(value);
-  }
-
-  @property(0)
-  public declare readonly rotation: Signal<number, this>;
-
-  @property(0)
-  public declare readonly offsetX: Signal<number, this>;
-
-  @property(0)
-  public declare readonly offsetY: Signal<number, this>;
-
-  @compound({x: 'offsetX', y: 'offsetY'})
-  @property(undefined, Vector2.lerp, Vector2)
-  public declare readonly offset: Signal<Vector2, this>;
-
-  @property(1)
-  public declare readonly scaleX: Signal<number, this>;
-
-  @property(1)
-  public declare readonly scaleY: Signal<number, this>;
-
-  @compound({x: 'scaleX', y: 'scaleY'})
-  @property(undefined, Vector2.lerp, Vector2)
-  public declare readonly scale: Signal<Vector2, this>;
-
-  @property(false)
-  public declare readonly overflow: Signal<boolean, this>;
 
   @property(false)
   public declare readonly cache: Signal<boolean, this>;
@@ -345,9 +111,13 @@ export class Node<TProps extends NodeProps = NodeProps>
   protected filterString(): string {
     let filters = '';
 
-    const blur = this.blur();
-    if (blur !== 0) {
-      filters += ` blur(${transformScalar(blur, this.compositeToWorld())}px)`;
+    const invert = this.invert();
+    if (invert !== 0) {
+      filters += ` invert(${invert * 100}%)`;
+    }
+    const sepia = this.sepia();
+    if (sepia !== 0) {
+      filters += ` sepia(${sepia * 100}%)`;
     }
     const brightness = this.brightness();
     if (brightness !== 1) {
@@ -365,92 +135,24 @@ export class Node<TProps extends NodeProps = NodeProps>
     if (hue !== 0) {
       filters += ` hue-rotate(${hue}deg)`;
     }
-    const invert = this.invert();
-    if (invert !== 0) {
-      filters += ` invert(${invert * 100}%)`;
-    }
     const saturate = this.saturate();
     if (saturate !== 1) {
       filters += ` saturate(${saturate * 100}%)`;
     }
-    const sepia = this.sepia();
-    if (sepia !== 0) {
-      filters += ` sepia(${sepia * 100}%)`;
+    const blur = this.blur();
+    if (blur !== 0) {
+      filters += ` blur(${transformScalar(blur, this.compositeToWorld())}px)`;
     }
 
     return filters;
   }
 
-  @compound(['x', 'y'])
-  @property(undefined, Vector2.lerp, Vector2)
-  public declare readonly position: Signal<Vector2, this>;
+  public readonly children = createSignal<Node[]>([]);
+  public readonly parent = createSignal<Node | null>(null);
 
-  @property(undefined, Vector2.lerp, Vector2)
-  public declare readonly absolutePosition: Signal<Vector2, this>;
-
-  protected getAbsolutePosition(): Vector2 {
-    const matrix = this.localToWorld();
-    return new Vector2(matrix.m41, matrix.m42);
-  }
-
-  protected setAbsolutePosition(value: SignalValue<Vector2>) {
-    if (isReactive(value)) {
-      this.position(() => value().transformAsPoint(this.worldToParent()));
-    } else {
-      this.position(value.transformAsPoint(this.worldToParent()));
-    }
-  }
-
-  @property()
-  public declare readonly absoluteRotation: Signal<Vector2, this>;
-
-  protected getAbsoluteRotation() {
-    const matrix = this.localToWorld();
-    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
-  }
-
-  protected setAbsoluteRotation(value: SignalValue<number>) {
-    if (isReactive(value)) {
-      this.rotation(() => transformAngle(value(), this.worldToParent()));
-    } else {
-      this.rotation(transformAngle(value, this.worldToParent()));
-    }
-  }
-
-  protected readonly children = createSignal<Node[]>([]);
-  protected readonly parent = createSignal<Node | null>(null);
-  protected readonly quality = createSignal(false);
-
-  public constructor({children, layout, ...rest}: TProps) {
-    this.layout = new Layout(layout ?? {});
+  public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
     this.append(children);
-  }
-
-  /**
-   * Get the resolved layout mode of this node.
-   *
-   * @remarks
-   * When the mode is `null`, its value will be inherited from the parent.
-   *
-   * Use {@link Layout.mode} to get the raw mode set for this node (without
-   * inheritance).
-   */
-  @computed()
-  public mode(): ResolvedLayoutMode {
-    const parent = this.parent();
-    const parentMode = parent?.mode();
-    let mode = this.layout.mode();
-
-    if (mode === null) {
-      if (!parentMode || parentMode === 'disabled') {
-        mode = 'disabled';
-      } else {
-        mode = 'enabled';
-      }
-    }
-
-    return mode;
   }
 
   @computed()
@@ -473,18 +175,7 @@ export class Node<TProps extends NodeProps = NodeProps>
 
   @computed()
   protected localToParent(): DOMMatrix {
-    const matrix = new DOMMatrix();
-    const size = this.computedSize();
-    const position = this.computedPosition();
-    matrix.translateSelf(position.x, position.y);
-    matrix.rotateSelf(0, 0, this.rotation());
-    matrix.scaleSelf(this.scaleX(), this.scaleY());
-    matrix.translateSelf(
-      (size.width / -2) * this.offsetX(),
-      (size.height / -2) * this.offsetY(),
-    );
-
-    return matrix;
+    return new DOMMatrix();
   }
 
   @computed()
@@ -544,101 +235,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   }
 
   @computed()
-  protected computedPosition(): Vector2 {
-    const mode = this.mode();
-    if (mode !== 'enabled') {
-      return new Vector2(this.customX(), this.customY());
-    }
-
-    this.requestLayoutUpdate();
-    this.requestFontUpdate();
-    const rect = this.layout.getComputedLayout();
-
-    const position = new Vector2(
-      rect.x + (rect.width / 2) * this.offsetX(),
-      rect.y + (rect.height / 2) * this.offsetY(),
-    );
-
-    const parent = this.parent();
-    if (parent) {
-      const parentRect = parent.layout.getComputedLayout();
-      position.x -= parentRect.x + (parentRect.width - rect.width) / 2;
-      position.y -= parentRect.y + (parentRect.height - rect.height) / 2;
-    }
-
-    return position;
-  }
-
-  @computed()
-  protected computedSize(): Size {
-    this.requestLayoutUpdate();
-    this.requestFontUpdate();
-    const rect = this.layout.getComputedLayout();
-
-    return new Size(rect);
-  }
-
-  /**
-   * Find the closest layout root and apply any new layout changes.
-   */
-  @computed()
-  protected requestLayoutUpdate() {
-    const mode = this.layout.mode();
-    const parent = this.parent();
-    if (mode === 'disabled' || mode === 'root' || !parent) {
-      this.updateLayout();
-      parent?.requestFontUpdate();
-    } else {
-      parent.requestLayoutUpdate();
-    }
-  }
-
-  /**
-   * Apply any new layout changes to this node and its children.
-   */
-  @computed()
-  protected updateLayout() {
-    this.updateFont();
-    this.layout
-      .setWidth(this.customWidth())
-      .setHeight(this.customHeight())
-      .applyFlex();
-    this.applyLayoutChanges();
-    for (const child of this.children()) {
-      child.updateLayout();
-    }
-  }
-
-  /**
-   * Apply any custom layout-related changes to this node.
-   */
-  protected applyLayoutChanges() {
-    // do nothing
-  }
-
-  /**
-   * Apply any new font changes to this node and all of its ancestors.
-   */
-  @computed()
-  protected requestFontUpdate() {
-    this.parent()?.requestFontUpdate();
-    this.updateFont();
-  }
-
-  /**
-   * Apply any new font changes to this node.
-   */
-  @computed()
-  protected updateFont() {
-    this.layout.applyFont();
-    this.applyFontChanges();
-  }
-
-  /**
-   * Apply any custom font-related changes to this node.
-   */
-  protected applyFontChanges() {
-    // do nothing
+  public view(): TwoDView | null {
+    return this.parent()?.view() ?? null;
   }
 
   public append(node: ComponentChildren): this {
@@ -663,12 +261,10 @@ export class Node<TProps extends NodeProps = NodeProps>
     }
 
     if (current) {
-      current.layout.element.removeChild(this.layout.element);
       current.children(current.children().filter(child => child !== this));
     }
 
     if (parent) {
-      parent.layout.element.append(this.layout.element);
       parent.children([...parent.children(), this]);
     }
 
@@ -726,8 +322,31 @@ export class Node<TProps extends NodeProps = NodeProps>
    * The returned rectangle should be in local space.
    */
   protected getCacheRect(): Rect {
-    const size = this.computedSize();
-    return new Rect(size.vector.scale(-0.5), size);
+    return new Rect();
+  }
+
+  /**
+   * Get a rectangle encapsulating the contents rendered by this node as well
+   * as its children.
+   */
+  @computed()
+  protected cacheRect(): Rect {
+    const cache = this.getCacheRect();
+    const children = this.children();
+    if (children.length === 0) {
+      return cache.pixelPerfect;
+    }
+
+    const points: Vector2[] = cache.corners;
+    for (const child of children) {
+      const childCache = child.fullCacheRect();
+      const childMatrix = child.localToParent();
+      points.push(
+        ...childCache.corners.map(r => r.transformAsPoint(childMatrix)),
+      );
+    }
+
+    return Rect.fromPoints(...points).pixelPerfect;
   }
 
   /**
@@ -737,12 +356,13 @@ export class Node<TProps extends NodeProps = NodeProps>
    * @remarks
    * The returned rectangle should be in local space.
    */
-  protected getFullCacheRect() {
+  @computed()
+  protected fullCacheRect(): Rect {
     const matrix = this.compositeToLocal();
     const shadowOffset = this.shadowOffset().transform(matrix);
     const shadowBlur = transformScalar(this.shadowBlur(), matrix);
 
-    const result = this.getCacheRect().expand(this.blur() * 2 + shadowBlur);
+    const result = this.cacheRect().expand(this.blur() * 2 + shadowBlur);
 
     if (shadowOffset.x < 0) {
       result.x += shadowOffset.x;
@@ -759,35 +379,6 @@ export class Node<TProps extends NodeProps = NodeProps>
     }
 
     return result;
-  }
-
-  /**
-   * Get a rectangle encapsulating the contents rendered by this node as well
-   * as its children.
-   */
-  @computed()
-  protected cacheRect(): Rect {
-    const cache = this.getCacheRect();
-    const children = this.children();
-    if (!this.overflow() || children.length === 0) {
-      return cache.pixelPerfect;
-    }
-
-    const points: Vector2[] = cache.corners;
-    for (const child of children) {
-      const childCache = child.fullCacheRect();
-      const childMatrix = child.localToParent();
-      points.push(
-        ...childCache.corners.map(r => r.transformAsPoint(childMatrix)),
-      );
-    }
-
-    return Rect.fromPoints(...points).pixelPerfect;
-  }
-
-  @computed()
-  protected fullCacheRect(): Rect {
-    return Rect.fromRects(this.cacheRect(), this.getFullCacheRect());
   }
 
   /**

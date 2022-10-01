@@ -10,8 +10,8 @@ import {createComputed} from '@motion-canvas/core/lib/utils/createComputed';
  */
 export function computed(): MethodDecorator {
   return (target: any, key) => {
-    const method = target[key];
     addInitializer(target, (instance: any) => {
+      const method = Object.getPrototypeOf(instance)[key];
       instance[key] = createComputed(method.bind(instance));
     });
   };

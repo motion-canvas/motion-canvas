@@ -10,6 +10,7 @@ export type SerializedVector2 = {
 
 export type PossibleVector2 =
   | SerializedVector2
+  | number
   | [number, number]
   | Size
   | Rect;
@@ -56,15 +57,15 @@ export class Vector2 {
 
   public constructor();
   public constructor(from: PossibleVector2);
-  public constructor(x: number, y?: number);
-  public constructor(one?: PossibleVector2 | number, two = 0) {
+  public constructor(x: number, y: number);
+  public constructor(one?: PossibleVector2 | number, two?: number) {
     if (one === undefined || one === null) {
       return;
     }
 
     if (typeof one === 'number') {
       this.x = one;
-      this.y = two;
+      this.y = two ?? one;
       return;
     }
 

@@ -1,52 +1,49 @@
-import {Node, NodeProps} from './Node';
 import {Signal} from '@motion-canvas/core/lib/utils';
 import {computed, property} from '../decorators';
+import {Layout, LayoutProps} from './Layout';
 
-export interface ImageProps extends NodeProps {
+export interface ImageProps extends LayoutProps {
   src?: string;
 }
 
-export class Image extends Node<ImageProps> {
+export class Image extends Layout {
   @property()
   public declare readonly src: Signal<string, this>;
+  protected readonly image: HTMLImageElement;
 
   public constructor(props: ImageProps) {
     super({
       ...props,
-      layout: props.layout
-        ? {...props.layout, tagName: 'img'}
-        : {tagName: 'img'},
+      tagName: 'img',
     });
+    this.image = <HTMLImageElement>this.element;
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
-    const image = <HTMLImageElement>this.layout.element;
     const {width, height} = this.computedSize();
 
-    context.drawImage(image, width / -2, height / -2, width, height);
+    context.drawImage(this.image, width / -2, height / -2, width, height);
     super.draw(context);
   }
 
-  protected override applyLayoutChanges() {
+  protected override updateLayout() {
     this.applySrc();
+    super.updateLayout();
   }
 
   @computed()
   protected applySrc() {
-    const src = this.src();
-    const image = <HTMLImageElement>this.layout.element;
-    image.src = src;
-    return image;
+    this.image.src = this.src();
   }
 
   protected override collectAsyncResources(deps: Promise<any>[]) {
     super.collectAsyncResources(deps);
-    const image = this.applySrc();
-    if (!image.complete) {
+    this.applySrc();
+    if (!this.image.complete) {
       deps.push(
         new Promise((resolve, reject) => {
-          image.addEventListener('load', resolve);
-          image.addEventListener('error', reject);
+          this.image.addEventListener('load', resolve);
+          this.image.addEventListener('error', reject);
         }),
       );
     }
