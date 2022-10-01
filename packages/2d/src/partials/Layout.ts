@@ -1,32 +1,61 @@
-import {computed, initialize, property} from '../decorators';
-import {createSignal, Signal} from '@motion-canvas/core/lib/utils';
-import {Rect} from '@motion-canvas/core/lib/types';
 import {
-  AlignItems,
+  compound,
+  computed,
+  initialize,
+  Property,
+  property,
+} from '../decorators';
+import {createSignal, Signal} from '@motion-canvas/core/lib/utils';
+import {
+  PossibleSpacing,
+  Rect,
+  Spacing,
+  Vector2,
+} from '@motion-canvas/core/lib/types';
+import {
+  FlexAlign,
   FlexDirection,
-  JustifyContent,
+  FlexWrap,
+  FlexJustify,
   LayoutMode,
   Length,
+  FlexBasis,
 } from './types';
 import {TwoDView} from '../scenes';
 
 export interface LayoutProps {
   tagName?: keyof HTMLElementTagNameMap;
   mode?: LayoutMode;
-  width?: number;
-  height?: number;
+
+  maxWidth?: Length;
+  maxHeight?: Length;
+  minWidth?: Length;
+  minHeight?: Length;
+  ratio?: number;
+
   marginTop?: number;
   marginBottom?: number;
   marginLeft?: number;
   marginRight?: number;
+  margin?: PossibleSpacing;
+
   paddingTop?: number;
   paddingBottom?: number;
   paddingLeft?: number;
   paddingRight?: number;
+  padding?: PossibleSpacing;
+
   direction?: FlexDirection;
-  justifyContent?: JustifyContent;
-  alignItems?: AlignItems;
-  ratio?: string;
+  basis?: FlexBasis;
+  grow?: number;
+  shrink?: number;
+  wrap?: FlexWrap;
+
+  justifyContent?: FlexJustify;
+  alignItems?: FlexAlign;
+  rowGap?: Length;
+  columnGap?: Length;
+  gap?: Length;
 
   fontFamily?: string;
   fontSize?: number;
@@ -34,12 +63,23 @@ export interface LayoutProps {
   fontWeight?: number;
   lineHeight?: number;
   letterSpacing?: number;
-  wrap?: boolean;
+  textWrap?: boolean;
 }
 
 export class Layout {
   @property(null)
   public declare readonly mode: Signal<LayoutMode, this>;
+
+  @property(null)
+  public declare readonly maxWidth: Signal<Length, this>;
+  @property(null)
+  public declare readonly maxHeight: Signal<Length, this>;
+  @property(null)
+  public declare readonly minWidth: Signal<Length, this>;
+  @property(null)
+  public declare readonly minHeight: Signal<Length, this>;
+  @property(null)
+  public declare readonly ratio: Signal<number | null, this>;
 
   @property(0)
   public declare readonly marginTop: Signal<number, this>;
@@ -49,6 +89,14 @@ export class Layout {
   public declare readonly marginLeft: Signal<number, this>;
   @property(0)
   public declare readonly marginRight: Signal<number, this>;
+  @compound({
+    top: 'marginTop',
+    bottom: 'marginBottom',
+    left: 'marginLeft',
+    right: 'marginRight',
+  })
+  @property(undefined, Spacing.lerp, Spacing)
+  public declare readonly margin: Property<PossibleSpacing, Spacing, this>;
 
   @property(0)
   public declare readonly paddingTop: Signal<number, this>;
@@ -58,15 +106,36 @@ export class Layout {
   public declare readonly paddingLeft: Signal<number, this>;
   @property(0)
   public declare readonly paddingRight: Signal<number, this>;
+  @compound({
+    top: 'paddingTop',
+    bottom: 'paddingBottom',
+    left: 'paddingLeft',
+    right: 'paddingRight',
+  })
+  @property(undefined, Spacing.lerp, Spacing)
+  public declare readonly padding: Property<PossibleSpacing, Spacing, this>;
 
   @property('row')
   public declare readonly direction: Signal<FlexDirection, this>;
-  @property('none')
-  public declare readonly ratio: Signal<string, this>;
-  @property('flex-start')
-  public declare readonly justifyContent: Signal<JustifyContent, this>;
-  @property('auto')
-  public declare readonly alignItems: Signal<AlignItems, this>;
+  @property(null)
+  public declare readonly basis: Signal<FlexBasis, this>;
+  @property(0)
+  public declare readonly grow: Signal<number, this>;
+  @property(1)
+  public declare readonly shrink: Signal<number, this>;
+  @property('nowrap')
+  public declare readonly wrap: Signal<FlexWrap, this>;
+
+  @property('normal')
+  public declare readonly justifyContent: Signal<FlexJustify, this>;
+  @property('normal')
+  public declare readonly alignItems: Signal<FlexAlign, this>;
+  @property(null)
+  public declare readonly gap: Signal<Length, this>;
+  @property(null)
+  public declare readonly rowGap: Signal<Length, this>;
+  @property(null)
+  public declare readonly columnGap: Signal<Length, this>;
 
   @property(null)
   public declare readonly fontFamily: Signal<string | null, this>;
@@ -81,7 +150,7 @@ export class Layout {
   @property(null)
   public declare readonly letterSpacing: Signal<number | null, this>;
   @property(null)
-  public declare readonly wrap: Signal<boolean | null, this>;
+  public declare readonly textWrap: Signal<boolean | null, this>;
 
   public readonly element: HTMLElement;
   public readonly styles: CSSStyleDeclaration;
@@ -101,7 +170,21 @@ export class Layout {
     initialize(this, {defaults: props});
   }
 
-  public toPixels(value: number) {
+  protected parseValue(value: number | string | null): string {
+    return value === null ? '' : value.toString();
+  }
+
+  protected parsePixels(value: number | null): string {
+    return value === null ? '' : `${value}px`;
+  }
+
+  protected parseLength(value: null | number | string): string {
+    if (value === null) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
     return `${value}px`;
   }
 
@@ -118,26 +201,12 @@ export class Layout {
   }
 
   public setWidth(width: Length): this {
-    if (width === null) {
-      this.element.style.width = 'auto';
-    } else if (typeof width === 'string') {
-      this.element.style.width = width;
-    } else {
-      this.element.style.width = this.toPixels(width);
-    }
-
+    this.element.style.width = this.parseLength(width);
     return this;
   }
 
   public setHeight(height: Length): this {
-    if (height === null) {
-      this.element.style.height = 'auto';
-    } else if (typeof height === 'string') {
-      this.element.style.height = height;
-    } else {
-      this.element.style.height = this.toPixels(height);
-    }
-
+    this.element.style.height = this.parseLength(height);
     return this;
   }
 
@@ -147,40 +216,51 @@ export class Layout {
     this.element.style.position =
       mode === 'disabled' || mode === 'root' ? 'absolute' : 'relative';
 
-    this.element.style.marginTop = this.toPixels(this.marginTop());
-    this.element.style.marginBottom = this.toPixels(this.marginBottom());
-    this.element.style.marginLeft = this.toPixels(this.marginLeft());
-    this.element.style.marginRight = this.toPixels(this.marginRight());
-    this.element.style.paddingTop = this.toPixels(this.paddingTop());
-    this.element.style.paddingBottom = this.toPixels(this.paddingBottom());
-    this.element.style.paddingLeft = this.toPixels(this.paddingLeft());
-    this.element.style.paddingRight = this.toPixels(this.paddingRight());
+    this.element.style.maxWidth = this.parseLength(this.maxWidth());
+    this.element.style.minWidth = this.parseLength(this.minWidth());
+    this.element.style.maxHeight = this.parseLength(this.maxHeight());
+    this.element.style.minWidth = this.parseLength(this.minWidth());
+    this.element.style.aspectRatio = this.parseValue(this.ratio());
+
+    this.element.style.marginTop = this.parsePixels(this.marginTop());
+    this.element.style.marginBottom = this.parsePixels(this.marginBottom());
+    this.element.style.marginLeft = this.parsePixels(this.marginLeft());
+    this.element.style.marginRight = this.parsePixels(this.marginRight());
+
+    this.element.style.paddingTop = this.parsePixels(this.paddingTop());
+    this.element.style.paddingBottom = this.parsePixels(this.paddingBottom());
+    this.element.style.paddingLeft = this.parsePixels(this.paddingLeft());
+    this.element.style.paddingRight = this.parsePixels(this.paddingRight());
+
     this.element.style.flexDirection = this.direction();
-    this.element.style.aspectRatio = this.ratio();
+    this.element.style.flexBasis = this.parseLength(this.basis());
+    this.element.style.flexWrap = this.wrap();
+
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
+    this.element.style.gap = this.parseLength(this.gap());
+    this.element.style.rowGap = this.parseLength(this.rowGap());
+    this.element.style.columnGap = this.parseLength(this.columnGap());
 
-    this.element.style.flexGrow = this.sizeLockCounter() > 0 ? '0' : '';
-    this.element.style.flexShrink = this.sizeLockCounter() > 0 ? '0' : '';
+    if (this.sizeLockCounter() > 0) {
+      this.element.style.flexGrow = '0';
+      this.element.style.flexShrink = '0';
+    } else {
+      this.element.style.flexGrow = this.parsePixels(this.grow());
+      this.element.style.flexShrink = this.parsePixels(this.shrink());
+    }
   }
 
   @computed()
   public applyFont() {
-    this.element.style.fontFamily = this.fontFamily() ?? '';
-    const fontSize = this.fontSize();
-    this.element.style.fontSize = fontSize ? this.toPixels(fontSize) : '';
-    this.element.style.fontStyle = this.fontStyle() ?? '';
-    const lineHeight = this.lineHeight();
-    this.element.style.lineHeight =
-      lineHeight === null ? '' : this.toPixels(lineHeight);
-    const fontWeight = this.fontWeight();
-    this.element.style.fontWeight =
-      fontWeight === null ? '' : fontWeight.toString();
-    const letterSpacing = this.letterSpacing();
-    this.element.style.letterSpacing = letterSpacing
-      ? this.toPixels(letterSpacing)
-      : '';
-    const wrap = this.wrap();
+    this.element.style.fontFamily = this.parseValue(this.fontFamily());
+    this.element.style.fontSize = this.parsePixels(this.fontSize());
+    this.element.style.fontStyle = this.parseValue(this.fontStyle());
+    this.element.style.lineHeight = this.parsePixels(this.lineHeight());
+    this.element.style.fontWeight = this.parseValue(this.fontWeight());
+    this.element.style.letterSpacing = this.parsePixels(this.letterSpacing());
+
+    const wrap = this.textWrap();
     this.element.style.whiteSpace =
       wrap === null ? '' : wrap ? 'normal' : 'nowrap';
   }

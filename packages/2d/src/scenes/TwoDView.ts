@@ -13,7 +13,7 @@ export class TwoDView extends Node {
         fontFamily: 'Roboto',
         fontSize: 48,
         lineHeight: 64,
-        wrap: false,
+        textWrap: false,
         fontStyle: 'normal',
       },
     });

@@ -185,8 +185,8 @@ export class Node<TProps extends NodeProps = NodeProps>
     this.layout.releaseSize();
   }
 
-  @compound(['width', 'height'], Size)
-  @property(undefined, Size.lerp)
+  @compound(['width', 'height'])
+  @property(undefined, Size.lerp, Size)
   public declare readonly size: Property<
     {width: Length; height: Length},
     Size,
@@ -246,8 +246,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(0)
   public declare readonly offsetY: Signal<number, this>;
 
-  @compound({x: 'offsetX', y: 'offsetY'}, Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound({x: 'offsetX', y: 'offsetY'})
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly offset: Signal<Vector2, this>;
 
   @property(1)
@@ -256,8 +256,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(1)
   public declare readonly scaleY: Signal<number, this>;
 
-  @compound({x: 'scaleX', y: 'scaleY'}, Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound({x: 'scaleX', y: 'scaleY'})
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly scale: Signal<Vector2, this>;
 
   @property(false)
@@ -313,8 +313,8 @@ export class Node<TProps extends NodeProps = NodeProps>
   @property(0)
   public declare readonly shadowOffsetY: Signal<number, this>;
 
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'}, Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly shadowOffset: Signal<Vector2, this>;
 
   @computed()
@@ -381,11 +381,11 @@ export class Node<TProps extends NodeProps = NodeProps>
     return filters;
   }
 
-  @compound(['x', 'y'], Vector2)
-  @property(undefined, Vector2.lerp)
+  @compound(['x', 'y'])
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly position: Signal<Vector2, this>;
 
-  @property(undefined, Vector2.lerp)
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly absolutePosition: Signal<Vector2, this>;
 
   protected getAbsolutePosition(): Vector2 {

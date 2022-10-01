@@ -1,22 +1,32 @@
 export type FlexDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 
-export type JustifyContent =
-  | 'flex-start'
+export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
+
+export type FlexBasis =
+  | Length
+  | 'content'
+  | 'max-content'
+  | 'min-content'
+  | 'fit-content'
+  | null;
+
+export type FlexJustify =
+  | 'normal'
   | 'center'
-  | 'flex-end'
+  | 'start'
+  | 'end'
   | 'space-between'
   | 'space-around'
-  | 'space-evenly';
+  | 'space-evenly'
+  | 'stretch';
 
-export type AlignItems =
-  | 'auto'
-  | 'flex-start'
+export type FlexAlign =
+  | 'normal'
   | 'center'
-  | 'flex-end'
+  | 'start'
+  | 'end'
   | 'stretch'
-  | 'baseline'
-  | 'space-between'
-  | 'space-around';
+  | 'baseline';
 
 export type ResolvedLayoutMode = 'disabled' | 'enabled' | 'root' | 'pop';
 export type LayoutMode = ResolvedLayoutMode | null;
