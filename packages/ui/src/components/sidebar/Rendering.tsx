@@ -73,6 +73,7 @@ export function Rendering() {
           value={width}
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
+            const {height} = player.project.getSize();
             player.project.setSize(value, height);
           }}
         />
@@ -83,6 +84,7 @@ export function Rendering() {
           value={height}
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
+            const {width} = player.project.getSize();
             player.project.setSize(width, value);
           }}
         />
