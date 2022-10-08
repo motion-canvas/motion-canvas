@@ -26,6 +26,7 @@
     "vite": "^3.0.5"
   },
   "dependencies": {
+    "code-fns": "^0.6.0",
     "colorjs.io": "^0.3.0",
     "mix-color": "^1.1.2",
     "mp4box": "^0.5.2"

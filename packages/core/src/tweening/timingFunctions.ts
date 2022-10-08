@@ -52,6 +52,21 @@ export function easeInCubic(value: number, from = 0, to = 1): number {
   return map(from, to, value);
 }
 
+export function easeInOutSine(value: number, from: number, to: number): number {
+  value = -(Math.cos(Math.PI * value) - 1) / 2;
+  return map(from, to, value);
+}
+
+export function easeOutSine(value: number, from: number, to: number): number {
+  value = 1 - Math.cos((value * Math.PI) / 2);
+  return map(from, to, value);
+}
+
+export function easeInSine(value: number, from: number, to: number): number {
+  value = 1 - Math.cos((value * Math.PI) / 2);
+  return map(from, to, value);
+}
+
 export function easeInOutQuint(value: number, from = 0, to = 1) {
   value =
     value < 0.5
