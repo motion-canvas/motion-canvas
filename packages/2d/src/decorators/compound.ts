@@ -40,21 +40,33 @@ import {addInitializer} from './initializers';
  * @param mapping - An array of signals to turn into a compound property or a
  *                  record mapping the property in the compound object to the
  *                  corresponding signal.
+ * @param klass - A class used to instantiate the returned value.
  */
 export function compound(
   mapping: string[] | Record<string, string>,
+  klass?: new (value: any) => any,
 ): PropertyDecorator {
   return (target: any, key) => {
     const entries = Array.isArray(mapping)
       ? mapping.map(key => [key, key])
       : Object.entries(mapping);
 
-    target.constructor.prototype[`get${capitalize(key.toString())}`] =
-      function () {
-        return Object.fromEntries(
-          entries.map(([key, property]) => [key, this[property]()]),
-        );
-      };
+    if (klass) {
+      target.constructor.prototype[`get${capitalize(key.toString())}`] =
+        function () {
+          const object = Object.fromEntries(
+            entries.map(([key, property]) => [key, this[property]()]),
+          );
+          return new klass(object);
+        };
+    } else {
+      target.constructor.prototype[`get${capitalize(key.toString())}`] =
+        function () {
+          return Object.fromEntries(
+            entries.map(([key, property]) => [key, this[property]()]),
+          );
+        };
+    }
 
     target.constructor.prototype[`set${capitalize(key.toString())}`] =
       function set(value: SignalValue<any>) {

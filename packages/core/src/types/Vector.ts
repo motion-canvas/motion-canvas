@@ -51,6 +51,14 @@ export class Vector2 {
     return new Vector2(Math.cos(radians), Math.sin(radians));
   }
 
+  public static magnitude(x: number, y: number) {
+    return Math.sqrt(x * x + y * y);
+  }
+
+  public get magnitude(): number {
+    return Vector2.magnitude(this.x, this.y);
+  }
+
   public get radians() {
     return Math.atan2(this.y, this.x);
   }
@@ -101,5 +109,21 @@ export class Vector2 {
       this.x * matrix.m11 + this.y * matrix.m21,
       this.x * matrix.m12 + this.y * matrix.m22,
     );
+  }
+
+  public mul(vector: Vector2) {
+    return new Vector2(this.x * vector.x, this.y * vector.y);
+  }
+
+  public add(vector: Vector2) {
+    return new Vector2(this.x + vector.x, this.y + vector.y);
+  }
+
+  public addX(value: number) {
+    return new Vector2(this.x + value, this.y);
+  }
+
+  public addY(value: number) {
+    return new Vector2(this.x, this.y + value);
   }
 }

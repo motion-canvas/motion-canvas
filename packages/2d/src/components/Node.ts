@@ -79,7 +79,7 @@ export class Node implements Promisable<Node> {
   @property(0)
   public declare readonly shadowOffsetY: Signal<number, this>;
 
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
+  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'}, Vector2)
   @property(undefined, Vector2.lerp, Vector2)
   public declare readonly shadowOffset: Signal<Vector2, this>;
 
@@ -156,7 +156,7 @@ export class Node implements Promisable<Node> {
   }
 
   @computed()
-  protected localToWorld(): DOMMatrix {
+  public localToWorld(): DOMMatrix {
     const parent = this.parent();
     return parent
       ? parent.localToWorld().multiply(this.localToParent())
@@ -164,17 +164,17 @@ export class Node implements Promisable<Node> {
   }
 
   @computed()
-  protected worldToLocal() {
+  public worldToLocal() {
     return this.localToWorld().inverse();
   }
 
   @computed()
-  protected worldToParent(): DOMMatrix {
+  public worldToParent(): DOMMatrix {
     return this.parent()?.worldToLocal() ?? new DOMMatrix();
   }
 
   @computed()
-  protected localToParent(): DOMMatrix {
+  public localToParent(): DOMMatrix {
     return new DOMMatrix();
   }
 
@@ -330,7 +330,7 @@ export class Node implements Promisable<Node> {
    * as its children.
    */
   @computed()
-  protected cacheRect(): Rect {
+  public cacheRect(): Rect {
     const cache = this.getCacheRect();
     const children = this.children();
     if (children.length === 0) {
@@ -458,6 +458,24 @@ export class Node implements Promisable<Node> {
       matrix.e,
       matrix.f,
     );
+  }
+
+  /**
+   * Try to find a node intersecting the given position.
+   *
+   * @param position - The searched position.
+   */
+  public hit(position: Vector2): Node | null {
+    let hit: Node | null = null;
+    const local = position.transformAsPoint(this.localToParent().inverse());
+    for (const child of this.children().reverse()) {
+      hit = child.hit(local);
+      if (hit) {
+        break;
+      }
+    }
+
+    return hit;
   }
 
   /**

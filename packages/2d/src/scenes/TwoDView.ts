@@ -1,4 +1,4 @@
-import {Layout} from '../components/Layout';
+import {Layout} from '../components';
 
 export class TwoDView extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
