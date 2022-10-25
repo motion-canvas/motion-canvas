@@ -1,23 +1,10 @@
-import {Node} from '../components';
+import {Layout} from '../components/Layout';
 
-export class TwoDView extends Node {
+export class TwoDView extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
+  public static document: Document;
 
-  public constructor() {
-    super({
-      // TODO Sync with the project size
-      width: 1920,
-      height: 1080,
-      composite: true,
-      layout: {
-        fontFamily: 'Roboto',
-        fontSize: 48,
-        lineHeight: 64,
-        textWrap: false,
-        fontStyle: 'normal',
-      },
-    });
-
+  static {
     let frame = document.querySelector<HTMLIFrameElement>(
       `#${TwoDView.frameID}`,
     );
@@ -33,10 +20,29 @@ export class TwoDView extends Node {
 
       document.body.prepend(frame);
     }
+    this.document = frame.contentDocument ?? document;
+  }
 
-    if (frame.contentDocument) {
-      frame.contentDocument.body.append(this.layout.element);
-    }
+  public constructor() {
+    super({
+      // TODO Sync with the project size
+      width: 1920,
+      height: 1080,
+      composite: true,
+      fontFamily: 'Roboto',
+      fontSize: 48,
+      lineHeight: 64,
+      textWrap: false,
+      fontStyle: 'normal',
+    });
+
+    TwoDView.document.body.append(this.element);
+    this.applyFlex();
+  }
+
+  public reset() {
+    this.removeChildren();
+    this.element.innerText = '';
   }
 
   public override render(context: CanvasRenderingContext2D) {
@@ -74,5 +80,13 @@ export class TwoDView extends Node {
 
   protected override transformContext() {
     // do nothing
+  }
+
+  protected override requestLayoutUpdate() {
+    this.updateLayout();
+  }
+
+  public override view(): TwoDView | null {
+    return this;
   }
 }

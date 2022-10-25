@@ -9,7 +9,7 @@ export interface TextProps extends ShapeProps {
   text?: string;
 }
 
-export class Text extends Shape<TextProps> {
+export class Text extends Shape {
   protected static segmenter;
 
   static {
@@ -35,15 +35,14 @@ export class Text extends Shape<TextProps> {
   protected override draw(context: CanvasRenderingContext2D) {
     this.requestFontUpdate();
     this.applyStyle(context);
-    context.font = this.layout.styles.font;
-    context.textBaseline = 'middle';
+    context.font = this.styles.font;
 
-    const parentRect = this.layout.element.getBoundingClientRect();
-    const {width, height} = this.computedSize();
+    const parentRect = this.element.getBoundingClientRect();
+    const {width, height} = this.size();
     const range = document.createRange();
     let line = '';
     const lineRect = new Rect();
-    for (const childNode of this.layout.element.childNodes) {
+    for (const childNode of this.element.childNodes) {
       if (!childNode.textContent) {
         continue;
       }
@@ -75,29 +74,36 @@ export class Text extends Shape<TextProps> {
     text: string,
     rect: Rect,
   ) {
+    const y =
+      rect.y +
+      rect.height / 2 +
+      context.measureText(text).fontBoundingBoxDescent;
+
     if (this.lineWidth() <= 0) {
       context.fillText(text, rect.x, rect.y + rect.height / 2);
     } else if (this.strokeFirst()) {
-      context.strokeText(text, rect.x, rect.y + rect.height / 2);
-      context.fillText(text, rect.x, rect.y + rect.height / 2);
+      context.strokeText(text, rect.x, y);
+      context.fillText(text, rect.x, y);
     } else {
-      context.fillText(text, rect.x, rect.y + rect.height / 2);
-      context.strokeText(text, rect.x, rect.y + rect.height / 2);
+      context.fillText(text, rect.x, y);
+      context.strokeText(text, rect.x, y);
     }
   }
 
-  protected override applyFontChanges() {
-    super.applyFontChanges();
-    const wrap = this.layout.styles.whiteSpace !== 'nowrap';
+  protected override updateLayout() {
+    this.applyFont();
+    this.applyFlex();
+
+    const wrap = this.styles.whiteSpace !== 'nowrap';
     const text = this.text();
 
     if (wrap && Text.segmenter) {
-      this.layout.element.innerText = '';
+      this.element.innerText = '';
       for (const word of Text.segmenter.segment(text)) {
-        this.layout.element.appendChild(document.createTextNode(word.segment));
+        this.element.appendChild(document.createTextNode(word.segment));
       }
     } else {
-      this.layout.element.innerText = this.text();
+      this.element.innerText = this.text();
     }
 
     if (wrap && !Text.segmenter) {
