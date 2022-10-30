@@ -60,6 +60,21 @@ export function easeInOutQuint(value: number, from = 0, to = 1) {
   return map(from, to, value);
 }
 
+export function easeInOutSine(value: number, from: number, to: number): number {
+  value = -(Math.cos(Math.PI * value) - 1) / 2;
+  return map(from, to, value);
+}
+
+export function easeInSine(value: number, from: number, to: number): number {
+  value = 1 - Math.cos((value * Math.PI) / 2);
+  return map(from, to, value);
+}
+
+export function easeOutSine(value: number, from: number, to: number): number {
+  value = Math.sin((value * Math.PI) / 2);
+  return map(from, to, value);
+}
+
 export function createEaseInBack(s = 1.70158): TimingFunction {
   return (value: number, from = 0, to = 1) => {
     return map(from, to, value * value * ((s + 1) * value - s));

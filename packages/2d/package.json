@@ -29,5 +29,8 @@
   "devDependencies": {
     "@motion-canvas/core": "^12.0.0-alpha.2",
     "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "code-fns": "^0.7.0"
   }
 }
