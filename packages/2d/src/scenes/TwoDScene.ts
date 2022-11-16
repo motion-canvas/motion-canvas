@@ -4,7 +4,6 @@ import {
   SceneRenderEvent,
 } from '@motion-canvas/core/lib/scenes';
 import {TwoDView} from './TwoDView';
-import {Node} from '../components';
 
 export class TwoDScene extends GeneratorScene<TwoDView> {
   private readonly view = new TwoDView();

@@ -109,12 +109,15 @@ export class Layout extends Node {
   public declare readonly marginLeft: Signal<number, this>;
   @property(0)
   public declare readonly marginRight: Signal<number, this>;
-  @compound({
-    top: 'marginTop',
-    bottom: 'marginBottom',
-    left: 'marginLeft',
-    right: 'marginRight',
-  })
+  @compound(
+    {
+      top: 'marginTop',
+      bottom: 'marginBottom',
+      left: 'marginLeft',
+      right: 'marginRight',
+    },
+    Spacing,
+  )
   @property(undefined, Spacing.lerp, Spacing)
   public declare readonly margin: Property<PossibleSpacing, Spacing, this>;
 
@@ -126,12 +129,15 @@ export class Layout extends Node {
   public declare readonly paddingLeft: Signal<number, this>;
   @property(0)
   public declare readonly paddingRight: Signal<number, this>;
-  @compound({
-    top: 'paddingTop',
-    bottom: 'paddingBottom',
-    left: 'paddingLeft',
-    right: 'paddingRight',
-  })
+  @compound(
+    {
+      top: 'paddingTop',
+      bottom: 'paddingBottom',
+      left: 'paddingLeft',
+      right: 'paddingRight',
+    },
+    Spacing,
+  )
   @property(undefined, Spacing.lerp, Spacing)
   public declare readonly padding: Property<PossibleSpacing, Spacing, this>;
 
@@ -293,7 +299,7 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
-  @compound(['width', 'height'])
+  @compound(['width', 'height'], Size)
   @property(undefined, Size.lerp, Size)
   public declare readonly size: Property<
     {width: Length; height: Length},
@@ -354,7 +360,7 @@ export class Layout extends Node {
   @property(0)
   public declare readonly offsetY: Signal<number, this>;
 
-  @compound({x: 'offsetX', y: 'offsetY'})
+  @compound({x: 'offsetX', y: 'offsetY'}, Vector2)
   @property(undefined, Vector2.lerp, Vector2)
   public declare readonly offset: Signal<Vector2, this>;
 
@@ -364,14 +370,29 @@ export class Layout extends Node {
   @property(1)
   public declare readonly scaleY: Signal<number, this>;
 
-  @compound({x: 'scaleX', y: 'scaleY'})
+  @compound({x: 'scaleX', y: 'scaleY'}, Vector2)
   @property(undefined, Vector2.lerp, Vector2)
   public declare readonly scale: Signal<Vector2, this>;
+
+  @property(undefined, Vector2.lerp, Vector2)
+  public declare readonly absoluteScale: Signal<Vector2, this>;
+
+  protected getAbsoluteScale(): Vector2 {
+    const matrix = this.localToWorld();
+    return new Vector2(
+      Vector2.magnitude(matrix.m11, matrix.m12),
+      Vector2.magnitude(matrix.m21, matrix.m22),
+    );
+  }
+
+  protected setAbsoluteScale(value: SignalValue<Vector2>) {
+    // TODO Implement setter
+  }
 
   @property(false)
   public declare readonly overflow: Signal<boolean, this>;
 
-  @compound(['x', 'y'])
+  @compound(['x', 'y'], Vector2)
   @property(undefined, Vector2.lerp, Vector2)
   public declare readonly position: Signal<Vector2, this>;
 
@@ -444,6 +465,14 @@ export class Layout extends Node {
     return null;
   }
 
+  @computed()
+  public anchorPosition() {
+    const size = this.computedSize();
+    const offset = this.offset();
+
+    return size.vector.scale(0.5).mul(offset);
+  }
+
   /**
    * Get the resolved layout mode of this node.
    *
@@ -469,7 +498,7 @@ export class Layout extends Node {
     return mode;
   }
 
-  protected override localToParent(): DOMMatrix {
+  public override localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
     const size = this.computedSize();
     matrix.translateSelf(this.x(), this.y());
@@ -641,5 +670,14 @@ export class Layout extends Node {
     const wrap = this.textWrap();
     this.element.style.whiteSpace =
       wrap === null ? '' : wrap ? 'normal' : 'nowrap';
+  }
+
+  public override hit(position: Vector2): Node | null {
+    const local = position.transformAsPoint(this.localToParent().inverse());
+    if (this.getCacheRect().includes(local)) {
+      return super.hit(position) ?? this;
+    }
+
+    return null;
   }
 }

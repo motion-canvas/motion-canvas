@@ -190,4 +190,13 @@ export class Rect {
       this.height + amount * 2,
     );
   }
+
+  public includes(point: Vector2): boolean {
+    return (
+      point.x >= this.x &&
+      point.x <= this.x + this.width &&
+      point.y >= this.y &&
+      point.y <= this.y + this.height
+    );
+  }
 }
