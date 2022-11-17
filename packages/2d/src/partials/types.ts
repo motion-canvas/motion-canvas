@@ -31,8 +31,7 @@ export type FlexAlign =
   | 'stretch'
   | 'baseline';
 
-export type ResolvedLayoutMode = 'disabled' | 'enabled' | 'root' | 'pop';
-export type LayoutMode = ResolvedLayoutMode | null;
+export type LayoutMode = boolean | null;
 
 export type Length = number | `${number}%` | null;
 

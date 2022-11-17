@@ -23,7 +23,6 @@ import {
   FlexWrap,
   LayoutMode,
   Length,
-  ResolvedLayoutMode,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -185,8 +184,7 @@ export class Layout extends Node {
   @property(0)
   public declare readonly x: Signal<number, this>;
   protected getX(): number {
-    const mode = this.resolvedMode();
-    if (mode !== 'enabled') {
+    if (this.isLayoutRoot()) {
       return this.customX();
     }
 
@@ -201,8 +199,7 @@ export class Layout extends Node {
   @property(0)
   public declare readonly y: Signal<number, this>;
   protected getY(): number {
-    const mode = this.resolvedMode();
-    if (mode !== 'enabled') {
+    if (this.isLayoutRoot()) {
       return this.customY();
     }
 
@@ -485,23 +482,13 @@ export class Layout extends Node {
    * inheritance).
    */
   @computed()
-  protected resolvedMode(): ResolvedLayoutMode {
-    const parentMode = this.parentTransform()?.resolvedMode();
-    let mode = this.layout();
+  protected layoutEnabled(): boolean {
+    return this.layout() ?? this.parentTransform()?.layoutEnabled() ?? false;
+  }
 
-    if (mode === null) {
-      if (!parentMode || parentMode === 'disabled') {
-        mode = 'disabled';
-      } else {
-        mode = 'enabled';
-      }
-    }
-
-    if (mode === 'root' && parentMode !== 'disabled') {
-      mode = 'enabled';
-    }
-
-    return mode;
+  @computed()
+  protected isLayoutRoot(): boolean {
+    return !this.layoutEnabled() || !this.parentTransform()?.layoutEnabled();
   }
 
   public override localToParent(): DOMMatrix {
@@ -553,9 +540,8 @@ export class Layout extends Node {
    */
   @computed()
   protected requestLayoutUpdate() {
-    const mode = this.resolvedMode();
     const parent = this.parentTransform();
-    if (mode === 'disabled' || mode === 'root' || !parent) {
+    if (this.isLayoutRoot() || !parent) {
       this.view()?.element.append(this.element);
       parent?.requestFontUpdate();
       this.updateLayout();
@@ -571,7 +557,7 @@ export class Layout extends Node {
   protected updateLayout() {
     this.applyFont();
     this.applyFlex();
-    if (this.resolvedMode() !== 'disabled') {
+    if (this.layoutEnabled()) {
       this.syncDOM();
     }
   }
@@ -666,9 +652,7 @@ export class Layout extends Node {
 
   @computed()
   protected applyFlex() {
-    const mode = this.resolvedMode();
-    this.element.style.position =
-      mode === 'disabled' || mode === 'root' ? 'absolute' : 'relative';
+    this.element.style.position = this.isLayoutRoot() ? 'absolute' : 'relative';
 
     this.element.style.width = this.parseLength(this.customWidth());
     this.element.style.height = this.parseLength(this.customHeight());
