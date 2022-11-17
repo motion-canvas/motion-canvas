@@ -1,5 +1,5 @@
 import Color from 'colorjs.io';
-import type {Rect, Vector2, PossibleSpacing, Spacing, Size} from '../types';
+import {Vector2} from '../types';
 
 export interface InterpolationFunction<T, Rest extends unknown[] = unknown[]> {
   (from: T, to: T, value: number, ...args: Rest): T;
@@ -188,4 +188,28 @@ export function clampRemap(
   if (fromOut > toOut) [fromOut, toOut] = [toOut, fromOut];
 
   return clamp(fromOut, toOut, remappedValue);
+}
+
+export function arcLerp(
+  value: number,
+  reverse: boolean,
+  ratio: number,
+): Vector2 {
+  let flip = reverse;
+  if (ratio > 1) {
+    ratio = 1 / ratio;
+  } else {
+    flip = !flip;
+  }
+
+  const normalized = flip ? Math.acos(1 - value) : Math.asin(value);
+  const radians = map(normalized, map(0, Math.PI / 2, value), ratio);
+
+  let xValue = Math.sin(radians);
+  let yValue = 1 - Math.cos(radians);
+  if (reverse) {
+    [xValue, yValue] = [yValue, xValue];
+  }
+
+  return new Vector2(xValue, yValue);
 }

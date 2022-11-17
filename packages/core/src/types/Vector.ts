@@ -1,6 +1,6 @@
 import {Size} from './Size';
 import {Rect} from './Rect';
-import {map} from '../tweening';
+import {arcLerp, map} from '../tweening';
 import {Direction, Origin} from './Origin';
 
 export type SerializedVector2 = {
@@ -20,9 +20,35 @@ export class Vector2 {
   public y = 0;
 
   public static readonly zero = new Vector2();
+  public static readonly one = new Vector2(1, 1);
+  public static readonly right = new Vector2(1, 0);
+  public static readonly left = new Vector2(-1, 0);
+  public static readonly up = new Vector2(0, 1);
+  public static readonly down = new Vector2(0, -1);
 
-  public static lerp(from: Vector2, to: Vector2, value: number) {
-    return new Vector2(map(from.x, to.x, value), map(from.y, to.y, value));
+  public static lerp(from: Vector2, to: Vector2, value: number | Vector2) {
+    let valueX;
+    let valueY;
+
+    if (typeof value === 'number') {
+      valueX = valueY = value;
+    } else {
+      valueX = value.x;
+      valueY = value.y;
+    }
+
+    return new Vector2(map(from.x, to.x, valueX), map(from.y, to.y, valueY));
+  }
+
+  public static arcLerp(
+    from: Vector2,
+    to: Vector2,
+    value: number,
+    reverse?: boolean,
+    ratio?: number,
+  ) {
+    ratio ??= from.sub(to).ctg;
+    return Vector2.lerp(from, to, arcLerp(value, reverse, ratio));
   }
 
   public static fromOrigin(origin: Origin | Direction) {
@@ -47,6 +73,10 @@ export class Vector2 {
     return position;
   }
 
+  public static fromScalar(value: number): Vector2 {
+    return new Vector2(value, value);
+  }
+
   public static fromRadians(radians: number) {
     return new Vector2(Math.cos(radians), Math.sin(radians));
   }
@@ -59,8 +89,28 @@ export class Vector2 {
     return Vector2.magnitude(this.x, this.y);
   }
 
+  public get normalized(): Vector2 {
+    return this.scale(1 / Vector2.magnitude(this.x, this.y));
+  }
+
+  public get safe(): Vector2 {
+    return new Vector2(isNaN(this.x) ? 0 : this.x, isNaN(this.y) ? 0 : this.y);
+  }
+
+  public get flipped(): Vector2 {
+    return new Vector2(-this.x, -this.y);
+  }
+
+  public get perpendicular(): Vector2 {
+    return new Vector2(this.y, -this.x);
+  }
+
   public get radians() {
     return Math.atan2(this.y, this.x);
+  }
+
+  public get ctg(): number {
+    return this.x / this.y;
   }
 
   public constructor();
@@ -117,6 +167,14 @@ export class Vector2 {
 
   public add(vector: Vector2) {
     return new Vector2(this.x + vector.x, this.y + vector.y);
+  }
+
+  public sub(vector: Vector2) {
+    return new Vector2(this.x - vector.x, this.y - vector.y);
+  }
+
+  public dot(vector: Vector2): number {
+    return this.x * vector.x + this.y * vector.y;
   }
 
   public addX(value: number) {

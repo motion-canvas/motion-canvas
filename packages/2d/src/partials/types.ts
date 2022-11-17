@@ -1,3 +1,6 @@
+import type {Gradient} from './Gradient';
+import type {Pattern} from './Pattern';
+
 export type FlexDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 
 export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
@@ -32,3 +35,5 @@ export type ResolvedLayoutMode = 'disabled' | 'enabled' | 'root' | 'pop';
 export type LayoutMode = ResolvedLayoutMode | null;
 
 export type Length = number | `${number}%` | null;
+
+export type CanvasStyle = null | string | Gradient | Pattern;

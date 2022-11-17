@@ -1,11 +1,13 @@
 import {compound, computed, Property, property} from '../decorators';
 import {
-  Vector2,
-  transformAngle,
+  Origin,
+  PossibleSpacing,
   Rect,
   Size,
-  PossibleSpacing,
   Spacing,
+  transformAngle,
+  Vector2,
+  originToOffset,
 } from '@motion-canvas/core/lib/types';
 import {isReactive, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {
@@ -32,58 +34,58 @@ export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;
   tagName?: keyof HTMLElementTagNameMap;
 
-  width?: Length;
-  height?: Length;
-  maxWidth?: Length;
-  maxHeight?: Length;
-  minWidth?: Length;
-  minHeight?: Length;
-  ratio?: number;
+  width?: SignalValue<Length>;
+  height?: SignalValue<Length>;
+  maxWidth?: SignalValue<Length>;
+  maxHeight?: SignalValue<Length>;
+  minWidth?: SignalValue<Length>;
+  minHeight?: SignalValue<Length>;
+  ratio?: SignalValue<number>;
 
-  marginTop?: number;
-  marginBottom?: number;
-  marginLeft?: number;
-  marginRight?: number;
-  margin?: PossibleSpacing;
+  marginTop?: SignalValue<number>;
+  marginBottom?: SignalValue<number>;
+  marginLeft?: SignalValue<number>;
+  marginRight?: SignalValue<number>;
+  margin?: SignalValue<PossibleSpacing>;
 
-  paddingTop?: number;
-  paddingBottom?: number;
-  paddingLeft?: number;
-  paddingRight?: number;
-  padding?: PossibleSpacing;
+  paddingTop?: SignalValue<number>;
+  paddingBottom?: SignalValue<number>;
+  paddingLeft?: SignalValue<number>;
+  paddingRight?: SignalValue<number>;
+  padding?: SignalValue<PossibleSpacing>;
 
-  direction?: FlexDirection;
-  basis?: FlexBasis;
-  grow?: number;
-  shrink?: number;
-  wrap?: FlexWrap;
+  direction?: SignalValue<FlexDirection>;
+  basis?: SignalValue<FlexBasis>;
+  grow?: SignalValue<number>;
+  shrink?: SignalValue<number>;
+  wrap?: SignalValue<FlexWrap>;
 
-  justifyContent?: FlexJustify;
-  alignItems?: FlexAlign;
-  rowGap?: Length;
-  columnGap?: Length;
-  gap?: Length;
+  justifyContent?: SignalValue<FlexJustify>;
+  alignItems?: SignalValue<FlexAlign>;
+  rowGap?: SignalValue<Length>;
+  columnGap?: SignalValue<Length>;
+  gap?: SignalValue<Length>;
 
-  fontFamily?: string;
-  fontSize?: number;
-  fontStyle?: string;
-  fontWeight?: number;
-  lineHeight?: number;
-  letterSpacing?: number;
-  textWrap?: boolean;
+  fontFamily?: SignalValue<string>;
+  fontSize?: SignalValue<number>;
+  fontStyle?: SignalValue<string>;
+  fontWeight?: SignalValue<number>;
+  lineHeight?: SignalValue<number>;
+  letterSpacing?: SignalValue<number>;
+  textWrap?: SignalValue<boolean>;
 
-  x?: number;
-  y?: number;
-  position?: Vector2;
-  size?: Size;
-  rotation?: number;
-  offsetX?: number;
-  offsetY?: number;
-  offset?: Vector2;
-  scaleX?: number;
-  scaleY?: number;
-  scale?: Vector2;
-  overflow?: boolean;
+  x?: SignalValue<number>;
+  y?: SignalValue<number>;
+  position?: SignalValue<Vector2>;
+  size?: SignalValue<Size>;
+  rotation?: SignalValue<number>;
+  offsetX?: SignalValue<number>;
+  offsetY?: SignalValue<number>;
+  offset?: SignalValue<Vector2>;
+  scaleX?: SignalValue<number>;
+  scaleY?: SignalValue<number>;
+  scale?: SignalValue<Vector2>;
+  clip?: SignalValue<boolean>;
 }
 
 export class Layout extends Node {
@@ -389,9 +391,6 @@ export class Layout extends Node {
     // TODO Implement setter
   }
 
-  @property(false)
-  public declare readonly overflow: Signal<boolean, this>;
-
   @compound(['x', 'y'], Vector2)
   @property(undefined, Vector2.lerp, Vector2)
   public declare readonly position: Signal<Vector2, this>;
@@ -427,6 +426,9 @@ export class Layout extends Node {
       this.rotation(transformAngle(value, this.worldToParent()));
     }
   }
+
+  @property(false)
+  public declare readonly clip: Signal<boolean, this>;
 
   public readonly element: HTMLElement;
   public readonly styles: CSSStyleDeclaration;
@@ -493,6 +495,10 @@ export class Layout extends Node {
       } else {
         mode = 'enabled';
       }
+    }
+
+    if (mode === 'root' && parentMode !== 'disabled') {
+      mode = 'enabled';
     }
 
     return mode;
@@ -565,7 +571,9 @@ export class Layout extends Node {
   protected updateLayout() {
     this.applyFont();
     this.applyFlex();
-    this.syncDOM();
+    if (this.resolvedMode() !== 'disabled') {
+      this.syncDOM();
+    }
   }
 
   @computed()
@@ -597,6 +605,47 @@ export class Layout extends Node {
     return new Rect(size.vector.scale(-0.5), size);
   }
 
+  protected override draw(context: CanvasRenderingContext2D) {
+    if (this.clip()) {
+      const size = this.computedSize();
+      if (size.width === 0 || size.height === 0) {
+        return;
+      }
+
+      context.beginPath();
+      context.rect(size.width / -2, size.height / -2, size.width, size.height);
+      context.closePath();
+      context.clip();
+    }
+
+    this.drawChildren(context);
+  }
+
+  public getOriginDelta(origin: Origin) {
+    const size = this.computedSize().scale(0.5);
+    const offset = this.offset().mul(size.vector);
+    if (origin === Origin.Middle) {
+      return offset.flipped;
+    }
+
+    const newOffset = originToOffset(origin).mul(size.vector);
+    return newOffset.sub(offset);
+  }
+
+  /**
+   * Update the offset of this node and adjust the position to keep it in the
+   * same place.
+   *
+   * @param offset - The new offset.
+   */
+  public moveOffset(offset: Vector2) {
+    const size = this.computedSize().scale(0.5);
+    const oldOffset = this.offset().mul(size.vector);
+    const newOffset = offset.mul(size.vector);
+    this.offset(offset);
+    this.position(this.position().add(newOffset).sub(oldOffset));
+  }
+
   protected parseValue(value: number | string | null): string {
     return value === null ? '' : value.toString();
   }
@@ -617,7 +666,7 @@ export class Layout extends Node {
 
   @computed()
   protected applyFlex() {
-    const mode = this.layout();
+    const mode = this.resolvedMode();
     this.element.style.position =
       mode === 'disabled' || mode === 'root' ? 'absolute' : 'relative';
 
@@ -653,8 +702,8 @@ export class Layout extends Node {
       this.element.style.flexGrow = '0';
       this.element.style.flexShrink = '0';
     } else {
-      this.element.style.flexGrow = this.parsePixels(this.grow());
-      this.element.style.flexShrink = this.parsePixels(this.shrink());
+      this.element.style.flexGrow = this.parseValue(this.grow());
+      this.element.style.flexShrink = this.parseValue(this.shrink());
     }
   }
 

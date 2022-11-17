@@ -1,4 +1,4 @@
-import {Layout} from '../components';
+import {Layout, Node} from '../components';
 
 export class TwoDView extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
@@ -23,6 +23,8 @@ export class TwoDView extends Layout {
     this.document = frame.contentDocument ?? document;
   }
 
+  private registeredNodes: Node[] = [];
+
   public constructor() {
     super({
       // TODO Sync with the project size
@@ -42,6 +44,10 @@ export class TwoDView extends Layout {
 
   public reset() {
     this.removeChildren();
+    for (const node of this.registeredNodes) {
+      node.dispose();
+    }
+    this.registeredNodes = [];
     this.element.innerText = '';
   }
 
@@ -88,5 +94,9 @@ export class TwoDView extends Layout {
 
   public override view(): TwoDView | null {
     return this;
+  }
+
+  public registerNode(node: Node) {
+    this.registeredNodes.push(node);
   }
 }
