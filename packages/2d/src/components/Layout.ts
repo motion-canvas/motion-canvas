@@ -384,7 +384,16 @@ export class Layout extends Node {
   }
 
   protected setAbsoluteScale(value: SignalValue<Vector2>) {
-    // TODO Implement setter
+    if (isReactive(value)) {
+      this.scale(() => this.getRelativeScale(value()));
+    } else {
+      this.scale(this.getRelativeScale(value));
+    }
+  }
+
+  private getRelativeScale(scale: Vector2): Vector2 {
+    const parentScale = this.parentTransform()?.absoluteScale() ?? Vector2.one;
+    return scale.div(parentScale);
   }
 
   @compound(['x', 'y'], Vector2)
@@ -566,11 +575,11 @@ export class Layout extends Node {
     this.element.innerText = '';
     const queue = [...this.children()];
     while (queue.length) {
-      const child = queue.shift()!;
+      const child = queue.shift();
       if (child instanceof Layout) {
         this.element.append(child.element);
         child.updateLayout();
-      } else {
+      } else if (child) {
         queue.push(...child.children());
       }
     }

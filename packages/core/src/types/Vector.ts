@@ -188,6 +188,10 @@ export class Vector2 {
     return new Vector2(this.x * vector.x, this.y * vector.y);
   }
 
+  public div(vector: Vector2) {
+    return new Vector2(this.x / vector.x, this.y / vector.y);
+  }
+
   public add(vector: Vector2) {
     return new Vector2(this.x + vector.x, this.y + vector.y);
   }
