@@ -2,6 +2,7 @@ export enum IconType {
   dragIndicator = 'dragIndicator',
   motionCanvas = 'motionCanvas',
   pause = 'pause',
+  photoCamera = 'photoCamera',
   play = 'play',
   repeat = 'repeat',
   skipNext = 'skipNext',

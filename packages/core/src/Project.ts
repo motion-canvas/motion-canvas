@@ -5,6 +5,9 @@ import {Size, CanvasColorSpace, CanvasOutputMimeType} from './types';
 import {AudioManager} from './media';
 import {ifHot} from './utils';
 
+const EXPORT_FRAME_LIMIT = 256;
+const EXPORT_RETRY_DELAY = 1000;
+
 export const ProjectSize: Record<string, Size> = {
   FullHD: new Size(1920, 1080),
 };
@@ -132,6 +135,7 @@ export class Project {
   private background: string | false;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private exportCounter = 0;
 
   private width: number;
   private height: number;
@@ -236,6 +240,12 @@ export class Project {
         if (this.currentScene.current) {
           await this.currentScene.current.reset(this.previousScene);
         }
+        if (
+          !this.currentScene.current ||
+          this.currentScene.current.isAfterTransitionIn()
+        ) {
+          this.previousScene = null;
+        }
       }
     }
 
@@ -292,7 +302,7 @@ export class Project {
     return finished;
   }
 
-  public async export() {
+  public async export(isStill = false) {
     const frame = this.frame;
 
     if (this.renderLookup[frame]) {
@@ -300,25 +310,24 @@ export class Project {
       return;
     }
 
-    await ifHot(
-      hot =>
-        new Promise<void>((resolve, reject) => {
-          setTimeout(() => {
-            delete this.renderLookup[frame];
-            reject(`Connection timeout when exporting frame no. ${frame}`);
-          }, 1000);
-          this.renderLookup[frame] = () => {
-            delete this.renderLookup[frame];
-            resolve();
-          };
-          hot.send('motion-canvas:export', {
-            frame,
-            data: this.canvas.toDataURL(this._fileType, this._quality),
-            mimeType: this._fileType,
-            project: this.name,
-          });
-        }),
-    );
+    await ifHot(async hot => {
+      while (this.exportCounter > EXPORT_FRAME_LIMIT) {
+        await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
+      }
+
+      this.exportCounter++;
+      this.renderLookup[frame] = () => {
+        this.exportCounter--;
+        delete this.renderLookup[frame];
+      };
+      hot.send('motion-canvas:export', {
+        frame,
+        isStill,
+        data: this.canvas.toDataURL(this._fileType, this._quality),
+        mimeType: this._fileType,
+        project: this.name,
+      });
+    });
   }
 
   public syncAudio(frameOffset = 0) {

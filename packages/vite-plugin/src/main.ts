@@ -305,10 +305,12 @@ export default ({
       });
       server.ws.on(
         'motion-canvas:export',
-        async ({frame, mimeType, data, project}, client) => {
-          const name = frame.toString().padStart(6, '0');
+        async ({frame, mimeType, data, project, isStill}, client) => {
           const extension = mime.extension(mimeType);
-          const file = path.join(outputPath, project, name + '.' + extension);
+          const name = frame.toString().padStart(6, '0') + '.' + extension;
+          const file = isStill
+            ? path.join(outputPath, 'still', project, name)
+            : path.join(outputPath, project, name);
 
           const directory = path.dirname(file);
           if (!fs.existsSync(directory)) {

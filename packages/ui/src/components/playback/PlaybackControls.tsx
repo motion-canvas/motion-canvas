@@ -93,6 +93,10 @@ export function PlaybackControls() {
           <Input size={4} readOnly value={`${framerate} FPS`} />
         )}
       />
+      <IconButton
+        icon={IconType.photoCamera}
+        onClick={() => player.exportCurrentFrame()}
+      />
     </div>
   );
 }
