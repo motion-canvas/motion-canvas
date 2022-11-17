@@ -224,6 +224,10 @@ export class Player {
     this.updateState({muted: !value});
   }
 
+  public async exportCurrentFrame() {
+    await this.project.export(true);
+  }
+
   private async run() {
     const commands = this.consumeCommands();
     const state = {...this.state.current};
