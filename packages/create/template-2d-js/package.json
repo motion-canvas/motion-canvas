@@ -1,0 +1,18 @@
+{
+  "name": "konva-starter",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "serve": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@motion-canvas/core": "*",
+    "@motion-canvas/2d": "*"
+  },
+  "devDependencies": {
+    "@motion-canvas/ui": "*",
+    "@motion-canvas/vite-plugin": "*",
+    "vite": "^3.0.5"
+  }
+}

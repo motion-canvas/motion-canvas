@@ -26,7 +26,7 @@ import {
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
-import {TwoDView} from '../scenes';
+import {View2D} from '../scenes';
 
 export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;
@@ -444,7 +444,7 @@ export class Layout extends Node {
   public constructor({tagName = 'div', ...props}: LayoutProps) {
     super(props);
 
-    this.element = TwoDView.document.createElement(tagName);
+    this.element = View2D.document.createElement(tagName);
     this.element.style.display = 'flex';
     this.element.style.boxSizing = 'border-box';
 

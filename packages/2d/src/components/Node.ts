@@ -9,7 +9,7 @@ import {
 } from '@motion-canvas/core/lib/utils';
 import {ComponentChild, ComponentChildren} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
-import {TwoDView, use2DView} from '../scenes';
+import {View2D, use2DView} from '../scenes';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 
@@ -187,7 +187,7 @@ export class Node implements Promisable<Node> {
 
   public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
-    this.append(children);
+    this.add(children);
     use2DView()?.registerNode(this);
   }
 
@@ -274,11 +274,11 @@ export class Node implements Promisable<Node> {
   }
 
   @computed()
-  public view(): TwoDView | null {
+  public view(): View2D | null {
     return this.parent()?.view() ?? null;
   }
 
-  public append(node: ComponentChildren): this {
+  public add(node: ComponentChildren): this {
     const nodes: ComponentChild[] = Array.isArray(node) ? node : [node];
     for (const node of nodes) {
       if (node instanceof Node) {

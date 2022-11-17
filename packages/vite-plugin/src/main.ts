@@ -339,6 +339,10 @@ export default ({
         server: {
           port: 9000,
         },
+        esbuild: {
+          jsx: 'automatic',
+          jsxImportSource: '@motion-canvas/2d/lib',
+        },
       };
     },
   };
