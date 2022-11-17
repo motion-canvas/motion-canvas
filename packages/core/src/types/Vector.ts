@@ -144,7 +144,7 @@ export class Vector2 {
 
     if (Array.isArray(one)) {
       this.x = one[0];
-      this.y = one[0];
+      this.y = one[1];
       return;
     }
 

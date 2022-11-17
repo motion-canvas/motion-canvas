@@ -1,5 +1,5 @@
 import {CanvasStyle} from '../partials';
-import {computed, property} from '../decorators';
+import {computed, initial, property} from '../decorators';
 import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {Layout, LayoutProps} from './Layout';
@@ -19,21 +19,29 @@ export interface ShapeProps extends LayoutProps {
 }
 
 export abstract class Shape extends Layout {
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly fill: Signal<CanvasStyle, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly stroke: Signal<CanvasStyle, this>;
-  @property(false)
+  @initial(false)
+  @property()
   public declare readonly strokeFirst: Signal<boolean, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly lineWidth: Signal<number, this>;
-  @property('miter')
+  @initial('miter')
+  @property()
   public declare readonly lineJoin: Signal<CanvasLineJoin, this>;
-  @property('butt')
+  @initial('butt')
+  @property()
   public declare readonly lineCap: Signal<CanvasLineCap, this>;
-  @property([])
+  @initial([])
+  @property()
   public declare readonly lineDash: Signal<number[], this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly lineDashOffset: Signal<number, this>;
 
   protected readonly rippleStrength = createSignal<number, this>(0);

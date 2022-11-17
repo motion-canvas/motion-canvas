@@ -1,4 +1,4 @@
-import {property} from '../decorators';
+import {initial, interpolation, property} from '../decorators';
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
@@ -22,7 +22,9 @@ export class Text extends Shape {
     }
   }
 
-  @property('', textLerp)
+  @initial('')
+  @interpolation(textLerp)
+  @property()
   public declare readonly text: Signal<string, this>;
 
   public constructor({children, ...rest}: TextProps) {

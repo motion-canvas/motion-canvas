@@ -1,5 +1,5 @@
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
-import {computed, property} from '../decorators';
+import {computed, initial, property} from '../decorators';
 import {Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
 import Color from 'colorjs.io';
 import {drawImage} from '../utils';
@@ -15,10 +15,12 @@ export class Image extends Rect {
   @property()
   public declare readonly src: Signal<string, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly alpha: Signal<number, this>;
 
-  @property(true)
+  @initial(true)
+  @property()
   public declare readonly smoothing: Signal<boolean, this>;
 
   protected readonly image: HTMLImageElement;

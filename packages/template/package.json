@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@motion-canvas/core": "*",
-    "@motion-canvas/legacy": "*"
+    "@motion-canvas/2d": "*"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",
