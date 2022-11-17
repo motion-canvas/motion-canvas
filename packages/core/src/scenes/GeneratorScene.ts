@@ -14,7 +14,7 @@ import {endScene, setProject, startScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
-import {Size} from '../types';
+import {Vector2} from '../types';
 import {SceneState} from './SceneState';
 
 export interface ThreadGeneratorFactory<T> {
@@ -203,7 +203,7 @@ export abstract class GeneratorScene<T>
     await this.next();
   }
 
-  public getSize(): Size {
+  public getSize(): Vector2 {
     return this.project.getSize();
   }
 

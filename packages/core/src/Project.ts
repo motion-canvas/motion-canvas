@@ -1,15 +1,15 @@
 import {Scene} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
-import {Size, CanvasColorSpace, CanvasOutputMimeType} from './types';
+import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
 import {ifHot} from './utils';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
 
-export const ProjectSize: Record<string, Size> = {
-  FullHD: new Size(1920, 1080),
+export const ProjectSize: Record<string, Vector2> = {
+  FullHD: new Vector2(1920, 1080),
 };
 
 export interface ProjectConfig {
@@ -18,7 +18,7 @@ export interface ProjectConfig {
   audio?: string;
   audioOffset?: number;
   canvas?: HTMLCanvasElement;
-  size?: Size;
+  size?: Vector2;
   background?: string | false;
 }
 
@@ -104,9 +104,9 @@ export class Project {
     this.updateCanvas();
   }
 
-  public setSize(size: Size): void;
+  public setSize(size: Vector2): void;
   public setSize(width: number, height: number): void;
-  public setSize(value: Size | number, height?: number): void {
+  public setSize(value: Vector2 | number, height?: number): void {
     if (typeof value === 'object') {
       this.width = value.width;
       this.height = value.height;
@@ -118,8 +118,8 @@ export class Project {
     this.reloadAll();
   }
 
-  public getSize(): Size {
-    return new Size(this.width, this.height);
+  public getSize(): Vector2 {
+    return new Vector2(this.width, this.height);
   }
 
   public readonly name: string;

@@ -3,7 +3,6 @@ import {
   Origin,
   PossibleSpacing,
   Rect,
-  Size,
   Spacing,
   transformAngle,
   Vector2,
@@ -76,7 +75,7 @@ export interface LayoutProps extends NodeProps {
   x?: SignalValue<number>;
   y?: SignalValue<number>;
   position?: SignalValue<Vector2>;
-  size?: SignalValue<Size>;
+  size?: SignalValue<Vector2>;
   rotation?: SignalValue<number>;
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
@@ -298,11 +297,11 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
-  @compound(['width', 'height'], Size)
-  @property(undefined, Size.lerp, Size)
+  @compound(['width', 'height'], Vector2)
+  @property(undefined, Vector2.lerp, Vector2)
   public declare readonly size: Property<
     {width: Length; height: Length},
-    Size,
+    Vector2,
     this
   >;
 
@@ -319,23 +318,23 @@ export class Layout extends Node {
     value: SignalValue<{width: Length; height: Length}>,
     time: number,
     timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Size>,
+    interpolationFunction: InterpolationFunction<Vector2>,
   ): ThreadGenerator {
     const size = this.customSize();
-    let from: Size;
+    let from: Vector2;
     if (typeof size.height !== 'number' || typeof size.width !== 'number') {
       from = this.size();
     } else {
-      from = <Size>size;
+      from = <Vector2>size;
     }
 
-    let to: Size;
+    let to: Vector2;
     if (
       typeof value === 'object' &&
       typeof value.height === 'number' &&
       typeof value.width === 'number'
     ) {
-      to = <Size>value;
+      to = <Vector2>value;
     } else {
       this.size(value);
       to = this.size();
@@ -469,7 +468,7 @@ export class Layout extends Node {
     const size = this.computedSize();
     const offset = this.offset();
 
-    return size.vector.scale(0.5).mul(offset);
+    return size.scale(0.5).mul(offset);
   }
 
   /**
@@ -530,9 +529,9 @@ export class Layout extends Node {
   }
 
   @computed()
-  protected computedSize(): Size {
+  protected computedSize(): Vector2 {
     this.requestLayoutUpdate();
-    return new Size(this.getComputedLayout());
+    return new Vector2(this.getComputedLayout());
   }
 
   /**
@@ -588,7 +587,7 @@ export class Layout extends Node {
 
   protected override getCacheRect(): Rect {
     const size = this.computedSize();
-    return new Rect(size.vector.scale(-0.5), size);
+    return new Rect(size.scale(-0.5), size);
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -609,12 +608,12 @@ export class Layout extends Node {
 
   public getOriginDelta(origin: Origin) {
     const size = this.computedSize().scale(0.5);
-    const offset = this.offset().mul(size.vector);
+    const offset = this.offset().mul(size);
     if (origin === Origin.Middle) {
       return offset.flipped;
     }
 
-    const newOffset = originToOffset(origin).mul(size.vector);
+    const newOffset = originToOffset(origin).mul(size);
     return newOffset.sub(offset);
   }
 
@@ -626,8 +625,8 @@ export class Layout extends Node {
    */
   public moveOffset(offset: Vector2) {
     const size = this.computedSize().scale(0.5);
-    const oldOffset = this.offset().mul(size.vector);
-    const newOffset = offset.mul(size.vector);
+    const oldOffset = this.offset().mul(size);
+    const newOffset = offset.mul(size);
     this.offset(offset);
     this.position(this.position().add(newOffset).sub(oldOffset));
   }

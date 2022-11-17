@@ -86,9 +86,7 @@ export class Image extends Rect {
 
   public getColorAtPoint(position: Vector2): any {
     const context = this.imageDrawnCanvas();
-    const relativePosition = position.add(
-      this.computedSize().vector.scale(0.5),
-    );
+    const relativePosition = position.add(this.computedSize().scale(0.5));
     const data = context.getImageData(
       relativePosition.x,
       relativePosition.y,

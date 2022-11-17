@@ -2,7 +2,7 @@ import type {Project} from '../Project';
 import {Meta, Metadata} from '../Meta';
 import {SavedTimeEvent, TimeEvents} from './TimeEvents';
 import {SubscribableEvent, SubscribableValueEvent} from '../events';
-import {Size} from '../types';
+import {Vector2} from '../types';
 import {LifecycleEvents} from './LifecycleEvents';
 
 export interface SceneMetadata extends Metadata {
@@ -210,7 +210,7 @@ export interface Scene<T = unknown> {
    *
    * Usually return `this.project.getSize()`.
    */
-  getSize(): Size;
+  getSize(): Vector2;
 
   /**
    * Is this scene in the {@link SceneState.AfterTransitionIn} state?
