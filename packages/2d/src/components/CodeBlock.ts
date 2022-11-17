@@ -1,4 +1,4 @@
-import {computed, property} from '../decorators';
+import {computed, initial, property} from '../decorators';
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {CodeTree, parse, diff, ready, MorphToken} from 'code-fns';
@@ -16,7 +16,8 @@ export interface CodeProps extends ShapeProps {
 }
 
 export class CodeBlock extends Shape {
-  @property('')
+  @initial('')
+  @property()
   public declare readonly code: Signal<CodeTree, this>;
 
   private progress: number | null = null;

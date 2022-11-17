@@ -1,4 +1,12 @@
-import {compound, computed, Property, property} from '../decorators';
+import {
+  compound,
+  computed,
+  initial,
+  interpolation,
+  Property,
+  property,
+  wrapper,
+} from '../decorators';
 import {
   Origin,
   PossibleSpacing,
@@ -87,100 +95,129 @@ export interface LayoutProps extends NodeProps {
 }
 
 export class Layout extends Node {
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly layout: Signal<LayoutMode, this>;
 
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly maxWidth: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly maxHeight: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly minWidth: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly minHeight: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly ratio: Signal<number | null, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly marginTop: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly marginBottom: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly marginLeft: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly marginRight: Signal<number, this>;
-  @compound(
-    {
-      top: 'marginTop',
-      bottom: 'marginBottom',
-      left: 'marginLeft',
-      right: 'marginRight',
-    },
-    Spacing,
-  )
-  @property(undefined, Spacing.lerp, Spacing)
+  @compound({
+    top: 'marginTop',
+    bottom: 'marginBottom',
+    left: 'marginLeft',
+    right: 'marginRight',
+  })
+  @wrapper(Spacing)
+  @property()
   public declare readonly margin: Property<PossibleSpacing, Spacing, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly paddingTop: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly paddingBottom: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly paddingLeft: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly paddingRight: Signal<number, this>;
-  @compound(
-    {
-      top: 'paddingTop',
-      bottom: 'paddingBottom',
-      left: 'paddingLeft',
-      right: 'paddingRight',
-    },
-    Spacing,
-  )
-  @property(undefined, Spacing.lerp, Spacing)
+  @compound({
+    top: 'paddingTop',
+    bottom: 'paddingBottom',
+    left: 'paddingLeft',
+    right: 'paddingRight',
+  })
+  @wrapper(Spacing)
+  @property()
   public declare readonly padding: Property<PossibleSpacing, Spacing, this>;
 
-  @property('row')
+  @initial('row')
+  @property()
   public declare readonly direction: Signal<FlexDirection, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly basis: Signal<FlexBasis, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly grow: Signal<number, this>;
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly shrink: Signal<number, this>;
-  @property('nowrap')
+  @initial('nowrap')
+  @property()
   public declare readonly wrap: Signal<FlexWrap, this>;
 
-  @property('normal')
+  @initial('normal')
+  @property()
   public declare readonly justifyContent: Signal<FlexJustify, this>;
-  @property('normal')
+  @initial('normal')
+  @property()
   public declare readonly alignItems: Signal<FlexAlign, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly gap: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly rowGap: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly columnGap: Signal<Length, this>;
 
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly fontFamily: Signal<string | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly fontSize: Signal<number | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly fontStyle: Signal<string | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly fontWeight: Signal<number | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly lineHeight: Signal<number | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly letterSpacing: Signal<number | null, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly textWrap: Signal<boolean | null, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   protected declare readonly customX: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly x: Signal<number, this>;
   protected getX(): number {
     if (this.isLayoutRoot()) {
@@ -193,9 +230,11 @@ export class Layout extends Node {
     this.customX(value);
   }
 
-  @property(0)
+  @initial(0)
+  @property()
   protected declare readonly customY: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly y: Signal<number, this>;
   protected getY(): number {
     if (this.isLayoutRoot()) {
@@ -208,9 +247,11 @@ export class Layout extends Node {
     this.customY(value);
   }
 
-  @property(null)
+  @initial(null)
+  @property()
   protected declare readonly customWidth: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly width: Property<Length, number, this>;
   protected getWidth(): number {
     return this.computedSize().width;
@@ -252,9 +293,11 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
-  @property(null)
+  @initial(null)
+  @property()
   protected declare readonly customHeight: Signal<Length, this>;
-  @property(null)
+  @initial(null)
+  @property()
   public declare readonly height: Property<Length, number, this>;
   protected getHeight(): number {
     return this.computedSize().height;
@@ -297,8 +340,9 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
-  @compound(['width', 'height'], Vector2)
-  @property(undefined, Vector2.lerp, Vector2)
+  @compound({x: 'width', y: 'height'})
+  @wrapper(Vector2)
+  @property()
   public declare readonly size: Property<
     {width: Length; height: Length},
     Vector2,
@@ -349,30 +393,38 @@ export class Layout extends Node {
     this.size(value);
   }
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly rotation: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly offsetX: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly offsetY: Signal<number, this>;
 
-  @compound({x: 'offsetX', y: 'offsetY'}, Vector2)
-  @property(undefined, Vector2.lerp, Vector2)
+  @compound({x: 'offsetX', y: 'offsetY'})
+  @wrapper(Vector2)
+  @property()
   public declare readonly offset: Signal<Vector2, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly scaleX: Signal<number, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly scaleY: Signal<number, this>;
 
-  @compound({x: 'scaleX', y: 'scaleY'}, Vector2)
-  @property(undefined, Vector2.lerp, Vector2)
+  @compound({x: 'scaleX', y: 'scaleY'})
+  @wrapper(Vector2)
+  @property()
   public declare readonly scale: Signal<Vector2, this>;
 
-  @property(undefined, Vector2.lerp, Vector2)
+  @wrapper(Vector2)
+  @property()
   public declare readonly absoluteScale: Signal<Vector2, this>;
 
   protected getAbsoluteScale(): Vector2 {
@@ -396,11 +448,13 @@ export class Layout extends Node {
     return scale.div(parentScale);
   }
 
-  @compound(['x', 'y'], Vector2)
-  @property(undefined, Vector2.lerp, Vector2)
+  @compound(['x', 'y'])
+  @wrapper(Vector2)
+  @property()
   public declare readonly position: Signal<Vector2, this>;
 
-  @property(undefined, Vector2.lerp, Vector2)
+  @wrapper(Vector2)
+  @property()
   public declare readonly absolutePosition: Signal<Vector2, this>;
 
   protected getAbsolutePosition(): Vector2 {
@@ -432,13 +486,15 @@ export class Layout extends Node {
     }
   }
 
-  @property(false)
+  @initial(false)
+  @property()
   public declare readonly clip: Signal<boolean, this>;
 
   public readonly element: HTMLElement;
   public readonly styles: CSSStyleDeclaration;
 
-  @property(0)
+  @initial(0)
+  @property()
   protected declare readonly sizeLockCounter: Signal<number, this>;
 
   public constructor({tagName = 'div', ...props}: LayoutProps) {

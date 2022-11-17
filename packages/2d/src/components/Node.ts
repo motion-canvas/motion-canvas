@@ -1,4 +1,12 @@
-import {compound, computed, initialize, property} from '../decorators';
+import {
+  compound,
+  computed,
+  initial,
+  initialize,
+  interpolation,
+  property,
+  wrapper,
+} from '../decorators';
 import {Vector2, Rect, transformScalar} from '@motion-canvas/core/lib/types';
 import {
   createSignal,
@@ -38,13 +46,16 @@ export interface NodeProps {
 export class Node implements Promisable<Node> {
   public declare isClass: boolean;
 
-  @property(false)
+  @initial(false)
+  @property()
   public declare readonly cache: Signal<boolean, this>;
 
-  @property(false)
+  @initial(false)
+  @property()
   public declare readonly composite: Signal<boolean, this>;
 
-  @property('source-over')
+  @initial('source-over')
+  @property()
   public declare readonly compositeOperation: Signal<
     GlobalCompositeOperation,
     this
@@ -70,7 +81,8 @@ export class Node implements Promisable<Node> {
     }
   }
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly opacity: Signal<number, this>;
 
   @computed()
@@ -78,44 +90,57 @@ export class Node implements Promisable<Node> {
     return (this.parent()?.absoluteOpacity() ?? 1) * this.opacity();
   }
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly blur: Signal<number, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly brightness: Signal<number, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly contrast: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly grayscale: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly hue: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly invert: Signal<number, this>;
 
-  @property(1)
+  @initial(1)
+  @property()
   public declare readonly saturate: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly sepia: Signal<number, this>;
 
-  @property('')
+  @initial('')
+  @property()
   public declare readonly shadowColor: Signal<string, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly shadowBlur: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly shadowOffsetX: Signal<number, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly shadowOffsetY: Signal<number, this>;
 
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'}, Vector2)
-  @property(undefined, Vector2.lerp, Vector2)
+  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
+  @wrapper(Vector2)
+  @property()
   public declare readonly shadowOffset: Signal<Vector2, this>;
 
   @computed()

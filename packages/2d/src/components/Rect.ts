@@ -1,7 +1,7 @@
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {Rect as RectType} from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
-import {property} from '../decorators';
+import {initial, property} from '../decorators';
 import {drawRoundRect} from '../utils';
 
 export interface RectProps extends ShapeProps {
@@ -9,7 +9,8 @@ export interface RectProps extends ShapeProps {
 }
 
 export class Rect extends Shape {
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly radius: Signal<number, this>;
 
   public constructor(props: RectProps) {

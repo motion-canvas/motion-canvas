@@ -11,15 +11,8 @@ export function addInitializer<T>(target: any, initializer: Initializer<T>) {
     // and it's not the target object itself
     !Object.prototype.hasOwnProperty.call(target, INITIALIZERS)
   ) {
-    const props = [];
-    let base = Object.getPrototypeOf(target);
-    while (base) {
-      if (Object.prototype.hasOwnProperty.call(base, INITIALIZERS)) {
-        props.push(...base[INITIALIZERS]);
-      }
-      base = Object.getPrototypeOf(base);
-    }
-    target[INITIALIZERS] = props;
+    const base = Object.getPrototypeOf(target);
+    target[INITIALIZERS] = [...base[INITIALIZERS]];
   }
 
   target[INITIALIZERS].push(initializer);

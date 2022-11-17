@@ -1,4 +1,12 @@
-import {compound, computed, initialize, property} from '../decorators';
+import {
+  compound,
+  computed,
+  initial,
+  initialize,
+  interpolation,
+  property,
+  wrapper,
+} from '../decorators';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Signal} from '@motion-canvas/core/lib/utils';
 
@@ -24,32 +32,43 @@ export interface GradientProps {
 }
 
 export class Gradient {
-  @property('linear')
+  @initial('linear')
+  @property()
   public declare readonly type: Signal<GradientType, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly fromX: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly fromY: Signal<number, this>;
   @compound({x: 'fromX', y: 'fromY'})
-  @property(undefined, Vector2.lerp, Vector2)
+  @wrapper(Vector2)
+  @property()
   public declare readonly from: Signal<Vector2, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly toX: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly toY: Signal<number, this>;
   @compound({x: 'toX', y: 'toY'})
-  @property(undefined, Vector2.lerp, Vector2)
+  @wrapper(Vector2)
+  @property()
   public declare readonly to: Signal<Vector2, this>;
 
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly angle: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly fromRadius: Signal<number, this>;
-  @property(0)
+  @initial(0)
+  @property()
   public declare readonly toRadius: Signal<number, this>;
-  @property([])
+  @initial([])
+  @property()
   public declare readonly stops: Signal<GradientStop[], this>;
 
   public constructor(props: GradientProps) {

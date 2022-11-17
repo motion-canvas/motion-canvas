@@ -20,6 +20,12 @@ export function capitalize<T extends string>(value: T): Capitalize<T> {
   return <Capitalize<T>>(value[0].toUpperCase() + value.slice(1));
 }
 
+export interface PropertyMetadata<T> {
+  default?: T;
+  interpolationFunction?: InterpolationFunction<T>;
+  wrapper?: new (value: any) => T;
+}
+
 export interface Property<
   TSetterValue,
   TGetterValue extends TSetterValue,
@@ -157,6 +163,18 @@ export function createProperty<
   return handler;
 }
 
+const PROPERTIES = Symbol.for('properties');
+
+export function getPropertiesOf(
+  value: any,
+): Record<string, PropertyMetadata<any>> {
+  if (value && typeof value === 'object') {
+    return value[PROPERTIES] ?? {};
+  }
+
+  return {};
+}
+
 /**
  * Create a signal property decorator.
  *
@@ -174,44 +192,136 @@ export function createProperty<
  * ```ts
  * class Example {
  *   \@property()
- *   public declare color: Signal<Color, this>;
- *
- *   \@customProperty()
- *   public declare colorString: Signal<string, this>;
- *
- *   protected getColorString() {
- *     return this.color().toString();
- *   }
- *
- *   protected setColorString(value: SignalValue<string>) {
- *     this.color(
- *       isReactive(value)
- *         ? () => new Color(value())
- *         : new Color(value)
- *     );
- *   }
+ *   public declare length: Signal<number, this>;
  * }
  * ```
- *
- * @param initial - An option initial value of the property.
- * @param interpolationFunction - The default function used to interpolate
- *                                between values.
- * @param klass - A class used to instantiate the returned value.
  */
-export function property<T>(
-  initial?: T,
-  interpolationFunction?: InterpolationFunction<T>,
-  klass?: new (value: any) => T,
-): PropertyDecorator {
+export function property<T>(): PropertyDecorator {
   return (target: any, key) => {
+    let lookup: Record<string | symbol, PropertyMetadata<T>>;
+    if (!target[PROPERTIES]) {
+      target[PROPERTIES] = lookup = {};
+    } else if (
+      target[PROPERTIES] &&
+      !Object.prototype.hasOwnProperty.call(target, PROPERTIES)
+    ) {
+      target[PROPERTIES] = lookup = Object.fromEntries<PropertyMetadata<T>>(
+        Object.entries(
+          <Record<string | symbol, PropertyMetadata<T>>>target[PROPERTIES],
+        ).map(([key, meta]) => [key, {...meta}]),
+      );
+    } else {
+      lookup = target[PROPERTIES];
+    }
+
+    const meta = (lookup[key] = lookup[key] ?? {});
     addInitializer(target, (instance: any, context: any) => {
       instance[key] = createProperty(
         instance,
         <string>key,
-        context.defaults[key] ?? initial,
-        interpolationFunction ?? deepLerp,
-        klass,
+        context.defaults[key] ?? meta.default,
+        meta.interpolationFunction ?? deepLerp,
+        meta.wrapper,
       );
     });
+  };
+}
+
+/**
+ * Create an initial property value decorator.
+ *
+ * @remarks
+ * This decorator specifies the initial value of a property.
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@initial(1)
+ *   \@property()
+ *   public declare length: Signal<number, this>;
+ * }
+ * ```
+ *
+ * @param value - The initial value of the property.
+ */
+export function initial<T>(value: T): PropertyDecorator {
+  return (target: any, key) => {
+    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.default = value;
+  };
+}
+
+/**
+ * Create a property interpolation function decorator.
+ *
+ * @remarks
+ * This decorator specifies the interpolation function of a property.
+ * The interpolation function is used when tweening between different values of
+ * the property.
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@interpolation(textLerp)
+ *   \@property()
+ *   public declare text: Signal<string, this>;
+ * }
+ * ```
+ *
+ * @param value - The interpolation function for the property.
+ */
+export function interpolation<T>(
+  value: InterpolationFunction<T>,
+): PropertyDecorator {
+  return (target: any, key) => {
+    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.interpolationFunction = value;
+  };
+}
+
+/**
+ * Create a property wrapper decorator.
+ *
+ * @remarks
+ * This decorator specifies the wrapper of a property.
+ * Instead of returning the raw value of the property, an instance of the
+ * wrapper is returned. The actual value is passed as the first parameter to the
+ * constructor.
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@wrapper(Vector2)
+ *   \@property()
+ *   public declare offset: Signal<Vector2, this>;
+ * }
+ * ```
+ *
+ * @param value - The wrapper class for the property.
+ */
+export function wrapper<T>(
+  value: (new (value: any) => T) & {lerp?: InterpolationFunction<T>},
+): PropertyDecorator {
+  return (target: any, key) => {
+    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.wrapper = value;
+    if ('lerp' in value) {
+      meta.interpolationFunction ??= value.lerp;
+    }
   };
 }
