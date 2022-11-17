@@ -1,7 +1,0 @@
-{
-  "extends": "@motion-canvas/legacy/tsconfig.project.json",
-  "compilerOptions": {
-    "baseUrl": "src"
-  },
-  "include": ["src"]
-}

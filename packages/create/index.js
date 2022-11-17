@@ -81,7 +81,7 @@ const MANIFEST = JSON.parse(
   const templateDir = path.resolve(
     fileURLToPath(import.meta.url),
     '..',
-    `template-konva-${response.language}`,
+    `template-2d-${response.language}`,
   );
   copyDirectory(templateDir, response.path);
 
