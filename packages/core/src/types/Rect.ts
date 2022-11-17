@@ -1,5 +1,4 @@
 import {Vector2} from './Vector';
-import {Size} from './Size';
 import {arcLerp, map} from '../tweening';
 
 export type SerializedRect = {
@@ -12,7 +11,6 @@ export type SerializedRect = {
 export type PossibleRect =
   | SerializedRect
   | [number, number, number, number]
-  | Size
   | Vector2;
 
 export class Rect {
@@ -58,14 +56,12 @@ export class Rect {
     ratio?: number,
   ) {
     ratio ??=
-      (from.position.sub(to.position).ctg +
-        from.size.vector.sub(to.size.vector).ctg) /
-      2;
+      (from.position.sub(to.position).ctg + from.size.sub(to.size).ctg) / 2;
 
     return Rect.lerp(from, to, arcLerp(value, reverse, ratio));
   }
 
-  public static fromSizeCentered(size: Size): Rect {
+  public static fromSizeCentered(size: Vector2): Rect {
     return new Rect(-size.width / 2, -size.height / 2, size.width, size.height);
   }
 
@@ -124,7 +120,7 @@ export class Rect {
   }
 
   public get size() {
-    return new Size(this.width, this.height);
+    return new Vector2(this.width, this.height);
   }
 
   public get left() {
@@ -161,23 +157,23 @@ export class Rect {
     this.height = value - this.y;
   }
 
-  public get topLeft() {
+  public get topLeft(): Vector2 {
     return this.position;
   }
 
-  public get topRight() {
+  public get topRight(): Vector2 {
     return new Vector2(this.x + this.width, this.y);
   }
 
-  public get bottomLeft() {
+  public get bottomLeft(): Vector2 {
     return new Vector2(this.x, this.y + this.height);
   }
 
-  public get bottomRight() {
+  public get bottomRight(): Vector2 {
     return new Vector2(this.x + this.width, this.y + this.height);
   }
 
-  public get corners() {
+  public get corners(): [Vector2, Vector2, Vector2, Vector2] {
     return [this.topLeft, this.topRight, this.bottomRight, this.bottomLeft];
   }
 
@@ -192,12 +188,11 @@ export class Rect {
 
   public constructor();
   public constructor(from: PossibleRect);
-  public constructor(position: Vector2, size: Size);
-  public constructor(from: Vector2, to: Vector2);
+  public constructor(position: Vector2, size: Vector2);
   public constructor(x: number, y?: number, width?: number, height?: number);
   public constructor(
     one?: PossibleRect | number,
-    two: Vector2 | Size | number = 0,
+    two: Vector2 | number = 0,
     three = 0,
     four = 0,
   ) {
@@ -217,20 +212,11 @@ export class Rect {
       this.x = one.x;
       this.y = one.y;
 
-      if (two instanceof Size) {
-        this.width = two.width;
-        this.height = two.height;
-      } else if (two instanceof Vector2) {
-        this.width = two.x - one.x;
-        this.height = two.y - one.y;
+      if (two instanceof Vector2) {
+        this.width = two.x;
+        this.height = two.y;
       }
 
-      return;
-    }
-
-    if (one instanceof Size) {
-      this.width = one.width;
-      this.height = one.height;
       return;
     }
 

@@ -1,4 +1,3 @@
-import {Size} from './Size';
 import {Rect} from './Rect';
 import {arcLerp, map} from '../tweening';
 import {Direction, Origin} from './Origin';
@@ -10,9 +9,9 @@ export type SerializedVector2 = {
 
 export type PossibleVector2 =
   | SerializedVector2
+  | {width: number; height: number}
   | number
   | [number, number]
-  | Size
   | Rect;
 
 export class Vector2 {
@@ -85,6 +84,22 @@ export class Vector2 {
     return Math.sqrt(x * x + y * y);
   }
 
+  public get width(): number {
+    return this.x;
+  }
+
+  public set width(value: number) {
+    this.x = value;
+  }
+
+  public get height(): number {
+    return this.y;
+  }
+
+  public set height(value: number) {
+    this.y = value;
+  }
+
   public get magnitude(): number {
     return Vector2.magnitude(this.x, this.y);
   }
@@ -127,20 +142,28 @@ export class Vector2 {
       return;
     }
 
-    if (one instanceof Size) {
-      this.x = one.width;
-      this.y = one.height;
-      return;
-    }
-
     if (Array.isArray(one)) {
       this.x = one[0];
       this.y = one[0];
       return;
     }
 
+    if ('width' in one) {
+      this.x = one.width;
+      this.y = one.height;
+      return;
+    }
+
     this.x = one.x;
     this.y = one.y;
+  }
+
+  public getOriginOffset(origin: Origin | Direction) {
+    const offset = Vector2.fromOrigin(origin);
+    offset.x *= this.x / 2;
+    offset.y *= this.y / 2;
+
+    return offset;
   }
 
   public scale(value: number) {

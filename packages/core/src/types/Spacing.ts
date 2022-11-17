@@ -1,6 +1,3 @@
-import type {Size} from './Size';
-import type {Rect} from './Rect';
-import type {Vector2} from './Vector';
 import {map} from '../tweening';
 
 export type SerializedSpacing = {

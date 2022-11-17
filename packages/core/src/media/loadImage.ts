@@ -1,9 +1,10 @@
-import {SerializedSize} from '../types';
-
 const canvas = document.createElement('canvas');
 const context = canvas.getContext('2d');
 
-export type ImageDataSource = CanvasImageSource & SerializedSize;
+export type ImageDataSource = CanvasImageSource & {
+  width: number;
+  height: number;
+};
 
 export function loadImage(source: string): Promise<HTMLImageElement> {
   const image = new Image();
