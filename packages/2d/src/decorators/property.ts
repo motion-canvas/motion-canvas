@@ -122,11 +122,19 @@ export function createProperty<
       }
 
       const from = getter();
-      return tween(duration, value => {
-        setter(
-          interpolationFunction(from, unwrap(newValue), timingFunction(value)),
-        );
-      });
+      return tween(
+        duration,
+        value => {
+          setter(
+            interpolationFunction(
+              from,
+              unwrap(newValue),
+              timingFunction(value),
+            ),
+          );
+        },
+        () => setter(wrap(newValue)),
+      );
     }
   );
 

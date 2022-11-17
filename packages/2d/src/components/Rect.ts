@@ -1,9 +1,11 @@
-import {Signal} from '@motion-canvas/core/lib/utils';
+import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {Rect as RectType} from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
 import {property} from '../decorators';
+import {drawRoundRect} from '../utils';
 
 export interface RectProps extends ShapeProps {
-  radius?: number;
+  radius?: SignalValue<number>;
 }
 
 export class Rect extends Shape {
@@ -17,20 +19,22 @@ export class Rect extends Shape {
   protected override getPath(): Path2D {
     const path = new Path2D();
     const radius = this.radius();
-    const {width, height} = this.size();
-    const x = width / -2;
-    const y = height / -2;
+    const rect = RectType.fromSizeCentered(this.size());
+    drawRoundRect(path, rect, radius);
 
-    if (radius > 0) {
-      const maxRadius = Math.min(height / 2, width / 2, radius);
-      path.moveTo(x + maxRadius, y);
-      path.arcTo(x + width, y, x + width, y + height, maxRadius);
-      path.arcTo(x + width, y + height, x, y + height, maxRadius);
-      path.arcTo(x, y + height, x, y, maxRadius);
-      path.arcTo(x, y, x + width, y, maxRadius);
-    } else {
-      path.rect(x, y, width, height);
-    }
+    return path;
+  }
+
+  protected override getCacheRect(): RectType {
+    return super.getCacheRect().expand(this.rippleSize());
+  }
+
+  protected override getRipplePath(): Path2D {
+    const path = new Path2D();
+    const rippleSize = this.rippleSize();
+    const radius = this.radius() + rippleSize;
+    const rect = RectType.fromSizeCentered(this.size()).expand(rippleSize);
+    drawRoundRect(path, rect, radius);
 
     return path;
   }

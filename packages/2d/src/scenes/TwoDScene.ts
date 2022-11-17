@@ -4,6 +4,15 @@ import {
   SceneRenderEvent,
 } from '@motion-canvas/core/lib/scenes';
 import {TwoDView} from './TwoDView';
+import {useScene} from '@motion-canvas/core/lib/utils';
+
+export function use2DView(): TwoDView | null {
+  const scene = useScene();
+  if (scene instanceof TwoDScene) {
+    return scene.getView();
+  }
+  return null;
+}
 
 export class TwoDScene extends GeneratorScene<TwoDView> {
   private readonly view = new TwoDView();

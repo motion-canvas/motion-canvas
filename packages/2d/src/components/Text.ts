@@ -1,12 +1,12 @@
 import {property} from '../decorators';
-import {Signal} from '@motion-canvas/core/lib/utils';
+import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {Rect} from '@motion-canvas/core/lib/types';
 
 export interface TextProps extends ShapeProps {
   children?: string;
-  text?: string;
+  text?: SignalValue<string>;
 }
 
 export class Text extends Shape {
@@ -80,7 +80,7 @@ export class Text extends Shape {
       context.measureText(text).fontBoundingBoxDescent;
 
     if (this.lineWidth() <= 0) {
-      context.fillText(text, rect.x, rect.y + rect.height / 2);
+      context.fillText(text, rect.x, y);
     } else if (this.strokeFirst()) {
       context.strokeText(text, rect.x, y);
       context.fillText(text, rect.x, y);
@@ -103,7 +103,7 @@ export class Text extends Shape {
         this.element.appendChild(document.createTextNode(word.segment));
       }
     } else {
-      this.element.innerText = this.text();
+      this.element.innerHTML = this.text();
     }
 
     if (wrap && !Text.segmenter) {

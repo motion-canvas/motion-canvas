@@ -154,15 +154,19 @@ export function createSignal<TValue, TReturn = void>(
       }
 
       const from = get();
-      return tween(duration, v => {
-        set(
-          interpolationFunction(
-            from,
-            isReactive(value) ? value() : value,
-            timingFunction(v),
-          ),
-        );
-      });
+      return tween(
+        duration,
+        v => {
+          set(
+            interpolationFunction(
+              from,
+              isReactive(value) ? value() : value,
+              timingFunction(v),
+            ),
+          );
+        },
+        () => set(value),
+      );
     }
   );
 

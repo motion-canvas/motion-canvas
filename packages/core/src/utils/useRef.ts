@@ -1,5 +1,5 @@
 export type Reference<TValue> = TValue extends (config: {
-  ref: infer TReference;
+  ref?: infer TReference;
 }) => void
   ? TReference
   : {value: TValue};

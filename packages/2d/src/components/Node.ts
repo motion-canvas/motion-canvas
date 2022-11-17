@@ -1,29 +1,38 @@
 import {compound, computed, initialize, property} from '../decorators';
 import {Vector2, Rect, transformScalar} from '@motion-canvas/core/lib/types';
-import {createSignal, Reference, Signal} from '@motion-canvas/core/lib/utils';
+import {
+  createSignal,
+  isReactive,
+  Reference,
+  Signal,
+  SignalValue,
+} from '@motion-canvas/core/lib/utils';
 import {ComponentChild, ComponentChildren} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
-import {TwoDView} from '../scenes';
+import {TwoDView, use2DView} from '../scenes';
+import {TimingFunction} from '@motion-canvas/core/lib/tweening';
+import {threadable} from '@motion-canvas/core/lib/decorators';
 
 export interface NodeProps {
-  ref?: Reference<Node>;
+  ref?: Reference<any>;
   children?: ComponentChildren;
-  opacity?: number;
-  blur?: number;
-  brightness?: number;
-  contrast?: number;
-  grayscale?: number;
-  hue?: number;
-  invert?: number;
-  saturate?: number;
-  sepia?: number;
-  shadowColor?: string;
-  shadowBlur?: number;
-  shadowOffsetX?: number;
-  shadowOffsetY?: number;
-  shadowOffset?: Vector2;
-  cache?: boolean;
-  composite?: boolean;
+  opacity?: SignalValue<number>;
+  blur?: SignalValue<number>;
+  brightness?: SignalValue<number>;
+  contrast?: SignalValue<number>;
+  grayscale?: SignalValue<number>;
+  hue?: SignalValue<number>;
+  invert?: SignalValue<number>;
+  saturate?: SignalValue<number>;
+  sepia?: SignalValue<number>;
+  shadowColor?: SignalValue<string>;
+  shadowBlur?: SignalValue<number>;
+  shadowOffsetX?: SignalValue<number>;
+  shadowOffsetY?: SignalValue<number>;
+  shadowOffset?: SignalValue<Vector2>;
+  cache?: SignalValue<boolean>;
+  composite?: SignalValue<boolean>;
+  compositeOperation?: SignalValue<GlobalCompositeOperation>;
 }
 
 export class Node implements Promisable<Node> {
@@ -34,6 +43,32 @@ export class Node implements Promisable<Node> {
 
   @property(false)
   public declare readonly composite: Signal<boolean, this>;
+
+  @property('source-over')
+  public declare readonly compositeOperation: Signal<
+    GlobalCompositeOperation,
+    this
+  >;
+
+  private readonly compositeOverride = createSignal(0);
+
+  @threadable()
+  protected *tweenCompositeOperation(
+    value: SignalValue<GlobalCompositeOperation>,
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const nextValue = isReactive(value) ? value() : value;
+    if (nextValue === 'source-over') {
+      yield* this.compositeOverride(1, time, timingFunction);
+      this.compositeOverride(0);
+      this.compositeOperation(nextValue);
+    } else {
+      this.compositeOperation(nextValue);
+      this.compositeOverride(1);
+      yield* this.compositeOverride(0, time, timingFunction);
+    }
+  }
 
   @property(1)
   public declare readonly opacity: Signal<number, this>;
@@ -153,6 +188,7 @@ export class Node implements Promisable<Node> {
   public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
     this.append(children);
+    use2DView()?.registerNode(this);
   }
 
   @computed()
@@ -229,9 +265,12 @@ export class Node implements Promisable<Node> {
   @computed()
   public compositeToLocal() {
     const root = this.compositeRoot();
-    return root
-      ? root.localToWorld().multiply(this.worldToLocal())
-      : new DOMMatrix();
+    if (root) {
+      const worldToLocal = this.worldToLocal();
+      worldToLocal.m44 = 1;
+      return root.localToWorld().multiply();
+    }
+    return new DOMMatrix();
   }
 
   @computed()
@@ -250,14 +289,14 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
-  public remove() {
-    this.moveTo(null);
+  public remove(): this {
+    return this.moveTo(null);
   }
 
-  protected moveTo(parent: Node | null) {
+  protected moveTo(parent: Node | null): this {
     const current = this.parent();
     if (current === parent) {
-      return;
+      return this;
     }
 
     if (current) {
@@ -269,12 +308,17 @@ export class Node implements Promisable<Node> {
     }
 
     this.parent(parent);
+    return this;
   }
 
   public removeChildren() {
     for (const node of this.children()) {
       node.remove();
     }
+  }
+
+  public dispose() {
+    // do nothing
   }
 
   /**
@@ -284,6 +328,7 @@ export class Node implements Promisable<Node> {
     return (
       this.cache() ||
       this.opacity() < 1 ||
+      this.compositeOperation() !== 'source-over' ||
       this.hasFilters() ||
       this.hasShadow()
     );
@@ -395,6 +440,7 @@ export class Node implements Promisable<Node> {
    * @param context - The context using which the cache will be drawn.
    */
   protected setupDrawFromCache(context: CanvasRenderingContext2D) {
+    context.globalCompositeOperation = this.compositeOperation();
     context.globalAlpha = this.opacity();
     if (this.hasFilters()) {
       context.filter = this.filterString();
@@ -417,6 +463,10 @@ export class Node implements Promisable<Node> {
    * @param context - The context to draw with.
    */
   public render(context: CanvasRenderingContext2D) {
+    if (this.absoluteOpacity() <= 0) {
+      return;
+    }
+
     context.save();
     this.transformContext(context);
 
@@ -424,7 +474,15 @@ export class Node implements Promisable<Node> {
       this.setupDrawFromCache(context);
       const cacheContext = this.cachedCanvas();
       const cacheRect = this.cacheRect();
+      const compositeOverride = this.compositeOverride();
       context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
+      if (compositeOverride > 0) {
+        context.save();
+        context.globalAlpha *= compositeOverride;
+        context.globalCompositeOperation = 'source-over';
+        context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
+        context.restore();
+      }
     } else {
       this.draw(context);
     }
@@ -443,6 +501,10 @@ export class Node implements Promisable<Node> {
    * @param context - The context to draw with.
    */
   protected draw(context: CanvasRenderingContext2D) {
+    this.drawChildren(context);
+  }
+
+  protected drawChildren(context: CanvasRenderingContext2D) {
     for (const child of this.children()) {
       child.render(context);
     }
