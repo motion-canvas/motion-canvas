@@ -305,35 +305,101 @@ export class Node implements Promisable<Node> {
   }
 
   public add(node: ComponentChildren): this {
-    const nodes: ComponentChild[] = Array.isArray(node) ? node : [node];
-    for (const node of nodes) {
+    return this.insert(node, Infinity);
+  }
+
+  public insert(node: ComponentChildren, index = 0): this {
+    const array: ComponentChild[] = Array.isArray(node) ? node : [node];
+    const children = this.children();
+    const newChildren = children.slice(0, index);
+
+    for (const node of array) {
       if (node instanceof Node) {
-        node.moveTo(this);
+        newChildren.push(node);
+        node.parent(this);
       }
     }
+
+    newChildren.push(...children.slice(index));
+    this.children(newChildren);
 
     return this;
   }
 
   public remove(): this {
-    return this.moveTo(null);
+    const current = this.parent();
+    if (current === null) {
+      return this;
+    }
+
+    current.children(current.children().filter(child => child !== this));
+    this.parent(null);
+    return this;
   }
 
-  protected moveTo(parent: Node | null): this {
+  public move(by = 1): this {
+    const parent = this.parent();
+    if (by === 0 || !parent) {
+      return this;
+    }
+
+    const children = parent.children();
+    const newChildren: Node[] = [];
+
+    if (by > 0) {
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (child === this) {
+          const target = i + by;
+          for (; i < target && i + 1 < children.length; i++) {
+            newChildren[i] = children[i + 1];
+          }
+        }
+        newChildren[i] = child;
+      }
+    } else {
+      for (let i = children.length - 1; i >= 0; i--) {
+        const child = children[i];
+        if (child === this) {
+          const target = i + by;
+          for (; i > target && i > 0; i--) {
+            newChildren[i] = children[i - 1];
+          }
+        }
+        newChildren[i] = child;
+      }
+    }
+
+    parent.children(newChildren);
+
+    return this;
+  }
+
+  public moveUp(): this {
+    return this.move(1);
+  }
+
+  public moveDown(): this {
+    return this.move(-1);
+  }
+
+  public moveToTop(): this {
+    return this.move(Infinity);
+  }
+
+  public moveToBottom(): this {
+    return this.move(-Infinity);
+  }
+
+  protected moveTo(parent: Node): this {
     const current = this.parent();
     if (current === parent) {
       return this;
     }
 
-    if (current) {
-      current.children(current.children().filter(child => child !== this));
-    }
-
-    if (parent) {
-      parent.children([...parent.children(), this]);
-    }
-
+    parent.children([...parent.children(), this]);
     this.parent(parent);
+
     return this;
   }
 
