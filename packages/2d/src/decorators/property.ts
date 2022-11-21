@@ -24,6 +24,9 @@ export interface PropertyMetadata<T> {
   default?: T;
   interpolationFunction?: InterpolationFunction<T>;
   wrapper?: new (value: any) => T;
+  clone?: boolean;
+  compoundParent?: string;
+  compound?: boolean;
 }
 
 export interface Property<
@@ -33,7 +36,7 @@ export interface Property<
 > extends SignalGetter<TGetterValue>,
     SignalSetter<TSetterValue>,
     SignalTween<TSetterValue>,
-    SignalUtils<TOwner> {}
+    SignalUtils<TSetterValue, TOwner> {}
 
 export type PropertyOwner<TGetterValue, TSetterValue> = {
   [key: `get${Capitalize<string>}`]: SignalGetter<TGetterValue> | undefined;
@@ -146,9 +149,9 @@ export function createProperty<
 
   Object.defineProperty(handler, 'reset', {
     value: signal
-      ? () => signal?.reset()
+      ? signal.reset
       : initial !== undefined
-      ? () => setter(initial)
+      ? () => setter(wrap(initial))
       : () => node,
   });
 
@@ -156,14 +159,25 @@ export function createProperty<
     value: () => setter(getter()),
   });
 
+  Object.defineProperty(handler, 'raw', {
+    value: signal?.raw ?? getter,
+  });
+
   if (initial !== undefined && !signal) {
-    setter(initial);
+    setter(wrap(initial));
   }
 
   return handler;
 }
 
 const PROPERTIES = Symbol.for('properties');
+
+export function getPropertyMeta<T>(
+  object: any,
+  key: string | symbol,
+): PropertyMetadata<T> | null {
+  return object[PROPERTIES]?.[key] ?? null;
+}
 
 export function getPropertiesOf(
   value: any,
@@ -214,7 +228,7 @@ export function property<T>(): PropertyDecorator {
       lookup = target[PROPERTIES];
     }
 
-    const meta = (lookup[key] = lookup[key] ?? {});
+    const meta = (lookup[key] = lookup[key] ?? {clone: true});
     addInitializer(target, (instance: any, context: any) => {
       instance[key] = createProperty(
         instance,
@@ -232,6 +246,7 @@ export function property<T>(): PropertyDecorator {
  *
  * @remarks
  * This decorator specifies the initial value of a property.
+ *
  * Must be specified before the {@link property} decorator.
  *
  * @example
@@ -247,7 +262,7 @@ export function property<T>(): PropertyDecorator {
  */
 export function initial<T>(value: T): PropertyDecorator {
   return (target: any, key) => {
-    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
       console.error(`Missing property decorator for "${key.toString()}"`);
       return;
@@ -261,8 +276,8 @@ export function initial<T>(value: T): PropertyDecorator {
  *
  * @remarks
  * This decorator specifies the interpolation function of a property.
- * The interpolation function is used when tweening between different values of
- * the property.
+ * The interpolation function is used when tweening between different values.
+ *
  * Must be specified before the {@link property} decorator.
  *
  * @example
@@ -280,7 +295,7 @@ export function interpolation<T>(
   value: InterpolationFunction<T>,
 ): PropertyDecorator {
   return (target: any, key) => {
-    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
       console.error(`Missing property decorator for "${key.toString()}"`);
       return;
@@ -294,9 +309,12 @@ export function interpolation<T>(
  *
  * @remarks
  * This decorator specifies the wrapper of a property.
- * Instead of returning the raw value of the property, an instance of the
- * wrapper is returned. The actual value is passed as the first parameter to the
- * constructor.
+ * Instead of returning the raw value, an instance of the wrapper is returned.
+ * The actual value is passed as the first parameter to the constructor.
+ *
+ * If the wrapper class has a method called `lerp` it will be set as the
+ * default interpolation function for the property.
+ *
  * Must be specified before the {@link property} decorator.
  *
  * @example
@@ -314,7 +332,7 @@ export function wrapper<T>(
   value: (new (value: any) => T) & {lerp?: InterpolationFunction<T>},
 ): PropertyDecorator {
   return (target: any, key) => {
-    const meta: PropertyMetadata<T> = target[PROPERTIES]?.[key];
+    const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
       console.error(`Missing property decorator for "${key.toString()}"`);
       return;
@@ -323,5 +341,38 @@ export function wrapper<T>(
     if ('lerp' in value) {
       meta.interpolationFunction ??= value.lerp;
     }
+  };
+}
+
+/**
+ * Create a cloning property decorator.
+ *
+ * @remarks
+ * This decorator specifies whether the property should be copied over when
+ * cloning the node.
+ *
+ * By default, any property is copied.
+ *
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@wrapper(Vector2)
+ *   \@property()
+ *   public declare offset: Signal<Vector2, this>;
+ * }
+ * ```
+ *
+ * @param value - Whether the property should be cloned.
+ */
+export function clone<T>(value = true): PropertyDecorator {
+  return (target: any, key) => {
+    const meta = getPropertyMeta<T>(target, key);
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.clone = value;
   };
 }

@@ -1,9 +1,9 @@
 import {
   compound,
   computed,
+  getPropertiesOf,
   initial,
   initialize,
-  interpolation,
   property,
   wrapper,
 } from '../decorators';
@@ -15,7 +15,7 @@ import {
   Signal,
   SignalValue,
 } from '@motion-canvas/core/lib/utils';
-import {ComponentChild, ComponentChildren} from './types';
+import {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {View2D, use2DView} from '../scenes';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
@@ -209,6 +209,7 @@ export class Node implements Promisable<Node> {
 
   public readonly children = createSignal<Node[]>([]);
   public readonly parent = createSignal<Node | null>(null);
+  public readonly properties = getPropertiesOf(this);
 
   public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
@@ -344,6 +345,88 @@ export class Node implements Promisable<Node> {
 
   public dispose() {
     // do nothing
+  }
+
+  /**
+   * Create a copy of this node.
+   *
+   * @param customProps - Properties to override.
+   */
+  public clone(customProps: NodeProps = {}): this {
+    const props: NodeProps & Record<string, any> = {...customProps};
+    if (this.children().length > 0) {
+      props.children ??= this.children().map(child => child.clone());
+    }
+
+    for (const key in this.properties) {
+      const meta = this.properties[key];
+      if (!meta.clone || key in props) continue;
+
+      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
+      props[key] = signal();
+    }
+
+    return this.instantiate(props);
+  }
+
+  /**
+   * Create a raw copy of this node.
+   *
+   * @remarks
+   * A raw copy preserves any reactive properties from the source node.
+   *
+   * @param customProps - Properties to override.
+   */
+  public rawClone(customProps: NodeProps = {}): this {
+    const props: NodeProps & Record<string, any> = {...customProps};
+    if (this.children().length > 0) {
+      props.children ??= this.children().map(child => child.rawClone());
+    }
+
+    for (const key in this.properties) {
+      const meta = this.properties[key];
+      if (!meta.clone || key in props) continue;
+
+      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
+      props[key] = signal.raw();
+    }
+
+    return this.instantiate(props);
+  }
+
+  /**
+   * Create a reactive copy of this node.
+   *
+   * @remarks
+   * A reactive copy has all its properties dynamically updated to match the
+   * source node.
+   *
+   * @param customProps - Properties to override.
+   */
+  public reactiveClone(customProps: NodeProps = {}): this {
+    const props: NodeProps & Record<string, any> = {...customProps};
+    if (this.children().length > 0) {
+      props.children ??= this.children().map(child => child.reactiveClone());
+    }
+
+    for (const key in this.properties) {
+      const meta = this.properties[key];
+      if (!meta.clone || key in props) continue;
+
+      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
+      props[key] = () => signal();
+    }
+
+    return this.instantiate(props);
+  }
+
+  /**
+   * Create an instance of this node's class.
+   *
+   * @param props - Properties to pass to the constructor.
+   */
+  public instantiate(props: NodeProps = {}): this {
+    return new (<NodeConstructor<NodeProps, this>>this.constructor)(props);
   }
 
   /**

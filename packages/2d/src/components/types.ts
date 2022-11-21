@@ -29,6 +29,6 @@ export interface FunctionComponent<T = any> {
   (props: T): Node | null;
 }
 
-export interface NodeConstructor<T = any> {
-  new (props: T): Node;
+export interface NodeConstructor<TProps = any, TNode = Node> {
+  new (props: TProps): TNode;
 }

@@ -3,7 +3,6 @@ import {
   computed,
   initial,
   initialize,
-  interpolation,
   property,
   wrapper,
 } from '../decorators';
