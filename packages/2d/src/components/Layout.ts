@@ -1,8 +1,8 @@
 import {
+  clone,
   compound,
   computed,
   initial,
-  interpolation,
   Property,
   property,
   wrapper,
@@ -424,6 +424,7 @@ export class Layout extends Node {
   public declare readonly scale: Signal<Vector2, this>;
 
   @wrapper(Vector2)
+  @clone(false)
   @property()
   public declare readonly absoluteScale: Signal<Vector2, this>;
 
@@ -454,6 +455,7 @@ export class Layout extends Node {
   public declare readonly position: Signal<Vector2, this>;
 
   @wrapper(Vector2)
+  @clone(false)
   @property()
   public declare readonly absolutePosition: Signal<Vector2, this>;
 
@@ -470,8 +472,9 @@ export class Layout extends Node {
     }
   }
 
+  @clone(false)
   @property()
-  public declare readonly absoluteRotation: Signal<Vector2, this>;
+  public declare readonly absoluteRotation: Signal<number, this>;
 
   protected getAbsoluteRotation() {
     const matrix = this.localToWorld();

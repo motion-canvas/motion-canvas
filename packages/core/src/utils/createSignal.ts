@@ -29,7 +29,7 @@ export interface SignalTween<TValue> {
   ): ThreadGenerator;
 }
 
-export interface SignalUtils<TReturn> {
+export interface SignalUtils<TValue, TReturn> {
   /**
    * Reset the signal to its initial value (if one has been set).
    *
@@ -59,13 +59,38 @@ export interface SignalUtils<TReturn> {
    * ```
    */
   save(): TReturn;
+
+  /**
+   * Get the raw value of this signal.
+   *
+   * @remarks
+   * If the signal was provided with a factory function, the function itself
+   * will be returned, without invoking it.
+   *
+   * This method can be used to create copies of signals.
+   *
+   * @example
+   * ```ts
+   * const a = createSignal(2);
+   * const b = createSignal(() => a);
+   * // b() == 2
+   *
+   * const bClone = createSignal(b.raw());
+   * // bClone() == 2
+   *
+   * a(4);
+   * // b() == 4
+   * // bClone() == 4
+   * ```
+   */
+  raw(): SignalValue<TValue>;
 }
 
 export interface Signal<TValue, TReturn = void>
   extends SignalSetter<TValue, TReturn>,
     SignalGetter<TValue>,
     SignalTween<TValue>,
-    SignalUtils<TReturn> {}
+    SignalUtils<TValue, TReturn> {}
 
 const collectionStack: DependencyContext[] = [];
 
@@ -176,6 +201,10 @@ export function createSignal<TValue, TReturn = void>(
 
   Object.defineProperty(handler, 'save', {
     value: () => set(get()),
+  });
+
+  Object.defineProperty(handler, 'raw', {
+    value: () => current,
   });
 
   if (initial !== undefined) {

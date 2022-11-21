@@ -1,6 +1,5 @@
 import {SignalValue, isReactive} from '@motion-canvas/core/lib/utils';
-import {capitalize, PropertyMetadata} from './property';
-import {addInitializer} from './initializers';
+import {capitalize, getPropertyMeta} from './property';
 
 /**
  * Create a compound property decorator.
@@ -45,12 +44,28 @@ export function compound(
   mapping: string[] | Record<string, string>,
 ): PropertyDecorator {
   return (target: any, key) => {
-    const metaKey = `meta${capitalize(key.toString())}`;
-    const meta: PropertyMetadata<any> = target[metaKey];
+    const meta = getPropertyMeta<any>(target, key);
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
 
     const entries = Array.isArray(mapping)
       ? mapping.map(key => [key, key])
       : Object.entries(mapping);
+
+    meta.compound = true;
+    meta.clone = false;
+    for (const [, property] of entries) {
+      const propertyMeta = getPropertyMeta<any>(target, property);
+      if (!propertyMeta) {
+        console.error(
+          `Missing property decorator for "${property.toString()}"`,
+        );
+        return;
+      }
+      propertyMeta.compoundParent = key.toString();
+    }
 
     target.constructor.prototype[`get${capitalize(key.toString())}`] =
       function () {
@@ -72,11 +87,5 @@ export function compound(
           }
         }
       };
-
-    addInitializer(target, (instance: any, context: any) => {
-      if (key in context.defaults) {
-        instance[key](context.defaults[key]);
-      }
-    });
   };
 }
