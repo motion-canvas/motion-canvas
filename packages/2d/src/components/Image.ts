@@ -1,7 +1,6 @@
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {computed, initial, property} from '../decorators';
-import {Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
-import Color from 'colorjs.io';
+import {Color, Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
 
@@ -96,11 +95,12 @@ export class Image extends Rect {
       1,
     ).data;
 
-    return new Color(
-      'sRGB',
-      [data[0] / 255, data[1] / 255, data[2] / 255],
-      data[3] / 255,
-    );
+    return new Color({
+      r: data[0] / 255,
+      g: data[1] / 255,
+      b: data[2] / 255,
+      a: data[3] / 255,
+    });
   }
 
   protected override collectAsyncResources(deps: Promise<any>[]) {

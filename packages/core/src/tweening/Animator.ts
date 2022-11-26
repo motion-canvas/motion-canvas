@@ -1,5 +1,4 @@
 import {
-  colorLerp,
   easeInOutCubic,
   TimingFunction,
   map,
@@ -194,11 +193,7 @@ export class Animator<Type, This> {
     let interpolationFunction: InterpolationFunction<unknown> = map;
 
     if (typeof value === 'string') {
-      if (value.startsWith('#') || value.startsWith('rgb')) {
-        interpolationFunction = colorLerp;
-      } else {
-        interpolationFunction = textLerp;
-      }
+      interpolationFunction = textLerp;
     } else if (value && typeof value === 'object') {
       interpolationFunction = deepLerp;
     }

@@ -21,7 +21,8 @@ export class View2D extends Layout {
     this.document = frame.contentDocument ?? document;
   }
 
-  private registeredNodes: Node[] = [];
+  private registeredNodes: Record<string, Node> = {};
+  private nodeCounters: Record<string, number> = {};
 
   public constructor() {
     super({
@@ -42,10 +43,11 @@ export class View2D extends Layout {
 
   public reset() {
     this.removeChildren();
-    for (const node of this.registeredNodes) {
-      node.dispose();
+    for (const key in this.registeredNodes) {
+      this.registeredNodes[key].dispose();
     }
-    this.registeredNodes = [];
+    this.registeredNodes = {};
+    this.nodeCounters = {};
     this.element.innerText = '';
   }
 
@@ -94,7 +96,16 @@ export class View2D extends Layout {
     return this;
   }
 
-  public registerNode(node: Node) {
-    this.registeredNodes.push(node);
+  public registerNode(node: Node): string {
+    const className = node.constructor?.name ?? 'unknown';
+    this.nodeCounters[className] ??= 0;
+
+    const key = `${className}[${this.nodeCounters[className]++}]`;
+    this.registeredNodes[key] = node;
+    return key;
+  }
+
+  public getNode(key: string): Node | null {
+    return this.registeredNodes[key] ?? null;
   }
 }

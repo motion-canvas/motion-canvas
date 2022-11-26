@@ -1,4 +1,4 @@
-import {deepLerp, colorLerp} from './interpolationFunctions';
+import {deepLerp} from './interpolationFunctions';
 import {Vector2} from '../types';
 
 describe('deepLerp', () => {
@@ -8,18 +8,6 @@ describe('deepLerp', () => {
 
   test('falls back to primitive tween for strings', () => {
     expect(deepLerp('foo', 'foobar', 2 / 3)).toEqual('fooba');
-  });
-
-  test('interpolates between colors', () => {
-    expect(deepLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 0)).toEqual(
-      'hsl(0, 0%, 0%)',
-    );
-    expect(
-      deepLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 1 / 2),
-    ).toMatchInlineSnapshot(`"rgb(50% 50% 50%)"`);
-    expect(deepLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 1)).toEqual(
-      'hsl(0, 0%, 100%)',
-    );
   });
 
   test('interpolates between values in an array', () => {
@@ -97,26 +85,5 @@ describe('deepLerp', () => {
       1 / 2,
     ];
     expect(deepLerp(...args)).toEqual(Vector2.lerp(...args));
-  });
-});
-
-describe('colorLerp', () => {
-  test('interpolates between colors', () => {
-    expect(
-      colorLerp('rgb(0, 0, 0)', 'rgb(255, 255, 255)', 1 / 2),
-    ).toMatchInlineSnapshot(`"rgb(50% 50% 50%)"`);
-    expect(
-      colorLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 1 / 2),
-    ).toMatchInlineSnapshot(`"rgb(50% 50% 50%)"`);
-  });
-  test('returns starting value at 0', () => {
-    expect(colorLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 0)).toEqual(
-      'hsl(0, 0%, 0%)',
-    );
-  });
-  test('returns final value at 1', () => {
-    expect(colorLerp('hsl(0, 0%, 0%)', 'hsl(0, 0%, 100%)', 1)).toEqual(
-      'hsl(0, 0%, 100%)',
-    );
   });
 });

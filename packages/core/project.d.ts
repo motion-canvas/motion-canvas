@@ -26,9 +26,4 @@ declare module '*?scene' {
   export = value;
 }
 
-declare module 'colorjs.io' {
-  const noTypesYet: any;
-  export default noTypesYet;
-}
-
 declare type Callback = (...args: unknown[]) => void;

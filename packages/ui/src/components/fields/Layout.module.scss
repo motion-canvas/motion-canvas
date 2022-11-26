@@ -1,0 +1,116 @@
+.surface {
+  background: var(--surface-color-light);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  line-height: 24px;
+  flex-shrink: 1;
+  flex-grow: 1;
+  flex-basis: 100%;
+  min-width: 0;
+  overflow: hidden;
+
+  &.disabled {
+    opacity: 0.54;
+    pointer-events: none;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  height: 24px;
+
+  .open & {
+    color: rgba(255, 255, 255, 0.32);
+  }
+}
+
+.toggle {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &:after {
+    width: 24px;
+    height: 24px;
+    display: block;
+    content: '';
+    -webkit-mask-image: url('../../img/icons/chevron_right.svg');
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: rotate 0.2s;
+
+    .open & {
+      rotate: 90deg;
+    }
+  }
+}
+
+.fields {
+  display: none;
+
+  .open & {
+    display: block;
+  }
+
+  .field {
+    border-top: 1px solid var(--surface-color);
+  }
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex-grow: 1;
+  overflow: hidden;
+
+  &.copy {
+    cursor: pointer;
+    &:hover {
+      background-color: var(--surface-color-hover);
+    }
+  }
+
+  &::before {
+    content: 'value copied!';
+    position: absolute;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background-color: var(--surface-color-hover);
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  &.copied::before {
+    opacity: 1;
+    transition: opacity 0s;
+  }
+}
+
+.label {
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+.value {
+  padding: 0 8px;
+  flex-shrink: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  &.right {
+    text-align: right;
+  }
+
+  &.grow {
+    flex-shrink: 1;
+    flex-grow: 1;
+  }
+}

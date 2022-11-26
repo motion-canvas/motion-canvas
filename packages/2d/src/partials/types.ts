@@ -1,5 +1,6 @@
 import type {Gradient} from './Gradient';
 import type {Pattern} from './Pattern';
+import {Color, PossibleColor} from '@motion-canvas/core/lib/types';
 
 export type FlexDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 
@@ -35,4 +36,5 @@ export type LayoutMode = boolean | null;
 
 export type Length = number | `${number}%` | null;
 
-export type CanvasStyle = null | string | Gradient | Pattern;
+export type PossibleCanvasStyle = null | PossibleColor | Gradient | Pattern;
+export type CanvasStyle = null | Color | Gradient | Pattern;

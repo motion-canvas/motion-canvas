@@ -1,5 +1,3 @@
-import {SerializedRect, SerializedVector2} from '../types';
-
 /**
  * Represents an element to inspect.
  *
@@ -16,31 +14,6 @@ export type InspectedElement = unknown;
 export type InspectedAttributes = Record<string, any>;
 
 /**
- * Represents different sizes and/or coordinates of an inspected element.
- */
-export interface InspectedSize {
-  /**
-   * Bounding box of the element (with padding).
-   */
-  rect?: SerializedRect;
-
-  /**
-   * Bounding box of the content of this element (without padding).
-   */
-  contentRect?: SerializedRect;
-
-  /**
-   * Bounding box of the element (with margin).
-   */
-  marginRect?: SerializedRect;
-
-  /**
-   * The absolute position of the object's origin.
-   */
-  position?: SerializedVector2;
-}
-
-/**
  * Scenes can implement this interface to make their components
  * inspectable through the UI.
  */
@@ -54,14 +27,12 @@ export interface Inspectable {
   inspectPosition(x: number, y: number): InspectedElement | null;
 
   /**
-   * Validate if the inspected element is still valid.
+   * Check if the inspected element is still valid.
    *
    * @remarks
    * If a scene destroys and recreates its components upon every reset, the
    * reference may no longer be valid. Even though the component is still
    * present. This method should check that and return a new reference.
-   *
-   * See {@link KonvaScene.validateInspection} for a sample implementation.
    *
    * @param element - The element to validate.
    */
@@ -78,14 +49,21 @@ export interface Inspectable {
   inspectAttributes(element: InspectedElement): InspectedAttributes | null;
 
   /**
-   * Return the sizes of the inspected element.
+   * Draw an overlay for the inspected element.
    *
    * @remarks
-   * This information will be used to draw the bounding boxes on the screen.
+   * This method can be used to overlay additional information about an
+   * element on top of the animation.
    *
-   * @param element - The element to inspect.
+   * @param element - The element for which to draw an overlay.
+   * @param matrix - A local-to-screen matrix.
+   * @param context - The context to draw with.
    */
-  inspectBoundingBox(element: InspectedElement): InspectedSize;
+  drawOverlay(
+    element: InspectedElement,
+    matrix: DOMMatrix,
+    context: CanvasRenderingContext2D,
+  ): void;
 }
 
 export function isInspectable(value: any): value is Inspectable {

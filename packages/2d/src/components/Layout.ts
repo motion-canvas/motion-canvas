@@ -1,5 +1,5 @@
 import {
-  clone,
+  cloneable,
   compound,
   computed,
   initial,
@@ -35,6 +35,7 @@ import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
 import {View2D} from '../scenes';
+import {drawLine, lineTo} from '../utils';
 
 export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;
@@ -424,7 +425,7 @@ export class Layout extends Node {
   public declare readonly scale: Signal<Vector2, this>;
 
   @wrapper(Vector2)
-  @clone(false)
+  @cloneable(false)
   @property()
   public declare readonly absoluteScale: Signal<Vector2, this>;
 
@@ -455,7 +456,7 @@ export class Layout extends Node {
   public declare readonly position: Signal<Vector2, this>;
 
   @wrapper(Vector2)
-  @clone(false)
+  @cloneable(false)
   @property()
   public declare readonly absolutePosition: Signal<Vector2, this>;
 
@@ -472,7 +473,7 @@ export class Layout extends Node {
     }
   }
 
-  @clone(false)
+  @cloneable(false)
   @property()
   public declare readonly absoluteRotation: Signal<number, this>;
 
@@ -672,6 +673,50 @@ export class Layout extends Node {
     }
 
     this.drawChildren(context);
+  }
+
+  public override drawOverlay(
+    context: CanvasRenderingContext2D,
+    matrix: DOMMatrix,
+  ) {
+    const size = this.computedSize();
+    const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
+    const rect = Rect.fromSizeCentered(size);
+    const layout = rect.transformCorners(matrix);
+    const padding = rect
+      .addSpacing(this.padding().scale(-1))
+      .transformCorners(matrix);
+    const margin = rect.addSpacing(this.margin()).transformCorners(matrix);
+
+    context.beginPath();
+    drawLine(context, margin);
+    drawLine(context, layout);
+    context.closePath();
+    context.fillStyle = 'rgba(255,193,125,0.6)';
+    context.fill('evenodd');
+
+    context.beginPath();
+    drawLine(context, layout);
+    drawLine(context, padding);
+    context.closePath();
+    context.fillStyle = 'rgba(180,255,147,0.6)';
+    context.fill('evenodd');
+
+    context.beginPath();
+    drawLine(context, layout);
+    context.closePath();
+    context.lineWidth = 1;
+    context.strokeStyle = 'white';
+    context.stroke();
+
+    const radius = 8;
+    context.beginPath();
+    lineTo(context, offset.addY(-radius));
+    lineTo(context, offset.addY(radius));
+    lineTo(context, offset);
+    lineTo(context, offset.addX(-radius));
+    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    context.stroke();
   }
 
   public getOriginDelta(origin: Origin) {

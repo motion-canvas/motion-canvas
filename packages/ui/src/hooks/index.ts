@@ -1,6 +1,7 @@
 export * from './useCurrentFrame';
 export * from './useDocumentEvent';
 export * from './useDrag';
+export * from './useFormattedNumber';
 export * from './useMeta';
 export * from './usePlayerState';
 export * from './usePlayerTime';

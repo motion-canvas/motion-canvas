@@ -1,7 +1,6 @@
-import Color from 'colorjs.io';
 import {Vector2} from '../types';
 
-export interface InterpolationFunction<T, Rest extends unknown[] = unknown[]> {
+export interface InterpolationFunction<T, Rest extends any[] = any[]> {
   (from: T, to: T, value: number, ...args: Rest): T;
 }
 
@@ -80,14 +79,6 @@ export function deepLerp(from: any, to: any, value: number): any {
   }
 
   if (typeof from === 'string' && typeof to === 'string') {
-    try {
-      Color.parse(from);
-      Color.parse(to);
-      return colorLerp(from, to, value);
-    } catch (err) {
-      // inputs are not colors
-    }
-
     return textLerp(from, to, value);
   }
 
@@ -121,42 +112,6 @@ export function deepLerp(from: any, to: any, value: number): any {
 
   // fallback with an immediate jump to the new value
   return to;
-}
-
-interface ColorLerpOptions {
-  /**
-   * The space to use during interpolation, affecting the intermediate colors
-   */
-  space?: string;
-  /**
-   * The format in which to return values
-   */
-  outputSpace?: string;
-}
-
-/**
- * Mix two colors together.
- *
- * @param from - The value to use at 0.
- * @param to - The value to use at 1.
- * @param value - How much of each color to use, on a scale of 0 to 1.
- * @param options - Additional configuration.
- *
- * @returns An srgb string, or one of the input values if value is 0 or 1.
- */
-export function colorLerp(
-  from: string | typeof Color,
-  to: string | typeof Color,
-  value: number,
-  options?: ColorLerpOptions,
-): string {
-  if (value === 0) return from;
-  if (value === 1) return to;
-  const range = new Color(from).range(to, {
-    space: options?.space ?? 'srgb',
-    outputSpace: options?.outputSpace ?? 'srgb',
-  });
-  return range(value).toString();
 }
 
 export function map(from: number, to: number, value: number) {

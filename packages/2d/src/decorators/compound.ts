@@ -55,7 +55,7 @@ export function compound(
       : Object.entries(mapping);
 
     meta.compound = true;
-    meta.clone = false;
+    meta.cloneable = false;
     for (const [, property] of entries) {
       const propertyMeta = getPropertyMeta<any>(target, property);
       if (!propertyMeta) {
@@ -65,6 +65,7 @@ export function compound(
         return;
       }
       propertyMeta.compoundParent = key.toString();
+      propertyMeta.inspectable = false;
     }
 
     target.constructor.prototype[`get${capitalize(key.toString())}`] =
@@ -72,7 +73,7 @@ export function compound(
         const object = Object.fromEntries(
           entries.map(([key, property]) => [key, this[property]()]),
         );
-        return meta?.wrapper ? new meta.wrapper(object) : object;
+        return meta?.parser ? meta.parser(object) : object;
       };
 
     target.constructor.prototype[`set${capitalize(key.toString())}`] =

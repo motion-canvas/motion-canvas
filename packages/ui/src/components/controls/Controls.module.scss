@@ -1,12 +1,3 @@
-.colorPreview {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-
-  margin: 4px;
-}
-
 .icon {
   &:after {
     width: 24px;
@@ -76,7 +67,6 @@
 
 .group {
   display: flex;
-  align-items: center;
   gap: 8px;
   padding: 4px 0;
 }
@@ -89,12 +79,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 24px;
 }
 
 .select,
 .input,
-.button,
-.value {
+.button {
   background: var(--surface-color-light);
   color: rgba(255, 255, 255, 0.6);
   border: 0;
@@ -133,36 +123,24 @@
   -moz-appearance: textfield;
 }
 
-.value {
+.colorPreview {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.16);
+  background-image: url('../../img/grid.svg');
   overflow: hidden;
-  text-overflow: ellipsis;
 
-  &::before {
-    content: attr(data-value);
-    white-space: nowrap;
+  div {
+    width: 16px;
+    height: 16px;
   }
-
-  &[data-full]:hover::before {
-    content: attr(data-full);
-  }
-
-  .colorPreview + & {
-    padding-left: 24px;
-  }
-}
-
-.valueWrapper {
-  position: relative;
-  display: flex;
-
-  flex-shrink: 1;
-  flex-grow: 1;
-  flex-basis: 100%;
 }
 
 .select,
-.button,
-.value.pointerCursor {
+.button {
   cursor: pointer;
 }
 
