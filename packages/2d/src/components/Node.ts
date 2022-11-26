@@ -4,10 +4,17 @@ import {
   getPropertiesOf,
   initial,
   initialize,
+  Property,
   property,
   wrapper,
 } from '../decorators';
-import {Vector2, Rect, transformScalar} from '@motion-canvas/core/lib/types';
+import {
+  Vector2,
+  Rect,
+  transformScalar,
+  PossibleColor,
+  Color,
+} from '@motion-canvas/core/lib/types';
 import {
   createSignal,
   isReactive,
@@ -20,6 +27,7 @@ import {Promisable} from '@motion-canvas/core/lib/threading';
 import {View2D, use2DView} from '../scenes';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
+import {drawLine} from '../utils';
 
 export interface NodeProps {
   ref?: Reference<any>;
@@ -33,7 +41,7 @@ export interface NodeProps {
   invert?: SignalValue<number>;
   saturate?: SignalValue<number>;
   sepia?: SignalValue<number>;
-  shadowColor?: SignalValue<string>;
+  shadowColor?: SignalValue<PossibleColor>;
   shadowBlur?: SignalValue<number>;
   shadowOffsetX?: SignalValue<number>;
   shadowOffsetY?: SignalValue<number>;
@@ -122,9 +130,10 @@ export class Node implements Promisable<Node> {
   @property()
   public declare readonly sepia: Signal<number, this>;
 
-  @initial('')
+  @initial('#0000')
+  @wrapper(Color)
   @property()
-  public declare readonly shadowColor: Signal<string, this>;
+  public declare readonly shadowColor: Property<PossibleColor, Color, this>;
 
   @initial(0)
   @property()
@@ -210,11 +219,12 @@ export class Node implements Promisable<Node> {
   public readonly children = createSignal<Node[]>([]);
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
+  public readonly key: string;
 
   public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
     this.add(children);
-    use2DView()?.registerNode(this);
+    this.key = use2DView()?.registerNode(this) ?? '';
   }
 
   @computed()
@@ -426,7 +436,7 @@ export class Node implements Promisable<Node> {
 
     for (const key in this.properties) {
       const meta = this.properties[key];
-      if (!meta.clone || key in props) continue;
+      if (!meta.cloneable || key in props) continue;
 
       const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
       props[key] = signal();
@@ -451,7 +461,7 @@ export class Node implements Promisable<Node> {
 
     for (const key in this.properties) {
       const meta = this.properties[key];
-      if (!meta.clone || key in props) continue;
+      if (!meta.cloneable || key in props) continue;
 
       const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
       props[key] = signal.raw();
@@ -477,7 +487,7 @@ export class Node implements Promisable<Node> {
 
     for (const key in this.properties) {
       const meta = this.properties[key];
-      if (!meta.clone || key in props) continue;
+      if (!meta.cloneable || key in props) continue;
 
       const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
       props[key] = () => signal();
@@ -624,7 +634,7 @@ export class Node implements Promisable<Node> {
       const offset = this.shadowOffset().transform(matrix);
       const blur = transformScalar(this.shadowBlur(), matrix);
 
-      context.shadowColor = this.shadowColor();
+      context.shadowColor = this.shadowColor().serialize();
       context.shadowBlur = blur;
       context.shadowOffsetX = offset.x;
       context.shadowOffsetY = offset.y;
@@ -682,6 +692,31 @@ export class Node implements Promisable<Node> {
     for (const child of this.children()) {
       child.render(context);
     }
+  }
+
+  /**
+   * Draw an overlay for this node.
+   *
+   * @remarks
+   * The overlay for the currently inspected node is displayed on top of the
+   * canvas.
+   *
+   * The provided context is in screen space. The local-to-screen matrix can be
+   * used to transform all shapes that need to be displayed.
+   * This approach allows to keep the line widths and gizmo sizes consistent,
+   * no matter how zoomed-in the view is.
+   *
+   * @param context - The context to draw with.
+   * @param matrix - A local-to-screen matrix.
+   */
+  public drawOverlay(context: CanvasRenderingContext2D, matrix: DOMMatrix) {
+    const rect = this.cacheRect().transformCorners(matrix);
+    context.strokeStyle = 'white';
+    context.lineWidth = 1;
+    context.beginPath();
+    drawLine(context, rect);
+    context.closePath();
+    context.stroke();
   }
 
   protected transformContext(context: CanvasRenderingContext2D) {

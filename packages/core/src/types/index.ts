@@ -1,4 +1,5 @@
 export * from './Canvas';
+export * from './Color';
 export * from './Matrix';
 export * from './Origin';
 export * from './Rect';

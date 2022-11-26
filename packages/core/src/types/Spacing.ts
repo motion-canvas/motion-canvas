@@ -1,4 +1,5 @@
 import {map} from '../tweening';
+import {Type} from './Type';
 
 export type SerializedSpacing = {
   top: number;
@@ -14,7 +15,11 @@ export type PossibleSpacing =
   | [number, number, number]
   | [number, number, number, number];
 
-export class Spacing {
+export class Spacing implements Type {
+  public static readonly symbol = Symbol.for(
+    '@motion-canvas/core/types/Spacing',
+  );
+
   public top = 0;
   public right = 0;
   public bottom = 0;
@@ -72,5 +77,27 @@ export class Spacing {
     this.right = one.right;
     this.bottom = one.bottom;
     this.left = one.left;
+  }
+
+  public scale(value: number): Spacing {
+    return new Spacing(
+      this.top * value,
+      this.right * value,
+      this.bottom * value,
+      this.left * value,
+    );
+  }
+
+  public toSymbol(): symbol {
+    return Spacing.symbol;
+  }
+
+  public serialize(): SerializedSpacing {
+    return {
+      top: this.top,
+      right: this.right,
+      bottom: this.bottom,
+      left: this.left,
+    };
   }
 }

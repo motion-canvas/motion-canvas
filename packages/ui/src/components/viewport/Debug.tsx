@@ -1,5 +1,6 @@
 import styles from './Viewport.module.scss';
-import {useCurrentScene, usePlayerTime} from '../../hooks';
+
+import {useCurrentScene, usePlayerState, usePlayerTime} from '../../hooks';
 import {useContext, useLayoutEffect, useRef} from 'preact/hooks';
 import {ViewportContext} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
@@ -8,6 +9,7 @@ import {useInspection} from '../../contexts';
 export function Debug() {
   const time = usePlayerTime();
   const scene = useCurrentScene();
+  const {scale} = usePlayerState();
   const canvasRef = useRef<HTMLCanvasElement>();
   const contextRef = useRef<CanvasRenderingContext2D>();
   const state = useContext(ViewportContext);
@@ -25,65 +27,17 @@ export function Debug() {
       return;
     }
 
-    ctx.save();
-    ctx.translate(
+    const size = scene.getSize().scale(scale / -2);
+    const matrix = new DOMMatrix();
+    matrix.translateSelf(
       state.x + canvasRef.current.width / 2,
       state.y + canvasRef.current.height / 2,
     );
-    ctx.scale(state.zoom, state.zoom);
-    const {rect, position, contentRect, marginRect} =
-      scene.inspectBoundingBox(element);
+    matrix.scaleSelf(state.zoom, state.zoom);
+    matrix.translateSelf(size.width, size.height);
 
-    if (contentRect && rect) {
-      ctx.beginPath();
-      ctx.rect(
-        contentRect.x,
-        contentRect.y,
-        contentRect.width,
-        contentRect.height,
-      );
-      ctx.rect(rect.x, rect.y, rect.width, rect.height);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(180,255,147,0.6)';
-      ctx.fill('evenodd');
-    }
-
-    if (rect) {
-      ctx.beginPath();
-      ctx.rect(rect.x, rect.y, rect.width, rect.height);
-      ctx.closePath();
-      ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
-      ctx.lineWidth = 2 / state.zoom;
-      ctx.stroke();
-    }
-
-    if (marginRect && rect) {
-      ctx.beginPath();
-      ctx.rect(rect.x, rect.y, rect.width, rect.height);
-      ctx.rect(marginRect.x, marginRect.y, marginRect.width, marginRect.height);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(255,193,125,0.6)';
-      ctx.fill('evenodd');
-    }
-
-    if (position) {
-      ctx.beginPath();
-      ctx.arc(position.x, position.y, 5 / state.zoom, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-      ctx.fill();
-    }
-
-    if (rect) {
-      ctx.font = `${16 / state.zoom}px JetBrains Mono`;
-      ctx.fillStyle = 'rgba(255, 255, 255, 1)';
-      ctx.fillText(
-        `${Math.floor(rect.width)} x ${Math.floor(rect.height)}`,
-        rect.x + 8 / state.zoom,
-        rect.y - 8 / state.zoom,
-      );
-    }
-
+    ctx.save();
+    scene.drawOverlay(element, matrix, ctx);
     ctx.restore();
   }, [state, scene, inspectedElement, time]);
 

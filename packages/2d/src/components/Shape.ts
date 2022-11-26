@@ -1,15 +1,15 @@
-import {CanvasStyle} from '../partials';
-import {computed, initial, property} from '../decorators';
+import {CanvasStyle, PossibleCanvasStyle} from '../partials';
+import {computed, initial, parser, Property, property} from '../decorators';
 import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {Layout, LayoutProps} from './Layout';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {easeOutExpo, linear, map} from '@motion-canvas/core/lib/tweening';
-import {parseCanvasStyle} from '../utils';
+import {resolveCanvasStyle, canvasStyleParser} from '../utils';
 
 export interface ShapeProps extends LayoutProps {
-  fill?: SignalValue<CanvasStyle>;
-  stroke?: SignalValue<CanvasStyle>;
+  fill?: SignalValue<PossibleCanvasStyle>;
+  stroke?: SignalValue<PossibleCanvasStyle>;
   strokeFirst?: SignalValue<boolean>;
   lineWidth?: SignalValue<number>;
   lineJoin?: SignalValue<CanvasLineJoin>;
@@ -20,11 +20,21 @@ export interface ShapeProps extends LayoutProps {
 
 export abstract class Shape extends Layout {
   @initial(null)
+  @parser(canvasStyleParser)
   @property()
-  public declare readonly fill: Signal<CanvasStyle, this>;
+  public declare readonly fill: Property<
+    PossibleCanvasStyle,
+    CanvasStyle,
+    this
+  >;
   @initial(null)
+  @parser(canvasStyleParser)
   @property()
-  public declare readonly stroke: Signal<CanvasStyle, this>;
+  public declare readonly stroke: Property<
+    PossibleCanvasStyle,
+    CanvasStyle,
+    this
+  >;
   @initial(false)
   @property()
   public declare readonly strokeFirst: Signal<boolean, this>;
@@ -56,8 +66,8 @@ export abstract class Shape extends Layout {
   }
 
   protected applyStyle(context: CanvasRenderingContext2D) {
-    context.fillStyle = parseCanvasStyle(this.fill(), context);
-    context.strokeStyle = parseCanvasStyle(this.stroke(), context);
+    context.fillStyle = resolveCanvasStyle(this.fill(), context);
+    context.strokeStyle = resolveCanvasStyle(this.stroke(), context);
     context.lineWidth = this.lineWidth();
     context.lineJoin = this.lineJoin();
     context.lineCap = this.lineCap();

@@ -23,8 +23,9 @@ export function capitalize<T extends string>(value: T): Capitalize<T> {
 export interface PropertyMetadata<T> {
   default?: T;
   interpolationFunction?: InterpolationFunction<T>;
-  wrapper?: new (value: any) => T;
-  clone?: boolean;
+  parser?: (value: any) => T;
+  cloneable?: boolean;
+  inspectable?: boolean;
   compoundParent?: string;
   compound?: boolean;
 }
@@ -54,7 +55,7 @@ export function createProperty<
   property: TProperty,
   initial?: TSetterValue,
   defaultInterpolation: InterpolationFunction<TGetterValue> = deepLerp,
-  klass?: new (value: TSetterValue) => TGetterValue,
+  parser?: (value: TSetterValue) => TGetterValue,
 ): Property<TSetterValue, TGetterValue, TNode> {
   let getter: SignalGetter<TGetterValue>;
   let setter: SignalSetter<TSetterValue>;
@@ -71,10 +72,9 @@ export function createProperty<
 
   let wrap: (value: SignalValue<TSetterValue>) => SignalValue<TGetterValue>;
   let unwrap: (value: SignalValue<TSetterValue>) => TGetterValue;
-  if (klass) {
-    wrap = value =>
-      isReactive(value) ? () => new klass(value()) : new klass(value);
-    unwrap = value => new klass(isReactive(value) ? value() : value);
+  if (parser) {
+    wrap = value => (isReactive(value) ? () => parser(value()) : parser(value));
+    unwrap = value => parser(isReactive(value) ? value() : value);
   } else {
     wrap = value => <SignalValue<TGetterValue>>value;
     unwrap = value => <TGetterValue>(isReactive(value) ? value() : value);
@@ -85,13 +85,13 @@ export function createProperty<
     signal = <Property<TSetterValue, TGetterValue, TNode>>(
       (<unknown>(
         createSignal(
-          initial === undefined ? undefined : wrap(initial),
+          wrap(<SignalValue<TSetterValue>>initial),
           defaultInterpolation,
           node,
         )
       ))
     );
-    if (!tweener) {
+    if (!tweener && !parser) {
       return signal;
     }
 
@@ -170,7 +170,7 @@ export function createProperty<
   return handler;
 }
 
-const PROPERTIES = Symbol.for('properties');
+const PROPERTIES = Symbol.for('@motion-canvas/2d/decorators/properties');
 
 export function getPropertyMeta<T>(
   object: any,
@@ -228,14 +228,17 @@ export function property<T>(): PropertyDecorator {
       lookup = target[PROPERTIES];
     }
 
-    const meta = (lookup[key] = lookup[key] ?? {clone: true});
+    const meta = (lookup[key] = lookup[key] ?? {
+      cloneable: true,
+      inspectable: true,
+    });
     addInitializer(target, (instance: any, context: any) => {
       instance[key] = createProperty(
         instance,
         <string>key,
         context.defaults[key] ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
-        meta.wrapper,
+        meta.parser,
       );
     });
   };
@@ -305,6 +308,41 @@ export function interpolation<T>(
 }
 
 /**
+ * Create a property parser decorator.
+ *
+ * @remarks
+ * This decorator specifies the parser of a property.
+ * Instead of returning the raw value, its passed as the first parameter to the
+ * parser and the resulting value is returned.
+ *
+ * If the wrapper class has a method called `lerp` it will be set as the
+ * default interpolation function for the property.
+ *
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@wrapper(Vector2)
+ *   \@property()
+ *   public declare offset: Signal<Vector2, this>;
+ * }
+ * ```
+ *
+ * @param value - The wrapper class for the property.
+ */
+export function parser<T>(value: (value: any) => T): PropertyDecorator {
+  return (target: any, key) => {
+    const meta = getPropertyMeta<T>(target, key);
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.parser = value;
+  };
+}
+
+/**
  * Create a property wrapper decorator.
  *
  * @remarks
@@ -337,7 +375,7 @@ export function wrapper<T>(
       console.error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
-    meta.wrapper = value;
+    meta.parser = raw => new value(raw);
     if ('lerp' in value) {
       meta.interpolationFunction ??= value.lerp;
     }
@@ -345,34 +383,67 @@ export function wrapper<T>(
 }
 
 /**
- * Create a cloning property decorator.
+ * Create a cloneable property decorator.
  *
  * @remarks
  * This decorator specifies whether the property should be copied over when
  * cloning the node.
  *
- * By default, any property is copied.
+ * By default, any property is cloneable.
  *
  * Must be specified before the {@link property} decorator.
  *
  * @example
  * ```ts
  * class Example {
- *   \@wrapper(Vector2)
+ *   \@clone(false)
  *   \@property()
- *   public declare offset: Signal<Vector2, this>;
+ *   public declare length: Signal<number, this>;
  * }
  * ```
  *
- * @param value - Whether the property should be cloned.
+ * @param value - Whether the property should be cloneable.
  */
-export function clone<T>(value = true): PropertyDecorator {
+export function cloneable<T>(value = true): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
       console.error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
-    meta.clone = value;
+    meta.cloneable = value;
+  };
+}
+
+/**
+ * Create a inspectable property decorator.
+ *
+ * @remarks
+ * This decorator specifies whether the property should be visible in the
+ * inspector.
+ *
+ * By default, any property is inspectable.
+ *
+ * Must be specified before the {@link property} decorator.
+ *
+ * @example
+ * ```ts
+ * class Example {
+ *   \@inspectable(false)
+ *   \@property()
+ *   public declare hiddenLength: Signal<number, this>;
+ * }
+ * ```
+ *
+ * @param value - Whether the property should be inspectable.
+ */
+export function inspectable<T>(value = true): PropertyDecorator {
+  return (target: any, key) => {
+    const meta = getPropertyMeta<T>(target, key);
+    if (!meta) {
+      console.error(`Missing property decorator for "${key.toString()}"`);
+      return;
+    }
+    meta.inspectable = value;
   };
 }

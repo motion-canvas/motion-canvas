@@ -6,14 +6,14 @@ import {
   property,
   wrapper,
 } from '../decorators';
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Color, PossibleColor, Vector2} from '@motion-canvas/core/lib/types';
 import {Signal} from '@motion-canvas/core/lib/utils';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
 
 export interface GradientStop {
   offset: number;
-  color: string;
+  color: PossibleColor;
 }
 
 export interface GradientProps {
@@ -106,7 +106,7 @@ export class Gradient {
     }
 
     for (const {offset, color} of this.stops()) {
-      gradient.addColorStop(offset, color);
+      gradient.addColorStop(offset, new Color(color).serialize());
     }
 
     return gradient;

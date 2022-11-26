@@ -1,5 +1,7 @@
 import {Vector2} from './Vector';
 import {arcLerp, map} from '../tweening';
+import {Type} from './Type';
+import {Spacing} from './Spacing';
 
 export type SerializedRect = {
   x: number;
@@ -13,7 +15,9 @@ export type PossibleRect =
   | [number, number, number, number]
   | Vector2;
 
-export class Rect {
+export class Rect implements Type {
+  public static readonly symbol = Symbol.for('@motion-canvas/core/types/Rect');
+
   public x = 0;
   public y = 0;
   public width = 0;
@@ -128,7 +132,7 @@ export class Rect {
   }
 
   public set left(value: number) {
-    this.width = this.right - value;
+    this.width += this.x - value;
     this.x = value;
   }
 
@@ -145,7 +149,7 @@ export class Rect {
   }
 
   public set top(value: number) {
-    this.width = this.bottom - value;
+    this.width += this.y - value;
     this.y = value;
   }
 
@@ -241,6 +245,10 @@ export class Rect {
     );
   }
 
+  public transformCorners(matrix: DOMMatrix) {
+    return this.corners.map(corner => corner.transformAsPoint(matrix));
+  }
+
   public expand(amount: number) {
     return new Rect(
       this.x - amount,
@@ -250,6 +258,16 @@ export class Rect {
     );
   }
 
+  public addSpacing(spacing: Spacing) {
+    const result = new Rect(this);
+    result.left -= spacing.left;
+    result.top -= spacing.top;
+    result.right += spacing.right;
+    result.bottom += spacing.bottom;
+
+    return result;
+  }
+
   public includes(point: Vector2): boolean {
     return (
       point.x >= this.x &&
@@ -257,5 +275,13 @@ export class Rect {
       point.y >= this.y &&
       point.y <= this.y + this.height
     );
+  }
+
+  public toSymbol(): symbol {
+    return Rect.symbol;
+  }
+
+  public serialize(): SerializedRect {
+    return {x: this.x, y: this.y, width: this.width, height: this.height};
   }
 }

@@ -1,15 +1,29 @@
-import {CanvasStyle, Gradient, Pattern} from '../partials';
-import {Rect} from '@motion-canvas/core/lib/types';
+import {CanvasStyle, Gradient, Pattern, PossibleCanvasStyle} from '../partials';
+import {Color, Rect, Vector2} from '@motion-canvas/core/lib/types';
 
-export function parseCanvasStyle(
+export function canvasStyleParser(style: PossibleCanvasStyle) {
+  if (style === null) {
+    return null;
+  }
+  if (style instanceof Gradient) {
+    return style;
+  }
+  if (style instanceof Pattern) {
+    return style;
+  }
+
+  return new Color(style);
+}
+
+export function resolveCanvasStyle(
   style: CanvasStyle,
   context: CanvasRenderingContext2D,
 ): string | CanvasGradient | CanvasPattern {
   if (style === null) {
     return '';
   }
-  if (typeof style === 'string') {
-    return style;
+  if (style instanceof Color) {
+    return (<Color>style).serialize();
   }
   if (style instanceof Gradient) {
     return style.canvasGradient(context);
@@ -49,6 +63,10 @@ export function fillRect(context: CanvasRenderingContext2D, rect: Rect) {
   context.fillRect(rect.x, rect.y, rect.width, rect.height);
 }
 
+export function strokeRect(context: CanvasRenderingContext2D, rect: Rect) {
+  context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+}
+
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
@@ -80,5 +98,21 @@ export function drawImage(
     );
   } else {
     context.drawImage(image, first.x, first.y, first.width, first.height);
+  }
+}
+
+export function moveTo(context: CanvasRenderingContext2D, position: Vector2) {
+  context.moveTo(position.x, position.y);
+}
+
+export function lineTo(context: CanvasRenderingContext2D, position: Vector2) {
+  context.lineTo(position.x, position.y);
+}
+
+export function drawLine(context: CanvasRenderingContext2D, points: Vector2[]) {
+  if (points.length < 2) return;
+  moveTo(context, points[0]);
+  for (const point of points.slice(1)) {
+    lineTo(context, point);
   }
 }

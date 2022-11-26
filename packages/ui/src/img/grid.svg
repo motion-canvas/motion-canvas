@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2">
+    <path d="M0 0H2V2H0z" fill="white"/>
+    <path d="M0 0H1V1H2V2H1V1H0z" fill="#ccc"/>
+</svg>

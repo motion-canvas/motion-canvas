@@ -1,6 +1,7 @@
 import {Rect} from './Rect';
 import {arcLerp, map} from '../tweening';
 import {Direction, Origin} from './Origin';
+import {Type} from './Type';
 
 export type SerializedVector2 = {
   x: number;
@@ -14,9 +15,10 @@ export type PossibleVector2 =
   | [number, number]
   | Rect;
 
-export class Vector2 {
-  public x = 0;
-  public y = 0;
+export class Vector2 implements Type {
+  public static readonly symbol = Symbol.for(
+    '@motion-canvas/core/types/Vector2',
+  );
 
   public static readonly zero = new Vector2();
   public static readonly one = new Vector2(1, 1);
@@ -24,6 +26,9 @@ export class Vector2 {
   public static readonly left = new Vector2(-1, 0);
   public static readonly up = new Vector2(0, 1);
   public static readonly down = new Vector2(0, -1);
+
+  public x = 0;
+  public y = 0;
 
   public static lerp(from: Vector2, to: Vector2, value: number | Vector2) {
     let valueX;
@@ -210,5 +215,13 @@ export class Vector2 {
 
   public addY(value: number) {
     return new Vector2(this.x, this.y + value);
+  }
+
+  public toSymbol(): symbol {
+    return Vector2.symbol;
+  }
+
+  public serialize(): SerializedVector2 {
+    return {x: this.x, y: this.y};
   }
 }

@@ -8,10 +8,8 @@ interface ColorPreviewProps extends JSX.HTMLAttributes<HTMLDivElement> {
 
 export function ColorPreview({color, ...props}: ColorPreviewProps) {
   return (
-    <div
-      className={styles.colorPreview}
-      style={{background: color}}
-      {...props}
-    />
+    <div className={styles.colorPreview} {...props}>
+      <div style={{background: color}} />
+    </div>
   );
 }
