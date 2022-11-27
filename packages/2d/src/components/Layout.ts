@@ -287,6 +287,7 @@ export class Layout extends Node {
 
   @cloneable(false)
   @wrapper(Vector2)
+  @initial({x: null, y: null})
   @compound({x: 'width', y: 'height'})
   public declare readonly size: Vector2LengthProperty<this>;
 
@@ -401,12 +402,12 @@ export class Layout extends Node {
    * inheritance).
    */
   @computed()
-  protected layoutEnabled(): boolean {
+  public layoutEnabled(): boolean {
     return this.layout() ?? this.parentTransform()?.layoutEnabled() ?? false;
   }
 
   @computed()
-  protected isLayoutRoot(): boolean {
+  public isLayoutRoot(): boolean {
     return !this.layoutEnabled() || !this.parentTransform()?.layoutEnabled();
   }
 
@@ -422,7 +423,9 @@ export class Layout extends Node {
   }
 
   protected getComputedLayout(): Rect {
-    return new Rect(this.element.getBoundingClientRect());
+    const rect = new Rect(this.element.getBoundingClientRect());
+    rect.position = rect.position.add(this.getCustomOffset());
+    return rect;
   }
 
   @computed()
@@ -448,7 +451,7 @@ export class Layout extends Node {
   @computed()
   protected computedSize(): Vector2 {
     this.requestLayoutUpdate();
-    return new Vector2(this.getComputedLayout());
+    return this.getComputedLayout().size;
   }
 
   /**
@@ -509,8 +512,9 @@ export class Layout extends Node {
   }
 
   protected override getCacheRect(): Rect {
-    const size = this.computedSize();
-    return new Rect(size.scale(-0.5), size);
+    const rect = Rect.fromSizeCentered(this.computedSize());
+    rect.position = rect.position.sub(this.getCustomOffset());
+    return rect;
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -536,6 +540,7 @@ export class Layout extends Node {
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
     const rect = Rect.fromSizeCentered(size);
+    rect.position = rect.position.sub(this.getCustomOffset());
     const layout = rect.transformCorners(matrix);
     const padding = rect
       .addSpacing(this.padding().scale(-1))
@@ -673,7 +678,7 @@ export class Layout extends Node {
 
   public override hit(position: Vector2): Node | null {
     const local = position.transformAsPoint(this.localToParent().inverse());
-    if (this.getCacheRect().includes(local)) {
+    if (this.cacheRect().includes(local)) {
       return super.hit(position) ?? this;
     }
 

@@ -123,6 +123,11 @@ export class Rect implements Type {
     return new Vector2(this.x, this.y);
   }
 
+  public set position(value: Vector2) {
+    this.x = value.x;
+    this.y = value.y;
+  }
+
   public get size() {
     return new Vector2(this.width, this.height);
   }
@@ -153,7 +158,7 @@ export class Rect implements Type {
   }
 
   public set top(value: number) {
-    this.width += this.y - value;
+    this.height += this.y - value;
     this.y = value;
   }
 
