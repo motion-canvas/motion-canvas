@@ -7,7 +7,7 @@ import {
   SceneRenderEvent,
 } from '@motion-canvas/core/lib/scenes';
 import {View2D} from './View2D';
-import {Signal, useScene} from '@motion-canvas/core/lib/utils';
+import {useScene} from '@motion-canvas/core/lib/utils';
 import {Node} from '../components';
 import {Vector2} from '@motion-canvas/core/lib/types';
 
@@ -59,12 +59,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   ): InspectedAttributes | null {
     if (!(element instanceof Node)) return null;
     const attributes: Record<string, any> = {};
-    for (const key in element.properties) {
-      const meta = element.properties[key];
+    for (const {key, meta, signal} of element) {
       if (!meta.inspectable) continue;
-      attributes[key] = (<Record<string, Signal<any>>>(<unknown>element))[
-        key
-      ]();
+      attributes[key] = signal();
     }
 
     return attributes;

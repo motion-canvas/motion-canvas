@@ -1,10 +1,10 @@
 import {
-  compound,
   computed,
   initial,
   initialize,
   property,
-  wrapper,
+  Vector2Property,
+  vector2Property,
 } from '../decorators';
 import {Color, PossibleColor, Vector2} from '@motion-canvas/core/lib/types';
 import {Signal} from '@motion-canvas/core/lib/utils';
@@ -35,27 +35,11 @@ export class Gradient {
   @property()
   public declare readonly type: Signal<GradientType, this>;
 
-  @initial(0)
-  @property()
-  public declare readonly fromX: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly fromY: Signal<number, this>;
-  @compound({x: 'fromX', y: 'fromY'})
-  @wrapper(Vector2)
-  @property()
-  public declare readonly from: Signal<Vector2, this>;
+  @vector2Property('from')
+  public declare readonly from: Vector2Property<this>;
 
-  @initial(0)
-  @property()
-  public declare readonly toX: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly toY: Signal<number, this>;
-  @compound({x: 'toX', y: 'toY'})
-  @wrapper(Vector2)
-  @property()
-  public declare readonly to: Signal<Vector2, this>;
+  @vector2Property('to')
+  public declare readonly to: Vector2Property<this>;
 
   @initial(0)
   @property()
@@ -80,26 +64,26 @@ export class Gradient {
     switch (this.type()) {
       case 'linear':
         gradient = context.createLinearGradient(
-          this.fromX(),
-          this.fromY(),
-          this.toX(),
-          this.toY(),
+          this.from.x(),
+          this.from.y(),
+          this.to.x(),
+          this.to.y(),
         );
         break;
       case 'conic':
         gradient = context.createConicGradient(
           this.angle(),
-          this.fromX(),
-          this.fromY(),
+          this.from.x(),
+          this.from.y(),
         );
         break;
       case 'radial':
         gradient = context.createRadialGradient(
-          this.fromX(),
-          this.fromY(),
+          this.from.x(),
+          this.from.y(),
           this.fromRadius(),
-          this.toX(),
-          this.toY(),
+          this.to.x(),
+          this.to.y(),
           this.toRadius(),
         );
         break;

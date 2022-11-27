@@ -101,15 +101,33 @@ export function drawImage(
   }
 }
 
-export function moveTo(context: CanvasRenderingContext2D, position: Vector2) {
+export function moveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  position: Vector2,
+) {
   context.moveTo(position.x, position.y);
 }
 
-export function lineTo(context: CanvasRenderingContext2D, position: Vector2) {
+export function lineTo(
+  context: CanvasRenderingContext2D | Path2D,
+  position: Vector2,
+) {
   context.lineTo(position.x, position.y);
 }
 
-export function drawLine(context: CanvasRenderingContext2D, points: Vector2[]) {
+export function arcTo(
+  context: CanvasRenderingContext2D | Path2D,
+  through: Vector2,
+  position: Vector2,
+  radius: number,
+) {
+  context.arcTo(through.x, through.y, position.x, position.y, radius);
+}
+
+export function drawLine(
+  context: CanvasRenderingContext2D | Path2D,
+  points: Vector2[],
+) {
   if (points.length < 2) return;
   moveTo(context, points[0]);
   for (const point of points.slice(1)) {

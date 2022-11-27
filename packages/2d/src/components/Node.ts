@@ -1,11 +1,15 @@
 import {
-  compound,
+  cloneable,
+  ColorProperty,
+  colorProperty,
   computed,
   getPropertiesOf,
   initial,
   initialize,
   Property,
   property,
+  Vector2Property,
+  vector2Property,
   wrapper,
 } from '../decorators';
 import {
@@ -13,7 +17,8 @@ import {
   Rect,
   transformScalar,
   PossibleColor,
-  Color,
+  transformAngle,
+  PossibleVector2,
 } from '@motion-canvas/core/lib/types';
 import {
   createSignal,
@@ -32,6 +37,15 @@ import {drawLine} from '../utils';
 export interface NodeProps {
   ref?: Reference<any>;
   children?: ComponentChildren;
+
+  x?: SignalValue<number>;
+  y?: SignalValue<number>;
+  position?: SignalValue<PossibleVector2>;
+  rotation?: SignalValue<number>;
+  scaleX?: SignalValue<number>;
+  scaleY?: SignalValue<number>;
+  scale?: SignalValue<PossibleVector2>;
+
   opacity?: SignalValue<number>;
   blur?: SignalValue<number>;
   brightness?: SignalValue<number>;
@@ -45,7 +59,7 @@ export interface NodeProps {
   shadowBlur?: SignalValue<number>;
   shadowOffsetX?: SignalValue<number>;
   shadowOffsetY?: SignalValue<number>;
-  shadowOffset?: SignalValue<Vector2>;
+  shadowOffset?: SignalValue<PossibleVector2>;
   cache?: SignalValue<boolean>;
   composite?: SignalValue<boolean>;
   compositeOperation?: SignalValue<GlobalCompositeOperation>;
@@ -53,6 +67,86 @@ export interface NodeProps {
 
 export class Node implements Promisable<Node> {
   public declare isClass: boolean;
+
+  @vector2Property()
+  public declare readonly position: Vector2Property<this>;
+
+  @wrapper(Vector2)
+  @cloneable(false)
+  @property()
+  public declare readonly absolutePosition: Property<
+    PossibleVector2,
+    Vector2,
+    this
+  >;
+
+  protected getAbsolutePosition(): Vector2 {
+    const matrix = this.localToWorld();
+    return new Vector2(matrix.m41, matrix.m42);
+  }
+
+  protected setAbsolutePosition(value: SignalValue<Vector2>) {
+    if (isReactive(value)) {
+      this.position(() => value().transformAsPoint(this.worldToParent()));
+    } else {
+      this.position(value.transformAsPoint(this.worldToParent()));
+    }
+  }
+
+  @initial(0)
+  @property()
+  public declare readonly rotation: Signal<number, this>;
+
+  @cloneable(false)
+  @property()
+  public declare readonly absoluteRotation: Signal<number, this>;
+
+  protected getAbsoluteRotation() {
+    const matrix = this.localToWorld();
+    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
+  }
+
+  protected setAbsoluteRotation(value: SignalValue<number>) {
+    if (isReactive(value)) {
+      this.rotation(() => transformAngle(value(), this.worldToParent()));
+    } else {
+      this.rotation(transformAngle(value, this.worldToParent()));
+    }
+  }
+
+  @initial(Vector2.one)
+  @vector2Property('scale')
+  public declare readonly scale: Vector2Property<this>;
+
+  @wrapper(Vector2)
+  @cloneable(false)
+  @property()
+  public declare readonly absoluteScale: Property<
+    PossibleVector2,
+    Vector2,
+    this
+  >;
+
+  protected getAbsoluteScale(): Vector2 {
+    const matrix = this.localToWorld();
+    return new Vector2(
+      Vector2.magnitude(matrix.m11, matrix.m12),
+      Vector2.magnitude(matrix.m21, matrix.m22),
+    );
+  }
+
+  protected setAbsoluteScale(value: SignalValue<Vector2>) {
+    if (isReactive(value)) {
+      this.scale(() => this.getRelativeScale(value()));
+    } else {
+      this.scale(this.getRelativeScale(value));
+    }
+  }
+
+  private getRelativeScale(scale: Vector2): Vector2 {
+    const parentScale = this.parent()?.absoluteScale() ?? Vector2.one;
+    return scale.div(parentScale);
+  }
 
   @initial(false)
   @property()
@@ -131,26 +225,15 @@ export class Node implements Promisable<Node> {
   public declare readonly sepia: Signal<number, this>;
 
   @initial('#0000')
-  @wrapper(Color)
-  @property()
-  public declare readonly shadowColor: Property<PossibleColor, Color, this>;
+  @colorProperty()
+  public declare readonly shadowColor: ColorProperty<this>;
 
   @initial(0)
   @property()
   public declare readonly shadowBlur: Signal<number, this>;
 
-  @initial(0)
-  @property()
-  public declare readonly shadowOffsetX: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly shadowOffsetY: Signal<number, this>;
-
-  @compound({x: 'shadowOffsetX', y: 'shadowOffsetY'})
-  @wrapper(Vector2)
-  @property()
-  public declare readonly shadowOffset: Signal<Vector2, this>;
+  @vector2Property('shadowOffset')
+  public declare readonly shadowOffset: Vector2Property<this>;
 
   @computed()
   protected hasFilters() {
@@ -171,8 +254,8 @@ export class Node implements Promisable<Node> {
     return (
       !!this.shadowColor() &&
       (this.shadowBlur() > 0 ||
-        this.shadowOffsetX() !== 0 ||
-        this.shadowOffsetY() !== 0)
+        this.shadowOffset.x() !== 0 ||
+        this.shadowOffset.y() !== 0)
     );
   }
 
@@ -223,6 +306,9 @@ export class Node implements Promisable<Node> {
 
   public constructor({children, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
+    for (const {signal} of this) {
+      signal.reset();
+    }
     this.add(children);
     this.key = use2DView()?.registerNode(this) ?? '';
   }
@@ -247,7 +333,12 @@ export class Node implements Promisable<Node> {
 
   @computed()
   public localToParent(): DOMMatrix {
-    return new DOMMatrix();
+    const matrix = new DOMMatrix();
+    matrix.translateSelf(this.position.x(), this.position.y());
+    matrix.rotateSelf(0, 0, this.rotation());
+    matrix.scaleSelf(this.scale.x(), this.scale.y());
+
+    return matrix;
   }
 
   @computed()
@@ -434,37 +525,40 @@ export class Node implements Promisable<Node> {
       props.children ??= this.children().map(child => child.clone());
     }
 
-    for (const key in this.properties) {
-      const meta = this.properties[key];
+    for (const {key, meta, signal} of this) {
       if (!meta.cloneable || key in props) continue;
-
-      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
-      props[key] = signal();
+      if (meta.compound) {
+        for (const [key, property] of meta.compoundEntries) {
+          props[property] = (<Record<string, Signal<any>>>(<unknown>signal))[
+            key
+          ].raw();
+        }
+      } else {
+        props[key] = signal.raw();
+      }
     }
 
     return this.instantiate(props);
   }
 
   /**
-   * Create a raw copy of this node.
+   * Create a copy of this node.
    *
    * @remarks
-   * A raw copy preserves any reactive properties from the source node.
+   * Unlike {@link clone}, a snapshot clone calculates any reactive properties
+   * at the moment of cloning and passes the raw values to the copy.
    *
    * @param customProps - Properties to override.
    */
-  public rawClone(customProps: NodeProps = {}): this {
+  public snapshotClone(customProps: NodeProps = {}): this {
     const props: NodeProps & Record<string, any> = {...customProps};
     if (this.children().length > 0) {
-      props.children ??= this.children().map(child => child.rawClone());
+      props.children ??= this.children().map(child => child.snapshotClone());
     }
 
-    for (const key in this.properties) {
-      const meta = this.properties[key];
+    for (const {key, meta, signal} of this) {
       if (!meta.cloneable || key in props) continue;
-
-      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
-      props[key] = signal.raw();
+      props[key] = signal();
     }
 
     return this.instantiate(props);
@@ -485,11 +579,8 @@ export class Node implements Promisable<Node> {
       props.children ??= this.children().map(child => child.reactiveClone());
     }
 
-    for (const key in this.properties) {
-      const meta = this.properties[key];
+    for (const {key, meta, signal} of this) {
       if (!meta.cloneable || key in props) continue;
-
-      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
       props[key] = () => signal();
     }
 
@@ -778,6 +869,14 @@ export class Node implements Promisable<Node> {
   public async toPromise(): Promise<this> {
     await this.waitForAsyncResources();
     return this;
+  }
+
+  public *[Symbol.iterator]() {
+    for (const key in this.properties) {
+      const meta = this.properties[key];
+      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
+      yield {meta, signal, key};
+    }
   }
 }
 

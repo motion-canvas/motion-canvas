@@ -1,19 +1,17 @@
-import {Rect} from './Rect';
 import {arcLerp, map} from '../tweening';
 import {Direction, Origin} from './Origin';
 import {Type} from './Type';
 
-export type SerializedVector2 = {
-  x: number;
-  y: number;
+export type SerializedVector2<T = number> = {
+  x: T;
+  y: T;
 };
 
-export type PossibleVector2 =
-  | SerializedVector2
-  | {width: number; height: number}
-  | number
-  | [number, number]
-  | Rect;
+export type PossibleVector2<T = number> =
+  | SerializedVector2<T>
+  | {width: T; height: T}
+  | T
+  | [T, T];
 
 export class Vector2 implements Type {
   public static readonly symbol = Symbol.for(
@@ -141,7 +139,7 @@ export class Vector2 implements Type {
       return;
     }
 
-    if (typeof one === 'number') {
+    if (typeof one !== 'object') {
       this.x = one;
       this.y = two ?? one;
       return;
