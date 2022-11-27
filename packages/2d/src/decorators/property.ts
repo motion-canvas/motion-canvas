@@ -28,6 +28,7 @@ export interface PropertyMetadata<T> {
   inspectable?: boolean;
   compoundParent?: string;
   compound?: boolean;
+  compoundEntries: [string, string][];
 }
 
 export interface Property<
@@ -56,13 +57,12 @@ export function createProperty<
   initial?: TSetterValue,
   defaultInterpolation: InterpolationFunction<TGetterValue> = deepLerp,
   parser?: (value: TSetterValue) => TGetterValue,
+  originalGetter?: SignalGetter<TGetterValue>,
+  originalSetter?: SignalSetter<TSetterValue>,
+  tweener?: SignalTween<TGetterValue>,
 ): Property<TSetterValue, TGetterValue, TNode> {
   let getter: SignalGetter<TGetterValue>;
   let setter: SignalSetter<TSetterValue>;
-
-  const originalGetter = node[`get${capitalize(property)}`];
-  const originalSetter = node[`set${capitalize(property)}`];
-  const tweener = node[`tween${capitalize(property)}`];
 
   if (!originalGetter !== !originalSetter) {
     console.warn(
@@ -148,6 +148,7 @@ export function createProperty<
   );
 
   Object.defineProperty(handler, 'reset', {
+    configurable: true,
     value: signal
       ? signal.reset
       : initial !== undefined
@@ -156,16 +157,13 @@ export function createProperty<
   });
 
   Object.defineProperty(handler, 'save', {
+    configurable: true,
     value: () => setter(getter()),
   });
 
   Object.defineProperty(handler, 'raw', {
     value: signal?.raw ?? getter,
   });
-
-  if (initial !== undefined && !signal) {
-    setter(wrap(initial));
-  }
 
   return handler;
 }
@@ -177,6 +175,34 @@ export function getPropertyMeta<T>(
   key: string | symbol,
 ): PropertyMetadata<T> | null {
   return object[PROPERTIES]?.[key] ?? null;
+}
+
+export function getPropertyMetaOrCreate<T>(
+  object: any,
+  key: string | symbol,
+): PropertyMetadata<T> {
+  let lookup: Record<string | symbol, PropertyMetadata<T>>;
+  if (!object[PROPERTIES]) {
+    object[PROPERTIES] = lookup = {};
+  } else if (
+    object[PROPERTIES] &&
+    !Object.prototype.hasOwnProperty.call(object, PROPERTIES)
+  ) {
+    object[PROPERTIES] = lookup = Object.fromEntries<PropertyMetadata<T>>(
+      Object.entries(
+        <Record<string | symbol, PropertyMetadata<T>>>object[PROPERTIES],
+      ).map(([key, meta]) => [key, {...meta}]),
+    );
+  } else {
+    lookup = object[PROPERTIES];
+  }
+
+  lookup[key] ??= {
+    cloneable: true,
+    inspectable: true,
+    compoundEntries: [],
+  };
+  return lookup[key];
 }
 
 export function getPropertiesOf(
@@ -212,26 +238,7 @@ export function getPropertiesOf(
  */
 export function property<T>(): PropertyDecorator {
   return (target: any, key) => {
-    let lookup: Record<string | symbol, PropertyMetadata<T>>;
-    if (!target[PROPERTIES]) {
-      target[PROPERTIES] = lookup = {};
-    } else if (
-      target[PROPERTIES] &&
-      !Object.prototype.hasOwnProperty.call(target, PROPERTIES)
-    ) {
-      target[PROPERTIES] = lookup = Object.fromEntries<PropertyMetadata<T>>(
-        Object.entries(
-          <Record<string | symbol, PropertyMetadata<T>>>target[PROPERTIES],
-        ).map(([key, meta]) => [key, {...meta}]),
-      );
-    } else {
-      lookup = target[PROPERTIES];
-    }
-
-    const meta = (lookup[key] = lookup[key] ?? {
-      cloneable: true,
-      inspectable: true,
-    });
+    const meta = getPropertyMetaOrCreate<T>(target, key);
     addInitializer(target, (instance: any, context: any) => {
       instance[key] = createProperty(
         instance,
@@ -239,6 +246,9 @@ export function property<T>(): PropertyDecorator {
         context.defaults[key] ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
         meta.parser,
+        target[`get${capitalize(<string>key)}`],
+        target[`set${capitalize(<string>key)}`],
+        target[`tween${capitalize(<string>key)}`],
       );
     });
   };
@@ -346,12 +356,11 @@ export function parser<T>(value: (value: any) => T): PropertyDecorator {
  * Create a property wrapper decorator.
  *
  * @remarks
- * This decorator specifies the wrapper of a property.
- * Instead of returning the raw value, an instance of the wrapper is returned.
- * The actual value is passed as the first parameter to the constructor.
+ * This is a shortcut decorator for setting both the {@link parser} and
+ * {@link interpolation}.
  *
- * If the wrapper class has a method called `lerp` it will be set as the
- * default interpolation function for the property.
+ * The interpolation function will be set only if the wrapper class has a method
+ * called `lerp`, which will be used as said function.
  *
  * Must be specified before the {@link property} decorator.
  *
@@ -359,6 +368,12 @@ export function parser<T>(value: (value: any) => T): PropertyDecorator {
  * ```ts
  * class Example {
  *   \@wrapper(Vector2)
+ *   \@property()
+ *   public declare offset: Signal<Vector2, this>;
+ *
+ *   // same as:
+ *   \@parser(value => new Vector2(value))
+ *   \@interpolation(Vector2.lerp)
  *   \@property()
  *   public declare offset: Signal<Vector2, this>;
  * }
@@ -416,7 +431,7 @@ export function cloneable<T>(value = true): PropertyDecorator {
 }
 
 /**
- * Create a inspectable property decorator.
+ * Create an inspectable property decorator.
  *
  * @remarks
  * This decorator specifies whether the property should be visible in the

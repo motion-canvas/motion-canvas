@@ -1,11 +1,17 @@
-import {CanvasStyle, PossibleCanvasStyle} from '../partials';
-import {computed, initial, parser, Property, property} from '../decorators';
+import {PossibleCanvasStyle} from '../partials';
+import {
+  computed,
+  initial,
+  property,
+  CanvasStyleProperty,
+  canvasStyleProperty,
+} from '../decorators';
 import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {Layout, LayoutProps} from './Layout';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {easeOutExpo, linear, map} from '@motion-canvas/core/lib/tweening';
-import {resolveCanvasStyle, canvasStyleParser} from '../utils';
+import {resolveCanvasStyle} from '../utils';
 
 export interface ShapeProps extends LayoutProps {
   fill?: SignalValue<PossibleCanvasStyle>;
@@ -19,22 +25,10 @@ export interface ShapeProps extends LayoutProps {
 }
 
 export abstract class Shape extends Layout {
-  @initial(null)
-  @parser(canvasStyleParser)
-  @property()
-  public declare readonly fill: Property<
-    PossibleCanvasStyle,
-    CanvasStyle,
-    this
-  >;
-  @initial(null)
-  @parser(canvasStyleParser)
-  @property()
-  public declare readonly stroke: Property<
-    PossibleCanvasStyle,
-    CanvasStyle,
-    this
-  >;
+  @canvasStyleProperty()
+  public declare readonly fill: CanvasStyleProperty<this>;
+  @canvasStyleProperty()
+  public declare readonly stroke: CanvasStyleProperty<this>;
   @initial(false)
   @property()
   public declare readonly strokeFirst: Signal<boolean, this>;

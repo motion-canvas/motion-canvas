@@ -127,6 +127,10 @@ export class Rect implements Type {
     return new Vector2(this.width, this.height);
   }
 
+  public get center() {
+    return new Vector2(this.x + this.width / 2, this.y + this.height / 2);
+  }
+
   public get left() {
     return this.x;
   }

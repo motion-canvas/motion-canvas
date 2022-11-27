@@ -1,9 +1,6 @@
 import {useMemo} from 'preact/hooks';
 import {useCurrentScene, useCurrentFrame} from '../../hooks';
-import type {
-  Inspectable,
-  InspectedAttributes,
-} from '@motion-canvas/core/lib/scenes';
+import type {Inspectable} from '@motion-canvas/core/lib/scenes';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {Pane} from '../tabs';
 import {useInspection} from '../../contexts';

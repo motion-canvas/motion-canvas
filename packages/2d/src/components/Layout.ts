@@ -3,20 +3,23 @@ import {
   compound,
   computed,
   initial,
-  Property,
+  inspectable,
   property,
+  Vector2LengthProperty,
+  Vector2Property,
+  vector2Property,
   wrapper,
 } from '../decorators';
 import {
   Origin,
   PossibleSpacing,
   Rect,
-  Spacing,
-  transformAngle,
   Vector2,
   originToOffset,
+  SerializedVector2,
+  PossibleVector2,
 } from '@motion-canvas/core/lib/types';
-import {isReactive, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {
   InterpolationFunction,
   TimingFunction,
@@ -36,6 +39,7 @@ import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
 import {View2D} from '../scenes';
 import {drawLine, lineTo} from '../utils';
+import {spacingProperty, SpacingProperty} from '../decorators/spacingProperty';
 
 export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;
@@ -81,17 +85,10 @@ export interface LayoutProps extends NodeProps {
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<boolean>;
 
-  x?: SignalValue<number>;
-  y?: SignalValue<number>;
-  position?: SignalValue<Vector2>;
-  size?: SignalValue<Vector2>;
-  rotation?: SignalValue<number>;
+  size?: SignalValue<PossibleVector2>;
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
-  offset?: SignalValue<Vector2>;
-  scaleX?: SignalValue<number>;
-  scaleY?: SignalValue<number>;
-  scale?: SignalValue<Vector2>;
+  offset?: SignalValue<PossibleVector2>;
   clip?: SignalValue<boolean>;
 }
 
@@ -116,49 +113,11 @@ export class Layout extends Node {
   @property()
   public declare readonly ratio: Signal<number | null, this>;
 
-  @initial(0)
-  @property()
-  public declare readonly marginTop: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly marginBottom: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly marginLeft: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly marginRight: Signal<number, this>;
-  @compound({
-    top: 'marginTop',
-    bottom: 'marginBottom',
-    left: 'marginLeft',
-    right: 'marginRight',
-  })
-  @wrapper(Spacing)
-  @property()
-  public declare readonly margin: Property<PossibleSpacing, Spacing, this>;
+  @spacingProperty('margin')
+  public declare readonly margin: SpacingProperty<this>;
 
-  @initial(0)
-  @property()
-  public declare readonly paddingTop: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly paddingBottom: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly paddingLeft: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly paddingRight: Signal<number, this>;
-  @compound({
-    top: 'paddingTop',
-    bottom: 'paddingBottom',
-    left: 'paddingLeft',
-    right: 'paddingRight',
-  })
-  @wrapper(Spacing)
-  @property()
-  public declare readonly padding: Property<PossibleSpacing, Spacing, this>;
+  @spacingProperty('padding')
+  public declare readonly padding: SpacingProperty<this>;
 
   @initial('row')
   @property()
@@ -214,12 +173,10 @@ export class Layout extends Node {
   @property()
   public declare readonly textWrap: Signal<boolean | null, this>;
 
-  @initial(0)
+  @cloneable(false)
+  @inspectable(false)
   @property()
   protected declare readonly customX: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly x: Signal<number, this>;
   protected getX(): number {
     if (this.isLayoutRoot()) {
       return this.customX();
@@ -231,12 +188,11 @@ export class Layout extends Node {
     this.customX(value);
   }
 
-  @initial(0)
+  @cloneable(false)
+  @inspectable(false)
   @property()
   protected declare readonly customY: Signal<number, this>;
-  @initial(0)
-  @property()
-  public declare readonly y: Signal<number, this>;
+
   protected getY(): number {
     if (this.isLayoutRoot()) {
       return this.customY();
@@ -248,12 +204,6 @@ export class Layout extends Node {
     this.customY(value);
   }
 
-  @initial(null)
-  @property()
-  protected declare readonly customWidth: Signal<Length, this>;
-  @initial(null)
-  @property()
-  public declare readonly width: Property<Length, number, this>;
   protected getWidth(): number {
     return this.computedSize().width;
   }
@@ -272,34 +222,28 @@ export class Layout extends Node {
     const lock = typeof width !== 'number' || typeof value !== 'number';
     let from: number;
     if (lock) {
-      from = this.width();
+      from = this.size.x();
     } else {
       from = width;
     }
 
     let to: number;
     if (lock) {
-      this.width(value);
-      to = this.width();
+      this.size.x(value);
+      to = this.size.x();
     } else {
       to = value;
     }
 
-    this.width(from);
+    this.size.x(from);
     lock && this.lockSize();
     yield* tween(time, value =>
-      this.width(interpolationFunction(from, to, timingFunction(value))),
+      this.size.x(interpolationFunction(from, to, timingFunction(value))),
     );
-    this.width(value);
+    this.size.x(value);
     lock && this.releaseSize();
   }
 
-  @initial(null)
-  @property()
-  protected declare readonly customHeight: Signal<Length, this>;
-  @initial(null)
-  @property()
-  public declare readonly height: Property<Length, number, this>;
   protected getHeight(): number {
     return this.computedSize().height;
   }
@@ -319,55 +263,57 @@ export class Layout extends Node {
 
     let from: number;
     if (lock) {
-      from = this.height();
+      from = this.size.y();
     } else {
       from = height;
     }
 
     let to: number;
     if (lock) {
-      this.height(value);
-      to = this.height();
+      this.size.y(value);
+      to = this.size.y();
     } else {
       to = value;
     }
 
-    this.height(from);
+    this.size.y(from);
     lock && this.lockSize();
     yield* tween(time, value =>
-      this.height(interpolationFunction(from, to, timingFunction(value))),
+      this.size.y(interpolationFunction(from, to, timingFunction(value))),
     );
-    this.height(value);
+    this.size.y(value);
     lock && this.releaseSize();
   }
 
-  @compound({x: 'width', y: 'height'})
+  @cloneable(false)
   @wrapper(Vector2)
-  @property()
-  public declare readonly size: Property<
-    {width: Length; height: Length},
-    Vector2,
-    this
-  >;
+  @compound({x: 'width', y: 'height'})
+  public declare readonly size: Vector2LengthProperty<this>;
 
+  @inspectable(false)
+  @property()
+  protected declare readonly customWidth: Signal<Length, this>;
+  @inspectable(false)
+  @property()
+  protected declare readonly customHeight: Signal<Length, this>;
   @computed()
-  protected customSize(): {width: Length; height: Length} {
+  protected customSize(): SerializedVector2<Length> {
     return {
-      width: this.customWidth(),
-      height: this.customHeight(),
+      x: this.customWidth(),
+      y: this.customHeight(),
     };
   }
 
   @threadable()
   protected *tweenSize(
-    value: SignalValue<{width: Length; height: Length}>,
+    value: SignalValue<SerializedVector2<Length>>,
     time: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Vector2>,
   ): ThreadGenerator {
     const size = this.customSize();
     let from: Vector2;
-    if (typeof size.height !== 'number' || typeof size.width !== 'number') {
+    if (typeof size.x !== 'number' || typeof size.y !== 'number') {
       from = this.size();
     } else {
       from = <Vector2>size;
@@ -376,8 +322,8 @@ export class Layout extends Node {
     let to: Vector2;
     if (
       typeof value === 'object' &&
-      typeof value.height === 'number' &&
-      typeof value.width === 'number'
+      typeof value.x === 'number' &&
+      typeof value.y === 'number'
     ) {
       to = <Vector2>value;
     } else {
@@ -394,101 +340,8 @@ export class Layout extends Node {
     this.size(value);
   }
 
-  @initial(0)
-  @property()
-  public declare readonly rotation: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly offsetX: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly offsetY: Signal<number, this>;
-
-  @compound({x: 'offsetX', y: 'offsetY'})
-  @wrapper(Vector2)
-  @property()
-  public declare readonly offset: Signal<Vector2, this>;
-
-  @initial(1)
-  @property()
-  public declare readonly scaleX: Signal<number, this>;
-
-  @initial(1)
-  @property()
-  public declare readonly scaleY: Signal<number, this>;
-
-  @compound({x: 'scaleX', y: 'scaleY'})
-  @wrapper(Vector2)
-  @property()
-  public declare readonly scale: Signal<Vector2, this>;
-
-  @wrapper(Vector2)
-  @cloneable(false)
-  @property()
-  public declare readonly absoluteScale: Signal<Vector2, this>;
-
-  protected getAbsoluteScale(): Vector2 {
-    const matrix = this.localToWorld();
-    return new Vector2(
-      Vector2.magnitude(matrix.m11, matrix.m12),
-      Vector2.magnitude(matrix.m21, matrix.m22),
-    );
-  }
-
-  protected setAbsoluteScale(value: SignalValue<Vector2>) {
-    if (isReactive(value)) {
-      this.scale(() => this.getRelativeScale(value()));
-    } else {
-      this.scale(this.getRelativeScale(value));
-    }
-  }
-
-  private getRelativeScale(scale: Vector2): Vector2 {
-    const parentScale = this.parentTransform()?.absoluteScale() ?? Vector2.one;
-    return scale.div(parentScale);
-  }
-
-  @compound(['x', 'y'])
-  @wrapper(Vector2)
-  @property()
-  public declare readonly position: Signal<Vector2, this>;
-
-  @wrapper(Vector2)
-  @cloneable(false)
-  @property()
-  public declare readonly absolutePosition: Signal<Vector2, this>;
-
-  protected getAbsolutePosition(): Vector2 {
-    const matrix = this.localToWorld();
-    return new Vector2(matrix.m41, matrix.m42);
-  }
-
-  protected setAbsolutePosition(value: SignalValue<Vector2>) {
-    if (isReactive(value)) {
-      this.position(() => value().transformAsPoint(this.worldToParent()));
-    } else {
-      this.position(value.transformAsPoint(this.worldToParent()));
-    }
-  }
-
-  @cloneable(false)
-  @property()
-  public declare readonly absoluteRotation: Signal<number, this>;
-
-  protected getAbsoluteRotation() {
-    const matrix = this.localToWorld();
-    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
-  }
-
-  protected setAbsoluteRotation(value: SignalValue<number>) {
-    if (isReactive(value)) {
-      this.rotation(() => transformAngle(value(), this.worldToParent()));
-    } else {
-      this.rotation(transformAngle(value, this.worldToParent()));
-    }
-  }
+  @vector2Property('offset')
+  public declare readonly offset: Vector2Property<this>;
 
   @initial(false)
   @property()
@@ -497,9 +350,7 @@ export class Layout extends Node {
   public readonly element: HTMLElement;
   public readonly styles: CSSStyleDeclaration;
 
-  @initial(0)
-  @property()
-  protected declare readonly sizeLockCounter: Signal<number, this>;
+  protected readonly sizeLockCounter = createSignal(0);
 
   public constructor({tagName = 'div', ...props}: LayoutProps) {
     super(props);
@@ -561,14 +412,11 @@ export class Layout extends Node {
 
   public override localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
-    const size = this.computedSize();
-    matrix.translateSelf(this.x(), this.y());
+    const offset = this.size().mul(this.offset()).scale(-0.5);
+    matrix.translateSelf(this.position.x(), this.position.y());
     matrix.rotateSelf(0, 0, this.rotation());
-    matrix.scaleSelf(this.scaleX(), this.scaleY());
-    matrix.translateSelf(
-      (size.width / -2) * this.offsetX(),
-      (size.height / -2) * this.offsetY(),
-    );
+    matrix.scaleSelf(this.scale.x(), this.scale.y());
+    matrix.translateSelf(offset.x, offset.y);
 
     return matrix;
   }
@@ -583,8 +431,8 @@ export class Layout extends Node {
     const rect = this.getComputedLayout();
 
     const position = new Vector2(
-      rect.x + (rect.width / 2) * this.offsetX(),
-      rect.y + (rect.height / 2) * this.offsetY(),
+      rect.x + (rect.width / 2) * this.offset.x(),
+      rect.y + (rect.height / 2) * this.offset.y(),
     );
 
     const parent = this.parentTransform();
@@ -626,23 +474,29 @@ export class Layout extends Node {
     this.applyFont();
     this.applyFlex();
     if (this.layoutEnabled()) {
-      this.syncDOM();
+      const children = this.layoutChildren();
+      for (const child of children) {
+        child.updateLayout();
+      }
     }
   }
 
   @computed()
-  protected syncDOM() {
+  protected layoutChildren(): Layout[] {
     this.element.innerText = '';
     const queue = [...this.children()];
+    const result: Layout[] = [];
     while (queue.length) {
       const child = queue.shift();
       if (child instanceof Layout) {
         this.element.append(child.element);
-        child.updateLayout();
+        result.push(child);
       } else if (child) {
         queue.push(...child.children());
       }
     }
+
+    return result;
   }
 
   /**
@@ -774,15 +628,15 @@ export class Layout extends Node {
     this.element.style.minWidth = this.parseLength(this.minWidth());
     this.element.style.aspectRatio = this.parseValue(this.ratio());
 
-    this.element.style.marginTop = this.parsePixels(this.marginTop());
-    this.element.style.marginBottom = this.parsePixels(this.marginBottom());
-    this.element.style.marginLeft = this.parsePixels(this.marginLeft());
-    this.element.style.marginRight = this.parsePixels(this.marginRight());
+    this.element.style.marginTop = this.parsePixels(this.margin.top());
+    this.element.style.marginBottom = this.parsePixels(this.margin.bottom());
+    this.element.style.marginLeft = this.parsePixels(this.margin.left());
+    this.element.style.marginRight = this.parsePixels(this.margin.right());
 
-    this.element.style.paddingTop = this.parsePixels(this.paddingTop());
-    this.element.style.paddingBottom = this.parsePixels(this.paddingBottom());
-    this.element.style.paddingLeft = this.parsePixels(this.paddingLeft());
-    this.element.style.paddingRight = this.parsePixels(this.paddingRight());
+    this.element.style.paddingTop = this.parsePixels(this.padding.top());
+    this.element.style.paddingBottom = this.parsePixels(this.padding.bottom());
+    this.element.style.paddingLeft = this.parsePixels(this.padding.left());
+    this.element.style.paddingRight = this.parsePixels(this.padding.right());
 
     this.element.style.flexDirection = this.direction();
     this.element.style.flexBasis = this.parseLength(this.basis());

@@ -1,92 +1,127 @@
 import {SignalValue, isReactive} from '@motion-canvas/core/lib/utils';
-import {capitalize, getPropertyMeta} from './property';
+import {
+  capitalize,
+  createProperty,
+  getPropertyMetaOrCreate,
+  Property,
+} from './property';
+import {addInitializer} from './initializers';
+import {deepLerp} from '@motion-canvas/core/lib/tweening';
 
 /**
  * Create a compound property decorator.
  *
  * @remarks
- * This decorator generates a getter and setter for a compound property.
- * These methods can then be used by the {@link property} decorator to create
- * a signal that acts as a shortcut for accessing multiple other signals.
- *
- * Both the getter and setter operate on an object whose properties correspond
- * to individual signals.
- * For example, `\@property(['x', 'y'])` will operate on an object of type
- * `{x: number, y: number}`. Here, the `x` property can retrieve or set the
- * value of the `this.x` signal.
+ * This decorator turns a given property into a signal consisting of one or more
+ * nested signals.
  *
  * @example
  * ```ts
  * class Example {
- *   \@property(1)
- *   public declare readonly scaleX: Signal<number, this>;
- *
- *   \@property(1)
- *   public declare readonly scaleY: Signal<number, this>;
- *
  *   \@compound({x: 'scaleX', y: 'scaleY'})
- *   \@property(undefined, vector2dLerp)
  *   public declare readonly scale: Signal<Vector2, this>;
  *
  *   public setScale() {
  *     this.scale({x: 7, y: 3});
  *     // same as:
- *     this.scaleX(7).scaleY(3);
+ *     this.scale.x(7).scale.y(3);
  *   }
  * }
  * ```
  *
- * @param mapping - An array of signals to turn into a compound property or a
- *                  record mapping the property in the compound object to the
- *                  corresponding signal.
+ * @param entries - A record mapping the property in the compound object to the
+ *                  corresponding property on the owner node.
  */
-export function compound(
-  mapping: string[] | Record<string, string>,
-): PropertyDecorator {
-  return (target: any, key) => {
-    const meta = getPropertyMeta<any>(target, key);
-    if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
-      return;
-    }
-
-    const entries = Array.isArray(mapping)
-      ? mapping.map(key => [key, key])
-      : Object.entries(mapping);
-
+export function compound(entries: Record<string, string>): PropertyDecorator {
+  return (target, key) => {
+    const meta = getPropertyMetaOrCreate<any>(target, key);
     meta.compound = true;
-    meta.cloneable = false;
-    for (const [, property] of entries) {
-      const propertyMeta = getPropertyMeta<any>(target, property);
-      if (!propertyMeta) {
-        console.error(
-          `Missing property decorator for "${property.toString()}"`,
-        );
+    meta.compoundEntries = Object.entries(entries);
+
+    addInitializer(target, (instance: any, context: any) => {
+      if (!meta.parser) {
+        console.error(`Missing parser decorator for "${key.toString()}"`);
         return;
       }
-      propertyMeta.compoundParent = key.toString();
-      propertyMeta.inspectable = false;
-    }
+      const parser = meta.parser;
+      const initial = context.defaults[key] ?? meta.default;
+      const initialWrapped: SignalValue<any> = isReactive(initial)
+        ? () => parser(initial())
+        : parser(initial);
 
-    target.constructor.prototype[`get${capitalize(key.toString())}`] =
-      function () {
+      const signals: [string, Property<any, any, any>][] = [];
+      for (const [key, property] of meta.compoundEntries) {
+        signals.push([
+          key,
+          createProperty(
+            instance,
+            property,
+            context.defaults[property] ??
+              (isReactive(initialWrapped)
+                ? () => initialWrapped()[key]
+                : initialWrapped[key]),
+            undefined,
+            undefined,
+            instance[`get${capitalize(<string>property)}`],
+            instance[`set${capitalize(<string>property)}`],
+            instance[`tween${capitalize(<string>property)}`],
+          ),
+        ]);
+      }
+
+      function getter() {
         const object = Object.fromEntries(
-          entries.map(([key, property]) => [key, this[property]()]),
+          signals.map(([key, property]) => [key, property()]),
         );
-        return meta?.parser ? meta.parser(object) : object;
-      };
+        return parser(object);
+      }
 
-    target.constructor.prototype[`set${capitalize(key.toString())}`] =
-      function set(value: SignalValue<any>) {
+      function setter(value: SignalValue<any>) {
         if (isReactive(value)) {
-          for (const [key, property] of entries) {
-            this[property](() => value()[key]);
+          for (const [key, property] of signals) {
+            property(() => value()[key]);
           }
         } else {
-          for (const [key, property] of entries) {
-            this[property](value[key]);
+          for (const [key, property] of signals) {
+            property(value[key]);
           }
         }
-      };
+      }
+
+      const property = createProperty(
+        instance,
+        <string>key,
+        undefined,
+        meta.interpolationFunction ?? deepLerp,
+        parser,
+        getter,
+        setter,
+        instance[`tween${capitalize(<string>key)}`],
+      );
+
+      for (const [key, signal] of signals) {
+        Object.defineProperty(property, key, {value: signal});
+      }
+
+      Object.defineProperty(property, 'reset', {
+        value: () => {
+          for (const [, signal] of signals) {
+            signal.reset();
+          }
+          return instance;
+        },
+      });
+
+      Object.defineProperty(property, 'save', {
+        value: () => {
+          for (const [, signal] of signals) {
+            signal.save();
+          }
+          return instance;
+        },
+      });
+
+      instance[key] = property;
+    });
   };
 }

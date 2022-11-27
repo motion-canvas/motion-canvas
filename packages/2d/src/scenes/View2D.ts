@@ -62,15 +62,16 @@ export class View2D extends Layout {
       customMatrix.e !== currentMatrix.e ||
       customMatrix.f !== currentMatrix.f
     ) {
-      this.x(customMatrix.m41)
-        .y(customMatrix.m42)
-        .scaleX(
+      this.position
+        .x(customMatrix.m41)
+        .position.y(customMatrix.m42)
+        .scale.x(
           Math.sqrt(
             customMatrix.m11 * customMatrix.m11 +
               customMatrix.m12 * customMatrix.m12,
           ),
         )
-        .scaleY(
+        .scale.y(
           Math.sqrt(
             customMatrix.m21 * customMatrix.m21 +
               customMatrix.m22 * customMatrix.m22,
