@@ -15,6 +15,23 @@ function renderRoot(vnode: ComponentChild) {
 
 export function editor(project: Project) {
   const player = new Player(project);
+  const playerKey = `${project.name}/player`;
+  const frameKey = `${project.name}/frame`;
+  const state = localStorage.getItem(playerKey);
+  const frame = localStorage.getItem(frameKey);
+  if (state) {
+    player.loadState(JSON.parse(state));
+  }
+  if (frame) {
+    player.requestSeek(parseInt(frame));
+  }
+  player.onStateChanged.subscribe(state => {
+    localStorage.setItem(playerKey, JSON.stringify(state));
+  });
+  player.onFrameChanged.subscribe(frame => {
+    localStorage.setItem(frameKey, frame.toString());
+  });
+
   document.title = `${project.name} | Motion Canvas`;
   renderRoot(
     <PlayerProvider player={player}>
