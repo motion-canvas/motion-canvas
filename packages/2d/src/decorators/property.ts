@@ -246,9 +246,9 @@ export function property<T>(): PropertyDecorator {
         context.defaults[key] ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
         meta.parser,
-        target[`get${capitalize(<string>key)}`],
-        target[`set${capitalize(<string>key)}`],
-        target[`tween${capitalize(<string>key)}`],
+        instance[`get${capitalize(<string>key)}`],
+        instance[`set${capitalize(<string>key)}`],
+        instance[`tween${capitalize(<string>key)}`],
       );
     });
   };

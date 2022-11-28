@@ -134,3 +134,21 @@ export function drawLine(
     lineTo(context, point);
   }
 }
+
+export function arc(
+  context: CanvasRenderingContext2D | Path2D,
+  center: Vector2,
+  radius: number,
+  startAngle = 0,
+  endAngle = Math.PI * 2,
+  counterclockwise = false,
+) {
+  context.arc(
+    center.x,
+    center.y,
+    radius,
+    startAngle,
+    endAngle,
+    counterclockwise,
+  );
+}
