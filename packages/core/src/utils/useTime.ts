@@ -18,5 +18,5 @@ import {useThread} from './useThread';
  * ```
  */
 export function useTime() {
-  return useThread().time;
+  return useThread().time();
 }

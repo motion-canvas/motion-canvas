@@ -161,9 +161,8 @@ export interface Scene<T = unknown> {
    * Render the scene onto a canvas.
    *
    * @param context - The context to used when rendering.
-   * @param canvas - The canvas onto which the scene should be rendered.
    */
-  render(context: CanvasRenderingContext2D, canvas: HTMLCanvasElement): void;
+  render(context: CanvasRenderingContext2D): Promise<void>;
 
   /**
    * Reload the scene.

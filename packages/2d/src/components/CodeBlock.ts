@@ -1,5 +1,9 @@
 import {computed, initial, property} from '../decorators';
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {
+  createComputedAsync,
+  Signal,
+  SignalValue,
+} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {CodeTree, parse, diff, ready, MorphToken} from 'code-fns';
 import {
@@ -16,6 +20,11 @@ export interface CodeProps extends ShapeProps {
 }
 
 export class CodeBlock extends Shape {
+  private static initialized = createComputedAsync(
+    () => ready().then(() => true),
+    false,
+  );
+
   @initial('')
   @property()
   public declare readonly code: Signal<CodeTree, this>;
@@ -35,9 +44,9 @@ export class CodeBlock extends Shape {
     }
   }
 
-  protected override collectAsyncResources(resources: Promise<any>[]): void {
-    super.collectAsyncResources(resources);
-    resources.push(ready());
+  protected override collectAsyncResources(): void {
+    super.collectAsyncResources();
+    CodeBlock.initialized();
   }
 
   @threadable()
@@ -61,6 +70,8 @@ export class CodeBlock extends Shape {
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
+    if (!CodeBlock.initialized()) return;
+
     this.requestFontUpdate();
     this.applyStyle(context);
     context.font = this.styles.font;

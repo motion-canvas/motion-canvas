@@ -1,4 +1,5 @@
 import type {Project} from '../Project';
+import {PlaybackState} from '../Project';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import type {CanvasColorSpace, CanvasOutputMimeType} from '../types';
 
@@ -235,6 +236,11 @@ export class Player {
       commands.seek = state.startFrame;
     }
 
+    const previousState = this.project.playbackState();
+    this.project.playbackState(
+      state.paused ? PlaybackState.Paused : PlaybackState.Playing,
+    );
+
     // Recalculate
     if (commands.recalculate) {
       const startTime = performance.now();
@@ -242,7 +248,7 @@ export class Player {
       const duration = this.project.frame;
       const frame = commands.seek < 0 ? this.frame.current : commands.seek;
       const finished = await this.project.seek(frame);
-      this.project.render();
+      await this.project.render();
       this.updateState({
         duration,
         finished,
@@ -272,8 +278,9 @@ export class Player {
 
     // Rendering
     if (state.render) {
+      this.project.playbackState(PlaybackState.Rendering);
       state.finished = await this.project.next();
-      this.project.render();
+      await this.project.render();
       try {
         await this.project.export();
       } catch (e) {
@@ -310,6 +317,9 @@ export class Player {
         this.project.audio.isInRange(this.project.time) &&
         this.project.audio.getTime() < this.project.time)
     ) {
+      if (state.paused && previousState !== PlaybackState.Paused) {
+        await this.project.render();
+      }
       this.request();
       return;
     }
@@ -336,7 +346,7 @@ export class Player {
     }
 
     // Draw the project
-    this.project.render();
+    await this.project.render();
 
     // handle finishing
     if (state.finished) {

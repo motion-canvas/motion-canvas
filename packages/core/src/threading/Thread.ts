@@ -1,6 +1,6 @@
 import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
-import {endThread, startThread, useProject} from '../utils';
+import {createSignal, endThread, startThread, useProject} from '../utils';
 
 /**
  * A class representing an individual thread.
@@ -25,7 +25,7 @@ export class Thread {
    * Used by {@link waitFor} and other time-based functions to properly
    * support durations shorter than one frame.
    */
-  public time = 0;
+  public readonly time = createSignal(0);
 
   /**
    * Check if this thread or any of its ancestors has been canceled.
@@ -46,7 +46,7 @@ export class Thread {
   ) {
     const project = useProject();
     this.frameDuration = project.framesToSeconds(1);
-    this.time = project.time;
+    this.time(project.time);
   }
 
   /**
@@ -64,7 +64,7 @@ export class Thread {
    * Prepare the thread for the next update cycle.
    */
   public update() {
-    this.time += useProject().framesToSeconds(1);
+    this.time(this.time() + useProject().framesToSeconds(1));
     this.children = this.children.filter(child => !child.canceled);
   }
 
@@ -72,7 +72,7 @@ export class Thread {
     child.cancel();
     child.parent = this;
     child.isCanceled = false;
-    child.time = this.time;
+    child.time(this.time());
     this.children.push(child);
 
     if (!Object.getPrototypeOf(child.runner).threadable) {

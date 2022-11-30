@@ -21,6 +21,7 @@ import {
   PossibleVector2,
 } from '@motion-canvas/core/lib/types';
 import {
+  consumePromises,
   createSignal,
   isReactive,
   Reference,
@@ -865,20 +866,17 @@ export class Node implements Promisable<Node> {
    * before continuing the animation.
    */
   public waitForAsyncResources() {
-    const deps: Promise<any>[] = [];
-    this.collectAsyncResources(deps);
-    return Promise.all(deps);
+    this.collectAsyncResources();
+    const promises = consumePromises();
+    return Promise.all(promises.map(handle => handle.promise));
   }
 
   /**
-   * Collect all asynchronous resources used by this node and put them in the
-   * `resources` array.
-   *
-   * @param resources - An array to which resources should be collected.
+   * Collect all asynchronous resources used by this node.
    */
-  protected collectAsyncResources(resources: Promise<any>[]) {
+  protected collectAsyncResources() {
     for (const child of this.children()) {
-      child.collectAsyncResources(resources);
+      child.collectAsyncResources();
     }
   }
 

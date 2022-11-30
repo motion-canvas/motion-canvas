@@ -11,8 +11,8 @@ export function* tween(
   const project = useProject();
   const thread = useThread();
 
-  const startTime = thread.time;
-  const endTime = thread.time + seconds;
+  const startTime = thread.time();
+  const endTime = thread.time() + seconds;
 
   onProgress(0, 0);
   while (endTime > project.time) {
@@ -23,7 +23,7 @@ export function* tween(
     }
     yield;
   }
-  thread.time = endTime;
+  thread.time(endTime);
 
   onProgress(1, seconds);
   onEnd?.(1, seconds);

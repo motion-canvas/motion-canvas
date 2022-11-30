@@ -1,8 +1,13 @@
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {
+  collectPromise,
+  Signal,
+  SignalValue,
+} from '@motion-canvas/core/lib/utils';
 import {computed, initial, property} from '../decorators';
 import {Color, Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
+import {View2D} from '../scenes';
 
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
@@ -11,6 +16,8 @@ export interface ImageProps extends RectProps {
 }
 
 export class Image extends Rect {
+  private static pool: Record<string, HTMLImageElement> = {};
+
   @property()
   public declare readonly src: Signal<string, this>;
 
@@ -22,43 +29,30 @@ export class Image extends Rect {
   @property()
   public declare readonly smoothing: Signal<boolean, this>;
 
-  protected readonly image: HTMLImageElement;
-
   public constructor(props: ImageProps) {
-    super({
-      ...props,
-      tagName: 'img',
-    });
-    this.image = <HTMLImageElement>this.element;
-  }
-
-  protected override draw(context: CanvasRenderingContext2D) {
-    this.drawShape(context);
-    if (this.clip()) {
-      context.clip(this.getPath());
-    }
-    const alpha = this.alpha();
-    if (alpha > 0) {
-      const rect = RectType.fromSizeCentered(this.computedSize());
-      context.save();
-      if (alpha < 1) {
-        context.globalAlpha *= alpha;
-      }
-      context.imageSmoothingEnabled = this.smoothing();
-      drawImage(context, this.image, rect);
-      context.restore();
-    }
-    this.drawChildren(context);
-  }
-
-  protected override updateLayout() {
-    this.applySrc();
-    super.updateLayout();
+    super(props);
   }
 
   @computed()
-  protected applySrc() {
-    this.image.src = this.src();
+  protected image(): HTMLImageElement {
+    const src = this.src();
+    if (Image.pool[src]) {
+      return Image.pool[src];
+    }
+
+    const image = View2D.document.createElement('img');
+    image.src = src;
+    if (!image.complete) {
+      collectPromise(
+        new Promise((resolve, reject) => {
+          image.addEventListener('load', resolve);
+          image.addEventListener('error', reject);
+        }),
+      );
+    }
+    Image.pool[src] = image;
+
+    return image;
   }
 
   @computed()
@@ -74,19 +68,46 @@ export class Image extends Rect {
   }
 
   @computed()
-  protected imageDrawnCanvas() {
-    this.applySrc();
+  protected filledImageCanvas() {
     const context = this.imageCanvas();
-    context.canvas.width = this.image.naturalWidth;
-    context.canvas.height = this.image.naturalHeight;
+    const image = this.image();
+    context.canvas.width = image.naturalWidth;
+    context.canvas.height = image.naturalHeight;
     context.imageSmoothingEnabled = this.smoothing();
-    context.drawImage(this.image, 0, 0);
+    context.drawImage(image, 0, 0);
 
     return context;
   }
 
-  public getColorAtPoint(position: Vector2): any {
-    const context = this.imageDrawnCanvas();
+  protected override draw(context: CanvasRenderingContext2D) {
+    this.drawShape(context);
+    if (this.clip()) {
+      context.clip(this.getPath());
+    }
+    const alpha = this.alpha();
+    if (alpha > 0) {
+      const rect = RectType.fromSizeCentered(this.computedSize());
+      context.save();
+      if (alpha < 1) {
+        context.globalAlpha *= alpha;
+      }
+      context.imageSmoothingEnabled = this.smoothing();
+      drawImage(context, this.image(), rect);
+      context.restore();
+    }
+    this.drawChildren(context);
+  }
+
+  protected override applyFlex() {
+    super.applyFlex();
+    const image = this.image();
+    this.element.style.aspectRatio = this.parseValue(
+      this.ratio() ?? image.naturalWidth / image.naturalHeight,
+    );
+  }
+
+  public getColorAtPoint(position: Vector2): Color {
+    const context = this.filledImageCanvas();
     const relativePosition = position.add(this.computedSize().scale(0.5));
     const data = context.getImageData(
       relativePosition.x,
@@ -103,16 +124,8 @@ export class Image extends Rect {
     });
   }
 
-  protected override collectAsyncResources(deps: Promise<any>[]) {
-    super.collectAsyncResources(deps);
-    this.applySrc();
-    if (!this.image.complete) {
-      deps.push(
-        new Promise((resolve, reject) => {
-          this.image.addEventListener('load', resolve);
-          this.image.addEventListener('error', reject);
-        }),
-      );
-    }
+  protected override collectAsyncResources() {
+    super.collectAsyncResources();
+    this.image();
   }
 }

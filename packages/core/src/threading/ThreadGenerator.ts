@@ -48,5 +48,7 @@ export type ThreadGenerator = Generator<
  * @param value - A possible thread {@link ThreadGenerator}.
  */
 export function isThreadGenerator(value: unknown): value is ThreadGenerator {
-  return typeof value === 'object' && Symbol.iterator in value;
+  return (
+    typeof value === 'object' && Symbol.iterator in value && 'next' in value
+  );
 }

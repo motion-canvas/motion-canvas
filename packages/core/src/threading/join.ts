@@ -55,20 +55,20 @@ export function* join(
     .map(task => parent.children.find(thread => thread.runner === task))
     .filter(thread => thread);
 
-  const startTime = parent.time;
+  const startTime = parent.time();
   let childTime;
   if (all) {
     while (threads.find(thread => !thread.canceled)) {
       yield;
     }
-    childTime = Math.max(...threads.map(thread => thread.time));
+    childTime = Math.max(...threads.map(thread => thread.time()));
   } else {
     while (!threads.find(thread => thread.canceled)) {
       yield;
     }
     const canceled = threads.filter(thread => thread.canceled);
-    childTime = Math.min(...canceled.map(thread => thread.time));
+    childTime = Math.min(...canceled.map(thread => thread.time()));
   }
 
-  parent.time = Math.max(startTime, childTime);
+  parent.time(Math.max(startTime, childTime));
 }
