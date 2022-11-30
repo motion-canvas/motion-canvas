@@ -27,6 +27,10 @@ export interface TimeEvent {
    * Duration of the event in seconds.
    */
   offset: number;
+  /**
+   * Stack trace at the moment of registration.
+   */
+  stack?: string;
 }
 
 /**
@@ -115,10 +119,14 @@ export class TimeEvents {
         initialTime,
         targetTime: initialTime,
         offset: 0,
+        stack: new Error().stack,
       };
     } else {
       let changed = false;
-      const event = {...this.lookup[name]};
+      const event = {
+        ...this.lookup[name],
+        stack: new Error().stack,
+      };
       if (event.initialTime !== initialTime) {
         event.initialTime = initialTime;
         changed = true;

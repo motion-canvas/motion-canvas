@@ -8,7 +8,11 @@ import {
 } from '../tweening';
 import {ThreadGenerator} from '../threading';
 
-type DependencyContext = [Set<Subscribable<void>>, EventHandler<void>];
+export interface DependencyContext {
+  dependencies: Set<Subscribable<void>>;
+  handler: EventHandler<void>;
+  stack?: string;
+}
 
 export type SignalValue<TValue> = TValue | (() => TValue);
 
@@ -100,23 +104,23 @@ export function startCollecting(context: DependencyContext) {
 }
 
 export function finishCollecting(context: DependencyContext) {
-  if (collectionStack.pop()[0] !== context[0]) {
+  if (collectionStack.pop() !== context) {
     throw new Error('collectStart/collectEnd was called out of order');
   }
 }
 
 export function collect(subscribable: Subscribable<void>) {
   if (collectionStack.length > 0) {
-    const [set, handler] = collectionStack.at(-1);
-    set.add(subscribable);
-    subscribable.subscribe(handler);
+    const context = collectionStack.at(-1);
+    context.dependencies.add(subscribable);
+    subscribable.subscribe(context.handler);
   }
 }
 
 export interface PromiseHandle<T> {
   promise: Promise<T>;
   value: T;
-  stack: string;
+  stack?: string;
 }
 
 export function collectPromise<T>(
@@ -126,15 +130,15 @@ export function collectPromise<T>(
   const handle: PromiseHandle<T> = {
     promise,
     value: initialValue,
-    stack: new Error().stack,
+    stack: collectionStack[0].stack,
   };
-  if (collectionStack.length > 1) {
-    const [, handler] = collectionStack.at(-2);
-    promise.then(value => {
-      handle.value = value;
-      handler();
-    });
-  }
+
+  const context = collectionStack.at(-2);
+  promise.then(value => {
+    handle.value = value;
+    context?.handler();
+  });
+
   promises.push(handle);
   return handle;
 }
@@ -156,8 +160,11 @@ export function createSignal<TValue, TReturn = void>(
 ): Signal<TValue, TReturn> {
   let current: SignalValue<TValue>;
   let last: TValue;
-  const dependencies = new Set<Subscribable<void>>();
   const event = new FlagDispatcher();
+  const context: DependencyContext = {
+    dependencies: new Set<Subscribable<void>>(),
+    handler: () => event.raise(),
+  };
 
   function set(value: SignalValue<TValue>) {
     if (current === value) {
@@ -167,9 +174,9 @@ export function createSignal<TValue, TReturn = void>(
     current = value;
     markDirty();
 
-    if (dependencies.size > 0) {
-      dependencies.forEach(dep => dep.unsubscribe(markDirty));
-      dependencies.clear();
+    if (context.dependencies.size > 0) {
+      context.dependencies.forEach(dep => dep.unsubscribe(markDirty));
+      context.dependencies.clear();
     }
 
     if (!isReactive(value)) {
@@ -181,11 +188,12 @@ export function createSignal<TValue, TReturn = void>(
 
   function get(): TValue {
     if (event.isRaised() && isReactive(current)) {
-      dependencies.forEach(dep => dep.unsubscribe(markDirty));
-      dependencies.clear();
-      startCollecting([dependencies, markDirty]);
+      context.dependencies.forEach(dep => dep.unsubscribe(markDirty));
+      context.dependencies.clear();
+      context.stack = new Error().stack;
+      startCollecting(context);
       last = current();
-      finishCollecting([dependencies, markDirty]);
+      finishCollecting(context);
     }
     event.reset();
     collect(event.subscribable);
