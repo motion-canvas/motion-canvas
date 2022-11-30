@@ -201,8 +201,9 @@ export abstract class GeneratorScene<T>
     const promises = consumePromises();
     if (promises.length > 0) {
       await Promise.all(promises.map(handle => handle.promise));
-      // TODO Display a more helpful message
-      console.error(promises);
+      console.error(
+        'Tried to access an asynchronous property before the node was ready.',
+      );
     }
 
     if (result.done) {

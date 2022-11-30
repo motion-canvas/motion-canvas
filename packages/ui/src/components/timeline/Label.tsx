@@ -4,6 +4,7 @@ import type {Scene, TimeEvent} from '@motion-canvas/core/lib/scenes';
 import {useDrag} from '../../hooks';
 import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
 import {usePlayer, useProject, useTimelineContext} from '../../contexts';
+import {findAndOpenFirstUserFile} from '../../utils';
 
 interface LabelProps {
   event: TimeEvent;
@@ -40,6 +41,11 @@ export function Label({event, scene}: LabelProps) {
   return (
     <>
       <div
+        onDblClick={async () => {
+          if (event.stack) {
+            await findAndOpenFirstUserFile(event.stack);
+          }
+        }}
         onMouseDown={e => {
           if (e.button === 1) {
             e.preventDefault();
