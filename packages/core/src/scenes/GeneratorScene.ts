@@ -8,13 +8,13 @@ import {
 import {Meta} from '../Meta';
 import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import {Project} from '../Project';
+import {PlaybackState, Project} from '../Project';
 import {decorate, threadable} from '../decorators';
-import {endScene, setProject, startScene} from '../utils';
+import {consumePromises, endScene, setProject, startScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
-import {Vector2} from '../types';
+import {Rect, Vector2} from '../types';
 import {SceneState} from './SceneState';
 
 export interface ThreadGeneratorFactory<T> {
@@ -31,6 +31,7 @@ export abstract class GeneratorScene<T>
 {
   public readonly timeEvents: TimeEvents;
   public project: Project;
+  public playbackInfo: PlaybackState;
 
   public get firstFrame() {
     return this.cache.current.firstFrame;
@@ -112,10 +113,27 @@ export abstract class GeneratorScene<T>
     // do nothing
   }
 
-  public abstract render(
-    context: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement,
-  ): void;
+  public async render(context: CanvasRenderingContext2D): Promise<void> {
+    let promises = consumePromises();
+    let iterations = 0;
+    do {
+      iterations++;
+      await Promise.all(promises.map(handle => handle.promise));
+      context.save();
+      const rect = Rect.fromSizeCentered(this.getSize());
+      context.clearRect(rect.x, rect.y, rect.width, rect.height);
+      this.draw(context);
+      context.restore();
+
+      promises = consumePromises();
+    } while (promises.length > 0 && iterations < 10);
+
+    if (iterations > 1) {
+      console.info('render iterations:', iterations);
+    }
+  }
+
+  protected abstract draw(context: CanvasRenderingContext2D): void;
 
   public reload(runnerFactory?: ThreadGeneratorFactory<T>) {
     if (runnerFactory) {
@@ -179,6 +197,13 @@ export abstract class GeneratorScene<T>
       this.update();
     }
     endScene(this);
+
+    const promises = consumePromises();
+    if (promises.length > 0) {
+      await Promise.all(promises.map(handle => handle.promise));
+      // TODO Display a more helpful message
+      console.error(promises);
+    }
 
     if (result.done) {
       this.state = SceneState.Finished;

@@ -1,4 +1,5 @@
 export * from './createComputed';
+export * from './createComputedAsync';
 export * from './createSignal';
 export * from './range';
 export * from './useAnimator';

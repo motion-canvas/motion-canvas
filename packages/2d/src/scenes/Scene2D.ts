@@ -26,7 +26,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     return this.view;
   }
 
-  public render(context: CanvasRenderingContext2D): void {
+  public draw(context: CanvasRenderingContext2D) {
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();

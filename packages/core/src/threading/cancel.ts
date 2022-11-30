@@ -21,7 +21,7 @@ export function cancel(...tasks: ThreadGenerator[]) {
     const child = thread.children.find(thread => thread.runner === task);
     if (child && !child.canceled) {
       child.cancel();
-      child.time = thread.time;
+      child.time(thread.time());
     }
   }
 }

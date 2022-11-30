@@ -3,7 +3,7 @@ import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
-import {ifHot} from './utils';
+import {createSignal, ifHot} from './utils';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -20,6 +20,13 @@ export interface ProjectConfig {
   canvas?: HTMLCanvasElement;
   size?: Vector2;
   background?: string | false;
+}
+
+export enum PlaybackState {
+  Playing,
+  Rendering,
+  Paused,
+  Seeking,
 }
 
 export type ProjectMetadata = Metadata;
@@ -89,14 +96,30 @@ export class Project {
   }
 
   private updateCanvas() {
-    if (this.canvas) {
-      this.context = this.canvas.getContext('2d', {
-        colorSpace: this._colorSpace,
-      });
-      this.canvas.width = this.width * this._resolutionScale;
-      this.canvas.height = this.height * this._resolutionScale;
-      this.render();
+    if (!this.canvas) {
+      return;
     }
+
+    this.buffer = this.buffer.canvas.getContext('2d', {
+      colorSpace: this._colorSpace,
+    });
+    this.previousBuffer = this.previousBuffer.canvas.getContext('2d', {
+      colorSpace: this._colorSpace,
+    });
+    this.context = this.canvas.getContext('2d', {
+      colorSpace: this._colorSpace,
+    });
+
+    this.canvas.width =
+      this.buffer.canvas.width =
+      this.previousBuffer.canvas.width =
+        this.width * this._resolutionScale;
+    this.canvas.height =
+      this.buffer.canvas.height =
+      this.previousBuffer.canvas.height =
+        this.height * this._resolutionScale;
+
+    this.render();
   }
 
   public setCanvas(value: HTMLCanvasElement) {
@@ -124,6 +147,7 @@ export class Project {
 
   public readonly name: string;
   public readonly audio = new AudioManager();
+  public playbackState = createSignal(PlaybackState.Paused);
   private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
   private _colorSpace: CanvasColorSpace = 'srgb';
@@ -135,6 +159,8 @@ export class Project {
   private background: string | false;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
+  private buffer = document.createElement('canvas').getContext('2d');
+  private previousBuffer = document.createElement('canvas').getContext('2d');
   private exportCounter = 0;
 
   private width: number;
@@ -183,31 +209,24 @@ export class Project {
     );
   }
 
-  public render() {
+  public async render() {
     if (!this.canvas) return;
 
-    this.transformCanvas(this.context);
+    this.transformCanvas(this.buffer);
+    this.transformCanvas(this.previousBuffer);
+    await this.previousScene?.render(this.previousBuffer);
+    await this.currentScene.current?.render(this.buffer);
+
     if (this.background) {
       this.context.save();
       this.context.fillStyle = this.background;
-      this.context.fillRect(
-        this.width / -2,
-        this.height / -2,
-        this.width,
-        this.height,
-      );
+      this.context.fillRect(0, 0, this.width, this.height);
       this.context.restore();
     } else {
-      this.context.clearRect(
-        this.width / -2,
-        this.height / -2,
-        this.width,
-        this.height,
-      );
+      this.context.clearRect(0, 0, this.width, this.height);
     }
-
-    this.previousScene?.render(this.context, this.canvas);
-    this.currentScene.current?.render(this.context, this.canvas);
+    this.context.drawImage(this.previousBuffer.canvas, 0, 0);
+    this.context.drawImage(this.buffer.canvas, 0, 0);
   }
 
   private reloadAll() {

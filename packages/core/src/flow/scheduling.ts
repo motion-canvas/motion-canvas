@@ -58,13 +58,13 @@ export function* waitFor(
   const thread = useThread();
   const step = project.framesToSeconds(1);
 
-  const targetTime = thread.time + seconds;
+  const targetTime = thread.time() + seconds;
   // subtracting the step is not necessary, but it keeps the thread time ahead
   // of the project time.
   while (targetTime - step > project.time) {
     yield;
   }
-  thread.time = targetTime;
+  thread.time(targetTime);
 
   if (after) {
     yield* after;

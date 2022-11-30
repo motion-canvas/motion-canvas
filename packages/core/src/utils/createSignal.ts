@@ -93,6 +93,7 @@ export interface Signal<TValue, TReturn = void>
     SignalUtils<TValue, TReturn> {}
 
 const collectionStack: DependencyContext[] = [];
+let promises: PromiseHandle<any>[] = [];
 
 export function startCollecting(context: DependencyContext) {
   collectionStack.push(context);
@@ -110,6 +111,38 @@ export function collect(subscribable: Subscribable<void>) {
     set.add(subscribable);
     subscribable.subscribe(handler);
   }
+}
+
+export interface PromiseHandle<T> {
+  promise: Promise<T>;
+  value: T;
+  stack: string;
+}
+
+export function collectPromise<T>(
+  promise: Promise<T>,
+  initialValue: T = null,
+): PromiseHandle<T> {
+  const handle: PromiseHandle<T> = {
+    promise,
+    value: initialValue,
+    stack: new Error().stack,
+  };
+  if (collectionStack.length > 1) {
+    const [, handler] = collectionStack.at(-2);
+    promise.then(value => {
+      handle.value = value;
+      handler();
+    });
+  }
+  promises.push(handle);
+  return handle;
+}
+
+export function consumePromises(): PromiseHandle<any>[] {
+  const result = promises;
+  promises = [];
+  return result;
 }
 
 export function isReactive<T>(value: SignalValue<T>): value is () => T {
