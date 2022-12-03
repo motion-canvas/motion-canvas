@@ -9,6 +9,15 @@
   --surface-color: #242424;
   --surface-color-light: #444444;
   --surface-color-hover: #333333;
+  --scrollbar-background: var(--surface-color);
+
+  --red: #e13238;
+  --yellow: #e6a700;
+  --blue: #4cb3d4;
+}
+
+.wait * {
+  cursor: wait !important;
 }
 
 * {
@@ -19,12 +28,12 @@
   &::-webkit-scrollbar {
     width: 16px;
     height: 16px;
-    background-color: var(--surface-color);
+    background-color: var(--scrollbar-background);
   }
 
   &::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.24);
-    border: 6px solid var(--surface-color);
+    border: 6px solid var(--scrollbar-background);
     border-radius: 8px;
   }
 

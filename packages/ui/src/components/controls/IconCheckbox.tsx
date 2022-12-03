@@ -6,6 +6,8 @@ import {IconType} from './IconType';
 interface IconCheckboxProps {
   iconOn?: IconType;
   iconOff?: IconType;
+  titleOn?: string;
+  titleOff?: string;
   id: string;
   onChange?: (value: boolean) => void;
   checked?: boolean;
@@ -15,6 +17,8 @@ interface IconCheckboxProps {
 export function IconCheckbox({
   iconOn,
   iconOff,
+  titleOn,
+  titleOff,
   id,
   onChange,
   checked = false,
@@ -32,6 +36,7 @@ export function IconCheckbox({
         }}
       />
       <label
+        title={titleOff && !checked ? titleOff : titleOn}
         className={classes(
           styles.icon,
           styles.iconLabel,

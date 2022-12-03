@@ -144,6 +144,54 @@
   cursor: pointer;
 }
 
+.toggle {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &:after {
+    width: 24px;
+    height: 24px;
+    display: block;
+    content: '';
+    -webkit-mask-image: url('../../img/icons/chevron_right.svg');
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: rotate 0.2s;
+  }
+
+  &.open:after {
+    rotate: 90deg;
+  }
+}
+
+.pill {
+  color: rgba(255, 255, 255, 0.7);
+  background-color: var(--surface-color-light);
+  user-select: none;
+  line-height: 24px;
+  border-radius: 12px;
+  padding: 0 12px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &.checked {
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: var(--theme);
+
+    &:hover {
+      box-shadow: 0 0 0 2px white inset;
+    }
+  }
+}
+
 .motionCanvas:after {
   -webkit-mask-image: url('../../img/icons/motion_canvas.svg');
 }
@@ -182,4 +230,16 @@
 }
 .dragIndicator:after {
   -webkit-mask-image: url('../../img/icons/drag_indicator.svg');
+}
+.warning:after {
+  -webkit-mask-image: url('../../img/icons/warning.svg');
+}
+.bug:after {
+  -webkit-mask-image: url('../../img/icons/bug.svg');
+}
+.clear:after {
+  -webkit-mask-image: url('../../img/icons/clear.svg');
+}
+.locate:after {
+  -webkit-mask-image: url('../../img/icons/locate.svg');
 }

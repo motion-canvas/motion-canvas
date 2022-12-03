@@ -1,6 +1,12 @@
 import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
-import {createSignal, endThread, startThread, useProject} from '../utils';
+import {
+  createSignal,
+  endThread,
+  startThread,
+  useLogger,
+  useProject,
+} from '../utils';
 
 /**
  * A class representing an individual thread.
@@ -76,7 +82,7 @@ export class Thread {
     this.children.push(child);
 
     if (!Object.getPrototypeOf(child.runner).threadable) {
-      console.warn('Non-threadable task: ', child.runner);
+      useLogger().warn(new Error(`Non-threadable task: ${child.runner}`));
       GeneratorHelper.makeThreadable(
         child.runner,
         `non-threadable ${this.children.length}`,

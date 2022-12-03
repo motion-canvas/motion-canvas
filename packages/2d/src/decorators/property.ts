@@ -14,6 +14,7 @@ import {
   SignalSetter,
   SignalTween,
   SignalUtils,
+  useLogger,
 } from '@motion-canvas/core/lib/utils';
 
 export function capitalize<T extends string>(value: T): Capitalize<T> {
@@ -65,7 +66,7 @@ export function createProperty<
   let setter: SignalSetter<TSetterValue>;
 
   if (!originalGetter !== !originalSetter) {
-    console.warn(
+    useLogger().warn(
       `The "${property}" property needs to provide either both the setter and getter or none of them`,
     );
   }
@@ -277,7 +278,7 @@ export function initial<T>(value: T): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.default = value;
@@ -310,7 +311,7 @@ export function interpolation<T>(
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.interpolationFunction = value;
@@ -345,7 +346,7 @@ export function parser<T>(value: (value: any) => T): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.parser = value;
@@ -387,7 +388,7 @@ export function wrapper<T>(
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.parser = raw => new value(raw);
@@ -423,7 +424,7 @@ export function cloneable<T>(value = true): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.cloneable = value;
@@ -456,7 +457,7 @@ export function inspectable<T>(value = true): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMeta<T>(target, key);
     if (!meta) {
-      console.error(`Missing property decorator for "${key.toString()}"`);
+      useLogger().error(`Missing property decorator for "${key.toString()}"`);
       return;
     }
     meta.inspectable = value;

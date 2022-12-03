@@ -4,6 +4,7 @@ import {ComponentChildren, JSX} from 'preact';
 import {useRef, useState} from 'preact/hooks';
 import {classes} from '../../utils';
 import {useFormattedNumber} from '../../hooks';
+import {Toggle} from '../controls';
 
 export interface FieldSetProps {
   children: ComponentChildren;
@@ -15,7 +16,7 @@ export function FieldSet({children, header}: FieldSetProps) {
   return (
     <FieldSurface open={open}>
       <div className={styles.header}>
-        <div className={styles.toggle} onClick={() => setOpen(!open)} />
+        <Toggle open={open} onToggle={setOpen} />
         {header}
       </div>
       <div className={styles.fields}>{children}</div>

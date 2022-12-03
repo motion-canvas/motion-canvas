@@ -1,6 +1,6 @@
 import {AudioData} from './AudioData';
 import {ValueDispatcher} from '../events';
-import {ifHot} from '../utils';
+import {ifHot, useLogger} from '../utils';
 
 export class AudioManager {
   public get onDataChanged() {
@@ -52,7 +52,7 @@ export class AudioManager {
     this.abortController = new AbortController();
     this.loadData(this.abortController.signal).catch(e => {
       if (e.name !== 'AbortError') {
-        console.error(e);
+        useLogger().error(e);
       }
     });
   }
@@ -91,7 +91,7 @@ export class AudioManager {
           return true;
         } catch (e) {
           if (!this.error) {
-            console.error(e);
+            useLogger().error(e);
           }
           this.error = true;
         }

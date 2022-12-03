@@ -15,6 +15,7 @@ import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {useInspection, usePlayer} from '../../contexts';
+import {highlight} from '../animations';
 
 const ZOOM_SPEED = 0.1;
 
@@ -65,23 +66,7 @@ export function View() {
 
   useSubscribable(
     player.onReloaded,
-    () =>
-      overlayRef.current.animate(
-        [
-          {
-            boxShadow: '0 0 0px 0 #ccc inset',
-            easing: 'cubic-bezier(0.33, 1, 0.68, 1)',
-          },
-          {
-            boxShadow: '0 0 0px 4px #ccc inset',
-            easing: 'cubic-bezier(0.32, 0, 0.67, 0)',
-          },
-          {boxShadow: '0 0 0px 0 #ccc inset'},
-        ],
-        {
-          duration: 300,
-        },
-      ),
+    () => overlayRef.current.animate(highlight(), {duration: 300}),
     [],
   );
 

@@ -1,2 +1,3 @@
 export * from './classes';
-export * from './SourceMapUtils';
+export * from './sourceMaps';
+export * from './withLoader';

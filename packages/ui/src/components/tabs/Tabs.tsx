@@ -18,45 +18,40 @@ type Tab =
       type: TabType.Pane;
       icon: IconType;
       pane: ComponentChildren;
+      badge?: ComponentChildren;
+      title?: string;
     }
   | {
       type: TabType.Link;
       icon: IconType;
       url?: string;
+      title?: string;
     }
   | {
       type: TabType.Space;
     };
 
-interface TabsProps {
+export interface TabsProps {
   children: Tab[];
-  onToggle?: (tab: number) => void;
-  id?: string;
+  tab: number;
+  onToggle: (tab: number) => void;
 }
 
-export function Tabs({children, onToggle, id}: TabsProps) {
-  const [tab, setTab] = useStorage(id, -1);
+export function Tabs({children, tab, onToggle}: TabsProps) {
   const toggleTab = useCallback(
     (value: number) => {
       const newTab = value === tab ? -1 : getPane(children[value]) ? value : -1;
-      setTab(newTab);
+      onToggle(newTab);
     },
-    [tab, setTab, children],
+    [tab, onToggle, children],
   );
   useLayoutEffect(() => {
     if (tab > -1 && !getPane(children[tab])) {
-      setTab(-1);
+      onToggle(-1);
     } else {
-      onToggle?.(tab);
+      onToggle(tab);
     }
   }, [onToggle, tab]);
-
-  const {inspectedElement} = useInspection();
-  useEffect(() => {
-    if (inspectedElement && tab !== -1) {
-      setTab(2);
-    }
-  }, [inspectedElement]);
 
   return (
     <div className={styles.root}>
@@ -66,6 +61,7 @@ export function Tabs({children, onToggle, id}: TabsProps) {
           data.type === TabType.Link ? (
             <Icon
               as="a"
+              title={data.title}
               type={data.icon}
               href={data.url}
               className={classes(styles.tab, [styles.disabled, !data.url])}
@@ -73,9 +69,12 @@ export function Tabs({children, onToggle, id}: TabsProps) {
           ) : data.type === TabType.Pane ? (
             <Icon
               type={data.icon}
+              title={data.title}
               onClick={() => toggleTab(index)}
               className={classes(styles.tab, [styles.active, tab === index])}
-            />
+            >
+              {data.badge}
+            </Icon>
           ) : (
             <div className={styles.space} />
           ),

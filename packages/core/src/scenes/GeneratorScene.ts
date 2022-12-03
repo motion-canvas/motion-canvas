@@ -129,7 +129,7 @@ export abstract class GeneratorScene<T>
     } while (promises.length > 0 && iterations < 10);
 
     if (iterations > 1) {
-      console.info('render iterations:', iterations);
+      this.project.logger.debug(`render iterations: ${iterations}`);
     }
   }
 
@@ -191,7 +191,10 @@ export abstract class GeneratorScene<T>
       } else if (isPromise(result.value)) {
         result = this.runner.next(await result.value);
       } else {
-        console.warn('Invalid value: ', result.value);
+        this.project.logger.warn({
+          message: 'Invalid value yielded by the scene.',
+          object: result.value,
+        });
         result = this.runner.next(result.value);
       }
       this.update();
@@ -201,9 +204,12 @@ export abstract class GeneratorScene<T>
     const promises = consumePromises();
     if (promises.length > 0) {
       await Promise.all(promises.map(handle => handle.promise));
-      console.error(
-        'Tried to access an asynchronous property before the node was ready.',
-      );
+      this.project.logger.error({
+        message:
+          'Tried to access an asynchronous property before the node was ready. ' +
+          'Make sure to yield the node before accessing the property.',
+        stack: promises[0].stack,
+      });
     }
 
     if (result.done) {
@@ -252,9 +258,8 @@ export abstract class GeneratorScene<T>
     if (this.state === SceneState.Initial) {
       this.state = SceneState.AfterTransitionIn;
     } else {
-      console.warn(
-        `Scene ${this.name} transitioned in an unexpected state: `,
-        this.state,
+      this.project.logger.warn(
+        `Scene ${this.name} transitioned in an unexpected state: ${this.state}`,
       );
     }
   }
@@ -266,25 +271,13 @@ export abstract class GeneratorScene<T>
     ) {
       this.state = SceneState.CanTransitionOut;
     } else {
-      console.warn(
-        `Scene ${this.name} was marked as finished in an unexpected state: `,
-        this.state,
+      this.project.logger.warn(
+        `Scene ${this.name} was marked as finished in an unexpected state: ${this.state}`,
       );
     }
   }
 
   public isCached() {
     return this.cached;
-  }
-
-  public generateNodeId(type: string): string {
-    let id = 0;
-    if (type in this.counters) {
-      id = ++this.counters[type];
-    } else {
-      this.counters[type] = id;
-    }
-
-    return `${this.name}.${type}.${id}`;
   }
 }

@@ -24,8 +24,9 @@ export class View2D extends Layout {
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
 
-  public constructor() {
+  public constructor(private readonly name: string) {
     super({
+      key: `${name}/View2D`,
       // TODO Sync with the project size
       width: 1920,
       height: 1080,
@@ -97,16 +98,17 @@ export class View2D extends Layout {
     return this;
   }
 
-  public registerNode(node: Node): string {
+  public registerNode(node: Node, key?: string): string {
     const className = node.constructor?.name ?? 'unknown';
     this.nodeCounters[className] ??= 0;
 
-    const key = `${className}[${this.nodeCounters[className]++}]`;
+    key ??= `${this.name}/${className}[${this.nodeCounters[className]++}]`;
     this.registeredNodes[key] = node;
     return key;
   }
 
   public getNode(key: string): Node | null {
+    if (this.key === key) return this;
     return this.registeredNodes[key] ?? null;
   }
 }

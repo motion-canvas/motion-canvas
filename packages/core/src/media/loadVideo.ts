@@ -1,4 +1,5 @@
 import {MP4Demuxer} from './MP4Demuxer';
+import {useLogger} from '../utils';
 
 const videos = new WeakMap<object, ImageBitmap[]>();
 const keys: Record<string, object> = {};
@@ -19,7 +20,7 @@ export async function loadVideo(src: string) {
   if (isRendering) {
     await decode(src, frames);
   } else {
-    decode(src, frames).catch(console.error);
+    decode(src, frames).catch(e => useLogger().error(e));
   }
 
   return frames;

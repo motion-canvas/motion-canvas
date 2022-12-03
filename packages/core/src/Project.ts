@@ -4,6 +4,7 @@ import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
 import {createSignal, ifHot} from './utils';
+import {Logger} from './Logger';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -147,6 +148,7 @@ export class Project {
 
   public readonly name: string;
   public readonly audio = new AudioManager();
+  public readonly logger = new Logger();
   public playbackState = createSignal(PlaybackState.Paused);
   private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
@@ -287,9 +289,8 @@ export class Project {
 
   public async seek(frame: number): Promise<boolean> {
     if (this.currentScene.current && !this.currentScene.current.isCached()) {
-      console.warn(
-        'Attempting to seek a project with an invalidated scene:',
-        this.currentScene.current.name,
+      this.logger.warn(
+        `Attempting to seek a project with an invalidated scene: ${this.currentScene.current.name}`,
       );
     }
 
@@ -325,7 +326,7 @@ export class Project {
     const frame = this.frame;
 
     if (this.renderLookup[frame]) {
-      console.warn(`Frame no. ${frame} is already being exported`);
+      this.logger.warn(`Frame no. ${frame} is already being exported.`);
       return;
     }
 
@@ -357,9 +358,8 @@ export class Project {
     let lastScene = null;
     for (const scene of this.scenes.current) {
       if (!scene.isCached()) {
-        console.warn(
-          'Attempting to seek a project with an invalidated scene:',
-          scene.name,
+        this.logger.warn(
+          `Attempting to seek a project with an invalidated scene: ${scene.name}`,
         );
         return scene;
       }
