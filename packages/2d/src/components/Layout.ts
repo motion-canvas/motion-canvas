@@ -37,7 +37,6 @@ import {
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
-import {View2D} from '../scenes';
 import {drawLine, lineTo} from '../utils';
 import {spacingProperty, SpacingProperty} from '../decorators/spacingProperty';
 
@@ -356,7 +355,7 @@ export class Layout extends Node {
   public constructor({tagName = 'div', ...props}: LayoutProps) {
     super(props);
 
-    this.element = View2D.document.createElement(tagName);
+    this.element = document.createElement(tagName);
     this.element.style.display = 'flex';
     this.element.style.boxSizing = 'border-box';
 

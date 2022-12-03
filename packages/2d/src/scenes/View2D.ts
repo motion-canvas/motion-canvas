@@ -2,23 +2,21 @@ import {Layout, Node} from '../components';
 
 export class View2D extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
-  public static document: Document;
+  public static shadowRoot: ShadowRoot;
 
   static {
-    let frame = document.querySelector<HTMLIFrameElement>(`#${View2D.frameID}`);
+    let frame = document.querySelector<HTMLDivElement>(`#${View2D.frameID}`);
     if (!frame) {
-      frame = document.createElement('iframe');
+      frame = document.createElement('div');
       frame.id = View2D.frameID;
       frame.style.position = 'absolute';
       frame.style.pointerEvents = 'none';
       frame.style.top = '0';
       frame.style.left = '0';
       frame.style.opacity = '0';
-      frame.style.border = 'none';
-
       document.body.prepend(frame);
     }
-    this.document = frame.contentDocument ?? document;
+    View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
   }
 
   private registeredNodes: Record<string, Node> = {};
@@ -38,7 +36,7 @@ export class View2D extends Layout {
       fontStyle: 'normal',
     });
 
-    View2D.document.body.append(this.element);
+    View2D.shadowRoot.append(this.element);
     this.applyFlex();
   }
 
