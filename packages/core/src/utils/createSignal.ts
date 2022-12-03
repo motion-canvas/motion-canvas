@@ -7,11 +7,13 @@ import {
   InterpolationFunction,
 } from '../tweening';
 import {ThreadGenerator} from '../threading';
+import {useLogger} from './useProject';
 
 export interface DependencyContext {
   dependencies: Set<Subscribable<void>>;
   handler: EventHandler<void>;
   stack?: string;
+  owner?: any;
 }
 
 export type SignalValue<TValue> = TValue | (() => TValue);
@@ -121,6 +123,7 @@ export interface PromiseHandle<T> {
   promise: Promise<T>;
   value: T;
   stack?: string;
+  owner?: any;
 }
 
 export function collectPromise<T>(
@@ -130,10 +133,13 @@ export function collectPromise<T>(
   const handle: PromiseHandle<T> = {
     promise,
     value: initialValue,
-    stack: collectionStack[0].stack,
+    stack: collectionStack[0]?.stack,
   };
 
   const context = collectionStack.at(-2);
+  if (context) {
+    handle.owner = context.owner;
+  }
   promise.then(value => {
     handle.value = value;
     context?.handler();
@@ -164,6 +170,7 @@ export function createSignal<TValue, TReturn = void>(
   const context: DependencyContext = {
     dependencies: new Set<Subscribable<void>>(),
     handler: () => event.raise(),
+    owner: setterReturn,
   };
 
   function set(value: SignalValue<TValue>) {
@@ -192,7 +199,15 @@ export function createSignal<TValue, TReturn = void>(
       context.dependencies.clear();
       context.stack = new Error().stack;
       startCollecting(context);
-      last = current();
+      try {
+        last = current();
+      } catch (e) {
+        useLogger().error({
+          message: e.message,
+          stack: e.stack,
+          inspect: context.owner?.key,
+        });
+      }
       finishCollecting(context);
     }
     event.reset();

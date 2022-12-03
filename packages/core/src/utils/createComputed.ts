@@ -5,17 +5,20 @@ import {
   finishCollecting,
   startCollecting,
 } from './createSignal';
+import {useLogger} from './useProject';
 
 export type Computed<TValue> = (...args: any[]) => TValue;
 
 export function createComputed<TValue>(
   factory: Computed<TValue>,
+  owner?: any,
 ): Computed<TValue> {
   let last: TValue;
   const event = new FlagDispatcher();
   const context: DependencyContext = {
     dependencies: new Set<Subscribable<void>>(),
     handler: () => event.raise(),
+    owner,
   };
 
   const handler = <Computed<TValue>>function handler(...args: any[]) {
@@ -24,7 +27,15 @@ export function createComputed<TValue>(
       context.dependencies.clear();
       context.stack = new Error().stack;
       startCollecting(context);
-      last = factory(...args);
+      try {
+        last = factory(...args);
+      } catch (e) {
+        useLogger().error({
+          message: e.message,
+          stack: e.stack,
+          inspect: context.owner?.key,
+        });
+      }
       finishCollecting(context);
     }
     event.reset();

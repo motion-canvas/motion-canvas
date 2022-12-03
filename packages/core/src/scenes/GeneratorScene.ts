@@ -209,6 +209,7 @@ export abstract class GeneratorScene<T>
           'Tried to access an asynchronous property before the node was ready. ' +
           'Make sure to yield the node before accessing the property.',
         stack: promises[0].stack,
+        inspect: promises[0].owner?.key ?? undefined,
       });
     }
 
