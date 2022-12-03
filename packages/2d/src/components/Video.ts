@@ -8,7 +8,6 @@ import {
   useProject,
   useThread,
 } from '@motion-canvas/core/lib/utils';
-import {View2D} from '../scenes';
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
@@ -62,7 +61,7 @@ export class Video extends Rect {
       return Video.pool[key];
     }
 
-    const video = View2D.document.createElement('video');
+    const video = document.createElement('video');
     video.src = src;
     if (video.readyState < 2) {
       collectPromise(

@@ -7,7 +7,6 @@ import {computed, initial, property} from '../decorators';
 import {Color, Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
-import {View2D} from '../scenes';
 
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
@@ -40,7 +39,7 @@ export class Image extends Rect {
       return Image.pool[src];
     }
 
-    const image = View2D.document.createElement('img');
+    const image = document.createElement('img');
     image.src = src;
     if (!image.complete) {
       collectPromise(
