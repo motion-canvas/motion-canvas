@@ -1,5 +1,5 @@
 import {initial, interpolation, property} from '../decorators';
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {Signal, SignalValue, useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {Rect} from '@motion-canvas/core/lib/types';
@@ -109,7 +109,10 @@ export class Text extends Shape {
     }
 
     if (wrap && !Text.segmenter) {
-      console.error('Wrapping is not supported');
+      useLogger().warn({
+        message: 'Wrapping is not supported',
+        inspect: this.key,
+      });
     }
   }
 }

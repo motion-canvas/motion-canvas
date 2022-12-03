@@ -1,0 +1,111 @@
+$colors: (
+  'error': var(--red),
+  'warn': var(--yellow),
+  'info': var(--blue),
+  'http': #cccccc,
+  'verbose': #cccccc,
+  'debug': #cccccc,
+  'silly': #cccccc,
+);
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@each $level, $color in $colors {
+  .list.#{$level} .log.#{$level} {
+    display: block;
+  }
+}
+
+.log {
+  border-left: 4px solid transparent;
+  background-color: var(--background-color-dark);
+  border-radius: 4px;
+  padding: 8px;
+  overflow: hidden;
+  display: none;
+
+  @each $level, $color in $colors {
+    &.#{$level} {
+      border-color: $color;
+    }
+  }
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  line-height: 24px;
+  gap: 8px;
+  margin: 0;
+
+  .log.empty & {
+    padding-left: 4px;
+  }
+}
+
+.message {
+  flex-grow: 1;
+}
+
+.duration {
+  background-color: var(--surface-color);
+  line-height: 24px;
+  padding: 0 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.code {
+  background-color: var(--surface-color);
+  border-radius: 4px;
+  line-height: 24px;
+  padding: 8px;
+  margin: 8px 0 0;
+  overflow-x: auto;
+}
+
+.stack {
+  margin-top: 8px;
+  padding: 8px;
+  overflow-x: auto;
+
+  --scrollbar-background: var(--background-color-dark);
+}
+
+.entry {
+  font-size: 12px;
+  line-height: 20px;
+  white-space: nowrap;
+
+  &.external {
+    opacity: 0.54;
+  }
+}
+
+.link {
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.navbar {
+  display: flex;
+  background-color: rgba(36, 36, 36, 0.54);
+  backdrop-filter: blur(5px);
+  padding: 12px 16px;
+  margin: -8px -16px 16px;
+  position: sticky;
+  top: -16px;
+  z-index: 1;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  flex-grow: 1;
+}

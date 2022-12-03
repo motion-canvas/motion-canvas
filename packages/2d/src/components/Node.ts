@@ -38,6 +38,7 @@ import {drawLine} from '../utils';
 export interface NodeProps {
   ref?: Reference<any>;
   children?: ComponentChildren;
+  key?: string;
 
   x?: SignalValue<number>;
   y?: SignalValue<number>;
@@ -305,13 +306,13 @@ export class Node implements Promisable<Node> {
   public readonly properties = getPropertiesOf(this);
   public readonly key: string;
 
-  public constructor({children, ...rest}: NodeProps) {
+  public constructor({children, key, ...rest}: NodeProps) {
     initialize(this, {defaults: rest});
     for (const {signal} of this) {
       signal.reset();
     }
     this.add(children);
-    this.key = use2DView()?.registerNode(this) ?? '';
+    this.key = use2DView()?.registerNode(this, key) ?? key ?? '';
   }
 
   @computed()

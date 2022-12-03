@@ -2,6 +2,7 @@ import type {Project} from '../Project';
 import {PlaybackState} from '../Project';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import type {CanvasColorSpace, CanvasOutputMimeType} from '../types';
+import {Logger} from '../Logger';
 
 const MAX_AUDIO_DESYNC = 1 / 50;
 
@@ -69,8 +70,11 @@ export class Player {
     recalculate: true,
   };
 
+  private readonly logger: Logger;
+
   public constructor(public readonly project: Project) {
     this.startTime = performance.now();
+    this.logger = this.project.logger;
     this.project.framerate = this.state.current.fps;
     this.project.resolutionScale = this.state.current.scale;
     this.project.colorSpace = this.state.current.colorSpace;
@@ -284,7 +288,7 @@ export class Player {
       try {
         await this.project.export();
       } catch (e) {
-        console.error(e);
+        this.logger.error(e);
         this.toggleRendering(false);
       }
 
@@ -304,9 +308,9 @@ export class Player {
     if (commands.seek >= 0 || !this.isInRange(this.project.frame, state)) {
       const seekFrame = commands.seek < 0 ? this.project.frame : commands.seek;
       const clampedFrame = this.clampRange(seekFrame, state);
-      console.time('seek time');
+      this.logger.profile('seek time');
       state.finished = await this.project.seek(clampedFrame);
-      console.timeEnd('seek time');
+      this.logger.profile('seek time');
       this.project.syncAudio(-3);
     }
     // Do nothing if paused or is ahead of the audio.
@@ -383,7 +387,7 @@ export class Player {
           await this.run();
         } catch (e) {
           this.requestId = null;
-          console.error(e);
+          this.logger.error(e);
         }
       } else {
         this.request();

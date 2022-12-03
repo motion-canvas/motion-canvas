@@ -3,6 +3,7 @@ import {
   createComputedAsync,
   Signal,
   SignalValue,
+  useLogger,
 } from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {CodeTree, parse, diff, ready, MorphToken} from 'code-fns';
@@ -135,7 +136,10 @@ export class CodeBlock extends Shape {
           );
           context.fillText(token.code, x, y);
         } else {
-          console.error(token);
+          useLogger().warn({
+            message: 'Invalid token',
+            object: token,
+          });
         }
       }
     }

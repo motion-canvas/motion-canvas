@@ -5,7 +5,12 @@ import {Player} from '@motion-canvas/core/lib/player';
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {Index, ProjectData} from './Index';
-import {InspectionProvider, PlayerProvider, ProjectProvider} from './contexts';
+import {
+  InspectionProvider,
+  LoggerProvider,
+  PlayerProvider,
+  ProjectProvider,
+} from './contexts';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -14,6 +19,15 @@ function renderRoot(vnode: ComponentChild) {
 }
 
 export function editor(project: Project) {
+  project.logger.onLogged.subscribe(log => {
+    const {level, message, stack, object, durationMs, ...rest} = log;
+    const fn = console[level as 'error'] ?? console.log;
+    fn(message, ...[object, durationMs, rest].filter(part => !!part));
+    if (stack) {
+      fn(stack);
+    }
+  });
+
   const player = new Player(project);
   const playerKey = `${project.name}/player`;
   const frameKey = `${project.name}/frame`;
@@ -36,9 +50,11 @@ export function editor(project: Project) {
   renderRoot(
     <PlayerProvider player={player}>
       <ProjectProvider project={project}>
-        <InspectionProvider>
-          <Editor />
-        </InspectionProvider>
+        <LoggerProvider>
+          <InspectionProvider>
+            <Editor />
+          </InspectionProvider>
+        </LoggerProvider>
       </ProjectProvider>
     </PlayerProvider>,
   );

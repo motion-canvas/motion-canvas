@@ -25,30 +25,6 @@
   }
 }
 
-.toggle {
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: var(--surface-color-hover);
-  }
-
-  &:after {
-    width: 24px;
-    height: 24px;
-    display: block;
-    content: '';
-    -webkit-mask-image: url('../../img/icons/chevron_right.svg');
-    background-color: rgba(255, 255, 255, 0.6);
-    transition: rotate 0.2s;
-
-    .open & {
-      rotate: 90deg;
-    }
-  }
-}
-
 .fields {
   display: none;
 

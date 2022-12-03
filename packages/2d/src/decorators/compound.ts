@@ -1,4 +1,8 @@
-import {SignalValue, isReactive} from '@motion-canvas/core/lib/utils';
+import {
+  SignalValue,
+  isReactive,
+  useLogger,
+} from '@motion-canvas/core/lib/utils';
 import {
   capitalize,
   createProperty,
@@ -40,7 +44,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
 
     addInitializer(target, (instance: any, context: any) => {
       if (!meta.parser) {
-        console.error(`Missing parser decorator for "${key.toString()}"`);
+        useLogger().error(`Missing parser decorator for "${key.toString()}"`);
         return;
       }
       const parser = meta.parser;

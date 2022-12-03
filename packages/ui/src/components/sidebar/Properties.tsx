@@ -28,7 +28,7 @@ export function Properties() {
             <AutoField label={key} value={value} />
           ))
         : inspectable
-        ? "Click on an element to view it's properties."
+        ? 'Click on a node to view its properties.'
         : "The current scene doesn't support inspecting."}
     </Pane>
   );

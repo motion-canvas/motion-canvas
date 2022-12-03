@@ -48,6 +48,7 @@ export function PlaybackControls() {
   return (
     <div className={classes(styles.controls, [styles.disabled, state.render])}>
       <Select
+        title="Playback speed"
         options={[
           {value: 0.25, text: 'x0.25'},
           {value: 0.5, text: 'x0.5'},
@@ -62,10 +63,13 @@ export function PlaybackControls() {
         id={'audio'}
         iconOn={IconType.volumeOn}
         iconOff={IconType.volumeOff}
+        titleOn="Mute audio"
+        titleOff="Unmute audio"
         checked={!state.muted}
         onChange={value => player.toggleAudio(value)}
       />
       <IconButton
+        title="Previous frame"
         icon={IconType.skipPrevious}
         onClick={() => player.requestPreviousFrame()}
       />
@@ -74,10 +78,13 @@ export function PlaybackControls() {
         main
         iconOn={IconType.pause}
         iconOff={IconType.play}
+        titleOn="Play"
+        titleOff="Pause"
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
       />
       <IconButton
+        title="Next frame"
         icon={IconType.skipNext}
         onClick={() => player.requestNextFrame()}
       />
@@ -85,15 +92,22 @@ export function PlaybackControls() {
         id={'loop'}
         iconOn={IconType.repeat}
         iconOff={IconType.repeat}
+        titleOn="Loop video"
         checked={state.loop}
         onChange={() => player.toggleLoop()}
       />
       <Framerate
-        render={framerate => (
-          <Input size={4} readOnly value={`${framerate} FPS`} />
+        render={(framerate, paused) => (
+          <Input
+            title="Current framerate"
+            size={4}
+            readOnly
+            value={paused ? 'PAUSED' : `${framerate} FPS`}
+          />
         )}
       />
       <IconButton
+        title="Save snapshot"
         icon={IconType.photoCamera}
         onClick={() => player.exportCurrentFrame()}
       />

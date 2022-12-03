@@ -3,7 +3,7 @@ import {useMemo} from 'preact/hooks';
 export function useFormattedNumber(value: number, precision = 6) {
   return useMemo(() => {
     if (typeof value !== 'number') {
-      return `invalid value type: ${typeof value}`;
+      return null;
     }
 
     const absolute = Math.abs(value);

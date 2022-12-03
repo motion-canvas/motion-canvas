@@ -12,4 +12,8 @@ export enum IconType {
   volumeOn = 'volumeOn',
   volumeOff = 'volumeOff',
   schedule = 'schedule',
+  warning = 'warning',
+  bug = 'bug',
+  clear = 'clear',
+  locate = 'locate',
 }

@@ -7,3 +7,5 @@ export * from './IconCheckbox';
 export * from './IconType';
 export * from './Label';
 export * from './Select';
+export * from './Toggle';
+export * from './Pill';

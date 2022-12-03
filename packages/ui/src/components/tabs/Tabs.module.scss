@@ -20,22 +20,40 @@
   padding: 12px;
   margin: 0;
   border-radius: 0 4px 4px 0;
-  opacity: 0.54;
   cursor: pointer;
+  position: relative;
+  --icon-color: rgba(255, 255, 255, 0.54);
 
   &:hover {
-    opacity: 1;
+    --icon-color: white;
   }
 
   &.active {
     background: var(--surface-color);
-    opacity: 1;
+    --icon-color: white;
   }
 
   &.disabled {
     pointer-events: none;
-    opacity: 0.16;
+    --icon-color: rgba(255, 255, 255, 0.16);
   }
+}
+
+.badge {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  position: absolute;
+  font-weight: 900;
+  right: 4px;
+  bottom: 4px;
+  padding: 0 4px;
+  min-width: 16px;
+  height: 16px;
+  background-color: var(--red);
+  border-radius: 8px;
+  line-height: 16px;
+  text-align: center;
+  z-index: 1;
 }
 
 .space {

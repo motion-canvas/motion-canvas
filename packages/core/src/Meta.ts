@@ -1,5 +1,5 @@
 import {ValueDispatcher} from './events';
-import {ifHot} from './utils';
+import {ifHot, useLogger} from './utils';
 
 const META_VERSION = 1;
 
@@ -44,7 +44,7 @@ export class Meta<T extends Metadata = Metadata> {
    * @param data - New data.
    */
   public setDataSync(data: Partial<T>) {
-    this.setData(data).catch(console.error);
+    this.setData(data).catch(error => useLogger().error(error));
   }
 
   public async setData(data: Partial<T>) {
@@ -58,15 +58,15 @@ export class Meta<T extends Metadata = Metadata> {
       }
 
       if (!this.source) {
-        console.warn(
-          `The meta file for ${this.name} is missing\n`,
-          `Make sure the file containing your scene is called "${this.name}.ts" to match the generator function name`,
+        useLogger().warn(
+          `The meta file for ${this.name} is missing.\n` +
+            `Make sure the file containing your scene is called "${this.name}.ts" to match the generator function name.`,
         );
         return;
       }
 
       if (Meta.sourceLookup[this.source]) {
-        console.warn(`Metadata for ${this.name} is already being updated`);
+        useLogger().warn(`Metadata for ${this.name} is already being updated`);
         return;
       }
 
