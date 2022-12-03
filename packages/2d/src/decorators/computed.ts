@@ -12,7 +12,7 @@ export function computed(): MethodDecorator {
   return (target: any, key) => {
     addInitializer(target, (instance: any) => {
       const method = Object.getPrototypeOf(instance)[key];
-      instance[key] = createComputed(method.bind(instance));
+      instance[key] = createComputed(method.bind(instance), instance);
     });
   };
 }
