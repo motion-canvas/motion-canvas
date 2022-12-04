@@ -14,6 +14,7 @@ export class View2D extends Layout {
       frame.style.top = '0';
       frame.style.left = '0';
       frame.style.opacity = '0';
+      frame.style.overflow = 'hidden';
       document.body.prepend(frame);
     }
     View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});

@@ -13,6 +13,7 @@
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "importHelpers": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/core/lib",
     "paths": {

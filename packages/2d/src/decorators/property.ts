@@ -15,7 +15,10 @@ import {
   SignalTween,
   SignalUtils,
   useLogger,
+  SignalGenerator,
 } from '@motion-canvas/core/lib/utils';
+import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
+import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 
 export function capitalize<T extends string>(value: T): Capitalize<T> {
   return <Capitalize<T>>(value[0].toUpperCase() + value.slice(1));
@@ -131,22 +134,55 @@ export function createProperty<
         );
       }
 
-      const from = getter();
-      return tween(
+      return makeAnimate(timingFunction, interpolationFunction)(
+        <TGetterValue>newValue,
         duration,
-        value => {
-          setter(
-            interpolationFunction(
-              from,
-              unwrap(newValue),
-              timingFunction(value),
-            ),
-          );
-        },
-        () => setter(wrap(newValue)),
       );
     }
   );
+
+  function makeAnimate(
+    defaultTimingFunction: TimingFunction,
+    defaultInterpolationFunction: InterpolationFunction<TGetterValue>,
+    before?: ThreadGenerator,
+  ) {
+    function animate(
+      value: SignalValue<TGetterValue>,
+      duration: number,
+      timingFunction = defaultTimingFunction,
+      interpolationFunction = defaultInterpolationFunction,
+    ) {
+      const task = <SignalGenerator<TGetterValue>>(
+        makeTask(value, duration, timingFunction, interpolationFunction, before)
+      );
+      task.to = makeAnimate(timingFunction, interpolationFunction, task);
+      return task;
+    }
+
+    return <SignalTween<TGetterValue>>animate;
+  }
+
+  decorate(<any>makeTask, threadable());
+  function* makeTask(
+    value: SignalValue<TGetterValue>,
+    duration: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<TGetterValue>,
+    before?: ThreadGenerator,
+  ) {
+    if (before) {
+      yield* before;
+    }
+
+    const from = getter();
+    yield* tween(
+      duration,
+      v => {
+        setter(interpolationFunction(from, unwrap(value), timingFunction(v)));
+      },
+      () => setter(wrap(value)),
+    );
+  }
 
   Object.defineProperty(handler, 'reset', {
     configurable: true,

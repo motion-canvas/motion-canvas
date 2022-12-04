@@ -2,7 +2,6 @@ export * from './createComputed';
 export * from './createComputedAsync';
 export * from './createSignal';
 export * from './range';
-export * from './useAnimator';
 export * from './useProject';
 export * from './useRef';
 export * from './useScene';
