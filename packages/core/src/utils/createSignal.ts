@@ -8,6 +8,7 @@ import {
 } from '../tweening';
 import {ThreadGenerator} from '../threading';
 import {useLogger} from './useProject';
+import {decorate, threadable} from '../decorators';
 
 export interface DependencyContext {
   dependencies: Set<Subscribable<void>>;
@@ -17,6 +18,10 @@ export interface DependencyContext {
 }
 
 export type SignalValue<TValue> = TValue | (() => TValue);
+
+export type SignalGenerator<TValue> = ThreadGenerator & {
+  to: SignalTween<TValue>;
+};
 
 export interface SignalSetter<TValue, TReturn = void> {
   (value: SignalValue<TValue>): TReturn;
@@ -32,7 +37,7 @@ export interface SignalTween<TValue> {
     time: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<TValue>,
-  ): ThreadGenerator;
+  ): SignalGenerator<TValue>;
 }
 
 export interface SignalUtils<TValue, TReturn> {
@@ -234,22 +239,61 @@ export function createSignal<TValue, TReturn = void>(
         return set(value);
       }
 
-      const from = get();
-      return tween(
+      return makeAnimate(timingFunction, interpolationFunction)(
+        value,
         duration,
-        v => {
-          set(
-            interpolationFunction(
-              from,
-              isReactive(value) ? value() : value,
-              timingFunction(v),
-            ),
-          );
-        },
-        () => set(value),
       );
     }
   );
+
+  function makeAnimate(
+    defaultTimingFunction: TimingFunction,
+    defaultInterpolationFunction: InterpolationFunction<TValue>,
+    before?: ThreadGenerator,
+  ) {
+    function animate(
+      value: SignalValue<TValue>,
+      duration: number,
+      timingFunction = defaultTimingFunction,
+      interpolationFunction = defaultInterpolationFunction,
+    ) {
+      const task = <SignalGenerator<TValue>>(
+        makeTask(value, duration, timingFunction, interpolationFunction, before)
+      );
+      task.to = makeAnimate(timingFunction, interpolationFunction, task);
+      return task;
+    }
+
+    return <SignalTween<TValue>>animate;
+  }
+
+  decorate(makeTask, threadable());
+  function* makeTask(
+    value: SignalValue<TValue>,
+    duration: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<TValue>,
+    before?: ThreadGenerator,
+  ) {
+    if (before) {
+      yield* before;
+    }
+
+    const from = get();
+    yield* tween(
+      duration,
+      v => {
+        set(
+          interpolationFunction(
+            from,
+            isReactive(value) ? value() : value,
+            timingFunction(v),
+          ),
+        );
+      },
+      () => set(value),
+    );
+  }
 
   Object.defineProperty(handler, 'reset', {
     value: initial !== undefined ? () => set(initial) : () => setterReturn,

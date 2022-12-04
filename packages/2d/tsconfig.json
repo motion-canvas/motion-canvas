@@ -14,6 +14,7 @@
     "experimentalDecorators": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/2d/lib",
+    "importHelpers": true,
     "paths": {
       "@motion-canvas/2d/lib/jsx-runtime": ["jsx-runtime.ts"]
     },
