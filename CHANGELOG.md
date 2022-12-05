@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0-alpha.5](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.4...v12.0.0-alpha.5) (2022-12-05)
+
+
+### Bug Fixes
+
+* **2d:** fix import order ([#94](https://github.com/motion-canvas/motion-canvas/issues/94)) ([bcc0bcf](https://github.com/motion-canvas/motion-canvas/commit/bcc0bcffae47855bd8f7ab06454aaebe93c4aa24)), closes [#76](https://github.com/motion-canvas/motion-canvas/issues/76)
+
+
+
+
+
 # [12.0.0-alpha.4](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.3...v12.0.0-alpha.4) (2022-12-05)
 
 

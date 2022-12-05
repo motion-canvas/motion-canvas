@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/create",
-  "version": "12.0.0-alpha.4",
+  "version": "12.0.0-alpha.5",
   "description": "Quickly scaffold Motion Canvas projects",
   "main": "index.js",
   "author": "motion-canvas",
@@ -21,7 +21,7 @@
     "url": "https://github.com/motion-canvas/motion-canvas.git"
   },
   "devDependencies": {
-    "@motion-canvas/2d": "^12.0.0-alpha.4",
+    "@motion-canvas/2d": "^12.0.0-alpha.5",
     "@motion-canvas/core": "^12.0.0-alpha.4",
     "@motion-canvas/ui": "^12.0.0-alpha.4",
     "@motion-canvas/vite-plugin": "^12.0.0-alpha.3"
