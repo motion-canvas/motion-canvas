@@ -53,8 +53,8 @@ const sidebars = {
     },
     {
       type: 'category',
-      label: 'Legacy',
-      items: createApiSidebar('legacy-api'),
+      label: '2D',
+      items: createApiSidebar('2d-api'),
     },
   ],
 };

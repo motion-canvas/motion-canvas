@@ -2,10 +2,8 @@ import styles from './Tabs.module.scss';
 
 import {Icon, IconType} from '../controls';
 import {ComponentChildren} from 'preact';
-import {useCallback, useEffect, useLayoutEffect} from 'preact/hooks';
+import {useCallback, useLayoutEffect} from 'preact/hooks';
 import {classes} from '../../utils';
-import {useStorage} from '../../hooks';
-import {useInspection} from '../../contexts';
 
 export enum TabType {
   Link,

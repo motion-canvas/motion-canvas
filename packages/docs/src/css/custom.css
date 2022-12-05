@@ -45,3 +45,12 @@ a.button:hover {
   color: var(--ifm-button-color);
   text-decoration: none;
 }
+
+motion-canvas-player {
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto var(--ifm-leading);
+  border-radius: var(--ifm-global-radius);
+  background-color: var(--ifm-background-surface-color);
+}

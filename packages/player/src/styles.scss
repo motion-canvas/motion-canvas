@@ -1,0 +1,112 @@
+$states: ('initial' 'loading' 'ready' 'error');
+
+@each $state in $states {
+  .#{$state} {
+    display: none;
+  }
+
+  .state-#{$state} .#{$state} {
+    display: block;
+  }
+}
+
+:host {
+  position: relative;
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  background-color: rgba(0, 0, 0, 0.54);
+  transition: opacity 0.1s;
+
+  &.state-ready {
+    cursor: pointer;
+  }
+
+  &:hover,
+  &:not(.playing) {
+    opacity: 1;
+
+    .button {
+      scale: 1;
+      transition: scale 0.1s ease-out;
+    }
+  }
+}
+
+.button {
+  width: 50%;
+  max-width: 96px;
+  aspect-ratio: 1;
+  scale: 0.5;
+  transition: scale 0.1s ease-in;
+
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.87;
+  background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bS0yIDE0LjV2LTlsNiA0LjUtNiA0LjV6Ii8+PC9zdmc+');
+
+  .playing & {
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiBoZWlnaHQ9IjI0cHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0cHgiIGZpbGw9IiNmZmZmZmYiPjxnPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjwvZz48Zz48Zy8+PHBhdGggZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTBzMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJ6IE0xMSwxNkg5VjhoMlYxNnogTTE1LDE2aC0yVjhoMlYxNnoiLz48L2c+PC9zdmc+');
+  }
+}
+
+.canvas {
+  width: 100%;
+  display: block;
+}
+
+.message {
+  font-family: 'JetBrains Mono', sans-serif;
+  text-align: center;
+  font-size: 20px;
+  padding: 8px 16px;
+  margin: 16px;
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(0, 0, 0, 0.87);
+}
+
+.loader {
+  width: 50%;
+  max-width: 96px;
+  display: none;
+
+  rotate: -90deg;
+  animation: stroke 2s cubic-bezier(0.5, 0, 0.5, 1) infinite,
+    rotate 2s linear infinite;
+}
+
+$circumference: calc(2 * 3.1415926536 * 9px);
+@keyframes stroke {
+  0% {
+    stroke-dasharray: $circumference * 0.1 $circumference * 0.9;
+    stroke-dashoffset: $circumference * 0.05;
+  }
+  50% {
+    stroke-dasharray: $circumference * 0.9 $circumference * 0.1;
+    stroke-dashoffset: $circumference * -0.05;
+  }
+  100% {
+    stroke-dasharray: $circumference * 0.1 $circumference * 0.9;
+    stroke-dashoffset: $circumference * -0.95;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    rotate: -110deg;
+  }
+  100% {
+    rotate: 250deg;
+  }
+}
