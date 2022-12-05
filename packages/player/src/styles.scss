@@ -28,11 +28,15 @@ $states: ('initial' 'loading' 'ready' 'error');
   background-color: rgba(0, 0, 0, 0.54);
   transition: opacity 0.1s;
 
-  &.state-ready {
+  &.state-ready:not(.auto) {
     cursor: pointer;
   }
 
-  &:hover,
+  &:not(.hover):not(.auto):hover {
+    cursor: none;
+  }
+
+  &.hover,
   &:not(.playing) {
     opacity: 1;
 
@@ -40,6 +44,10 @@ $states: ('initial' 'loading' 'ready' 'error');
       scale: 1;
       transition: scale 0.1s ease-out;
     }
+  }
+
+  &.auto .button {
+    display: none;
   }
 }
 

@@ -3,7 +3,6 @@ import * as fs from 'fs';
 
 export default defineConfig({
   build: {
-    minify: 'esbuild',
     lib: {
       entry: 'src/main.ts',
       formats: ['es'],

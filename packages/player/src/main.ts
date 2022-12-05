@@ -15,7 +15,12 @@ enum State {
 
 class MotionCanvasPlayer extends HTMLElement {
   public static get observedAttributes() {
-    return ['src', 'quality', 'width', 'height'];
+    return ['src', 'quality', 'width', 'height', 'auto'];
+  }
+
+  private get auto() {
+    const attr = this.getAttribute('auto');
+    return !!attr;
   }
 
   private get quality() {
@@ -43,7 +48,8 @@ class MotionCanvasPlayer extends HTMLElement {
   private defaultHeight = 1080;
   private project: Project | null = null;
   private abortController: AbortController | null = null;
-  private requestId: number | null = null;
+  private runId: number | null = null;
+  private mouseMoveId: number | null = null;
   private renderTime = 0;
   private finished = false;
   private playing = false;
@@ -57,10 +63,32 @@ class MotionCanvasPlayer extends HTMLElement {
     this.button = this.root.querySelector('.button');
 
     this.overlay.addEventListener('click', this.handleClick);
+    this.overlay.addEventListener('mousemove', this.handleMouseMove);
+    this.overlay.addEventListener('mouseleave', this.handleMouseLeave);
     this.setState(State.Initial);
   }
 
+  private handleMouseMove = () => {
+    if (this.mouseMoveId) {
+      clearTimeout(this.mouseMoveId);
+    }
+    this.mouseMoveId = window.setTimeout(() => {
+      this.mouseMoveId = null;
+      this.updateClass();
+    }, 2000);
+    this.updateClass();
+  };
+
+  private handleMouseLeave = () => {
+    if (this.mouseMoveId) {
+      clearTimeout(this.mouseMoveId);
+      this.mouseMoveId = null;
+      this.updateClass();
+    }
+  };
+
   private handleClick = () => {
+    this.handleMouseMove();
     this.setPlaying(!this.playing);
     this.button.animate(
       [
@@ -80,15 +108,23 @@ class MotionCanvasPlayer extends HTMLElement {
   }
 
   private setPlaying(value: boolean) {
-    if (this.state === State.Ready && value) {
+    if (this.state === State.Ready && (value || this.auto)) {
       this.playing = true;
       this.request();
     } else {
       this.playing = false;
     }
+    this.updateClass();
+  }
 
+  private updateClass() {
     this.overlay.className = `overlay state-${this.state}`;
     this.overlay.classList.toggle('playing', this.playing);
+    this.overlay.classList.toggle('auto', this.auto);
+    this.overlay.classList.toggle(
+      'hover',
+      this.mouseMoveId !== null && !this.auto,
+    );
   }
 
   private shouldPlay() {
@@ -145,8 +181,8 @@ class MotionCanvasPlayer extends HTMLElement {
   }
 
   private request() {
-    this.requestId ??= requestAnimationFrame(async time => {
-      this.requestId = null;
+    this.runId ??= requestAnimationFrame(async time => {
+      this.runId = null;
       if (time - this.renderTime >= 990 / this.project.framerate) {
         this.renderTime = time;
         if (!this.shouldPlay()) return;
@@ -165,6 +201,9 @@ class MotionCanvasPlayer extends HTMLElement {
 
   private attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     switch (name) {
+      case 'auto':
+        this.setPlaying(true);
+        break;
       case 'src':
         this.updateSource(newValue);
         break;
