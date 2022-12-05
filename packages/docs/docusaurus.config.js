@@ -114,7 +114,7 @@ const config = {
       {
         routeBasePath: '/',
         sidebarPath: 'sidebars.js',
-        exclude: ['**/core-api/*.md', '**/legacy-api/*.md'],
+        exclude: ['**/core-api/*.md', '**/2d-api/*.md'],
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
       },
@@ -137,7 +137,7 @@ const config = {
         out: 'core-api',
         excludeExternals: true,
         entryPoints: [
-          '../core/src',
+          '../core/',
           '../core/src/decorators',
           '../core/src/events',
           '../core/src/flow',
@@ -157,20 +157,18 @@ const config = {
     [
       'docusaurus-plugin-typedoc',
       {
-        id: 'legacy',
-        out: 'legacy-api',
+        id: '2d',
+        out: '2d-api',
         excludeExternals: true,
         entryPoints: [
-          '../legacy/src/animations',
-          '../legacy/src/components',
-          '../legacy/src/decorators',
-          '../legacy/src/helpers',
-          '../legacy/src/scenes',
-          '../legacy/src/styles',
-          '../legacy/src/themes',
-          '../legacy/src/utils',
+          '../2d/src/components',
+          '../2d/src/curves',
+          '../2d/src/decorators',
+          '../2d/src/partials',
+          '../2d/src/scenes',
+          '../2d/src/utils',
         ],
-        tsconfig: '../legacy/tsconfig.json',
+        tsconfig: '../2d/tsconfig.json',
       },
     ],
   ],

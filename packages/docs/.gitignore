@@ -8,7 +8,8 @@
 .docusaurus
 .cache-loader
 docs/core-api
-docs/legacy-api
+docs/2d-api
+static/examples
 
 # Misc
 .DS_Store

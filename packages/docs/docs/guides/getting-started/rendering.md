@@ -2,7 +2,7 @@
 sidebar_position: 2
 ---
 
-# Rendering an Animation
+# Rendering
 
 To render an animation, open the Rendering panel in the top left of the screen
 using the button with the icon below.
