@@ -6,10 +6,9 @@ import {
   Scene,
   SceneRenderEvent,
 } from '@motion-canvas/core/lib/scenes';
-import {View2D} from './View2D';
 import {useScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
-import {Node} from '../components';
+import {Node, View2D} from '../components';
 
 export function use2DView(): View2D | null {
   const scene = useScene();
