@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0-alpha.3](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.2...v12.0.0-alpha.3) (2022-12-05)
+
+
+### Bug Fixes
+
+* fix player state not being saved ([#85](https://github.com/motion-canvas/motion-canvas/issues/85)) ([74b54b9](https://github.com/motion-canvas/motion-canvas/commit/74b54b970d1287e80fe2334a034844ad6a80c23b))
+* the resolution fields in Rendering no longer reset each other ([#73](https://github.com/motion-canvas/motion-canvas/issues/73)) ([ddabec5](https://github.com/motion-canvas/motion-canvas/commit/ddabec549be3cecec27cf9f5643b036e12a83472))
+
+
+### Features
+
+* add basic logger ([#88](https://github.com/motion-canvas/motion-canvas/issues/88)) ([3d82e86](https://github.com/motion-canvas/motion-canvas/commit/3d82e863af3dc88b3709adbcd0b84e790d05c3b8)), closes [#17](https://github.com/motion-canvas/motion-canvas/issues/17)
+* add basic transform to Node class ([#83](https://github.com/motion-canvas/motion-canvas/issues/83)) ([9e114c8](https://github.com/motion-canvas/motion-canvas/commit/9e114c8830a99c78e6a4fd9265b0e7552758af14))
+* add inspection ([#82](https://github.com/motion-canvas/motion-canvas/issues/82)) ([4d7f2ae](https://github.com/motion-canvas/motion-canvas/commit/4d7f2aee6daeda1a2146b632dfdc28b455295776))
+* add video node ([#86](https://github.com/motion-canvas/motion-canvas/issues/86)) ([f4aa654](https://github.com/motion-canvas/motion-canvas/commit/f4aa65437a18cc85b00199f80cd5e04654c00c4b))
+* animation player ([#92](https://github.com/motion-canvas/motion-canvas/issues/92)) ([8155118](https://github.com/motion-canvas/motion-canvas/commit/8155118eb13dc2a8b422b81aabacc923ce2f919b))
+* make exporting concurrent ([4f9ef8d](https://github.com/motion-canvas/motion-canvas/commit/4f9ef8d40d9d9c1147e2edfc0766c5ea5cc4297c))
+* open time events in editor ([#87](https://github.com/motion-canvas/motion-canvas/issues/87)) ([74b781d](https://github.com/motion-canvas/motion-canvas/commit/74b781d57fca7ef1d10904673276f2a7354c01b8))
+* unify core types ([#71](https://github.com/motion-canvas/motion-canvas/issues/71)) ([9c5853d](https://github.com/motion-canvas/motion-canvas/commit/9c5853d8bc65204693c38109a25d1fefd44241b7))
+
+
+
+
+
 # [12.0.0-alpha.2](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.1...v12.0.0-alpha.2) (2022-09-07)
 
 **Note:** Version bump only for package @motion-canvas/ui
