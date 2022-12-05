@@ -30,10 +30,11 @@ import {
 } from '@motion-canvas/core/lib/utils';
 import {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
-import {View2D, use2DView} from '../scenes';
+import {use2DView} from '../scenes';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
+import type {View2D} from './View2D';
 
 export interface NodeProps {
   ref?: Reference<any>;
