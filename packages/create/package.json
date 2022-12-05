@@ -21,6 +21,7 @@
     "url": "https://github.com/motion-canvas/motion-canvas.git"
   },
   "devDependencies": {
+    "@motion-canvas/2d": "^12.0.0-alpha.3",
     "@motion-canvas/core": "^12.0.0-alpha.3",
     "@motion-canvas/ui": "^12.0.0-alpha.3",
     "@motion-canvas/vite-plugin": "^12.0.0-alpha.3"
