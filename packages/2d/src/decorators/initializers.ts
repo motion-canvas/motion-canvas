@@ -20,8 +20,13 @@ export function addInitializer<T>(target: any, initializer: Initializer<T>) {
 
 export function initialize(target: any, context: any) {
   if (target[INITIALIZERS]) {
-    target[INITIALIZERS].forEach((initializer: Initializer<any>) =>
-      initializer(target, context),
-    );
+    try {
+      target[INITIALIZERS].forEach((initializer: Initializer<any>) =>
+        initializer(target, context),
+      );
+    } catch (e: any) {
+      e.inspect ??= target.key;
+      throw e;
+    }
   }
 }

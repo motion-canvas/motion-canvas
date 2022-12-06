@@ -52,41 +52,9 @@ export class View2D extends Layout {
   }
 
   public override render(context: CanvasRenderingContext2D) {
-    const currentMatrix = this.localToParent();
-    const customMatrix = context.getTransform();
-    if (
-      customMatrix.a !== currentMatrix.a ||
-      customMatrix.b !== currentMatrix.b ||
-      customMatrix.c !== currentMatrix.c ||
-      customMatrix.d !== currentMatrix.d ||
-      customMatrix.e !== currentMatrix.e ||
-      customMatrix.f !== currentMatrix.f
-    ) {
-      this.position
-        .x(customMatrix.m41)
-        .position.y(customMatrix.m42)
-        .scale.x(
-          Math.sqrt(
-            customMatrix.m11 * customMatrix.m11 +
-              customMatrix.m12 * customMatrix.m12,
-          ),
-        )
-        .scale.y(
-          Math.sqrt(
-            customMatrix.m21 * customMatrix.m21 +
-              customMatrix.m22 * customMatrix.m22,
-          ),
-        )
-        .rotation(Math.atan2(customMatrix.m12, customMatrix.m11));
-    }
-
     this.computedSize();
     this.computedPosition();
     super.render(context);
-  }
-
-  protected override transformContext() {
-    // do nothing
   }
 
   protected override requestLayoutUpdate() {

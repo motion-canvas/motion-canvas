@@ -308,12 +308,12 @@ export class Node implements Promisable<Node> {
   public readonly key: string;
 
   public constructor({children, key, ...rest}: NodeProps) {
+    this.key = use2DView()?.registerNode(this, key) ?? key ?? '';
     initialize(this, {defaults: rest});
     for (const {signal} of this) {
       signal.reset();
     }
     this.add(children);
-    this.key = use2DView()?.registerNode(this, key) ?? key ?? '';
   }
 
   @computed()

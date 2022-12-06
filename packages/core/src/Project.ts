@@ -227,7 +227,9 @@ export class Project {
     } else {
       this.context.clearRect(0, 0, this.width, this.height);
     }
-    this.context.drawImage(this.previousBuffer.canvas, 0, 0);
+    if (this.previousScene) {
+      this.context.drawImage(this.previousBuffer.canvas, 0, 0);
+    }
     this.context.drawImage(this.buffer.canvas, 0, 0);
   }
 
