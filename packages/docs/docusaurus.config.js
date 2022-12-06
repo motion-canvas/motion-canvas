@@ -115,6 +115,7 @@ const config = {
         routeBasePath: '/',
         sidebarPath: 'sidebars.js',
         exclude: ['**/core-api/*.md', '**/2d-api/*.md'],
+        showLastUpdateAuthor: true,
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
       },

@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-import '@motion-canvas/player';
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
 
 # Quickstart
 
@@ -93,11 +93,7 @@ reflected in the preview. You should see a gray circle in the preview pane at
 the top right of the web application. Press the play button to see the circle
 animate across the screen.
 
-<motion-canvas-player
-style={{maxWidth: 480}}
-quality={0.5}
-src="/examples/quickstart.js"
-/>
+<AnimationPlayer small name="quickstart" />
 
 Depending on the size of your browser, you may want to zoom the preview out by
 scrolling down on your mouse wheel while hovering over the preview panel.

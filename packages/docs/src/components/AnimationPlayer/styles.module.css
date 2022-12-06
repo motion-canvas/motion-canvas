@@ -1,0 +1,61 @@
+.container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--ifm-global-radius);
+  background-color: var(--ifm-background-color);
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.container.small {
+  max-width: 480px;
+  margin: 0 auto var(--ifm-leading);
+}
+
+.banner {
+  aspect-ratio: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(56vw, 320px);
+}
+
+.player {
+  aspect-ratio: 16 / 9;
+}
+
+.banner .player {
+  min-width: min(150vw, 960px);
+}
+
+.link {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: block;
+  opacity: 0.54;
+  transition: opacity 0.1s;
+}
+
+.link span {
+  opacity: 0;
+  transition: opacity 0.1s;
+}
+
+.link:focus,
+.link:hover,
+.container:hover .player[data-overlay] + .link {
+  opacity: 1;
+}
+
+.link:focus span,
+.link:hover span,
+.container:hover .player[data-overlay] + .link span {
+  opacity: 1;
+}
+
+.icon {
+  margin-bottom: -0.4rem;
+  margin-left: 0.3rem;
+}
