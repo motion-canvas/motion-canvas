@@ -8,7 +8,7 @@ decorate(sequence, threadable());
  *
  * @remarks
  * The function doesn't wait until the previous task in the sequence has
- * finished. Once the delay has passed, the next task will start event if
+ * finished. Once the delay has passed, the next task will start even if
  * the previous is still running.
  *
  * @example

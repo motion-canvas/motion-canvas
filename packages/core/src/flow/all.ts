@@ -6,7 +6,7 @@ decorate(all, threadable());
  * Run all tasks concurrently and wait for all of them to finish.
  *
  * @example
- * ```
+ * ```ts
  * // current time: 0s
  * yield* all(
  *   rect.fill('#ff0000', 2),
