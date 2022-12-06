@@ -8,6 +8,7 @@ import {
   useStorage,
   useSubscribable,
   usePlayerState,
+  useStateChange,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
@@ -63,6 +64,17 @@ export function View() {
   useEffect(() => {
     player.project.setCanvas(viewportRef.current);
   }, [playerState.colorSpace]);
+
+  useStateChange(
+    ([scale]) => {
+      console.log(playerState.scale);
+      const zoom = (state.zoom * scale) / playerState.scale;
+      if (!isNaN(zoom) && zoom > 0) {
+        setState({...state, zoom});
+      }
+    },
+    [playerState.scale],
+  );
 
   useSubscribable(
     player.onReloaded,

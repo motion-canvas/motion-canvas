@@ -1,4 +1,5 @@
 export * from './Button';
+export * from './InputSelect';
 export * from './Group';
 export * from './Input';
 export * from './Icon';

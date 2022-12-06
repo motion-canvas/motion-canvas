@@ -35,7 +35,7 @@ export function Timeline() {
   const player = usePlayer();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
-  const {duration} = usePlayerState();
+  const {duration, fps} = usePlayerState();
   const rect = useSize(containerRef);
   const [offset, setOffset] = useState(0);
   const [scale, setScale] = useState(1);
@@ -95,9 +95,10 @@ export function Timeline() {
 
   useStateChange(
     ([prevDuration, prevWidth]) => {
+      const newDuration = duration / fps;
       let newScale = scale;
-      if (prevDuration !== 0 && duration !== 0) {
-        newScale *= duration / prevDuration;
+      if (prevDuration !== 0 && newDuration !== 0) {
+        newScale *= newDuration / prevDuration;
       }
       if (prevWidth !== 0 && rect.width !== 0) {
         newScale *= prevWidth / rect.width;
@@ -106,7 +107,7 @@ export function Timeline() {
         setScale(clamp(ZOOM_MIN, ZOOM_MAX, newScale));
       }
     },
-    [duration, rect.width],
+    [duration / fps, rect.width],
   );
 
   useDocumentEvent(

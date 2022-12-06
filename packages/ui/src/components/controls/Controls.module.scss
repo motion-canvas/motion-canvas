@@ -113,6 +113,26 @@
   }
 }
 
+.inputSelect {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  .input {
+    width: 0;
+    border-radius: 4px 0 0 4px;
+    border-right: 1px solid var(--surface-color);
+  }
+
+  .select {
+    font-size: 0;
+    flex-grow: 0;
+    flex-basis: 0;
+    padding-left: 12px;
+    border-radius: 0 4px 4px 0;
+  }
+}
+
 .input[type='number'] {
   text-align: right;
   &::-webkit-inner-spin-button,
@@ -242,4 +262,10 @@
 }
 .locate:after {
   -webkit-mask-image: url('../../img/icons/locate.svg');
+}
+.add:after {
+  -webkit-mask-image: url('../../img/icons/add.svg');
+}
+.unfoldMore:after {
+  -webkit-mask-image: url('../../img/icons/unfold_more.svg');
 }
