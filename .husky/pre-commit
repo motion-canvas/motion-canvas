@@ -2,4 +2,4 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 npx lint-staged
-npx --no -- jest --onlyChanged --config=packages/core/jest.config.js
+npx --no -- vitest --changed --run -r packages/core/

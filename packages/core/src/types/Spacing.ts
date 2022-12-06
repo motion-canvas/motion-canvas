@@ -79,6 +79,10 @@ export class Spacing implements Type {
     this.left = one.left;
   }
 
+  public lerp(to: Spacing, value: number) {
+    return Spacing.lerp(this, to, value);
+  }
+
   public scale(value: number): Spacing {
     return new Spacing(
       this.top * value,

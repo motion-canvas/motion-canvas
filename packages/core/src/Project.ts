@@ -3,7 +3,7 @@ import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
-import {createSignal, ifHot} from './utils';
+import {createSignal} from './utils';
 import {Logger} from './Logger';
 
 const EXPORT_FRAME_LIMIT = 256;
@@ -101,10 +101,10 @@ export class Project {
       return;
     }
 
-    this.buffer = this.buffer.canvas.getContext('2d', {
+    this.bufferContext = this.buffer.getContext('2d', {
       colorSpace: this._colorSpace,
     });
-    this.previousBuffer = this.previousBuffer.canvas.getContext('2d', {
+    this.previousBufferContext = this.previousBuffer.getContext('2d', {
       colorSpace: this._colorSpace,
     });
     this.context = this.canvas.getContext('2d', {
@@ -112,12 +112,12 @@ export class Project {
     });
 
     this.canvas.width =
-      this.buffer.canvas.width =
-      this.previousBuffer.canvas.width =
+      this.buffer.width =
+      this.previousBuffer.width =
         this.width * this._resolutionScale;
     this.canvas.height =
-      this.buffer.canvas.height =
-      this.previousBuffer.canvas.height =
+      this.buffer.height =
+      this.previousBuffer.height =
         this.height * this._resolutionScale;
 
     this.render();
@@ -161,8 +161,10 @@ export class Project {
   private background: string | false;
   private canvas: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
-  private buffer = document.createElement('canvas').getContext('2d');
-  private previousBuffer = document.createElement('canvas').getContext('2d');
+  private buffer = document.createElement('canvas');
+  private bufferContext: CanvasRenderingContext2D;
+  private previousBuffer = document.createElement('canvas');
+  private previousBufferContext: CanvasRenderingContext2D;
   private exportCounter = 0;
 
   private width: number;
@@ -193,11 +195,11 @@ export class Project {
     }
     this.scenes.current = [...scenes];
 
-    ifHot(hot => {
-      hot.on('motion-canvas:export-ack', ({frame}) => {
+    if (import.meta.hot) {
+      import.meta.hot.on('motion-canvas:export-ack', ({frame}) => {
         this.renderLookup[frame]?.();
       });
-    });
+    }
   }
 
   public transformCanvas(context: CanvasRenderingContext2D) {
@@ -214,10 +216,15 @@ export class Project {
   public async render() {
     if (!this.canvas) return;
 
-    this.transformCanvas(this.buffer);
-    this.transformCanvas(this.previousBuffer);
-    await this.previousScene?.render(this.previousBuffer);
-    await this.currentScene.current?.render(this.buffer);
+    if (this.previousScene) {
+      this.previousBufferContext ??= this.previousBuffer.getContext('2d');
+      this.transformCanvas(this.previousBufferContext);
+      await this.previousScene.render(this.previousBufferContext);
+    }
+
+    this.bufferContext ??= this.buffer.getContext('2d');
+    this.transformCanvas(this.bufferContext);
+    await this.currentScene.current?.render(this.bufferContext);
 
     if (this.background) {
       this.context.save();
@@ -227,10 +234,12 @@ export class Project {
     } else {
       this.context.clearRect(0, 0, this.width, this.height);
     }
+
     if (this.previousScene) {
-      this.context.drawImage(this.previousBuffer.canvas, 0, 0);
+      this.context.drawImage(this.previousBuffer, 0, 0);
     }
-    this.context.drawImage(this.buffer.canvas, 0, 0);
+
+    this.context.drawImage(this.buffer, 0, 0);
   }
 
   private reloadAll() {
@@ -331,8 +340,7 @@ export class Project {
       this.logger.warn(`Frame no. ${frame} is already being exported.`);
       return;
     }
-
-    await ifHot(async hot => {
+    if (import.meta.hot) {
       while (this.exportCounter > EXPORT_FRAME_LIMIT) {
         await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
       }
@@ -342,14 +350,14 @@ export class Project {
         this.exportCounter--;
         delete this.renderLookup[frame];
       };
-      hot.send('motion-canvas:export', {
+      import.meta.hot.send('motion-canvas:export', {
         frame,
         isStill,
         data: this.canvas.toDataURL(this._fileType, this._quality),
         mimeType: this._fileType,
         project: this.name,
       });
-    });
+    }
   }
 
   public syncAudio(frameOffset = 0) {

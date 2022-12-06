@@ -83,7 +83,7 @@ export function deepLerp(from: any, to: any, value: number): any {
   }
 
   if ('lerp' in from) {
-    return from.lerp(from, to, value);
+    return from.lerp(to, value);
   }
 
   if (from && to && typeof from === 'object' && typeof to === 'object') {

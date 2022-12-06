@@ -1,3 +1,4 @@
+import {describe, test, expect, vi} from 'vitest';
 import {createSignal} from './createSignal';
 import {createComputed} from './createComputed';
 
@@ -26,7 +27,7 @@ describe('createComputed()', () => {
   test('Value is cached and recalculated only when necessary', () => {
     const a = createSignal(1);
 
-    const value = jest.fn(() => a() * 2);
+    const value = vi.fn(() => a() * 2);
     const c = createComputed(value);
 
     expect(value.mock.calls.length).toBe(0);

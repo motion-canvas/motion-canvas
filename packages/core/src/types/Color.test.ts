@@ -1,3 +1,4 @@
+import {describe, test, expect} from 'vitest';
 import {Color} from './Color';
 
 describe('Color.lerp', () => {

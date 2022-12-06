@@ -1,4 +1,4 @@
-import {Color, InterpolationMode, mix} from 'chroma-js';
+import {Color, ColorSpace, InterpolationMode, mix} from 'chroma-js';
 import type {Type} from './Type';
 import type {InterpolationFunction} from '../tweening';
 
@@ -13,6 +13,11 @@ export type PossibleColor =
 declare module 'chroma-js' {
   interface Color extends Type {
     serialize(): string;
+    lerp(
+      to: ColorInterface | string,
+      value: number,
+      colorSpace?: ColorSpace,
+    ): ColorInterface;
   }
   type ColorInterface = import('chroma-js').Color;
   type ColorSpace = import('chroma-js').InterpolationMode;
@@ -55,6 +60,15 @@ Color.prototype.toSymbol = () => {
 
 Color.prototype.serialize = function (this: Color): SerializedColor {
   return this.css();
+};
+
+Color.prototype.lerp = function (
+  this: Color,
+  to: Color,
+  value: number,
+  colorSpace?: ColorSpace,
+) {
+  return Color.lerp(this, to, value, colorSpace);
 };
 
 export {Color};

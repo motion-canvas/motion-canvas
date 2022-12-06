@@ -16,13 +16,10 @@ import {
   SignalUtils,
   useLogger,
   SignalGenerator,
+  capitalize,
 } from '@motion-canvas/core/lib/utils';
 import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-
-export function capitalize<T extends string>(value: T): Capitalize<T> {
-  return <Capitalize<T>>(value[0].toUpperCase() + value.slice(1));
-}
 
 export interface PropertyMetadata<T> {
   default?: T;

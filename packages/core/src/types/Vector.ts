@@ -1,4 +1,5 @@
-import {arcLerp, map} from '../tweening';
+import {arcLerp} from '../tweening';
+import {map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
 import {Type} from './Type';
 
@@ -163,6 +164,10 @@ export class Vector2 implements Type {
 
     this.x = one.x;
     this.y = one.y;
+  }
+
+  public lerp(to: Vector2, value: Vector2 | number) {
+    return Vector2.lerp(this, to, value);
   }
 
   public getOriginOffset(origin: Origin | Direction) {

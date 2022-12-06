@@ -1,5 +1,5 @@
 import {ValueDispatcher} from './events';
-import {ifHot, useLogger} from './utils';
+import {useLogger} from './utils';
 
 const META_VERSION = 1;
 
@@ -52,7 +52,8 @@ export class Meta<T extends Metadata = Metadata> {
       ...this.data.current,
       ...data,
     };
-    await ifHot(async hot => {
+
+    if (import.meta.hot) {
       if (this.source === false) {
         return;
       }
@@ -80,12 +81,12 @@ export class Meta<T extends Metadata = Metadata> {
           delete Meta.sourceLookup[source];
           resolve();
         };
-        hot.send('motion-canvas:meta', {
+        import.meta.hot.send('motion-canvas:meta', {
           source,
           data: this.data.current,
         });
       });
-    });
+    }
   }
 
   /**
@@ -101,10 +102,10 @@ export class Meta<T extends Metadata = Metadata> {
   private static sourceLookup: Record<string, Callback> = {};
 
   static {
-    ifHot(hot => {
-      hot.on('motion-canvas:meta-ack', ({source}) => {
+    if (import.meta.hot) {
+      import.meta.hot.on('motion-canvas:meta-ack', ({source}) => {
         this.sourceLookup[source]?.();
       });
-    });
+    }
   }
 }
