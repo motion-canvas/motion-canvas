@@ -98,6 +98,7 @@ export abstract class Shape extends Layout {
     return super.getCacheRect().expand(this.lineWidth() / 2);
   }
 
+  @computed()
   protected getPath(): Path2D {
     return new Path2D();
   }

@@ -222,7 +222,7 @@ export class Project {
     if (this.background) {
       this.context.save();
       this.context.fillStyle = this.background;
-      this.context.fillRect(0, 0, this.width, this.height);
+      this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.context.restore();
     } else {
       this.context.clearRect(0, 0, this.width, this.height);

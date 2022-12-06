@@ -459,13 +459,22 @@ export class Layout extends Node {
   @computed()
   protected requestLayoutUpdate() {
     const parent = this.parentTransform();
-    if (this.isLayoutRoot() || !parent) {
-      this.view()?.element.append(this.element);
+    if (this.appendedToView()) {
       parent?.requestFontUpdate();
       this.updateLayout();
     } else {
-      parent.requestLayoutUpdate();
+      parent!.requestLayoutUpdate();
     }
+  }
+
+  @computed()
+  protected appendedToView() {
+    const root = this.isLayoutRoot();
+    if (root) {
+      this.view()?.element.append(this.element);
+    }
+
+    return root;
   }
 
   /**
