@@ -1,3 +1,4 @@
+export * from './capitalize';
 export * from './createComputed';
 export * from './createComputedAsync';
 export * from './createSignal';
@@ -8,4 +9,3 @@ export * from './useScene';
 export * from './useThread';
 export * from './useTime';
 export * from './useContext';
-export * from './ifHot';

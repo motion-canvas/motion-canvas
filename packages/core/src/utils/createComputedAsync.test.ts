@@ -1,3 +1,4 @@
+import {describe, test, expect} from 'vitest';
 import {createSignal} from './createSignal';
 import {createComputedAsync} from './createComputedAsync';
 

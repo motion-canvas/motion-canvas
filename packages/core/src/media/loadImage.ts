@@ -1,5 +1,5 @@
-const canvas = document.createElement('canvas');
-const context = canvas.getContext('2d');
+let canvas: HTMLCanvasElement;
+let context: CanvasRenderingContext2D;
 
 export type ImageDataSource = CanvasImageSource & {
   width: number;
@@ -24,6 +24,9 @@ export function loadAnimation(sources: string[]): Promise<HTMLImageElement[]> {
 }
 
 export function getImageData(image: ImageDataSource) {
+  canvas ??= document.createElement('canvas');
+  context ??= canvas.getContext('2d');
+
   canvas.width = image.width;
   canvas.height = image.height;
   context.clearRect(0, 0, image.width, image.height);

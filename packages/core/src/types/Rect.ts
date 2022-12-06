@@ -119,6 +119,10 @@ export class Rect implements Type {
     return new Rect(minX, minY, maxX - minX, maxY - minY);
   }
 
+  public lerp(to: Rect, value: number | Vector2 | Rect) {
+    return Rect.lerp(this, to, value);
+  }
+
   public get position() {
     return new Vector2(this.x, this.y);
   }

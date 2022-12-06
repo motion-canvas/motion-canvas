@@ -1,3 +1,4 @@
+import {describe, test, beforeEach, expect} from 'vitest';
 import {threads} from './threads';
 import {noop, run} from '../flow';
 import {setProject} from '../utils';

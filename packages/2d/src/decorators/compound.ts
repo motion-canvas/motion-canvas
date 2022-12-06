@@ -2,13 +2,9 @@ import {
   SignalValue,
   isReactive,
   useLogger,
-} from '@motion-canvas/core/lib/utils';
-import {
   capitalize,
-  createProperty,
-  getPropertyMetaOrCreate,
-  Property,
-} from './property';
+} from '@motion-canvas/core/lib/utils';
+import {createProperty, getPropertyMetaOrCreate, Property} from './property';
 import {addInitializer} from './initializers';
 import {deepLerp} from '@motion-canvas/core/lib/tweening';
 

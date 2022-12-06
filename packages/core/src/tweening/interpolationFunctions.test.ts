@@ -1,3 +1,4 @@
+import {describe, test, expect, vi} from 'vitest';
 import {deepLerp} from './interpolationFunctions';
 import {Vector2} from '../types';
 
@@ -79,11 +80,13 @@ describe('deepLerp', () => {
   });
 
   test('invokes native interpolation function', () => {
+    const spy = vi.spyOn(Vector2, 'lerp');
     const args: [Vector2, Vector2, number] = [
       new Vector2(50, 65),
       new Vector2(10, 100),
       1 / 2,
     ];
     expect(deepLerp(...args)).toEqual(Vector2.lerp(...args));
+    expect(spy).toHaveBeenCalledTimes(2);
   });
 });

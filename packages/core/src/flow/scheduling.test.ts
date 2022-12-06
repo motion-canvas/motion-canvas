@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import {describe, test, beforeEach, expect} from 'vitest';
 import {Project} from '../Project';
-import {setProject, useProject, useThread, useTime} from '../utils';
+import {setProject, useProject, useTime} from '../utils';
 import {threads} from '../threading';
 import {waitFor} from './scheduling';
 
