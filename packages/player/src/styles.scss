@@ -32,12 +32,13 @@ $states: ('initial' 'loading' 'ready' 'error');
     cursor: pointer;
   }
 
-  &:not(.hover):not(.auto):hover {
+  &.playing:not(.hover):hover {
     cursor: none;
   }
 
   &.hover,
-  &:not(.playing) {
+  &.state-ready:focus-within,
+  &.state-ready:not(.playing) {
     opacity: 1;
 
     .button {
@@ -46,8 +47,14 @@ $states: ('initial' 'loading' 'ready' 'error');
     }
   }
 
-  &.auto .button {
-    display: none;
+  &.state-loading,
+  &.state-error {
+    opacity: 1;
+    transition: opacity 1s;
+  }
+
+  &.state-ready.auto {
+    opacity: 0;
   }
 }
 
@@ -56,21 +63,39 @@ $states: ('initial' 'loading' 'ready' 'error');
   max-width: 96px;
   aspect-ratio: 1;
   scale: 0.5;
-  transition: scale 0.1s ease-in;
+  transition: scale 0.1s ease-in, opacity 0.1s;
+  background-color: transparent;
+  border: none;
 
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  opacity: 0.87;
+  opacity: 0.54;
+  cursor: inherit;
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAwIDI0IDI0IiB3aWR0aD0iMjRweCIgZmlsbD0iI2ZmZmZmZiI+PHBhdGggZD0iTTAgMGgyNHYyNEgwVjB6IiBmaWxsPSJub25lIi8+PHBhdGggZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bS0yIDE0LjV2LTlsNiA0LjUtNiA0LjV6Ii8+PC9zdmc+');
 
   .playing & {
     background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDI0IDI0IiBoZWlnaHQ9IjI0cHgiIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0cHgiIGZpbGw9IiNmZmZmZmYiPjxnPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjxyZWN0IGZpbGw9Im5vbmUiIGhlaWdodD0iMjQiIHdpZHRoPSIyNCIvPjwvZz48Zz48Zy8+PHBhdGggZD0iTTEyLDJDNi40OCwyLDIsNi40OCwyLDEyczQuNDgsMTAsMTAsMTBzMTAtNC40OCwxMC0xMFMxNy41MiwyLDEyLDJ6IE0xMSwxNkg5VjhoMlYxNnogTTE1LDE2aC0yVjhoMlYxNnoiLz48L2c+PC9zdmc+');
+  }
+
+  &:focus,
+  .overlay:hover & {
+    opacity: 0.87;
+  }
+
+  .auto & {
+    display: none;
   }
 }
 
 .canvas {
   width: 100%;
   display: block;
+  opacity: 0;
+  transition: opacity 0.1s;
+
+  &.state-ready {
+    opacity: 1;
+  }
 }
 
 .message {
