@@ -16,4 +16,6 @@ export enum IconType {
   bug = 'bug',
   clear = 'clear',
   locate = 'locate',
+  add = 'add',
+  unfoldMore = 'unfoldMore',
 }

@@ -1,5 +1,16 @@
+import styles from './Sidebar.module.scss';
+
 import {usePlayerState} from '../../hooks';
-import {Button, Group, Input, Label, Select} from '../controls';
+import {
+  Button,
+  Group,
+  Icon,
+  IconType,
+  Input,
+  InputSelect,
+  Label,
+  Select,
+} from '../controls';
 import {Pane} from '../tabs';
 import {usePlayer} from '../../contexts';
 import type {
@@ -29,6 +40,11 @@ export function Rendering() {
     {value: 'image/webp', text: 'webp'},
   ];
 
+  const frameRates = [
+    {value: '30', text: '30 FPS'},
+    {value: '60', text: '60 FPS'},
+  ];
+
   return (
     <Pane title="Rendering">
       <Group>
@@ -55,14 +71,14 @@ export function Rendering() {
       </Group>
       <Group>
         <Label>frame rate</Label>
-        <Input
+        <InputSelect
           type="number"
           min={1}
-          value={state.fps}
-          onChange={event => {
-            const value = parseInt((event.target as HTMLInputElement).value);
-            player.setFramerate(value);
+          value={state.fps.toString()}
+          onChange={value => {
+            player.setFramerate(parseInt(value));
           }}
+          options={frameRates}
         />
       </Group>
       <Group>
@@ -77,7 +93,7 @@ export function Rendering() {
             player.project.setSize(value, height);
           }}
         />
-        x
+        <Icon className={styles.times} type={IconType.add} />
         <Input
           type="number"
           min={1}
@@ -113,19 +129,23 @@ export function Rendering() {
           onChange={value => player.setFileType(value as CanvasOutputMimeType)}
         />
       </Group>
-      <Group>
-        <Label>quality</Label>
-        <Input
-          type="number"
-          min={0}
-          max={1}
-          value={state.quality}
-          onChange={event => {
-            const value = parseFloat((event.target as HTMLInputElement).value);
-            player.setQuality(value);
-          }}
-        />
-      </Group>
+      {state.fileType !== 'image/png' && (
+        <Group>
+          <Label>quality (%)</Label>
+          <Input
+            type="number"
+            min={0}
+            max={100}
+            value={state.quality * 100}
+            onChange={event => {
+              const value = parseFloat(
+                (event.target as HTMLInputElement).value,
+              );
+              player.setQuality(value / 100);
+            }}
+          />
+        </Group>
+      )}
       <Group>
         <Label />
         <Button main onClick={() => player.toggleRendering()}>

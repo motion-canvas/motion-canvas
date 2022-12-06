@@ -19,6 +19,8 @@ function renderRoot(vnode: ComponentChild) {
 }
 
 export function editor(project: Project) {
+  Error.stackTraceLimit = Infinity;
+
   project.logger.onLogged.subscribe(log => {
     const {level, message, stack, object, durationMs, ...rest} = log;
     const fn = console[level as 'error'] ?? console.log;

@@ -39,7 +39,7 @@ export function Debug() {
     ctx.save();
     scene.drawOverlay(element, matrix, ctx);
     ctx.restore();
-  }, [state, scene, inspectedElement, time]);
+  }, [state, scene, inspectedElement, time, scale]);
 
   return (
     <canvas

@@ -1,17 +1,25 @@
 import styles from './Controls.module.scss';
+import {classes} from '../../utils';
 
-interface SelectProps<T> {
+export interface SelectProps<T> {
   title?: string;
   options: {value: T; text: string}[];
+  className?: string;
   value: T;
   onChange: (value: T) => void;
 }
 
-export function Select<T>({options, value, onChange, title}: SelectProps<T>) {
+export function Select<T>({
+  options,
+  value,
+  onChange,
+  title,
+  className,
+}: SelectProps<T>) {
   return (
     <select
       title={title}
-      className={styles.select}
+      className={classes(styles.select, className)}
       value={options.findIndex(option => option.value === value)}
       onChange={event =>
         onChange(
