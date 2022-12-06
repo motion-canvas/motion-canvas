@@ -23,6 +23,10 @@ class MotionCanvasPlayer extends HTMLElement {
     return !!attr;
   }
 
+  private get hover() {
+    return this.getAttribute('auto') === 'hover';
+  }
+
   private get quality() {
     const attr = this.getAttribute('quality');
     return attr ? parseFloat(attr) : 1;
@@ -53,6 +57,7 @@ class MotionCanvasPlayer extends HTMLElement {
   private renderTime = 0;
   private finished = false;
   private playing = false;
+  private connected = false;
 
   public constructor() {
     super();
@@ -65,6 +70,7 @@ class MotionCanvasPlayer extends HTMLElement {
     this.overlay.addEventListener('click', this.handleClick);
     this.overlay.addEventListener('mousemove', this.handleMouseMove);
     this.overlay.addEventListener('mouseleave', this.handleMouseLeave);
+    this.button.addEventListener('mousedown', this.handleMouseDown);
     this.setState(State.Initial);
   }
 
@@ -72,6 +78,10 @@ class MotionCanvasPlayer extends HTMLElement {
     if (this.mouseMoveId) {
       clearTimeout(this.mouseMoveId);
     }
+    if (this.hover && !this.playing) {
+      this.setPlaying(true);
+    }
+
     this.mouseMoveId = window.setTimeout(() => {
       this.mouseMoveId = null;
       this.updateClass();
@@ -80,6 +90,9 @@ class MotionCanvasPlayer extends HTMLElement {
   };
 
   private handleMouseLeave = () => {
+    if (this.hover) {
+      this.setPlaying(false);
+    }
     if (this.mouseMoveId) {
       clearTimeout(this.mouseMoveId);
       this.mouseMoveId = null;
@@ -87,7 +100,12 @@ class MotionCanvasPlayer extends HTMLElement {
     }
   };
 
+  private handleMouseDown = (e: MouseEvent) => {
+    e.preventDefault();
+  };
+
   private handleClick = () => {
+    if (this.auto) return;
     this.handleMouseMove();
     this.setPlaying(!this.playing);
     this.button.animate(
@@ -108,7 +126,7 @@ class MotionCanvasPlayer extends HTMLElement {
   }
 
   private setPlaying(value: boolean) {
-    if (this.state === State.Ready && (value || this.auto)) {
+    if (this.state === State.Ready && (value || (this.auto && !this.hover))) {
       this.playing = true;
       this.request();
     } else {
@@ -119,29 +137,39 @@ class MotionCanvasPlayer extends HTMLElement {
 
   private updateClass() {
     this.overlay.className = `overlay state-${this.state}`;
+    this.canvas.className = `canvas state-${this.state}`;
     this.overlay.classList.toggle('playing', this.playing);
     this.overlay.classList.toggle('auto', this.auto);
-    this.overlay.classList.toggle(
-      'hover',
-      this.mouseMoveId !== null && !this.auto,
-    );
+    this.overlay.classList.toggle('hover', this.mouseMoveId !== null);
+
+    if (this.connected) {
+      if (this.mouseMoveId !== null || !this.playing) {
+        this.dataset.overlay = '';
+      } else {
+        delete this.dataset.overlay;
+      }
+    }
   }
 
   private shouldPlay() {
-    return this.state === State.Ready && this.playing;
+    return this.state === State.Ready && this.playing && this.connected;
   }
 
   private async updateSource(source: string) {
-    this.setState(State.Loading);
+    this.setState(State.Initial);
 
     this.abortController?.abort();
     this.abortController = new AbortController();
 
     let project: Project;
     try {
-      project = (
-        await import(/* webpackIgnore: true */ /* @vite-ignore */ source)
-      ).default;
+      const promise = import(
+        /* webpackIgnore: true */ /* @vite-ignore */ source
+      );
+      const delay = new Promise(resolve => setTimeout(resolve, 200));
+      await Promise.any([delay, promise]);
+      this.setState(State.Loading);
+      project = (await promise).default;
     } catch (e) {
       this.setState(State.Error);
       return;
@@ -183,10 +211,10 @@ class MotionCanvasPlayer extends HTMLElement {
   private request() {
     this.runId ??= requestAnimationFrame(async time => {
       this.runId = null;
+      if (!this.shouldPlay()) return;
+
       if (time - this.renderTime >= 990 / this.project.framerate) {
         this.renderTime = time;
-        if (!this.shouldPlay()) return;
-
         try {
           await this.run();
         } catch (e) {
@@ -202,7 +230,7 @@ class MotionCanvasPlayer extends HTMLElement {
   private attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     switch (name) {
       case 'auto':
-        this.setPlaying(true);
+        this.setPlaying(this.playing);
         break;
       case 'src':
         this.updateSource(newValue);
@@ -222,9 +250,12 @@ class MotionCanvasPlayer extends HTMLElement {
   }
 
   private disconnectedCallback() {
-    if (this.playing) {
-      this.setPlaying(false);
-    }
+    this.connected = false;
+  }
+
+  private connectedCallback() {
+    this.connected = true;
+    this.request();
   }
 }
 
