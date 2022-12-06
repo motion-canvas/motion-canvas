@@ -1,0 +1,98 @@
+---
+sidebar_position: 8
+---
+
+# Configuration
+
+Motion Canvas is configured in the Vite's configuration file:
+
+```ts title="vite.config.ts"
+import {defineConfig} from 'vite';
+import motionCanvas from '@motion-canvas/vite-plugin';
+
+export default defineConfig({
+  plugins: [
+    motionCanvas({
+      // custom options
+    }),
+  ],
+});
+```
+
+### `project`
+
+- Type: `string | string[]`
+- Default: `./src/project.ts`
+
+The import path of the project file, relative to the configuration file.
+A project file must contain a default export with an instance of the `Project` class.
+
+When set to an array, the Editor will display a project selection screen,
+making it possible to change the project without restarting Vite.
+
+```ts
+motionCanvas({
+  project: [
+    // highlight-start
+    './src/firstProject.ts',
+    './src/secondProject.ts',
+  ],
+});
+```
+
+### `output`
+
+- Type: `string`
+- Default: `./output`
+
+An output path to which the animation will be saved. Relative to the configuration file.
+
+When rendering, the complete path has the following format:
+
+```
+[output]/[projectName]/[frameNumber].[extension]
+```
+
+Stills are saved to a `still` subdirectory:
+
+```
+[output]/still/[projectName]/[frameNumber].[extension]
+```
+
+### `bufferedAssets`
+
+- Type: `RegExp`
+- Default: `/\.(wav|mp3|ogg)$/`
+
+Defines which assets should be buffered before being sent to the browser.
+
+Streaming larger assets directly from the drive my cause issues with other
+applications. For instance, if an audio file is being used in the project,
+Adobe Audition will perceive it as "being used by another application"
+and refuse to override it.
+
+Buffered assets are first loaded to the memory and then streamed from
+there. This leaves the original files open for modification with hot module
+replacement still working.
+
+### `editor`
+
+- Type: `string`
+- Default: `@motion-canvas/ui`
+
+The import path of the editor package.
+
+This option can be used to develop/use an editor different than the official one.
+The path will be resolved using Node.js module resolution rules.
+It should lead to a directory containing the following files:
+
+- `editor.html` - The HTML template for the editor.
+- `styles.css` - The editor styles.
+- `main.js` - A module exporting necessary factory functions.
+
+`main.js` should export the following functions:
+
+- `editor` - Receives the project as its first argument and creates the
+  user interface.
+- `index` - Receives a list of all projects as its first argument and
+  creates the initial page for selecting a project.
