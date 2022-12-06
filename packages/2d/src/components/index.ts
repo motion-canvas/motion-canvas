@@ -1,5 +1,6 @@
 export * from './Circle';
 export * from './Image';
+export * from './Grid';
 export * from './Layout';
 export * from './Line';
 export * from './Node';

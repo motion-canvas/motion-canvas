@@ -119,6 +119,10 @@ export class Vector2 implements Type {
     return new Vector2(-this.x, -this.y);
   }
 
+  public get floored(): Vector2 {
+    return new Vector2(Math.floor(this.x), Math.floor(this.y));
+  }
+
   public get perpendicular(): Vector2 {
     return new Vector2(this.y, -this.x);
   }
