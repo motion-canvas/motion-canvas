@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "docusaurus start",
+    "start": "docusaurus start --no-open",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
@@ -22,6 +22,7 @@
     "@motion-canvas/player": "*",
     "clsx": "^1.2.0",
     "prism-react-renderer": "^1.3.5",
+    "raw-loader": "^4.0.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

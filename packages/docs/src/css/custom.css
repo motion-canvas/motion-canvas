@@ -13,10 +13,14 @@
   --ifm-color-primary-light: #33925d;
   --ifm-color-primary-lighter: #359962;
   --ifm-color-primary-lightest: #3cad6e;
-  --ifm-code-font-size: 95%;
   --ifm-background-color: #eee;
   --ifm-background-surface-color: #fff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-global-radius: 4px;
+  --ifm-font-family-base: Roboto, Noto Sans, system-ui, -apple-system, Segoe UI,
+    sans-serif;
+  --ifm-font-family-monospace: JetBrains Mono, Consolas, monospace;
+  --ifm-pre-line-height: 1.6;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -31,6 +35,16 @@ html[data-theme='dark'] {
   --ifm-background-color: #141414;
   --ifm-background-surface-color: #242424;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  --ifm-color-secondary-dark: #fff;
+  --ifm-color-success-dark: #55c244;
+  --ifm-color-info-dark: #4cb3d4;
+  --ifm-color-warning-dark: #e6a700;
+  --ifm-color-danger-dark: #e13238;
+}
+
+.alert {
+  background-color: var(--ifm-background-surface-color);
 }
 
 .footer--dark {
@@ -44,13 +58,4 @@ html {
 a.button:hover {
   color: var(--ifm-button-color);
   text-decoration: none;
-}
-
-motion-canvas-player {
-  overflow: hidden;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  margin: 0 auto var(--ifm-leading);
-  border-radius: var(--ifm-global-radius);
-  background-color: var(--ifm-background-surface-color);
 }
