@@ -26,4 +26,4 @@ declare module '*?scene' {
   export = value;
 }
 
-declare type Callback = (...args: unknown[]) => void;
+declare type Callback = (...args: any[]) => void;

@@ -1,6 +1,7 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from './ThreadGenerator';
 import {useThread} from '../utils';
+import {Thread} from './Thread';
 
 decorate(join, threadable());
 /**
@@ -51,9 +52,11 @@ export function* join(
   }
 
   const parent = useThread();
-  const threads = tasks
-    .map(task => parent.children.find(thread => thread.runner === task))
-    .filter(thread => thread);
+  const threads = <Thread[]>(
+    tasks
+      .map(task => parent.children.find(thread => thread.runner === task))
+      .filter(thread => thread)
+  );
 
   const startTime = parent.time();
   let childTime;

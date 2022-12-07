@@ -8,7 +8,7 @@ import {
 import {Meta} from '../Meta';
 import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import {PlaybackState, Project} from '../Project';
+import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
 import {consumePromises, endScene, setProject, startScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
@@ -30,8 +30,16 @@ export abstract class GeneratorScene<T>
   implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
   public readonly timeEvents: TimeEvents;
-  public project: Project;
-  public playbackInfo: PlaybackState;
+
+  public get project(): Project {
+    if (!this.currentProject) {
+      throw new Error(`Project for Scene ${this.name} has not been set.`);
+    }
+    return this.currentProject;
+  }
+  public set project(value: Project) {
+    this.currentProject = value;
+  }
 
   public get firstFrame() {
     return this.cache.current.firstFrame;
@@ -64,7 +72,7 @@ export abstract class GeneratorScene<T>
   public get onThreadChanged() {
     return this.thread.subscribable;
   }
-  private readonly thread = new ValueDispatcher<Thread>(null);
+  private readonly thread = new ValueDispatcher<Thread | null>(null);
 
   public get onRenderLifecycle() {
     return this.renderLifecycle.subscribable;
@@ -84,8 +92,9 @@ export abstract class GeneratorScene<T>
     return this.previousScene;
   }
 
-  private previousScene: Scene = null;
-  private runner: ThreadGenerator;
+  private previousScene: Scene | null = null;
+  private currentProject: Project | null = null;
+  private runner: ThreadGenerator | null = null;
   private state: SceneState = SceneState.Initial;
   private cached = false;
   private counters: Record<string, number> = {};
@@ -181,6 +190,10 @@ export abstract class GeneratorScene<T>
   }
 
   public async next() {
+    if (!this.runner) {
+      return;
+    }
+
     startScene(this);
     setProject(this.project);
     let result = this.runner.next();
@@ -218,7 +231,7 @@ export abstract class GeneratorScene<T>
     }
   }
 
-  public async reset(previousScene: Scene = null) {
+  public async reset(previousScene: Scene | null = null) {
     this.counters = {};
     this.previousScene = previousScene;
     this.runner = threads(

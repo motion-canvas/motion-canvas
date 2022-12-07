@@ -37,7 +37,7 @@ export function isPromisable(value: any): value is Promisable<any> {
  * [promise]: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/promise
  */
 export type ThreadGenerator = Generator<
-  ThreadGenerator | Promise<any> | Promisable<any>,
+  ThreadGenerator | Promise<any> | Promisable<any> | void,
   void,
   Thread | any
 >;
@@ -49,6 +49,9 @@ export type ThreadGenerator = Generator<
  */
 export function isThreadGenerator(value: unknown): value is ThreadGenerator {
   return (
-    typeof value === 'object' && Symbol.iterator in value && 'next' in value
+    value !== null &&
+    typeof value === 'object' &&
+    Symbol.iterator in value &&
+    'next' in value
   );
 }

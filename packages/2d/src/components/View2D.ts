@@ -1,4 +1,4 @@
-import {Layout, Node} from '../components';
+import {Layout} from './Layout';
 
 export class View2D extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
@@ -20,15 +20,13 @@ export class View2D extends Layout {
     View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
   }
 
-  private registeredNodes: Record<string, Node> = {};
-  private nodeCounters: Record<string, number> = {};
-
-  public constructor(private readonly name: string) {
+  public constructor() {
     super({
-      key: `${name}/View2D`,
       // TODO Sync with the project size
       width: 1920,
       height: 1080,
+      x: 960,
+      y: 540,
       composite: true,
       fontFamily: 'Roboto',
       fontSize: 48,
@@ -41,13 +39,12 @@ export class View2D extends Layout {
     this.applyFlex();
   }
 
-  public reset() {
+  protected override transformContext() {
+    // do nothing
+  }
+
+  public override dispose() {
     this.removeChildren();
-    for (const key in this.registeredNodes) {
-      this.registeredNodes[key].dispose();
-    }
-    this.registeredNodes = {};
-    this.nodeCounters = {};
     this.element.innerText = '';
   }
 
@@ -63,19 +60,5 @@ export class View2D extends Layout {
 
   public override view(): View2D | null {
     return this;
-  }
-
-  public registerNode(node: Node, key?: string): string {
-    const className = node.constructor?.name ?? 'unknown';
-    this.nodeCounters[className] ??= 0;
-
-    key ??= `${this.name}/${className}[${this.nodeCounters[className]++}]`;
-    this.registeredNodes[key] = node;
-    return key;
-  }
-
-  public getNode(key: string): Node | null {
-    if (this.key === key) return this;
-    return this.registeredNodes[key] ?? null;
   }
 }

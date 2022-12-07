@@ -63,7 +63,7 @@ export class Player {
 
   private startTime: number;
   private renderTime = 0;
-  private requestId: number = null;
+  private requestId: number | null = null;
 
   private commands: PlayerCommands = {
     seek: -1,
@@ -287,7 +287,7 @@ export class Player {
       await this.project.render();
       try {
         await this.project.export();
-      } catch (e) {
+      } catch (e: any) {
         this.logger.error(e);
         this.toggleRendering(false);
       }
@@ -385,7 +385,7 @@ export class Player {
         this.renderTime = time;
         try {
           await this.run();
-        } catch (e) {
+        } catch (e: any) {
           this.requestId = null;
           this.logger.error(e);
         }

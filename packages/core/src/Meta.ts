@@ -81,7 +81,7 @@ export class Meta<T extends Metadata = Metadata> {
           delete Meta.sourceLookup[source];
           resolve();
         };
-        import.meta.hot.send('motion-canvas:meta', {
+        import.meta.hot!.send('motion-canvas:meta', {
           source,
           data: this.data.current,
         });

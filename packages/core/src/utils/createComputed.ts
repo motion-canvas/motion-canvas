@@ -29,7 +29,7 @@ export function createComputed<TValue>(
       startCollecting(context);
       try {
         last = factory(...args);
-      } catch (e) {
+      } catch (e: any) {
         useLogger().error({
           message: e.message,
           stack: e.stack,

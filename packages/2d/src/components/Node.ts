@@ -30,7 +30,7 @@ import {
 } from '@motion-canvas/core/lib/utils';
 import {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
-import {use2DView} from '../scenes';
+import {useScene2D} from '../scenes';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
@@ -308,7 +308,7 @@ export class Node implements Promisable<Node> {
   public readonly key: string;
 
   public constructor({children, key, ...rest}: NodeProps) {
-    this.key = use2DView()?.registerNode(this, key) ?? key ?? '';
+    this.key = useScene2D()?.registerNode(this, key) ?? key ?? '';
     initialize(this, {defaults: rest});
     for (const {signal} of this) {
       signal.reset();

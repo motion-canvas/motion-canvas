@@ -6,7 +6,7 @@ export class AudioManager {
   public get onDataChanged() {
     return this.data.subscribable;
   }
-  private readonly data = new ValueDispatcher<AudioData>(null);
+  private readonly data = new ValueDispatcher<AudioData | null>(null);
 
   public get onOffsetChanged() {
     return this.offset.subscribable;
@@ -15,14 +15,14 @@ export class AudioManager {
 
   private static readonly context = new AudioContext();
   private readonly audioElement: HTMLAudioElement = new Audio();
-  private source: string = null;
+  private source: string | null = null;
   private error = false;
-  private abortController: AbortController = null;
+  private abortController: AbortController | null = null;
 
   public constructor() {
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
-        if (urls.includes(this.source)) {
+        if (this.source && urls.includes(this.source)) {
           this.setSource(this.source);
         }
       });
@@ -89,7 +89,7 @@ export class AudioManager {
           await this.audioElement.play();
           this.error = false;
           return true;
-        } catch (e) {
+        } catch (e: any) {
           if (!this.error) {
             useLogger().error(e);
           }
@@ -103,6 +103,9 @@ export class AudioManager {
 
   private async loadData(signal: AbortSignal) {
     this.data.current = null;
+    if (!this.source) {
+      return;
+    }
 
     const response = await fetch(this.source, {signal});
     const rawBuffer = await response.arrayBuffer();

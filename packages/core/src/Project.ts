@@ -3,7 +3,7 @@ import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
-import {createSignal} from './utils';
+import {createSignal, getContext} from './utils';
 import {Logger} from './Logger';
 
 const EXPORT_FRAME_LIMIT = 256;
@@ -47,7 +47,7 @@ export class Project {
   public get onCurrentSceneChanged() {
     return this.currentScene.subscribable;
   }
-  private readonly currentScene = new ValueDispatcher<Scene>(null);
+  private readonly currentScene = new ValueDispatcher<Scene | null>(null);
 
   /**
    * Triggered after any of the scenes were reloaded.
@@ -57,7 +57,7 @@ export class Project {
   }
   private readonly reloaded = new EventDispatcher<void>();
 
-  public readonly meta: Meta<ProjectMetadata>;
+  public declare readonly meta: Meta<ProjectMetadata>;
   public frame = 0;
 
   public get time(): number {
@@ -123,7 +123,7 @@ export class Project {
     this.render();
   }
 
-  public setCanvas(value: HTMLCanvasElement) {
+  public setCanvas(value: HTMLCanvasElement | null = null) {
     this.canvas = value;
     this.updateCanvas();
   }
@@ -136,7 +136,7 @@ export class Project {
       this.height = value.height;
     } else {
       this.width = value;
-      this.height = height;
+      this.height = height!;
     }
     this.updateCanvas();
     this.reloadAll();
@@ -146,7 +146,7 @@ export class Project {
     return new Vector2(this.width, this.height);
   }
 
-  public readonly name: string;
+  public declare readonly name: string;
   public readonly audio = new AudioManager();
   public readonly logger = new Logger();
   public playbackState = createSignal(PlaybackState.Paused);
@@ -157,18 +157,18 @@ export class Project {
   private _quality = 1;
   private _speed = 1;
   private framesPerSeconds = 30;
-  private previousScene: Scene = null;
+  private previousScene: Scene | null = null;
   private background: string | false;
-  private canvas: HTMLCanvasElement;
-  private context: CanvasRenderingContext2D;
+  private canvas: HTMLCanvasElement | null = null;
+  private context: CanvasRenderingContext2D | null = null;
   private buffer = document.createElement('canvas');
-  private bufferContext: CanvasRenderingContext2D;
+  private bufferContext: CanvasRenderingContext2D | null = null;
   private previousBuffer = document.createElement('canvas');
-  private previousBufferContext: CanvasRenderingContext2D;
+  private previousBufferContext: CanvasRenderingContext2D | null = null;
   private exportCounter = 0;
 
-  private width: number;
-  private height: number;
+  private width = 0;
+  private height = 0;
 
   public constructor({
     scenes,
@@ -214,15 +214,15 @@ export class Project {
   }
 
   public async render() {
-    if (!this.canvas) return;
+    if (!this.canvas || !this.context) return;
 
     if (this.previousScene) {
-      this.previousBufferContext ??= this.previousBuffer.getContext('2d');
+      this.previousBufferContext ??= getContext(this.previousBuffer);
       this.transformCanvas(this.previousBufferContext);
       await this.previousScene.render(this.previousBufferContext);
     }
 
-    this.bufferContext ??= this.buffer.getContext('2d');
+    this.bufferContext ??= getContext(this.buffer);
     this.transformCanvas(this.bufferContext);
     await this.currentScene.current?.render(this.bufferContext);
 
@@ -344,13 +344,16 @@ export class Project {
       while (this.exportCounter > EXPORT_FRAME_LIMIT) {
         await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
       }
+      if (!this.canvas) {
+        return;
+      }
 
       this.exportCounter++;
       this.renderLookup[frame] = () => {
         this.exportCounter--;
         delete this.renderLookup[frame];
       };
-      import.meta.hot.send('motion-canvas:export', {
+      import.meta.hot!.send('motion-canvas:export', {
         frame,
         isStill,
         data: this.canvas.toDataURL(this._fileType, this._quality),
@@ -365,7 +368,7 @@ export class Project {
   }
 
   private findBestScene(frame: number): Scene {
-    let lastScene = null;
+    let lastScene = this.scenes.current[0];
     for (const scene of this.scenes.current) {
       if (!scene.isCached()) {
         this.logger.warn(
@@ -382,7 +385,7 @@ export class Project {
     return lastScene;
   }
 
-  private getNextScene(scene?: Scene): Scene {
+  private getNextScene(scene?: Scene): Scene | null {
     const scenes = this.scenes.current;
     if (!scene) {
       return scenes[0];

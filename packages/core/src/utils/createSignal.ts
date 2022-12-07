@@ -117,8 +117,8 @@ export function finishCollecting(context: DependencyContext) {
 }
 
 export function collect(subscribable: Subscribable<void>) {
-  if (collectionStack.length > 0) {
-    const context = collectionStack.at(-1);
+  const context = collectionStack.at(-1);
+  if (context) {
     context.dependencies.add(subscribable);
     subscribable.subscribe(context.handler);
   }
@@ -131,11 +131,16 @@ export interface PromiseHandle<T> {
   owner?: any;
 }
 
+export function collectPromise<T>(promise: Promise<T>): PromiseHandle<T | null>;
 export function collectPromise<T>(
   promise: Promise<T>,
-  initialValue: T = null,
-): PromiseHandle<T> {
-  const handle: PromiseHandle<T> = {
+  initialValue: T,
+): PromiseHandle<T>;
+export function collectPromise<T>(
+  promise: Promise<T>,
+  initialValue: T | null = null,
+): PromiseHandle<T | null> {
+  const handle: PromiseHandle<T | null> = {
     promise,
     value: initialValue,
     stack: collectionStack[0]?.stack,
@@ -206,7 +211,7 @@ export function createSignal<TValue, TReturn = void>(
       startCollecting(context);
       try {
         last = current();
-      } catch (e) {
+      } catch (e: any) {
         useLogger().error({
           message: e.message,
           stack: e.stack,
