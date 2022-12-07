@@ -5,6 +5,7 @@ export * from './Layout';
 export * from './Line';
 export * from './Node';
 export * from './Rect';
+export * from './Shape';
 export * from './Text';
 export * from './types';
 export * from './Video';
