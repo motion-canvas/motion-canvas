@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.1](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0...v12.0.1) (2022-12-07)
+
+
+### Bug Fixes
+
+* **2d:** add missing shape export ([#111](https://github.com/motion-canvas/motion-canvas/issues/111)) ([02a1fa7](https://github.com/motion-canvas/motion-canvas/commit/02a1fa7ea62155e498809f2e57ff29a18c82ac12))
+* **docs:** fix links to examples ([#106](https://github.com/motion-canvas/motion-canvas/issues/106)) ([d445b56](https://github.com/motion-canvas/motion-canvas/commit/d445b564746bb5e8cbabcddaa9857ffec80a8755))
+* **docs:** fix small typo ([#107](https://github.com/motion-canvas/motion-canvas/issues/107)) ([fe6cbb0](https://github.com/motion-canvas/motion-canvas/commit/fe6cbb0083407f3de4594c76692a417bf4f616ee))
+* **docs:** small corrections ([#108](https://github.com/motion-canvas/motion-canvas/issues/108)) ([9212343](https://github.com/motion-canvas/motion-canvas/commit/921234377bad7bb0f334c5dda04498cce26f7891))
+
+
+
+
+
 # [12.0.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.6...v12.0.0) (2022-12-07)
 
 

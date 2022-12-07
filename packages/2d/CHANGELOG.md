@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.1](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0...v12.0.1) (2022-12-07)
+
+
+### Bug Fixes
+
+* **2d:** add missing shape export ([#111](https://github.com/motion-canvas/motion-canvas/issues/111)) ([02a1fa7](https://github.com/motion-canvas/motion-canvas/commit/02a1fa7ea62155e498809f2e57ff29a18c82ac12))
+
+
+
+
+
 # [12.0.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.6...v12.0.0) (2022-12-07)
 
 **Note:** Version bump only for package @motion-canvas/2d
