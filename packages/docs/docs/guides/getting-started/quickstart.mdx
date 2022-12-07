@@ -34,7 +34,7 @@ npm init @motion-canvas
 ```
 
 Answer the prompts to name your project and select which language you would
-like to use, either TypeScript or plain JavaScript.
+like to use; either TypeScript or plain JavaScript.
 
 :::tip
 
@@ -45,7 +45,7 @@ we're using throughout this documentation.
 
 ### Starting the editor
 
-From your new Motion Canvas project directory, run
+From your new Motion Canvas project directory, run:
 
 ```shell
 npm run serve
@@ -151,7 +151,7 @@ view.add(
 You may recognize this XML-like syntax from libraries such as React.
 That's because Motion Canvas uses the same JavaScript syntax extension called
 [JSX](https://reactjs.org/docs/introducing-jsx.html).
-However, it's important to remember that Motion Canvas does **not** use React
+However, it's important to remember that Motion Canvas does **NOT** use React
 itself and any preconceptions you may have due to React will most likely not
 apply.
 
@@ -238,7 +238,7 @@ myCircle.value.fill('#e6a700', 1);
 This creates a tween animation that smoothly changes the fill color over one
 second.
 
-But animations in Motion Canvas don't play on their own, we need to explicitly
+Animations in Motion Canvas don't play on their own, we need to explicitly
 tell them to. This is why scenes are declared using generator functions -
 they serve as a description of how the animation should play out. By yielding
 different instructions we can tell the scene animation to do different things.
