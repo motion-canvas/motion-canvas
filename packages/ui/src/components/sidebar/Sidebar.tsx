@@ -47,6 +47,7 @@ export function Sidebar({setOpen}: SidebarProps) {
       >
         {{
           title: 'Project Selection',
+          id: 'project-selection-link',
           type: TabType.Link,
           icon: IconType.motionCanvas,
           url: window.location.pathname === '/' ? undefined : '/',
@@ -56,24 +57,28 @@ export function Sidebar({setOpen}: SidebarProps) {
         }}
         {{
           title: 'Inspector',
+          id: 'inspector-tab',
           type: TabType.Pane,
           icon: IconType.tune,
           pane: <Properties />,
         }}
         {{
           title: 'Video Settings',
+          id: 'rendering-tab',
           type: TabType.Pane,
           icon: IconType.videoSettings,
           pane: <Rendering />,
         }}
         {{
           title: 'Thread Debugger',
+          id: 'threads-tab',
           type: TabType.Pane,
           icon: IconType.schedule,
           pane: <Threads />,
         }}
         {{
           title: errorCount > 0 ? `Console (${errorCount})` : 'Console',
+          id: 'console-tab',
           type: TabType.Pane,
           icon: IconType.bug,
           pane: <Console />,

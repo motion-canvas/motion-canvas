@@ -1,18 +1,22 @@
 {
-  "name": "@motion-canvas/examples",
+  "name": "@motion-canvas/e2e",
   "private": true,
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "serve": "vite",
-    "build": "tsc && vite build"
+    "test": "vitest"
   },
   "dependencies": {
     "@motion-canvas/2d": "*",
-    "@motion-canvas/core": "*"
+    "@motion-canvas/core": "*",
+    "jest-image-snapshot": "^6.1.0",
+    "puppeteer": "^19.3.0",
+    "vitest": "^0.25.5"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",
     "@motion-canvas/vite-plugin": "*",
+    "@types/puppeteer": "^7.0.4",
     "vite": "^3.0.5"
   }
 }

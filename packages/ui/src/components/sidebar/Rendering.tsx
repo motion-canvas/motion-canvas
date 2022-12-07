@@ -46,7 +46,7 @@ export function Rendering() {
   ];
 
   return (
-    <Pane title="Rendering">
+    <Pane title="Rendering" id="rendering-pane">
       <Group>
         <Label>range</Label>
         <Input
@@ -148,7 +148,12 @@ export function Rendering() {
       )}
       <Group>
         <Label />
-        <Button main onClick={() => player.toggleRendering()}>
+        <Button
+          main
+          id="render"
+          data-rendering={state.render}
+          onClick={() => player.toggleRendering()}
+        >
           {state.render ? 'STOP RENDERING' : 'RENDER'}
         </Button>
       </Group>

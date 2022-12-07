@@ -29,3 +29,5 @@ jobs:
         run: npx lerna run test
       - name: Build
         run: npx lerna run build
+      - name: E2E
+        run: npm run e2e:test
