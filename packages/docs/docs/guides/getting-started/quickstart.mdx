@@ -43,17 +43,24 @@ we're using throughout this documentation.
 
 :::
 
+To complete the scaffolding process, run the following command in your
+newly created project directory:
+
+```shell
+npm install
+```
+
 ### Starting the editor
 
-From your new Motion Canvas project directory, run:
+To start the editor, run:
 
 ```shell
 npm run serve
 ```
 
-This will start the Motion Canvas editor, which you can open by visiting
-[http://localhost:9000/](http://localhost:9000/). We'll use the editor to
-preview our animation, but for now there's not much to see.
+The editor can be accessed by visiting
+[http://localhost:9000/](http://localhost:9000/). We'll use it to preview our
+animation, but for now there's not much to see.
 
 ### Programming an animation
 
@@ -66,13 +73,14 @@ the file with the following snippet.
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {useRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
   const myCircle = useRef<Circle>();
 
   view.add(
     <Circle
-      // highlight-start
+      //highlight-start
       ref={myCircle}
       x={-300}
       width={240}
@@ -295,13 +303,14 @@ This brings us back to our initial example:
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {useRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
   const myCircle = useRef<Circle>();
 
   view.add(
     <Circle
-      // highlight-start
+      //highlight-start
       ref={myCircle}
       x={-300}
       width={240}
