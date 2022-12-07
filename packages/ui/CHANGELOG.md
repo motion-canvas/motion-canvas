@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0-alpha.6](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.5...v12.0.0-alpha.6) (2022-12-07)
+
+
+### Features
+
+* add E2E testing ([#101](https://github.com/motion-canvas/motion-canvas/issues/101)) ([6398c54](https://github.com/motion-canvas/motion-canvas/commit/6398c54e4c4d6667ce9f45b9bbef6ea110ea2215)), closes [#42](https://github.com/motion-canvas/motion-canvas/issues/42)
+* **core:** switch to vitest ([#99](https://github.com/motion-canvas/motion-canvas/issues/99)) ([762eeb0](https://github.com/motion-canvas/motion-canvas/commit/762eeb0a99c2f378d20dbd147f815ba6736099d9)), closes [#48](https://github.com/motion-canvas/motion-canvas/issues/48)
+* **ui:** visual changes ([#96](https://github.com/motion-canvas/motion-canvas/issues/96)) ([3d599f4](https://github.com/motion-canvas/motion-canvas/commit/3d599f4e1788fbd15e996be8bf95679f1c6787bd))
+
+
+
+
+
 # [12.0.0-alpha.4](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.3...v12.0.0-alpha.4) (2022-12-05)
 
 **Note:** Version bump only for package @motion-canvas/ui

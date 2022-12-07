@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0-alpha.6](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.5...v12.0.0-alpha.6) (2022-12-07)
+
+
+### Bug Fixes
+
+* previous scene being rendered twice ([#97](https://github.com/motion-canvas/motion-canvas/issues/97)) ([90205bd](https://github.com/motion-canvas/motion-canvas/commit/90205bdc1a086abe5f73b04cb4616c6af5ec4377))
+
+
+### Features
+
+* add E2E testing ([#101](https://github.com/motion-canvas/motion-canvas/issues/101)) ([6398c54](https://github.com/motion-canvas/motion-canvas/commit/6398c54e4c4d6667ce9f45b9bbef6ea110ea2215)), closes [#42](https://github.com/motion-canvas/motion-canvas/issues/42)
+* add Grid node ([e1f83da](https://github.com/motion-canvas/motion-canvas/commit/e1f83da1f43d20d392df4acb11e3df9cc457585d))
+* **core:** switch to vitest ([#99](https://github.com/motion-canvas/motion-canvas/issues/99)) ([762eeb0](https://github.com/motion-canvas/motion-canvas/commit/762eeb0a99c2f378d20dbd147f815ba6736099d9)), closes [#48](https://github.com/motion-canvas/motion-canvas/issues/48)
+* **docs:** visual changes ([be83edf](https://github.com/motion-canvas/motion-canvas/commit/be83edf847fb35cc77590ff5720f9eca79e9b787))
+* **player:** add auto mode ([c107259](https://github.com/motion-canvas/motion-canvas/commit/c107259f7c2a3886ccfe4ca0140d13064aed238f))
+* **player:** improve accessibility ([0fc9235](https://github.com/motion-canvas/motion-canvas/commit/0fc923576e7b12f9bc799f3a4e861861d49a2406))
+* **ui:** visual changes ([#96](https://github.com/motion-canvas/motion-canvas/issues/96)) ([3d599f4](https://github.com/motion-canvas/motion-canvas/commit/3d599f4e1788fbd15e996be8bf95679f1c6787bd))
+
+
+
+
+
 # [12.0.0-alpha.5](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.4...v12.0.0-alpha.5) (2022-12-05)
 
 
