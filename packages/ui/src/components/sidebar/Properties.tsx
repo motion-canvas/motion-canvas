@@ -22,7 +22,7 @@ export function Properties() {
   );
 
   return (
-    <Pane title="Properties">
+    <Pane title="Properties" id="properties-pane">
       {attributes
         ? Object.entries(attributes).map(([key, value]) => (
             <AutoField label={key} value={value} />

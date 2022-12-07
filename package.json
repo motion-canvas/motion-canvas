@@ -23,6 +23,7 @@
     "docs:build": "npm run build -w packages/docs",
     "vite-plugin:build": "npm run build -w packages/vite-plugin",
     "vite-plugin:watch": "npm run watch -w packages/vite-plugin",
+    "e2e:test": "npm run test -w packages/e2e",
     "eslint": "eslint --fix \"**/*.ts?(x)\"",
     "prettier": "prettier --write ."
   },

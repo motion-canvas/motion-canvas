@@ -18,12 +18,14 @@ type Tab =
       pane: ComponentChildren;
       badge?: ComponentChildren;
       title?: string;
+      id?: string;
     }
   | {
       type: TabType.Link;
       icon: IconType;
       url?: string;
       title?: string;
+      id?: string;
     }
   | {
       type: TabType.Space;
@@ -62,12 +64,14 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
               title={data.title}
               type={data.icon}
               href={data.url}
+              id={data.id}
               className={classes(styles.tab, [styles.disabled, !data.url])}
             />
           ) : data.type === TabType.Pane ? (
             <Icon
               type={data.icon}
               title={data.title}
+              id={data.id}
               onClick={() => toggleTab(index)}
               className={classes(styles.tab, [styles.active, tab === index])}
             >

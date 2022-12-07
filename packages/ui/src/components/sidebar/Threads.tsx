@@ -18,7 +18,7 @@ export function Threads() {
   );
 
   return (
-    <Pane title="Threads">
+    <Pane title="Threads" id="threads-pane">
       {thread ? (
         <ThreadView thread={thread} />
       ) : (

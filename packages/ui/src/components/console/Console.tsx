@@ -21,7 +21,7 @@ export function Console() {
   const [filters, setFilters] = useState(LOG_LEVELS);
 
   return (
-    <Pane title="Console">
+    <Pane title="Console" id="console">
       <div className={styles.navbar}>
         <div className={styles.pills}>
           {Object.keys(LOG_LEVELS).map(level => {

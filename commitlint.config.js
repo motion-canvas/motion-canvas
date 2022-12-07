@@ -10,6 +10,7 @@ module.exports = {
         'core',
         'create',
         'docs',
+        'e2e',
         'examples',
         'legacy',
         'player',

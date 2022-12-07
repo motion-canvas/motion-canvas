@@ -363,6 +363,12 @@ export class Project {
     }
   }
 
+  public async finishExport() {
+    while (this.exportCounter > 0) {
+      await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
+    }
+  }
+
   public syncAudio(frameOffset = 0) {
     this.audio.setTime(this.framesToSeconds(this.frame + frameOffset));
   }

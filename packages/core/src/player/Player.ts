@@ -293,6 +293,7 @@ export class Player {
       }
 
       if (state.finished || this.project.frame >= state.endFrame) {
+        await this.project.finishExport();
         this.toggleRendering(false);
       }
 
