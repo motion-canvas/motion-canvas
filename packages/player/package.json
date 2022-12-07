@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/player",
-  "version": "12.0.0-alpha.6",
+  "version": "12.0.0",
   "description": "A custom element for displaying animations made with Motion Canvas",
   "main": "dist/main.js",
   "types": "types/main.d.ts",
@@ -26,7 +26,7 @@
     "@motion-canvas/core": "*"
   },
   "devDependencies": {
-    "@motion-canvas/core": "^12.0.0-alpha.6",
+    "@motion-canvas/core": "^12.0.0",
     "terser": "^5.16.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.4"

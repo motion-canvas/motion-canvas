@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.6...v12.0.0) (2022-12-07)
+
+**Note:** Version bump only for package @motion-canvas/2d
+
+
+
+
+
 # [12.0.0-alpha.6](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.5...v12.0.0-alpha.6) (2022-12-07)
 
 

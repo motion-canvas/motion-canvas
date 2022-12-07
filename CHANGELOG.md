@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.6...v12.0.0) (2022-12-07)
+
+
+### Bug Fixes
+
+* **docs:** fix broken links ([#105](https://github.com/motion-canvas/motion-canvas/issues/105)) ([f79427d](https://github.com/motion-canvas/motion-canvas/commit/f79427d588190908ba4015b7820d529f25e64e6a))
+* fix docs workflow ([#102](https://github.com/motion-canvas/motion-canvas/issues/102)) ([f591169](https://github.com/motion-canvas/motion-canvas/commit/f5911699a7ae6b970ee4c0de891383a9c0cd5d0d))
+* fix docs workflow ([#103](https://github.com/motion-canvas/motion-canvas/issues/103)) ([b9e2006](https://github.com/motion-canvas/motion-canvas/commit/b9e20063be6aab75471d2a91cf862ac5bdc70e12))
+* fix docs workflow ([#104](https://github.com/motion-canvas/motion-canvas/issues/104)) ([7e59a1a](https://github.com/motion-canvas/motion-canvas/commit/7e59a1a5f77f4be65e599f539e16f6cf58785d9c))
+
+
+
+
+
 # [12.0.0-alpha.6](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.5...v12.0.0-alpha.6) (2022-12-07)
 
 
