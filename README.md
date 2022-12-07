@@ -11,13 +11,7 @@ the following weeks.
 
 ## Using Motion Canvas
 
-Make sure that [Node.js](https://nodejs.org/) is installed on your machine.
-The recommended version is 16. You can check the currently installed version
-using:
-
-```shell
-node -v
-```
+Check out the [getting started][docs] guide to learn how to use Motion Canvas.
 
 ### Authenticate to GitHub Packages
 
@@ -47,27 +41,6 @@ node -v
       > Email: jacob@mail.com
       ```
 
-### Set up a project
-
-Run the following command in order to scaffold a new Motion Canvas project:
-
-```bash
-npm init @motion-canvas
-```
-
-### Run Motion Canvas
-
-Start your project using the `serve` script:
-
-```shell
-npm run serve
-```
-
-You can now open Motion Canvas in your browser by visiting
-[http://localhost:9000/](http://localhost:9000/).
-
-In case of any problems, please visit [our discord server][discord].
-
 ## Developing Motion Canvas locally
 
 The project is maintained as one monorepo containing the following packages:
@@ -75,30 +48,37 @@ The project is maintained as one monorepo containing the following packages:
 | Name          | Description                                                    |
 | ------------- | -------------------------------------------------------------- |
 | `core`        | All logic related to running and rendering animations.         |
-| `ui`          | The user interface used for editing.                           |
-| `template`    | A template project included for developer's convenience.       |
+| `2d`          | The default renderer for 2D motion graphics                    |
+| `create`      | A package for bootstrapping new projects.                      |
 | `docs`        | [Our documentation website.][docs]                             |
+| `e2e`         | End-to-end tests.                                              |
+| `examples`    | Animation examples used in documentation.                      |
+| `player`      | A custom element for displaying animations in a browser.       |
+| `template`    | A template project included for developer's convenience.       |
+| `ui`          | The user interface used for editing.                           |
 | `vite-plugin` | A plugin for Vite used for developing and bundling animations. |
 
 After cloning the repo, run `npm install` in the root of the project to install
 all necessary dependencies.
 
-### Developing Core
+### Developing Core & 2D
 
 When developing the core, start both `core:watch` and `template:serve`.
 
 This will pick up any changes you make to the core package,
 automatically rebuild the `template` project and refresh the page.
 
+Similarly, when developing the 2D package, start `2d:watch` and `template:serve`.
+
 ### Developing UI
 
-If you want to develop the UI, start both `ui:serve` and `template:ui`.
+If you want to develop the UI, first build the template project by running:
+`template:build`. Next, start `ui:serve`.
 
-`ui:serve` will start another webpack dev server specifically for the UI.
-Meanwhile, `template:ui` will start the template project with a `--ui-server`
-flag that will load the UI from said server instead of a static file.
+### Developing Player
 
-You can combine it with `core:ui` to develop everything at once.
+Like with UI, to develop the player, first build the template: `template:build`.
+Then, start `player:serve`.
 
 ## Contributing
 
@@ -108,4 +88,4 @@ help make Motion Canvas better.
 [authenticate]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token
 [template]: https://github.com/motion-canvas/project-template#using-the-template
 [discord]: https://www.patreon.com/posts/53003221
-[docs]: https://motion-canvas.github.io/api
+[docs]: https://motion-canvas.github.io/guides/getting-started/quickstart
