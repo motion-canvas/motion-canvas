@@ -15,7 +15,6 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
-
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -62,7 +61,7 @@ const config = {
               },
               {
                 label: 'API',
-                to: 'api',
+                to: 'api/core',
               },
             ],
           },
@@ -114,7 +113,7 @@ const config = {
       {
         routeBasePath: '/',
         sidebarPath: 'sidebars.js',
-        exclude: ['**/core-api/*.md', '**/2d-api/*.md'],
+        exclude: ['**/api/core/*.md', '**/api/2d/*.md'],
         showLastUpdateAuthor: true,
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
@@ -135,7 +134,7 @@ const config = {
       'docusaurus-plugin-typedoc',
       {
         id: 'core',
-        out: 'core-api',
+        out: 'api/core',
         excludeExternals: true,
         entryPoints: [
           '../core/',
@@ -159,7 +158,7 @@ const config = {
       'docusaurus-plugin-typedoc',
       {
         id: '2d',
-        out: '2d-api',
+        out: 'api/2d',
         excludeExternals: true,
         entryPoints: [
           '../2d/src/components',

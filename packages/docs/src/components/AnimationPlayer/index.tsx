@@ -1,9 +1,13 @@
-import '@motion-canvas/player';
 import type {MotionCanvasPlayerProps} from '@motion-canvas/player';
 import React, {ComponentProps} from 'react';
 import styles from './styles.module.css';
 import AnimationLink from './AnimationLink';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import clsx from 'clsx';
+
+if (ExecutionEnvironment.canUseDOM) {
+  import('@motion-canvas/player');
+}
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -14,7 +18,7 @@ declare global {
   }
 }
 
-export interface AnimationBannerProps {
+export interface AnimationPlayerProps {
   banner?: boolean;
   small?: boolean;
   name: string;
@@ -24,7 +28,7 @@ export default function AnimationPlayer({
   name,
   banner,
   small,
-}: AnimationBannerProps) {
+}: AnimationPlayerProps) {
   return (
     <div
       className={clsx(

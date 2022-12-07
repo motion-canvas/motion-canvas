@@ -49,12 +49,12 @@ const sidebars = {
     {
       type: 'category',
       label: 'Core',
-      items: createApiSidebar('core-api'),
+      items: createApiSidebar('api/core'),
     },
     {
       type: 'category',
       label: '2D',
-      items: createApiSidebar('2d-api'),
+      items: createApiSidebar('api/2d'),
     },
   ],
 };
