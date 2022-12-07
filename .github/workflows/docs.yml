@@ -16,9 +16,7 @@ jobs:
           node-version: 18
           cache: npm
       - run: npm ci
-      - run: npm run core:build
-      - run: npm run 2d:build
-      - run: npm run vite-plugin:build
+      - run: npx lerna run build
       - run: npm run examples:build
       - run: npm run docs:build
       - uses: peaceiris/actions-gh-pages@v3
