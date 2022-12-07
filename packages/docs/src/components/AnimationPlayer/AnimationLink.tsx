@@ -9,7 +9,7 @@ export interface AnimationLinkProps {
 }
 
 export default function AnimationLink({name}: AnimationLinkProps) {
-  const url = `https://github.com/motion-canvas/motion-canvas/blob/main/examples/src/scenes/${name}.tsx`;
+  const url = `https://github.com/motion-canvas/motion-canvas/blob/main/packages/examples/src/scenes/${name}.tsx`;
   return (
     <Link to={url} className={clsx('padding--sm', styles.link)}>
       <span>View source code</span>
