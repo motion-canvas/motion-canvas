@@ -6,7 +6,11 @@ const sceneStack: Scene[] = [];
  * Get a reference to the current scene.
  */
 export function useScene(): Scene {
-  return sceneStack.at(-1);
+  const scene = sceneStack.at(-1);
+  if (!scene) {
+    throw new Error('The scene is not available in the current context');
+  }
+  return scene;
 }
 
 export function startScene(scene: Scene) {

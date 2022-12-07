@@ -155,7 +155,7 @@ export interface Scene<T = unknown> {
   /**
    * The scene directly before this scene, or null if omitted for performance.
    */
-  get previous(): Scene;
+  get previous(): Scene | null;
 
   /**
    * Render the scene onto a canvas.

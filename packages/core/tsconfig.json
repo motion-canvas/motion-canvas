@@ -4,6 +4,7 @@
     "outDir": "lib",
     "inlineSourceMap": true,
     "noImplicitAny": true,
+    "strict": true,
     "module": "esnext",
     "target": "es2020",
     "allowJs": true,

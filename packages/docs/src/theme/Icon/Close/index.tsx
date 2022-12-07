@@ -12,8 +12,6 @@ export default function IconClose({
   width = 24,
   height = 24,
   color = 'currentColor',
-  strokeWidth = 1.2,
-  className,
   ...restProps
 }: Props): JSX.Element {
   return (

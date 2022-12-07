@@ -37,7 +37,7 @@ export function run(
 ): ThreadGenerator {
   let task;
   if (typeof firstArg === 'string') {
-    task = runner();
+    task = runner!();
     GeneratorHelper.makeThreadable(task, firstArg);
   } else {
     task = firstArg();

@@ -6,7 +6,11 @@ const threadStack: Thread[] = [];
  * Get a reference to the current thread.
  */
 export function useThread(): Thread {
-  return threadStack.at(-1);
+  const thread = threadStack.at(-1);
+  if (!thread) {
+    throw new Error('The thread is not available in the current context');
+  }
+  return thread;
 }
 
 export function startThread(thread: Thread) {

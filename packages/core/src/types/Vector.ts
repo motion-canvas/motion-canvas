@@ -47,7 +47,7 @@ export class Vector2 implements Type {
     from: Vector2,
     to: Vector2,
     value: number,
-    reverse?: boolean,
+    reverse = false,
     ratio?: number,
   ) {
     ratio ??= from.sub(to).ctg;

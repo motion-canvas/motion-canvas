@@ -1,6 +1,6 @@
 import {Shape, ShapeProps} from './Shape';
 import {SignalValue} from '@motion-canvas/core/lib/utils';
-import {PossibleVector2, Vector2} from '@motion-canvas/core/lib/types';
+import {PossibleVector2} from '@motion-canvas/core/lib/types';
 import {initial, vector2Property, Vector2Property} from '../decorators';
 
 export interface GridProps extends ShapeProps {

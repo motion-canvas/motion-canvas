@@ -67,7 +67,7 @@ export function* threads(
 
     while (queue.length > 0) {
       const thread = queue.pop();
-      if (thread.canceled) {
+      if (!thread || thread.canceled) {
         continue;
       }
 

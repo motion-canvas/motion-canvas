@@ -40,7 +40,7 @@ export class Thread {
     return this.isCanceled || (this.parent?.canceled ?? false);
   }
 
-  public parent: Thread = null;
+  public parent: Thread | null = null;
   private isCanceled = false;
   private readonly frameDuration: number;
 

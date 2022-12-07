@@ -1,3 +1,5 @@
+import {getContext} from '../utils';
+
 let canvas: HTMLCanvasElement;
 let context: CanvasRenderingContext2D;
 
@@ -25,7 +27,7 @@ export function loadAnimation(sources: string[]): Promise<HTMLImageElement[]> {
 
 export function getImageData(image: ImageDataSource) {
   canvas ??= document.createElement('canvas');
-  context ??= canvas.getContext('2d');
+  context ??= getContext(canvas);
 
   canvas.width = image.width;
   canvas.height = image.height;

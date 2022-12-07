@@ -14,7 +14,7 @@ export interface Threadable {
    *
    * @eventProperty
    */
-  get onThreadChanged(): SubscribableValueEvent<Thread>;
+  get onThreadChanged(): SubscribableValueEvent<Thread | null>;
 }
 
 export function isThreadable(value: any): value is Threadable {
