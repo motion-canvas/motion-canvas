@@ -17,6 +17,7 @@
   --ifm-background-surface-color: #fff;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --ifm-global-radius: 4px;
+  --ifm-alert-border-left-width: 4px;
   --ifm-font-family-base: Roboto, Noto Sans, system-ui, -apple-system, Segoe UI,
     sans-serif;
   --ifm-font-family-monospace: JetBrains Mono, Consolas, monospace;
