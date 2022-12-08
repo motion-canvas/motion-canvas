@@ -13,9 +13,33 @@
   --ifm-color-primary-light: #33925d;
   --ifm-color-primary-lighter: #359962;
   --ifm-color-primary-lightest: #3cad6e;
-  --ifm-background-color: #eee;
-  --ifm-background-surface-color: #fff;
+
+  --ifm-color-gray-100: #f8f8f8;
+  --ifm-color-gray-200: #ededed;
+  --ifm-color-gray-300: #dddddd;
+  --ifm-color-gray-400: #d0d0d0;
+  --ifm-color-gray-500: #c3c3c3;
+  --ifm-color-gray-600: #959595;
+  --ifm-color-gray-700: #666666;
+  --ifm-color-gray-800: #444444;
+  --ifm-color-gray-900: #1c1c1c;
+
+  --ifm-color-secondary-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-success-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-info-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-warning-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-danger-contrast-foreground: var(--ifm-font-color-base);
+
+  --ifm-background-color: #ffffff;
+  --ifm-background-surface-color: #f8f8f8;
+  --ifm-footer-background-color: var(--ifm-background-surface-color);
+  --ifm-menu-background-color: var(--ifm-background-surface-color);
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.7);
+  --ifm-toc-border-color: var(--ifm-color-emphasis-300);
+  --ifm-color-emphasis-300: rgba(60, 60, 60, 0.12);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --code-background-color: var(--ifm-background-surface-color);
+
   --ifm-global-radius: 4px;
   --ifm-alert-border-left-width: 4px;
   --ifm-font-family-base: Roboto, Noto Sans, system-ui, -apple-system, Segoe UI,
@@ -33,23 +57,33 @@ html[data-theme='dark'] {
   --ifm-color-primary-light: #29d5b0;
   --ifm-color-primary-lighter: #32d8b4;
   --ifm-color-primary-lightest: #4fddbf;
-  --ifm-background-color: #141414;
-  --ifm-background-surface-color: #242424;
+  --ifm-background-color: #242424;
+  --ifm-background-surface-color: #1a1a1a;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-navbar-background-color: rgba(36, 36, 36, 0.7);
 
   --ifm-color-secondary-dark: #fff;
   --ifm-color-success-dark: #55c244;
   --ifm-color-info-dark: #4cb3d4;
   --ifm-color-warning-dark: #e6a700;
   --ifm-color-danger-dark: #e13238;
+
+  --ifm-color-emphasis-300: rgba(84, 84, 84, 0.48);
+  --ifm-toc-border-color: var(--ifm-color-emphasis-300);
 }
 
 .alert {
+  --code-background-color: var(--ifm-background-color);
   background-color: var(--ifm-background-surface-color);
 }
 
-.footer--dark {
-  --ifm-footer-background-color: #242424;
+.navbar {
+  box-shadow: none;
+  backdrop-filter: saturate(50%) blur(8px);
+}
+
+.menu {
+  background-color: var(--ifm-menu-background-color);
 }
 
 html {
