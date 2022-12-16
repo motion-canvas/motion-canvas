@@ -5,7 +5,7 @@ import {useThread} from './useThread';
  *
  * @remarks
  * The returned value accounts for offsets caused by functions such as
- * {@link waitFor}.
+ * {@link flow~waitFor}.
  *
  * @example
  * ```ts

@@ -71,9 +71,15 @@ export interface NodeProps {
 export class Node implements Promisable<Node> {
   public declare isClass: boolean;
 
+  /**
+   * @category Transform
+   */
   @vector2Property()
   public declare readonly position: Vector2Property<this>;
 
+  /**
+   * @category Transform
+   */
   @wrapper(Vector2)
   @cloneable(false)
   @property()
@@ -96,10 +102,16 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * @category Transform
+   */
   @initial(0)
   @property()
   public declare readonly rotation: Signal<number, this>;
 
+  /**
+   * @category Transform
+   */
   @cloneable(false)
   @property()
   public declare readonly absoluteRotation: Signal<number, this>;
@@ -117,10 +129,16 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * @category Transform
+   */
   @initial(Vector2.one)
   @vector2Property('scale')
   public declare readonly scale: Vector2Property<this>;
 
+  /**
+   * @category Transform
+   */
   @wrapper(Vector2)
   @cloneable(false)
   @property()

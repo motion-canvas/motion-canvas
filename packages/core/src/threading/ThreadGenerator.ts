@@ -14,27 +14,25 @@ export function isPromisable(value: any): value is Promisable<any> {
  * @example
  * Yielded values can be used to control the flow of animation:
  *
- * - Progress to the next frame:
+ * Progress to the next frame:
  * ```ts
  * yield;
  * ```
  *
- * - Run another generator synchronously:
+ * Run another generator synchronously:
  * ```ts
  * yield* generatorFunction();
  * ```
  *
- * - Run another generator concurrently:
+ * Run another generator concurrently:
  * ```ts
  * const task = yield generatorFunction();
  * ```
-
- * - Await a [Promise][promise]:
+ *
+ * Await a Promise:
  * ```ts
  * const result = yield asyncFunction();
  * ```
- *
- * [promise]: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/promise
  */
 export type ThreadGenerator = Generator<
   ThreadGenerator | Promise<any> | Promisable<any> | void,
