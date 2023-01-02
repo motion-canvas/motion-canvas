@@ -28,7 +28,7 @@ export class Thread {
    * The current time of this thread.
    *
    * @remarks
-   * Used by {@link waitFor} and other time-based functions to properly
+   * Used by {@link flow~waitFor} and other time-based functions to properly
    * support durations shorter than one frame.
    */
   public readonly time = createSignal(0);

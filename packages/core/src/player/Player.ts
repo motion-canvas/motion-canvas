@@ -325,6 +325,12 @@ export class Player {
       if (state.paused && previousState !== PlaybackState.Paused) {
         await this.project.render();
       }
+
+      // Sync the audio if the animation is too far ahead.
+      if (this.project.time > this.project.audio.getTime() + MAX_AUDIO_DESYNC) {
+        this.project.syncAudio();
+      }
+
       this.request();
       return;
     }

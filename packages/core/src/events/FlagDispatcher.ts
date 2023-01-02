@@ -58,9 +58,6 @@ export class FlagDispatcher extends EventDispatcherBase<void> {
     return this.value;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public subscribe(handler: EventHandler<void>) {
     const unsubscribe = super.subscribe(handler);
     if (this.value) {

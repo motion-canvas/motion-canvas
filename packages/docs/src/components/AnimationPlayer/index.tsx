@@ -10,7 +10,6 @@ if (ExecutionEnvironment.canUseDOM) {
 }
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       'motion-canvas-player': MotionCanvasPlayerProps & ComponentProps<'div'>;

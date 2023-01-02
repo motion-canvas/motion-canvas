@@ -1,0 +1,18 @@
+.header {
+  flex-direction: row-reverse;
+}
+
+.filters {
+  width: auto;
+  flex-shrink: 0;
+  flex-grow: 0;
+  white-space: nowrap;
+  display: flex;
+  justify-content: end;
+  align-items: start;
+}
+
+.icon {
+  margin-left: 0.3em;
+  margin-bottom: -0.3em;
+}

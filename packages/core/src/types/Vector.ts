@@ -14,6 +14,9 @@ export type PossibleVector2<T = number> =
   | T
   | [T, T];
 
+/**
+ * Represents a two-dimensional vector.
+ */
 export class Vector2 implements Type {
   public static readonly symbol = Symbol.for(
     '@motion-canvas/core/types/Vector2',

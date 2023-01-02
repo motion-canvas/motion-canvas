@@ -1,8 +1,8 @@
 /**
  * Utilities for controlling the flow and timing of an animation.
- *
- * @module
+ * @packageDocumentation
  */
+
 export * from './all';
 export * from './any';
 export * from './chain';

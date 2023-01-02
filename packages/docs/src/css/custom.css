@@ -24,6 +24,12 @@
   --ifm-color-gray-800: #444444;
   --ifm-color-gray-900: #1c1c1c;
 
+  --ifm-color-secondary-dark: #666666;
+  --ifm-color-success-dark: #99c47a;
+  --ifm-color-info-dark: #68abdf;
+  --ifm-color-warning-dark: #ffc66d;
+  --ifm-color-danger-dark: #ff6470;
+
   --ifm-color-secondary-contrast-foreground: var(--ifm-font-color-base);
   --ifm-color-success-contrast-foreground: var(--ifm-font-color-base);
   --ifm-color-info-contrast-foreground: var(--ifm-font-color-base);
@@ -39,6 +45,8 @@
   --ifm-color-emphasis-300: rgba(60, 60, 60, 0.12);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
   --code-background-color: var(--ifm-background-surface-color);
+  --ifm-code-hover-background: #f0f0f0;
+  --ifm-hr-background-color: var(--ifm-color-emphasis-300);
 
   --ifm-global-radius: 4px;
   --ifm-alert-border-left-width: 4px;
@@ -46,27 +54,38 @@
     sans-serif;
   --ifm-font-family-monospace: JetBrains Mono, Consolas, monospace;
   --ifm-pre-line-height: 1.6;
+
+  --ifm-h3-font-size: 1.5rem;
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 html[data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #25c281;
+  --ifm-color-primary-dark: #21af74;
+  --ifm-color-primary-darker: #1fa56e;
+  --ifm-color-primary-darkest: #1a885a;
+  --ifm-color-primary-light: #29d58e;
+  --ifm-color-primary-lighter: #32d893;
+  --ifm-color-primary-lightest: #4fdda2;
+
   --ifm-background-color: #242424;
   --ifm-background-surface-color: #1a1a1a;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
   --ifm-navbar-background-color: rgba(36, 36, 36, 0.7);
+  --ifm-code-background: var(--ifm-background-surface-color);
+  --ifm-code-hover-background: #141414;
 
-  --ifm-color-secondary-dark: #fff;
-  --ifm-color-success-dark: #55c244;
-  --ifm-color-info-dark: #4cb3d4;
-  --ifm-color-warning-dark: #e6a700;
-  --ifm-color-danger-dark: #e13238;
+  --ifm-color-secondary-dark: #f8f8f8;
+  --ifm-color-success-dark: #7ac445;
+  --ifm-color-info-dark: #50a0de;
+  --ifm-color-warning-dark: #ffaa00;
+  --ifm-color-danger-dark: #ff3849;
+
+  --ifm-color-secondary-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-success-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-info-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-warning-contrast-foreground: var(--ifm-font-color-base);
+  --ifm-color-danger-contrast-foreground: var(--ifm-font-color-base);
 
   --ifm-color-emphasis-300: rgba(84, 84, 84, 0.48);
   --ifm-toc-border-color: var(--ifm-color-emphasis-300);
@@ -88,9 +107,24 @@ html[data-theme='dark'] {
 
 html {
   height: 100%;
+  accent-color: var(--ifm-color-primary);
 }
 
 a.button:hover {
   color: var(--ifm-button-color);
   text-decoration: none;
+}
+
+@media screen and (max-width: 996px) {
+  :root {
+    --ifm-navbar-background-color: rgb(255, 255, 255);
+  }
+
+  html[data-theme='dark'] {
+    --ifm-navbar-background-color: rgb(36, 36, 36);
+  }
+
+  .navbar {
+    backdrop-filter: none;
+  }
 }

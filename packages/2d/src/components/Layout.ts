@@ -397,7 +397,7 @@ export class Layout extends Node {
    * @remarks
    * When the mode is `null`, its value will be inherited from the parent.
    *
-   * Use {@link Layout.mode} to get the raw mode set for this node (without
+   * Use {@link layout} to get the raw mode set for this node (without
    * inheritance).
    */
   @computed()

@@ -1,7 +1,7 @@
 /**
  * Thread management.
  *
- * @module
+ * @packageDocumentation
  */
 export * from './cancel';
 export * from './join';

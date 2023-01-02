@@ -12,10 +12,16 @@
     {
       "tagName": "@default",
       "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@category",
+      "syntaxKind": "modifier"
     }
   ],
   "supportForTags": {
+    "@packageDocumentation": true,
     "@module": true,
+    "@category": true,
     "@param": true,
     "@deprecated": true,
     "@returns": true,

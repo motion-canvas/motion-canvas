@@ -18,7 +18,7 @@ export abstract class EventDispatcherBase<
   private subscribers = new Set<THandler>();
 
   /**
-   * {@inheritDoc SubscribableEvent.subscribe}
+   * {@inheritDoc Subscribable.subscribe}
    */
   public subscribe(handler: THandler) {
     this.subscribers.add(handler);
@@ -26,7 +26,7 @@ export abstract class EventDispatcherBase<
   }
 
   /**
-   * {@inheritDoc SubscribableEvent.unsubscribe}
+   * {@inheritDoc Subscribable.unsubscribe}
    */
   public unsubscribe(handler: THandler) {
     this.subscribers.delete(handler);
