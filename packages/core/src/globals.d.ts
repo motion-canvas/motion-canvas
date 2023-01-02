@@ -1,3 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars,@typescript-eslint/no-namespace */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 declare type Callback = (...args: any[]) => void;

@@ -1,0 +1,104 @@
+.list {
+}
+.elements {
+}
+
+.element:not(:last-child)::after {
+  content: attr(data-separator);
+}
+.elements.wrap > .element::after {
+  content: attr(data-separator) '\a';
+}
+.elements.wrap::before {
+  content: '\a';
+}
+.elements.wrap::after {
+  content: '';
+}
+.wrap .elements.wrap::after {
+  padding-left: 2ch;
+}
+.wrap .wrap .elements.wrap::after {
+  padding-left: 4ch;
+}
+
+.elements.wrap > .element {
+  padding-left: 2ch;
+}
+.wrap .elements.wrap > .element {
+  padding-left: 4ch;
+}
+.wrap .wrap .elements.wrap > .element {
+  padding-left: 6ch;
+}
+
+.angle::before {
+  content: '<';
+}
+.angle::after {
+  content: '>';
+}
+.curly::before {
+  content: '{';
+}
+.curly::after {
+  content: '}';
+}
+.square::before {
+  content: '[';
+}
+.square::after {
+  content: ']';
+}
+.parentheses::before {
+  content: '(';
+}
+.parentheses::after {
+  content: ')';
+}
+
+.codeBlockContainer hr {
+  margin: 0;
+  background-color: #141414;
+}
+.blockSeparator {
+  margin: 0;
+  background-color: #141414;
+}
+.codeBlock {
+  border-radius: var(--ifm-pre-border-radius);
+}
+.codeBlock.highlight {
+  --prism-background-color: var(--ifm-code-background);
+}
+.codeBlock.highlight > pre > code {
+  border-left: var(--ifm-alert-border-left-width) solid
+    var(--ifm-color-emphasis-400);
+  padding-left: calc(
+    var(--ifm-pre-padding) - var(--ifm-alert-border-left-width)
+  );
+  border-radius: var(--ifm-pre-border-radius);
+}
+.codeBlock:first-child:not(:last-child) {
+  --ifm-pre-border-radius: var(--ifm-global-radius) var(--ifm-global-radius) 0 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+.codeBlock:not(:first-child):not(:last-child) {
+  --ifm-pre-border-radius: 0;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+}
+.codeBlock:not(:first-child):last-child {
+  --ifm-pre-border-radius: 0 0 var(--ifm-global-radius) var(--ifm-global-radius);
+}
+
+.codeBlock.pointer {
+  cursor: pointer;
+}
+.codeBlock.pointer:hover {
+  --prism-background-color: var(--ifm-code-hover-background);
+}
+
+.codeBlockContainer {
+  position: relative;
+  scroll-margin-top: calc(var(--ifm-navbar-height) + var(--ifm-leading));
+}

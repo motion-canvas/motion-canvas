@@ -35,12 +35,7 @@ const config = {
             position: 'left',
             label: 'Guides',
           },
-          {
-            type: 'docSidebar',
-            sidebarId: 'api',
-            position: 'left',
-            label: 'API',
-          },
+          {to: '/api/core', label: 'API', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/motion-canvas',
@@ -129,47 +124,7 @@ const config = {
     '@docusaurus/plugin-content-pages',
     '@docusaurus/plugin-debug',
     '@docusaurus/plugin-sitemap',
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: 'core',
-        out: 'api/core',
-        excludeExternals: true,
-        entryPoints: [
-          '../core/',
-          '../core/src/decorators',
-          '../core/src/events',
-          '../core/src/flow',
-          '../core/src/helpers',
-          '../core/src/media',
-          '../core/src/player',
-          '../core/src/scenes',
-          '../core/src/threading',
-          '../core/src/transitions',
-          '../core/src/tweening',
-          '../core/src/types',
-          '../core/src/utils',
-        ],
-        tsconfig: '../core/tsconfig.build.json',
-      },
-    ],
-    [
-      'docusaurus-plugin-typedoc',
-      {
-        id: '2d',
-        out: 'api/2d',
-        excludeExternals: true,
-        entryPoints: [
-          '../2d/src/components',
-          '../2d/src/curves',
-          '../2d/src/decorators',
-          '../2d/src/partials',
-          '../2d/src/scenes',
-          '../2d/src/utils',
-        ],
-        tsconfig: '../2d/tsconfig.json',
-      },
-    ],
+    require('./typedoc'),
   ],
 };
 

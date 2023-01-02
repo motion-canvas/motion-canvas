@@ -1,0 +1,44 @@
+import React from 'react';
+
+import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
+import Container from '@site/src/components/Api/Code/Container';
+import Line from '@site/src/components/Api/Code/Line';
+import PropertyPreview from '@site/src/components/Api/Preview/PropertyPreview';
+import Heading from '@theme/Heading';
+import Comment from '@site/src/components/Api/Comment';
+import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
+import type {JSONOutput} from 'typedoc';
+
+export default function PropertyItem({
+  reflection,
+}: {
+  reflection: JSONOutput.DeclarationReflection;
+}) {
+  return (
+    <>
+      {reflection.hasOwnPage ? (
+        <h1>{reflection.name}</h1>
+      ) : (
+        <Heading as="h3" id={reflection.anchor}>
+          <code>{reflection.name}</code>
+        </Heading>
+      )}
+      <Container>
+        <CodeBlock link={reflection.sources?.[0]?.url}>
+          <Line>
+            <PropertyPreview reflection={reflection} />
+          </Line>
+        </CodeBlock>
+      </Container>
+      <Comment comment={reflection.comment} />
+      {reflection.inheritedFrom && (
+        <>
+          Inherited from{' '}
+          <code>
+            <ReferenceType type={reflection.inheritedFrom} />
+          </code>
+        </>
+      )}
+    </>
+  );
+}

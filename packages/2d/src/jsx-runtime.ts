@@ -6,7 +6,6 @@ import type {
   JSXProps,
 } from './components';
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace JSX {
   export type Element = Node;
   export type ElementClass = Node;
