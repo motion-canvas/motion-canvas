@@ -212,8 +212,7 @@ class MotionCanvasPlayer extends HTMLElement {
     this.runId ??= requestAnimationFrame(async time => {
       this.runId = null;
       if (!this.shouldPlay()) return;
-
-      if (time - this.renderTime >= 990 / this.project.framerate) {
+      if (time - this.renderTime >= 1000 / (this.project.framerate + 5)) {
         this.renderTime = time;
         try {
           await this.run();

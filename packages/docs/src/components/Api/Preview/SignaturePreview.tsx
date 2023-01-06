@@ -51,7 +51,7 @@ export default function SignaturePreview({
       ) : isArrow ? (
         ''
       ) : (
-        <Token type="plain">{reflection.name}</Token>
+        <Token type="function">{reflection.name}</Token>
       )}
       {!!reflection.typeParameter?.length && (
         <TokenList type={ListType.Angle}>

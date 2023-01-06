@@ -388,7 +388,7 @@ export class Player {
 
   private request() {
     this.requestId = requestAnimationFrame(async time => {
-      if (time - this.renderTime >= 990 / this.state.current.fps) {
+      if (time - this.renderTime >= 1000 / (this.state.current.fps + 5)) {
         this.renderTime = time;
         try {
           await this.run();

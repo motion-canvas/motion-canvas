@@ -3,6 +3,8 @@ sidebar_position: 1
 ---
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import CodeBlock from '@theme/CodeBlock';
+import source from '!!raw-loader!@motion-canvas/examples/src/scenes/quickstart';
 
 # Quickstart
 
@@ -69,32 +71,9 @@ going to focus on `src/scenes/example.tsx`, which is where we can add our
 animations. Open `example.tsx` in a text editor, and replace all code in
 the file with the following snippet.
 
-```tsx title="src/scenes/example.tsx"
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {useRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
-
-export default makeScene2D(function* (view) {
-  const myCircle = useRef<Circle>();
-
-  view.add(
-    <Circle
-      //highlight-start
-      ref={myCircle}
-      x={-300}
-      width={240}
-      height={240}
-      fill="#e13238"
-    />,
-  );
-
-  yield* all(
-    myCircle.value.fill('#e6a700', 1).to('#e13238', 1),
-    myCircle.value.position.x(300, 1).to(-300, 1),
-  );
-});
-```
+<CodeBlock language="tsx" title="src/scenes/example.tsx">
+  {source}
+</CodeBlock>
 
 Now save the file. Any changes you make are automatically picked up and
 reflected in the preview. You should see a gray circle in the preview pane at
@@ -299,32 +278,9 @@ Now they'll happen at the same time.
 
 This brings us back to our initial example:
 
-```tsx title="src/scenes/example.tsx"
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {useRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
-
-export default makeScene2D(function* (view) {
-  const myCircle = useRef<Circle>();
-
-  view.add(
-    <Circle
-      //highlight-start
-      ref={myCircle}
-      x={-300}
-      width={240}
-      height={240}
-      fill="#e13238"
-    />,
-  );
-
-  yield* all(
-    myCircle.value.fill('#e6a700', 1).to('#e13238', 1),
-    myCircle.value.position.x(300, 1).to(-300, 1),
-  );
-});
-```
+<CodeBlock language="tsx" title="src/scenes/example.tsx">
+  {source}
+</CodeBlock>
 
 [installation]: /guides/getting-started/installation
 [generators]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*

@@ -4,7 +4,13 @@ import motionCanvas from '@motion-canvas/vite-plugin';
 export default defineConfig({
   plugins: [
     motionCanvas({
-      project: ['./src/quickstart.ts'],
+      project: [
+        './src/quickstart.ts',
+        './src/tweening-linear.ts',
+        './src/tweening-cubic.ts',
+        './src/tweening-color.ts',
+        './src/tweening-vector.ts',
+      ],
     }),
   ],
   build: {

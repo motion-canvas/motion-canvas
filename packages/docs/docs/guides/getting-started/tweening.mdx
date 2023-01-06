@@ -2,4 +2,181 @@
 sidebar_position: 3
 ---
 
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import CodeBlock from '@theme/CodeBlock';
+import linearSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-linear';
+
 # Tweening
+
+Tweens are one of the fundamental building blocks of animation.
+They are a special type of generators that animate between two values
+over given time.
+
+## `tween` function
+
+The simplest way to create a tween is via the
+[`tween`](/api/core/tweening#tween) function:
+
+<CodeBlock language="tsx">{linearSource}</CodeBlock>
+
+In the example above, we animate the x coordinate of our circle
+from `-300` to `300` over a span of `2` second.
+
+The [`tween`](/api/core/tweening#tween) function takes two parameters.
+The first one specifies the tween duration in seconds. The second is
+a callback function that will be called each frame the tween takes
+place. The `value` parameter it recieves is a number ranging from `0`
+to `1`, informing us about the progress of the tween. We can use it to
+calculate the values that our tween animates. In the case of our circle,
+we use the `map` function to map the `value` range from `[0, 1]` to
+`[-300, 300]` and set it as the `x` coordinate:
+
+<AnimationPlayer small name="tweening-linear" />
+
+## Timing functions
+
+At the moment, our animation feels a bit unnatural. The speed with which
+the `value` parameter changes is constant, which in turn makes the circle
+move with constant speed. In real life, however, objects have inertia -
+they take time to speed up and slow down. We can simulate this behavior
+with [timing functions](/api/core/tweening).
+
+A timing function takes a number in the range `[0, 1]` and returns another
+number in the same range but with a modified rate of change.
+Motion Canvas provides all
+[the most popular timing functions](https://easings.net/) (sometimes called
+easing functions) but since it's a normal JavaScript function you can create
+your own.
+
+Let's use the [`easeInOutCubic`](/api/core/tweening#easeInOutCubic) function
+to fix our animation:
+
+```ts
+yield* tween(2, value => {
+  circle.value.position.x(map(-300, 300, easeInOutCubic(value)));
+});
+```
+
+<AnimationPlayer small name="tweening-cubic" />
+
+`easeInOut` means that the object will speed up at the start (`in`) and slow
+down at the end (`Out`). `Cubic` denotes the mathematical function used -
+in this case it's a cubic equation. Knowing that, a function called
+`easeOutQuad` would make the object start with full speed and then slow down
+at the end using a quadratic equation.
+
+Because using timing functions to map a range of values is a really common
+pattern, it's possible to skip `map` entirely and pass the range to the
+timing function itself:
+
+```ts
+// This:
+map(-300, 300, easeInOutCubic(value));
+// Can be simplified to:
+easeInOutCubic(value, -300, 300);
+```
+
+## Interplation functions
+
+So far, we've only animated a single, numeric value.
+The [`map`](/api/core/tweening#map) function can be used to interpolate between
+two numbers but to animate more complex types we'll need to use interpolation
+functions. Consider the following example:
+
+```ts
+yield* tween(2, value => {
+  circle.value.color(
+    Color.lerp(
+      new Color('#e6a700'),
+      new Color('#e13238'),
+      easeInOutCubic(value),
+    ),
+  );
+});
+```
+
+[`Color.lerp`](/api/core/types/Color#lerp) is a static function that
+interpolates between two colors:
+
+<AnimationPlayer small name="tweening-color" />
+
+:::tip
+
+All [complex types](/api/core/types) in Motion Canvas provide a static method
+called `lerp` that interpolates between two instances of said type.
+
+:::
+
+Aside from the default linear interpolation, some types offer more advanced
+functions such as the [`Vector2.arcLerp`](/api/core/types/Vector2#arcLerp).
+It makes the object follow a curved path from point a to b:
+
+```ts
+yield* tween(2, value => {
+  circle.value.position(
+    // highlight-next-line
+    Vector2.arcLerp(
+      new Vector2(-300, 200),
+      new Vector2(300, -200),
+      easeInOutCubic(value),
+    ),
+  );
+});
+```
+
+<AnimationPlayer small name="tweening-vector" />
+
+## Tweening properties
+
+The [`tween`](/api/core/tweening#tween) function is useful when we need to
+orchestrate complex animations. However, there's a better way of tweening
+individual properties. You may recall from the
+[quickstart](/guides/getting-started/quickstart) section that the following
+tween:
+
+```ts
+yield* tween(2, value => {
+  circle.value.color(
+    Color.lerp(
+      new Color('#e6a700'),
+      new Color('#e13238'),
+      easeInOutCubic(value),
+    ),
+  );
+});
+```
+
+Can be written as:
+
+```ts
+yield* circle.value.color('#e13238', 2);
+```
+
+Here, we use a [`SignalTween`](/api/core/utils/SignalTween) signature that
+looks similar to a setter, except it accepts the transition duration as its
+second argument. Under the hood, this will also create a tween - one that
+starts with the current value and ends with the newly provided one.
+
+By default, it will use `easeInOutCubic` as the timing function.
+We can override that by providing a third argument:
+
+```ts
+yield* circle.value.color(
+  '#e13238',
+  2,
+  // highlight-next-line
+  easeOutQuad
+);
+```
+
+Similarly, we can pass a custom interpolation function as the forth argument:
+
+```ts
+yield* circle.value.position(
+  new Vector2(300, -200),
+  2,
+  easeInOutCubic,
+  // highlight-next-line
+  Vector2.arcLerp
+);
+```
