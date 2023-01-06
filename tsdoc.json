@@ -33,6 +33,7 @@
     "@typeParam": true,
     "@ignore": true,
     "@inheritDoc": true,
-    "@default": true
+    "@default": true,
+    "@see": true
   }
 }

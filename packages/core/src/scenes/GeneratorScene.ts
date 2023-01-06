@@ -16,6 +16,7 @@ import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
 import {Rect, Vector2} from '../types';
 import {SceneState} from './SceneState';
+import {Random} from './Random';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -30,6 +31,7 @@ export abstract class GeneratorScene<T>
   implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
   public readonly timeEvents: TimeEvents;
+  public random: Random;
 
   public get project(): Project {
     if (!this.currentProject) {
@@ -106,6 +108,14 @@ export abstract class GeneratorScene<T>
   ) {
     decorate(this.runnerFactory, threadable(name));
     this.timeEvents = new TimeEvents(this);
+
+    let seed = this.meta.getData().seed;
+    if (typeof seed !== 'number') {
+      seed = Random.createSeed();
+      this.meta.setDataSync({seed});
+    }
+
+    this.random = new Random(seed);
   }
 
   public abstract getView(): T;
@@ -234,6 +244,7 @@ export abstract class GeneratorScene<T>
   public async reset(previousScene: Scene | null = null) {
     this.counters = {};
     this.previousScene = previousScene;
+    this.random = new Random(this.meta.getData().seed!);
     this.runner = threads(
       () => this.runnerFactory(this.getView()),
       thread => {
