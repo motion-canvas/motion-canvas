@@ -3,7 +3,7 @@ import {Node} from './Node';
 import {computed, initial, property} from '../decorators';
 import {arc, lineTo, moveTo, resolveCanvasStyle} from '../utils';
 import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
-import {Rect, Vector2} from '@motion-canvas/core/lib/types';
+import {Rect, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Length} from '../partials';
 import {Layout} from './Layout';
@@ -65,18 +65,8 @@ export class Line extends Shape {
   @property()
   public declare readonly arrowSize: Signal<number, this>;
 
-  public getCustomWidth(): Length {
-    return this.childrenRect().width;
-  }
-  public setCustomWidth() {
-    // do nothing
-  }
-
-  public getCustomHeight(): Length {
-    return this.childrenRect().height;
-  }
-  public setCustomHeight() {
-    // do nothing
+  protected override desiredSize(): SerializedVector2<Length> {
+    return this.childrenRect().size;
   }
 
   public constructor(props: LineProps) {

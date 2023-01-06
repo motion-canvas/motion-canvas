@@ -4,9 +4,15 @@ import {
   SignalValue,
 } from '@motion-canvas/core/lib/utils';
 import {computed, initial, property} from '../decorators';
-import {Color, Rect as RectType, Vector2} from '@motion-canvas/core/lib/types';
+import {
+  Color,
+  Rect as RectType,
+  SerializedVector2,
+  Vector2,
+} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
+import {Length} from '../partials';
 
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
@@ -30,6 +36,19 @@ export class Image extends Rect {
 
   public constructor(props: ImageProps) {
     super(props);
+  }
+
+  protected override desiredSize(): SerializedVector2<Length> {
+    const custom = super.desiredSize();
+    if (custom.x === null && custom.y === null) {
+      const image = this.image();
+      return {
+        x: image.naturalWidth,
+        y: image.naturalHeight,
+      };
+    }
+
+    return custom;
   }
 
   @computed()

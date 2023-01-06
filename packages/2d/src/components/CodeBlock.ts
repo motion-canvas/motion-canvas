@@ -1,12 +1,13 @@
 import {computed, initial, property} from '../decorators';
 import {
   createComputedAsync,
+  createSignal,
   Signal,
   SignalValue,
   useLogger,
 } from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
-import {CodeTree, parse, diff, ready, MorphToken} from 'code-fns';
+import {CodeTree, parse, diff, ready, MorphToken, Token} from 'code-fns';
 import {
   clampRemap,
   easeInOutSine,
@@ -14,6 +15,8 @@ import {
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
+import {Length} from '../partials';
+import {SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 
 export interface CodeProps extends ShapeProps {
   children?: CodeTree;
@@ -30,11 +33,15 @@ export class CodeBlock extends Shape {
   @property()
   public declare readonly code: Signal<CodeTree, this>;
 
-  private progress: number | null = null;
+  private progress = createSignal<number | null>(null);
   private diffed: MorphToken[] | null = null;
 
   @computed()
   protected parsed() {
+    if (!CodeBlock.initialized()) {
+      return [];
+    }
+
     return parse(this.code());
   }
 
@@ -43,6 +50,55 @@ export class CodeBlock extends Shape {
     if (children) {
       this.code(children);
     }
+  }
+
+  @computed()
+  protected characterSize() {
+    this.requestFontUpdate();
+    const context = this.cacheCanvas();
+    context.save();
+    this.applyStyle(context);
+    context.font = this.styles.font;
+    const width = context.measureText('X').width;
+    context.restore();
+
+    return new Vector2(width, parseFloat(this.styles.lineHeight));
+  }
+
+  protected override desiredSize(): SerializedVector2<Length> {
+    const custom = super.desiredSize();
+    const tokensSize = this.getTokensSize(this.parsed());
+    return {
+      x: custom.x ?? tokensSize.x,
+      y: custom.y ?? tokensSize.y,
+    };
+  }
+
+  protected getTokensSize(tokens: Token[]) {
+    const size = this.characterSize();
+    let maxWidth = 0;
+    let height = size.height;
+    let width = 0;
+
+    for (const token of tokens) {
+      for (let i = 0; i < token.code.length; i++) {
+        if (token.code[i] === '\n') {
+          if (width > maxWidth) {
+            maxWidth = width;
+          }
+          width = 0;
+          height += size.height;
+        } else {
+          width += size.width;
+        }
+      }
+    }
+
+    if (width > maxWidth) {
+      maxWidth = width;
+    }
+
+    return {x: maxWidth, y: height};
   }
 
   protected override collectAsyncResources(): void {
@@ -57,14 +113,40 @@ export class CodeBlock extends Shape {
     timingFunction: TimingFunction,
   ) {
     if (typeof code === 'function') throw new Error();
-    this.progress = 0;
+    if (!CodeBlock.initialized()) return;
+
+    const autoWidth = this.customWidth() === null;
+    const autoHeight = this.customHeight() === null;
+    const fromSize = this.size();
+    const toSize = this.getTokensSize(parse(code));
+
+    const beginning = 0.2;
+    const ending = 0.8;
+
+    this.progress(0);
     this.diffed = diff(this.code(), code);
     yield* tween(
       time,
-      value => (this.progress = timingFunction(value)),
+      value => {
+        const progress = timingFunction(value);
+        const remapped = clampRemap(beginning, ending, 0, 1, progress);
+        this.progress(progress);
+        if (autoWidth) {
+          this.customWidth(easeInOutSine(remapped, fromSize.x, toSize.x));
+        }
+        if (autoHeight) {
+          this.customHeight(easeInOutSine(remapped, fromSize.y, toSize.y));
+        }
+      },
       () => {
-        this.progress = null;
+        this.progress(null);
         this.diffed = null;
+        if (autoWidth) {
+          this.customWidth(null);
+        }
+        if (autoHeight) {
+          this.customHeight(null);
+        }
         this.code(code);
       },
     );
@@ -77,10 +159,13 @@ export class CodeBlock extends Shape {
     this.applyStyle(context);
     context.font = this.styles.font;
     context.textBaseline = 'top';
-    const lh = parseInt(this.styles.fontSize) * 1.5;
-
+    const lh = parseFloat(this.styles.lineHeight);
     const w = context.measureText('X').width;
-    if (this.progress == null) {
+    const size = this.computedSize();
+    const progress = this.progress();
+
+    context.translate(size.x / -2, size.y / -2);
+    if (progress == null) {
       const parsed = this.parsed();
       let x = 0;
       let y = 0;
@@ -106,31 +191,25 @@ export class CodeBlock extends Shape {
         context.fillStyle = token.color as string;
         if (token.morph === 'delete') {
           context.save();
-          const opacity = clampRemap(
-            0,
-            beginning + overlap,
-            1,
-            0,
-            this.progress,
-          );
+          const opacity = clampRemap(0, beginning + overlap, 1, 0, progress);
           context.globalAlpha = opacity;
           context.fillText(token.code, token.from![0] * w, token.from![1] * lh);
           context.restore();
         } else if (token.morph === 'create') {
           context.save();
-          const opacity = clampRemap(ending - overlap, 1, 0, 1, this.progress);
+          const opacity = clampRemap(ending - overlap, 1, 0, 1, progress);
           context.globalAlpha = opacity;
           context.fillText(token.code, token.to![0] * w, token.to![1] * lh);
           context.restore();
         } else if (token.morph === 'retain') {
-          const progress = clampRemap(beginning, ending, 0, 1, this.progress);
+          const remapped = clampRemap(beginning, ending, 0, 1, progress);
           const x = easeInOutSine(
-            progress,
+            remapped,
             token.from![0] * w,
             token.to![0] * w,
           );
           const y = easeInOutSine(
-            progress,
+            remapped,
             token.from![1] * lh,
             token.to![1] * lh,
           );

@@ -217,7 +217,7 @@ export class Layout extends Node {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Length>,
   ): ThreadGenerator {
-    const width = this.customWidth();
+    const width = this.desiredSize().x;
     const lock = typeof width !== 'number' || typeof value !== 'number';
     let from: number;
     if (lock) {
@@ -257,7 +257,7 @@ export class Layout extends Node {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Length>,
   ): ThreadGenerator {
-    const height = this.customHeight();
+    const height = this.desiredSize().y;
     const lock = typeof height !== 'number' || typeof value !== 'number';
 
     let from: number;
@@ -297,7 +297,7 @@ export class Layout extends Node {
   @property()
   protected declare readonly customHeight: Signal<Length, this>;
   @computed()
-  protected customSize(): SerializedVector2<Length> {
+  protected desiredSize(): SerializedVector2<Length> {
     return {
       x: this.customWidth(),
       y: this.customHeight(),
@@ -311,7 +311,7 @@ export class Layout extends Node {
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<Vector2>,
   ): ThreadGenerator {
-    const size = this.customSize();
+    const size = this.desiredSize();
     let from: Vector2;
     if (typeof size.x !== 'number' || typeof size.y !== 'number') {
       from = this.size();
@@ -633,8 +633,9 @@ export class Layout extends Node {
   protected applyFlex() {
     this.element.style.position = this.isLayoutRoot() ? 'absolute' : 'relative';
 
-    this.element.style.width = this.parseLength(this.customWidth());
-    this.element.style.height = this.parseLength(this.customHeight());
+    const size = this.desiredSize();
+    this.element.style.width = this.parseLength(size.x);
+    this.element.style.height = this.parseLength(size.y);
     this.element.style.maxWidth = this.parseLength(this.maxWidth());
     this.element.style.minWidth = this.parseLength(this.minWidth());
     this.element.style.maxHeight = this.parseLength(this.maxHeight());
