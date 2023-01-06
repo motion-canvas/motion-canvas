@@ -1,24 +1,24 @@
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {useRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {tween, map, easeInOutCubic} from '@motion-canvas/core/lib/tweening';
 
 export default makeScene2D(function* (view) {
-  const myCircle = useRef<Circle>();
+  const circle = useRef<Circle>();
 
   view.add(
     <Circle
       //highlight-start
-      ref={myCircle}
+      ref={circle}
       x={-300}
       width={240}
       height={240}
       fill="#e13238"
     />,
   );
-
-  yield* all(
-    myCircle.value.position.x(300, 1).to(-300, 1),
-    myCircle.value.fill('#e6a700', 1).to('#e13238', 1),
-  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle.value.position.x(map(-300, 300, easeInOutCubic(value)));
+  });
+  //highlight-end
 });
