@@ -4,9 +4,11 @@ import {SavedTimeEvent, TimeEvents} from './TimeEvents';
 import {SubscribableEvent, SubscribableValueEvent} from '../events';
 import {Vector2} from '../types';
 import {LifecycleEvents} from './LifecycleEvents';
+import {Random} from './Random';
 
 export interface SceneMetadata extends Metadata {
   timeEvents: SavedTimeEvent[];
+  seed: number;
 }
 
 /**
@@ -100,6 +102,7 @@ export interface Scene<T = unknown> {
    */
   project: Project;
   readonly timeEvents: TimeEvents;
+  readonly random: Random;
   readonly meta: Meta<SceneMetadata>;
 
   /**

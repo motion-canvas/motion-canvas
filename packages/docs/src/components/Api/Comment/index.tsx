@@ -4,28 +4,48 @@ import Summary from '@site/src/components/Api/Comment/Summary';
 
 export default function Comment({
   comment,
-  withExamples = true,
+  full = true,
 }: {
   comment: JSONOutput.Comment;
-  withExamples?: boolean;
+  full?: boolean;
 }) {
   const remarks = useMemo(() => {
     return comment?.blockTags?.find(({tag}) => tag === '@remarks');
-  }, [comment]);
-  const examples = useMemo(() => {
-    return comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [];
   }, [comment]);
 
   return (
     <>
       <Summary id={comment?.summaryId} />
       <Summary id={remarks?.contentId} />
-      {withExamples && examples.length > 0 && (
+      {full && <ExamplesAndSeeAlso comment={comment} />}
+    </>
+  );
+}
+
+function ExamplesAndSeeAlso({comment}: {comment: JSONOutput.Comment}) {
+  const examples = useMemo(
+    () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
+    [comment],
+  );
+  const seeAlso = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@see'),
+    [comment],
+  );
+
+  return (
+    <>
+      {examples.length > 0 && (
         <>
           <h4>Examples</h4>
           {examples.map(example => (
             <Summary id={example.contentId} />
           ))}
+        </>
+      )}
+      {seeAlso && (
+        <>
+          <h4>See also</h4>
+          <Summary id={seeAlso.contentId} />
         </>
       )}
     </>

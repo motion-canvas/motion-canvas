@@ -19,6 +19,7 @@
   align-items: center;
   justify-content: center;
   min-height: min(56vw, 320px);
+  margin-bottom: var(--ifm-leading);
 }
 
 .player {

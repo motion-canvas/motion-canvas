@@ -5,6 +5,7 @@ export * from './createSignal';
 export * from './getContext';
 export * from './range';
 export * from './useProject';
+export * from './useRandom';
 export * from './useRef';
 export * from './useScene';
 export * from './useThread';

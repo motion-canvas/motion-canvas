@@ -102,7 +102,7 @@ export default function Tooltip({children}: {children: ReactNode}) {
           show && styles.active,
         )}
       >
-        {comment && <Comment comment={comment} withExamples={false} />}
+        {comment && <Comment comment={comment} full={false} />}
       </div>
     </div>
   );

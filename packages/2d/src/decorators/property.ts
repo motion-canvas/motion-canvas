@@ -121,16 +121,6 @@ export function createProperty<
         return setter(wrap(newValue));
       }
 
-      if (tweener) {
-        return tweener.call(
-          node,
-          wrap(newValue),
-          duration,
-          timingFunction,
-          interpolationFunction,
-        );
-      }
-
       return makeAnimate(timingFunction, interpolationFunction)(
         <TGetterValue>newValue,
         duration,
@@ -171,14 +161,24 @@ export function createProperty<
       yield* before;
     }
 
-    const from = getter();
-    yield* tween(
-      duration,
-      v => {
-        setter(interpolationFunction(from, unwrap(value), timingFunction(v)));
-      },
-      () => setter(wrap(value)),
-    );
+    if (tweener) {
+      yield* tweener.call(
+        node,
+        wrap(value),
+        duration,
+        timingFunction,
+        interpolationFunction,
+      );
+    } else {
+      const from = getter();
+      yield* tween(
+        duration,
+        v => {
+          setter(interpolationFunction(from, unwrap(value), timingFunction(v)));
+        },
+        () => setter(wrap(value)),
+      );
+    }
   }
 
   Object.defineProperty(handler, 'reset', {

@@ -10,6 +10,7 @@ export default defineConfig({
         './src/tweening-cubic.ts',
         './src/tweening-color.ts',
         './src/tweening-vector.ts',
+        './src/random.ts',
       ],
     }),
   ],
