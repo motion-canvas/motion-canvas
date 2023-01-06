@@ -1,4 +1,7 @@
-import {Rect as RectType} from '@motion-canvas/core/lib/types';
+import {
+  Rect as RectType,
+  SerializedVector2,
+} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {computed, initial, property} from '../decorators';
 import {
@@ -11,6 +14,7 @@ import {
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
+import {Length} from '../partials';
 
 export interface VideoProps extends RectProps {
   src?: SignalValue<string>;
@@ -46,6 +50,19 @@ export class Video extends Rect {
 
   public constructor(props: VideoProps) {
     super(props);
+  }
+
+  protected override desiredSize(): SerializedVector2<Length> {
+    const custom = super.desiredSize();
+    if (custom.x === null && custom.y === null) {
+      const image = this.video();
+      return {
+        x: image.videoWidth,
+        y: image.videoHeight,
+      };
+    }
+
+    return custom;
   }
 
   @computed()
