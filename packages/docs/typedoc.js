@@ -228,10 +228,14 @@ async function parseTypes(options, projectName, externalProject) {
       }
     } else {
       reflection.url = reflection.parent.url;
+      let name = reflection.name;
+      if (reflection.flags?.isStatic) {
+        name = `static-${name}`;
+      }
       if (reflection.parent.anchor) {
-        reflection.anchor = reflection.parent.anchor + '-' + reflection.name;
+        reflection.anchor = reflection.parent.anchor + '-' + name;
       } else {
-        reflection.anchor = reflection.name;
+        reflection.anchor = name;
       }
     }
 
