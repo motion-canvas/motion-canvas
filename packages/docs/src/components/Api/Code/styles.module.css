@@ -3,18 +3,26 @@
 .elements {
 }
 
-.element:not(:last-child)::after {
+.elements:not(.wrap) > .element:not(:last-child)::after {
   content: attr(data-separator);
 }
-.elements.wrap > .element::after {
+.elements.wrap:not(.left) > .element::after {
   content: attr(data-separator) '\a';
 }
-.elements.wrap::before {
+.elements.wrap.left > .element::before {
+  content: '\a' attr(data-separator);
+}
+
+.elements.wrap:not(.left)::before {
   content: '\a';
 }
-.elements.wrap::after {
+.elements.wrap:not(.left)::after {
   content: '';
 }
+.elements.wrap.left::after {
+  content: '\a';
+}
+
 .wrap .elements.wrap::after {
   padding-left: 2ch;
 }

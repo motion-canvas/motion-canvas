@@ -14,6 +14,7 @@ import ConditionalType from '@site/src/components/Api/Type/ConditionalType';
 import InferredType from '@site/src/components/Api/Type/InferredType';
 import IndexedAccessType from '@site/src/components/Api/Type/IndexedAccessType';
 import TypeOperatorType from '@site/src/components/Api/Type/TypeOperatorType';
+import MappedType from '@site/src/components/Api/Type/MappedType';
 import type {JSONOutput} from 'typedoc';
 
 export interface CodeTypeProps {
@@ -58,7 +59,7 @@ export default function CodeType(props: CodeTypeProps) {
       case 'inferred':
         return InferredType;
       case 'mapped':
-        break;
+        return MappedType;
       case 'template-literal':
         return TemplateLiteralType;
       case 'indexedAccess':
