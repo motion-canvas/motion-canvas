@@ -11,6 +11,8 @@ import {
   Vector2Property,
   vector2Property,
   wrapper,
+  FiltersProperty,
+  filtersProperty,
 } from '../decorators';
 import {
   Vector2,
@@ -35,6 +37,7 @@ import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
+import {Filter} from '../partials';
 
 export interface NodeProps {
   ref?: Reference<any>;
@@ -50,14 +53,7 @@ export interface NodeProps {
   scale?: SignalValue<PossibleVector2>;
 
   opacity?: SignalValue<number>;
-  blur?: SignalValue<number>;
-  brightness?: SignalValue<number>;
-  contrast?: SignalValue<number>;
-  grayscale?: SignalValue<number>;
-  hue?: SignalValue<number>;
-  invert?: SignalValue<number>;
-  saturate?: SignalValue<number>;
-  sepia?: SignalValue<number>;
+  filters?: SignalValue<Filter[]>;
   shadowColor?: SignalValue<PossibleColor>;
   shadowBlur?: SignalValue<number>;
   shadowOffsetX?: SignalValue<number>;
@@ -195,37 +191,8 @@ export class Node implements Promisable<Node> {
     return (this.parent()?.absoluteOpacity() ?? 1) * this.opacity();
   }
 
-  @initial(0)
-  @property()
-  public declare readonly blur: Signal<number, this>;
-
-  @initial(1)
-  @property()
-  public declare readonly brightness: Signal<number, this>;
-
-  @initial(1)
-  @property()
-  public declare readonly contrast: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly grayscale: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly hue: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly invert: Signal<number, this>;
-
-  @initial(1)
-  @property()
-  public declare readonly saturate: Signal<number, this>;
-
-  @initial(0)
-  @property()
-  public declare readonly sepia: Signal<number, this>;
+  @filtersProperty()
+  public declare readonly filters: FiltersProperty;
 
   @initial('#0000')
   @colorProperty()
@@ -239,17 +206,8 @@ export class Node implements Promisable<Node> {
   public declare readonly shadowOffset: Vector2Property<this>;
 
   @computed()
-  protected hasFilters() {
-    return (
-      this.blur() !== 0 ||
-      this.brightness() !== 1 ||
-      this.contrast() !== 1 ||
-      this.grayscale() !== 0 ||
-      this.hue() !== 0 ||
-      this.invert() !== 0 ||
-      this.saturate() !== 1 ||
-      this.sepia() !== 0
-    );
+  protected hasFilters(): boolean {
+    return !!this.filters().find(filter => filter.isActive());
   }
 
   @computed()
@@ -265,38 +223,11 @@ export class Node implements Promisable<Node> {
   @computed()
   protected filterString(): string {
     let filters = '';
-
-    const invert = this.invert();
-    if (invert !== 0) {
-      filters += ` invert(${invert * 100}%)`;
-    }
-    const sepia = this.sepia();
-    if (sepia !== 0) {
-      filters += ` sepia(${sepia * 100}%)`;
-    }
-    const brightness = this.brightness();
-    if (brightness !== 1) {
-      filters += ` brightness(${brightness * 100}%)`;
-    }
-    const contrast = this.contrast();
-    if (contrast !== 1) {
-      filters += ` contrast(${contrast * 100}%)`;
-    }
-    const grayscale = this.grayscale();
-    if (grayscale !== 0) {
-      filters += ` grayscale(${grayscale * 100}%)`;
-    }
-    const hue = this.hue();
-    if (hue !== 0) {
-      filters += ` hue-rotate(${hue}deg)`;
-    }
-    const saturate = this.saturate();
-    if (saturate !== 1) {
-      filters += ` saturate(${saturate * 100}%)`;
-    }
-    const blur = this.blur();
-    if (blur !== 0) {
-      filters += ` blur(${transformScalar(blur, this.compositeToWorld())}px)`;
+    const matrix = this.compositeToWorld();
+    for (const filter of this.filters()) {
+      if (filter.isActive()) {
+        filters += ' ' + filter.serialize(matrix);
+      }
     }
 
     return filters;
@@ -694,7 +625,9 @@ export class Node implements Promisable<Node> {
     const shadowOffset = this.shadowOffset().transform(matrix);
     const shadowBlur = transformScalar(this.shadowBlur(), matrix);
 
-    const result = this.cacheRect().expand(this.blur() * 2 + shadowBlur);
+    const result = this.cacheRect().expand(
+      this.filters.blur() * 2 + shadowBlur,
+    );
 
     if (shadowOffset.x < 0) {
       result.x += shadowOffset.x;

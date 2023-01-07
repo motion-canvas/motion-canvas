@@ -28,24 +28,31 @@ const classes: Record<ListType, string> = {
 export default function TokenList({
   children,
   type,
-  separator,
+  separator = Separator.Comma,
 }: {
-  children: ReactNode[];
+  children: ReactNode | ReactNode[];
   type?: ListType;
   separator?: Separator;
 }) {
   return (
     <span className={clsx(styles.list, classes[type ?? ListType.None])}>
-      <span className={styles.elements}>
-        {children.flatMap((child, index) => (
-          <span
-            data-separator={separator ?? Separator.Comma}
-            key={index}
-            className={styles.element}
-          >
-            {child}
-          </span>
-        ))}
+      <span
+        className={clsx(
+          styles.elements,
+          separator !== Separator.Comma && styles.left,
+        )}
+      >
+        {(Array.isArray(children) ? children : [children]).flatMap(
+          (child, index) => (
+            <span
+              data-separator={separator}
+              key={index}
+              className={styles.element}
+            >
+              {child}
+            </span>
+          ),
+        )}
       </span>
     </span>
   );
