@@ -17,6 +17,7 @@ import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {useInspection, usePlayer} from '../../contexts';
 import {highlight} from '../animations';
+import {classes} from '../../utils';
 
 const ZOOM_SPEED = 0.1;
 
@@ -29,23 +30,29 @@ export function View() {
   const size = useSize(containerRef);
   const playerState = usePlayerState();
 
-  const [state, setState] = useStorage<ViewportState>('viewport', {
-    width: 1920,
-    height: 1080,
-    x: 0,
-    y: 0,
-    zoom: 1,
-    grid: false,
-  });
-  const {inspectedElement, setInspectedElement} = useInspection();
+  const [state, setState, wasStateLoaded] = useStorage<ViewportState>(
+    'viewport',
+    {
+      width: 1920,
+      height: 1080,
+      x: 0,
+      y: 0,
+      zoom: 1,
+      grid: false,
+    },
+  );
+  const {setInspectedElement} = useInspection();
 
-  useEffect(() => {
-    setState({
-      ...state,
-      width: size.width,
-      height: size.height,
-    });
-  }, [size]);
+  const resetZoom = useCallback(() => {
+    const rect = containerRef.current.getBoundingClientRect();
+    const {width, height} = player.project.getSize();
+    let zoom = rect.height / height;
+    if (width * zoom > rect.width) {
+      zoom = rect.width / width;
+    }
+    zoom /= playerState.scale;
+    setState({...state, zoom, x: 0, y: 0});
+  }, [state, player, playerState.scale]);
 
   const [handleDrag, isDragging] = useDrag(
     useCallback(
@@ -60,6 +67,20 @@ export function View() {
     undefined,
     null,
   );
+
+  useEffect(() => {
+    setState({
+      ...state,
+      width: size.width,
+      height: size.height,
+    });
+  }, [size]);
+
+  useEffect(() => {
+    if (!wasStateLoaded) {
+      resetZoom();
+    }
+  }, [wasStateLoaded]);
 
   useEffect(() => {
     player.project.setCanvas(viewportRef.current);
@@ -87,13 +108,7 @@ export function View() {
       event => {
         switch (event.key) {
           case '0': {
-            const rect = containerRef.current.getBoundingClientRect();
-            const {width, height} = player.project.getSize();
-            let zoom = rect.height / height;
-            if (width * zoom > rect.width) {
-              zoom = rect.width / width;
-            }
-            setState({...state, zoom, x: 0, y: 0});
+            resetZoom();
             break;
           }
           case '=':
@@ -114,7 +129,7 @@ export function View() {
           }
         }
       },
-      [setState, state, inspectedElement],
+      [state, resetZoom],
     ),
   );
 
@@ -135,8 +150,8 @@ export function View() {
             const projectSize = player.project.getSize();
             position.x -= state.x + size.width / 2;
             position.y -= state.y + size.height / 2;
-            position.x /= state.zoom;
-            position.y /= state.zoom;
+            position.x /= state.zoom * playerState.scale;
+            position.y /= state.zoom * playerState.scale;
             position.x += projectSize.width / 2;
             position.y += projectSize.height / 2;
 
@@ -163,10 +178,15 @@ export function View() {
         }}
       >
         <div
+          className={
+            player.project.background
+              ? styles.canvasOutline
+              : styles.alphaBackground
+          }
           style={{
             transform: `translate(${state.x}px, ${state.y}px) scale(${state.zoom})`,
+            outlineWidth: `${1 / state.zoom}px`,
           }}
-          id={'viewport'}
         >
           <canvas key={playerState.colorSpace} ref={viewportRef} />
         </div>

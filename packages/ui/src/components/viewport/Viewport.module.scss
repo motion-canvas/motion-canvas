@@ -18,6 +18,17 @@
   background-color: #000000;
 }
 
+.alphaBackground {
+  background-color: rgba(0, 0, 0, 0.16);
+  background-size: 80px;
+  background-position: center;
+  background-image: url('../../img/grid.svg');
+}
+
+.canvasOutline {
+  outline: 1px solid var(--surface-color);
+}
+
 .overlay {
   position: absolute;
   top: 0;
