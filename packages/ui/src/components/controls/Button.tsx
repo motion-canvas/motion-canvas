@@ -1,6 +1,6 @@
 import styles from './Controls.module.scss';
 import type {JSX} from 'preact';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   main?: boolean;
@@ -9,7 +9,7 @@ interface ButtonProps extends JSX.HTMLAttributes<HTMLButtonElement> {
 export function Button(props: ButtonProps) {
   return (
     <button
-      className={classes(styles.button, [styles.main, props.main])}
+      className={clsx(styles.button, props.main && styles.main)}
       type={'button'}
       {...props}
     />

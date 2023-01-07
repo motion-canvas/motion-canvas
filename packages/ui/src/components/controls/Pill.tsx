@@ -1,6 +1,6 @@
 import styles from './Controls.module.scss';
 import {ComponentChildren} from 'preact';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 export interface PillProps {
   children: ComponentChildren;
@@ -20,7 +20,7 @@ export function Pill({
   return (
     <div
       title={titleOff && !checked ? titleOff : titleOn}
-      className={classes(styles.pill, [styles.checked, checked])}
+      className={clsx(styles.pill, checked && styles.checked)}
       onClick={() => onChange(!checked)}
     >
       {children}

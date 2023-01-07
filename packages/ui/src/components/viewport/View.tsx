@@ -17,7 +17,6 @@ import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {useInspection, usePlayer} from '../../contexts';
 import {highlight} from '../animations';
-import {classes} from '../../utils';
 
 const ZOOM_SPEED = 0.1;
 

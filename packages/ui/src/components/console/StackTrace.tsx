@@ -1,6 +1,7 @@
 import styles from './Console.module.scss';
 
-import {classes, openFileInEditor, StackTraceEntry} from '../../utils';
+import {openFileInEditor, StackTraceEntry} from '../../utils';
+import clsx from 'clsx';
 
 export interface StackTraceProps {
   entries: StackTraceEntry[];
@@ -11,7 +12,7 @@ export function StackTrace({entries}: StackTraceProps) {
     <div className={styles.stack}>
       {entries.map(entry => (
         <div
-          className={classes(styles.entry, [styles.external, entry.isExternal])}
+          className={clsx(styles.entry, entry.isExternal && styles.external)}
         >
           at (
           {entry.isExternal ? (

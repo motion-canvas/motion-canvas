@@ -4,10 +4,10 @@ import {LogLevel} from '@motion-canvas/core/lib';
 import {capitalize} from '@motion-canvas/core/lib/utils';
 import {Pane} from '../tabs';
 import {useLogs} from '../../contexts';
-import {classes} from '../../utils';
 import {useState} from 'preact/hooks';
 import {IconButton, IconType, Pill} from '../controls';
 import {Log} from './Log';
+import clsx from 'clsx';
 
 const LOG_LEVELS: Record<string, boolean> = {
   [LogLevel.Error]: true,
@@ -50,7 +50,7 @@ export function Console() {
         )}
       </div>
       <div
-        className={classes(
+        className={clsx(
           styles.list,
           ...Object.entries(filters)
             .filter(([, enabled]) => enabled)

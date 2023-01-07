@@ -5,8 +5,8 @@ import {useDocumentEvent, usePlayerState} from '../../hooks';
 import {Select, Input} from '../controls';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
-import {classes} from '../../utils';
 import {usePlayer} from '../../contexts';
+import clsx from 'clsx';
 
 export function PlaybackControls() {
   const player = usePlayer();
@@ -46,7 +46,7 @@ export function PlaybackControls() {
   );
 
   return (
-    <div className={classes(styles.controls, [styles.disabled, state.render])}>
+    <div className={clsx(styles.controls, state.render && styles.disabled)}>
       <Select
         title="Playback speed"
         options={[

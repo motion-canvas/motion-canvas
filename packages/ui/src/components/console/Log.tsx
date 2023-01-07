@@ -2,12 +2,13 @@ import styles from './Console.module.scss';
 
 import {LogLevel, LogPayload} from '@motion-canvas/core';
 import {useEffect, useMemo, useState} from 'preact/hooks';
-import {classes, resolveStackTrace, StackTraceEntry} from '../../utils';
+import {resolveStackTrace, StackTraceEntry} from '../../utils';
 import {useInspection} from '../../contexts';
 import {useFormattedNumber} from '../../hooks';
 import {IconButton, IconType, Toggle} from '../controls';
 import {StackTrace} from './StackTrace';
 import {SourceCodeFrame} from './SourceCodeFrame';
+import clsx from 'clsx';
 
 export interface LogProps {
   payload: LogPayload;
@@ -37,10 +38,11 @@ export function Log({payload}: LogProps) {
 
   return (
     <div
-      className={classes(styles.log, styles[payload.level], [
-        styles.empty,
-        !hasBody,
-      ])}
+      className={clsx(
+        styles.log,
+        styles[payload.level],
+        !hasBody && styles.empty,
+      )}
     >
       <div className={styles.header}>
         {hasBody && <Toggle open={open} onToggle={setOpen} />}

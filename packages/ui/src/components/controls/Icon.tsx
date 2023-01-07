@@ -1,8 +1,8 @@
 import styles from './Controls.module.scss';
 
 import {IconType} from './IconType';
-import {classes} from '../../utils';
 import {JSX} from 'preact';
+import clsx from 'clsx';
 
 type IntrinsicTag = keyof JSX.IntrinsicElements;
 
@@ -20,6 +20,6 @@ export function Icon<T extends IntrinsicTag = 'div'>({
 }: IconProps<T>) {
   const As = as as string;
   return (
-    <As className={classes(styles.icon, styles[type], className)} {...rest} />
+    <As className={clsx(styles.icon, styles[type], className)} {...rest} />
   );
 }

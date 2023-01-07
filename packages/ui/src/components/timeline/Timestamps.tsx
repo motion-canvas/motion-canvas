@@ -2,7 +2,7 @@ import styles from './Timeline.module.scss';
 
 import {useMemo} from 'preact/hooks';
 import {useTimelineContext} from '../../contexts';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 export function Timestamps() {
   const {
@@ -18,10 +18,9 @@ export function Timestamps() {
     for (let i = firstVisibleFrame; i < lastVisibleFrame; i += clamped) {
       timestamps.push(
         <div
-          className={classes(styles.timestamp, [
-            styles.odd,
-            segmentDensity > 0 && (i / segmentDensity) % 2 !== 0,
-          ])}
+          className={clsx(styles.timestamp, {
+            [styles.odd]: segmentDensity > 0 && (i / segmentDensity) % 2 !== 0,
+          })}
           style={{left: `${framesToPercents(i)}%`}}
           key={i}
           data-frame={i}

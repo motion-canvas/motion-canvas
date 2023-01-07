@@ -2,9 +2,9 @@ import styles from './Layout.module.scss';
 
 import {ComponentChildren, JSX} from 'preact';
 import {useRef, useState} from 'preact/hooks';
-import {classes} from '../../utils';
 import {useFormattedNumber} from '../../hooks';
 import {Toggle} from '../controls';
+import clsx from 'clsx';
 
 export interface FieldSetProps {
   children: ComponentChildren;
@@ -37,11 +37,10 @@ export function FieldValue({
 }: FieldValueProps) {
   return (
     <div
-      className={classes(
-        styles.value,
-        [styles.right, alignRight],
-        [styles.grow, grow],
-      )}
+      className={clsx(styles.value, {
+        [styles.right]: alignRight,
+        [styles.grow]: grow,
+      })}
       {...props}
     >
       {children}
@@ -60,11 +59,10 @@ export function Field({label, copy, children}: FieldProps) {
 
   return (
     <div
-      className={classes(
-        styles.field,
-        [styles.copy, !!copy],
-        [styles.copied, copied],
-      )}
+      className={clsx(styles.field, {
+        [styles.copy]: !!copy,
+        [styles.copied]: copied,
+      })}
       onClick={() => {
         if (!copy) return;
         window.navigator.clipboard.writeText(copy);
@@ -97,12 +95,10 @@ export function FieldSurface({
 }: FieldSurfaceProps) {
   return (
     <div
-      className={classes(
-        styles.surface,
-        className,
-        [styles.open, open],
-        [styles.disabled, disabled],
-      )}
+      className={clsx(styles.surface, className, {
+        [styles.open]: open,
+        [styles.disabled]: disabled,
+      })}
       {...props}
     />
   );
