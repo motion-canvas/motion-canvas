@@ -137,6 +137,9 @@ export function View() {
       <div
         className={styles.viewport}
         ref={containerRef}
+        onContextMenu={event => {
+          event.preventDefault();
+        }}
         onMouseDown={event => {
           if (event.button === 0 && !event.shiftKey) {
             if (!isInspectable(scene)) return;
