@@ -1,17 +1,16 @@
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
-import {Rect as RectType} from '@motion-canvas/core/lib/types';
+import {SignalValue} from '@motion-canvas/core/lib/utils';
+import {PossibleSpacing, Rect as RectType} from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
-import {initial, property} from '../decorators';
 import {drawRoundRect} from '../utils';
+import {spacingProperty, SpacingProperty} from '../decorators/spacingProperty';
 
 export interface RectProps extends ShapeProps {
-  radius?: SignalValue<number>;
+  radius?: SignalValue<PossibleSpacing>;
 }
 
 export class Rect extends Shape {
-  @initial(0)
-  @property()
-  public declare readonly radius: Signal<number, this>;
+  @spacingProperty('radius')
+  public declare readonly radius: SpacingProperty<this>;
 
   public constructor(props: RectProps) {
     super(props);
@@ -33,7 +32,7 @@ export class Rect extends Shape {
   protected override getRipplePath(): Path2D {
     const path = new Path2D();
     const rippleSize = this.rippleSize();
-    const radius = this.radius() + rippleSize;
+    const radius = this.radius().addScalar(rippleSize);
     const rect = RectType.fromSizeCentered(this.size()).expand(rippleSize);
     drawRoundRect(path, rect, radius);
 
