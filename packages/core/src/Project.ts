@@ -149,6 +149,7 @@ export class Project {
   public declare readonly name: string;
   public readonly audio = new AudioManager();
   public readonly logger = new Logger();
+  public readonly background: string | false;
   public playbackState = createSignal(PlaybackState.Paused);
   private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
@@ -158,7 +159,6 @@ export class Project {
   private _speed = 1;
   private framesPerSeconds = 30;
   private previousScene: Scene | null = null;
-  private background: string | false;
   private canvas: HTMLCanvasElement | null = null;
   private context: CanvasRenderingContext2D | null = null;
   private buffer = document.createElement('canvas');
