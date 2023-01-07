@@ -92,6 +92,15 @@ export class Spacing implements Type {
     );
   }
 
+  public addScalar(value: number): Spacing {
+    return new Spacing(
+      this.top + value,
+      this.right + value,
+      this.bottom + value,
+      this.left + value,
+    );
+  }
+
   public toSymbol(): symbol {
     return Spacing.symbol;
   }

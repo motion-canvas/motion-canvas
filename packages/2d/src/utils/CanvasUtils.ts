@@ -1,5 +1,5 @@
 import {CanvasStyle, Gradient, Pattern, PossibleCanvasStyle} from '../partials';
-import {Color, Rect, Vector2} from '@motion-canvas/core/lib/types';
+import {Color, Rect, Spacing, Vector2} from '@motion-canvas/core/lib/types';
 
 export function canvasStyleParser(style: PossibleCanvasStyle) {
   if (style === null) {
@@ -38,18 +38,36 @@ export function resolveCanvasStyle(
 export function drawRoundRect(
   context: CanvasRenderingContext2D | Path2D,
   rect: Rect,
-  radius: number,
+  radius: Spacing,
 ) {
-  if (radius > 0) {
-    const maxRadius = Math.min(rect.width / 2, rect.height / 2, radius);
-    context.moveTo(rect.left + maxRadius, rect.top);
-    context.arcTo(rect.right, rect.top, rect.right, rect.bottom, maxRadius);
-    context.arcTo(rect.right, rect.bottom, rect.left, rect.bottom, maxRadius);
-    context.arcTo(rect.left, rect.bottom, rect.left, rect.top, maxRadius);
-    context.arcTo(rect.left, rect.top, rect.right, rect.top, maxRadius);
-  } else {
+  if (
+    radius.top === 0 &&
+    radius.bottom === 0 &&
+    radius.left === 0 &&
+    radius.right === 0
+  ) {
     drawRect(context, rect);
+    return;
   }
+
+  const topLeft = Math.min(rect.width, rect.height, radius.top);
+  const topRight = Math.min(rect.width - topLeft, rect.height, radius.right);
+  const bottomRight = Math.min(
+    rect.width,
+    rect.height - topRight,
+    radius.bottom,
+  );
+  const bottomLeft = Math.min(
+    rect.width - topLeft,
+    rect.height - bottomRight,
+    radius.left,
+  );
+
+  context.moveTo(rect.left + topLeft, rect.top);
+  context.arcTo(rect.right, rect.top, rect.right, rect.bottom, topRight);
+  context.arcTo(rect.right, rect.bottom, rect.left, rect.bottom, bottomRight);
+  context.arcTo(rect.left, rect.bottom, rect.left, rect.top, bottomLeft);
+  context.arcTo(rect.left, rect.top, rect.right, rect.top, topLeft);
 }
 
 export function drawRect(
