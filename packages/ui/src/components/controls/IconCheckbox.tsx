@@ -1,7 +1,7 @@
 import styles from './Controls.module.scss';
 
-import {classes} from '../../utils';
 import {IconType} from './IconType';
+import clsx from 'clsx';
 
 interface IconCheckboxProps {
   iconOn?: IconType;
@@ -37,12 +37,12 @@ export function IconCheckbox({
       />
       <label
         title={titleOff && !checked ? titleOff : titleOn}
-        className={classes(
+        className={clsx(
           styles.icon,
           styles.iconLabel,
-          [styles.main, main],
-          [styles[iconOn], checked || !iconOff],
-          [styles[iconOff], iconOff && !checked],
+          main && styles.main,
+          (checked || !iconOff) && styles[iconOn],
+          iconOff && !checked && styles[iconOff],
         )}
         htmlFor={id}
       />

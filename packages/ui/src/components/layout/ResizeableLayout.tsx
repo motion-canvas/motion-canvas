@@ -2,8 +2,8 @@ import styles from './ResizeableLayout.module.scss';
 
 import {ComponentChild, JSX} from 'preact';
 import {useCallback, useMemo, useRef} from 'preact/hooks';
-import {classes} from '../../utils';
 import {useDrag, useStorage} from '../../hooks';
+import clsx from 'clsx';
 
 interface ResizeableLayoutProps {
   start: ComponentChild;
@@ -47,11 +47,10 @@ export function ResizeableLayout({
   return (
     <div
       ref={containerRef}
-      className={classes(
-        styles.root,
-        [styles.vertical, vertical],
-        [styles.resizeable, resizeable],
-      )}
+      className={clsx(styles.root, {
+        [styles.vertical]: vertical,
+        [styles.resizeable]: resizeable,
+      })}
     >
       <div className={styles.left} style={style}>
         {start}

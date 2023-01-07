@@ -3,7 +3,7 @@ import styles from './Tabs.module.scss';
 import {Icon, IconType} from '../controls';
 import {ComponentChildren} from 'preact';
 import {useCallback, useLayoutEffect} from 'preact/hooks';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 export enum TabType {
   Link,
@@ -65,7 +65,7 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
               type={data.icon}
               href={data.url}
               id={data.id}
-              className={classes(styles.tab, [styles.disabled, !data.url])}
+              className={clsx(styles.tab, !data.url && styles.disabled)}
             />
           ) : data.type === TabType.Pane ? (
             <Icon
@@ -73,7 +73,7 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
               title={data.title}
               id={data.id}
               onClick={() => toggleTab(index)}
-              className={classes(styles.tab, [styles.active, tab === index])}
+              className={clsx(styles.tab, tab === index && styles.active)}
             >
               {data.badge}
             </Icon>

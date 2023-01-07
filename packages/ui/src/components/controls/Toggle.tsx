@@ -1,5 +1,5 @@
 import styles from './Controls.module.scss';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 export interface ToggleProps {
   open?: boolean;
@@ -9,7 +9,7 @@ export interface ToggleProps {
 export function Toggle({open, onToggle}: ToggleProps) {
   return (
     <div
-      className={classes(styles.toggle, [styles.open, open])}
+      className={clsx(styles.toggle, open && styles.open)}
       onClick={() => onToggle(!open)}
     />
   );

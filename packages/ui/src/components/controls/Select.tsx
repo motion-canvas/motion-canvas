@@ -1,5 +1,5 @@
 import styles from './Controls.module.scss';
-import {classes} from '../../utils';
+import clsx from 'clsx';
 
 export interface SelectProps<T> {
   title?: string;
@@ -19,7 +19,7 @@ export function Select<T>({
   return (
     <select
       title={title}
-      className={classes(styles.select, className)}
+      className={clsx(styles.select, className)}
       value={options.findIndex(option => option.value === value)}
       onChange={event =>
         onChange(
