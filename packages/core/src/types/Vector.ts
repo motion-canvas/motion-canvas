@@ -1,7 +1,8 @@
-import {arcLerp} from '../tweening';
+import {arcLerp, InterpolationFunction} from '../tweening';
 import {map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
 import {Type} from './Type';
+import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -12,7 +13,15 @@ export type PossibleVector2<T = number> =
   | SerializedVector2<T>
   | {width: T; height: T}
   | T
-  | [T, T];
+  | [T, T]
+  | undefined;
+
+export type Vector2Signal<T> = CompoundSignal<
+  PossibleVector2,
+  Vector2,
+  'x' | 'y',
+  T
+>;
 
 /**
  * Represents a two-dimensional vector.
@@ -31,6 +40,20 @@ export class Vector2 implements Type {
 
   public x = 0;
   public y = 0;
+
+  public static createSignal(
+    initial?: SignalValue<PossibleVector2>,
+    interpolation: InterpolationFunction<Vector2> = Vector2.lerp,
+    owner?: any,
+  ): Vector2Signal<void> {
+    return new CompoundSignalContext(
+      ['x', 'y'],
+      (value: PossibleVector2) => new Vector2(value),
+      initial,
+      interpolation,
+      owner,
+    ).toSignal();
+  }
 
   public static lerp(from: Vector2, to: Vector2, value: number | Vector2) {
     let valueX;
@@ -138,10 +161,10 @@ export class Vector2 implements Type {
   public get ctg(): number {
     return this.x / this.y;
   }
-
   public constructor();
   public constructor(from: PossibleVector2);
   public constructor(x: number, y: number);
+
   public constructor(one?: PossibleVector2 | number, two?: number) {
     if (one === undefined || one === null) {
       return;

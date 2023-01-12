@@ -1,8 +1,8 @@
 import {Shape, ShapeProps} from './Shape';
 import {Node} from './Node';
-import {computed, initial, property} from '../decorators';
+import {computed, initial, signal} from '../decorators';
 import {arc, lineTo, moveTo, resolveCanvasStyle} from '../utils';
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {Rect, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Length} from '../partials';
@@ -30,40 +30,40 @@ export interface LineProps extends ShapeProps {
 
 export class Line extends Shape {
   @initial(0)
-  @property()
-  public declare readonly radius: Signal<number, this>;
+  @signal()
+  public declare readonly radius: SimpleSignal<number, this>;
 
   @initial(false)
-  @property()
-  public declare readonly closed: Signal<boolean, this>;
+  @signal()
+  public declare readonly closed: SimpleSignal<boolean, this>;
 
   @initial(0)
-  @property()
-  public declare readonly start: Signal<number, this>;
+  @signal()
+  public declare readonly start: SimpleSignal<number, this>;
 
   @initial(0)
-  @property()
-  public declare readonly startOffset: Signal<number, this>;
+  @signal()
+  public declare readonly startOffset: SimpleSignal<number, this>;
 
   @initial(false)
-  @property()
-  public declare readonly startArrow: Signal<boolean, this>;
+  @signal()
+  public declare readonly startArrow: SimpleSignal<boolean, this>;
 
   @initial(1)
-  @property()
-  public declare readonly end: Signal<number, this>;
+  @signal()
+  public declare readonly end: SimpleSignal<number, this>;
 
   @initial(1)
-  @property()
-  public declare readonly endOffset: Signal<number, this>;
+  @signal()
+  public declare readonly endOffset: SimpleSignal<number, this>;
 
   @initial(false)
-  @property()
-  public declare readonly endArrow: Signal<boolean, this>;
+  @signal()
+  public declare readonly endArrow: SimpleSignal<boolean, this>;
 
   @initial(24)
-  @property()
-  public declare readonly arrowSize: Signal<number, this>;
+  @signal()
+  public declare readonly arrowSize: SimpleSignal<number, this>;
 
   protected override desiredSize(): SerializedVector2<Length> {
     return this.childrenRect().size;

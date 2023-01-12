@@ -10,7 +10,7 @@ export function useProject() {
 }
 
 export function useLogger() {
-  return currentProject.logger;
+  return currentProject?.logger ?? console;
 }
 
 export function setProject(project: Project) {

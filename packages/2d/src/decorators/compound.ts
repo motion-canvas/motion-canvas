@@ -1,12 +1,9 @@
-import {
-  SignalValue,
-  isReactive,
-  useLogger,
-  capitalize,
-} from '@motion-canvas/core/lib/utils';
-import {createProperty, getPropertyMetaOrCreate, Property} from './property';
+import {useLogger} from '@motion-canvas/core/lib/utils';
+import {getPropertyMetaOrCreate} from './signal';
 import {addInitializer} from './initializers';
 import {deepLerp} from '@motion-canvas/core/lib/tweening';
+import {CompoundSignalContext} from '@motion-canvas/core/lib/signals';
+import {patchSignal} from '../utils/patchSignal';
 
 /**
  * Create a compound property decorator.
@@ -43,85 +40,25 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
         useLogger().error(`Missing parser decorator for "${key.toString()}"`);
         return;
       }
-      const parser = meta.parser;
-      const initial = context.defaults[key] ?? meta.default;
-      const initialWrapped: SignalValue<any> = isReactive(initial)
-        ? () => parser(initial())
-        : parser(initial);
 
-      const signals: [string, Property<any, any, any>][] = [];
+      const signalContext = new CompoundSignalContext(
+        Object.keys(entries),
+        meta.parser,
+        context.defaults[key] ?? meta.default,
+        meta.interpolationFunction ?? deepLerp,
+        instance,
+      );
+      patchSignal(signalContext, meta.parser, instance, <string>key);
+      const signal = signalContext.toSignal();
+
       for (const [key, property] of meta.compoundEntries) {
-        signals.push([
-          key,
-          createProperty(
-            instance,
-            property,
-            context.defaults[property] ??
-              (isReactive(initialWrapped)
-                ? () => initialWrapped()[key]
-                : initialWrapped[key]),
-            undefined,
-            undefined,
-            instance[`get${capitalize(<string>property)}`],
-            instance[`set${capitalize(<string>property)}`],
-            instance[`tween${capitalize(<string>property)}`],
-          ),
-        ]);
-      }
-
-      function getter() {
-        const object = Object.fromEntries(
-          signals.map(([key, property]) => [key, property()]),
-        );
-        return parser(object);
-      }
-
-      function setter(value: SignalValue<any>) {
-        if (isReactive(value)) {
-          for (const [key, property] of signals) {
-            property(() => value()[key]);
-          }
-        } else {
-          for (const [key, property] of signals) {
-            property(value[key]);
-          }
+        patchSignal(signal[key].context, undefined, instance, property);
+        if (property in context.defaults) {
+          signal[key].context.setInitial(context.defaults[property]);
         }
       }
 
-      const property = createProperty(
-        instance,
-        <string>key,
-        undefined,
-        meta.interpolationFunction ?? deepLerp,
-        parser,
-        getter,
-        setter,
-        instance[`tween${capitalize(<string>key)}`],
-      );
-
-      for (const [key, signal] of signals) {
-        Object.defineProperty(property, key, {value: signal});
-      }
-
-      Object.defineProperty(property, 'reset', {
-        value: () => {
-          for (const [, signal] of signals) {
-            signal.reset();
-          }
-          return instance;
-        },
-      });
-
-      Object.defineProperty(property, 'save', {
-        value: () => {
-          for (const [, signal] of signals) {
-            signal.save();
-          }
-          return instance;
-        },
-      });
-
-      instance[key] = property;
+      instance[key] = signal;
     });
   };
 }

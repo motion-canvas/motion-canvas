@@ -3,8 +3,9 @@ import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
 import {AudioManager} from './media';
-import {createSignal, getContext} from './utils';
+import {getContext} from './utils';
 import {Logger} from './Logger';
+import {createSignal} from './signals';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;

@@ -10,13 +10,14 @@ import {TimeEvents} from './TimeEvents';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
-import {consumePromises, endScene, setProject, startScene} from '../utils';
+import {endScene, setProject, startScene} from '../utils';
 import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
 import {Rect, Vector2} from '../types';
 import {SceneState} from './SceneState';
 import {Random} from './Random';
+import {DependencyContext} from '../signals';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -133,7 +134,7 @@ export abstract class GeneratorScene<T>
   }
 
   public async render(context: CanvasRenderingContext2D): Promise<void> {
-    let promises = consumePromises();
+    let promises = DependencyContext.consumePromises();
     let iterations = 0;
     do {
       iterations++;
@@ -144,7 +145,7 @@ export abstract class GeneratorScene<T>
       this.draw(context);
       context.restore();
 
-      promises = consumePromises();
+      promises = DependencyContext.consumePromises();
     } while (promises.length > 0 && iterations < 10);
 
     if (iterations > 1) {
@@ -224,7 +225,7 @@ export abstract class GeneratorScene<T>
     }
     endScene(this);
 
-    const promises = consumePromises();
+    const promises = DependencyContext.consumePromises();
     if (promises.length > 0) {
       await Promise.all(promises.map(handle => handle.promise));
       this.project.logger.error({

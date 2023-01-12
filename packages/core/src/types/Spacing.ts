@@ -1,5 +1,6 @@
-import {map} from '../tweening';
+import {InterpolationFunction, map} from '../tweening';
 import {Type} from './Type';
+import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 
 export type SerializedSpacing = {
   top: number;
@@ -13,7 +14,15 @@ export type PossibleSpacing =
   | number
   | [number, number]
   | [number, number, number]
-  | [number, number, number, number];
+  | [number, number, number, number]
+  | undefined;
+
+export type SpacingSignal<T> = CompoundSignal<
+  PossibleSpacing,
+  Spacing,
+  'top' | 'right' | 'bottom' | 'left',
+  T
+>;
 
 export class Spacing implements Type {
   public static readonly symbol = Symbol.for(
@@ -24,6 +33,18 @@ export class Spacing implements Type {
   public right = 0;
   public bottom = 0;
   public left = 0;
+
+  public static createSignal(
+    initial?: SignalValue<PossibleSpacing>,
+    interpolation: InterpolationFunction<Spacing> = Spacing.lerp,
+  ): SpacingSignal<void> {
+    return new CompoundSignalContext(
+      ['top', 'right', 'bottom', 'left'],
+      (value: PossibleSpacing) => new Spacing(value),
+      initial,
+      interpolation,
+    ).toSignal();
+  }
 
   public static lerp(from: Spacing, to: Spacing, value: number): Spacing {
     return new Spacing(

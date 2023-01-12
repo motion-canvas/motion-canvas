@@ -1,25 +1,11 @@
 import {
   deepLerp,
-  easeInOutCubic,
-  TimingFunction,
-  tween,
   InterpolationFunction,
 } from '@motion-canvas/core/lib/tweening';
 import {addInitializer} from './initializers';
-import {
-  SignalValue,
-  isReactive,
-  createSignal,
-  SignalGetter,
-  SignalSetter,
-  SignalTween,
-  SignalUtils,
-  useLogger,
-  SignalGenerator,
-  capitalize,
-} from '@motion-canvas/core/lib/utils';
-import {decorate, threadable} from '@motion-canvas/core/lib/decorators';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {useLogger} from '@motion-canvas/core/lib/utils';
+import {patchSignal} from '../utils/patchSignal';
+import {SignalContext} from '@motion-canvas/core/lib/signals';
 
 export interface PropertyMetadata<T> {
   default?: T;
@@ -30,176 +16,6 @@ export interface PropertyMetadata<T> {
   compoundParent?: string;
   compound?: boolean;
   compoundEntries: [string, string][];
-}
-
-export interface Property<
-  TSetterValue,
-  TGetterValue extends TSetterValue,
-  TOwner,
-> extends SignalGetter<TGetterValue>,
-    SignalSetter<TSetterValue>,
-    SignalTween<TSetterValue>,
-    SignalUtils<TSetterValue, TOwner> {}
-
-export type PropertyOwner<TGetterValue, TSetterValue> = {
-  [key: `get${Capitalize<string>}`]: SignalGetter<TGetterValue> | undefined;
-  [key: `set${Capitalize<string>}`]: SignalSetter<TSetterValue> | undefined;
-  [key: `tween${Capitalize<string>}`]: SignalTween<TGetterValue> | undefined;
-};
-
-export function createProperty<
-  TSetterValue,
-  TGetterValue extends TSetterValue,
-  TNode extends PropertyOwner<TGetterValue, TSetterValue>,
-  TProperty extends string & keyof TNode,
->(
-  node: TNode,
-  property: TProperty,
-  initial?: TSetterValue,
-  defaultInterpolation: InterpolationFunction<TGetterValue> = deepLerp,
-  parser?: (value: TSetterValue) => TGetterValue,
-  originalGetter?: SignalGetter<TGetterValue>,
-  originalSetter?: SignalSetter<TSetterValue>,
-  tweener?: SignalTween<TGetterValue>,
-): Property<TSetterValue, TGetterValue, TNode> {
-  let getter: SignalGetter<TGetterValue>;
-  let setter: SignalSetter<TSetterValue>;
-
-  if (!originalGetter !== !originalSetter) {
-    useLogger().warn(
-      `The "${property}" property needs to provide either both the setter and getter or none of them`,
-    );
-  }
-
-  let wrap: (value: SignalValue<TSetterValue>) => SignalValue<TGetterValue>;
-  let unwrap: (value: SignalValue<TSetterValue>) => TGetterValue;
-  if (parser) {
-    wrap = value => (isReactive(value) ? () => parser(value()) : parser(value));
-    unwrap = value => parser(isReactive(value) ? value() : value);
-  } else {
-    wrap = value => <SignalValue<TGetterValue>>value;
-    unwrap = value => <TGetterValue>(isReactive(value) ? value() : value);
-  }
-
-  let signal: Property<TSetterValue, TGetterValue, TNode> | null = null;
-  if (!originalGetter || !originalSetter) {
-    signal = <Property<TSetterValue, TGetterValue, TNode>>(
-      (<unknown>(
-        createSignal(
-          wrap(<SignalValue<TSetterValue>>initial),
-          defaultInterpolation,
-          node,
-        )
-      ))
-    );
-    if (!tweener && !parser) {
-      return signal;
-    }
-
-    getter = signal;
-    setter = signal;
-  } else {
-    getter = originalGetter.bind(node);
-    setter = (...args) => {
-      originalSetter.apply(node, args);
-      return node;
-    };
-  }
-
-  const handler = <Property<TSetterValue, TGetterValue, TNode>>(
-    function (
-      newValue?: SignalValue<TSetterValue>,
-      duration?: number,
-      timingFunction: TimingFunction = easeInOutCubic,
-      interpolationFunction: InterpolationFunction<TGetterValue> = defaultInterpolation,
-    ) {
-      if (newValue === undefined) {
-        return getter();
-      }
-
-      if (duration === undefined) {
-        return setter(wrap(newValue));
-      }
-
-      return makeAnimate(timingFunction, interpolationFunction)(
-        <TGetterValue>newValue,
-        duration,
-      );
-    }
-  );
-
-  function makeAnimate(
-    defaultTimingFunction: TimingFunction,
-    defaultInterpolationFunction: InterpolationFunction<TGetterValue>,
-    before?: ThreadGenerator,
-  ) {
-    function animate(
-      value: SignalValue<TGetterValue>,
-      duration: number,
-      timingFunction = defaultTimingFunction,
-      interpolationFunction = defaultInterpolationFunction,
-    ) {
-      const task = <SignalGenerator<TGetterValue>>(
-        makeTask(value, duration, timingFunction, interpolationFunction, before)
-      );
-      task.to = makeAnimate(timingFunction, interpolationFunction, task);
-      return task;
-    }
-
-    return <SignalTween<TGetterValue>>animate;
-  }
-
-  decorate(<any>makeTask, threadable());
-  function* makeTask(
-    value: SignalValue<TGetterValue>,
-    duration: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<TGetterValue>,
-    before?: ThreadGenerator,
-  ) {
-    if (before) {
-      yield* before;
-    }
-
-    if (tweener) {
-      yield* tweener.call(
-        node,
-        wrap(value),
-        duration,
-        timingFunction,
-        interpolationFunction,
-      );
-    } else {
-      const from = getter();
-      yield* tween(
-        duration,
-        v => {
-          setter(interpolationFunction(from, unwrap(value), timingFunction(v)));
-        },
-        () => setter(wrap(value)),
-      );
-    }
-  }
-
-  Object.defineProperty(handler, 'reset', {
-    configurable: true,
-    value: signal
-      ? signal.reset
-      : initial !== undefined
-      ? () => setter(wrap(initial))
-      : () => node,
-  });
-
-  Object.defineProperty(handler, 'save', {
-    configurable: true,
-    value: () => setter(getter()),
-  });
-
-  Object.defineProperty(handler, 'raw', {
-    value: signal?.raw ?? getter,
-  });
-
-  return handler;
 }
 
 const PROPERTIES = Symbol.for('@motion-canvas/2d/decorators/properties');
@@ -250,7 +66,7 @@ export function getPropertiesOf(
 }
 
 /**
- * Create a signal property decorator.
+ * Create a signal decorator.
  *
  * @remarks
  * This decorator turns the given property into a signal.
@@ -260,8 +76,6 @@ export function getPropertiesOf(
  * - `get[PropertyName]` - A property setter.
  * - `tween[PropertyName]` - A tween provider.
  *
- * See the {@link PropertyOwner} type for more detailed method signatures.
- *
  * @example
  * ```ts
  * class Example {
@@ -270,31 +84,28 @@ export function getPropertiesOf(
  * }
  * ```
  */
-export function property<T>(): PropertyDecorator {
+export function signal<T>(): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMetaOrCreate<T>(target, key);
     addInitializer(target, (instance: any, context: any) => {
-      instance[key] = createProperty(
-        instance,
-        <string>key,
+      const signal = new SignalContext<T, T, any>(
         context.defaults[key] ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
-        meta.parser,
-        instance[`get${capitalize(<string>key)}`],
-        instance[`set${capitalize(<string>key)}`],
-        instance[`tween${capitalize(<string>key)}`],
+        instance,
       );
+      patchSignal(signal, meta.parser, instance, <string>key);
+      instance[key] = signal.toSignal();
     });
   };
 }
 
 /**
- * Create an initial property value decorator.
+ * Create an initial signal value decorator.
  *
  * @remarks
  * This decorator specifies the initial value of a property.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts
@@ -319,13 +130,13 @@ export function initial<T>(value: T): PropertyDecorator {
 }
 
 /**
- * Create a property interpolation function decorator.
+ * Create a signal interpolation function decorator.
  *
  * @remarks
  * This decorator specifies the interpolation function of a property.
  * The interpolation function is used when tweening between different values.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts
@@ -352,7 +163,7 @@ export function interpolation<T>(
 }
 
 /**
- * Create a property parser decorator.
+ * Create a signal parser decorator.
  *
  * @remarks
  * This decorator specifies the parser of a property.
@@ -362,7 +173,7 @@ export function interpolation<T>(
  * If the wrapper class has a method called `lerp` it will be set as the
  * default interpolation function for the property.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts
@@ -387,7 +198,7 @@ export function parser<T>(value: (value: any) => T): PropertyDecorator {
 }
 
 /**
- * Create a property wrapper decorator.
+ * Create a signal wrapper decorator.
  *
  * @remarks
  * This is a shortcut decorator for setting both the {@link parser} and
@@ -396,7 +207,7 @@ export function parser<T>(value: (value: any) => T): PropertyDecorator {
  * The interpolation function will be set only if the wrapper class has a method
  * called `lerp`, which will be used as said function.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts
@@ -440,7 +251,7 @@ export function wrapper<T>(
  *
  * By default, any property is cloneable.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts
@@ -473,7 +284,7 @@ export function cloneable<T>(value = true): PropertyDecorator {
  *
  * By default, any property is inspectable.
  *
- * Must be specified before the {@link property} decorator.
+ * Must be specified before the {@link signal} decorator.
  *
  * @example
  * ```ts

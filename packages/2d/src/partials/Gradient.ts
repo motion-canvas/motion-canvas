@@ -1,13 +1,14 @@
+import {initial, signal} from '../decorators/signal';
+import {vector2Signal} from '../decorators/vector2Signal';
+import {computed} from '../decorators/computed';
+import {initialize} from '../decorators/initializers';
 import {
-  computed,
-  initial,
-  initialize,
-  property,
-  Vector2Property,
-  vector2Property,
-} from '../decorators';
-import {Color, PossibleColor, Vector2} from '@motion-canvas/core/lib/types';
-import {Signal} from '@motion-canvas/core/lib/utils';
+  Color,
+  PossibleColor,
+  Vector2,
+  Vector2Signal,
+} from '@motion-canvas/core/lib/types';
+import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
 
@@ -32,27 +33,27 @@ export interface GradientProps {
 
 export class Gradient {
   @initial('linear')
-  @property()
-  public declare readonly type: Signal<GradientType, this>;
+  @signal()
+  public declare readonly type: SimpleSignal<GradientType, this>;
 
-  @vector2Property('from')
-  public declare readonly from: Vector2Property<this>;
+  @vector2Signal('from')
+  public declare readonly from: Vector2Signal<this>;
 
-  @vector2Property('to')
-  public declare readonly to: Vector2Property<this>;
+  @vector2Signal('to')
+  public declare readonly to: Vector2Signal<this>;
 
   @initial(0)
-  @property()
-  public declare readonly angle: Signal<number, this>;
+  @signal()
+  public declare readonly angle: SimpleSignal<number, this>;
   @initial(0)
-  @property()
-  public declare readonly fromRadius: Signal<number, this>;
+  @signal()
+  public declare readonly fromRadius: SimpleSignal<number, this>;
   @initial(0)
-  @property()
-  public declare readonly toRadius: Signal<number, this>;
+  @signal()
+  public declare readonly toRadius: SimpleSignal<number, this>;
   @initial([])
-  @property()
-  public declare readonly stops: Signal<GradientStop[], this>;
+  @signal()
+  public declare readonly stops: SimpleSignal<GradientStop[], this>;
 
   public constructor(props: GradientProps) {
     initialize(this, {defaults: props});

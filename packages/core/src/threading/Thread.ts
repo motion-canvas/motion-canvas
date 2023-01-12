@@ -1,12 +1,7 @@
 import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
-import {
-  createSignal,
-  endThread,
-  startThread,
-  useLogger,
-  useProject,
-} from '../utils';
+import {endThread, startThread, useLogger, useProject} from '../utils';
+import {createSignal} from '../signals';
 
 /**
  * A class representing an individual thread.

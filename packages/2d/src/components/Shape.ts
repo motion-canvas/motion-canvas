@@ -1,17 +1,19 @@
 import {PossibleCanvasStyle} from '../partials';
-import {
-  computed,
-  initial,
-  property,
-  CanvasStyleProperty,
-  canvasStyleProperty,
-} from '../decorators';
-import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {computed, initial, signal} from '../decorators';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {Layout, LayoutProps} from './Layout';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {easeOutExpo, linear, map} from '@motion-canvas/core/lib/tweening';
 import {resolveCanvasStyle} from '../utils';
+import {
+  canvasStyleSignal,
+  CanvasStyleSignal,
+} from '../decorators/canvasStyleSignal';
+import {
+  createSignal,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export interface ShapeProps extends LayoutProps {
   fill?: SignalValue<PossibleCanvasStyle>;
@@ -25,28 +27,28 @@ export interface ShapeProps extends LayoutProps {
 }
 
 export abstract class Shape extends Layout {
-  @canvasStyleProperty()
-  public declare readonly fill: CanvasStyleProperty<this>;
-  @canvasStyleProperty()
-  public declare readonly stroke: CanvasStyleProperty<this>;
+  @canvasStyleSignal()
+  public declare readonly fill: CanvasStyleSignal<this>;
+  @canvasStyleSignal()
+  public declare readonly stroke: CanvasStyleSignal<this>;
   @initial(false)
-  @property()
-  public declare readonly strokeFirst: Signal<boolean, this>;
+  @signal()
+  public declare readonly strokeFirst: SimpleSignal<boolean, this>;
   @initial(0)
-  @property()
-  public declare readonly lineWidth: Signal<number, this>;
+  @signal()
+  public declare readonly lineWidth: SimpleSignal<number, this>;
   @initial('miter')
-  @property()
-  public declare readonly lineJoin: Signal<CanvasLineJoin, this>;
+  @signal()
+  public declare readonly lineJoin: SimpleSignal<CanvasLineJoin, this>;
   @initial('butt')
-  @property()
-  public declare readonly lineCap: Signal<CanvasLineCap, this>;
+  @signal()
+  public declare readonly lineCap: SimpleSignal<CanvasLineCap, this>;
   @initial([])
-  @property()
-  public declare readonly lineDash: Signal<number[], this>;
+  @signal()
+  public declare readonly lineDash: SimpleSignal<number[], this>;
   @initial(0)
-  @property()
-  public declare readonly lineDashOffset: Signal<number, this>;
+  @signal()
+  public declare readonly lineDashOffset: SimpleSignal<number, this>;
 
   protected readonly rippleStrength = createSignal<number, this>(0);
 

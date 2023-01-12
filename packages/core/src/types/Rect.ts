@@ -1,7 +1,8 @@
 import {Vector2} from './Vector';
-import {arcLerp, map} from '../tweening';
+import {arcLerp, InterpolationFunction, map} from '../tweening';
 import {Type} from './Type';
 import {Spacing} from './Spacing';
+import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 
 export type SerializedRect = {
   x: number;
@@ -13,7 +14,15 @@ export type SerializedRect = {
 export type PossibleRect =
   | SerializedRect
   | [number, number, number, number]
-  | Vector2;
+  | Vector2
+  | undefined;
+
+export type RectSignal<T> = CompoundSignal<
+  PossibleRect,
+  Rect,
+  'x' | 'y' | 'width' | 'height',
+  T
+>;
 
 export class Rect implements Type {
   public static readonly symbol = Symbol.for('@motion-canvas/core/types/Rect');
@@ -22,6 +31,18 @@ export class Rect implements Type {
   public y = 0;
   public width = 0;
   public height = 0;
+
+  public static createSignal(
+    initial?: SignalValue<PossibleRect>,
+    interpolation: InterpolationFunction<Rect> = Rect.lerp,
+  ): RectSignal<void> {
+    return new CompoundSignalContext(
+      ['x', 'y', 'width', 'height'],
+      (value: PossibleRect) => new Rect(value),
+      initial,
+      interpolation,
+    ).toSignal();
+  }
 
   public static lerp(
     from: Rect,

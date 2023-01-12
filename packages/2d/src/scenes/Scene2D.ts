@@ -8,18 +8,10 @@ import {
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {endScene, startScene, useScene} from '@motion-canvas/core/lib/utils';
+import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Node, View2D} from '../components';
 import {Meta} from '@motion-canvas/core';
-
-export function useScene2D(): Scene2D | null {
-  const scene = useScene();
-  if (scene instanceof Scene2D) {
-    return scene;
-  }
-  return null;
-}
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private readonly view: View2D;

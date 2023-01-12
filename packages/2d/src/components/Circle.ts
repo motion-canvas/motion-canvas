@@ -1,6 +1,6 @@
 import {Shape, ShapeProps} from './Shape';
-import {Signal, SignalValue} from '@motion-canvas/core/lib/utils';
-import {initial, property} from '../decorators';
+import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {initial, signal} from '../decorators';
 
 export interface CircleProps extends ShapeProps {
   startAngle?: SignalValue<number>;
@@ -9,12 +9,12 @@ export interface CircleProps extends ShapeProps {
 
 export class Circle extends Shape {
   @initial(0)
-  @property()
-  public declare readonly startAngle: Signal<number, this>;
+  @signal()
+  public declare readonly startAngle: SimpleSignal<number, this>;
 
   @initial(360)
-  @property()
-  public declare readonly endAngle: Signal<number, this>;
+  @signal()
+  public declare readonly endAngle: SimpleSignal<number, this>;
 
   public constructor(props: CircleProps) {
     super(props);
