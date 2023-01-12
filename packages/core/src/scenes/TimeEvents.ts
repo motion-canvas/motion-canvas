@@ -57,7 +57,7 @@ export class TimeEvents {
 
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
-  private previousReference: SavedTimeEvent[] = [];
+  private previousReference: SavedTimeEvent[] | undefined = [];
   private didEventsChange = false;
   private preserveTiming = true;
 
@@ -174,7 +174,7 @@ export class TimeEvents {
 
     if (
       this.didEventsChange ||
-      this.previousReference.length !== this.events.current.length
+      (this.previousReference?.length ?? 0) !== this.events.current.length
     ) {
       this.didEventsChange = false;
       this.previousReference = Object.values(this.registeredEvents).map(
