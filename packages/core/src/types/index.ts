@@ -1,3 +1,9 @@
+/**
+ * Complex types used in animations.
+ *
+ * @packageDocumentation
+ */
+
 export * from './Canvas';
 export * from './Color';
 export * from './Matrix';

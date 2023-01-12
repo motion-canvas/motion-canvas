@@ -10,6 +10,7 @@ import {matchFilters, useFilters} from '@site/src/contexts/filters';
 import {TOCItem} from '@docusaurus/mdx-loader';
 import Tooltip from '@site/src/components/Tooltip';
 import type {JSONOutput} from 'typedoc';
+import {ReflectionKind} from './ReflectionKind';
 
 interface ApiItemProps {
   route: {
@@ -26,7 +27,7 @@ export default function ApiItem({route}: ApiItemProps): JSX.Element {
   const [filters] = useFilters();
   const toc = useMemo(() => {
     const toc: TOCItem[] = [];
-    if (!reflection.groups) {
+    if (!reflection.groups || reflection.kind === ReflectionKind.Project) {
       return toc;
     }
 

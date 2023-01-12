@@ -1,3 +1,9 @@
+/**
+ * General utilities and helper functions.
+ *
+ * @packageDocumentation
+ */
+
 export * from './capitalize';
 export * from './getContext';
 export * from './range';
