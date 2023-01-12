@@ -1,7 +1,7 @@
-import {GeneratorHelper} from '../helpers';
 import {ThreadGenerator} from './ThreadGenerator';
-import {endThread, startThread, useLogger, useProject} from '../utils';
+import {endThread, startThread, useProject} from '../utils';
 import {createSignal} from '../signals';
+import {setTaskName} from './names';
 
 /**
  * A class representing an individual thread.
@@ -76,13 +76,7 @@ export class Thread {
     child.time(this.time());
     this.children.push(child);
 
-    if (!Object.getPrototypeOf(child.runner).threadable) {
-      useLogger().warn(new Error(`Non-threadable task: ${child.runner}`));
-      GeneratorHelper.makeThreadable(
-        child.runner,
-        `non-threadable ${this.children.length}`,
-      );
-    }
+    setTaskName(child.runner, `unknown ${this.children.length}`);
   }
 
   public cancel() {
