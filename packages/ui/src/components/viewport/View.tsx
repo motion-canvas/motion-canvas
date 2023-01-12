@@ -190,7 +190,11 @@ export function View() {
             outlineWidth: `${1 / state.zoom}px`,
           }}
         >
-          <canvas key={playerState.colorSpace} ref={viewportRef} />
+          <canvas
+            className={styles.preview}
+            key={playerState.colorSpace}
+            ref={viewportRef}
+          />
         </div>
         <Grid />
         <Debug />
