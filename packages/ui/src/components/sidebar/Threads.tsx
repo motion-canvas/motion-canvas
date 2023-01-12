@@ -1,8 +1,7 @@
 import styles from './Sidebar.module.scss';
 
-import type {Thread} from '@motion-canvas/core/lib/threading';
+import {type Thread, getTaskName} from '@motion-canvas/core/lib/threading';
 import {isThreadable} from '@motion-canvas/core/lib/scenes/Threadable';
-import {GeneratorHelper} from '@motion-canvas/core/lib/helpers/GeneratorHelper';
 import {
   useCurrentFrame,
   useCurrentScene,
@@ -35,9 +34,7 @@ interface ThreadViewProps {
 function ThreadView({thread}: ThreadViewProps) {
   return (
     <div className={styles.thread}>
-      <div className={styles.threadTitle}>
-        {GeneratorHelper.getName(thread.runner)}
-      </div>
+      <div className={styles.threadTitle}>{getTaskName(thread.runner)}</div>
       {thread.children.length > 0 && (
         <ul className={styles.threadList}>
           {thread.children.map(value => (

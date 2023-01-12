@@ -1,7 +1,7 @@
-import {GeneratorHelper} from '../helpers';
 import {decorate, threadable} from '../decorators';
 import {Thread} from './Thread';
 import {isThreadGenerator, ThreadGenerator} from './ThreadGenerator';
+import {setTaskName} from './names';
 
 /**
  * Check if the given value is a [Promise][promise].
@@ -56,7 +56,7 @@ export function* threads(
   callback?: ThreadsCallback,
 ): ThreadGenerator {
   const root = factory();
-  GeneratorHelper.makeThreadable(root, 'root');
+  setTaskName(root, 'root');
   const rootThread = new Thread(root);
   callback?.(rootThread);
 

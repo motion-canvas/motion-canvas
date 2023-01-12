@@ -1,5 +1,4 @@
-import {ThreadGenerator} from '../threading';
-import {GeneratorHelper} from '../helpers';
+import {setTaskName, ThreadGenerator} from '../threading';
 
 /**
  * Turn the given generator function into a threadable generator.
@@ -38,10 +37,10 @@ export function run(
   let task;
   if (typeof firstArg === 'string') {
     task = runner!();
-    GeneratorHelper.makeThreadable(task, firstArg);
+    setTaskName(task, firstArg);
   } else {
     task = firstArg();
-    GeneratorHelper.makeThreadable(task, task);
+    setTaskName(task, task);
   }
 
   return task;
