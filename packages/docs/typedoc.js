@@ -28,6 +28,7 @@ module.exports = () => ({
           '../core/src/media',
           '../core/src/player',
           '../core/src/scenes',
+          '../core/src/signals',
           '../core/src/threading',
           '../core/src/transitions',
           '../core/src/tweening',

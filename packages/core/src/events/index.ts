@@ -1,3 +1,9 @@
+/**
+ * Subscriptions and triggering of events.
+ *
+ * @packageDocumentation
+ */
+
 export * from './AsyncEventDispatcher';
 export * from './EventDispatcher';
 export * from './EventDispatcherBase';
