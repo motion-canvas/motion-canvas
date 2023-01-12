@@ -1,18 +1,13 @@
 import {
   cloneable,
-  ColorProperty,
-  colorProperty,
+  colorSignal,
   computed,
   getPropertiesOf,
   initial,
   initialize,
-  Property,
-  property,
-  Vector2Property,
-  vector2Property,
+  signal,
+  vector2Signal,
   wrapper,
-  FiltersProperty,
-  filtersProperty,
 } from '../decorators';
 import {
   Vector2,
@@ -21,23 +16,28 @@ import {
   PossibleColor,
   transformAngle,
   PossibleVector2,
+  Vector2Signal,
+  ColorSignal,
 } from '@motion-canvas/core/lib/types';
-import {
-  consumePromises,
-  createSignal,
-  isReactive,
-  Reference,
-  Signal,
-  SignalValue,
-} from '@motion-canvas/core/lib/utils';
-import {ComponentChild, ComponentChildren, NodeConstructor} from './types';
+import {Reference} from '@motion-canvas/core/lib/utils';
+import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
-import {useScene2D} from '../scenes';
+import {useScene2D} from '../scenes/useScene2D';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
 import {Filter} from '../partials';
+import {filtersSignal, FiltersSignal} from '../decorators/filtersSignal';
+import {
+  createSignal,
+  Signal,
+  DependencyContext,
+  SignalValue,
+  SimpleSignal,
+  SignalContext,
+  isReactive,
+} from '@motion-canvas/core/lib/signals';
 
 export interface NodeProps {
   ref?: Reference<any>;
@@ -67,13 +67,13 @@ export interface NodeProps {
 export class Node implements Promisable<Node> {
   public declare isClass: boolean;
 
-  @vector2Property()
-  public declare readonly position: Vector2Property<this>;
+  @vector2Signal()
+  public declare readonly position: Vector2Signal<this>;
 
   @wrapper(Vector2)
   @cloneable(false)
-  @property()
-  public declare readonly absolutePosition: Property<
+  @signal()
+  public declare readonly absolutePosition: SignalContext<
     PossibleVector2,
     Vector2,
     this
@@ -93,12 +93,12 @@ export class Node implements Promisable<Node> {
   }
 
   @initial(0)
-  @property()
-  public declare readonly rotation: Signal<number, this>;
+  @signal()
+  public declare readonly rotation: SimpleSignal<number, this>;
 
   @cloneable(false)
-  @property()
-  public declare readonly absoluteRotation: Signal<number, this>;
+  @signal()
+  public declare readonly absoluteRotation: SimpleSignal<number, this>;
 
   protected getAbsoluteRotation() {
     const matrix = this.localToWorld();
@@ -114,17 +114,13 @@ export class Node implements Promisable<Node> {
   }
 
   @initial(Vector2.one)
-  @vector2Property('scale')
-  public declare readonly scale: Vector2Property<this>;
+  @vector2Signal('scale')
+  public declare readonly scale: Vector2Signal<this>;
 
   @wrapper(Vector2)
   @cloneable(false)
-  @property()
-  public declare readonly absoluteScale: Property<
-    PossibleVector2,
-    Vector2,
-    this
-  >;
+  @signal()
+  public declare readonly absoluteScale: Signal<PossibleVector2, Vector2, this>;
 
   protected getAbsoluteScale(): Vector2 {
     const matrix = this.localToWorld();
@@ -148,16 +144,16 @@ export class Node implements Promisable<Node> {
   }
 
   @initial(false)
-  @property()
-  public declare readonly cache: Signal<boolean, this>;
+  @signal()
+  public declare readonly cache: SimpleSignal<boolean, this>;
 
   @initial(false)
-  @property()
-  public declare readonly composite: Signal<boolean, this>;
+  @signal()
+  public declare readonly composite: SimpleSignal<boolean, this>;
 
   @initial('source-over')
-  @property()
-  public declare readonly compositeOperation: Signal<
+  @signal()
+  public declare readonly compositeOperation: SimpleSignal<
     GlobalCompositeOperation,
     this
   >;
@@ -183,27 +179,27 @@ export class Node implements Promisable<Node> {
   }
 
   @initial(1)
-  @property()
-  public declare readonly opacity: Signal<number, this>;
+  @signal()
+  public declare readonly opacity: SimpleSignal<number, this>;
 
   @computed()
   public absoluteOpacity(): number {
     return (this.parent()?.absoluteOpacity() ?? 1) * this.opacity();
   }
 
-  @filtersProperty()
-  public declare readonly filters: FiltersProperty;
+  @filtersSignal()
+  public declare readonly filters: FiltersSignal<this>;
 
   @initial('#0000')
-  @colorProperty()
-  public declare readonly shadowColor: ColorProperty<this>;
+  @colorSignal()
+  public declare readonly shadowColor: ColorSignal<this>;
 
   @initial(0)
-  @property()
-  public declare readonly shadowBlur: Signal<number, this>;
+  @signal()
+  public declare readonly shadowBlur: SimpleSignal<number, this>;
 
-  @vector2Property('shadowOffset')
-  public declare readonly shadowOffset: Vector2Property<this>;
+  @vector2Signal('shadowOffset')
+  public declare readonly shadowOffset: Vector2Signal<this>;
 
   @computed()
   protected hasFilters(): boolean {
@@ -472,12 +468,12 @@ export class Node implements Promisable<Node> {
       if (!meta.cloneable || key in props) continue;
       if (meta.compound) {
         for (const [key, property] of meta.compoundEntries) {
-          props[property] = (<Record<string, Signal<any>>>(<unknown>signal))[
-            key
-          ].raw();
+          props[property] = (<Record<string, SimpleSignal<any>>>(
+            (<unknown>signal)
+          ))[key].context.raw();
         }
       } else {
-        props[key] = signal.raw();
+        props[key] = signal.context.raw();
       }
     }
 
@@ -802,7 +798,7 @@ export class Node implements Promisable<Node> {
    */
   public waitForAsyncResources() {
     this.collectAsyncResources();
-    const promises = consumePromises();
+    const promises = DependencyContext.consumePromises();
     return Promise.all(promises.map(handle => handle.promise));
   }
 
@@ -823,7 +819,7 @@ export class Node implements Promisable<Node> {
   public *[Symbol.iterator]() {
     for (const key in this.properties) {
       const meta = this.properties[key];
-      const signal = (<Record<string, Signal<any>>>(<unknown>this))[key];
+      const signal = (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
       yield {meta, signal, key};
     }
   }

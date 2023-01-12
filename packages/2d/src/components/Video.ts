@@ -3,18 +3,17 @@ import {
   SerializedVector2,
 } from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
-import {computed, initial, property} from '../decorators';
-import {
-  collectPromise,
-  Signal,
-  SignalValue,
-  useProject,
-  useThread,
-} from '@motion-canvas/core/lib/utils';
+import {computed, initial, signal} from '../decorators';
+import {useProject, useThread} from '@motion-canvas/core/lib/utils';
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
 import {Length} from '../partials';
+import {
+  DependencyContext,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export interface VideoProps extends RectProps {
   src?: SignalValue<string>;
@@ -27,24 +26,24 @@ export interface VideoProps extends RectProps {
 export class Video extends Rect {
   private static readonly pool: Record<string, HTMLVideoElement> = {};
 
-  @property()
-  public declare readonly src: Signal<string, this>;
+  @signal()
+  public declare readonly src: SimpleSignal<string, this>;
 
   @initial(1)
-  @property()
-  public declare readonly alpha: Signal<number, this>;
+  @signal()
+  public declare readonly alpha: SimpleSignal<number, this>;
 
   @initial(true)
-  @property()
-  public declare readonly smoothing: Signal<boolean, this>;
+  @signal()
+  public declare readonly smoothing: SimpleSignal<boolean, this>;
 
   @initial(0)
-  @property()
-  protected declare readonly time: Signal<number, this>;
+  @signal()
+  protected declare readonly time: SimpleSignal<number, this>;
 
   @initial(false)
-  @property()
-  protected declare readonly playing: Signal<boolean, this>;
+  @signal()
+  protected declare readonly playing: SimpleSignal<boolean, this>;
 
   private lastTime = -1;
 
@@ -81,7 +80,7 @@ export class Video extends Rect {
     const video = document.createElement('video');
     video.src = src;
     if (video.readyState < 2) {
-      collectPromise(
+      DependencyContext.collectPromise(
         new Promise<void>(resolve => {
           const listener = () => {
             resolve();
@@ -125,7 +124,7 @@ export class Video extends Rect {
     const playing = this.playing() && time < video.duration;
     if (playing) {
       if (video.paused) {
-        collectPromise(video.play());
+        DependencyContext.collectPromise(video.play());
       }
     } else {
       if (!video.paused) {
@@ -181,7 +180,7 @@ export class Video extends Rect {
     video.currentTime = value;
     this.lastTime = value;
     if (video.seeking) {
-      collectPromise(
+      DependencyContext.collectPromise(
         new Promise<void>(resolve => {
           const listener = () => {
             resolve();

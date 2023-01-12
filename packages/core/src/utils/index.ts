@@ -1,7 +1,4 @@
 export * from './capitalize';
-export * from './createComputed';
-export * from './createComputedAsync';
-export * from './createSignal';
 export * from './getContext';
 export * from './range';
 export * from './useProject';

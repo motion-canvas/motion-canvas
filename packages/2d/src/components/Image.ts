@@ -1,9 +1,4 @@
-import {
-  collectPromise,
-  Signal,
-  SignalValue,
-} from '@motion-canvas/core/lib/utils';
-import {computed, initial, property} from '../decorators';
+import {computed, initial, signal} from '../decorators';
 import {
   Color,
   Rect as RectType,
@@ -13,6 +8,11 @@ import {
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
 import {Length} from '../partials';
+import {
+  DependencyContext,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
@@ -23,16 +23,16 @@ export interface ImageProps extends RectProps {
 export class Image extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 
-  @property()
-  public declare readonly src: Signal<string, this>;
+  @signal()
+  public declare readonly src: SimpleSignal<string, this>;
 
   @initial(1)
-  @property()
-  public declare readonly alpha: Signal<number, this>;
+  @signal()
+  public declare readonly alpha: SimpleSignal<number, this>;
 
   @initial(true)
-  @property()
-  public declare readonly smoothing: Signal<boolean, this>;
+  @signal()
+  public declare readonly smoothing: SimpleSignal<boolean, this>;
 
   public constructor(props: ImageProps) {
     super(props);
@@ -61,7 +61,7 @@ export class Image extends Rect {
     const image = document.createElement('img');
     image.src = src;
     if (!image.complete) {
-      collectPromise(
+      DependencyContext.collectPromise(
         new Promise((resolve, reject) => {
           image.addEventListener('load', resolve);
           image.addEventListener('error', reject);

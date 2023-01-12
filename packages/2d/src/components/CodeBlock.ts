@@ -1,11 +1,5 @@
-import {computed, initial, property} from '../decorators';
-import {
-  createComputedAsync,
-  createSignal,
-  Signal,
-  SignalValue,
-  useLogger,
-} from '@motion-canvas/core/lib/utils';
+import {computed, initial, signal} from '../decorators';
+import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {CodeTree, parse, diff, ready, MorphToken, Token} from 'code-fns';
 import {
@@ -17,6 +11,12 @@ import {
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {Length} from '../partials';
 import {SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
+import {
+  createComputedAsync,
+  createSignal,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export interface CodeProps extends ShapeProps {
   children?: CodeTree;
@@ -30,8 +30,8 @@ export class CodeBlock extends Shape {
   );
 
   @initial('')
-  @property()
-  public declare readonly code: Signal<CodeTree, this>;
+  @signal()
+  public declare readonly code: SimpleSignal<CodeTree, this>;
 
   private progress = createSignal<number | null>(null);
   private diffed: MorphToken[] | null = null;

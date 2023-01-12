@@ -1,7 +1,7 @@
 import {Shape, ShapeProps} from './Shape';
-import {SignalValue} from '@motion-canvas/core/lib/utils';
-import {PossibleVector2} from '@motion-canvas/core/lib/types';
-import {initial, vector2Property, Vector2Property} from '../decorators';
+import {PossibleVector2, Vector2Signal} from '@motion-canvas/core/lib/types';
+import {initial, vector2Signal} from '../decorators';
+import {SignalValue} from '@motion-canvas/core/lib/signals';
 
 export interface GridProps extends ShapeProps {
   spacing?: SignalValue<PossibleVector2>;
@@ -9,8 +9,8 @@ export interface GridProps extends ShapeProps {
 
 export class Grid extends Shape {
   @initial(80)
-  @vector2Property('spacing')
-  public declare readonly spacing: Vector2Property<this>;
+  @vector2Signal('spacing')
+  public declare readonly spacing: Vector2Signal<this>;
 
   public constructor(props: GridProps) {
     super(props);

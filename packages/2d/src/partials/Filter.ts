@@ -1,4 +1,8 @@
-import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
+import {
+  createSignal,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 import {map} from '@motion-canvas/core/lib/tweening';
 import {transformScalar} from '@motion-canvas/core/lib/types';
 
@@ -78,7 +82,7 @@ export class Filter {
     return this.props.default;
   }
 
-  public readonly value: Signal<number, Filter>;
+  public readonly value: SimpleSignal<number, Filter>;
   private readonly props: FilterProps;
 
   public constructor(props: Partial<FilterProps>) {

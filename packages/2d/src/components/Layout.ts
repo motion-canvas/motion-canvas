@@ -1,14 +1,11 @@
 import {
   cloneable,
-  compound,
   computed,
   initial,
   inspectable,
-  property,
-  Vector2LengthProperty,
-  Vector2Property,
-  vector2Property,
-  wrapper,
+  signal,
+  Vector2LengthSignal,
+  vector2Signal,
 } from '../decorators';
 import {
   Origin,
@@ -18,8 +15,9 @@ import {
   originToOffset,
   SerializedVector2,
   PossibleVector2,
+  SpacingSignal,
+  Vector2Signal,
 } from '@motion-canvas/core/lib/types';
-import {createSignal, Signal, SignalValue} from '@motion-canvas/core/lib/utils';
 import {
   InterpolationFunction,
   TimingFunction,
@@ -38,7 +36,12 @@ import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
 import {drawLine, lineTo} from '../utils';
-import {spacingProperty, SpacingProperty} from '../decorators/spacingProperty';
+import {spacingSignal} from '../decorators/spacingSignal';
+import {
+  createSignal,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;
@@ -93,89 +96,89 @@ export interface LayoutProps extends NodeProps {
 
 export class Layout extends Node {
   @initial(null)
-  @property()
-  public declare readonly layout: Signal<LayoutMode, this>;
+  @signal()
+  public declare readonly layout: SimpleSignal<LayoutMode, this>;
 
   @initial(null)
-  @property()
-  public declare readonly maxWidth: Signal<Length, this>;
+  @signal()
+  public declare readonly maxWidth: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly maxHeight: Signal<Length, this>;
+  @signal()
+  public declare readonly maxHeight: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly minWidth: Signal<Length, this>;
+  @signal()
+  public declare readonly minWidth: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly minHeight: Signal<Length, this>;
+  @signal()
+  public declare readonly minHeight: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly ratio: Signal<number | null, this>;
+  @signal()
+  public declare readonly ratio: SimpleSignal<number | null, this>;
 
-  @spacingProperty('margin')
-  public declare readonly margin: SpacingProperty<this>;
+  @spacingSignal('margin')
+  public declare readonly margin: SpacingSignal<this>;
 
-  @spacingProperty('padding')
-  public declare readonly padding: SpacingProperty<this>;
+  @spacingSignal('padding')
+  public declare readonly padding: SpacingSignal<this>;
 
   @initial('row')
-  @property()
-  public declare readonly direction: Signal<FlexDirection, this>;
+  @signal()
+  public declare readonly direction: SimpleSignal<FlexDirection, this>;
   @initial(null)
-  @property()
-  public declare readonly basis: Signal<FlexBasis, this>;
+  @signal()
+  public declare readonly basis: SimpleSignal<FlexBasis, this>;
   @initial(0)
-  @property()
-  public declare readonly grow: Signal<number, this>;
+  @signal()
+  public declare readonly grow: SimpleSignal<number, this>;
   @initial(1)
-  @property()
-  public declare readonly shrink: Signal<number, this>;
+  @signal()
+  public declare readonly shrink: SimpleSignal<number, this>;
   @initial('nowrap')
-  @property()
-  public declare readonly wrap: Signal<FlexWrap, this>;
+  @signal()
+  public declare readonly wrap: SimpleSignal<FlexWrap, this>;
 
   @initial('normal')
-  @property()
-  public declare readonly justifyContent: Signal<FlexJustify, this>;
+  @signal()
+  public declare readonly justifyContent: SimpleSignal<FlexJustify, this>;
   @initial('normal')
-  @property()
-  public declare readonly alignItems: Signal<FlexAlign, this>;
+  @signal()
+  public declare readonly alignItems: SimpleSignal<FlexAlign, this>;
   @initial(null)
-  @property()
-  public declare readonly gap: Signal<Length, this>;
+  @signal()
+  public declare readonly gap: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly rowGap: Signal<Length, this>;
+  @signal()
+  public declare readonly rowGap: SimpleSignal<Length, this>;
   @initial(null)
-  @property()
-  public declare readonly columnGap: Signal<Length, this>;
+  @signal()
+  public declare readonly columnGap: SimpleSignal<Length, this>;
 
   @initial(null)
-  @property()
-  public declare readonly fontFamily: Signal<string | null, this>;
+  @signal()
+  public declare readonly fontFamily: SimpleSignal<string | null, this>;
   @initial(null)
-  @property()
-  public declare readonly fontSize: Signal<number | null, this>;
+  @signal()
+  public declare readonly fontSize: SimpleSignal<number | null, this>;
   @initial(null)
-  @property()
-  public declare readonly fontStyle: Signal<string | null, this>;
+  @signal()
+  public declare readonly fontStyle: SimpleSignal<string | null, this>;
   @initial(null)
-  @property()
-  public declare readonly fontWeight: Signal<number | null, this>;
+  @signal()
+  public declare readonly fontWeight: SimpleSignal<number | null, this>;
   @initial(null)
-  @property()
-  public declare readonly lineHeight: Signal<number | null, this>;
+  @signal()
+  public declare readonly lineHeight: SimpleSignal<number | null, this>;
   @initial(null)
-  @property()
-  public declare readonly letterSpacing: Signal<number | null, this>;
+  @signal()
+  public declare readonly letterSpacing: SimpleSignal<number | null, this>;
   @initial(null)
-  @property()
-  public declare readonly textWrap: Signal<boolean | null, this>;
+  @signal()
+  public declare readonly textWrap: SimpleSignal<boolean | null, this>;
 
   @cloneable(false)
   @inspectable(false)
-  @property()
-  protected declare readonly customX: Signal<number, this>;
+  @signal()
+  protected declare readonly customX: SimpleSignal<number, this>;
   protected getX(): number {
     if (this.isLayoutRoot()) {
       return this.customX();
@@ -189,8 +192,8 @@ export class Layout extends Node {
 
   @cloneable(false)
   @inspectable(false)
-  @property()
-  protected declare readonly customY: Signal<number, this>;
+  @signal()
+  protected declare readonly customY: SimpleSignal<number, this>;
 
   protected getY(): number {
     if (this.isLayoutRoot()) {
@@ -285,17 +288,16 @@ export class Layout extends Node {
   }
 
   @cloneable(false)
-  @wrapper(Vector2)
   @initial({x: null, y: null})
-  @compound({x: 'width', y: 'height'})
-  public declare readonly size: Vector2LengthProperty<this>;
+  @vector2Signal({x: 'width', y: 'height'})
+  public declare readonly size: Vector2LengthSignal<this>;
 
   @inspectable(false)
-  @property()
-  protected declare readonly customWidth: Signal<Length, this>;
+  @signal()
+  protected declare readonly customWidth: SimpleSignal<Length, this>;
   @inspectable(false)
-  @property()
-  protected declare readonly customHeight: Signal<Length, this>;
+  @signal()
+  protected declare readonly customHeight: SimpleSignal<Length, this>;
   @computed()
   protected desiredSize(): SerializedVector2<Length> {
     return {
@@ -340,12 +342,12 @@ export class Layout extends Node {
     this.size(value);
   }
 
-  @vector2Property('offset')
-  public declare readonly offset: Vector2Property<this>;
+  @vector2Signal('offset')
+  public declare readonly offset: Vector2Signal<this>;
 
   @initial(false)
-  @property()
-  public declare readonly clip: Signal<boolean, this>;
+  @signal()
+  public declare readonly clip: SimpleSignal<boolean, this>;
 
   public readonly element: HTMLElement;
   public readonly styles: CSSStyleDeclaration;

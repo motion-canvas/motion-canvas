@@ -1,5 +1,5 @@
 import {addInitializer} from './initializers';
-import {createComputed} from '@motion-canvas/core/lib/utils/createComputed';
+import {createComputed} from '@motion-canvas/core/lib/signals';
 
 /**
  * Create a computed method decorator.

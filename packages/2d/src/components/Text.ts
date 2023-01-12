@@ -1,8 +1,9 @@
-import {initial, interpolation, property} from '../decorators';
-import {Signal, SignalValue, useLogger} from '@motion-canvas/core/lib/utils';
+import {initial, interpolation, signal} from '../decorators';
+import {useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {Rect} from '@motion-canvas/core/lib/types';
+import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 export interface TextProps extends ShapeProps {
   children?: string;
@@ -24,8 +25,8 @@ export class Text extends Shape {
 
   @initial('')
   @interpolation(textLerp)
-  @property()
-  public declare readonly text: Signal<string, this>;
+  @signal()
+  public declare readonly text: SimpleSignal<string, this>;
 
   public constructor({children, ...rest}: TextProps) {
     super(rest);

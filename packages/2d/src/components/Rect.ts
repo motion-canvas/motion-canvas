@@ -1,16 +1,20 @@
-import {SignalValue} from '@motion-canvas/core/lib/utils';
-import {PossibleSpacing, Rect as RectType} from '@motion-canvas/core/lib/types';
+import {
+  PossibleSpacing,
+  Rect as RectType,
+  SpacingSignal,
+} from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
 import {drawRoundRect} from '../utils';
-import {spacingProperty, SpacingProperty} from '../decorators/spacingProperty';
+import {spacingSignal} from '../decorators/spacingSignal';
+import {SignalValue} from '@motion-canvas/core/lib/signals';
 
 export interface RectProps extends ShapeProps {
   radius?: SignalValue<PossibleSpacing>;
 }
 
 export class Rect extends Shape {
-  @spacingProperty('radius')
-  public declare readonly radius: SpacingProperty<this>;
+  @spacingSignal('radius')
+  public declare readonly radius: SpacingSignal<this>;
 
   public constructor(props: RectProps) {
     super(props);
