@@ -58,8 +58,8 @@ export interface MotionCanvasPluginConfig {
    * - `main.js` - A module exporting necessary factory functions.
    *
    * `main.js` should export the following functions:
-   * - `editor` - Receives the project as its first argument and creates the
-   *              user interface.
+   * - `editor` - Receives the project factory as its first argument and creates
+   *              the user interface.
    * - `index` - Receives a list of all projects as its first argument and
    *             creates the initial page for selecting a project.
    *
@@ -159,22 +159,24 @@ export default ({
           const sceneFile = `${name}`;
 
           return source(
+            `import {ValueDispatcher} from '@motion-canvas/core/lib/events';`,
             `import meta from './${metaFile}';`,
             `import description from './${sceneFile}';`,
-            `let scene;`,
+            `description.name = '${name}';`,
+            `description.meta = meta;`,
             `if (import.meta.hot) {`,
-            `  scene = import.meta.hot.data.scene;`,
+            `  description.onReplaced = import.meta.hot.data.onReplaced;`,
             `}`,
-            `scene ??= new description.klass('${name}', meta, description.config);`,
+            `description.onReplaced ??= new ValueDispatcher(description.config);`,
             `if (import.meta.hot) {`,
             `  import.meta.hot.accept();`,
-            `  if (import.meta.hot.data.scene) {`,
-            `    scene.reload(description.config);`,
+            `  if (import.meta.hot.data.onReplaced) {`,
+            `    description.onReplaced.current = description.config;`,
             `  } else {`,
-            `    import.meta.hot.data.scene = scene;`,
+            `    import.meta.hot.data.onReplaced = description.onReplaced;`,
             `  }`,
             `}`,
-            `export default scene;`,
+            `export default description;`,
           );
         }
 
@@ -183,11 +185,23 @@ export default ({
           await createMeta(path.join(dir, metaFile));
 
           return source(
+            `import {Project} from '@motion-canvas/core';`,
             `import meta from './${metaFile}';`,
-            `import project from './${name}';`,
-            `project.meta = meta`,
-            `project.name = '${name}'`,
-            `export default project;`,
+            `import config from './${name}';`,
+            `const factory = () => {`,
+            `  if (config instanceof Project) {`,
+            `    config.meta = meta;`,
+            `    config.name = '${name}';`,
+            `    config.logger.warn({`,
+            `      message: 'A project instance was exported instead of a project factory.',`,
+            `      remarks: \`<p>Use the "makeProject()" function instead:</p><pre>import {makeProject} from '@motion-canvas/core';\nexport default makeProject({\n  // Configuration and scenes go here.\n});</pre>\`,`,
+            `      stack: config.creationStack,`,
+            `    });`,
+            `    return config;`,
+            `  }`,
+            `  return new Project('${name}', meta, config);`,
+            `}`,
+            `export default factory;`,
           );
         }
       }

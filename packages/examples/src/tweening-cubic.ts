@@ -1,7 +1,7 @@
-import {Project} from '@motion-canvas/core/lib';
+import {makeProject} from '@motion-canvas/core';
 
 import scene from './scenes/tweening-cubic?scene';
 
-export default new Project({
+export default makeProject({
   scenes: [scene],
 });

@@ -18,7 +18,8 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export function editor(project: Project) {
+export function editor(factory: () => Project) {
+  const project = factory();
   Error.stackTraceLimit = Infinity;
 
   project.logger.onLogged.subscribe(log => {

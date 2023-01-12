@@ -1,7 +1,11 @@
 import type {Project} from '../Project';
 import {Meta, Metadata} from '../Meta';
 import {SavedTimeEvent, TimeEvents} from './TimeEvents';
-import {SubscribableEvent, SubscribableValueEvent} from '../events';
+import {
+  SubscribableEvent,
+  SubscribableValueEvent,
+  ValueDispatcher,
+} from '../events';
 import {Vector2} from '../types';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Random} from './Random';
@@ -27,7 +31,7 @@ export interface SceneConstructor<T> {
 }
 
 /**
- * Describes a scene exposed by a `*.scene.tsx` file.
+ * Describes a scene exposed by scene files.
  *
  * @typeParam T - The type of the configuration object.
  */
@@ -40,6 +44,17 @@ export interface SceneDescription<T = unknown> {
    * Configuration object.
    */
   config: T;
+}
+
+/**
+ * Describes a complete scene together with the meta file.
+ *
+ * @typeParam T - The type of the configuration object.
+ */
+export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
+  name: string;
+  meta: Meta<SceneMetadata>;
+  onReplaced: ValueDispatcher<T>;
 }
 
 export type DescriptionOf<TScene> = TScene extends Scene<infer TConfig>
