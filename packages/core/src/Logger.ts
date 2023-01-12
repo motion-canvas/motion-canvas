@@ -27,11 +27,13 @@ export class Logger {
     return this.logged.subscribable;
   }
   private readonly logged = new EventDispatcher<LogPayload>();
+  public readonly history: LogPayload[] = [];
 
   private profilers: Record<string, number> = {};
 
   public log(payload: LogPayload) {
     this.logged.dispatch(payload);
+    this.history.push(payload);
   }
 
   public error(payload: string | LogPayload) {

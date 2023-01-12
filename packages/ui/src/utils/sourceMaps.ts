@@ -3,7 +3,7 @@ import {withLoader} from './withLoader';
 
 const externalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const stackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
-  ? /^ +at.+\((.*):([0-9]+):([0-9]+)/
+  ? /^ +at.* \(?(.*):([0-9]+):([0-9]+)/
   : /@(.*):([0-9]+):([0-9]+)/;
 
 async function getSourceMap(file: string): Promise<SourceMapConsumer> {
@@ -102,10 +102,12 @@ export function getSourceCodeFrame(entry: StackTraceEntry): string | null {
 
   const sourceLines = source.split('\n');
   const {line, column} = entry;
+  const lastLine = line + 2;
+  const spacing = lastLine.toString().length;
   const formatted = sourceLines
-    .slice(line - 1, line + 2)
+    .slice(line - 1, lastLine)
     .map((text, index) => `${line + index} | ${text}`);
-  formatted.splice(1, 0, `   | ${' '.repeat(column)}^`);
+  formatted.splice(1, 0, `${' '.repeat(spacing)} | ${' '.repeat(column)}^`);
   return formatted.join('\n');
 }
 

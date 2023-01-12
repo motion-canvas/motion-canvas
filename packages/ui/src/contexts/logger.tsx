@@ -20,7 +20,7 @@ export class LoggerManager {
 
   public constructor(project: Project) {
     this.logger = project.logger;
-    this.logs.current = [];
+    this.logs.current = project.logger.history;
     this.logger.onLogged.subscribe(this.handleLog);
     project.onReloaded.subscribe(this.clear);
   }

@@ -59,6 +59,7 @@ $colors: (
   white-space: nowrap;
 }
 
+.remarks pre,
 .code {
   background-color: var(--surface-color);
   border-radius: 4px;
@@ -74,6 +75,14 @@ $colors: (
   overflow-x: auto;
 
   --scrollbar-background: var(--background-color-dark);
+}
+
+.remarks {
+  margin-top: 16px;
+
+  p {
+    margin: 8px;
+  }
 }
 
 .entry {

@@ -28,7 +28,7 @@ export function Log({payload}: LogProps) {
     return entries?.find(entry => !entry.isExternal) ?? null;
   }, [entries]);
 
-  const hasBody = !!object || !!entries;
+  const hasBody = !!object || !!entries || !!payload.remarks;
 
   useEffect(() => {
     if (payload.stack) {
@@ -61,8 +61,14 @@ export function Log({payload}: LogProps) {
       {hasBody && open && (
         <div>
           {userEntry && <SourceCodeFrame entry={userEntry} />}
-          {object && <pre className={styles.code}>{object}</pre>}
           {entries && <StackTrace entries={entries} />}
+          {object && <pre className={styles.code}>{object}</pre>}
+          {payload.remarks && (
+            <div
+              className={styles.remarks}
+              dangerouslySetInnerHTML={{__html: payload.remarks}}
+            />
+          )}
         </div>
       )}
     </div>

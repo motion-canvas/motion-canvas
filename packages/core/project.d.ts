@@ -22,7 +22,7 @@ declare module '*.glsl' {
 }
 
 declare module '*?scene' {
-  const value: import('./lib/scenes/Scene').Scene;
+  const value: import('./lib/scenes/Scene').FullSceneDescription;
   export = value;
 }
 

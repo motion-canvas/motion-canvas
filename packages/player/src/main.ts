@@ -169,7 +169,7 @@ class MotionCanvasPlayer extends HTMLElement {
       const delay = new Promise(resolve => setTimeout(resolve, 200));
       await Promise.any([delay, promise]);
       this.setState(State.Loading);
-      project = (await promise).default;
+      project = (await promise).default();
     } catch (e) {
       this.setState(State.Error);
       return;

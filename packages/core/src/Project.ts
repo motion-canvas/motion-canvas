@@ -1,4 +1,4 @@
-import {Scene} from './scenes';
+import {FullSceneDescription, Scene, SceneDescription} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
@@ -16,7 +16,7 @@ export const ProjectSize: Record<string, Vector2> = {
 
 export interface ProjectConfig {
   name?: string;
-  scenes: Scene[];
+  scenes: FullSceneDescription[];
   audio?: string;
   audioOffset?: number;
   canvas?: HTMLCanvasElement;
@@ -32,6 +32,10 @@ export enum PlaybackState {
 }
 
 export type ProjectMetadata = Metadata;
+
+export function makeProject(config: ProjectConfig) {
+  return config;
+}
 
 export class Project {
   /**
@@ -58,7 +62,7 @@ export class Project {
   }
   private readonly reloaded = new EventDispatcher<void>();
 
-  public declare readonly meta: Meta<ProjectMetadata>;
+  public readonly meta: Meta<ProjectMetadata>;
   public frame = 0;
 
   public get time(): number {
@@ -147,10 +151,11 @@ export class Project {
     return new Vector2(this.width, this.height);
   }
 
-  public declare readonly name: string;
+  public readonly name: string;
   public readonly audio = new AudioManager();
   public readonly logger = new Logger();
   public readonly background: string | false;
+  public readonly creationStack: string;
   public playbackState = createSignal(PlaybackState.Paused);
   private readonly renderLookup: Record<number, Callback> = {};
   private _resolutionScale = 1;
@@ -171,14 +176,35 @@ export class Project {
   private width = 0;
   private height = 0;
 
-  public constructor({
-    scenes,
-    audio,
-    audioOffset,
-    canvas,
-    size = ProjectSize.FullHD,
-    background = false,
-  }: ProjectConfig) {
+  /**
+   * @deprecated Use {@link makeProject} instead.
+   *
+   * @param config - The project configuration.
+   */
+  public constructor(config: ProjectConfig);
+  public constructor(
+    name: string,
+    meta: Meta<ProjectMetadata>,
+    config: ProjectConfig,
+  );
+  public constructor(
+    name: string | ProjectConfig,
+    meta?: Meta<ProjectMetadata>,
+    config?: ProjectConfig,
+  ) {
+    const {
+      scenes,
+      audio,
+      audioOffset,
+      canvas,
+      size = ProjectSize.FullHD,
+      background = false,
+    } = typeof name === 'string' ? config! : name;
+
+    this.name = typeof name === 'string' ? name : '';
+    this.meta = meta!;
+
+    this.creationStack = new Error().stack ?? '';
     this.setCanvas(canvas);
     this.setSize(size);
     this.background = background;
@@ -190,11 +216,19 @@ export class Project {
       this.audio.setOffset(audioOffset);
     }
 
-    for (const scene of scenes) {
+    const instances: Scene[] = [];
+    for (const description of scenes) {
+      const scene = new description.klass(
+        description.name,
+        description.meta,
+        description.config,
+      );
       scene.project = this;
+      description.onReplaced?.subscribe(config => scene.reload(config), false);
       scene.onReloaded.subscribe(() => this.reloaded.dispatch());
+      instances.push(scene);
     }
-    this.scenes.current = [...scenes];
+    this.scenes.current = instances;
 
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:export-ack', ({frame}) => {

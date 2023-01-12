@@ -1,7 +1,7 @@
-import {Project} from '@motion-canvas/core/lib';
+import {makeProject} from '@motion-canvas/core';
 
-import quickstart from './scenes/quickstart?scene';
+import scene from './scenes/quickstart?scene';
 
-export default new Project({
-  scenes: [quickstart],
+export default makeProject({
+  scenes: [scene],
 });
