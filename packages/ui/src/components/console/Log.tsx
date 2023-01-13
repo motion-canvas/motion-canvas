@@ -60,14 +60,24 @@ export function Log({payload}: LogProps) {
       </div>
       {hasBody && open && (
         <div>
-          {userEntry && <SourceCodeFrame entry={userEntry} />}
-          {entries && <StackTrace entries={entries} />}
-          {object && <pre className={styles.code}>{object}</pre>}
           {payload.remarks && (
             <div
-              className={styles.remarks}
+              className={clsx(styles.section, styles.remarks)}
               dangerouslySetInnerHTML={{__html: payload.remarks}}
             />
+          )}
+          {object && (
+            <div className={styles.section}>
+              Related object:
+              <pre className={styles.code}>{object}</pre>
+            </div>
+          )}
+          {entries && (
+            <div className={styles.section}>
+              The problem occurred here:
+              {userEntry && <SourceCodeFrame entry={userEntry} />}
+              <StackTrace entries={entries} />
+            </div>
           )}
         </div>
       )}

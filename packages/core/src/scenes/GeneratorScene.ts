@@ -136,6 +136,7 @@ export abstract class GeneratorScene<T>
   public async render(context: CanvasRenderingContext2D): Promise<void> {
     let promises = DependencyContext.consumePromises();
     let iterations = 0;
+    startScene(this);
     do {
       iterations++;
       await Promise.all(promises.map(handle => handle.promise));
@@ -147,6 +148,7 @@ export abstract class GeneratorScene<T>
 
       promises = DependencyContext.consumePromises();
     } while (promises.length > 0 && iterations < 10);
+    endScene(this);
 
     if (iterations > 1) {
       this.project.logger.debug(`render iterations: ${iterations}`);

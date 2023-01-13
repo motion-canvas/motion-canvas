@@ -1,4 +1,4 @@
-import {useLogger} from '../utils';
+import {errorToLog, useLogger} from '../utils';
 import {DependencyContext} from './DependencyContext';
 
 export interface Computed<TValue> {
@@ -30,8 +30,7 @@ export class ComputedContext<TValue> extends DependencyContext<any> {
         this.last = this.factory(...args);
       } catch (e: any) {
         useLogger().error({
-          message: e.message,
-          stack: e.stack,
+          ...errorToLog(e),
           inspect: this.owner?.key,
         });
       }

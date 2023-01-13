@@ -194,7 +194,7 @@ export default ({
             `    config.name = '${name}';`,
             `    config.logger.warn({`,
             `      message: 'A project instance was exported instead of a project factory.',`,
-            `      remarks: \`<p>Use the "makeProject()" function instead:</p><pre>import {makeProject} from '@motion-canvas/core';\nexport default makeProject({\n  // Configuration and scenes go here.\n});</pre>\`,`,
+            `      remarks: \`Use the <code>makeProject()</code> function instead:<pre>import {makeProject} from '@motion-canvas/core';\nexport default makeProject({\n  // Configuration and scenes go here.\n});</pre>\`,`,
             `      stack: config.creationStack,`,
             `    });`,
             `    return config;`,

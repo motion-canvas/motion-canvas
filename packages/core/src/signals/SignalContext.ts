@@ -4,7 +4,7 @@ import {
   TimingFunction,
   tween,
 } from '../tweening';
-import {useLogger} from '../utils';
+import {errorToLog, useLogger} from '../utils';
 import {ThreadGenerator} from '../threading';
 import {run} from '../flow';
 import {DependencyContext} from './DependencyContext';
@@ -133,8 +133,7 @@ export class SignalContext<
         this.last = this.parse(this.current());
       } catch (e: any) {
         useLogger().error({
-          message: e.message,
-          stack: e.stack,
+          ...errorToLog(e),
           inspect: (<any>this.owner)?.key,
         });
       }

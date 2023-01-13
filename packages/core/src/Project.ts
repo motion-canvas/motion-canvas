@@ -1,4 +1,4 @@
-import {FullSceneDescription, Scene, SceneDescription} from './scenes';
+import {FullSceneDescription, Scene} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
 import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
