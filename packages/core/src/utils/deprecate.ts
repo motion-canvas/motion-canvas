@@ -7,12 +7,12 @@ import {useLogger} from './useProject';
  * @param message - The log message.
  * @param remarks - The optional log remarks.
  */
-export function deprecate<TArgs extends any[], TThis, TReturn>(
-  fn: (this: TThis, ...args: TArgs) => TReturn,
+export function deprecate<TArgs extends any[], TReturn>(
+  fn: (...args: TArgs) => TReturn,
   message: string,
   remarks?: string,
-): (this: TThis, ...args: TArgs) => TReturn {
-  return function (...args) {
+): (...args: TArgs) => TReturn {
+  return function (this: any, ...args) {
     useLogger().warn({message, remarks, stack: new Error().stack});
     return fn.apply(this, args);
   };

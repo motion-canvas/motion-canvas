@@ -15,6 +15,7 @@ import InferredType from '@site/src/components/Api/Type/InferredType';
 import IndexedAccessType from '@site/src/components/Api/Type/IndexedAccessType';
 import TypeOperatorType from '@site/src/components/Api/Type/TypeOperatorType';
 import MappedType from '@site/src/components/Api/Type/MappedType';
+import NamedTupleMemberType from '@site/src/components/Api/Type/NamedTupleMemberType';
 import type {JSONOutput} from 'typedoc';
 
 export interface CodeTypeProps {
@@ -35,7 +36,7 @@ export default function CodeType(props: CodeTypeProps) {
       case 'query':
         return QueryType;
       case 'named-tuple-member':
-        break;
+        return NamedTupleMemberType;
       case 'optional':
         break;
       case 'union':

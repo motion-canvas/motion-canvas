@@ -27,6 +27,7 @@ import {
 } from '../signals';
 
 /**
+ * @internal
  * @deprecated Use {@link createRef} instead.
  */
 const useRef = deprecate(
@@ -37,6 +38,7 @@ const useRef = deprecate(
 );
 
 /**
+ * @internal
  * @deprecated Use {@link createSignal} instead.
  */
 const createSignal = deprecate(
@@ -47,6 +49,7 @@ const createSignal = deprecate(
 );
 
 /**
+ * @internal
  * @deprecated Use {@link createComputed} instead.
  */
 const createComputed = deprecate(

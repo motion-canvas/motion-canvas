@@ -17,14 +17,18 @@ export default function Comment({
     <>
       <Summary id={comment?.summaryId} />
       <Summary id={remarks?.contentId} />
-      {full && <ExamplesAndSeeAlso comment={comment} />}
+      {full && <FullComment comment={comment} />}
     </>
   );
 }
 
-function ExamplesAndSeeAlso({comment}: {comment: JSONOutput.Comment}) {
+function FullComment({comment}: {comment: JSONOutput.Comment}) {
   const examples = useMemo(
     () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
+    [comment],
+  );
+  const deprecated = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@deprecated'),
     [comment],
   );
   const seeAlso = useMemo(
@@ -40,6 +44,12 @@ function ExamplesAndSeeAlso({comment}: {comment: JSONOutput.Comment}) {
           {examples.map(example => (
             <Summary id={example.contentId} />
           ))}
+        </>
+      )}
+      {deprecated && (
+        <>
+          <h4>Deprecated</h4>
+          <Summary id={deprecated.contentId} />
         </>
       )}
       {seeAlso && (
