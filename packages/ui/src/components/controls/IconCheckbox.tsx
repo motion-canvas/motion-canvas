@@ -1,11 +1,10 @@
 import styles from './Controls.module.scss';
 
-import {IconType} from './IconType';
 import clsx from 'clsx';
+import {ComponentChildren} from 'preact';
 
 interface IconCheckboxProps {
-  iconOn?: IconType;
-  iconOff?: IconType;
+  children: ComponentChildren;
   titleOn?: string;
   titleOff?: string;
   id: string;
@@ -15,8 +14,7 @@ interface IconCheckboxProps {
 }
 
 export function IconCheckbox({
-  iconOn,
-  iconOff,
+  children,
   titleOn,
   titleOff,
   id,
@@ -26,26 +24,22 @@ export function IconCheckbox({
 }: IconCheckboxProps) {
   return (
     <div className={styles.iconCheckbox}>
-      <input
-        className={styles.iconInput}
-        type="checkbox"
-        id={id}
-        checked={checked}
-        onChange={event => {
-          onChange?.((event.target as HTMLInputElement).checked);
-        }}
-      />
       <label
         title={titleOff && !checked ? titleOff : titleOn}
-        className={clsx(
-          styles.icon,
-          styles.iconLabel,
-          main && styles.main,
-          (checked || !iconOff) && styles[iconOn],
-          iconOff && !checked && styles[iconOff],
-        )}
+        className={clsx(styles.iconLabel, main && styles.main)}
         htmlFor={id}
-      />
+      >
+        <input
+          className={styles.iconInput}
+          type="checkbox"
+          id={id}
+          checked={checked}
+          onChange={event => {
+            onChange?.((event.target as HTMLInputElement).checked);
+          }}
+        />
+        {children}
+      </label>
     </div>
   );
 }

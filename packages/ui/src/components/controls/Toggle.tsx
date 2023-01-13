@@ -1,5 +1,6 @@
 import styles from './Controls.module.scss';
 import clsx from 'clsx';
+import {ChevronRight} from '../icons/ChevronRight';
 
 export interface ToggleProps {
   open?: boolean;
@@ -11,6 +12,8 @@ export function Toggle({open, onToggle}: ToggleProps) {
     <div
       className={clsx(styles.toggle, open && styles.open)}
       onClick={() => onToggle(!open)}
-    />
+    >
+      <ChevronRight />
+    </div>
   );
 }

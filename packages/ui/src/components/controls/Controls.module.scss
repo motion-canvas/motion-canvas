@@ -1,20 +1,16 @@
-.icon {
-  &:after {
-    width: 24px;
-    height: 24px;
-    display: block;
-    content: '';
-    background: var(--icon-color);
-  }
-}
-
 .iconCheckbox {
   width: 24px;
   height: 24px;
+  position: relative;
 }
 
 .iconInput {
-  display: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  appearance: none;
 }
 
 .iconLabel {
@@ -22,25 +18,21 @@
   height: 24px;
   display: block;
   cursor: pointer;
+  color: rgba(255, 255, 255, 0.54);
 
-  &::after {
-    background-color: rgba(255, 255, 255, 0.54);
+  &.main {
+    color: #fff;
   }
 
-  &.main::after {
-    background-color: var(--icon-color);
-  }
-
-  .iconInput + &:hover::after {
-    background-color: var(--icon-color);
+  .iconInput + &:hover {
+    color: #fff;
   }
 
   .iconInput:checked + & {
-    &:after {
-      background: var(--theme);
-    }
-    &.main:after {
-      background: var(--icon-color);
+    color: var(--theme);
+
+    &.main {
+      color: #fff;
     }
   }
 }
@@ -55,13 +47,10 @@
   background: transparent;
   padding: 0;
   margin: 0;
+  color: rgba(255, 255, 255, 0.54);
 
-  &::after {
-    background-color: rgba(255, 255, 255, 0.54);
-  }
-
-  &:hover::after {
-    background-color: var(--icon-color);
+  &:hover {
+    color: #fff;
   }
 }
 
@@ -168,22 +157,17 @@
   width: 24px;
   height: 24px;
   cursor: pointer;
+  color: rgba(255, 255, 255, 0.6);
 
   &:hover {
     background-color: var(--surface-color-hover);
   }
 
-  &:after {
-    width: 24px;
-    height: 24px;
-    display: block;
-    content: '';
-    -webkit-mask-image: url('../../img/icons/chevron_right.svg');
-    background-color: rgba(255, 255, 255, 0.6);
+  svg {
     transition: rotate 0.2s;
   }
 
-  &.open:after {
+  &.open svg {
     rotate: 90deg;
   }
 }
@@ -210,62 +194,4 @@
       box-shadow: 0 0 0 2px white inset;
     }
   }
-}
-
-.motionCanvas:after {
-  -webkit-mask-image: url('../../img/icons/motion_canvas.svg');
-}
-.pause:after {
-  -webkit-mask-image: url('../../img/icons/pause.svg');
-}
-.photoCamera:after {
-  -webkit-mask-image: url('../../img/icons/photo_camera.svg');
-}
-.play:after {
-  -webkit-mask-image: url('../../img/icons/play_arrow.svg');
-}
-.repeat:after {
-  -webkit-mask-image: url('../../img/icons/repeat.svg');
-}
-.skipNext:after {
-  -webkit-mask-image: url('../../img/icons/skip_next.svg');
-}
-.skipPrevious:after {
-  -webkit-mask-image: url('../../img/icons/skip_previous.svg');
-}
-.volumeOn:after {
-  -webkit-mask-image: url('../../img/icons/volume_on.svg');
-}
-.volumeOff:after {
-  -webkit-mask-image: url('../../img/icons/volume_off.svg');
-}
-.schedule:after {
-  -webkit-mask-image: url('../../img/icons/schedule.svg');
-}
-.tune:after {
-  -webkit-mask-image: url('../../img/icons/tune.svg');
-}
-.videoSettings:after {
-  -webkit-mask-image: url('../../img/icons/video_settings.svg');
-}
-.dragIndicator:after {
-  -webkit-mask-image: url('../../img/icons/drag_indicator.svg');
-}
-.warning:after {
-  -webkit-mask-image: url('../../img/icons/warning.svg');
-}
-.bug:after {
-  -webkit-mask-image: url('../../img/icons/bug.svg');
-}
-.clear:after {
-  -webkit-mask-image: url('../../img/icons/clear.svg');
-}
-.locate:after {
-  -webkit-mask-image: url('../../img/icons/locate.svg');
-}
-.add:after {
-  -webkit-mask-image: url('../../img/icons/add.svg');
-}
-.unfoldMore:after {
-  -webkit-mask-image: url('../../img/icons/unfold_more.svg');
 }

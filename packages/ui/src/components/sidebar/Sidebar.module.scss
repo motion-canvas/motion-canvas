@@ -4,8 +4,9 @@
 
 .times {
   rotate: 45deg;
-  --icon-color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.32);
   margin: 0 -4px;
+  flex-shrink: 0;
 }
 
 .thread {

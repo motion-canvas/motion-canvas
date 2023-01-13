@@ -5,9 +5,10 @@ import {capitalize} from '@motion-canvas/core/lib/utils';
 import {Pane} from '../tabs';
 import {useLogs} from '../../contexts';
 import {useState} from 'preact/hooks';
-import {IconButton, IconType, Pill} from '../controls';
+import {IconButton, Pill} from '../controls';
 import {Log} from './Log';
 import clsx from 'clsx';
+import {Clear} from '../icons';
 
 const LOG_LEVELS: Record<string, boolean> = {
   [LogLevel.Error]: true,
@@ -42,11 +43,9 @@ export function Console() {
           })}
         </div>
         {logs.length > 0 && (
-          <IconButton
-            icon={IconType.clear}
-            onClick={clear}
-            title={'Clear console'}
-          />
+          <IconButton onClick={clear} title={'Clear console'}>
+            <Clear />
+          </IconButton>
         )}
       </div>
       <div

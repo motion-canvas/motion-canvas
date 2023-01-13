@@ -5,10 +5,11 @@ import {useEffect, useMemo, useState} from 'preact/hooks';
 import {resolveStackTrace, StackTraceEntry} from '../../utils';
 import {useInspection} from '../../contexts';
 import {useFormattedNumber} from '../../hooks';
-import {IconButton, IconType, Toggle} from '../controls';
+import {IconButton, Toggle} from '../controls';
 import {StackTrace} from './StackTrace';
 import {SourceCodeFrame} from './SourceCodeFrame';
 import clsx from 'clsx';
+import {Locate} from '../icons';
 
 export interface LogProps {
   payload: LogPayload;
@@ -53,9 +54,10 @@ export function Log({payload}: LogProps) {
         {payload.inspect && (
           <IconButton
             title="Select related node"
-            icon={IconType.locate}
             onClick={() => setInspectedElement(payload.inspect)}
-          />
+          >
+            <Locate />
+          </IconButton>
         )}
       </div>
       {hasBody && open && (

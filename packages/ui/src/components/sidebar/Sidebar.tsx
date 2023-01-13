@@ -1,4 +1,3 @@
-import {IconType} from '../controls';
 import {Badge, Tabs, TabType} from '../tabs';
 import {Properties} from './Properties';
 import {Rendering} from './Rendering';
@@ -8,6 +7,7 @@ import {useInspection, useLogger} from '../../contexts';
 import {useEffect, useRef, useState} from 'preact/hooks';
 import {shake} from '../animations';
 import {useStorage} from '../../hooks';
+import {MotionCanvas, Bug, Tune, VideoSettings, Schedule} from '../icons';
 
 interface SidebarProps {
   setOpen?: (value: boolean) => void;
@@ -49,7 +49,7 @@ export function Sidebar({setOpen}: SidebarProps) {
           title: 'Project Selection',
           id: 'project-selection-link',
           type: TabType.Link,
-          icon: IconType.motionCanvas,
+          icon: <MotionCanvas />,
           url: window.location.pathname === '/' ? undefined : '/',
         }}
         {{
@@ -59,28 +59,28 @@ export function Sidebar({setOpen}: SidebarProps) {
           title: 'Inspector',
           id: 'inspector-tab',
           type: TabType.Pane,
-          icon: IconType.tune,
+          icon: <Tune />,
           pane: <Properties />,
         }}
         {{
           title: 'Video Settings',
           id: 'rendering-tab',
           type: TabType.Pane,
-          icon: IconType.videoSettings,
+          icon: <VideoSettings />,
           pane: <Rendering />,
         }}
         {{
           title: 'Thread Debugger',
           id: 'threads-tab',
           type: TabType.Pane,
-          icon: IconType.schedule,
+          icon: <Schedule />,
           pane: <Threads />,
         }}
         {{
           title: errorCount > 0 ? `Console (${errorCount})` : 'Console',
           id: 'console-tab',
           type: TabType.Pane,
-          icon: IconType.bug,
+          icon: <Bug />,
           pane: <Console />,
           badge: errorCount > 0 && (
             <Badge badgeRef={badge}>

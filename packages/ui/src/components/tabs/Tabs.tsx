@@ -1,6 +1,5 @@
 import styles from './Tabs.module.scss';
 
-import {Icon, IconType} from '../controls';
 import {ComponentChildren} from 'preact';
 import {useCallback, useLayoutEffect} from 'preact/hooks';
 import clsx from 'clsx';
@@ -14,7 +13,7 @@ export enum TabType {
 type Tab =
   | {
       type: TabType.Pane;
-      icon: IconType;
+      icon: ComponentChildren;
       pane: ComponentChildren;
       badge?: ComponentChildren;
       title?: string;
@@ -22,7 +21,7 @@ type Tab =
     }
   | {
       type: TabType.Link;
-      icon: IconType;
+      icon: ComponentChildren;
       url?: string;
       title?: string;
       id?: string;
@@ -59,24 +58,24 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
       <div className={styles.tabs}>
         {children.map((data, index) =>
           data.type === TabType.Link ? (
-            <Icon
-              as="a"
+            <a
               title={data.title}
-              type={data.icon}
               href={data.url}
               id={data.id}
               className={clsx(styles.tab, !data.url && styles.disabled)}
-            />
+            >
+              {data.icon}
+            </a>
           ) : data.type === TabType.Pane ? (
-            <Icon
-              type={data.icon}
+            <button
               title={data.title}
               id={data.id}
               onClick={() => toggleTab(index)}
               className={clsx(styles.tab, tab === index && styles.active)}
             >
+              {data.icon}
               {data.badge}
-            </Icon>
+            </button>
           ) : (
             <div className={styles.space} />
           ),
