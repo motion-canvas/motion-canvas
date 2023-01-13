@@ -1,4 +1,5 @@
 import {FlagDispatcher, Subscribable} from '../events';
+import {DetailedError} from '../utils';
 
 export interface PromiseHandle<T> {
   promise: Promise<T>;
@@ -8,6 +9,7 @@ export interface PromiseHandle<T> {
 }
 
 export class DependencyContext<TOwner = void> {
+  protected static collectionSet = new Set<DependencyContext<any>>();
   protected static collectionStack: DependencyContext<any>[] = [];
   protected static promises: PromiseHandle<any>[] = [];
 
@@ -61,14 +63,24 @@ export class DependencyContext<TOwner = void> {
   }
 
   protected startCollecting() {
+    if (DependencyContext.collectionSet.has(this)) {
+      throw new DetailedError(
+        'A circular dependency occurred between signals.',
+        `This can happen when signals reference each other in a loop.
+        Try using the attached stack trace to locate said loop.`,
+      );
+    }
+
     this.stack = new Error().stack;
+    DependencyContext.collectionSet.add(this);
     DependencyContext.collectionStack.push(this);
   }
 
   protected finishCollecting() {
     this.stack = undefined;
+    DependencyContext.collectionSet.delete(this);
     if (DependencyContext.collectionStack.pop() !== this) {
-      throw new Error('collectStart/collectEnd was called out of order');
+      throw new Error('collectStart/collectEnd was called out of order.');
     }
   }
 

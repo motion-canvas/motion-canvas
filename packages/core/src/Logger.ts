@@ -14,6 +14,7 @@ export interface LogPayload {
   level?: LogLevel;
   message: string;
   stack?: string;
+  remarks?: string;
   object?: any;
   durationMs?: number;
   [K: string]: any;

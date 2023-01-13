@@ -5,6 +5,8 @@
  */
 
 export * from './capitalize';
+export * from './DetailedError';
+export * from './errorToLog';
 export * from './getContext';
 export * from './range';
 export * from './useProject';
