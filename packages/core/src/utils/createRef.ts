@@ -4,7 +4,7 @@ export type Reference<TValue> = TValue extends (config: {
   ? TReference
   : {value: TValue};
 
-export function useRef<T>(): Reference<T> {
+export function createRef<T>(): Reference<T> {
   return {} as Reference<T>;
 }
 

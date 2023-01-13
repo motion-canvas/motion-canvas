@@ -1,10 +1,10 @@
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
-import {useRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core/lib/utils';
 import {all} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
-  const myCircle = useRef<Circle>();
+  const myCircle = createRef<Circle>();
 
   view.add(
     <Circle
