@@ -1,21 +1,23 @@
 import styles from './Controls.module.scss';
 
-import {IconType} from './IconType';
 import clsx from 'clsx';
+import {ComponentChildren} from 'preact';
 
 interface IconButtonProps {
-  icon: IconType;
   title?: string;
   onClick?: () => void;
+  children: ComponentChildren;
 }
 
-export function IconButton({icon, onClick, title}: IconButtonProps) {
+export function IconButton({children, onClick, title}: IconButtonProps) {
   return (
     <button
       title={title}
-      className={clsx(styles.iconButton, styles.icon, styles[icon])}
+      className={clsx(styles.iconButton)}
       type="button"
       onClick={onClick}
-    />
+    >
+      {children}
+    </button>
   );
 }

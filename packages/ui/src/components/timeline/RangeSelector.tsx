@@ -2,8 +2,8 @@ import styles from './Timeline.module.scss';
 
 import {useDrag, usePlayerState} from '../../hooks';
 import {useCallback, useEffect, useState} from 'preact/hooks';
-import {Icon, IconType} from '../controls';
 import {usePlayer, useTimelineContext} from '../../contexts';
+import {DragIndicator} from '../icons';
 
 export function RangeSelector() {
   const {pixelsToFrames, framesToPercents} = useTimelineContext();
@@ -79,17 +79,9 @@ export function RangeSelector() {
         }
       }}
     >
-      <Icon
-        onMouseDown={handleDragStart}
-        className={styles.handle}
-        type={IconType.dragIndicator}
-      />
+      <DragIndicator onMouseDown={handleDragStart} className={styles.handle} />
       <div class={styles.handleSpacer} />
-      <Icon
-        onMouseDown={handleDragEnd}
-        className={styles.handle}
-        type={IconType.dragIndicator}
-      />
+      <DragIndicator onMouseDown={handleDragEnd} className={styles.handle} />
     </div>
   );
 }

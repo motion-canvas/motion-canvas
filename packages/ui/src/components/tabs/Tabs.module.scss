@@ -17,25 +17,25 @@
 }
 
 .tab {
-  padding: 12px;
-  margin: 0;
-  border-radius: 0 4px 4px 0;
+  padding: 8px;
+  margin: 4px;
+  border-radius: 4px;
   cursor: pointer;
   position: relative;
-  --icon-color: rgba(255, 255, 255, 0.54);
+  color: rgba(255, 255, 255, 0.54);
 
   &:hover {
-    --icon-color: white;
+    color: white;
   }
 
   &.active {
     background: var(--surface-color);
-    --icon-color: white;
+    color: white;
   }
 
   &.disabled {
     pointer-events: none;
-    --icon-color: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.16);
   }
 }
 

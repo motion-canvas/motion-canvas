@@ -1,22 +1,14 @@
 import styles from './Sidebar.module.scss';
 
 import {usePlayerState} from '../../hooks';
-import {
-  Button,
-  Group,
-  Icon,
-  IconType,
-  Input,
-  InputSelect,
-  Label,
-  Select,
-} from '../controls';
+import {Button, Group, Input, InputSelect, Label, Select} from '../controls';
 import {Pane} from '../tabs';
 import {usePlayer} from '../../contexts';
 import type {
   CanvasColorSpace,
   CanvasOutputMimeType,
 } from '@motion-canvas/core/lib/types';
+import {Add} from '../icons';
 
 export function Rendering() {
   const player = usePlayer();
@@ -93,7 +85,7 @@ export function Rendering() {
             player.project.setSize(value, height);
           }}
         />
-        <Icon className={styles.times} type={IconType.add} />
+        <Add className={styles.times} />
         <Input
           type="number"
           min={1}

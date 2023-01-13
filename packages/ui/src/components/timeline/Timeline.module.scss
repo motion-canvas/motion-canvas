@@ -242,18 +242,15 @@
 .handle {
   cursor: pointer;
   margin-top: 2px;
+  color: rgba(255, 255, 255, 0);
 
-  &:after {
-    background-color: rgba(255, 255, 255, 0);
+  .range:hover > & {
+    color: rgba(255, 255, 255, 0.24);
   }
 
-  .range:hover > &:after {
-    background-color: rgba(255, 255, 255, 0.24);
-  }
-
-  .range > &:hover:after,
-  .range > &:active:after {
-    background-color: rgba(255, 255, 255, 0.6);
+  .range > &:hover,
+  .range > &:active {
+    color: rgba(255, 255, 255, 0.6);
   }
 }
 

@@ -3,7 +3,6 @@
 :root {
   --theme: #33a6ff;
   --theme-overlay: rgba(51, 166, 255, 0.24);
-  --icon-color: #ffffff;
   --background-color: #181818;
   --background-color-dark: #141414;
   --surface-color: #242424;
@@ -58,4 +57,17 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+button {
+  background: none;
+  appearance: none;
+  border: 0;
+  padding: 0;
 }

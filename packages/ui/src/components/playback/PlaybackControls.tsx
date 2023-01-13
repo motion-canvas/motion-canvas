@@ -1,12 +1,23 @@
 import styles from './Playback.module.scss';
 
-import {IconType, IconButton, IconCheckbox} from '../controls';
+import {IconButton, IconCheckbox} from '../controls';
 import {useDocumentEvent, usePlayerState} from '../../hooks';
 import {Select, Input} from '../controls';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {usePlayer} from '../../contexts';
 import clsx from 'clsx';
+import React from 'react';
+import {
+  Pause,
+  PhotoCamera,
+  PlayArrow,
+  Repeat,
+  SkipNext,
+  SkipPrevious,
+  VolumeOff,
+  VolumeOn,
+} from '../icons';
 
 export function PlaybackControls() {
   const player = usePlayer();
@@ -61,41 +72,40 @@ export function PlaybackControls() {
       />
       <IconCheckbox
         id={'audio'}
-        iconOn={IconType.volumeOn}
-        iconOff={IconType.volumeOff}
         titleOn="Mute audio"
         titleOff="Unmute audio"
         checked={!state.muted}
         onChange={value => player.toggleAudio(value)}
-      />
+      >
+        {state.muted ? <VolumeOff /> : <VolumeOn />}
+      </IconCheckbox>
       <IconButton
         title="Previous frame"
-        icon={IconType.skipPrevious}
         onClick={() => player.requestPreviousFrame()}
-      />
+      >
+        <SkipPrevious />
+      </IconButton>
       <IconCheckbox
         id={'play'}
         main
-        iconOn={IconType.pause}
-        iconOff={IconType.play}
         titleOn="Play"
         titleOff="Pause"
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
-      />
-      <IconButton
-        title="Next frame"
-        icon={IconType.skipNext}
-        onClick={() => player.requestNextFrame()}
-      />
+      >
+        {state.paused ? <PlayArrow /> : <Pause />}
+      </IconCheckbox>
+      <IconButton title="Next frame" onClick={() => player.requestNextFrame()}>
+        <SkipNext />
+      </IconButton>
       <IconCheckbox
         id={'loop'}
-        iconOn={IconType.repeat}
-        iconOff={IconType.repeat}
         titleOn="Loop video"
         checked={state.loop}
         onChange={() => player.toggleLoop()}
-      />
+      >
+        <Repeat />
+      </IconCheckbox>
       <Framerate
         render={(framerate, paused) => (
           <Input
@@ -108,9 +118,10 @@ export function PlaybackControls() {
       />
       <IconButton
         title="Save snapshot"
-        icon={IconType.photoCamera}
         onClick={() => player.exportCurrentFrame()}
-      />
+      >
+        <PhotoCamera />
+      </IconButton>
     </div>
   );
 }
