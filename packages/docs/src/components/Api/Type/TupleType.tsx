@@ -5,11 +5,13 @@ import Type from '@site/src/components/Api/Type';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 
 export default function TupleType({type}: {type: JSONOutput.TupleType}) {
-  return (
+  return type.elements ? (
     <TokenList type={ListType.Square}>
       {type.elements.map((type, index) => (
         <Type key={index} type={type} />
       ))}
     </TokenList>
+  ) : (
+    <>[]</>
   );
 }
