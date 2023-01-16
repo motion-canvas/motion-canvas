@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.1.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.1...v12.1.0) (2023-01-16)
+
+
+### Features
+
+* **2d:** construct lines using signals ([#133](https://github.com/motion-canvas/motion-canvas/issues/133)) ([2968a24](https://github.com/motion-canvas/motion-canvas/commit/2968a2426564469fb4f4343fe71a6d30e95361f2))
+* **2d:** improve Rect corner radius ([#120](https://github.com/motion-canvas/motion-canvas/issues/120)) ([b471fe0](https://github.com/motion-canvas/motion-canvas/commit/b471fe0e37c0a426d3af8299c9c3c22539e7df05))
+* **2d:** unify desired sizes ([#118](https://github.com/motion-canvas/motion-canvas/issues/118)) ([401a799](https://github.com/motion-canvas/motion-canvas/commit/401a79946b034a96b9abff2f3fb5efd6cc9080f3))
+* add random number generator ([#116](https://github.com/motion-canvas/motion-canvas/issues/116)) ([d505312](https://github.com/motion-canvas/motion-canvas/commit/d5053123eef308c7a2a61d92b6e76c637f4ed0b8)), closes [#14](https://github.com/motion-canvas/motion-canvas/issues/14)
+* filter reordering ([#119](https://github.com/motion-canvas/motion-canvas/issues/119)) ([2398d0f](https://github.com/motion-canvas/motion-canvas/commit/2398d0f9d57f36b47c9c66a988ca5607e9a3a30e))
+* merge properties and signals ([#124](https://github.com/motion-canvas/motion-canvas/issues/124)) ([da3ba83](https://github.com/motion-canvas/motion-canvas/commit/da3ba83d82ee74f5a5c3631b07597f08cdf9e8e4))
+
+
+
+
+
 ## [12.0.1](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0...v12.0.1) (2022-12-07)
 
 

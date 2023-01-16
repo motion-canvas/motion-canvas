@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.1.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.1...v12.1.0) (2023-01-16)
+
+
+### Bug Fixes
+
+* **docs:** name collisions between members ([#117](https://github.com/motion-canvas/motion-canvas/issues/117)) ([1e52b94](https://github.com/motion-canvas/motion-canvas/commit/1e52b945cac15dc7da2d9db8fbcf5d88ba293c6f))
+* empty time events crashing ([a1c53de](https://github.com/motion-canvas/motion-canvas/commit/a1c53deba7c405ddf1a3b4874f22b63e0b085af9))
+* **ui:** misaligned overlay ([#127](https://github.com/motion-canvas/motion-canvas/issues/127)) ([0379730](https://github.com/motion-canvas/motion-canvas/commit/03797302a302e28caf9f2428cfce4a122f827775))
+* **ui:** prevent context menu in viewport ([#123](https://github.com/motion-canvas/motion-canvas/issues/123)) ([0fdd85e](https://github.com/motion-canvas/motion-canvas/commit/0fdd85ecf5b61907ce1e16f5fb9253540528a8b0))
+
+
+### Features
+
+* **2d:** construct lines using signals ([#133](https://github.com/motion-canvas/motion-canvas/issues/133)) ([2968a24](https://github.com/motion-canvas/motion-canvas/commit/2968a2426564469fb4f4343fe71a6d30e95361f2))
+* **2d:** improve Rect corner radius ([#120](https://github.com/motion-canvas/motion-canvas/issues/120)) ([b471fe0](https://github.com/motion-canvas/motion-canvas/commit/b471fe0e37c0a426d3af8299c9c3c22539e7df05))
+* **2d:** unify desired sizes ([#118](https://github.com/motion-canvas/motion-canvas/issues/118)) ([401a799](https://github.com/motion-canvas/motion-canvas/commit/401a79946b034a96b9abff2f3fb5efd6cc9080f3))
+* add deprecation support ([#130](https://github.com/motion-canvas/motion-canvas/issues/130)) ([da0e104](https://github.com/motion-canvas/motion-canvas/commit/da0e104451af72eedb3eedd998f60b305fffdb0e))
+* add random number generator ([#116](https://github.com/motion-canvas/motion-canvas/issues/116)) ([d505312](https://github.com/motion-canvas/motion-canvas/commit/d5053123eef308c7a2a61d92b6e76c637f4ed0b8)), closes [#14](https://github.com/motion-canvas/motion-canvas/issues/14)
+* detect circular signal dependencies ([#129](https://github.com/motion-canvas/motion-canvas/issues/129)) ([6fcdb41](https://github.com/motion-canvas/motion-canvas/commit/6fcdb41df90dca1c39537a4f6d4960ab551f4d6e))
+* editor improvements ([#121](https://github.com/motion-canvas/motion-canvas/issues/121)) ([e8b32ce](https://github.com/motion-canvas/motion-canvas/commit/e8b32ceff1b8216282c4b5713508ce1172645e20))
+* filter reordering ([#119](https://github.com/motion-canvas/motion-canvas/issues/119)) ([2398d0f](https://github.com/motion-canvas/motion-canvas/commit/2398d0f9d57f36b47c9c66a988ca5607e9a3a30e))
+* merge properties and signals ([#124](https://github.com/motion-canvas/motion-canvas/issues/124)) ([da3ba83](https://github.com/motion-canvas/motion-canvas/commit/da3ba83d82ee74f5a5c3631b07597f08cdf9e8e4))
+* support multiple players ([#128](https://github.com/motion-canvas/motion-canvas/issues/128)) ([24f75cf](https://github.com/motion-canvas/motion-canvas/commit/24f75cf7cdaf38f890e3936edf175afbfd340210))
+
+
+
+
+
 ## [12.0.1](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0...v12.0.1) (2022-12-07)
 
 

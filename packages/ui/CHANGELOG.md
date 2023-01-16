@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.1.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.1...v12.1.0) (2023-01-16)
+
+
+### Bug Fixes
+
+* **ui:** misaligned overlay ([#127](https://github.com/motion-canvas/motion-canvas/issues/127)) ([0379730](https://github.com/motion-canvas/motion-canvas/commit/03797302a302e28caf9f2428cfce4a122f827775))
+* **ui:** prevent context menu in viewport ([#123](https://github.com/motion-canvas/motion-canvas/issues/123)) ([0fdd85e](https://github.com/motion-canvas/motion-canvas/commit/0fdd85ecf5b61907ce1e16f5fb9253540528a8b0))
+
+
+### Features
+
+* detect circular signal dependencies ([#129](https://github.com/motion-canvas/motion-canvas/issues/129)) ([6fcdb41](https://github.com/motion-canvas/motion-canvas/commit/6fcdb41df90dca1c39537a4f6d4960ab551f4d6e))
+* editor improvements ([#121](https://github.com/motion-canvas/motion-canvas/issues/121)) ([e8b32ce](https://github.com/motion-canvas/motion-canvas/commit/e8b32ceff1b8216282c4b5713508ce1172645e20))
+* support multiple players ([#128](https://github.com/motion-canvas/motion-canvas/issues/128)) ([24f75cf](https://github.com/motion-canvas/motion-canvas/commit/24f75cf7cdaf38f890e3936edf175afbfd340210))
+
+
+
+
+
 # [12.0.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.0-alpha.6...v12.0.0) (2022-12-07)
 
 **Note:** Version bump only for package @motion-canvas/ui
