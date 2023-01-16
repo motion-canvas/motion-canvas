@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 ---
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
@@ -152,12 +152,18 @@ Can be written as:
 yield* circle.value.color('#e13238', 2);
 ```
 
-Here, we use a [`SignalTween`](/api/core/utils/SignalTween) signature that
+Here, we use a [`SignalTween`](/api/core/signals/SignalTween) signature that
 looks similar to a setter, except it accepts the transition duration as its
 second argument. Under the hood, this will also create a tween - one that
 starts with the current value and ends with the newly provided one.
 
-By default, it will use `easeInOutCubic` as the timing function.
+We can chain multiple tweens together by calling the
+`to()` method on the returned object:
+```ts
+yield* circle.value.color('#e13238', 2).to('#e6a700', 2);
+```
+
+By default, property tweens use `easeInOutCubic` as the timing function.
 We can override that by providing a third argument:
 
 ```ts

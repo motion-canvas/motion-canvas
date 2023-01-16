@@ -39,8 +39,9 @@ const config = {
           {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/motion-canvas',
-            label: 'GitHub',
             position: 'right',
+            className: 'navbar-github-link',
+            'aria-label': 'GitHub repository',
           },
         ],
       },
