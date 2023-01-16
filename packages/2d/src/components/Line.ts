@@ -2,7 +2,11 @@ import {Shape, ShapeProps} from './Shape';
 import {Node} from './Node';
 import {computed, initial, signal} from '../decorators';
 import {arc, lineTo, moveTo, resolveCanvasStyle} from '../utils';
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {
+  isReactive,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 import {Rect, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Length} from '../partials';
@@ -16,7 +20,7 @@ import {
 } from '../curves';
 
 export interface LineProps extends ShapeProps {
-  children: Node[];
+  children?: Node[];
   closed?: SignalValue<boolean>;
   radius?: SignalValue<number>;
   start?: SignalValue<number>;
@@ -26,6 +30,7 @@ export interface LineProps extends ShapeProps {
   endOffset?: SignalValue<number>;
   endArrow?: SignalValue<boolean>;
   arrowSize?: SignalValue<number>;
+  points?: SignalValue<SignalValue<Vector2>[]>;
 }
 
 export class Line extends Shape {
@@ -65,6 +70,13 @@ export class Line extends Shape {
   @signal()
   public declare readonly arrowSize: SimpleSignal<number, this>;
 
+  @initial(null)
+  @signal()
+  public declare readonly points: SimpleSignal<
+    SignalValue<Vector2>[] | null,
+    this
+  >;
+
   protected override desiredSize(): SerializedVector2<Length> {
     return this.childrenRect().size;
   }
@@ -84,7 +96,10 @@ export class Line extends Shape {
 
   @computed()
   public profile(): CurveProfile {
-    const points = this.children().map(child => child.position());
+    const custom = this.points();
+    const points = custom
+      ? custom.map(signal => (isReactive(signal) ? signal() : signal))
+      : this.children().map(child => child.position());
     return getPolylineProfile(points, this.radius(), this.closed());
   }
 

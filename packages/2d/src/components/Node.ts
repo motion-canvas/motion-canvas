@@ -35,7 +35,6 @@ import {
   DependencyContext,
   SignalValue,
   SimpleSignal,
-  SignalContext,
   isReactive,
 } from '@motion-canvas/core/lib/signals';
 
@@ -73,7 +72,7 @@ export class Node implements Promisable<Node> {
   @wrapper(Vector2)
   @cloneable(false)
   @signal()
-  public declare readonly absolutePosition: SignalContext<
+  public declare readonly absolutePosition: Signal<
     PossibleVector2,
     Vector2,
     this
