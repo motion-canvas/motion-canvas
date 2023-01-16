@@ -2,7 +2,7 @@
   width: 100%;
   overflow: hidden;
   border-radius: var(--ifm-global-radius);
-  background-color: var(--ifm-background-color);
+  background-color: var(--ifm-background-surface-color);
   position: relative;
   aspect-ratio: 16 / 9;
   border: 1px solid var(--ifm-color-emphasis-300);

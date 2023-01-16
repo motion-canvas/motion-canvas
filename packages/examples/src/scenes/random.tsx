@@ -13,7 +13,7 @@ export default makeScene2D(function* (view) {
       {range(40).map(i => (
         <Rect
           ref={makeRef(rects, i)}
-          radius={20}
+          radius={5}
           width={10}
           height={10}
           fill={'#e13238'}
