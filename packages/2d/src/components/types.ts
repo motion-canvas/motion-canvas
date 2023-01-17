@@ -1,5 +1,5 @@
 import type {Node} from './Node';
-import type {Reference} from '@motion-canvas/core/lib/utils';
+import type {ReferenceReceiver} from '@motion-canvas/core/lib/utils';
 
 export type ComponentChild =
   | Node
@@ -22,7 +22,7 @@ export type PropsOf<T> = T extends NodeConstructor<infer P>
 
 export interface JSXProps {
   children?: ComponentChildren;
-  ref?: Reference<Node>;
+  ref?: ReferenceReceiver<Node>;
 }
 
 export interface FunctionComponent<T = any> {

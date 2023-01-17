@@ -19,7 +19,7 @@ import {
   Vector2Signal,
   ColorSignal,
 } from '@motion-canvas/core/lib/types';
-import {Reference} from '@motion-canvas/core/lib/utils';
+import {ReferenceReceiver} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
@@ -39,7 +39,7 @@ import {
 } from '@motion-canvas/core/lib/signals';
 
 export interface NodeProps {
-  ref?: Reference<any>;
+  ref?: ReferenceReceiver<any>;
   children?: ComponentChildren;
   key?: string;
 

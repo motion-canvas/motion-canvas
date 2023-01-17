@@ -35,9 +35,7 @@ export function jsx(
 
   if (isClassComponent(type)) {
     const node = new type({...rest, children: flatChildren});
-    if (ref) {
-      ref.value = node;
-    }
+    ref?.(node);
     return node;
   } else {
     return type({...rest, ref, children: flatChildren});
