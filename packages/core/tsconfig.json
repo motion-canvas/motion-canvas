@@ -19,7 +19,12 @@
     "paths": {
       "@motion-canvas/core/lib/jsx-runtime": ["jsx-runtime.ts"]
     },
-    "types": ["node", "dom-webcodecs"]
+    "types": ["node", "dom-webcodecs"],
+    "plugins": [
+      {
+        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
+      }
+    ]
   },
   "include": ["src"]
 }

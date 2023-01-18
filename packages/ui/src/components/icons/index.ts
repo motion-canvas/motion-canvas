@@ -4,6 +4,7 @@ export * from './Clear';
 export * from './DragIndicator';
 export * from './Locate';
 export * from './MotionCanvas';
+export * from './OpenInNew';
 export * from './Pause';
 export * from './PhotoCamera';
 export * from './PlayArrow';

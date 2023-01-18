@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import {Readable} from 'stream';
 import mime from 'mime-types';
+import projectInstance from './__logs__/project-instance.md';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -194,7 +195,7 @@ export default ({
             `    config.name = '${name}';`,
             `    config.logger.warn({`,
             `      message: 'A project instance was exported instead of a project factory.',`,
-            `      remarks: \`Use the <code>makeProject()</code> function instead:<pre>import {makeProject} from '@motion-canvas/core';\nexport default makeProject({\n  // Configuration and scenes go here.\n});</pre>\`,`,
+            `      remarks: \`${projectInstance}\`,`,
             `      stack: config.creationStack,`,
             `    });`,
             `    return config;`,

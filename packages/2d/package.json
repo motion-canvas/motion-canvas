@@ -8,8 +8,8 @@
   "main": "lib/scenes/index.js",
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w"
+    "build": "ttsc",
+    "watch": "ttsc -w"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/motion-canvas"
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@motion-canvas/core": "^12.1.0",
+    "@motion-canvas/internal": "0.0.0",
     "typescript": "^4.7.4"
   },
   "dependencies": {

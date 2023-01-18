@@ -18,12 +18,12 @@ export function StackTrace({entries}: StackTraceProps) {
           {entry.isExternal ? (
             `${entry.file}:${entry.line}:${entry.column}`
           ) : (
-            <span
+            <button
               className={styles.link}
               onClick={() => openFileInEditor(entry)}
             >
               {entry.file}:{entry.line}:{entry.column}
-            </span>
+            </button>
           )}
           )
         </div>

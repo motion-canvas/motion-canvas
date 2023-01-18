@@ -71,7 +71,6 @@ export function PlaybackControls() {
         onChange={speed => player.setSpeed(speed)}
       />
       <IconCheckbox
-        id={'audio'}
         titleOn="Mute audio"
         titleOff="Unmute audio"
         checked={!state.muted}
@@ -86,7 +85,6 @@ export function PlaybackControls() {
         <SkipPrevious />
       </IconButton>
       <IconCheckbox
-        id={'play'}
         main
         titleOn="Play"
         titleOff="Pause"
@@ -99,7 +97,6 @@ export function PlaybackControls() {
         <SkipNext />
       </IconButton>
       <IconCheckbox
-        id={'loop'}
         titleOn="Loop video"
         checked={state.loop}
         onChange={() => player.toggleLoop()}

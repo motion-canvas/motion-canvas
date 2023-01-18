@@ -9,11 +9,11 @@ export interface ToggleProps {
 
 export function Toggle({open, onToggle}: ToggleProps) {
   return (
-    <div
+    <button
       className={clsx(styles.toggle, open && styles.open)}
       onClick={() => onToggle(!open)}
     >
       <ChevronRight />
-    </div>
+    </button>
   );
 }
