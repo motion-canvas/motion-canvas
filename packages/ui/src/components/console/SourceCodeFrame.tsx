@@ -7,6 +7,8 @@ import {
   StackTraceEntry,
 } from '../../utils';
 
+import {IconButton} from '../controls';
+import {OpenInNew} from '../icons';
 export interface SourceFrameProps {
   entry: StackTraceEntry;
 }
@@ -18,21 +20,26 @@ export function SourceCodeFrame({entry}: SourceFrameProps) {
   );
 
   return (
-    <pre
-      className={styles.code}
-      onDblClick={async () => {
-        if (entry) {
-          await openFileInEditor(entry);
-        }
-      }}
-      onMouseDown={e => {
-        // Prevent selection when double-clicking.
-        if (e.detail > 1) {
-          e.preventDefault();
-        }
-      }}
-    >
-      {frame ?? 'Could not load the source code.'}
-    </pre>
+    <div className={styles.sourceCode}>
+      <pre>
+        <code
+          className="language-ts"
+          dangerouslySetInnerHTML={{
+            __html: frame ?? 'Could not load the source code.',
+          }}
+        />
+      </pre>
+      <IconButton
+        title="Go to source"
+        className={styles.viewSource}
+        onClick={async () => {
+          if (entry) {
+            await openFileInEditor(entry);
+          }
+        }}
+      >
+        <OpenInNew />
+      </IconButton>
+    </div>
   );
 }

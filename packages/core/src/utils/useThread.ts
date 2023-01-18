@@ -11,7 +11,8 @@ export function useThread(): Thread {
   if (!thread) {
     throw new DetailedError(
       'The thread is not available in the current context.',
-      `<code>useThread()</code> can only be called from within generator functions.
+      // language=markdown
+      `\`useThread()\` can only be called from within generator functions.
       It's not available during rendering.`,
     );
   }

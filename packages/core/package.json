@@ -6,8 +6,8 @@
   "author": "motion-canvas",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "watch": "tsc -p tsconfig.build.json -w",
+    "build": "ttsc -p tsconfig.build.json",
+    "watch": "ttsc -p tsconfig.build.json -w",
     "test": "vitest"
   },
   "publishConfig": {
@@ -31,6 +31,8 @@
     "mix-color": "^1.1.2"
   },
   "devDependencies": {
+    "@motion-canvas/internal": "0.0.0",
+    "@rollup/plugin-typescript": "^11.0.0",
     "@types/dom-webcodecs": "^0.1.4",
     "canvas-5-polyfill": "^0.1.5",
     "typescript": "^4.7.4",

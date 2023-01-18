@@ -1,0 +1,10 @@
+{
+  "name": "@motion-canvas/internal",
+  "private": true,
+  "version": "0.0.0",
+  "devDependencies": {
+    "highlight.js": "^11.7.0",
+    "marked": "^4.2.12",
+    "ttypescript": "^1.5.15"
+  }
+}

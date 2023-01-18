@@ -68,18 +68,26 @@ $colors: (
 .section {
   margin: 16px 8px 8px;
 
-  pre {
-    background-color: var(--surface-color);
-    border-radius: 4px;
-    padding: 8px;
-    margin: 8px -8px;
-    overflow-x: auto;
+  p {
+    margin: 8px 0;
   }
 
   code {
     background-color: var(--surface-color);
     padding: 2px 0;
     border-radius: 4px;
+  }
+
+  pre {
+    margin: 8px -8px;
+    overflow-x: auto;
+    background-color: var(--surface-color);
+    padding: 8px;
+    border-radius: 4px;
+
+    code {
+      padding: 0;
+    }
   }
 
   a {
@@ -90,6 +98,26 @@ $colors: (
     &:focus {
       text-decoration: underline;
     }
+  }
+}
+
+.sourceCode {
+  position: relative;
+}
+
+.viewSource {
+  position: absolute;
+  top: 0;
+  right: -8px;
+  border-radius: 4px;
+  padding: 8px;
+  background-color: var(--surface-color);
+  opacity: 0;
+  transition: opacity 0.1s;
+
+  &:focus,
+  .sourceCode:hover & {
+    opacity: 1;
   }
 }
 
@@ -105,8 +133,12 @@ $colors: (
 
 .link {
   font-size: 12px;
-  text-decoration: underline;
   cursor: pointer;
+  color: inherit;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .navbar {

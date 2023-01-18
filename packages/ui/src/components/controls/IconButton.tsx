@@ -7,13 +7,19 @@ interface IconButtonProps {
   title?: string;
   onClick?: () => void;
   children: ComponentChildren;
+  className?: string;
 }
 
-export function IconButton({children, onClick, title}: IconButtonProps) {
+export function IconButton({
+  children,
+  onClick,
+  title,
+  className,
+}: IconButtonProps) {
   return (
     <button
       title={title}
-      className={clsx(styles.iconButton)}
+      className={clsx(styles.iconButton, className)}
       type="button"
       onClick={onClick}
     >

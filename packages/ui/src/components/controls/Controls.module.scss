@@ -1,35 +1,14 @@
 .iconCheckbox {
-  width: 24px;
-  height: 24px;
-  position: relative;
-}
-
-.iconInput {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  appearance: none;
-}
-
-.iconLabel {
-  width: 24px;
-  height: 24px;
-  display: block;
-  cursor: pointer;
-  color: rgba(255, 255, 255, 0.54);
-
   &.main {
     color: #fff;
   }
 
-  .iconInput + &:hover {
-    color: #fff;
-  }
-
-  .iconInput:checked + & {
+  &.checked {
     color: var(--theme);
+
+    &:hover {
+      color: var(--theme);
+    }
 
     &.main {
       color: #fff;
@@ -39,8 +18,6 @@
 
 .iconButton {
   -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
   display: block;
   cursor: pointer;
   border: 0;

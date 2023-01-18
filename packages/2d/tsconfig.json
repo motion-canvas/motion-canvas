@@ -17,7 +17,12 @@
     "paths": {
       "@motion-canvas/2d/lib/jsx-runtime": ["jsx-runtime.ts"]
     },
-    "types": ["node"]
+    "types": ["node"],
+    "plugins": [
+      {
+        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
+      }
+    ]
   },
   "include": ["src"]
 }

@@ -1,5 +1,6 @@
 import {SourceMapConsumer} from 'source-map-js';
 import {withLoader} from './withLoader';
+import highlight from 'highlight.js';
 
 const externalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const stackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
@@ -100,13 +101,16 @@ export function getSourceCodeFrame(entry: StackTraceEntry): string | null {
     return null;
   }
 
-  const sourceLines = source.split('\n');
   const {line, column} = entry;
   const lastLine = line + 2;
   const spacing = lastLine.toString().length;
-  const formatted = sourceLines
-    .slice(line - 1, lastLine)
-    .map((text, index) => `${line + index} | ${text}`);
+  const sourceLines = source.split('\n').slice(line - 1, lastLine);
+
+  const code = highlight
+    .highlight('typescript', sourceLines.join('\n'))
+    .value.split('\n');
+
+  const formatted = code.map((text, index) => `${line + index} | ${text}`);
   formatted.splice(1, 0, `${' '.repeat(spacing)} | ${' '.repeat(column)}^`);
   return formatted.join('\n');
 }

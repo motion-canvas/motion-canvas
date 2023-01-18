@@ -8,7 +8,12 @@
     "target": "es2021",
     "moduleResolution": "node",
     "declaration": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+      {
+        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
+      }
+    ]
   },
   "include": ["src"]
 }

@@ -6,8 +6,8 @@
   "author": "motion-canvas",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w"
+    "build": "ttsc",
+    "watch": "ttsc -w"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/motion-canvas"
@@ -23,6 +23,7 @@
     "vite": "3.x"
   },
   "devDependencies": {
+    "@motion-canvas/internal": "0.0.0",
     "@types/mime-types": "^2.1.1",
     "typescript": "^4.7.4",
     "vite": "^3.0.9"

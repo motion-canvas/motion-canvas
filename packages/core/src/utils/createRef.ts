@@ -1,4 +1,6 @@
 import {deprecate} from './deprecate';
+import getReferenceValue from './__logs__/get-reference-value.md';
+import setReferenceValue from './__logs__/set-reference-value.md';
 
 export interface ReferenceReceiver<T> {
   (reference: T): void;
@@ -27,16 +29,14 @@ export function createRef<T>(): Reference<T> {
     get: deprecate(
       () => value,
       'get Reference.value has been deprecated.',
-      `To retrieve the referenced object, invoke the reference like a function:
-      <pre>ref.value; // wrong\nref(); // correct</pre>`,
+      getReferenceValue,
     ),
     set: deprecate(
       newValue => {
         value = newValue;
       },
       'set Reference.value has been deprecated.',
-      `To set the referenced object, pass it to the reference like you would to a function:
-      <pre>ref.value = object; // wrong\nref(object); // correct</pre>`,
+      setReferenceValue,
     ),
   });
 
