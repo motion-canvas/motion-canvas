@@ -1,0 +1,267 @@
+---
+sidebar_position: 5
+---
+
+# References
+
+Usually, when creating a node, we want to store a reference to it, so we can
+animate it later. One way to do that is by assigning it to a variable first, and
+then adding it to the scene:
+
+```tsx
+const circle = <Circle />;
+view.add(circle);
+
+// we can now animate our circle:
+yield * circle.scale(2, 0.3);
+```
+
+:::info
+
+If you're used to libraries such as React, the above example may seem strange.
+In Motion Canvas, the JSX components immediately create and return an instance
+of the given class. It's completely valid to store it as a reference and use it
+throughout the animation.
+
+:::
+
+But this approach doesn't scale well. The more nodes we add, the harder it gets
+to see the overall structure of our scene. Consider the following example:
+
+```tsx
+const rectA = <Rect />;
+const rectB = <Rect />;
+const circle = <Circle>{rectA}</Circle>;
+view.add(
+  <Layout>
+    {circle}
+    {rectB}
+  </Layout>,
+);
+```
+
+And now compare it to a version that doesn't store any references:
+
+```tsx
+view.add(
+  <Layout>
+    <Circle>
+      <Rect />
+    </Circle>
+    <Rect />
+  </Layout>,
+);
+```
+
+If you find the latter example more readable, this guide is for you.
+
+## `ref` property
+
+Each node in Motion Canvas has a property called `ref` that allows you to create
+a reference to said node. It excepts a callback that will be invoked right after
+the node has benn created, with the first argument being the newly created
+instance.
+
+With this in mind, we can rewrite the initial example as:
+
+```tsx
+let circle: Circle;
+view.add(
+  <Circle
+    ref={instance => {
+      circle = instance;
+    }}
+  />,
+);
+
+yield * circle.scale(2, 0.3);
+```
+
+Using the `ref` property in this way is not really practical, and we wouldn't
+recommend it. But it's crucial to understand how it works because all the
+upcoming methods use this property as a base.
+
+## `createRef()` function
+
+The preferred way of using the `ref` property is in conjunction with the
+[`createRef()`](/api/core/utils#createRef) function. Continuing with our
+example, we can rewrite it as:
+
+```tsx
+import {createRef} from '@motion-canvas/core/lib/utils';
+
+// ...
+
+const circle = createRef<Circle>();
+view.add(<Circle ref={circle} />);
+
+yield * circle().scale(2, 0.3);
+```
+
+Notice that `circle` is no longer just a variable that points to our circle.
+Instead, it's a [signal-like](/guides/getting-started/signals) function that can
+be used to access it. Invoking it without any arguments (`circle()`) returns our
+instance.
+
+Going back to the example with the more complex scene, we can now rewrite it as:
+
+```tsx
+const rectA = createRef<Rect>();
+const rectB = createRef<Rect>();
+const circle = createRef<Circle>();
+view.add(
+  <Layout>
+    <Circle ref={circle}>
+      <Rect ref={rectA} />
+    </Circle>
+    <Rect ref={rectB} />
+  </Layout>,
+);
+```
+
+## `makeRef()` function
+
+Another common use case of the `ref` property is to assign the newly created
+instance to a property of some object. In the following example, we assign our
+circle to `circle.instance` (We'll talk about why this may be useful in a bit):
+
+```tsx
+const circle = {instance: null as Circle};
+view.add(
+  <Circle
+    // highlight-start
+    ref={instance => {
+      circle.instance = instance;
+    }}
+    // highlight-end
+  />,
+);
+```
+
+We can use the [`makeRef()`](/api/core/utils#makeRef) function to simplify this
+process:
+
+```tsx
+import {makeRef} from '@motion-canvas/core/lib/utils';
+
+// ...
+
+const circle = {instance: null as Circle};
+view.add(
+  // highlight-next-line
+  <Circle ref={makeRef(circle, 'instance')} />,
+);
+```
+
+### Array of references
+
+`makeRef()` can be particularly useful when we create an array of nodes and want
+to grab references to all of them:
+
+```tsx
+const circles: Circle[] = [];
+view.add(
+  <Layout>
+    {range(10).map(index => (
+      // highlight-next-line
+      <Circle ref={makeRef(circles, index)} />
+    ))}
+  </Layout>,
+);
+```
+
+In JavaScript, arrays are objects whose properties are their indices. So
+`makeRef(circles, index)` will set the nth element of our array to the created
+circle. As a result, we end up with an array of size `10` filled with circles
+that we can use to animate all of them.
+
+### Custom functions
+
+`makeRef()` can also be used to return more than one reference from a custom
+function component:
+
+```tsx
+function Label({
+  refs,
+  children,
+}: {
+  refs: {rect: Rect; text: Text};
+  children: string;
+}) {
+  return (
+    // highlight-next-line
+    <Rect ref={makeRef(refs, 'rect')}>
+      // highlight-next-line
+      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+    </Rect>
+  );
+}
+
+const label = {rect: null as Rect, text: null as Text};
+view.add(<Label refs={label}>HELLO</Label>);
+
+// we can now animate both the Rect and the Text of our label:
+yield * label.rect.opacity(2, 0.3);
+yield * label.text.fontSize(24, 0.3);
+```
+
+In this example, we define a function component called `Label` consisting of a
+rectangle with some text inside. When using the component, we use the `refs`
+property to pass the `label` object created by us. `makeRef()` is then used to
+fill this object with all the necessary references.
+
+## `makeRefs()` function
+
+Looking at the previous example, you may notice that we had to define the `refs`
+type twice. First in the `Label` declaration and then again when creating the
+`label` object:
+
+```tsx
+function Label({
+  refs,
+  children,
+}: {
+  // highlight-next-line
+  refs: {rect: Rect; text: Text};
+  children: string;
+}) {
+  return (
+    <Rect ref={makeRef(refs, 'rect')}>
+      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+    </Rect>
+  );
+}
+
+// highlight-next-line
+const label = {rect: null as Rect, text: null as Text};
+view.add(<Label refs={label}>HELLO</Label>);
+```
+
+We can use [`makeRefs()`](/api/core/utils#makeRefs) to eliminate this
+redundancy. It can extract the type from the `Label` declaration and create an
+empty object matching it:
+
+```tsx
+import {makeRef, makeRefs} from '@motion-canvas/core/lib/utils';
+
+// ...
+
+function Label({
+  refs,
+  children,
+}: {
+  // highlight-next-line
+  refs: {rect: Rect; text: Text};
+  children: string;
+}) {
+  return (
+    <Rect ref={makeRef(refs, 'rect')}>
+      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+    </Rect>
+  );
+}
+
+// highlight-next-line
+const label = makeRefs<typeof Label>();
+view.add(<Label refs={label}>HELLO</Label>);
+```
