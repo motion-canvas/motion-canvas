@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.1](https://github.com/motion-canvas/motion-canvas/compare/v12.2.0...v12.2.1) (2023-01-19)
+
+
+### Bug Fixes
+
+* **2d:** fix Line overview crashing ([#142](https://github.com/motion-canvas/motion-canvas/issues/142)) ([6bd5fd9](https://github.com/motion-canvas/motion-canvas/commit/6bd5fd941e583e44f5d920ecd20215efb1eed58a))
+
+
+
+
+
 # [12.2.0](https://github.com/motion-canvas/motion-canvas/compare/v12.1.0...v12.2.0) (2023-01-19)
 
 
