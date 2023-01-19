@@ -10,7 +10,7 @@ export default defineConfig({
       fileName: 'main',
     },
     rollupOptions: {
-      external: ['@motion-canvas/core'],
+      external: [/^@motion-canvas\/core/],
     },
   },
   plugins: [

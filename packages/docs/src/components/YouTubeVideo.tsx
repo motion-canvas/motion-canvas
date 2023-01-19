@@ -18,6 +18,7 @@ export default function YouTubeVideo({
       width={width ?? 560}
       height={height ?? 315}
       src={src}
+      loading="lazy"
       title={title ?? 'YouTube video player'}
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
       allowFullScreen
