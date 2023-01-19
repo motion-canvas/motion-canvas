@@ -50,7 +50,7 @@ export function Sidebar({setOpen}: SidebarProps) {
           id: 'project-selection-link',
           type: TabType.Link,
           icon: <MotionCanvas />,
-          url: window.location.pathname === '/' ? undefined : '/',
+          url: window.location.pathname === '/' ? undefined : '../',
         }}
         {{
           type: TabType.Space,

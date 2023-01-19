@@ -3,7 +3,7 @@
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Motion Canvas',
-  tagline: 'Create animations programmatically',
+  tagline: 'Visualize complex ideas programmatically',
   url: 'https://motion-canvas.github.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -38,7 +38,7 @@ const config = {
           {to: '/api/core', label: 'API', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/motion-canvas',
+            href: 'https://github.com/motion-canvas/motion-canvas',
             position: 'right',
             className: 'navbar-github-link',
             'aria-label': 'GitHub repository',
@@ -82,7 +82,7 @@ const config = {
               },
               {
                 label: 'GitHub',
-                href: 'https://github.com/motion-canvas',
+                href: 'https://github.com/motion-canvas/motion-canvas',
               },
             ],
           },
@@ -125,7 +125,22 @@ const config = {
     '@docusaurus/plugin-content-pages',
     '@docusaurus/plugin-debug',
     '@docusaurus/plugin-sitemap',
-    require('./typedoc'),
+    './typedoc',
+    [
+      './editor',
+      {
+        examples: [
+          {
+            name: 'random',
+            url: 'Random values generator',
+          },
+          {
+            name: 'quickstart',
+            url: 'Quickstart example',
+          },
+        ],
+      },
+    ],
   ],
 };
 

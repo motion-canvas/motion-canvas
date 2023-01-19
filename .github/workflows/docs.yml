@@ -18,6 +18,7 @@ jobs:
       - run: npm ci
       - run: npx lerna run build
       - run: npm run examples:build
+      - run: npm run ui:showcase
       - run: npm run docs:build
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"

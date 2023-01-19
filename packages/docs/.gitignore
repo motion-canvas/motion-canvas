@@ -10,6 +10,7 @@
 docs/core-api
 docs/2d-api
 static/examples
+static/editor
 
 # Misc
 .DS_Store

@@ -144,6 +144,10 @@ html[data-theme='dark'] .navbar-github-link::before {
   background-image: url('/img/github-icon-dark.svg');
 }
 
+.navbar-sidebar .navbar-github-link {
+  display: none;
+}
+
 @media screen and (max-width: 996px) {
   :root {
     --ifm-navbar-background-color: rgb(255, 255, 255);
@@ -156,4 +160,15 @@ html[data-theme='dark'] .navbar-github-link::before {
   .navbar {
     backdrop-filter: none;
   }
+}
+
+.button.button--outline {
+  background-color: transparent;
+  color: var(--ifm-link-color);
+  border: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.button.button--outline:hover {
+  color: var(--ifm-link-color);
+  border-color: var(--ifm-color-primary);
 }
