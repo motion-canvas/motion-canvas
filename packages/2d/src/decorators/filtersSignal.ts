@@ -44,7 +44,8 @@ export class FiltersSignalContext<TOwner> extends SignalContext<
           if (newValue === undefined) {
             return (
               this.get()?.find(filter => filter.name === props.name) ??
-              props.default
+              props.default ??
+              0
             );
           }
 

@@ -266,8 +266,6 @@ export class Node implements Promisable<Node> {
     matrix.translateSelf(this.position.x(), this.position.y());
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scale.x(), this.scale.y());
-    const offset = this.getCustomOffset();
-    matrix.translateSelf(offset.x, offset.y);
 
     return matrix;
   }
@@ -329,13 +327,6 @@ export class Node implements Promisable<Node> {
       return root.localToWorld().multiply();
     }
     return new DOMMatrix();
-  }
-
-  /**
-   * Get the custom offset for this node's children.
-   */
-  protected getCustomOffset(): Vector2 {
-    return Vector2.zero;
   }
 
   @computed()
