@@ -9,13 +9,13 @@ import {
 } from '../decorators';
 import {
   Origin,
-  PossibleSpacing,
-  Rect,
-  Vector2,
   originToOffset,
-  SerializedVector2,
+  PossibleSpacing,
   PossibleVector2,
+  Rect,
+  SerializedVector2,
   SpacingSignal,
+  Vector2,
   Vector2Signal,
 } from '@motion-canvas/core/lib/types';
 import {
@@ -424,9 +424,7 @@ export class Layout extends Node {
   }
 
   protected getComputedLayout(): Rect {
-    const rect = new Rect(this.element.getBoundingClientRect());
-    rect.position = rect.position.add(this.getCustomOffset());
-    return rect;
+    return new Rect(this.element.getBoundingClientRect());
   }
 
   @computed()
@@ -522,9 +520,7 @@ export class Layout extends Node {
   }
 
   protected override getCacheRect(): Rect {
-    const rect = Rect.fromSizeCentered(this.computedSize());
-    rect.position = rect.position.sub(this.getCustomOffset());
-    return rect;
+    return Rect.fromSizeCentered(this.computedSize());
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -550,7 +546,6 @@ export class Layout extends Node {
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
     const rect = Rect.fromSizeCentered(size);
-    rect.position = rect.position.sub(this.getCustomOffset());
     const layout = rect.transformCorners(matrix);
     const padding = rect
       .addSpacing(this.padding().scale(-1))

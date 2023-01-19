@@ -1,13 +1,18 @@
 import {Shape, ShapeProps} from './Shape';
 import {Node} from './Node';
 import {computed, initial, signal} from '../decorators';
-import {arc, lineTo, moveTo, resolveCanvasStyle} from '../utils';
+import {arc, drawLine, lineTo, moveTo, resolveCanvasStyle} from '../utils';
 import {
   isReactive,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
-import {Rect, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
+import {
+  PossibleVector2,
+  Rect,
+  SerializedVector2,
+  Vector2,
+} from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Length} from '../partials';
 import {Layout} from './Layout';
@@ -30,7 +35,7 @@ export interface LineProps extends ShapeProps {
   endOffset?: SignalValue<number>;
   endArrow?: SignalValue<boolean>;
   arrowSize?: SignalValue<number>;
-  points?: SignalValue<SignalValue<Vector2>[]>;
+  points?: SignalValue<SignalValue<PossibleVector2>[]>;
 }
 
 export class Line extends Shape {
@@ -73,7 +78,7 @@ export class Line extends Shape {
   @initial(null)
   @signal()
   public declare readonly points: SimpleSignal<
-    SignalValue<Vector2>[] | null,
+    SignalValue<PossibleVector2>[] | null,
     this
   >;
 
@@ -87,20 +92,35 @@ export class Line extends Shape {
 
   @computed()
   protected childrenRect() {
-    return Rect.fromPoints(
-      ...this.children()
-        .filter(child => !(child instanceof Layout) || child.isLayoutRoot())
-        .map(child => child.position()),
-    );
+    const custom = this.points();
+    const points = custom
+      ? custom.map(
+          signal => new Vector2(isReactive(signal) ? signal() : signal),
+        )
+      : this.children()
+          .filter(child => !(child instanceof Layout) || child.isLayoutRoot())
+          .map(child => child.position());
+
+    return Rect.fromPoints(...points);
+  }
+
+  @computed()
+  public parsedPoints(): Vector2[] {
+    const custom = this.points();
+    return custom
+      ? custom.map(
+          signal => new Vector2(isReactive(signal) ? signal() : signal),
+        )
+      : this.children().map(child => child.position());
   }
 
   @computed()
   public profile(): CurveProfile {
-    const custom = this.points();
-    const points = custom
-      ? custom.map(signal => (isReactive(signal) ? signal() : signal))
-      : this.children().map(child => child.position());
-    return getPolylineProfile(points, this.radius(), this.closed());
+    return getPolylineProfile(
+      this.parsedPoints(),
+      this.radius(),
+      this.closed(),
+    );
   }
 
   public percentageToDistance(value: number): number {
@@ -195,12 +215,10 @@ export class Line extends Shape {
     context.lineDashOffset -= arcLength / 2;
   }
 
-  protected override getCustomOffset(): Vector2 {
-    if (this.layoutEnabled()) {
-      return this.childrenRect().center.flipped;
-    } else {
-      return Vector2.zero;
-    }
+  protected override getComputedLayout(): Rect {
+    const rect = super.getComputedLayout();
+    rect.position = rect.position.sub(this.childrenRect().center);
+    return rect;
   }
 
   protected override getPath(): Path2D {
@@ -208,9 +226,10 @@ export class Line extends Shape {
   }
 
   protected override getCacheRect(): Rect {
+    const rect = this.childrenRect();
     const arrowSize = this.arrowSize();
     const lineWidth = this.lineWidth();
-    return super.getCacheRect().expand(Math.max(0, arrowSize - lineWidth / 2));
+    return rect.expand(Math.max(0, arrowSize - lineWidth / 2));
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
@@ -255,15 +274,17 @@ export class Line extends Shape {
     context: CanvasRenderingContext2D,
     matrix: DOMMatrix,
   ) {
-    super.drawOverlay(context, matrix);
+    const rect = this.childrenRect().transformCorners(matrix);
+    const size = this.computedSize();
+    const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
 
     context.fillStyle = 'white';
     context.strokeStyle = 'black';
     context.lineWidth = 1;
 
     const path = new Path2D();
-    const points = this.children().map(child =>
-      child.position().transformAsPoint(matrix),
+    const points = this.parsedPoints().map(point =>
+      point.transformAsPoint(matrix),
     );
     moveTo(path, points[0]);
     for (const point of points) {
@@ -277,5 +298,19 @@ export class Line extends Shape {
 
     context.strokeStyle = 'white';
     context.stroke(path);
+
+    const radius = 8;
+    context.beginPath();
+    lineTo(context, offset.addY(-radius));
+    lineTo(context, offset.addY(radius));
+    lineTo(context, offset);
+    lineTo(context, offset.addX(-radius));
+    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    context.stroke();
+
+    context.beginPath();
+    drawLine(context, rect);
+    context.closePath();
+    context.stroke();
   }
 }
