@@ -14,7 +14,10 @@ export function patchSignal<TSetterValue, TValue extends TSetterValue>(
   if (name && owner) {
     const setter = owner?.[`set${capitalize(name)}`];
     if (setter) {
-      signal.set = setter.bind(owner);
+      signal.set = (...args: any[]) => {
+        setter.apply(owner, args);
+        return owner;
+      };
     }
     const getter = owner?.[`get${capitalize(name)}`];
     if (getter) {
