@@ -18,6 +18,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      metadata: [{name: 'keywords', content: 'typescript, animation, library'}],
       colorMode: {
         defaultMode: 'dark',
       },
