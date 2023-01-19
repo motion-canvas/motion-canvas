@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.2.0](https://github.com/motion-canvas/motion-canvas/compare/v12.1.0...v12.2.0) (2023-01-19)
+
+
+### Features
+
+* add markdown logs ([#138](https://github.com/motion-canvas/motion-canvas/issues/138)) ([e42447a](https://github.com/motion-canvas/motion-canvas/commit/e42447a0c07a8192c06d21c5f1801f0266279075))
+
+
+
+
+
 # [12.1.0](https://github.com/motion-canvas/motion-canvas/compare/v12.0.1...v12.1.0) (2023-01-16)
 
 
