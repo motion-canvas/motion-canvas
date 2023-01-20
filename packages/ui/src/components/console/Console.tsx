@@ -4,11 +4,12 @@ import {LogLevel} from '@motion-canvas/core/lib';
 import {capitalize} from '@motion-canvas/core/lib/utils';
 import {Pane} from '../tabs';
 import {useLogs} from '../../contexts';
-import {useState} from 'preact/hooks';
+import {useLayoutEffect, useRef} from 'preact/hooks';
 import {IconButton, Pill} from '../controls';
 import {Log} from './Log';
 import clsx from 'clsx';
 import {Clear} from '../icons';
+import {useStorage} from '../../hooks';
 
 const LOG_LEVELS: Record<string, boolean> = {
   [LogLevel.Error]: true,
@@ -18,8 +19,13 @@ const LOG_LEVELS: Record<string, boolean> = {
 };
 
 export function Console() {
+  const anchor = useRef<HTMLDivElement>();
   const [logs, clear] = useLogs();
-  const [filters, setFilters] = useState(LOG_LEVELS);
+  const [filters, setFilters] = useStorage('log-filters', LOG_LEVELS);
+
+  useLayoutEffect(() => {
+    anchor.current.scrollIntoView();
+  }, []);
 
   return (
     <Pane title="Console" id="console">
@@ -59,6 +65,7 @@ export function Console() {
         {logs.map(log => (
           <Log payload={log} />
         ))}
+        <div ref={anchor} className={styles.anchor} />
       </div>
     </Pane>
   );
