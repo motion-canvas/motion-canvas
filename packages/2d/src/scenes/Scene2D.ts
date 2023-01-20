@@ -1,17 +1,16 @@
 import {
+  FullSceneDescription,
   GeneratorScene,
   Inspectable,
   InspectedAttributes,
   InspectedElement,
   Scene,
-  SceneMetadata,
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
 import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Node, View2D} from '../components';
-import {Meta} from '@motion-canvas/core';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private readonly view: View2D;
@@ -19,11 +18,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private nodeCounters: Record<string, number> = {};
 
   public constructor(
-    name: string,
-    meta: Meta<SceneMetadata>,
-    runnerFactory: ThreadGeneratorFactory<View2D>,
+    description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
   ) {
-    super(name, meta, runnerFactory);
+    super(description);
     startScene(this);
     this.view = new View2D();
     endScene(this);
@@ -72,6 +69,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     if (!node) return null;
 
     const attributes: Record<string, any> = {
+      stack: node.creationStack,
       key: node.key,
     };
     for (const {key, meta, signal} of node) {

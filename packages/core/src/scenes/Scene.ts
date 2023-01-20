@@ -27,7 +27,7 @@ export interface SceneMetadata extends Metadata {
  *                {@link SceneDescription.config}.
  */
 export interface SceneConstructor<T> {
-  new (name: string, meta: Meta<SceneMetadata>, config: T): Scene;
+  new (description: FullSceneDescription<T>): Scene;
 }
 
 /**
@@ -44,6 +44,10 @@ export interface SceneDescription<T = unknown> {
    * Configuration object.
    */
   config: T;
+  /**
+   * The stack trace at the moment of creation.
+   */
+  stack?: string;
 }
 
 /**
@@ -54,7 +58,8 @@ export interface SceneDescription<T = unknown> {
 export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   name: string;
   meta: Meta<SceneMetadata>;
-  onReplaced: ValueDispatcher<T>;
+  project: Project;
+  onReplaced: ValueDispatcher<FullSceneDescription<T>>;
 }
 
 export type DescriptionOf<TScene> = TScene extends Scene<infer TConfig>
@@ -115,10 +120,11 @@ export interface Scene<T = unknown> {
   /**
    * Reference to the project.
    */
-  project: Project;
+  readonly project: Project;
   readonly timeEvents: TimeEvents;
   readonly random: Random;
   readonly meta: Meta<SceneMetadata>;
+  creationStack?: string;
 
   /**
    * The frame at which this scene starts.

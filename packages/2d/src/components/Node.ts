@@ -232,9 +232,11 @@ export class Node implements Promisable<Node> {
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
   public readonly key: string;
+  public readonly creationStack?: string;
 
   public constructor({children, key, ...rest}: NodeProps) {
     this.key = useScene2D()?.registerNode(this, key) ?? key ?? '';
+    this.creationStack = new Error().stack;
     initialize(this, {defaults: rest});
     for (const {signal} of this) {
       signal.reset();

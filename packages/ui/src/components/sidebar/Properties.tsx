@@ -5,6 +5,8 @@ import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {Pane} from '../tabs';
 import {useInspection} from '../../contexts';
 import {AutoField} from '../fields';
+import {Button, Group, Label} from '../controls';
+import {findAndOpenFirstUserFile} from '../../utils';
 
 export function Properties() {
   const {inspectedElement} = useInspection();
@@ -16,13 +18,25 @@ export function Properties() {
     [scene],
   );
 
-  const attributes = useMemo(
-    () => inspectable?.inspectAttributes(inspectedElement),
-    [inspectedElement, inspectable, frame],
-  );
+  const [stack, attributes] = useMemo(() => {
+    const attributes = inspectable?.inspectAttributes(inspectedElement);
+    if (attributes) {
+      const {stack, ...rest} = attributes;
+      return [stack, rest];
+    }
+    return [undefined, undefined];
+  }, [inspectedElement, inspectable, frame]);
 
   return (
     <Pane title="Properties" id="properties-pane">
+      {stack && (
+        <Group>
+          <Label />
+          <Button onClick={() => findAndOpenFirstUserFile(stack)} main>
+            GO TO SOURCE
+          </Button>
+        </Group>
+      )}
       {attributes
         ? Object.entries(attributes).map(([key, value]) => (
             <AutoField label={key} value={value} />

@@ -172,7 +172,7 @@ export default ({
             `if (import.meta.hot) {`,
             `  import.meta.hot.accept();`,
             `  if (import.meta.hot.data.onReplaced) {`,
-            `    description.onReplaced.current = description.config;`,
+            `    description.onReplaced.current = description;`,
             `  } else {`,
             `    import.meta.hot.data.onReplaced = description.onReplaced;`,
             `  }`,

@@ -11,5 +11,6 @@ export function makeScene2D(
   return {
     klass: Scene2D,
     config: runner,
+    stack: new Error().stack,
   };
 }

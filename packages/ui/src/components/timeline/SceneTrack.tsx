@@ -4,6 +4,7 @@ import type {Scene} from '@motion-canvas/core/lib/scenes';
 import {useScenes, useSubscribableValue} from '../../hooks';
 import {usePlayer, useTimelineContext} from '../../contexts';
 import {useMemo} from 'preact/hooks';
+import {findAndOpenFirstUserFile} from '../../utils';
 
 export function SceneTrack() {
   const scenes = useScenes();
@@ -63,9 +64,19 @@ function SceneClip({scene}: SceneClipProps) {
             className={styles.transition}
           />
         )}
-        <div className={styles.sceneName} style={nameStyle}>
+        <button
+          className={styles.sceneName}
+          style={nameStyle}
+          title="Go to source"
+          onMouseUp={async event => {
+            event.stopPropagation();
+            if (scene.creationStack) {
+              await findAndOpenFirstUserFile(scene.creationStack);
+            }
+          }}
+        >
           {scene.name}
-        </div>
+        </button>
       </div>
     </div>
   );
