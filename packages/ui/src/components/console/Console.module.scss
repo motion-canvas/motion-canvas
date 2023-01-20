@@ -12,12 +12,21 @@ $colors: (
   display: flex;
   flex-direction: column;
   gap: 8px;
+
+  * {
+    overflow-anchor: none;
+  }
 }
 
 @each $level, $color in $colors {
   .list.#{$level} .log.#{$level} {
     display: block;
   }
+}
+
+.anchor {
+  overflow-anchor: auto;
+  height: 1px;
 }
 
 .log {
