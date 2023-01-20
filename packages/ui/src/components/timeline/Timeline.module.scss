@@ -110,12 +110,17 @@
     }
 
     .sceneName {
+      color: inherit;
+      cursor: pointer;
       position: relative;
       line-height: 24px;
-      pointer-events: none;
       overflow: hidden;
       text-overflow: ellipsis;
       margin: 8px 12px;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }

@@ -11,7 +11,13 @@ import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
 import {endScene, setProject, startScene} from '../utils';
-import {CachedSceneData, Scene, SceneMetadata, SceneRenderEvent} from './Scene';
+import {
+  CachedSceneData,
+  FullSceneDescription,
+  Scene,
+  SceneMetadata,
+  SceneRenderEvent,
+} from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
 import {Rect, Vector2} from '../types';
@@ -31,18 +37,12 @@ export interface ThreadGeneratorFactory<T> {
 export abstract class GeneratorScene<T>
   implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
+  public readonly name: string;
+  public readonly project: Project;
+  public readonly meta: Meta<SceneMetadata>;
   public readonly timeEvents: TimeEvents;
   public random: Random;
-
-  public get project(): Project {
-    if (!this.currentProject) {
-      throw new Error(`Project for Scene ${this.name} has not been set.`);
-    }
-    return this.currentProject;
-  }
-  public set project(value: Project) {
-    this.currentProject = value;
-  }
+  public creationStack?: string;
 
   public get firstFrame() {
     return this.cache.current.firstFrame;
@@ -95,19 +95,23 @@ export abstract class GeneratorScene<T>
     return this.previousScene;
   }
 
+  private runnerFactory: ThreadGeneratorFactory<T>;
   private previousScene: Scene | null = null;
-  private currentProject: Project | null = null;
   private runner: ThreadGenerator | null = null;
   private state: SceneState = SceneState.Initial;
   private cached = false;
   private counters: Record<string, number> = {};
 
   public constructor(
-    public readonly name: string,
-    public readonly meta: Meta<SceneMetadata>,
-    private runnerFactory: ThreadGeneratorFactory<T>,
+    description: FullSceneDescription<ThreadGeneratorFactory<T>>,
   ) {
-    decorate(this.runnerFactory, threadable(name));
+    this.name = description.name;
+    this.project = description.project;
+    this.meta = description.meta;
+    this.runnerFactory = description.config;
+    this.creationStack = description.stack;
+
+    decorate(this.runnerFactory, threadable(this.name));
     this.timeEvents = new TimeEvents(this);
 
     let seed = this.meta.getData().seed;

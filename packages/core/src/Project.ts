@@ -218,13 +218,14 @@ export class Project {
 
     const instances: Scene[] = [];
     for (const description of scenes) {
-      const scene = new description.klass(
-        description.name,
-        description.meta,
-        description.config,
-      );
-      scene.project = this;
-      description.onReplaced?.subscribe(config => scene.reload(config), false);
+      const scene = new description.klass({
+        ...description,
+        project: this,
+      });
+      description.onReplaced?.subscribe(description => {
+        scene.creationStack = description.stack;
+        scene.reload(description.config);
+      }, false);
       scene.onReloaded.subscribe(() => this.reloaded.dispatch());
       instances.push(scene);
     }

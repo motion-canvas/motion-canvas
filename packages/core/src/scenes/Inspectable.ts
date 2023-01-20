@@ -11,7 +11,10 @@ export type InspectedElement = unknown;
 /**
  * Represents attributes of an inspected element.
  */
-export type InspectedAttributes = Record<string, any>;
+export type InspectedAttributes = {
+  stack?: string;
+  [K: string]: any;
+};
 
 /**
  * Scenes can implement this interface to make their components
