@@ -9,8 +9,12 @@ export default function PredicateType({
 }: {
   type: JSONOutput.PredicateType;
 }) {
-  // TODO Figure out what `type.asserts` does.
-  return (
+  return type.asserts ? (
+    <>
+      <Token type="keyword">asserts </Token>
+      <Token>{type.name} </Token>
+    </>
+  ) : (
     <>
       <Token>{type.name} </Token>
       <Token type="keyword">is </Token>
