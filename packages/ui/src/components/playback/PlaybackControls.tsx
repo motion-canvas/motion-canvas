@@ -27,6 +27,9 @@ export function PlaybackControls() {
     'keydown',
     useCallback(
       event => {
+        if (document.activeElement.tagName === 'INPUT') {
+          return;
+        }
         switch (event.key) {
           case ' ':
             player.togglePlayback();

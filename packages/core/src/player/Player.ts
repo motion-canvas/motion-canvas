@@ -174,13 +174,11 @@ export class Player {
   public setScale(scale: number) {
     this.project.resolutionScale = scale;
     this.updateState({scale});
-    this.project.render();
   }
 
   public setColorSpace(colorSpace: CanvasColorSpace) {
     this.project.colorSpace = colorSpace;
     this.updateState({colorSpace});
-    this.project.render();
   }
 
   public setFileType(fileType: CanvasOutputMimeType) {

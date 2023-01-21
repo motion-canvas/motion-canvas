@@ -53,7 +53,7 @@ to fix our animation:
 
 ```ts
 yield* tween(2, value => {
-  circle.value.position.x(map(-300, 300, easeInOutCubic(value)));
+  circle().position.x(map(-300, 300, easeInOutCubic(value)));
 });
 ```
 
@@ -85,7 +85,7 @@ functions. Consider the following example:
 
 ```ts
 yield* tween(2, value => {
-  circle.value.color(
+  circle().color(
     Color.lerp(
       new Color('#e6a700'),
       new Color('#e13238'),
@@ -113,7 +113,7 @@ It makes the object follow a curved path from point a to b:
 
 ```ts
 yield* tween(2, value => {
-  circle.value.position(
+  circle().position(
     // highlight-next-line
     Vector2.arcLerp(
       new Vector2(-300, 200),
@@ -136,7 +136,7 @@ tween:
 
 ```ts
 yield* tween(2, value => {
-  circle.value.color(
+  circle().color(
     Color.lerp(
       new Color('#e6a700'),
       new Color('#e13238'),
@@ -149,7 +149,7 @@ yield* tween(2, value => {
 Can be written as:
 
 ```ts
-yield* circle.value.color('#e13238', 2);
+yield* circle().color('#e13238', 2);
 ```
 
 Here, we use a [`SignalTween`](/api/core/signals/SignalTween) signature that
@@ -160,14 +160,14 @@ starts with the current value and ends with the newly provided one.
 We can chain multiple tweens together by calling the
 `to()` method on the returned object:
 ```ts
-yield* circle.value.color('#e13238', 2).to('#e6a700', 2);
+yield* circle().color('#e13238', 2).to('#e6a700', 2);
 ```
 
 By default, property tweens use `easeInOutCubic` as the timing function.
 We can override that by providing a third argument:
 
 ```ts
-yield* circle.value.color(
+yield* circle().color(
   '#e13238',
   2,
   // highlight-next-line
@@ -178,7 +178,7 @@ yield* circle.value.color(
 Similarly, we can pass a custom interpolation function as the forth argument:
 
 ```ts
-yield* circle.value.position(
+yield* circle().position(
   new Vector2(300, -200),
   2,
   easeInOutCubic,

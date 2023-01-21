@@ -1,7 +1,12 @@
 import {FullSceneDescription, Scene} from './scenes';
 import {Meta, Metadata} from './Meta';
 import {EventDispatcher, ValueDispatcher} from './events';
-import {CanvasColorSpace, CanvasOutputMimeType, Vector2} from './types';
+import {
+  CanvasColorSpace,
+  CanvasOutputMimeType,
+  PossibleVector2,
+  Vector2,
+} from './types';
 import {AudioManager} from './media';
 import {getContext} from './utils';
 import {Logger} from './Logger';
@@ -119,11 +124,11 @@ export class Project {
     this.canvas.width =
       this.buffer.width =
       this.previousBuffer.width =
-        this.width * this._resolutionScale;
+        this.size.x * this._resolutionScale;
     this.canvas.height =
       this.buffer.height =
       this.previousBuffer.height =
-        this.height * this._resolutionScale;
+        this.size.y * this._resolutionScale;
 
     this.render();
   }
@@ -133,22 +138,14 @@ export class Project {
     this.updateCanvas();
   }
 
-  public setSize(size: Vector2): void;
-  public setSize(width: number, height: number): void;
-  public setSize(value: Vector2 | number, height?: number): void {
-    if (typeof value === 'object') {
-      this.width = value.width;
-      this.height = value.height;
-    } else {
-      this.width = value;
-      this.height = height!;
-    }
+  public setSize(size: PossibleVector2): void {
+    this.size = new Vector2(size);
     this.updateCanvas();
     this.reloadAll();
   }
 
   public getSize(): Vector2 {
-    return new Vector2(this.width, this.height);
+    return this.size;
   }
 
   public readonly name: string;
@@ -172,9 +169,7 @@ export class Project {
   private previousBuffer = document.createElement('canvas');
   private previousBufferContext: CanvasRenderingContext2D | null = null;
   private exportCounter = 0;
-
-  private width = 0;
-  private height = 0;
+  private size = Vector2.zero;
 
   /**
    * @deprecated Use {@link makeProject} instead.
@@ -244,8 +239,8 @@ export class Project {
       0,
       0,
       this._resolutionScale,
-      (this.width * this._resolutionScale) / 2,
-      (this.height * this._resolutionScale) / 2,
+      (this.size.x * this._resolutionScale) / 2,
+      (this.size.y * this._resolutionScale) / 2,
     );
   }
 
@@ -268,7 +263,7 @@ export class Project {
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.context.restore();
     } else {
-      this.context.clearRect(0, 0, this.width, this.height);
+      this.context.clearRect(0, 0, this.size.x, this.size.y);
     }
 
     if (this.previousScene) {

@@ -20,7 +20,7 @@ export default makeScene2D(function* (view) {
   );
   //highlight-start
   yield* tween(2, value => {
-    circle.value.position(
+    circle().position(
       Vector2.arcLerp(
         new Vector2(-300, 200),
         new Vector2(300, -200),
