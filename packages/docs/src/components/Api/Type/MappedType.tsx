@@ -6,7 +6,6 @@ import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 
 export default function MappedType({type}: {type: JSONOutput.MappedType}) {
-  // TODO Figure out what `type.asserts` does.
   return (
     <>
       <TokenList type={ListType.Curly}>
