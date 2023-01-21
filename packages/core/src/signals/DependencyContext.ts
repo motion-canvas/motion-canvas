@@ -25,7 +25,7 @@ export class DependencyContext<TOwner = void> {
     const handle: PromiseHandle<T | null> = {
       promise,
       value: initialValue,
-      stack: this.collectionStack[0]?.stack,
+      stack: new Error().stack,
     };
 
     const context = this.collectionStack.at(-2);
@@ -51,11 +51,14 @@ export class DependencyContext<TOwner = void> {
 
   protected dependencies = new Set<Subscribable<void>>();
   protected event = new FlagDispatcher();
-  protected stack: string | undefined;
   protected markDirty = () => this.event.raise();
 
   public constructor(protected readonly owner: TOwner) {
     this.invokable = this.invoke.bind(this);
+
+    Object.defineProperty(this.invokable, 'context', {
+      value: this,
+    });
   }
 
   protected invoke() {
@@ -71,13 +74,11 @@ export class DependencyContext<TOwner = void> {
       );
     }
 
-    this.stack = new Error().stack;
     DependencyContext.collectionSet.add(this);
     DependencyContext.collectionStack.push(this);
   }
 
   protected finishCollecting() {
-    this.stack = undefined;
     DependencyContext.collectionSet.delete(this);
     if (DependencyContext.collectionStack.pop() !== this) {
       throw new Error('collectStart/collectEnd was called out of order.');

@@ -5,6 +5,7 @@ import {
   getPropertiesOf,
   initial,
   initialize,
+  inspectable,
   signal,
   vector2Signal,
   wrapper,
@@ -19,7 +20,7 @@ import {
   Vector2Signal,
   ColorSignal,
 } from '@motion-canvas/core/lib/types';
-import {ReferenceReceiver} from '@motion-canvas/core/lib/utils';
+import {DetailedError, ReferenceReceiver} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
@@ -36,11 +37,13 @@ import {
   SignalValue,
   SimpleSignal,
   isReactive,
+  Computed,
 } from '@motion-canvas/core/lib/signals';
 
 export interface NodeProps {
   ref?: ReferenceReceiver<any>;
   children?: ComponentChildren;
+  spawner?: SignalValue<Node[]>;
   key?: string;
 
   x?: SignalValue<number>;
@@ -228,13 +231,58 @@ export class Node implements Promisable<Node> {
     return filters;
   }
 
-  public readonly children = createSignal<Node[]>([]);
+  @inspectable(false)
+  @cloneable(false)
+  @initial([])
+  @signal()
+  protected declare readonly spawner: SimpleSignal<Node[], this>;
+
+  @inspectable(false)
+  @cloneable(false)
+  @signal()
+  public declare readonly children: SimpleSignal<Node[], this>;
+  protected setChildren(value: SignalValue<Node[]>) {
+    this.spawner(value);
+  }
+  protected getChildren(): Node[] {
+    this.spawnChildren();
+    return this.realChildren;
+  }
+
+  @computed()
+  protected spawnChildren() {
+    const children = this.spawner();
+    if (isReactive(this.spawner.context.raw())) {
+      const keep = new Set<string>();
+      for (const realChild of children) {
+        const current = realChild.parent.context.raw();
+        if (current && current !== this) {
+          throw new DetailedError(
+            'The spawner returned a node that already has a parent',
+            'A spawner should either create entirely new nodes or reuse nodes from a pool.',
+          );
+        }
+        realChild.parent(this);
+        keep.add(realChild.key);
+      }
+      for (const realChild of this.realChildren) {
+        if (!keep.has(realChild.key)) {
+          realChild.parent(null);
+        }
+      }
+      this.realChildren = children;
+    } else {
+      this.realChildren = children;
+    }
+  }
+
+  private realChildren: Node[] = [];
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
   public readonly key: string;
   public readonly creationStack?: string;
 
-  public constructor({children, key, ...rest}: NodeProps) {
+  public constructor({children, spawner, key, ...rest}: NodeProps) {
     this.key = useScene2D()?.registerNode(this, key) ?? key ?? '';
     this.creationStack = new Error().stack;
     initialize(this, {defaults: rest});
@@ -242,6 +290,9 @@ export class Node implements Promisable<Node> {
       signal.reset();
     }
     this.add(children);
+    if (spawner) {
+      this.children(spawner);
+    }
   }
 
   @computed()
@@ -342,6 +393,10 @@ export class Node implements Promisable<Node> {
 
   public insert(node: ComponentChildren, index = 0): this {
     const array: ComponentChild[] = Array.isArray(node) ? node : [node];
+    if (array.length === 0) {
+      return this;
+    }
+
     const children = this.children();
     const newChildren = children.slice(0, index);
 
@@ -452,7 +507,9 @@ export class Node implements Promisable<Node> {
    */
   public clone(customProps: NodeProps = {}): this {
     const props: NodeProps & Record<string, any> = {...customProps};
-    if (this.children().length > 0) {
+    if (isReactive(this.spawner.context.raw())) {
+      props.spawner = this.spawner.context.raw();
+    } else if (this.children().length > 0) {
       props.children ??= this.children().map(child => child.clone());
     }
 
@@ -460,6 +517,7 @@ export class Node implements Promisable<Node> {
       if (!meta.cloneable || key in props) continue;
       if (meta.compound) {
         for (const [key, property] of meta.compoundEntries) {
+          if (property in props) continue;
           props[property] = (<Record<string, SimpleSignal<any>>>(
             (<unknown>signal)
           ))[key].context.raw();

@@ -66,9 +66,6 @@ export class SignalContext<
     Object.defineProperty(this.invokable, 'save', {
       value: this.save.bind(this),
     });
-    Object.defineProperty(this.invokable, 'context', {
-      value: this,
-    });
 
     if (this.initial !== undefined) {
       this.current = this.initial;
