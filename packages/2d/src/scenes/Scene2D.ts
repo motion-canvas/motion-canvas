@@ -60,7 +60,10 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   public inspectPosition(x: number, y: number): InspectedElement | null {
-    return this.view.hit(new Vector2(x, y))?.key ?? null;
+    startScene(this);
+    const node = this.view.hit(new Vector2(x, y))?.key ?? null;
+    endScene(this);
+    return node;
   }
 
   public validateInspection(

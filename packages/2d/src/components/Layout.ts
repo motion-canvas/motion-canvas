@@ -495,18 +495,19 @@ export class Layout extends Node {
 
   @computed()
   protected layoutChildren(): Layout[] {
-    this.element.innerText = '';
     const queue = [...this.children()];
     const result: Layout[] = [];
+    const elements: HTMLElement[] = [];
     while (queue.length) {
       const child = queue.shift();
       if (child instanceof Layout) {
-        this.element.append(child.element);
         result.push(child);
+        elements.push(child.element);
       } else if (child) {
         queue.push(...child.children());
       }
     }
+    this.element.replaceChildren(...elements);
 
     return result;
   }
