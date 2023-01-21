@@ -18,7 +18,7 @@ export default makeScene2D(function* (view) {
   );
   //highlight-start
   yield* tween(2, value => {
-    circle.value.fill(
+    circle().fill(
       Color.lerp(
         new Color('#e13238'),
         new Color('#e6a700'),

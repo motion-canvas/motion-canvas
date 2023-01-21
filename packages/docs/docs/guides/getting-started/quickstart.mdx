@@ -156,13 +156,13 @@ view.add(
 ```
 
 To animate our circle we first need to grab a reference to it.
-That's the purpose of the `useRef` function.
+That's the purpose of the `createRef` function.
 We use it to create a reference and pass it to our circle using the `ref`
 attribute:
 
 ```tsx
 // highlight-next-line
-const myCircle = useRef<Circle>();
+const myCircle = createRef<Circle>();
 
 view.add(
   <Circle
@@ -176,13 +176,13 @@ view.add(
 );
 ```
 
-We then access the circle through `myCircle.value` and animate its properties:
+We then access the circle through `myCircle()` and animate its properties:
 
 ```tsx
 yield *
   all(
-    myCircle.value.fill('#e6a700', 1).to('#e13238', 1),
-    myCircle.value.position.x(300, 1).to(-300, 1),
+    myCircle().fill('#e6a700', 1).to('#e13238', 1),
+    myCircle().position.x(300, 1).to(-300, 1),
   );
 ```
 
@@ -205,13 +205,13 @@ For example, in the circle above we defined its `fill` property as `'#e13238'`:
 Using our reference we can now retrieve this property's value:
 
 ```ts
-const fill = myCircle.value.fill(); // '#e13238'
+const fill = myCircle().fill(); // '#e13238'
 ```
 
 We can also update it by passing the new value as the first argument:
 
 ```ts
-myCircle.value.fill('#e6a700');
+myCircle().fill('#e6a700');
 ```
 
 This will immediately update the color of our circle.
@@ -219,7 +219,7 @@ If we want to transition to a new value over some time,
 we can pass the transition duration (in seconds) as the second argument:
 
 ```ts
-myCircle.value.fill('#e6a700', 1);
+myCircle().fill('#e6a700', 1);
 ```
 
 This creates a tween animation that smoothly changes the fill color over one
@@ -233,7 +233,7 @@ different instructions we can tell the scene animation to do different things.
 For example, to play the tween we created, we can do:
 
 ```ts
-yield * myCircle.value.fill('#e6a700', 1);
+yield * myCircle().fill('#e6a700', 1);
 ```
 
 This will pause the generator, play out the animation we yielded, and then
@@ -243,23 +243,23 @@ To play another animation, right after the first one, we can simply write
 another `yield*` statement:
 
 ```ts
-yield * myCircle.value.fill('#e6a700', 1);
-yield * myCircle.value.fill('#e13238', 1);
+yield * myCircle().fill('#e6a700', 1);
+yield * myCircle().fill('#e13238', 1);
 ```
 
 But since we're animating the same property,
 we can write it in a more compact way:
 
 ```ts
-yield * myCircle.value.fill('#e6a700', 1).to('#e13238', 1);
+yield * myCircle().fill('#e6a700', 1).to('#e13238', 1);
 ```
 
 In our example, aside from changing the color, we also move our circle around.
 We can try doing it the same way we animated the color:
 
 ```ts
-yield * myCircle.value.fill('#e6a700', 1).to('#e13238', 1);
-yield * myCircle.value.position.x(300, 1).to(-300, 1);
+yield * myCircle().fill('#e6a700', 1).to('#e13238', 1);
+yield * myCircle().position.x(300, 1).to(-300, 1);
 ```
 
 This works, but the position will start animating **after** the fill color.
@@ -268,8 +268,8 @@ To make them happen at the same time, we use the `all()` function:
 ```ts
 yield *
   all(
-    myCircle.value.fill('#e6a700', 1).to('#e13238', 1),
-    myCircle.value.position.x(300, 1).to(-300, 1),
+    myCircle().fill('#e6a700', 1).to('#e13238', 1),
+    myCircle().position.x(300, 1).to(-300, 1),
   );
 ```
 

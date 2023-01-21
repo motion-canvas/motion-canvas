@@ -105,6 +105,9 @@ export function View() {
     'keydown',
     useCallback(
       event => {
+        if (document.activeElement.tagName === 'INPUT') {
+          return;
+        }
         switch (event.key) {
           case '0': {
             resetZoom();

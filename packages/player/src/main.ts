@@ -189,7 +189,7 @@ class MotionCanvasPlayer extends HTMLElement {
     this.finished = false;
     this.project = project;
     this.project.resolutionScale = this.quality;
-    this.project.setSize(this.width, this.height);
+    this.project.setSize([this.width, this.height]);
     this.project.logger.onLogged.subscribe(console.log);
     this.project.setCanvas(this.canvas);
 
@@ -242,7 +242,7 @@ class MotionCanvasPlayer extends HTMLElement {
       case 'width':
       case 'height':
         if (this.project) {
-          this.project.setSize(this.width, this.height);
+          this.project.setSize([this.width, this.height]);
         }
         break;
     }

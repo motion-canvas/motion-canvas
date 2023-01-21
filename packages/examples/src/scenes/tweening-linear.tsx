@@ -18,7 +18,7 @@ export default makeScene2D(function* (view) {
   );
   //highlight-start
   yield* tween(2, value => {
-    circle.value.position.x(map(-300, 300, value));
+    circle().position.x(map(-300, 300, value));
   });
   //highlight-end
 });

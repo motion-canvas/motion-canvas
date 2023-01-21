@@ -1,4 +1,4 @@
-import {Layout} from './Layout';
+import {Layout, LayoutProps} from './Layout';
 
 export class View2D extends Layout {
   public static frameID = 'motion-canvas-2d-frame';
@@ -20,19 +20,15 @@ export class View2D extends Layout {
     View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
   }
 
-  public constructor() {
+  public constructor(props: LayoutProps) {
     super({
-      // TODO Sync with the project size
-      width: 1920,
-      height: 1080,
-      x: 960,
-      y: 540,
       composite: true,
       fontFamily: 'Roboto',
       fontSize: 48,
       lineHeight: 64,
       textWrap: false,
       fontStyle: 'normal',
+      ...props,
     });
 
     View2D.shadowRoot.append(this.element);

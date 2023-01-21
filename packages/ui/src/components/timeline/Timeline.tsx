@@ -117,8 +117,7 @@ export function Timeline() {
         if (event.key !== 'f') return;
         const frame = player.onFrameChanged.current;
         const maxOffset = sizes.fullLength - sizes.viewLength;
-        const playheadPosition = state.framesToPixels(frame);
-        const scrollLeft = playheadPosition - sizes.viewLength / 2;
+        const scrollLeft = state.framesToPixels(frame);
         const newOffset = clamp(0, maxOffset, scrollLeft);
         containerRef.current.scrollLeft = newOffset;
         setOffset(newOffset);

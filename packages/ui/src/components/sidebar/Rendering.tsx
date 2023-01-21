@@ -82,7 +82,7 @@ export function Rendering() {
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
             const {height} = player.project.getSize();
-            player.project.setSize(value, height);
+            player.project.setSize([value, height]);
           }}
         />
         <Add className={styles.times} />
@@ -93,7 +93,7 @@ export function Rendering() {
           onChange={event => {
             const value = parseInt((event.target as HTMLInputElement).value);
             const {width} = player.project.getSize();
-            player.project.setSize(width, value);
+            player.project.setSize([width, value]);
           }}
         />
       </Group>

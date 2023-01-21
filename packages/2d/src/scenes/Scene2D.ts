@@ -22,7 +22,11 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   ) {
     super(description);
     startScene(this);
-    this.view = new View2D();
+    const size = this.getSize();
+    this.view = new View2D({
+      position: size.scale(0.5),
+      size,
+    });
     endScene(this);
   }
 
@@ -49,6 +53,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.registeredNodes = {};
     this.nodeCounters = {};
     this.registerNode(this.view, this.view.key);
+    const size = this.getSize();
+    this.view.position(size.scale(0.5));
+    this.view.size(size);
     return super.reset(previousScene);
   }
 
