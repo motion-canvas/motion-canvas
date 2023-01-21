@@ -31,6 +31,7 @@ import {
   FlexWrap,
   LayoutMode,
   Length,
+  TextWrap,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -85,7 +86,7 @@ export interface LayoutProps extends NodeProps {
   fontWeight?: SignalValue<number>;
   lineHeight?: SignalValue<number>;
   letterSpacing?: SignalValue<number>;
-  textWrap?: SignalValue<boolean>;
+  textWrap?: SignalValue<TextWrap>;
 
   size?: SignalValue<PossibleVector2>;
   offsetX?: SignalValue<number>;
@@ -173,7 +174,7 @@ export class Layout extends Node {
   public declare readonly letterSpacing: SimpleSignal<number | null, this>;
   @initial(null)
   @signal()
-  public declare readonly textWrap: SimpleSignal<boolean | null, this>;
+  public declare readonly textWrap: SimpleSignal<TextWrap, this>;
 
   @cloneable(false)
   @inspectable(false)
@@ -679,7 +680,13 @@ export class Layout extends Node {
 
     const wrap = this.textWrap();
     this.element.style.whiteSpace =
-      wrap === null ? '' : wrap ? 'normal' : 'nowrap';
+      wrap === null
+        ? ''
+        : typeof wrap === 'boolean'
+        ? wrap
+          ? 'normal'
+          : 'nowrap'
+        : wrap;
   }
 
   public override hit(position: Vector2): Node | null {

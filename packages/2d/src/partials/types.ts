@@ -32,6 +32,8 @@ export type FlexAlign =
   | 'stretch'
   | 'baseline';
 
+export type TextWrap = boolean | 'pre' | null;
+
 export type LayoutMode = boolean | null;
 
 export type Length = number | `${number}%` | null;
