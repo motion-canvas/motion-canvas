@@ -387,10 +387,64 @@ export class Node implements Promisable<Node> {
     return this.parent()?.view() ?? null;
   }
 
+  /**
+   * Add the given node(s) as the children of this node.
+   *
+   * @remarks
+   * The nodes will be appended at the end of the children list.
+   *
+   * @example
+   * ```tsx
+   * const node = <Layout />;
+   * node.add(<Rect />);
+   * node.add(<Circle />);
+   * ```
+   * Result:
+   * ```mermaid
+   * graph TD;
+   *   layout([Layout])
+   *   circle([Circle])
+   *   rect([Rect])
+   *     layout-->rect;
+   *     layout-->circle;
+   * ```
+   *
+   * @param node - A node or an array of nodes to append.
+   */
   public add(node: ComponentChildren): this {
     return this.insert(node, Infinity);
   }
 
+  /**
+   * Insert the given node(s) at the specified index in the children list.
+   *
+   * @example
+   * ```tsx
+   * const node = (
+   *   <Layout>
+   *     <Rect />
+   *     <Circle />
+   *   </Layout>
+   * );
+   *
+   * node.insert(<Text />, 1);
+   * ```
+   *
+   * Result:
+   * ```mermaid
+   * graph TD;
+   *   layout([Layout])
+   *   circle([Circle])
+   *   text([Text])
+   *   rect([Rect])
+   *     layout-->rect;
+   *     layout-->text;
+   *     layout-->circle;
+   * ```
+   *
+   * @param node - A node or an array of nodes to insert.
+   * @param index - An index at which to insert the node(s).
+   */
   public insert(node: ComponentChildren, index = 0): this {
     const array: ComponentChild[] = Array.isArray(node) ? node : [node];
     if (array.length === 0) {
@@ -413,6 +467,9 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Remove this node from the tree.
+   */
   public remove(): this {
     const current = this.parent();
     if (current === null) {
@@ -424,6 +481,18 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Rearrange this node in relation to its siblings.
+   *
+   * @remarks
+   * Children are rendered starting from the beginning of the children list.
+   * We can change the rendering order by rearranging said list.
+   *
+   * A positive `by` arguments move the node up (it will be rendered on top of
+   * the elements it has passed). Negative values move it down.
+   *
+   * @param by - Number of places by which the node should be moved.
+   */
   public move(by = 1): this {
     const parent = this.parent();
     if (by === 0 || !parent) {
@@ -462,18 +531,46 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Move the node up in relation to its siblings.
+   *
+   * @remarks
+   * The node will exchange places with the sibling right above it (if any) and
+   * from then on will be rendered on top of it.
+   */
   public moveUp(): this {
     return this.move(1);
   }
 
+  /**
+   * Move the node down in relation to its siblings.
+   *
+   * @remarks
+   * The node will exchange places with the sibling right below it (if any) and
+   * from then on will be rendered under it.
+   */
   public moveDown(): this {
     return this.move(-1);
   }
 
+  /**
+   * Move the node to the top in relation to its siblings.
+   *
+   * @remarks
+   * The node will be placed at the end of the children list and from then on
+   * will be rendered on top of all of its siblings.
+   */
   public moveToTop(): this {
     return this.move(Infinity);
   }
 
+  /**
+   * Move the node to the bottom in relation to its siblings.
+   *
+   * @remarks
+   * The node will be placed at the beginning of the children list and from then
+   * on will be rendered below all of its siblings.
+   */
   public moveToBottom(): this {
     return this.move(-Infinity);
   }
@@ -490,12 +587,25 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Remove all children of this node.
+   */
   public removeChildren() {
     for (const node of this.children()) {
       node.remove();
     }
   }
 
+  /**
+   * Prepare this node to be disposed of.
+   *
+   * @remarks
+   * This method is called automatically when a scene is refreshed. It will
+   * be called even if the node is not currently attached to the tree.
+   *
+   * The goal of this method is to clean any external references to allow the
+   * node to be garbage collected.
+   */
   public dispose() {
     // do nothing
   }

@@ -1,6 +1,9 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
 import Summary from '@site/src/components/Api/Comment/Summary';
+import {Collapsible} from '@docusaurus/theme-common';
+import styles from './styles.module.css';
+import clsx from 'clsx';
 
 export default function Comment({
   comment,
@@ -23,6 +26,7 @@ export default function Comment({
 }
 
 function FullComment({comment}: {comment: JSONOutput.Comment}) {
+  const [collapsed, setCollapsed] = useState(true);
   const examples = useMemo(
     () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
     [comment],
@@ -40,10 +44,27 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
     <>
       {examples.length > 0 && (
         <>
-          <h4>Examples</h4>
-          {examples.map(example => (
-            <Summary key={example.contentId} id={example.contentId} />
-          ))}
+          <h4>
+            <a
+              className={clsx(styles.toggle, collapsed && styles.collapsed)}
+              onClick={e => {
+                e.preventDefault();
+                setCollapsed(!collapsed);
+              }}
+              href="#"
+            >
+              Examples
+            </a>
+          </h4>
+          <Collapsible lazy as={'div'} collapsed={collapsed}>
+            <div className={styles.collapse}>
+              {examples.map(example => (
+                <Summary key={example.contentId} id={example.contentId} />
+              ))}
+            </div>
+            <div className={styles.clearFix}></div>
+          </Collapsible>
+          <div className={clsx(styles.clearFix, styles.inverse)}></div>
         </>
       )}
       {deprecated && (

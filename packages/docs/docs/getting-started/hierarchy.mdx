@@ -18,8 +18,9 @@ representation:
 
 <div className="row margin-bottom--md">
   <div className="col col--6">
-    <CodeBlock language={'tsx'}>
-      {`view.add(
+
+```tsx
+view.add(
   <>
     <Circle />
     <Layout>
@@ -27,12 +28,14 @@ representation:
       <Text>Hi</Text>
     </Layout>
   </>,
-);`}
-    </CodeBlock>
+);
+```
+
   </div>
   <div className="col col--6">
-    <Mermaid
-      value={`graph TD;
+
+```mermaid
+graph TD;
   view[Scene View]
   circle([Circle])
   layout([Layout])
@@ -41,8 +44,9 @@ representation:
     view-->circle;
     view-->layout;
     layout-->rect;
-    layout-->text;`}
-    />
+    layout-->text;
+```
+
   </div>
 </div>
 
@@ -56,8 +60,9 @@ code snippets are equivalent:
 
 <div className="row">
   <div className="col col--6">
-    <CodeBlock language={'tsx'}>
-      {`// JSX
+
+```tsx
+// JSX
 view.add(
   <>
     <Circle />
@@ -66,21 +71,25 @@ view.add(
       <Text>Hi</Text>
     </Layout>
   </>,
-);`}
-    </CodeBlock>
+);
+```
+
   </div>
   <div className="col col--6">
-    <CodeBlock language={'tsx'}>
-      {`// No JSX
+
+```tsx
+// No JSX
 view.add([
   new Circle({}),
   new Layout({
     children: [
+      // highlight-start
       new Rect({}),
-      new Text({text: 'Hi'})
-    ]
-  })
-]);`} </CodeBlock>
+      new Text({text: 'Hi'}),
+    ],
+  }),
+]);
+```
 
   </div>
 </div>
