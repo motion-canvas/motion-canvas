@@ -25,7 +25,7 @@
     "types"
   ],
   "dependencies": {
-    "@motion-canvas/core": "*"
+    "@motion-canvas/core": "^12.3.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.3.0",
