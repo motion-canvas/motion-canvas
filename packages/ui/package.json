@@ -24,11 +24,10 @@
     "dist",
     "types"
   ],
-  "peerDependencies": {
+  "dependencies": {
     "@motion-canvas/core": "*"
   },
   "devDependencies": {
-    "@motion-canvas/core": "^12.3.0",
     "@preact/preset-vite": "^2.3.0",
     "clsx": "^1.2.1",
     "highlight.js": "^11.7.0",
