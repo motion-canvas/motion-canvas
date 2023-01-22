@@ -1,0 +1,28 @@
+.toggle::after {
+  display: inline-block;
+  content: '';
+  background: var(--ifm-menu-link-sublist-icon) 50% / 2rem 2rem;
+  filter: var(--ifm-menu-link-sublist-icon-filter);
+  height: 1.25rem;
+  width: 1.25rem;
+  transform: rotate(180deg);
+  transition: transform var(--ifm-transition-fast) linear;
+  vertical-align: text-bottom;
+  margin-left: 0.3rem;
+}
+
+.toggle.collapsed::after {
+  transform: rotateZ(90deg);
+}
+
+.collapse {
+  margin-bottom: var(--ifm-leading);
+}
+
+.inverse {
+  margin-bottom: calc(-1 * var(--ifm-leading));
+}
+
+.clearFix {
+  height: 1px;
+}
