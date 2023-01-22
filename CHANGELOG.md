@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/motion-canvas/motion-canvas/compare/v12.2.1...v12.3.0) (2023-01-22)
+
+
+### Bug Fixes
+
+* **2d:** some signal setters not returning owners ([#143](https://github.com/motion-canvas/motion-canvas/issues/143)) ([09ab7f9](https://github.com/motion-canvas/motion-canvas/commit/09ab7f96afcaae608399a653c0b4878ba9b467d4))
+* **docs:** improve predicate type ([#148](https://github.com/motion-canvas/motion-canvas/issues/148)) ([3abee4f](https://github.com/motion-canvas/motion-canvas/commit/3abee4f89ef467a48eb68382ac6d46d443ad28d9))
+* use correct scene sizes ([#146](https://github.com/motion-canvas/motion-canvas/issues/146)) ([f279638](https://github.com/motion-canvas/motion-canvas/commit/f279638f9ad7ed1f4c44900d48c10c2d6560946e))
+
+
+### Features
+
+* **2d:** add option for preformatted text ([#147](https://github.com/motion-canvas/motion-canvas/issues/147)) ([989be53](https://github.com/motion-canvas/motion-canvas/commit/989be532d86642e1125bb7fa62a801b09c1b8f26))
+* add node spawners ([#149](https://github.com/motion-canvas/motion-canvas/issues/149)) ([da18a4e](https://github.com/motion-canvas/motion-canvas/commit/da18a4e24104022a84ecd6cec1666b520186058f))
+* minor console improvements ([#145](https://github.com/motion-canvas/motion-canvas/issues/145)) ([3e32e73](https://github.com/motion-canvas/motion-canvas/commit/3e32e73434ad872049af9e3f1f711bc0185410f4))
+* navigate to scene and node source ([#144](https://github.com/motion-canvas/motion-canvas/issues/144)) ([86d495d](https://github.com/motion-canvas/motion-canvas/commit/86d495d01a9f8f0a58e676fedb6df9c12a14d14a))
+
+
+
+
+
 ## [12.2.1](https://github.com/motion-canvas/motion-canvas/compare/v12.2.0...v12.2.1) (2023-01-19)
 
 

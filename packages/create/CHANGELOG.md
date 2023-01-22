@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/motion-canvas/motion-canvas/compare/v12.2.1...v12.3.0) (2023-01-22)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
 ## [12.2.1](https://github.com/motion-canvas/motion-canvas/compare/v12.2.0...v12.2.1) (2023-01-19)
 
 **Note:** Version bump only for package @motion-canvas/create

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/motion-canvas/motion-canvas/compare/v12.2.1...v12.3.0) (2023-01-22)
+
+
+### Bug Fixes
+
+* use correct scene sizes ([#146](https://github.com/motion-canvas/motion-canvas/issues/146)) ([f279638](https://github.com/motion-canvas/motion-canvas/commit/f279638f9ad7ed1f4c44900d48c10c2d6560946e))
+
+
+
+
+
 # [12.2.0](https://github.com/motion-canvas/motion-canvas/compare/v12.1.0...v12.2.0) (2023-01-19)
 
 **Note:** Version bump only for package @motion-canvas/player

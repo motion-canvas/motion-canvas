@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/motion-canvas/motion-canvas/compare/v12.2.1...v12.3.0) (2023-01-22)
+
+
+### Features
+
+* navigate to scene and node source ([#144](https://github.com/motion-canvas/motion-canvas/issues/144)) ([86d495d](https://github.com/motion-canvas/motion-canvas/commit/86d495d01a9f8f0a58e676fedb6df9c12a14d14a))
+
+
+
+
+
 # [12.2.0](https://github.com/motion-canvas/motion-canvas/compare/v12.1.0...v12.2.0) (2023-01-19)
 
 
