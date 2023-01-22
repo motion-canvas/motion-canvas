@@ -1,7 +1,7 @@
 import React from 'react';
-import {useApiContent} from '@site/src/contexts/api';
+import * as summaries from '@site/src/generated/markdown';
 
 export default function Summary({id}: {id: string}) {
-  const Content = useApiContent(id);
+  const Content = summaries[id] ?? React.Fragment;
   return <Content />;
 }

@@ -15,10 +15,14 @@ const config = {
     defaultLocale: 'en',
     locales: ['en'],
   },
+  markdown: {
+    mermaid: true,
+  },
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       metadata: [{name: 'keywords', content: 'typescript, animation, library'}],
+      image: 'img/banner.png',
       colorMode: {
         defaultMode: 'dark',
       },
@@ -32,9 +36,9 @@ const config = {
         items: [
           {
             type: 'docSidebar',
-            sidebarId: 'guides',
+            sidebarId: 'docs',
             position: 'left',
-            label: 'Guides',
+            label: 'Docs',
           },
           {to: '/api/core', label: 'API', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
@@ -52,8 +56,8 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Guides',
-                to: 'guides/intro',
+                label: 'Docs',
+                to: 'docs',
               },
               {
                 label: 'API',
@@ -102,15 +106,17 @@ const config = {
         customCss: require.resolve('./src/css/custom.css'),
       },
     ],
+    '@docusaurus/theme-mermaid',
   ],
   plugins: [
     [
       '@docusaurus/plugin-content-docs',
       {
-        routeBasePath: '/',
+        routeBasePath: '/docs',
         sidebarPath: 'sidebars.js',
         exclude: ['**/api/core/*.md', '**/api/2d/*.md'],
         showLastUpdateAuthor: true,
+        docItemComponent: '@site/src/components/DocPage',
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
       },

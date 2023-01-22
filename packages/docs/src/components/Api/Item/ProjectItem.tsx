@@ -10,7 +10,7 @@ export default function ProjectItem({
 }: {
   reflection: JSONOutput.DeclarationReflection;
 }) {
-  const lookup = useApiLookup();
+  const lookup = useApiLookup(reflection.project);
   const modules = reflection.groups[0].children
     .map(id => lookup[id])
     .filter(module => !!module);

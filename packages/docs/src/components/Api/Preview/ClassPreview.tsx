@@ -7,6 +7,7 @@ import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
 import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
 import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
+import {useApiFinder} from '@site/src/contexts/api';
 
 const mainKeyword = {
   [ReflectionKind.Namespace]: 'namespace',
@@ -20,6 +21,7 @@ export default function ClassPreview({
 }: {
   reflection: JSONOutput.DeclarationReflection;
 }) {
+  const find = useApiFinder();
   return (
     <>
       <FlagsPreview flags={reflection.flags} />
@@ -27,8 +29,8 @@ export default function ClassPreview({
       <Token type="class-name">{reflection.name}</Token>
       {!!reflection.typeParameters?.length && (
         <TokenList type={ListType.Angle}>
-          {reflection.typeParameters.map((type, index) => (
-            <TypeParameterPreview key={index} reflection={type} />
+          {reflection.typeParameters.map(type => (
+            <TypeParameterPreview key={type.id} reflection={find(type)} />
           ))}
         </TokenList>
       )}{' '}

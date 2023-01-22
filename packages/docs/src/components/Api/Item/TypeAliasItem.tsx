@@ -17,7 +17,7 @@ export default function TypeAliasItem({
 }: {
   reflection: JSONOutput.DeclarationReflection;
 }) {
-  const lookup = useApiLookup();
+  const lookup = useApiLookup(reflection.project);
 
   return (
     <>

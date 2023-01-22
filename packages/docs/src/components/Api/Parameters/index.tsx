@@ -1,14 +1,17 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 import Summary from '@site/src/components/Api/Comment/Summary';
 import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
+import {useApiFinder, useApiLookup} from '@site/src/contexts/api';
 
-export default function Parameters({
-  parameters,
-}: {
-  parameters: JSONOutput.ParameterReflection[];
-}) {
-  if (!parameters?.length) {
+export default function Parameters({parameters}: {parameters: number[]}) {
+  const find = useApiFinder();
+  const data = useMemo(
+    () => parameters?.map(find<JSONOutput.ParameterReflection>),
+    [parameters],
+  );
+
+  if (!data?.length) {
     return <></>;
   }
 
@@ -16,7 +19,7 @@ export default function Parameters({
     <>
       <h4>Parameters</h4>
       <ul>
-        {parameters.map(parameter => (
+        {data.map(parameter => (
           <li key={parameter.id}>
             <code>
               <ParameterPreview

@@ -1,0 +1,135 @@
+---
+sidebar_position: 2
+slug: /hierarchy
+---
+
+import Mermaid from '@theme/Mermaid';
+import CodeBlock from '@theme/CodeBlock';
+import ApiSnippet from '@site/src/components/Api/ApiSnippet';
+
+# Scene hierarchy
+
+Scenes are collections of nodes displayed in your animation. They're organized
+in a tree hierarchy, with the scene view at its root. This concept is similar to
+the Document Object Model used ot represent HTML and XML documents.
+
+Here's an example of a simple scene hierarchy together with its object
+representation:
+
+<div className="row margin-bottom--md">
+  <div className="col col--6">
+    <CodeBlock language={'tsx'}>
+      {`view.add(
+  <>
+    <Circle />
+    <Layout>
+      <Rect />
+      <Text>Hi</Text>
+    </Layout>
+  </>,
+);`}
+    </CodeBlock>
+  </div>
+  <div className="col col--6">
+    <Mermaid
+      value={`graph TD;
+  view[Scene View]
+  circle([Circle])
+  layout([Layout])
+  rect([Rect])
+  text([text 'Hi'])
+    view-->circle;
+    view-->layout;
+    layout-->rect;
+    layout-->text;`}
+    />
+  </div>
+</div>
+
+Each node is an instance of a class extending the base [`Node`][node] class. To
+make the code more readable, Motion Canvas uses a custom
+[JSX](https://reactjs.org/docs/introducing-jsx.html) runtime. This way, instead
+of instantiating the nodes ourselves, we can write an XML-like markup. Note that
+Motion Canvas does **not** use React itself, only JSX. There's no virtual DOM or
+reconciliation and the JSX tags are mapped directly to Node instances. These two
+code snippets are equivalent:
+
+<div className="row">
+  <div className="col col--6">
+    <CodeBlock language={'tsx'}>
+      {`// JSX
+view.add(
+  <>
+    <Circle />
+    <Layout>
+      <Rect />
+      <Text>Hi</Text>
+    </Layout>
+  </>,
+);`}
+    </CodeBlock>
+  </div>
+  <div className="col col--6">
+    <CodeBlock language={'tsx'}>
+      {`// No JSX
+view.add([
+  new Circle({}),
+  new Layout({
+    children: [
+      new Rect({}),
+      new Text({text: 'Hi'})
+    ]
+  })
+]);`} </CodeBlock>
+
+  </div>
+</div>
+
+Just like with DOM, it's possible to add, remove, and rearrange nodes at any
+time. The [`Node`][node] class contains the
+[`children`](/api/2d/components/Node#children) and
+[`parent`](/api/2d/components/Node#parent) properties that can be used to
+traverse the tree. But in order to modify it, it's recommended to use the
+following helper methods:
+
+## `Node.add`
+
+<ApiSnippet url={'/api/2d/components/Node#add'} />
+<hr />
+
+## `Node.insert`
+
+<ApiSnippet url={'/api/2d/components/Node#insert'} />
+<hr />
+
+## `Node.remove`
+
+<ApiSnippet url={'/api/2d/components/Node#remove'} />
+<hr />
+
+## `Node.moveUp`
+
+<ApiSnippet url={'/api/2d/components/Node#moveUp'} />
+<hr />
+
+## `Node.moveDown`
+
+<ApiSnippet url={'/api/2d/components/Node#moveDown'} />
+<hr />
+
+## `Node.moveToTop`
+
+<ApiSnippet url={'/api/2d/components/Node#moveToTop'} />
+<hr />
+
+## `Node.moveToBottom`
+
+<ApiSnippet url={'/api/2d/components/Node#moveToBottom'} />
+<hr />
+
+## `Node.removeChildren`
+
+<ApiSnippet url={'/api/2d/components/Node#removeChildren'} />
+<hr />
+
+[node]: /api/2d/components/Node

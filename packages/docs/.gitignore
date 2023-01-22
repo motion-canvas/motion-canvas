@@ -11,6 +11,7 @@ docs/core-api
 docs/2d-api
 static/examples
 static/editor
+src/generated
 
 # Misc
 .DS_Store

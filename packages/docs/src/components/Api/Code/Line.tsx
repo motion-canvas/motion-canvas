@@ -3,6 +3,10 @@ import React, {ReactNode, useLayoutEffect, useRef} from 'react';
 import styles from './styles.module.css';
 import clsx from 'clsx';
 
+function compare(a: number, b: number) {
+  return a > b ? 1 : a < b ? -1 : 0;
+}
+
 export default function Line({children}: {children?: ReactNode | ReactNode[]}) {
   const line = useRef<HTMLSpanElement>();
 
@@ -11,16 +15,11 @@ export default function Line({children}: {children?: ReactNode | ReactNode[]}) {
     const parent = line.current.closest('pre');
     if (parent.scrollWidth > parent.clientWidth) {
       const lists: HTMLElement[] = Array.from(
-        line.current.querySelectorAll(`.${styles.elements}`),
-      );
+        line.current.querySelectorAll<HTMLElement>(`.${styles.elements}`),
+      ).sort((a, b) => compare(b.innerText.length, a.innerText.length));
 
-      const multiple = lists.filter(list => list.children.length > 1);
       while (parent.scrollWidth > parent.clientWidth && lists.length > 0) {
-        if (multiple.length > 0) {
-          multiple.shift().classList.add(styles.wrap);
-        } else {
-          lists.shift().classList.add(styles.wrap);
-        }
+        lists.shift().classList.add(styles.wrap);
       }
     }
   });

@@ -4,8 +4,7 @@ import DocItemLayout from '@theme/DocItem/Layout';
 import {DocProvider} from '@docusaurus/theme-common/internal';
 import Item from '@site/src/components/Api/Item';
 import {useApiLookup} from '@site/src/contexts/api';
-import {ThemeDictProvider, themeToDict} from '@site/src/contexts/codeTheme';
-import {usePrismTheme} from '@docusaurus/theme-common';
+import {ThemeDictProvider} from '@site/src/contexts/codeTheme';
 import {matchFilters, useFilters} from '@site/src/contexts/filters';
 import {TOCItem} from '@docusaurus/mdx-loader';
 import Tooltip from '@site/src/components/Tooltip';
@@ -15,13 +14,12 @@ import {ReflectionKind} from './ReflectionKind';
 interface ApiItemProps {
   route: {
     reflectionId: number;
+    projectId: number;
   };
 }
 
 export default function ApiItem({route}: ApiItemProps): JSX.Element {
-  const theme = usePrismTheme();
-  const dictionary = useMemo(() => themeToDict(theme, 'typescript'), [theme]);
-  const lookup = useApiLookup();
+  const lookup = useApiLookup(route.projectId);
   const reflection: JSONOutput.DeclarationReflection =
     lookup[route.reflectionId];
   const [filters] = useFilters();
@@ -77,7 +75,7 @@ export default function ApiItem({route}: ApiItemProps): JSX.Element {
         assets: {},
       }}
     >
-      <ThemeDictProvider dictionary={dictionary}>
+      <ThemeDictProvider>
         <DocItemMetadata />
         <Tooltip>
           <DocItemLayout>

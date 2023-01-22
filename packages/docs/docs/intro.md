@@ -1,5 +1,6 @@
 ---
 sidebar_position: 1
+slug: /
 ---
 
 # Introduction
@@ -32,5 +33,6 @@ as wide a user base as possible.
 If you would like to contribute pull requests, please read [the contribution
 guide][contributing] to learn about our process.
 
-[contributing]: https://github.com/motion-canvas/motion-canvas/blob/main/CONTRIBUTING.md
+[contributing]:
+  https://github.com/motion-canvas/motion-canvas/blob/main/CONTRIBUTING.md
 [repo]: https://github.com/motion-canvas/motion-canvas

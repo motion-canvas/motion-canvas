@@ -10,8 +10,10 @@ import ProjectItem from '@site/src/components/Api/Item/ProjectItem';
 
 export default function Item({
   reflection,
+  headless = false,
 }: {
   reflection: JSONOutput.DeclarationReflection;
+  headless?: boolean;
 }) {
   const Component = useMemo(() => {
     switch (reflection.kind as ReflectionKind) {
@@ -62,5 +64,5 @@ export default function Item({
     );
   }, [reflection.kind]);
 
-  return <Component reflection={reflection} />;
+  return <Component reflection={reflection} headless={headless} />;
 }

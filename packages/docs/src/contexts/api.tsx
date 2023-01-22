@@ -3,11 +3,12 @@ import type {JSONOutput} from 'typedoc';
 
 declare module 'typedoc' {
   namespace JSONOutput {
-    interface ReferenceType {
-      lookupId?: number;
+    interface Type {
+      project?: number;
     }
 
     interface Reflection {
+      project?: number;
       docId: string;
       href: string;
       url: string;
@@ -37,8 +38,6 @@ export interface ReflectionReference {
 export interface ApiContext {
   lookup: ApiLookups;
   urlLookup: Record<string, ReflectionReference>;
-  contents: Record<string, FunctionComponent>;
-  id: number;
 }
 
 export type ApiLookup = Record<number, JSONOutput.Reflection>;
@@ -47,27 +46,19 @@ export type ApiLookups = Record<number, ApiLookup>;
 const Context = React.createContext<ApiContext>({
   lookup: {},
   urlLookup: {},
-  contents: {},
-  id: 0,
 });
 
 export function ApiProvider({
   children,
   lookup,
   urlLookup,
-  contents,
-  id,
 }: {
   children: ReactNode;
   lookup: ApiLookups;
   urlLookup: Record<string, ReflectionReference>;
-  contents: Record<string, FunctionComponent>;
-  id: number;
 }) {
   return (
-    <Context.Provider value={{lookup, contents, urlLookup, id}}>
-      {children}
-    </Context.Provider>
+    <Context.Provider value={{lookup, urlLookup}}>{children}</Context.Provider>
   );
 }
 
@@ -75,9 +66,23 @@ export function useApiContext(): ApiContext {
   return useContext(Context);
 }
 
-export function useApiLookup(customId?: number): ApiLookup {
-  const {lookup, id} = useContext(Context);
-  return lookup[customId ?? id];
+export function useApiLookup(id: number): ApiLookup {
+  const {lookup} = useContext(Context);
+  return lookup[id];
+}
+
+interface ApiFinder {
+  <T extends JSONOutput.Reflection>(value?: {id: number; project: number}): T;
+}
+
+export function useApiFinder(): ApiFinder {
+  const {lookup} = useContext(Context);
+  return (value => {
+    if (typeof value?.project === 'number') {
+      return lookup[value.project][value.id];
+    }
+    return undefined;
+  }) as ApiFinder;
 }
 
 export function useUrlLookup(): (url: string) => JSONOutput.Reflection | null {
@@ -91,11 +96,6 @@ export function useUrlLookup(): (url: string) => JSONOutput.Reflection | null {
 
     return lookup[reference.projectId]?.[reference.id] ?? null;
   };
-}
-
-export function useApiContent(id: string): FunctionComponent {
-  const {contents} = useContext(Context);
-  return contents[id] ?? React.Fragment;
 }
 
 export function getUrl(reflection?: JSONOutput.DeclarationReflection) {

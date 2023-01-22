@@ -46,9 +46,15 @@ function filterGroup(
   }
 }
 
-export default function Group({group}: {group: JSONOutput.ReflectionGroup}) {
+export default function Group({
+  group,
+  project,
+}: {
+  group: JSONOutput.ReflectionGroup;
+  project: number;
+}) {
   const location = useLocation();
-  const lookup = useApiLookup();
+  const lookup = useApiLookup(project);
   const {setTabGroupChoices} = useTabGroupChoice();
   const hash = location.hash.split('-')[0].slice(1);
   const [filters] = useFilters();
