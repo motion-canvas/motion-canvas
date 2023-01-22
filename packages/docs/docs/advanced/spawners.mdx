@@ -1,0 +1,66 @@
+---
+slug: /spawners
+---
+
+# Spawners
+
+Sometimes we want the children of a given node to be reactive. In other words,
+we want them to change according to some external state. Consider the following
+example:
+
+```tsx
+const count = createSignal(10);
+
+view.add(
+  <Layout layout>
+    {range(count()).map(() => (
+      <Circle width={32} height={32} fill={'white'} />
+    ))}
+  </Layout>,
+);
+```
+
+We first create the `count` signal and then use its value to generate N number
+of circles.
+
+This example is not reactive - changing the `count` signal won't change the
+number of circles inside the `Layout` node. We can fix that with the use of the
+[`spawner`](/api/2d/components/NodeProps#spawner) property:
+
+```tsx
+const count = createSignal(10);
+
+view.add(
+  <Layout
+    layout
+    spawner={() =>
+      range(count()).map(() => <Circle width={32} height={32} fill={'white'} />)
+    }
+  />,
+);
+```
+
+`spawner` accepts a function that returns an array of nodes. These nodes will
+become the new children of the `Layout` node. We can now animate our `count`
+signal to check if it works:
+
+```ts
+yield * count(5, 2);
+```
+
+It's important to remember that (like most Node properties) `spawner` is a
+signal. The function we pass to it will be invoked each time any of its
+dependencies change. If the spawner happens to generate a large number of nodes
+and its dependencies change every frame, it may drastically reduce the
+playback's performance. To counteract this, we can use an object pool that will
+let us reuse the same nodes instead of recreating them each time:
+
+```tsx
+const count = createSignal(10);
+
+const pool = range(64).map(i => (
+  <Circle x={i * 32} width={32} height={32} fill={'lightseagreen'} />
+));
+
+view.add(<Layout layout spawner={() => pool.slice(0, count())} />);
+```

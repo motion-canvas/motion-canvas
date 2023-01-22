@@ -19,7 +19,7 @@ export default function ModuleItem({
         <Comment comment={reflection.comment} />
       </Filters>
       {reflection.groups?.map(group => (
-        <Group group={group} key={group.title} />
+        <Group group={group} key={group.title} project={reflection.project} />
       ))}
     </>
   );

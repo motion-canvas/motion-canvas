@@ -10,10 +10,21 @@ const {
   Comment,
 } = require('typedoc');
 const mdn = require('mdn-links');
+const fs = require('fs');
 
 module.exports = () => ({
   name: 'docusaurus-typedoc-plugin',
   async loadContent() {
+    const dir = './src/generated';
+    if (fs.existsSync(dir)) {
+      const api = JSON.parse(
+        await fs.promises.readFile(`${dir}/api.json`, 'utf8'),
+      );
+      return api.lookups;
+    }
+
+    fs.mkdirSync(`${dir}/markdown`, {recursive: true});
+
     const core = await parseTypes(
       {
         theme: 'custom',
@@ -39,55 +50,38 @@ module.exports = () => ({
       },
       'core',
     );
-    return [
+    const ui = await parseTypes(
+      {
+        theme: 'custom',
+        excludeExternals: true,
+        excludeInternal: true,
+        excludePrivate: true,
+        entryPoints: [
+          '../2d/src/components',
+          '../2d/src/curves',
+          '../2d/src/decorators',
+          '../2d/src/partials',
+          '../2d/src/scenes',
+          '../2d/src/utils',
+        ],
+        tsconfig: '../2d/tsconfig.json',
+      },
+      '2d',
       core,
-      await parseTypes(
-        {
-          theme: 'custom',
-          excludeExternals: true,
-          excludeInternal: true,
-          excludePrivate: true,
-          entryPoints: [
-            '../2d/src/components',
-            '../2d/src/curves',
-            '../2d/src/decorators',
-            '../2d/src/partials',
-            '../2d/src/scenes',
-            '../2d/src/utils',
-          ],
-          tsconfig: '../2d/tsconfig.json',
-        },
-        '2d',
-        core,
-      ),
-    ];
-  },
-  async contentLoaded({content, actions}) {
-    if (content === null) {
-      return;
-    }
+    );
 
     const sidebar = [];
     const lookups = {};
-    const promises = [];
     let urlLookups = {};
     let previousProject;
-    let imports = '';
-    let exports = '';
+    let mdContents = [];
 
-    for (const project of content) {
+    for (const project of [core, ui]) {
       urlLookups = {
         ...urlLookups,
         ...project.urlLookup,
       };
-      for (let i = 0; i < project.mdContents.length; i++) {
-        const md = project.mdContents[i];
-        const name = getContentName(project.id, i);
-
-        promises.push(actions.createData(`${name}.md`, md));
-        imports += `import ${name} from "./${name}.md";\n`;
-        exports += `${name},\n`;
-      }
+      mdContents.push(...project.mdContents);
 
       lookups[project.id] = project.lookup;
       sidebar.push(project.sidebar);
@@ -108,22 +102,40 @@ module.exports = () => ({
       previousProject = project;
     }
 
-    await Promise.all(promises);
-    const lookupData = await actions.createData(
-      'lookup.json',
-      JSON.stringify({sidebar, lookups, urlLookups}),
+    await fs.promises.writeFile(
+      `${dir}/markdown/index.js`,
+      `
+      ${mdContents.map(id => `import ${id} from './${id}.md';`).join('\n')}
+      export {
+        ${mdContents.map(id => `${id},\n`).join('\n')}
+      }`,
+      'utf8',
     );
 
-    const contents = await actions.createData(
-      'test.js',
-      `${imports}const contents = {\n${exports}};\nexport default contents;`,
+    await fs.promises.writeFile(
+      `${dir}/sidebar.json`,
+      JSON.stringify(sidebar),
+      'utf8',
     );
 
-    for (const project of content) {
+    await fs.promises.writeFile(
+      `${dir}/api.json`,
+      JSON.stringify({lookups, urlLookups}),
+      'utf8',
+    );
+
+    return lookups;
+  },
+  async contentLoaded({content, actions}) {
+    if (content === null) {
+      return;
+    }
+
+    for (const [id, lookup] of Object.entries(content)) {
       actions.addRoute({
-        path: project.lookup[project.id].url,
+        path: lookup[id].url,
         component: '@site/src/components/Api/ApiPage.tsx',
-        routes: Object.values(project.lookup)
+        routes: Object.values(lookup)
           .filter(reflection => reflection.hasOwnPage)
           .map(reflection => ({
             path: reflection.url,
@@ -131,14 +143,9 @@ module.exports = () => ({
             exact: true,
             sidebar: 'api',
             reflectionId: reflection.id,
+            projectId: id,
           })),
-        modules: {
-          lookup: lookupData,
-          contents: contents,
-        },
         exact: false,
-        reflectionId: project.id,
-        projectName: project.name,
       });
     }
   },
@@ -163,9 +170,9 @@ async function parseTypes(options, projectName, externalProject) {
       if (reference) {
         if (ref.symbolReference.path.length > 0) {
           for (const value of ref.symbolReference.path.slice(1)) {
-            reference = reference.children.find(
-              child => child.name === value.path,
-            );
+            reference = reference.children
+              .map(({id}) => externalProject.lookup[id])
+              .find(child => child.name === value.path);
           }
         }
 
@@ -261,25 +268,14 @@ async function parseTypes(options, projectName, externalProject) {
   const lookup = {};
   const nameLookup = {};
   const urlLookup = {};
+
   app.serializer.addSerializer({
     priority: -Infinity,
-    supports(item) {
-      return item instanceof Reflection;
+    supports() {
+      return true;
     },
     toObject(item, obj) {
-      urlLookup[item.href] = {
-        id: item.id,
-        projectId: project.id,
-      };
-      nameLookup[obj.name] = obj;
-      lookup[obj.id] = obj;
-      obj.url = item.url;
-      obj.anchor = item.anchor;
-      obj.href = item.href;
-      obj.hasOwnPage = item.hasOwnPage;
-      obj.docId = item.docId;
-      obj.next = item.sidebar?.next;
-      obj.previous = item.sidebar?.previous;
+      obj.project = project.id;
       return obj;
     },
   });
@@ -301,6 +297,30 @@ async function parseTypes(options, projectName, externalProject) {
     },
   });
 
+  app.serializer.addSerializer({
+    priority: -Infinity,
+    supports(item) {
+      return item instanceof Reflection;
+    },
+    toObject(item, obj) {
+      urlLookup[item.href] = {
+        id: item.id,
+        projectId: project.id,
+      };
+      nameLookup[obj.name] = obj;
+      lookup[obj.id] = obj;
+      obj.url = item.url;
+      obj.anchor = item.anchor;
+      obj.href = item.href;
+      obj.hasOwnPage = item.hasOwnPage;
+      obj.docId = item.docId;
+      obj.next = item.sidebar?.next;
+      obj.previous = item.sidebar?.previous;
+      return {id: item.id, project: project.id};
+    },
+  });
+
+  const promises = [];
   const mdContents = [];
   app.serializer.addSerializer({
     priority: -Infinity,
@@ -309,19 +329,35 @@ async function parseTypes(options, projectName, externalProject) {
     },
     toObject(item, obj) {
       if (item instanceof CommentTag) {
-        obj.contentId = getContentName(project.id, mdContents.length);
-        mdContents.push(partsToMarkdown(item.content));
+        obj.contentId = getContentName(project.id, promises.length);
+        mdContents.push(obj.contentId);
+        promises.push(
+          fs.promises.writeFile(
+            `./src/generated/markdown/${obj.contentId}.md`,
+            partsToMarkdown(item.content),
+          ),
+          'utf8',
+        );
       }
 
       if (item.summary) {
         obj.summaryText = partsToText(item.summary);
-        obj.summaryId = getContentName(project.id, mdContents.length);
-        mdContents.push(partsToMarkdown(item.summary));
+        obj.summaryId = getContentName(project.id, promises.length);
+        mdContents.push(obj.summaryId);
+        promises.push(
+          fs.promises.writeFile(
+            `./src/generated/markdown/${obj.summaryId}.md`,
+            partsToMarkdown(item.summary),
+          ),
+          'utf8',
+        );
       }
       return obj;
     },
   });
   app.serializer.projectToObject(project);
+
+  await Promise.all(promises);
 
   return {
     id: project.id,

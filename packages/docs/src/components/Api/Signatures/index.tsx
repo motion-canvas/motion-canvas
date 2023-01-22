@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 
 import Container from '@site/src/components/Api/Code/Container';
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
@@ -8,22 +8,28 @@ import Comment from '@site/src/components/Api/Comment';
 import TypeParameters from '@site/src/components/Api/TypeParameters';
 import type {JSONOutput} from 'typedoc';
 import Parameters from '@site/src/components/Api/Parameters';
+import {useApiFinder, useApiLookup} from '@site/src/contexts/api';
 
 export default function Signatures({
   signatures,
   flags,
   source,
 }: {
-  signatures: JSONOutput.SignatureReflection[];
-  flags?: JSONOutput.ReflectionFlags;
+  signatures: number[];
+  flags: JSONOutput.ReflectionFlags;
   source?: JSONOutput.SourceReference;
 }) {
-  const [signature, setSignature] = useState(signatures[0]);
+  const find = useApiFinder();
+  const data = useMemo(
+    () => signatures.map(find<JSONOutput.SignatureReflection>),
+    [signatures],
+  );
+  const [signature, setSignature] = useState(data[0]);
 
   return (
     <>
       <Container>
-        {signatures.map(child => (
+        {data.map(child => (
           <CodeBlock
             link={source?.url}
             key={child.id}

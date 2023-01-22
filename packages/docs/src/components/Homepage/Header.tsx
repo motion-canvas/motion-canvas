@@ -20,10 +20,7 @@ export default function HomepageHeader() {
           <b>Programmatically</b>
         </h1>
         <div className={styles.buttons}>
-          <Link
-            className="button button--primary button--lg"
-            to="/guides/intro"
-          >
+          <Link className="button button--primary button--lg" to="/docs">
             Get Started
           </Link>
           <a

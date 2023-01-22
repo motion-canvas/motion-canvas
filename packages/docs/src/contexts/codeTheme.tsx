@@ -1,5 +1,6 @@
 import {Language, PrismTheme} from 'prism-react-renderer';
-import React, {ReactNode, useContext} from 'react';
+import React, {ReactNode, useContext, useMemo} from 'react';
+import {usePrismTheme} from '@docusaurus/theme-common';
 
 export type StyleObj = {
   [key: string]: string | number | void;
@@ -36,13 +37,10 @@ export function themeToDict(theme: PrismTheme, language: Language): ThemeDict {
 
 const Context = React.createContext<ThemeDict | null>(null);
 
-export function ThemeDictProvider({
-  children,
-  dictionary,
-}: {
-  children: ReactNode;
-  dictionary: ThemeDict;
-}) {
+export function ThemeDictProvider({children}: {children: ReactNode}) {
+  const theme = usePrismTheme();
+  const dictionary = useMemo(() => themeToDict(theme, 'typescript'), [theme]);
+
   return <Context.Provider value={dictionary}>{children}</Context.Provider>;
 }
 

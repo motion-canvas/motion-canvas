@@ -32,12 +32,12 @@ export default function PropertyItem({
       </Container>
       <Comment comment={reflection.comment} />
       {reflection.inheritedFrom && (
-        <>
+        <small>
           Inherited from{' '}
           <code>
             <ReferenceType type={reflection.inheritedFrom} />
           </code>
-        </>
+        </small>
       )}
     </>
   );

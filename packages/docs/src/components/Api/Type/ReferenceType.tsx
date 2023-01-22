@@ -11,8 +11,8 @@ export default function ReferenceType({
 }: {
   type: JSONOutput.ReferenceType;
 }) {
-  const lookup = useApiLookup(type.lookupId);
-  const reference = lookup[type.id];
+  const lookup = useApiLookup(type.project);
+  const reference = lookup?.[type.id];
   const to = type.externalUrl ?? getUrl(reference);
 
   return (

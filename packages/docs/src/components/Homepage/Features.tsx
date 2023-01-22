@@ -90,7 +90,7 @@ export default function HomepageFeatures(): JSX.Element {
           <p>
             <Link
               className="button button--outline button--lg"
-              to="/guides/getting-started/quickstart"
+              to="/docs/quickstart"
             >
               Learn More
             </Link>

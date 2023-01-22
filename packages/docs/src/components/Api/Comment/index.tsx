@@ -42,7 +42,7 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
         <>
           <h4>Examples</h4>
           {examples.map(example => (
-            <Summary id={example.contentId} />
+            <Summary key={example.contentId} id={example.contentId} />
           ))}
         </>
       )}

@@ -7,7 +7,7 @@ import Type from '@site/src/components/Api/Type';
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
-import {getUrl, useApiLookup} from '@site/src/contexts/api';
+import {getUrl, useApiFinder, useApiLookup} from '@site/src/contexts/api';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
 
 export default function SignaturePreview({
@@ -17,7 +17,7 @@ export default function SignaturePreview({
   reflection: JSONOutput.SignatureReflection;
   flags?: JSONOutput.ReflectionFlags;
 }) {
-  const lookup = useApiLookup();
+  const find = useApiFinder();
   const isArrow = reflection.name === '__type';
 
   return (
@@ -34,7 +34,13 @@ export default function SignaturePreview({
       )}
       {reflection.overwrites && (
         <>
-          <Token to={getUrl(lookup[reflection.overwrites.id])} type="keyword">
+          <Token
+            to={
+              reflection.overwrites.externalUrl ??
+              getUrl(find(reflection.overwrites.id))
+            }
+            type="keyword"
+          >
             override
           </Token>{' '}
         </>
@@ -56,14 +62,14 @@ export default function SignaturePreview({
       {!!reflection.typeParameter?.length && (
         <TokenList type={ListType.Angle}>
           {reflection.typeParameter.map(type => (
-            <TypeParameterPreview key={type.id} reflection={type} />
+            <TypeParameterPreview key={type.id} reflection={find(type)} />
           ))}
         </TokenList>
       )}
       {reflection.parameters?.length ? (
         <TokenList type={ListType.Parentheses}>
-          {reflection.parameters.map(parameter => (
-            <ParameterPreview key={parameter.id} reflection={parameter} />
+          {reflection.parameters.map(id => (
+            <ParameterPreview key={id} reflection={find(id)} />
           ))}
         </TokenList>
       ) : (

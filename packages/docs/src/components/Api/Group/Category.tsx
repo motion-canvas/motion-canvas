@@ -17,7 +17,7 @@ export default function Category({group}: {group: FilteredGroup}) {
       {group.external.length > 0 && (
         <ul>
           {group.external.map(child => (
-            <li>
+            <li key={child.id}>
               <code>
                 <ReferenceType type={child} />
               </code>

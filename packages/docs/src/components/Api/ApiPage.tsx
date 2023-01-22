@@ -1,38 +1,16 @@
-import React, {FunctionComponent} from 'react';
+import React from 'react';
 import DocPage, {Props} from '@theme/DocPage';
-import {
-  ApiLookups,
-  ApiProvider,
-  ReflectionReference,
-} from '@site/src/contexts/api';
-import {PropSidebar} from '@docusaurus/plugin-content-docs';
+import {ApiProvider} from '@site/src/contexts/api';
 import {FiltersProvider} from '@site/src/contexts/filters';
+import api from '@site/src/generated/api';
+import sidebar from '@site/src/generated/sidebar';
 
-interface ApiPageProps extends Props {
-  lookup: {
-    lookups: ApiLookups;
-    urlLookups: Record<string, ReflectionReference>;
-    sidebar: PropSidebar;
-  };
-  contents: Record<string, FunctionComponent>;
-  route: {
-    reflectionId: number;
-  };
-}
-
-export default function ApiPage(props: ApiPageProps) {
-  const {lookup, contents, ...rest} = props;
-
+export default function ApiPage(props: Props) {
   return (
-    <ApiProvider
-      lookup={lookup.lookups}
-      urlLookup={lookup.urlLookups}
-      contents={contents}
-      id={props.route.reflectionId}
-    >
+    <ApiProvider lookup={api.lookups} urlLookup={api.urlLookups}>
       <FiltersProvider>
         <DocPage
-          {...rest}
+          {...props}
           versionMetadata={{
             version: 'current',
             pluginId: 'typedoc',
@@ -43,7 +21,7 @@ export default function ApiPage(props: ApiPageProps) {
             isLast: false,
             label: 'test',
             docsSidebars: {
-              api: lookup.sidebar,
+              api: sidebar,
             },
           }}
         />

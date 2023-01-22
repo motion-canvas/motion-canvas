@@ -64,7 +64,7 @@ export default function ClassItem({
         </>
       )}
       {reflection.groups?.map(group => (
-        <Group group={group} key={group.title} />
+        <Group group={group} key={group.title} project={reflection.project} />
       ))}
     </>
   );
