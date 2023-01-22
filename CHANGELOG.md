@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.6.0](https://github.com/motion-canvas/motion-canvas/compare/v12.5.0...v12.6.0) (2023-01-22)
+
+
+### Features
+
+* **vite-plugin:** improve audio handling ([#154](https://github.com/motion-canvas/motion-canvas/issues/154)) ([482f144](https://github.com/motion-canvas/motion-canvas/commit/482f14447ae54543346fab0f9e5b94631c5cfd4d))
+
+
+
+
+
 # [12.5.0](https://github.com/motion-canvas/motion-canvas/compare/v12.4.0...v12.5.0) (2023-01-22)
 
 
