@@ -45,9 +45,9 @@ export interface MotionCanvasPluginConfig {
    * there. This leaves the original files open for modification with hot module
    * replacement still working.
    *
-   * @default /\.(wav|mp3|ogg)$/
+   * @default /\.(wav|ogg)$/
    */
-  bufferedAssets?: RegExp;
+  bufferedAssets?: RegExp | false;
   /**
    * The import path of the editor package.
    *
@@ -77,7 +77,7 @@ interface ProjectData {
 export default ({
   project = './src/project.ts',
   output = './output',
-  bufferedAssets = /\.(wav|mp3|ogg)$/,
+  bufferedAssets = /\.(wav|ogg)$/,
   editor = '@motion-canvas/ui',
 }: MotionCanvasPluginConfig = {}): Plugin => {
   const editorPath = path.dirname(require.resolve(editor));
@@ -288,7 +288,7 @@ export default ({
     },
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        if (req.url && bufferedAssets.test(req.url)) {
+        if (req.url && bufferedAssets && bufferedAssets.test(req.url)) {
           const file = fs.readFileSync(
             path.resolve(viteConfig.root, req.url.slice(1)),
           );
