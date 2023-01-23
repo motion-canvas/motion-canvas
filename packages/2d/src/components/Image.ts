@@ -1,6 +1,7 @@
 import {computed, initial, signal} from '../decorators';
 import {
   Color,
+  PossibleVector2,
   Rect as RectType,
   SerializedVector2,
   Vector2,
@@ -124,20 +125,37 @@ export class Image extends Rect {
     );
   }
 
-  public getColorAtPoint(position: Vector2): Color {
+  /**
+   * Get color of the image at the given position.
+   *
+   * @param position - The position in local space at which to sample the color.
+   */
+  public getColorAtPoint(position: PossibleVector2): Color {
+    const image = this.image();
+    const size = this.computedSize();
+    const naturalSize = new Vector2(image.naturalWidth, image.naturalHeight);
+
+    const pixelPosition = new Vector2(position)
+      .add(this.computedSize().scale(0.5))
+      .mul(naturalSize.div(size).safe);
+
+    return this.getPixelColor(pixelPosition);
+  }
+
+  /**
+   * Get color of the image at the given pixel.
+   *
+   * @param position - The pixel's position.
+   */
+  public getPixelColor(position: PossibleVector2): Color {
     const context = this.filledImageCanvas();
-    const relativePosition = position.add(this.computedSize().scale(0.5));
-    const data = context.getImageData(
-      relativePosition.x,
-      relativePosition.y,
-      1,
-      1,
-    ).data;
+    const vector = new Vector2(position);
+    const data = context.getImageData(vector.x, vector.y, 1, 1).data;
 
     return new Color({
-      r: data[0] / 255,
-      g: data[1] / 255,
-      b: data[2] / 255,
+      r: data[0],
+      g: data[1],
+      b: data[2],
       a: data[3] / 255,
     });
   }
