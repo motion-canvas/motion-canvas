@@ -177,3 +177,8 @@ html[data-theme='dark'] .navbar-github-link::before {
   color: var(--ifm-link-color);
   border-color: var(--ifm-color-primary);
 }
+
+.icon-inline {
+  vertical-align: text-bottom;
+  margin: 0 0.3rem;
+}

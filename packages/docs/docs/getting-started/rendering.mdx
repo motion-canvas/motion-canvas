@@ -2,27 +2,28 @@
 sidebar_position: 9
 ---
 
+import {VideoSettings} from '@site/src/Icon/VideoSettings';
+import {PhotoCamera} from '@site/src/Icon/PhotoCamera';
+
 # Rendering
 
-To render an animation, open the Rendering panel in the top left of the screen
-using the button with the icon below.
+To render an animation, open the Rendering tab using the <VideoSettings
+  className="icon-inline"
+  alt="Video Settings"
+  title="Video Settings"
+/> icon. Here, you can configure the output settings of your animation as well
+as initialize the rendering process.
 
-![The icon used to identify the rendering panel tab.](/img/rendering_icon.svg)
+## Configuration
 
-You should see a panel titled "RENDERING" with several fields and a Render
-button. The default settings are sufficient to render the animation, but we will
-explore some of the options.
+### Range
 
-### Options
+The Range is the span of frames that will be rendered. If set to a smaller range
+than the entire length of the video, it will only render a portion of the frames
+in your animation. This can be useful for quickly rendering small changes in
+your animation.
 
-##### Range
-
-The Range is the span of frames that will render. If set to a smaller range than
-the entire length of the video, it will only render a portion of the frames in
-your animation. This can be useful for quickly rendering small changes in your
-animation.
-
-##### Frame rate
+### Frame rate
 
 The frame rate at which the preview plays and the number of frames that will
 render per one second of runtime. The most common values are 24, 30, and 60,
@@ -30,14 +31,14 @@ though any whole integer value is allowed. Motion Canvas animations are
 resilient to changes in frame rate, so most animations will not be affected by
 changing it.
 
-##### Resolution
+### Resolution
 
 The resolution in pixels of each frame in the video. You may use this value to
 render in a higher resolution or to change the aspect ratio. Note, however, that
 animations will not scale with changes in resolution, so plan ahead for any
 adjustments to resolution.
 
-##### Scale
+### Scale
 
 Scale will increase or decrease the resolution of the animation, but, unlike the
 Resolution option, the coordinates and size of animation elements will be
@@ -45,20 +46,20 @@ adjusted as well. You may use this option to render in multiple different
 resolution densities or to adjust your output resolution after completing an
 animation.
 
-##### Color Space
+### Color Space
 
 The HTML Canvas color space to use when previewing or rendering the animation.
 Current options include sRGB, a common color space for images and video, and
 DCI-P3, a wide-gamut color space.
 
-##### File Type
+### File Type
 
 The type of image file to which Motion Canvas will convert the frames. Current
 options are PNG, JPEG, and WebP. Note that Motion Canvas depends on the
 capabilities of your browser to generate image files, and so WebP may not work
 on Safari or older browsers.
 
-##### Quality
+### Quality
 
 The quality target for compression from 0 to 1, where a lower setting will
 result in smaller file sizes but might degrade image quality. A setting of 1
@@ -67,22 +68,23 @@ will often produce no discernible difference. Note that output to a file type of
 PNG does not allow for different quality settings, so this option will be
 ignored when outputting to PNG.
 
-### The Output
+## Rendering
 
-After clicking the Render button, Motion Canvas will play through the animation
-and save each frame as an image to `/output` in your project directory. The
-target output direction may be configured in `vite.config.js`, however, by
-setting the `output` property in the `motionCanvas` plugin options.
+Clicking the `RENDER` button will initialize rendering. Motion Canvas will play
+through the animation and save each frame as an image to `/output` in your
+project directory. You can
+[change the output directory](/docs/configuration#output) in the configuration
+file.
 
-```js
-export default defineConfig({
-  plugins: [
-    motionCanvas({
-      output: './custom',
-    }),
-  ],
-});
-```
+The rendering process will finish once the playhead reaches the end of the
+selected range. You can also stop the process at any time by pressing the
+`RENDER` button again.
 
-You may then import your animation as frames into a video editor of your choice,
-or convert the frames directly to a video using a tool like `ffmpeg`.
+After rendering, you can import the rendered image sequence into a video editor
+of your choice, or convert the frames directly to a video using a tool like
+`ffmpeg`.
+
+## Taking Snapshots
+
+You can use the <PhotoCamera className="icon-inline"/> icon take a snapshot of
+the current frame. Snapshots are saved in the output directory, under `/still`.
