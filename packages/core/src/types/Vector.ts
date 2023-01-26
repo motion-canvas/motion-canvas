@@ -2,7 +2,12 @@ import {arcLerp, InterpolationFunction} from '../tweening';
 import {map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
 import {Type} from './Type';
-import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
+import {
+  CompoundSignal,
+  CompoundSignalContext,
+  Signal,
+  SignalValue,
+} from '../signals';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -22,6 +27,8 @@ export type Vector2Signal<T> = CompoundSignal<
   'x' | 'y',
   T
 >;
+
+export type SimpleVector2Signal<T> = Signal<PossibleVector2, Vector2, T>;
 
 /**
  * Represents a two-dimensional vector.

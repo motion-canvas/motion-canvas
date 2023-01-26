@@ -11,18 +11,21 @@ import type {JSONOutput} from 'typedoc';
 
 export default function PropertyItem({
   reflection,
+  headless,
 }: {
   reflection: JSONOutput.DeclarationReflection;
+  headless?: boolean;
 }) {
   return (
     <>
-      {reflection.hasOwnPage ? (
-        <h1>{reflection.name}</h1>
-      ) : (
-        <Heading as="h3" id={reflection.anchor}>
-          <code>{reflection.name}</code>
-        </Heading>
-      )}
+      {!headless &&
+        (reflection.hasOwnPage ? (
+          <h1>{reflection.name}</h1>
+        ) : (
+          <Heading as="h3" id={reflection.anchor}>
+            <code>{reflection.name}</code>
+          </Heading>
+        ))}
       <Container>
         <CodeBlock link={reflection.sources?.[0]?.url}>
           <Line>
