@@ -19,6 +19,7 @@ import {
   PossibleVector2,
   Vector2Signal,
   ColorSignal,
+  SimpleVector2Signal,
 } from '@motion-canvas/core/lib/types';
 import {DetailedError, ReferenceReceiver} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
@@ -75,11 +76,7 @@ export class Node implements Promisable<Node> {
   @wrapper(Vector2)
   @cloneable(false)
   @signal()
-  public declare readonly absolutePosition: Signal<
-    PossibleVector2,
-    Vector2,
-    this
-  >;
+  public declare readonly absolutePosition: SimpleVector2Signal<this>;
 
   protected getAbsolutePosition(): Vector2 {
     const matrix = this.localToWorld();
@@ -122,7 +119,7 @@ export class Node implements Promisable<Node> {
   @wrapper(Vector2)
   @cloneable(false)
   @signal()
-  public declare readonly absoluteScale: Signal<PossibleVector2, Vector2, this>;
+  public declare readonly absoluteScale: SimpleVector2Signal<this>;
 
   protected getAbsoluteScale(): Vector2 {
     const matrix = this.localToWorld();

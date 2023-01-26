@@ -1,0 +1,136 @@
+---
+sidebar_position: 4
+slug: /positioning
+---
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import ApiSnippet from '@site/src/components/Api/ApiSnippet';
+
+# Positioning
+
+<AnimationPlayer name="positioning" banner />
+
+Motion Canvas uses a Cartesian coordinate system. Its origin is located in the
+center of the scene, with the x-axis going to the right and the y-axis going
+down.
+
+## Transform
+
+All nodes are positioned relatively to their parents. This means that any
+transformations applied to the parent are also applied to its children. The
+transform of each node consists of the following properties:
+
+### `Node.position`
+
+<ApiSnippet url={'/api/2d/components/Node#position'} />
+<hr />
+
+### `Node.scale`
+
+<ApiSnippet url={'/api/2d/components/Node#scale'} />
+<hr />
+
+### `Node.rotation`
+
+<ApiSnippet url={'/api/2d/components/Node#rotation'} />
+<hr />
+
+## Absolute Transform
+
+Each of the basic transform properties has a dedicated helper method that
+operates in world space.
+
+This can be helpful, for instance, when we need to match the transforms of two
+nodes located within different parents. Consider the following example:
+
+```tsx
+const circleA = createRef<Node>();
+const circleB = createRef<Node>();
+
+view.add(
+  <>
+    <Node position={[200, 100]}>
+      <Circle
+        position={[0, 100]}
+        ref={circleA}
+        width={20}
+        height={20}
+        fill={'white'}
+      />
+    </Node>
+    <Circle ref={circleB} width={10} height={10} fill={'red'} />
+  </>,
+);
+
+circleB().absolutePosition(circleA().absolutePosition());
+```
+
+We access the absolute position (position in world space) of `circleA` and
+assign it as the absolute position of `circleB`. This will move the `circleB`
+right on top of `circleA`.
+
+:::info
+
+Note that we still need to set the `absolutePosition` of `circleB` and not just
+the `position`. It may seem redundant since `circleB` is a direct child of the
+scene view. But the local space of the scene view is **not** the same as the
+world space.
+
+:::
+
+All available world-space properties are listed below:
+
+### `Node.absolutePosition`
+
+<ApiSnippet url={'/api/2d/components/Node#absolutePosition'} />
+<hr />
+
+### `Node.absoluteScale`
+
+<ApiSnippet url={'/api/2d/components/Node#absoluteScale'} />
+<hr />
+
+### `Node.absoluteRotation`
+
+<ApiSnippet url={'/api/2d/components/Node#absoluteRotation'} />
+<hr />
+
+## Matrices
+
+For more advanced uses, nodes expose all the matrices necessary to map vectors
+from one space to another. For example, the helper properties described above
+could be reimplemented using the `worldToParent` and `localToWorld` matrices:
+
+```ts
+// getting the absolute position:
+node.absolutePosition();
+// same as:
+Vector2.zero.transformAsPoint(node.localToWorld());
+
+// setting the absolute position:
+node.absolutePosition(vector);
+// same as:
+node.position(vector.transformAsPoint(node.worldToParent()));
+```
+
+The available matrices include:
+
+### `Node.localToWorld`
+
+<ApiSnippet url={'/api/2d/components/Node#localToWorld'} />
+<hr />
+
+### `Node.worldToLocal`
+
+<ApiSnippet url={'/api/2d/components/Node#worldToLocal'} />
+<hr />
+
+### `Node.localToParent`
+
+<ApiSnippet url={'/api/2d/components/Node#localToParent'} />
+<hr />
+
+### `Node.worldToParent`
+
+<ApiSnippet url={'/api/2d/components/Node#worldToParent'} />
+<hr />

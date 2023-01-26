@@ -1,24 +1,24 @@
 import {Direction, Vector2} from '../types';
-import {easeInOutCubic, tween} from '../tweening';
 import {useScene} from '../utils';
 import {useTransition} from './useTransition';
+import {all} from '../flow';
 
-export function slideTransition(direction: Direction = Direction.Top) {
+export function* slideTransition(
+  direction: Direction = Direction.Top,
+  duration = 0.6,
+) {
   const size = useScene().getSize();
   const position = size.getOriginOffset(direction).scale(2);
-  const inverse = position.scale(-1);
-  let ppos = new Vector2();
-  let cpos = new Vector2();
+  const previousPosition = Vector2.createSignal();
+  const currentPosition = Vector2.createSignal(position);
   const endTransition = useTransition(
-    ctx => ctx.translate(cpos.x, cpos.y),
-    ctx => ctx.translate(ppos.x, ppos.y),
+    ctx => ctx.translate(currentPosition.x(), currentPosition.y()),
+    ctx => ctx.translate(previousPosition.x(), previousPosition.y()),
   );
-  return tween(
-    0.6,
-    value => {
-      ppos = Vector2.lerp(Vector2.zero, inverse, easeInOutCubic(value));
-      cpos = Vector2.lerp(position, Vector2.zero, easeInOutCubic(value));
-    },
-    endTransition,
+
+  yield* all(
+    previousPosition(position.scale(-1), duration),
+    currentPosition(Vector2.zero, duration),
   );
+  endTransition();
 }
