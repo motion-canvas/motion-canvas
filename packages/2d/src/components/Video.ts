@@ -177,6 +177,8 @@ export class Video extends Rect {
 
   protected setCurrentTime(value: number) {
     const video = this.video();
+    if (video.readyState < 2) return;
+
     video.currentTime = value;
     this.lastTime = value;
     if (video.seeking) {

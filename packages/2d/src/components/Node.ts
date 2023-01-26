@@ -949,20 +949,6 @@ export class Node implements Promisable<Node> {
   }
 
   /**
-   * Wait for any asynchronous resources that this node or its children have.
-   *
-   * @remarks
-   * Certain resources like images are always loaded asynchronously.
-   * Awaiting this method makes sure that all such resources are done loading
-   * before continuing the animation.
-   */
-  public waitForAsyncResources() {
-    this.collectAsyncResources();
-    const promises = DependencyContext.consumePromises();
-    return Promise.all(promises.map(handle => handle.promise));
-  }
-
-  /**
    * Collect all asynchronous resources used by this node.
    */
   protected collectAsyncResources() {
@@ -971,8 +957,21 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * Wait for any asynchronous resources that this node or its children have.
+   *
+   * @remarks
+   * Certain resources like images are always loaded asynchronously.
+   * Awaiting this method makes sure that all such resources are done loading
+   * before continuing the animation.
+   */
   public async toPromise(): Promise<this> {
-    await this.waitForAsyncResources();
+    let promises = DependencyContext.consumePromises();
+    do {
+      await Promise.all(promises.map(handle => handle.promise));
+      this.collectAsyncResources();
+      promises = DependencyContext.consumePromises();
+    } while (promises.length > 0);
     return this;
   }
 

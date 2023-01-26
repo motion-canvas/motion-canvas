@@ -5,7 +5,11 @@ export interface Promisable<T> {
 }
 
 export function isPromisable(value: any): value is Promisable<any> {
-  return value && typeof value === 'object' && 'toPromise' in value;
+  return (
+    value &&
+    (typeof value === 'object' || typeof value === 'function') &&
+    'toPromise' in value
+  );
 }
 
 /**

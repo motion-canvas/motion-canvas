@@ -1,5 +1,6 @@
 import {FlagDispatcher, Subscribable} from '../events';
 import {DetailedError} from '../utils';
+import {Promisable} from '../threading';
 
 export interface PromiseHandle<T> {
   promise: Promise<T>;
@@ -8,7 +9,9 @@ export interface PromiseHandle<T> {
   owner?: any;
 }
 
-export class DependencyContext<TOwner = void> {
+export class DependencyContext<TOwner = void>
+  implements Promisable<DependencyContext<TOwner>>
+{
   protected static collectionSet = new Set<DependencyContext<any>>();
   protected static collectionStack: DependencyContext<any>[] = [];
   protected static promises: PromiseHandle<any>[] = [];
@@ -28,7 +31,7 @@ export class DependencyContext<TOwner = void> {
       stack: new Error().stack,
     };
 
-    const context = this.collectionStack.at(-2);
+    const context = this.collectionStack.at(-1);
     if (context) {
       handle.owner = context.owner;
     }
@@ -58,6 +61,10 @@ export class DependencyContext<TOwner = void> {
 
     Object.defineProperty(this.invokable, 'context', {
       value: this,
+    });
+
+    Object.defineProperty(this.invokable, 'toPromise', {
+      value: this.toPromise.bind(this),
     });
   }
 
@@ -91,5 +98,15 @@ export class DependencyContext<TOwner = void> {
       signal.dependencies.add(this.event.subscribable);
       this.event.subscribe(signal.markDirty);
     }
+  }
+
+  public async toPromise(): Promise<this> {
+    let promises = DependencyContext.consumePromises();
+    do {
+      await Promise.all(promises.map(handle => handle.promise));
+      this.invokable();
+      promises = DependencyContext.consumePromises();
+    } while (promises.length > 0);
+    return this.invokable;
   }
 }

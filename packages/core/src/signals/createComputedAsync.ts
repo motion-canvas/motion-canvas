@@ -1,5 +1,10 @@
 import {createComputed} from './createComputed';
-import {Computed, ComputedContext} from '../signals';
+import {
+  Computed,
+  ComputedContext,
+  createSignal,
+  PromiseHandle,
+} from '../signals';
 
 export function createComputedAsync<T>(
   factory: () => Promise<T>,
@@ -12,8 +17,17 @@ export function createComputedAsync<T>(
   factory: () => Promise<T>,
   initial: T | null = null,
 ): Computed<T | null> {
-  const handle = createComputed(() =>
-    ComputedContext.collectPromise(factory(), initial),
-  );
-  return createComputed(() => handle().value);
+  let handle: PromiseHandle<T | null>;
+  const signal = createSignal(factory);
+  return createComputed(() => {
+    const promise = signal();
+    if (!handle || handle.promise !== promise) {
+      handle = ComputedContext.collectPromise(
+        promise,
+        handle?.value ?? initial,
+      );
+    }
+
+    return handle.value;
+  });
 }
