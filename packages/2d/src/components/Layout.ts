@@ -319,7 +319,7 @@ export class Layout extends Node {
     if (typeof size.x !== 'number' || typeof size.y !== 'number') {
       from = this.size();
     } else {
-      from = <Vector2>size;
+      from = new Vector2(<Vector2>size);
     }
 
     let to: Vector2;
@@ -328,7 +328,7 @@ export class Layout extends Node {
       typeof value.x === 'number' &&
       typeof value.y === 'number'
     ) {
-      to = <Vector2>value;
+      to = new Vector2(<Vector2>value);
     } else {
       this.size(value);
       to = this.size();

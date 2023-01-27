@@ -454,6 +454,7 @@ export class Node implements Promisable<Node> {
     for (const node of array) {
       if (node instanceof Node) {
         newChildren.push(node);
+        node.remove();
         node.parent(this);
       }
     }
@@ -572,16 +573,23 @@ export class Node implements Promisable<Node> {
     return this.move(-Infinity);
   }
 
-  protected moveTo(parent: Node): this {
-    const current = this.parent();
-    if (current === parent) {
-      return this;
-    }
-
-    parent.children([...parent.children(), this]);
-    this.parent(parent);
-
-    return this;
+  /**
+   * Change the parent of this node while keeping the absolute transform.
+   * 
+   * @remarks
+   * After performing this operation, the node will stay in the same place
+   * visually, but its parent will be changed.
+   * 
+   * @param newParent - The new parent of this node.
+   */
+  public reparent(newParent: Node) {
+    const position = this.absolutePosition();
+    const rotation = this.absoluteRotation();
+    const scale = this.absoluteScale();
+    newParent.add(this);
+    this.absolutePosition(position);
+    this.absoluteRotation(rotation);
+    this.absoluteScale(scale);
   }
 
   /**
