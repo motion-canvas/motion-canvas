@@ -123,10 +123,14 @@ export class TimeEvents {
       };
     } else {
       let changed = false;
-      const event = {
-        ...this.lookup[name],
-        stack: new Error().stack,
-      };
+      const event = {...this.lookup[name]};
+
+      const stack = new Error().stack;
+      if (event.stack !== stack) {
+        event.stack = stack;
+        changed = true;
+      }
+
       if (event.initialTime !== initialTime) {
         event.initialTime = initialTime;
         changed = true;
