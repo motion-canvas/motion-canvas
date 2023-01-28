@@ -89,8 +89,8 @@ export function PlaybackControls() {
       </IconButton>
       <IconCheckbox
         main
-        titleOn="Play"
-        titleOff="Pause"
+        titleOn="Pause"
+        titleOff="Play"
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
       >
@@ -100,7 +100,8 @@ export function PlaybackControls() {
         <SkipNext />
       </IconButton>
       <IconCheckbox
-        titleOn="Loop video"
+        titleOn="Loop video (Enabled)"
+        titleOff="Loop video (Disabled)"
         checked={state.loop}
         onChange={() => player.toggleLoop()}
       >

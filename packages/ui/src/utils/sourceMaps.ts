@@ -6,11 +6,18 @@ const externalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const stackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
   ? /^ +at.* \(?(.*):([0-9]+):([0-9]+)/
   : /@(.*):([0-9]+):([0-9]+)/;
+const cache = new Map<string, SourceMapConsumer>();
 
-async function getSourceMap(file: string): Promise<SourceMapConsumer> {
-  const response = await fetch(`${file}.map`);
-  // TODO Find a way to cache the consumer while staying up-to-date with HMR.
-  return new SourceMapConsumer(await response.json());
+async function getSourceMap(file: string, search = ''): Promise<SourceMapConsumer> {
+  const key = `${file}.map${search}`;
+  if (cache.has(key)) {
+    return cache.get(key);
+  }
+
+  const response = await fetch(`${file}.map${search}`);
+  const consumer = new SourceMapConsumer(await response.json());
+  cache.set(key, consumer);
+  return consumer;
 }
 
 export interface StackTraceEntry {
@@ -39,7 +46,8 @@ export async function resolveStackTrace(
     const match = textLine.match(stackTraceRegex);
     if (!match) continue;
     const [, uri, line, column] = match;
-    const file = new URL(uri).pathname;
+    const parsed = new URL(uri);
+    const file = parsed.pathname;
     const entry: StackTraceEntry = {
       file,
       uri,
@@ -50,7 +58,7 @@ export async function resolveStackTrace(
 
     if (!externalFileRegex.test(file)) {
       try {
-        const sourceMap = await getSourceMap(file);
+        const sourceMap = await getSourceMap(file, parsed.search);
         const position = sourceMap.originalPositionFor(entry);
         if (position.line === null || position.column === null) {
           entry.isExternal = true;
@@ -110,7 +118,10 @@ export function getSourceCodeFrame(entry: StackTraceEntry): string | null {
     .highlight('typescript', sourceLines.join('\n'))
     .value.split('\n');
 
-  const formatted = code.map((text, index) => `${line + index} | ${text}`);
+  const formatted = code.map(
+    (text, index) =>
+      `${(line + index).toString().padStart(spacing, ' ')} | ${text}`,
+  );
   formatted.splice(1, 0, `${' '.repeat(spacing)} | ${' '.repeat(column)}^`);
   return formatted.join('\n');
 }
