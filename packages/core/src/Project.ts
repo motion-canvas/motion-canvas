@@ -263,7 +263,7 @@ export class Project {
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.context.restore();
     } else {
-      this.context.clearRect(0, 0, this.size.x, this.size.y);
+      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     if (this.previousScene) {

@@ -1,0 +1,24 @@
+.root {
+  display: block;
+  max-width: 640px;
+  margin: 0 auto var(--ifm-leading);
+  background-color: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  border: 1px solid var(--ifm-color-emphasis-100);
+}
+
+.root g {
+  animation: slide 4s infinite;
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(-100px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}

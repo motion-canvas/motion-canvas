@@ -36,6 +36,16 @@ export type TextWrap = boolean | 'pre' | null;
 
 export type LayoutMode = boolean | null;
 
+/**
+ * Represents a length used by most layout properties.
+ *
+ * @remarks
+ * The value can be either:
+ * - `number` - the desired length in pixels
+ * - `${number}%` - a string with the desired length in percents, for example
+ *                  `'50%'`
+ * - `null` - an automatic length (equivalent to `auto` in CSS)
+ */
 export type Length = number | `${number}%` | null;
 
 export type PossibleCanvasStyle = null | PossibleColor | Gradient | Pattern;

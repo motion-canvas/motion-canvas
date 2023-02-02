@@ -98,7 +98,7 @@ export default function HomepageFeatures(): JSX.Element {
         </Feature>
         <Feature
           content={
-            <YouTubeVideo src="https://www.youtube.com/embed/HsOKwUwL1bE" />
+            <YouTubeVideo src="https://www.youtube.com/embed/R6vQ9VmMz2w" />
           }
         >
           <h3>
@@ -107,6 +107,15 @@ export default function HomepageFeatures(): JSX.Element {
           <p>
             The road ahead is still long, but you can already use Motion Canvas
             to create production-quality animations.
+          </p>
+          <p>
+            <a
+              className="button button--outline button--lg"
+              href="https://github.com/motion-canvas/examples"
+              target="_blank"
+            >
+              Video Source Code
+            </a>
           </p>
         </Feature>
       </div>

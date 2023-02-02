@@ -288,6 +288,55 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
+  /**
+   * Represents the size of this node.
+   *
+   * @remarks
+   * A size is a two-dimensional vector, where `x` represents the width, and `y`
+   * represents the `height`.
+   *
+   * The value of both x and y is of type {@link partials~Length} which is
+   * either:
+   * - `number` - the desired length in pixels
+   * - `${number}%` - a string with the desired length in percents, for example
+   *                  `'50%'`
+   * - `null` - an automatic length
+   *
+   * When retrieving the size, all units are converted to pixels, using the
+   * current state of the layout. For example, retrieving the width set to
+   * `'50%'`, while the parent has a width of `200px` will result in the number
+   * `100` being returned.
+   *
+   * When the node is not part of the layout, setting its size using percents
+   * refers to the size of the entire scene.
+   *
+   * @example
+   * Initializing the size:
+   * ```tsx
+   * // with a possible vector:
+   * <Node size={['50%', 200]} />
+   * // with individual components:
+   * <Node width={'50%'} height={200} />
+   * ```
+   *
+   * Accessing the size:
+   * ```tsx
+   * // retrieving the vector:
+   * const size = node.size();
+   * // retrieving an individual component:
+   * const width = node.size.x();
+   * ```
+   *
+   * Setting the size:
+   * ```tsx
+   * // with a possible vector:
+   * node.size(['50%', 200]);
+   * node.size(() => ['50%', 200]);
+   * // with individual components:
+   * node.size.x('50%');
+   * node.size.x(() => '50%');
+   * ```
+   */
   @cloneable(false)
   @initial({x: null, y: null})
   @vector2Signal({x: 'width', y: 'height'})
@@ -343,6 +392,21 @@ export class Layout extends Node {
     this.size(value);
   }
 
+  /**
+   * Represents the offset of this node's origin.
+   *
+   * @remarks
+   * By default, the origin of a node is located at its center. The origin
+   * serves as the pivot point when rotating and scaling a node, but it doesn't
+   * affect the placement of its children.
+   *
+   * The value is relative to the size of this node. A value of `1` means as far
+   * to the right/bottom as possible. Here are a few examples of offsets:
+   * - `[-1, -1]` - top left corner
+   * - `[1, -1]` - top right corner
+   * - `[0, 1]` - bottom edge
+   * - `[-1, 1]` - bottom left corner
+   */
   @vector2Signal('offset')
   public declare readonly offset: Vector2Signal<this>;
 
@@ -504,7 +568,7 @@ export class Layout extends Node {
         result.push(child);
         elements.push(child.element);
       } else if (child) {
-        queue.push(...child.children());
+        queue.unshift(...child.children());
       }
     }
     this.element.replaceChildren(...elements);

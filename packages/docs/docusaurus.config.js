@@ -118,7 +118,7 @@ const config = {
         showLastUpdateAuthor: true,
         docItemComponent: '@site/src/components/DocPage',
         editUrl: ({versionDocsDirPath, docPath}) =>
-          `https://github.com/motion-canvas/motion-canvas/blob/main/${versionDocsDirPath}/${docPath}`,
+          `https://github.com/motion-canvas/motion-canvas/blob/main/packages/docs/${versionDocsDirPath}/${docPath}`,
       },
     ],
     [
@@ -126,7 +126,7 @@ const config = {
       {
         showReadingTime: true,
         editUrl: ({blogDirPath, blogPath}) =>
-          `https://github.com/motion-canvas/motion-canvas/blob/main/${blogDirPath}/${blogPath}`,
+          `https://github.com/motion-canvas/motion-canvas/blob/main/packages/docs/${blogDirPath}/${blogPath}`,
       },
     ],
     '@docusaurus/plugin-content-pages',

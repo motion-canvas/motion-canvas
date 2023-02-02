@@ -1,0 +1,131 @@
+---
+sidebar_position: 5
+slug: /layouts
+---
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import ApiSnippet from '@site/src/components/Api/ApiSnippet';
+
+# Layouts
+
+<AnimationPlayer name="layout" banner />
+
+Layouts allow you to arrange your nodes using [Flexbox][flexbox]. Any node
+extending the [`Layout`](/api/2d/components/Layout) node can become a part of
+the layout. This includes, but is not limited to:
+[`Rect`](/api/2d/components/Rect), [`Circle`](/api/2d/components/Circle), and
+[`Image`](/api/2d/components/Image).
+
+## Layout root
+
+Layouts are an opt-in feature, meaning that they need to be enabled. It's done
+by setting the [`layout`](/api/2d/components/Layout#layout) property on the Node
+that we want to become the root of our layout:
+
+```tsx
+// ↓ layout root
+<Rect layout>
+  {/* ↓ layout child */}
+  <Circle width={320} height={320} />
+</Rect>
+```
+
+In the example above, we marked the `<Rect>` as the layout root. This will cause
+the position and size of its descendants to be controlled by Flexbox (In this
+case there's only one valid descendant: `<Circle>`). The layout root itself is
+treated differently than its children - its size is controlled by Flexbox, but
+the position stays unaffected.
+
+:::info
+
+Just setting the `layout` property doesn't always turn the node into a layout
+root. If the node is already a part of the layout, it will be treated like the
+rest of the descendants:
+
+```tsx
+// ↓ layout root
+<Rect layout>
+  {/* ↓ layout child, NOT a layout root */}
+  <Rect layout>
+    {/* ↓ layout child */}
+    <Circle width={320} height={320} />
+  </Rect>
+</Rect>
+```
+
+:::
+
+## Size and offset
+
+Aside from the position, rotation, and scale, any node extending the `Layout`
+class has additional `size` and `offset` properties:
+
+### `Layout.size`
+
+<ApiSnippet url={'/api/2d/components/Layout#size'} />
+<hr />
+
+### `Layout.offset`
+
+<ApiSnippet url={'/api/2d/components/Layout#offset'} />
+<hr />
+
+## Flexbox configuration
+
+Most flexbox attributes available in CSS are available as
+[`Layout` properties](/api/2d/components/Layout#Properties). You can check out
+this [Flexbox guide][flexbox] to better understand how they work. The most
+useful properties are listed below:
+
+### `Layout.padding`
+
+<ApiSnippet url={'/api/2d/components/Layout#padding'} />
+<hr />
+
+### `Layout.margin`
+
+<ApiSnippet url={'/api/2d/components/Layout#margin'} />
+<hr />
+
+### `Layout.gap`
+
+<ApiSnippet url={'/api/2d/components/Layout#gap'} />
+<hr />
+
+### `Layout.direction`
+
+<ApiSnippet url={'/api/2d/components/Layout#direction'} />
+<hr />
+
+### `Layout.alignItems`
+
+<ApiSnippet url={'/api/2d/components/Layout#alignItems'} />
+<hr />
+
+### `Layout.justifyContent`
+
+<ApiSnippet url={'/api/2d/components/Layout#justifyContent'} />
+<hr />
+
+## Groups
+
+Nodes that don't extend the `Layout` class, such as the `Node` itself, are
+unaffected by the layout and are treated as if they were never there. This lets
+you apply filters and transformations to layout nodes without affecting the
+hierarchy.
+
+From the layout's perspective, all `<Rect>`s in the example below are siblings:
+
+```tsx
+<Layout direction={'column'} width={960} gap={40} layout>
+  <Node opacity={0.1}>
+    <Rect height={240} fill={'#ff6470'} />
+    <Rect height={240} fill={'#ff6470'} />
+  </Node>
+  <Rect height={240} fill={'#ff6470'} />
+</Layout>
+```
+
+<AnimationPlayer name="layout-group" small />
+
+[flexbox]: https://css-tricks.com/snippets/css/a-guide-to-flexbox/

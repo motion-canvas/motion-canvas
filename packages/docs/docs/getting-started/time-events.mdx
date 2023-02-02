@@ -3,4 +3,48 @@ sidebar_position: 8
 slug: /time-events
 ---
 
+import UI from '@site/src/components/UI';
+
 # Time Events
+
+One of the pain points of creating explanatory animations using code is
+**synchronizing them with audio**. Imagine that you'd like a certain animation
+to start right after some specific verbal cue. With a code-only solution, you're
+left with hard-coding how long (or until which frame) you want to wait.
+
+In Motion Canvas, it could look somewhat like this:
+
+```ts
+yield * animationOne();
+yield * waitFor(3.1415); // but how long should we wait?
+yield * animationTwo();
+```
+
+Evidently, this approach can get really tedious. Not only do you need to somehow
+find the exact timestamp to wait for, but also each time you modify the
+voiceover, you have to go through your code and adjust these hard-coded numbers.
+
+That's why Motion Canvas allows you to edit these delays not through code, but
+through the editor. With the use of [`waitUntil`](/api/core/flow#waitUntil) you
+can pause the animation without specifying the actual duration:
+
+```ts
+yield * animationOne();
+yield * waitUntil('event'); // wait for an event called "event"
+yield * animationTwo();
+```
+
+This will cause the event to appear in the editor. From there, you can drag it
+to adjust its timing:
+
+<UI className="image-inline" />
+
+The dark trail behind the event illustrates its duration. It starts at the
+moment `waitUntil` was called - this is when the animation will pause. It will
+resume when the playhead reaches the event pill.
+
+By default, adjusting a time event will also adjust all events that happen after
+it. This is useful when you want to extend or shorten a pause in your voiceover
+because correcting the first time event after the pause will also fix all events
+after it. You can hold `SHIFT` when editing an event to prevent this from
+happening.
