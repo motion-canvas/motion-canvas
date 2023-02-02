@@ -70,9 +70,55 @@ export interface NodeProps {
 export class Node implements Promisable<Node> {
   public declare isClass: boolean;
 
+  /**
+   * Represents the position of this node in local space of its parent.
+   *
+   * @example
+   * Initializing the position:
+   * ```tsx
+   * // with a possible vector:
+   * <Node position={[1, 2]} />
+   * // with individual components:
+   * <Node x={1} y={2} />
+   * ```
+   *
+   * Accessing the position:
+   * ```tsx
+   * // retrieving the vector:
+   * const position = node.position();
+   * // retrieving an individual component:
+   * const x = node.position.x();
+   * ```
+   *
+   * Setting the position:
+   * ```tsx
+   * // with a possible vector:
+   * node.position([1, 2]);
+   * node.position(() => [1, 2]);
+   * // with individual components:
+   * node.position.x(1);
+   * node.position.x(() => 1);
+   * ```
+   */
   @vector2Signal()
   public declare readonly position: Vector2Signal<this>;
 
+  /**
+   * A helper signal for operating on the position in world space.
+   *
+   * @remarks
+   * Retrieving the position using this signal returns the position in world
+   * space. Similarly, setting the position using this signal transforms the
+   * new value to local space.
+   *
+   * If the new value is a function, the position of this node will be
+   * continuously updated to always match the position returned by the function.
+   * This can be useful to "pin" the node in a specific place or to make it
+   * follow another node's position.
+   *
+   * Unlike {@link position}, this signal is not compound - it doesn't contain
+   * separate signals for the `x` and `y` components.
+   */
   @wrapper(Vector2)
   @cloneable(false)
   @signal()
@@ -91,10 +137,24 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * Represents the rotation (in degrees) of this node relative to its parent.
+   */
   @initial(0)
   @signal()
   public declare readonly rotation: SimpleSignal<number, this>;
 
+  /**
+   * A helper signal for operating on the rotation in world space.
+   *
+   * @remarks
+   * Retrieving the rotation using this signal returns the rotation in world
+   * space. Similarly, setting the rotation using this signal transforms the
+   * new value to local space.
+   *
+   * If the new value is a function, the rotation of this node will be
+   * continuously updated to always match the rotation returned by the function.
+   */
   @cloneable(false)
   @signal()
   public declare readonly absoluteRotation: SimpleSignal<number, this>;
@@ -112,10 +172,54 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * Represents the scale of this node in local space of its parent.
+   *
+   * @example
+   * Initializing the scale:
+   * ```tsx
+   * // with a possible vector:
+   * <Node scale={[1, 2]} />
+   * // with individual components:
+   * <Node scaleX={1} scaleY={2} />
+   * ```
+   *
+   * Accessing the scale:
+   * ```tsx
+   * // retrieving the vector:
+   * const scale = node.scale();
+   * // retrieving an individual component:
+   * const scaleX = node.scale.x();
+   * ```
+   *
+   * Setting the scale:
+   * ```tsx
+   * // with a possible vector:
+   * node.scale([1, 2]);
+   * node.scale(() => [1, 2]);
+   * // with individual components:
+   * node.scale.x(1);
+   * node.scale.x(() => 1);
+   * ```
+   */
   @initial(Vector2.one)
   @vector2Signal('scale')
   public declare readonly scale: Vector2Signal<this>;
 
+  /**
+   * A helper signal for operating on the scale in world space.
+   *
+   * @remarks
+   * Retrieving the scale using this signal returns the scale in world space.
+   * Similarly, setting the scale using this signal transforms the new value to
+   * local space.
+   *
+   * If the new value is a function, the scale of this node will be continuously
+   * updated to always match the position returned by the function.
+   *
+   * Unlike {@link scale}, this signal is not compound - it doesn't contain
+   * separate signals for the `x` and `y` components.
+   */
   @wrapper(Vector2)
   @cloneable(false)
   @signal()
@@ -292,6 +396,21 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * Get the local-to-world matrix for this node.
+   *
+   * @remarks
+   * This matrix transforms vectors from local space of this node to world
+   * space.
+   *
+   * @example
+   * Calculate the absolute position of a point located 200 pixels to the right
+   * of the node:
+   * ```ts
+   * const local = new Vector2(0, 200);
+   * const world = local.transformAsPoint(node.localToWorld());
+   * ```
+   */
   @computed()
   public localToWorld(): DOMMatrix {
     const parent = this.parent();
@@ -300,16 +419,45 @@ export class Node implements Promisable<Node> {
       : this.localToParent();
   }
 
+  /**
+   * Get the world-to-local matrix for this node.
+   *
+   * @remarks
+   * This matrix transforms vectors from world space to local space of this
+   * node.
+   *
+   * @example
+   * Calculate the position relative to this node for a point located in the
+   * top-left corner of the screen:
+   * ```ts
+   * const world = new Vector2(0, 0);
+   * const local = world.transformAsPoint(node.worldToLocal());
+   * ```
+   */
   @computed()
   public worldToLocal() {
     return this.localToWorld().inverse();
   }
 
+  /**
+   * Get the world-to-parent matrix for this node.
+   *
+   * @remarks
+   * This matrix transforms vectors from world space to local space of this
+   * node's parent.
+   */
   @computed()
   public worldToParent(): DOMMatrix {
     return this.parent()?.worldToLocal() ?? new DOMMatrix();
   }
 
+  /**
+   * Get the local-to-parent matrix for this node.
+   *
+   * @remarks
+   * This matrix transforms vectors from local space of this node to local space
+   * of this node's parent.
+   */
   @computed()
   public localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
@@ -575,11 +723,11 @@ export class Node implements Promisable<Node> {
 
   /**
    * Change the parent of this node while keeping the absolute transform.
-   * 
+   *
    * @remarks
    * After performing this operation, the node will stay in the same place
    * visually, but its parent will be changed.
-   * 
+   *
    * @param newParent - The new parent of this node.
    */
   public reparent(newParent: Node) {
@@ -822,7 +970,7 @@ export class Node implements Promisable<Node> {
    */
   protected setupDrawFromCache(context: CanvasRenderingContext2D) {
     context.globalCompositeOperation = this.compositeOperation();
-    context.globalAlpha = this.opacity();
+    context.globalAlpha *= this.opacity();
     if (this.hasFilters()) {
       context.filter = this.filterString();
     }

@@ -3,4 +3,117 @@ sidebar_position: 9
 slug: /transitions
 ---
 
+import ApiSnippet from '@site/src/components/Api/ApiSnippet';
+
 # Transitions
+
+Transitions allow you to customize the way scenes transition from one into
+another. A transition is an animation performed at the beginning of the scene.
+It can modify the context of both the current and the previous scene.
+
+## Pre-made transitions
+
+Motion Canvas comes with a set of common transitions in a form of easy-to-use
+generator. To use them, yield the transition generator at the beggining of the
+scene:
+
+```ts
+export default makeScene2D(function* (view) {
+  // perform a slide transition to the left:
+  yield* slideTransition(Direction.Left);
+  // proceed with the animation
+});
+```
+
+The available transitions are:
+
+### `slideTransition`
+
+<ApiSnippet url={'/api/core/transitions#slideTransition'} />
+<hr />
+
+### `zoomInTransition`
+
+<ApiSnippet url={'/api/core/transitions#zoomInTransition'} />
+<hr />
+
+### `zoomOutTransition`
+
+<ApiSnippet url={'/api/core/transitions#zoomOutTransition'} />
+<hr />
+
+## Custom transitions
+
+You can use the [`useTransition`](/api/core/transitions#useTransition) function
+to implement custom transitions. It allows you to specify two callbacks that
+will modify the contexts of the current and previous scene respectively. The
+value it returns is a callback that you need to call once you finish the
+transition.
+
+The transition template looks as follows:
+
+```ts
+// set up the transition
+const endTransition = useTransition(
+  currentContext => {
+    // modify the context of the current scene
+  },
+  previousContext => {
+    // modify the context of the previous scene
+  },
+);
+
+// perform animations
+
+// finish the transition
+endTransition();
+```
+
+Here's how you could implement a simple slide transition:
+
+```ts
+export function* slideTransition(
+  direction: Direction = Direction.Top,
+  duration = 0.6,
+): ThreadGenerator {
+  const size = useScene().getSize();
+  const position = size.getOriginOffset(direction).scale(2);
+  const previousPosition = Vector2.createSignal();
+  const currentPosition = Vector2.createSignal(position);
+
+  // set up the transition
+  const endTransition = useTransition(
+    // modify the context of the current scene
+    ctx => ctx.translate(currentPosition.x(), currentPosition.y()),
+    // modify the context of the previous scene
+    ctx => ctx.translate(previousPosition.x(), previousPosition.y()),
+  );
+
+  // perform animations
+  yield* all(
+    previousPosition(position.scale(-1), duration),
+    currentPosition(Vector2.zero, duration),
+  );
+
+  // finish the transition
+  endTransition();
+}
+```
+
+## Animate when transitioning
+
+By default, Motion Canvas will transition to the next scene once the generator
+of the current scene has reached the end. In this case, the scene will freeze
+for the duration of the transition. You can use the
+[`finishScene`](/api/core/utils#finishScene) function to trigger the transition
+early, allowing the animation to continue while transitioning:
+
+```tsx
+export default makeScene2D(function* (view) {
+  yield* animationOne();
+  // trigger the transition early:
+  finishScene();
+  // continue animating:
+  yield* animationTwo();
+});
+```

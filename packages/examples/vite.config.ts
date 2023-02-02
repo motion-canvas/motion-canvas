@@ -13,6 +13,7 @@ export default defineConfig({
         './src/node-signal.ts',
         './src/random.ts',
         './src/layout.ts',
+        './src/layout-group.ts',
         './src/positioning.ts',
       ],
     }),

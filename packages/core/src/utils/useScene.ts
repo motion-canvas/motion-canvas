@@ -22,3 +22,14 @@ export function endScene(scene: Scene) {
     throw new Error('startScene/endScene was called out of order.');
   }
 }
+
+/**
+ * Mark the current scene as ready to transition out.
+ *
+ * @remarks
+ * Usually used together with transitions. When a scene is marked as finished,
+ * the transition will start but the scene generator will continue running.
+ */
+export function finishScene() {
+  useScene().enterCanTransitionOut();
+}
