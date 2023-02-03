@@ -43,9 +43,15 @@ const config = {
           {to: '/api/core', label: 'API', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {
+            href: 'https://discord.gg/XnnWTrHYAW',
+            position: 'right',
+            className: 'navbar-icon navbar-discord-link',
+            'aria-label': 'Discord server',
+          },
+          {
             href: 'https://github.com/motion-canvas/motion-canvas',
             position: 'right',
-            className: 'navbar-github-link',
+            className: 'navbar-icon navbar-github-link',
             'aria-label': 'GitHub repository',
           },
         ],
@@ -75,6 +81,10 @@ const config = {
               {
                 label: 'YouTube',
                 href: 'https://youtube.com/aarthificial',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.gg/XnnWTrHYAW',
               },
             ],
           },

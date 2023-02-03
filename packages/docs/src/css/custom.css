@@ -120,7 +120,7 @@ a.button:hover {
   font-weight: 700;
 }
 
-.navbar-github-link {
+.navbar-icon {
   transition: background var(--ifm-transition-fast);
   width: 2rem;
   height: 2rem;
@@ -132,24 +132,36 @@ a.button:hover {
   margin-right: var(--ifm-button-padding-vertical);
 }
 
-.navbar-github-link:hover {
+.navbar-icon:hover {
   background-color: var(--ifm-color-emphasis-200);
 }
 
-.navbar-github-link::before {
+.navbar-icon::before {
+  background-repeat: no-repeat;
+  background-position: center;
   display: flex;
   content: '';
-  background-image: url('/img/github-icon.svg');
   width: 20px;
   height: 20px;
-  color: red;
+}
+
+.navbar-github-link::before {
+  background-image: url('/img/github-icon.svg');
+}
+
+.navbar-discord-link::before {
+  background-image: url('/img/discord-icon.svg');
 }
 
 html[data-theme='dark'] .navbar-github-link::before {
   background-image: url('/img/github-icon-dark.svg');
 }
 
-.navbar-sidebar .navbar-github-link {
+html[data-theme='dark'] .navbar-discord-link::before {
+  background-image: url('/img/discord-icon-dark.svg');
+}
+
+.navbar-sidebar .navbar-icon {
   display: none;
 }
 

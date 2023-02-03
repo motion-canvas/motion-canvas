@@ -19,7 +19,7 @@ the animation that could otherwise be tedious. You can learn more about this
 functionality in the [time events](/docs/time-events) section.
 
 Motion Canvas is a free and open source project. You can help making it better
-by reporting bugs, requesting features, or contributing to the codebase. If
+by reporting bugs, proposing new features, or contributing to the codebase. If
 you're interested, our [contribution guide][contributing] will help you get
 started.
 

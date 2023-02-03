@@ -1,5 +1,7 @@
 import React from 'react';
 
+import styles from './styles.module.css';
+
 export interface YouTubeVideoProps {
   src: string;
   width?: number;
@@ -15,6 +17,7 @@ export default function YouTubeVideo({
 }: YouTubeVideoProps): JSX.Element {
   return (
     <iframe
+      className={styles.root}
       width={width ?? 560}
       height={height ?? 315}
       src={src}
