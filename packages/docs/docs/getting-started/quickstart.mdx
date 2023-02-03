@@ -13,10 +13,11 @@ In this guide, we'll create a simple animation using Motion Canvas.
 
 ### Prerequisites
 
-Make sure that [Node.js](https://nodejs.org/) version 16 or greater is
-installed on your machine.
+Make sure that [Node.js](https://nodejs.org/) version 16 or greater is installed
+on your machine.
 
 :::tip
+
 You can run the following command to check if Node.js is already installed:
 
 ```bash
@@ -24,9 +25,6 @@ node -v
 ```
 
 :::
-
-If you're using Motion Canvas as part of the Patreon early access, make sure to
-[authenticate to GitHub Packages][autheticate] first.
 
 ### Creating a new project
 
@@ -36,8 +34,8 @@ Run the following command in order to scaffold a new Motion Canvas project:
 npm init @motion-canvas
 ```
 
-Answer the prompts to name your project and select which language you would
-like to use; either TypeScript or plain JavaScript.
+Answer the prompts to name your project and select which language you would like
+to use; either TypeScript or plain JavaScript.
 
 :::tip
 
@@ -46,8 +44,8 @@ we're using throughout this documentation.
 
 :::
 
-To complete the scaffolding process, run the following command in your
-newly created project directory:
+To complete the scaffolding process, run the following command in your newly
+created project directory:
 
 ```shell
 npm install
@@ -69,8 +67,8 @@ animation, but for now there's not much to see.
 
 The scaffolding command will create several files for you, but for now we're
 going to focus on `src/scenes/example.tsx`, which is where we can add our
-animations. Open `example.tsx` in a text editor, and replace all code in
-the file with the following snippet.
+animations. Open `example.tsx` in a text editor, and replace all code in the
+file with the following snippet.
 
 <CodeBlock language="tsx" title="src/scenes/example.tsx">
   {source}
@@ -118,10 +116,14 @@ export default makeScene2D(function* (view) {
 
 `makeScene2D()` takes a function generator and turns it into a scene which we
 then import in our project file. The function generator describes the flow of
-the animation, while the provided `view` argument is used to add elements to
-the scene.
+the animation, while the provided `view` argument is used to add elements to the
+scene.
 
-In our example we used a `<Circle/>` node to display a circle on the screen:
+You can learn more about scenes, nodes, and this XML-like syntax in the
+[scene hierarchy](/docs/hierarchy) section. For now, what's important is that,
+in our example, we add an individual [`<Circle/>`](/api/2d/components/Circle)
+node to our scene. We make it red, set its width and height as `320` pixels and
+position it `300` pixels left from the center:
 
 ```tsx
 view.add(
@@ -136,30 +138,11 @@ view.add(
 );
 ```
 
-You may recognize this XML-like syntax from libraries such as React.
-That's because Motion Canvas uses the same JavaScript syntax extension called
-[JSX](https://reactjs.org/docs/introducing-jsx.html).
-However, it's important to remember that Motion Canvas does **NOT** use React
-itself and any preconceptions you may have due to React will most likely not
-apply.
-
-A `Circle` is just a class and the above JSX code can be written as:
-
-```ts
-view.add(
-  new Circle({
-    x: -300,
-    width: 240,
-    height: 240,
-    fill: '#ccc',
-  }),
-);
-```
-
-To animate our circle we first need to grab a reference to it.
-That's the purpose of the `createRef` function.
-We use it to create a reference and pass it to our circle using the `ref`
-attribute:
+To animate our circle we first need to
+[grab a reference to it](/docs/references). That's the purpose of the
+[`createRef`](/api/core/utils#createRef) function. We use it to create a
+reference and pass it to our circle using the
+[`ref`](/api/2d/components/NodeProps#ref) attribute:
 
 ```tsx
 // highlight-next-line
@@ -189,8 +172,8 @@ yield *
 
 This snippet may seem a bit confusing so let's break it down.
 
-Each property of a node can be read and updated throughout the animation.
-For example, in the circle above we defined its `fill` property as `'#e13238'`:
+Each property of a node can be read and updated throughout the animation. For
+example, in the circle above we defined its `fill` property as `'#e13238'`:
 
 ```tsx
 <Circle
@@ -215,21 +198,21 @@ We can also update it by passing the new value as the first argument:
 myCircle().fill('#e6a700');
 ```
 
-This will immediately update the color of our circle.
-If we want to transition to a new value over some time,
-we can pass the transition duration (in seconds) as the second argument:
+This will immediately update the color of our circle. If we want to transition
+to a new value over some time, we can pass the transition duration (in seconds)
+as the second argument:
 
 ```ts
 myCircle().fill('#e6a700', 1);
 ```
 
-This creates a tween animation that smoothly changes the fill color over one
-second.
+This [creates a tween animation](/docs/tweening) that smoothly changes the fill
+color over one second.
 
-Animations in Motion Canvas don't play on their own, we need to explicitly
-tell them to. This is why scenes are declared using generator functions -
-they serve as a description of how the animation should play out. By yielding
-different instructions we can tell the scene animation to do different things.
+Animations in Motion Canvas don't play on their own, we need to explicitly tell
+them to. This is why scenes are declared using generator functions - they serve
+as a description of how the animation should play out. By yielding different
+instructions we can tell the scene animation to do different things.
 
 For example, to play the tween we created, we can do:
 
@@ -248,8 +231,8 @@ yield * myCircle().fill('#e6a700', 1);
 yield * myCircle().fill('#e13238', 1);
 ```
 
-But since we're animating the same property,
-we can write it in a more compact way:
+But since we're animating the same property, we can write it in a more compact
+way:
 
 ```ts
 yield * myCircle().fill('#e6a700', 1).to('#e13238', 1);
@@ -263,8 +246,8 @@ yield * myCircle().fill('#e6a700', 1).to('#e13238', 1);
 yield * myCircle().position.x(300, 1).to(-300, 1);
 ```
 
-This works, but the position will start animating **after** the fill color.
-To make them happen at the same time, we use the `all()` function:
+This works, but the position will start animating **after** the fill color. To
+make them happen at the same time, we use the [`all`][all] function:
 
 ```ts
 yield *
@@ -274,8 +257,9 @@ yield *
   );
 ```
 
-`all()` takes one or more animations and merges them together.
-Now they'll happen at the same time.
+[`all`][all] takes one or more animations and merges them together. Now they'll
+happen at the same time. The [animation flow](/docs/flow) section goes into more
+depth about generators and flow functions such as [`all`][all].
 
 This brings us back to our initial example:
 
@@ -283,5 +267,6 @@ This brings us back to our initial example:
   {source}
 </CodeBlock>
 
-[generators]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
-[autheticate]: https://github.com/motion-canvas/motion-canvas#authenticate-to-github-packages
+[generators]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*
+[all]: /api/core/flow#all

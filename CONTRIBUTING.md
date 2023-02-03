@@ -1,7 +1,7 @@
 # Contributing to Motion Canvas
 
-This is an initial version of the Contribution Guide.
-Feel free to discuss it and suggest any changes on [our discord server][discord].
+This is an initial version of the Contribution Guide. Feel free to discuss it
+and suggest any changes on [our discord server][discord].
 
 ## Code of Conduct
 
@@ -10,20 +10,20 @@ Before contributing to the project, please read our
 
 ## Reporting a bug
 
-Before you submit an issue, please search [the issue tracker][issues].
-An issue for your problem might already exist and the discussion might inform
-you of workarounds readily available.
+Before you submit an issue, please search [the issue tracker][issues]. An issue
+for your problem might already exist and the discussion might inform you of
+workarounds readily available.
 
-You can file new issues by [selecting an issue template][new-issue] and
-filling out the necessary information.
+You can file new issues by [selecting an issue template][new-issue] and filling
+out the necessary information.
 
 ## Proposing a Change
 
-If you intend to change the public API, or make any non-trivial changes to
-the implementation, make sure to [create an issue][new-feature] first. This
-will let us discuss a proposal before you put significant effort into it.
-After a proposal has been discussed it may receive the [accepted][label-accepted]
-label indicating that it's ready to be implemented.
+If you intend to change the public API, or make any non-trivial changes to the
+implementation, make sure to [create an issue][new-feature] first. This will let
+us discuss a proposal before you put significant effort into it. After a
+proposal has been discussed it may receive the [accepted][label-accepted] label
+indicating that it's ready to be implemented.
 
 If you're only fixing a bug, it's fine to submit a pull request right away
 without creating an issue but make sure it contains a clear and concise
@@ -32,18 +32,14 @@ description of said bug.
 ## Working on Issues
 
 Before you start working on an issue make sure that no one is assigned to it.
-Otherwise, you may duplicate other people's efforts.
-If somebody claims an issue but doesn't follow up for more than two weeks, it’s
-fine to take it over, but you should still leave a comment.
-You should also assign yourself to any issue you're working on, to let others know.
+Otherwise, you may duplicate other people's efforts. If somebody claims an issue
+but doesn't follow up for more than two weeks, it’s fine to take it over, but
+you should still leave a comment. You should also assign yourself to any issue
+you're working on, to let others know.
 
 ## Semantic Versioning
 
 Motion Canvas follows [semantic versioning][semver].
-Due to [the limitations of `semantic-release`][semantic-release] the major
-version is not set to zero. Nevertheless, Motion Canvas is still in early
-development and breaking changes are very much expected and welcome. Before
-the public release to npm, the version will be reset back to `1.0.0`.
 
 ## Making a Pull Request
 
@@ -62,8 +58,8 @@ the public release to npm, the version will be reset back to `1.0.0`.
    ```shell
    git push origin my-fix-branch
    ```
-6. In GitHub, send a pull request to [the master branch][master]
-   and **request a review** from [aarthificial](https://github.com/aarthificial).
+6. In GitHub, send a pull request to [the master branch][master] and **request a
+   review** from [aarthificial](https://github.com/aarthificial).
 
 ### Addressing review feedback
 
@@ -81,13 +77,16 @@ This Contribution Guide was partially inspired by [React][react] and
 [Angular][angular].
 
 [semver]: https://semver.org/
-[discord]: https://www.patreon.com/posts/53003221
-[semantic-release]: https://semantic-release.gitbook.io/semantic-release/support/faq#can-i-set-the-initial-release-version-of-my-package-to-0.0.1
+[discord]: https://discord.gg/XnnWTrHYAW
+[semantic-release]:
+  https://semantic-release.gitbook.io/semantic-release/support/faq#can-i-set-the-initial-release-version-of-my-package-to-0.0.1
 [master]: https://github.com/aarthificial/motion-canvas/tree/master
 [issues]: https://github.com/motion-canvas/core/issues
 [new-issue]: https://github.com/motion-canvas/core/issues/new/choose
-[new-feature]: https://github.com/motion-canvas/core/issues/new?template=feature_request.md
-[commit-format]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
+[new-feature]:
+  https://github.com/motion-canvas/core/issues/new?template=feature_request.md
+[commit-format]:
+  https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
 [angular]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md
 [react]: https://reactjs.org/docs/how-to-contribute.html
 [label-accepted]: https://github.com/motion-canvas/core/labels/accepted
