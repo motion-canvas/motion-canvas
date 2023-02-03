@@ -8,7 +8,7 @@ export function patchSignal<TSetterValue, TValue extends TSetterValue>(
   name?: string,
 ) {
   if (parser) {
-    signal.setParser(parser);
+    signal.setParser(parser.bind(owner));
   }
 
   if (name && owner) {
