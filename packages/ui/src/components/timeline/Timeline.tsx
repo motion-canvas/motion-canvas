@@ -140,7 +140,9 @@ export function Timeline() {
             setOffset((event.target as HTMLElement).scrollLeft)
           }
           onWheel={event => {
-            if (event.shiftKey) return;
+            const isVertical = Math.abs(event.deltaX) > Math.abs(event.deltaY);
+            if (event.shiftKey || isVertical) return;
+            event.preventDefault();
 
             let ratio = 1 - Math.sign(event.deltaY) * ZOOM_SPEED;
             let newScale = scale * ratio;
