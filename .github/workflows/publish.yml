@@ -30,6 +30,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          registry-url: 'https://registry.npmjs.org'
           cache: npm
       - run: git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
       - run: git config --global user.name "github-actions[bot]"
