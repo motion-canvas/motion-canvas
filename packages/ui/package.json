@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
   "types": "types/main.d.ts",
@@ -15,9 +15,6 @@
     "showcase": "tsc && vite build -c vite.showcase.ts",
     "preview": "vite preview"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/motion-canvas"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/motion-canvas/motion-canvas.git"
@@ -27,7 +24,7 @@
     "types"
   ],
   "dependencies": {
-    "@motion-canvas/core": "^2.0.0"
+    "@motion-canvas/core": "*"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.3.0",
