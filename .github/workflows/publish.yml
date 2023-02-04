@@ -1,4 +1,4 @@
-name: Publish Packages to GitHub
+name: Publish Packages to NPM
 
 on:
   workflow_dispatch:
@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+      NPM_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
       GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v3
