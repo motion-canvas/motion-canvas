@@ -1,10 +1,12 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "12.5.0",
+  "version": "1.0.0",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
   "types": "types/main.d.ts",
   "author": "motion-canvas",
+  "homepage": "https://motion-canvas.github.io/",
+  "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -25,7 +27,7 @@
     "types"
   ],
   "dependencies": {
-    "@motion-canvas/core": "^12.3.0"
+    "@motion-canvas/core": "*"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.3.0",
