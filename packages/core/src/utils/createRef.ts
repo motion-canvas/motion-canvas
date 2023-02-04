@@ -1,18 +1,9 @@
-import {deprecate} from './deprecate';
-import getReferenceValue from './__logs__/get-reference-value.md';
-import setReferenceValue from './__logs__/set-reference-value.md';
-
 export interface ReferenceReceiver<T> {
   (reference: T): void;
 }
 
 export interface Reference<T> extends ReferenceReceiver<T> {
   (): T;
-
-  /**
-   * @deprecated Invoke the reference instead.
-   */
-  value: T;
 }
 
 export function createRef<T>(): Reference<T> {
@@ -24,21 +15,6 @@ export function createRef<T>(): Reference<T> {
       return value;
     }
   };
-
-  Object.defineProperty(ref, 'value', {
-    get: deprecate(
-      () => value,
-      'get Reference.value has been deprecated.',
-      getReferenceValue,
-    ),
-    set: deprecate(
-      newValue => {
-        value = newValue;
-      },
-      'set Reference.value has been deprecated.',
-      setReferenceValue,
-    ),
-  });
 
   return ref as Reference<T>;
 }
