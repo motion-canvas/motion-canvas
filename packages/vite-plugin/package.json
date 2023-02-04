@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "2.0.0",
+  "version": "0.0.0",
   "description": "A Vite plugin for Motion Canvas projects",
   "main": "lib/main.js",
   "author": "motion-canvas",
@@ -10,9 +10,6 @@
   "scripts": {
     "build": "ttsc",
     "watch": "ttsc -w"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/motion-canvas"
   },
   "repository": {
     "type": "git",
