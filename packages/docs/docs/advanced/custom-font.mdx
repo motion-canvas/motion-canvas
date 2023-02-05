@@ -1,1 +1,38 @@
-hello bruh
+# Custom font
+
+Make a css file under `src`, for example `global.css`.
+
+```
+src
+├─scenes/
+├─motion-canvas.d.ts
+├─project.meta
+├─project.ts
+└─global.css *
+```
+
+Inside `global.css`, import the font using `@import`.
+
+For example, importing Fira Code from Google Fonts :
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+```
+
+Then, in `project.ts`, import the css file.
+
+```ts
+import {makeProject} from '@motion-canvas/core/lib';
+
+import example from './scenes/example?scene';
+
+import "./global.css" <- import the css
+
+export default makeProject({
+  scenes: [example],
+  background: '#141414',
+});
+
+```
+
+Now you can reference the name `Fira Code` in the `fontFamily` property.
