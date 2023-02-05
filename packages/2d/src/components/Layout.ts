@@ -292,7 +292,7 @@ export class Layout extends Node {
    * Represents the size of this node.
    *
    * @remarks
-   * A size is a two-dimensional vector, where `x` represents the width, and `y`
+   * A size is a two-dimensional vector, where `x` represents the `width`, and `y`
    * represents the `height`.
    *
    * The value of both x and y is of type {@link partials~Length} which is
