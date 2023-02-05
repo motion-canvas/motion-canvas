@@ -58,7 +58,7 @@ Motion Canvas follows [semantic versioning][semver].
    ```shell
    git push origin my-fix-branch
    ```
-6. In GitHub, send a pull request to [the master branch][master] and **request a
+6. In GitHub, send a pull request to [the main branch][main] and **request a
    review** from [aarthificial](https://github.com/aarthificial).
 
 ### Addressing review feedback
@@ -80,13 +80,13 @@ This Contribution Guide was partially inspired by [React][react] and
 [discord]: https://discord.gg/XnnWTrHYAW
 [semantic-release]:
   https://semantic-release.gitbook.io/semantic-release/support/faq#can-i-set-the-initial-release-version-of-my-package-to-0.0.1
-[master]: https://github.com/aarthificial/motion-canvas/tree/master
-[issues]: https://github.com/motion-canvas/core/issues
-[new-issue]: https://github.com/motion-canvas/core/issues/new/choose
+[main]: https://github.com/motion-canvas/motion-canvas/tree/main
+[issues]: https://github.com/motion-canvas/motion-canvas/issues
+[new-issue]: https://github.com/motion-canvas/motion-canvas/issues/new/choose
 [new-feature]:
-  https://github.com/motion-canvas/core/issues/new?template=feature_request.md
+  https://github.com/motion-canvas/motion-canvas/issues/new?template=feature_request.md
 [commit-format]:
   https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
 [angular]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md
 [react]: https://reactjs.org/docs/how-to-contribute.html
-[label-accepted]: https://github.com/motion-canvas/core/labels/accepted
+[label-accepted]: https://github.com/motion-canvas/motion-canvas/labels/accepted
