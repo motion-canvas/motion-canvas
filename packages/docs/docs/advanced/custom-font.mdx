@@ -1,19 +1,18 @@
 # Custom font
 
-Make a css file under `src`, for example `global.css`.
+To use a font from hosters like Google Fonts. First make a css file under `src`
 
 ```
-src
-├─scenes/
-├─motion-canvas.d.ts
-├─project.meta
-├─project.ts
-└─global.css *
+root
+└─src
+  ├─scenes/
+  ├─motion-canvas.d.ts
+  ├─project.meta
+  ├─project.ts
+  └─global.css *
 ```
 
-Inside `global.css`, import the font using `@import`.
-
-For example, importing Fira Code from Google Fonts :
+Inside `global.css`, import the font using `@import url(your link)`.
 
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
@@ -35,4 +34,38 @@ export default makeProject({
 
 ```
 
-Now you can reference the name `Fira Code` in the `fontFamily` property.
+Now you can reference the fonts in the `fontFamily` property in this project.
+
+```tsx
+<Text fontFamily={"Fira Code"}>Fira Code</Text>
+```
+
+For local fonts, make a directory `fonts` and put your font inside it.
+
+```
+root
+├─public
+│ └─fonts *
+│   └─CASCADIACODE.TTF
+└─src
+```
+
+Inside `global.css`, import the font using `@font-face`.
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+@font-face{
+    font-family: 'Cascadia Code';
+    src: local('Cascadia Code'), url(public/fonts/CASCADIACODE.TTF) format('truetype');
+}
+```
+
+Notice the name of the font will match the string in `@font-face/font-family` from the css.
+
+```tsx
+<Layout direction={"column"} alignItems={"center"} layout>
+  <Text fontFamily={"Fira Code"}>Fira Code</Text>
+  <Text fontFamily={"Cascadia Code"}>Cascadia Code</Text>
+</Layout>
+```
