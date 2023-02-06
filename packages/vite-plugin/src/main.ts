@@ -297,12 +297,14 @@ export default ({
         }
 
         if (req.url === '/') {
+          res.setHeader('Content-Type', 'text/html');
           res.end(createHtml('/@id/__x00__virtual:editor'));
           return;
         }
 
         const name = req.url?.slice(1);
         if (name && name in projectLookup) {
+          res.setHeader('Content-Type', 'text/html');
           res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
           return;
         }
