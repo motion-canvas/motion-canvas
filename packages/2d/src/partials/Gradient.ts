@@ -5,29 +5,33 @@ import {initialize} from '../decorators/initializers';
 import {
   Color,
   PossibleColor,
-  Vector2,
+  PossibleVector2,
   Vector2Signal,
 } from '@motion-canvas/core/lib/types';
-import {SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {
+  isReactive,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
 
 export interface GradientStop {
-  offset: number;
-  color: PossibleColor;
+  offset: SignalValue<number>;
+  color: SignalValue<PossibleColor>;
 }
 
 export interface GradientProps {
-  type?: GradientType;
-  fromX?: number;
-  fromY?: number;
-  from?: Vector2;
-  toX?: number;
-  toY?: number;
-  to?: Vector2;
-  angle?: number;
-  fromRadius?: number;
-  toRadius?: number;
+  type?: SignalValue<GradientType>;
+  fromX?: SignalValue<number>;
+  fromY?: SignalValue<number>;
+  from?: SignalValue<PossibleVector2>;
+  toX?: SignalValue<number>;
+  toY?: SignalValue<number>;
+  to?: SignalValue<PossibleVector2>;
+  angle?: SignalValue<number>;
+  fromRadius?: SignalValue<number>;
+  toRadius?: SignalValue<number>;
   stops?: GradientStop[];
 }
 
@@ -91,7 +95,10 @@ export class Gradient {
     }
 
     for (const {offset, color} of this.stops()) {
-      gradient.addColorStop(offset, new Color(color).serialize());
+      gradient.addColorStop(
+        isReactive(offset) ? offset() : offset,
+        new Color(isReactive(color) ? color() : color).serialize(),
+      );
     }
 
     return gradient;
