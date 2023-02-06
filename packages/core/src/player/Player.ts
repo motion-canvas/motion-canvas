@@ -234,9 +234,11 @@ export class Player {
   private async run() {
     const commands = this.consumeCommands();
     const state = {...this.state.current};
-    if (state.finished && state.loop && commands.seek < 0) {
-      commands.seek = state.startFrame;
-    }
+    // if (state.finished && commands.seek < 0 && !state.loop && !state.paused) {
+    //   this.togglePlayback(false);
+    //   this.request();
+    //   return;
+    // }
 
     const previousState = this.project.playbackState();
     this.project.playbackState(
@@ -357,15 +359,25 @@ export class Player {
     // Draw the project
     await this.project.render();
 
-    // handle finishing
-    if (state.finished) {
-      if (commands.seek >= 0) {
-        this.requestSeek(state.startFrame);
-      }
+    // Loop back at the end if looping is enabled
+    if (
+      state.loop &&
+      (commands.seek > Math.min(state.duration, state.endFrame) ||
+        (state.finished && !state.paused))
+    ) {
+      this.requestSeek(state.startFrame);
+    }
+    // Otherwise pause at the end
+    if (!state.loop && state.finished && !state.paused) {
+      this.togglePlayback(false);
+      this.request();
+      return;
     }
 
     this.updateState({
-      finished: state.finished || this.project.frame >= state.endFrame,
+      finished:
+        state.finished ||
+        this.project.frame >= Math.min(state.duration, state.endFrame),
     });
     this.frame.current = this.project.frame;
 
@@ -373,8 +385,9 @@ export class Player {
   }
 
   private clampRange(frame: number, state: PlayerState): number {
-    return frame > state.endFrame
-      ? state.endFrame
+    const endFrame = Math.min(state.endFrame, state.duration);
+    return frame > endFrame
+      ? endFrame
       : frame < state.startFrame
       ? state.startFrame
       : frame;
