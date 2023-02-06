@@ -48,3 +48,14 @@ it. This is useful when you want to extend or shorten a pause in your voiceover
 because correcting the first time event after the pause will also fix all events
 after it. You can hold `SHIFT` when editing an event to prevent this from
 happening.
+
+## Controlling animation duration
+
+Aside from specifying _when_ something should happen, Time Events can also be used to 
+control _how long_ something should last. You can use the 
+[`useDuration`](/api/core/utils#useDuration) function to retrieve the duration of an event
+and use it in your animation:
+
+```ts
+yield* circle().scale(2, useDuration('event'));
+```
