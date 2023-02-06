@@ -2,13 +2,14 @@ name: Verify Pull Request
 
 on:
   pull_request: {}
+  workflow_dispatch: {}
 
 env:
   HUSKY: 0
 
 jobs:
-  verification:
-    name: Verification
+  commit:
+    name: Commit name
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,14 +20,50 @@ jobs:
           node-version: 18
           cache: npm
       - run: npm ci
-      - name: Commit name
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
-      - name: ESLint
-        run: npx lerna run lint
-      - name: Prettier
-        run: npx lerna run prettier
-      - name: Tests
-        run: npx lerna run test
+      - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npx lerna run lint
+  prettier:
+    name: Code style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npx lerna run prettier
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npx lerna run test
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
       - name: Build
         run: npx lerna run build
       - name: Examples
