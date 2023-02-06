@@ -1,0 +1,73 @@
+# Custom font
+## Loading fonts from the web
+
+To use a font from hosters like Google Fonts. First make a css file under `src`
+
+```diff
+root
+└─src
+  ├─scenes/
+  ├─motion-canvas.d.ts
+  ├─project.meta
+  ├─project.ts
++ └─global.css
+```
+
+Inside `global.css`, import the font using `@import url(your link)`.
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+```
+
+Then, in `project.ts`, import the css file.
+
+```ts
+import {makeProject} from '@motion-canvas/core/lib';
+
+import example from './scenes/example?scene';
+
+import "./global.css"; // <- import the css
+
+export default makeProject({
+  scenes: [example],
+  background: '#141414',
+});
+
+```
+
+Now you can reference the fonts in the `fontFamily` property in this project.
+
+```tsx
+<Text fontFamily={"Fira Code"}>Fira Code</Text>
+```
+
+## Loading fonts from local
+
+For local fonts, make a directory `fonts` and put your font inside it.
+
+```diff
+root
+└─public
++ └─fonts *
++   └─CASCADIACODE.TTF
+```
+
+Inside `global.css`, import the font using `@font-face`.
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap');
+
+@font-face{
+    font-family: 'Cascadia Code';
+    src: local('Cascadia Code'), url(public/fonts/CASCADIACODE.TTF) format('truetype');
+}
+```
+
+Notice the name of the font will match the string in `@font-face/font-family` from the css.
+
+```tsx
+<Layout direction={"column"} alignItems={"center"} layout>
+  <Text fontFamily={"Fira Code"}>Fira Code</Text>
+  <Text fontFamily={"Cascadia Code"}>Cascadia Code</Text>
+</Layout>
+```
