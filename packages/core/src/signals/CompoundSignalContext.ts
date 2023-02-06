@@ -76,11 +76,12 @@ export class CompoundSignalContext<
   public override set(value: SignalValue<TValue>): TOwner {
     if (isReactive(value)) {
       for (const [key, property] of this.signals) {
-        property(() => value()[key]);
+        property(() => this.parser(value())[key]);
       }
     } else {
+      const parsed = this.parse(value);
       for (const [key, property] of this.signals) {
-        property(value[key]);
+        property(parsed[key]);
       }
     }
 
