@@ -25,7 +25,7 @@ decorate(chain, threadable());
  * functions. For example:
  * ```ts
  * yield* all(
- *   rect.corenerRadius(20, 3),
+ *   rect.radius(20, 3),
  *   chain(
  *     rect.fill('#ff0000', 2),
  *     rect.opacity(1, 1),
