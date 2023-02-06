@@ -42,25 +42,32 @@ export function drawRoundRect(
 ) {
   if (
     radius.top === 0 &&
+    radius.right === 0 &&
     radius.bottom === 0 &&
-    radius.left === 0 &&
-    radius.right === 0
+    radius.left === 0
   ) {
     drawRect(context, rect);
     return;
   }
 
-  const topLeft = Math.min(rect.width, rect.height, radius.top);
-  const topRight = Math.min(rect.width - topLeft, rect.height, radius.right);
-  const bottomRight = Math.min(
-    rect.width,
-    rect.height - topRight,
+  const topLeft = adjustRectRadius(radius.top, radius.right, radius.left, rect);
+  const topRight = adjustRectRadius(
+    radius.right,
+    radius.top,
     radius.bottom,
+    rect,
   );
-  const bottomLeft = Math.min(
-    rect.width - topLeft,
-    rect.height - bottomRight,
+  const bottomRight = adjustRectRadius(
+    radius.bottom,
     radius.left,
+    radius.right,
+    rect,
+  );
+  const bottomLeft = adjustRectRadius(
+    radius.left,
+    radius.bottom,
+    radius.top,
+    rect,
   );
 
   context.moveTo(rect.left + topLeft, rect.top);
@@ -68,6 +75,24 @@ export function drawRoundRect(
   context.arcTo(rect.right, rect.bottom, rect.left, rect.bottom, bottomRight);
   context.arcTo(rect.left, rect.bottom, rect.left, rect.top, bottomLeft);
   context.arcTo(rect.left, rect.top, rect.right, rect.top, topLeft);
+}
+
+function adjustRectRadius(
+  radius: number,
+  horizontal: number,
+  vertical: number,
+  rect: Rect,
+): number {
+  const width =
+    radius + horizontal > rect.width
+      ? rect.width * (radius / (radius + horizontal))
+      : radius;
+  const height =
+    radius + vertical > rect.height
+      ? rect.height * (radius / (radius + vertical))
+      : radius;
+
+  return Math.min(width, height);
 }
 
 export function drawRect(
