@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "serve": "vite",
-    "build": "tsc && vite build"
+    "build": "tsc && vite build --base /examples/"
   },
   "dependencies": {
     "@motion-canvas/2d": "*",
