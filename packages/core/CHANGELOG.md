@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/motion-canvas/motion-canvas/compare/v2.0.0...v2.1.0) (2023-02-07)
+
+
+### Bug Fixes
+
+* **core:** fix looping ([#217](https://github.com/motion-canvas/motion-canvas/issues/217)) ([a38e1a7](https://github.com/motion-canvas/motion-canvas/commit/a38e1a7c8fc21384cc17f3f982802071b8cd0cbf)), closes [#178](https://github.com/motion-canvas/motion-canvas/issues/178)
+* fix compound property setter ([#218](https://github.com/motion-canvas/motion-canvas/issues/218)) ([6cd1b95](https://github.com/motion-canvas/motion-canvas/commit/6cd1b952df950554eb637c9f8e82947c415d00c5)), closes [#208](https://github.com/motion-canvas/motion-canvas/issues/208) [#210](https://github.com/motion-canvas/motion-canvas/issues/210)
+
+
+### Features
+
+* add `useDuration` helper ([#226](https://github.com/motion-canvas/motion-canvas/issues/226)) ([fa97d6c](https://github.com/motion-canvas/motion-canvas/commit/fa97d6c7f076f287c9b86d2f8852341bd368ef1c)), closes [#171](https://github.com/motion-canvas/motion-canvas/issues/171)
+
+
+
+
+
 # 2.0.0 (2023-02-04)
 
 

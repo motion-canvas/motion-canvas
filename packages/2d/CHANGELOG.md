@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/motion-canvas/motion-canvas/compare/v2.0.0...v2.1.0) (2023-02-07)
+
+
+### Bug Fixes
+
+* **2d:** fix font ligatures in CodeBlock ([#231](https://github.com/motion-canvas/motion-canvas/issues/231)) ([11ee3fe](https://github.com/motion-canvas/motion-canvas/commit/11ee3fef5ad878313cf19833df6881333ced4dac))
+* **2d:** fix Line cache ([#232](https://github.com/motion-canvas/motion-canvas/issues/232)) ([a953b64](https://github.com/motion-canvas/motion-canvas/commit/a953b64540c020657845efc84d4179142a7a0974)), closes [#205](https://github.com/motion-canvas/motion-canvas/issues/205)
+* **2d:** handle lines with no points ([#233](https://github.com/motion-canvas/motion-canvas/issues/233)) ([8108474](https://github.com/motion-canvas/motion-canvas/commit/81084743dfad7b6419760796fda825047909d4d4)), closes [#212](https://github.com/motion-canvas/motion-canvas/issues/212)
+* **2d:** improve Rect radius ([#221](https://github.com/motion-canvas/motion-canvas/issues/221)) ([3437e42](https://github.com/motion-canvas/motion-canvas/commit/3437e42713a3f4a8d44d246ee01e2eb23b61e06a)), closes [#207](https://github.com/motion-canvas/motion-canvas/issues/207)
+* **2d:** stop code highlighting from jumping ([#230](https://github.com/motion-canvas/motion-canvas/issues/230)) ([67ef1c4](https://github.com/motion-canvas/motion-canvas/commit/67ef1c497056dd1f8f9e20d1d7fc1af03ec3849e))
+* fix compound property setter ([#218](https://github.com/motion-canvas/motion-canvas/issues/218)) ([6cd1b95](https://github.com/motion-canvas/motion-canvas/commit/6cd1b952df950554eb637c9f8e82947c415d00c5)), closes [#208](https://github.com/motion-canvas/motion-canvas/issues/208) [#210](https://github.com/motion-canvas/motion-canvas/issues/210)
+
+
+
+
+
 # 2.0.0 (2023-02-04)
 
 

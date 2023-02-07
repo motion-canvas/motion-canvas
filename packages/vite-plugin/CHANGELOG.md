@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.1.0](https://github.com/motion-canvas/motion-canvas/compare/v2.0.0...v2.1.0) (2023-02-07)
+
+
+### Bug Fixes
+
+* **vite-plugin:** add missing headers to html ([#219](https://github.com/motion-canvas/motion-canvas/issues/219)) ([2552bcf](https://github.com/motion-canvas/motion-canvas/commit/2552bcfbe2e90f3d4b86810d39f8cee24349e405)), closes [#201](https://github.com/motion-canvas/motion-canvas/issues/201)
+
+
+
+
+
 # 2.0.0 (2023-02-04)
 
 
