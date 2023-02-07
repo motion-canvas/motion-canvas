@@ -229,7 +229,7 @@ export class Line extends Shape {
     const rect = this.childrenRect();
     const arrowSize = this.arrowSize();
     const lineWidth = this.lineWidth();
-    return rect.expand(Math.max(0, arrowSize - lineWidth / 2));
+    return rect.expand(Math.max(0, arrowSize, lineWidth / 2));
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
