@@ -299,84 +299,66 @@ export class CodeBlock extends Shape {
     const size = this.computedSize();
     const progress = this.codeProgress();
     const selectionOpacity = this.selectionOpacity();
+    const globalAlpha = context.globalAlpha;
 
     const getSelectionAlpha = (x: number, y: number) =>
       map(selectionOpacity, 1, this.selectionStrength(x, y));
 
+    const drawToken = (
+      code: string,
+      position: SerializedVector2,
+      alpha = 1,
+    ) => {
+      for (let i = 0; i < code.length; i++) {
+        const char = code.charAt(i);
+        if (char === '\n') {
+          position.y++;
+          position.x = 0;
+          continue;
+        }
+        context.globalAlpha =
+          globalAlpha * alpha * getSelectionAlpha(position.x, position.y);
+        context.fillText(char, position.x * w, position.y * lh);
+        position.x++;
+      }
+    };
+
     context.translate(size.x / -2, size.y / -2);
     if (progress == null) {
       const parsed = this.parsed();
-      let x = 0;
-      let y = 0;
+      const position = {x: 0, y: 0};
       for (const token of parsed) {
         context.save();
-        context.fillStyle = token.color ?? '#ff6470';
-
-        const alpha = context.globalAlpha;
-        for (let i = 0; i < token.code.length; i++) {
-          const char = token.code.charAt(i);
-          if (char === '\n') {
-            y++;
-            x = 0;
-            continue;
-          }
-          context.globalAlpha = alpha * getSelectionAlpha(x, y);
-          context.fillText(char, x * w, y * lh);
-          x++;
-        }
+        context.fillStyle = token.color ?? '#c9d1d9';
+        drawToken(token.code, position);
         context.restore();
       }
     } else {
       const diffed = this.diffed!;
-
       const beginning = 0.2;
       const ending = 0.8;
       const overlap = 0.15;
       for (const token of diffed) {
         context.save();
-        context.fillStyle = token.color ?? '#ff6470';
+        context.fillStyle = token.color ?? '#c9d1d9';
 
         if (token.morph === 'delete') {
-          context.globalAlpha *= getSelectionAlpha(
-            token.from![0],
-            token.from![1],
+          drawToken(
+            token.code,
+            {x: token.from![0], y: token.from![1]},
+            clampRemap(0, beginning + overlap, 1, 0, progress),
           );
-          context.globalAlpha *= clampRemap(
-            0,
-            beginning + overlap,
-            1,
-            0,
-            progress,
-          );
-          context.fillText(token.code, token.from![0] * w, token.from![1] * lh);
         } else if (token.morph === 'create') {
-          context.globalAlpha *= getSelectionAlpha(token.to![0], token.to![1]);
-          context.globalAlpha *= clampRemap(
-            ending - overlap,
-            1,
-            0,
-            1,
-            progress,
+          drawToken(
+            token.code,
+            {x: token.to![0], y: token.to![1]},
+            clampRemap(ending - overlap, 1, 0, 1, progress),
           );
-          context.fillText(token.code, token.to![0] * w, token.to![1] * lh);
         } else if (token.morph === 'retain') {
           const remapped = clampRemap(beginning, ending, 0, 1, progress);
-          const alpha = context.globalAlpha;
-          context.globalAlpha *=
-            remapped > 0.5
-              ? getSelectionAlpha(token.to![0], token.to![1])
-              : getSelectionAlpha(token.from![0], token.from![1]);
-
-          const x = easeInOutSine(
-            remapped,
-            token.from![0] * w,
-            token.to![0] * w,
-          );
-          const y = easeInOutSine(
-            remapped,
-            token.from![1] * lh,
-            token.to![1] * lh,
-          );
+          const x = easeInOutSine(remapped, token.from![0], token.to![0]);
+          const y = easeInOutSine(remapped, token.from![1], token.to![1]);
+          const point: CodePoint = remapped > 0.5 ? token.to! : token.from!;
 
           let offsetX = 0;
           let offsetY = 0;
@@ -389,18 +371,10 @@ export class CodeBlock extends Shape {
             }
 
             context.globalAlpha =
-              alpha *
-              (remapped > 0.5
-                ? getSelectionAlpha(
-                    token.to![0] + offsetX,
-                    token.to![1] + offsetY,
-                  )
-                : getSelectionAlpha(
-                    token.from![0] + offsetX,
-                    token.from![1] + offsetY,
-                  ));
+              globalAlpha *
+              getSelectionAlpha(point[0] + offsetX, point[1] + offsetY);
 
-            context.fillText(char, x + offsetX * w, y + offsetY * lh);
+            context.fillText(char, (x + offsetX) * w, (y + offsetY) * lh);
             offsetX++;
           }
         } else {
