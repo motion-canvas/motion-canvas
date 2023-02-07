@@ -23,6 +23,8 @@ import {
   getPointAtDistance,
   CurvePoint,
 } from '../curves';
+import {useLogger} from '@motion-canvas/core/lib/utils';
+import lineWithoutPoints from './__logs__/line-without-points.md';
 
 export interface LineProps extends ShapeProps {
   children?: Node[];
@@ -88,6 +90,13 @@ export class Line extends Shape {
 
   public constructor(props: LineProps) {
     super(props);
+    if (props.children === undefined && props.points === undefined) {
+      useLogger().warn({
+        message: 'No points specified for the line',
+        remarks: lineWithoutPoints,
+        inspect: this.key,
+      });
+    }
   }
 
   @computed()
@@ -286,14 +295,16 @@ export class Line extends Shape {
     const points = this.parsedPoints().map(point =>
       point.transformAsPoint(matrix),
     );
-    moveTo(path, points[0]);
-    for (const point of points) {
-      lineTo(path, point);
-      context.beginPath();
-      arc(context, point, 4);
-      context.closePath();
-      context.fill();
-      context.stroke();
+    if (points.length > 0) {
+      moveTo(path, points[0]);
+      for (const point of points) {
+        lineTo(path, point);
+        context.beginPath();
+        arc(context, point, 4);
+        context.closePath();
+        context.fill();
+        context.stroke();
+      }
     }
 
     context.strokeStyle = 'white';

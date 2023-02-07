@@ -1000,17 +1000,19 @@ export class Node implements Promisable<Node> {
     this.transformContext(context);
 
     if (this.requiresCache()) {
-      this.setupDrawFromCache(context);
-      const cacheContext = this.cachedCanvas();
       const cacheRect = this.cacheRect();
-      const compositeOverride = this.compositeOverride();
-      context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
-      if (compositeOverride > 0) {
-        context.save();
-        context.globalAlpha *= compositeOverride;
-        context.globalCompositeOperation = 'source-over';
+      if (cacheRect.width !== 0 && cacheRect.height !== 0) {
+        this.setupDrawFromCache(context);
+        const cacheContext = this.cachedCanvas();
+        const compositeOverride = this.compositeOverride();
         context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
-        context.restore();
+        if (compositeOverride > 0) {
+          context.save();
+          context.globalAlpha *= compositeOverride;
+          context.globalCompositeOperation = 'source-over';
+          context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
+          context.restore();
+        }
       }
     } else {
       this.draw(context);

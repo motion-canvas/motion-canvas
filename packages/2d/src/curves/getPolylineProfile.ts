@@ -13,6 +13,10 @@ export function getPolylineProfile(
     segments: [],
   };
 
+  if (points.length === 0) {
+    return profile;
+  }
+
   if (closed) {
     const middle = points[0].add(points[points.length - 1]).scale(0.5);
     points.unshift(middle);
