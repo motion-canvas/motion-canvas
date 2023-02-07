@@ -6,6 +6,7 @@ slug: /signals
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
 import signalSource from '!!raw-loader!@motion-canvas/examples/src/scenes/node-signal';
+import FirefoxTextWarning from '@site/src/warnings/FirefoxTextWarning';
 
 # Signals
 
@@ -109,6 +110,8 @@ We can use the fact that properties of nodes are represented by signals to const
 <AnimationPlayer small name="node-signal" />
 
 Below you'll find the code used to create this animation. We highlighted all the places where signals are used:
+
+<FirefoxTextWarning />
 
 <CodeBlock language="tsx">{signalSource}</CodeBlock>
 

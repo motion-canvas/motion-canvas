@@ -3,6 +3,8 @@ sidebar_position: 7
 slug: /references
 ---
 
+import FirefoxTextWarning from '@site/src/warnings/FirefoxTextWarning';
+
 # References
 
 Usually, when creating a node, we want to store a reference to it, so we can
@@ -100,9 +102,8 @@ yield * circle().scale(2, 0.3);
 ```
 
 Notice that `circle` is no longer just a variable that points to our circle.
-Instead, it's a [signal-like](/docs/signals) function that can
-be used to access it. Invoking it without any arguments (`circle()`) returns our
-instance.
+Instead, it's a [signal-like](/docs/signals) function that can be used to access
+it. Invoking it without any arguments (`circle()`) returns our instance.
 
 Going back to the example with the more complex scene, we can now rewrite it as:
 
@@ -178,6 +179,8 @@ that we can use to animate all of them.
 
 ### Custom functions
 
+<FirefoxTextWarning />
+
 `makeRef()` can also be used to return more than one reference from a custom
 function component:
 
@@ -212,6 +215,8 @@ property to pass the `label` object created by us. `makeRef()` is then used to
 fill this object with all the necessary references.
 
 ## `makeRefs()` function
+
+<FirefoxTextWarning />
 
 Looking at the previous example, you may notice that we had to define the `refs`
 type twice. First in the `Label` declaration and then again when creating the
