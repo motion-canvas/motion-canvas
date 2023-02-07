@@ -312,42 +312,19 @@ export class CodeBlock extends Shape {
         context.save();
         context.fillStyle = token.color ?? '#ff6470';
 
-        if (token.code.includes('()')) {
-          const alpha = context.globalAlpha;
-          for (let i = 0; i < token.code.length; i++) {
-            const char = token.code.charAt(i);
-            if (char === '\n') {
-              y++;
-              x = 0;
-              continue;
-            }
-            context.globalAlpha = alpha * getSelectionAlpha(x, y);
-            context.fillText(char, x * w, y * lh);
-            x++;
+        const alpha = context.globalAlpha;
+        for (let i = 0; i < token.code.length; i++) {
+          const char = token.code.charAt(i);
+          if (char === '\n') {
+            y++;
+            x = 0;
+            continue;
           }
-          context.restore();
-          continue;
-        }
-
-        //*
-        const [first, ...rest] = token.code.split('\n');
-        context.save();
-        context.globalAlpha *= getSelectionAlpha(x, y);
-        context.fillText(first, x * w, y * lh);
-        context.restore();
-
-        x += first.length;
-        for (const text of rest) {
-          x = 0;
-          y++;
-          context.save();
-          context.globalAlpha *= getSelectionAlpha(x, y);
-          context.fillText(text, x * w, y * lh);
-          context.restore();
-          x = text.length;
+          context.globalAlpha = alpha * getSelectionAlpha(x, y);
+          context.fillText(char, x * w, y * lh);
+          x++;
         }
         context.restore();
-        //*/
       }
     } else {
       const diffed = this.diffed!;
@@ -401,34 +378,30 @@ export class CodeBlock extends Shape {
             token.to![1] * lh,
           );
 
-          if (token.code.includes('()')) {
-            let offsetX = 0;
-            let offsetY = 0;
-            for (let i = 0; i < token.code.length; i++) {
-              const char = token.code.charAt(i);
-              if (char === '\n') {
-                offsetY++;
-                offsetX = 0;
-                continue;
-              }
-
-              context.globalAlpha =
-                alpha *
-                (remapped > 0.5
-                  ? getSelectionAlpha(
-                      token.to![0] + offsetX,
-                      token.to![1] + offsetY,
-                    )
-                  : getSelectionAlpha(
-                      token.from![0] + offsetX,
-                      token.from![1] + offsetY,
-                    ));
-
-              context.fillText(char, x + offsetX * w, y + offsetY * lh);
-              offsetX++;
+          let offsetX = 0;
+          let offsetY = 0;
+          for (let i = 0; i < token.code.length; i++) {
+            const char = token.code.charAt(i);
+            if (char === '\n') {
+              offsetY++;
+              offsetX = 0;
+              continue;
             }
-          } else {
-            context.fillText(token.code, x, y);
+
+            context.globalAlpha =
+              alpha *
+              (remapped > 0.5
+                ? getSelectionAlpha(
+                    token.to![0] + offsetX,
+                    token.to![1] + offsetY,
+                  )
+                : getSelectionAlpha(
+                    token.from![0] + offsetX,
+                    token.from![1] + offsetY,
+                  ));
+
+            context.fillText(char, x + offsetX * w, y + offsetY * lh);
+            offsetX++;
           }
         } else {
           useLogger().warn({
