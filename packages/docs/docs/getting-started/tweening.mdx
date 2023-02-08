@@ -85,6 +85,7 @@ two numbers but to animate more complex types we'll need to use interpolation
 functions. Consider the following example:
 
 ```ts
+// import { Color } from "@motion-canvas/core/lib/types";
 yield* tween(2, value => {
   circle().color(
     Color.lerp(
