@@ -18,6 +18,13 @@ const config = {
   markdown: {
     mermaid: true,
   },
+  customFields: {
+    discordApi:
+      'https://discord.com/api/guilds/1071029581009657896/widget.json',
+    discordUrl: 'https://discord.gg/XnnWTrHYAW',
+    githubApi: 'https://api.github.com/repos/motion-canvas/motion-canvas',
+    githubUrl: 'https://github.com/motion-canvas/motion-canvas',
+  },
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -42,18 +49,6 @@ const config = {
           },
           {to: '/api/core', label: 'API', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: 'https://discord.gg/XnnWTrHYAW',
-            position: 'right',
-            className: 'navbar-icon navbar-discord-link',
-            'aria-label': 'Discord server',
-          },
-          {
-            href: 'https://github.com/motion-canvas/motion-canvas',
-            position: 'right',
-            className: 'navbar-icon navbar-github-link',
-            'aria-label': 'GitHub repository',
-          },
         ],
       },
       footer: {
