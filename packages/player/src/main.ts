@@ -15,7 +15,7 @@ enum State {
 
 class MotionCanvasPlayer extends HTMLElement {
   public static get observedAttributes() {
-    return ['src', 'quality', 'width', 'height', 'auto'];
+    return ['src', 'quality', 'width', 'height', 'auto', 'variables'];
   }
 
   private get auto() {
@@ -40,6 +40,11 @@ class MotionCanvasPlayer extends HTMLElement {
   private get height() {
     const attr = this.getAttribute('height');
     return attr ? parseFloat(attr) : this.defaultHeight;
+  }
+
+  private get variables() {
+    const attr = this.getAttribute('variables');
+    return attr ? JSON.parse(attr) : {};
   }
 
   private readonly root: ShadowRoot;
@@ -71,6 +76,7 @@ class MotionCanvasPlayer extends HTMLElement {
     this.overlay.addEventListener('mousemove', this.handleMouseMove);
     this.overlay.addEventListener('mouseleave', this.handleMouseLeave);
     this.button.addEventListener('mousedown', this.handleMouseDown);
+
     this.setState(State.Initial);
   }
 
@@ -170,6 +176,7 @@ class MotionCanvasPlayer extends HTMLElement {
       await Promise.any([delay, promise]);
       this.setState(State.Loading);
       project = (await promise).default();
+      project.setVariables(this.variables);
     } catch (e) {
       this.setState(State.Error);
       return;
@@ -245,6 +252,10 @@ class MotionCanvasPlayer extends HTMLElement {
           this.project.setSize([this.width, this.height]);
         }
         break;
+      case 'variables':
+        if (this.project) {
+          this.project.setVariables(this.variables);
+        }
     }
   }
 
