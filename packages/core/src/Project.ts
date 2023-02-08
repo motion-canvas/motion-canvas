@@ -27,6 +27,7 @@ export interface ProjectConfig {
   canvas?: HTMLCanvasElement;
   size?: Vector2;
   background?: string | false;
+  variables?: {[key: string]: any};
 }
 
 export enum PlaybackState {
@@ -148,6 +149,17 @@ export class Project {
     return this.size;
   }
 
+  public setVariables(variables: object) {
+    this.variables = variables;
+    if (this.scenes.current[0]) {
+      this.scenes.current[0].variables.updateSignals();
+    }
+  }
+
+  public getVariables(): {[key: string]: any} {
+    return this.variables;
+  }
+
   public readonly name: string;
   public readonly audio = new AudioManager();
   public readonly logger = new Logger();
@@ -170,6 +182,7 @@ export class Project {
   private previousBufferContext: CanvasRenderingContext2D | null = null;
   private exportCounter = 0;
   private size = Vector2.zero;
+  private variables: {[key: string]: any} = {};
 
   /**
    * @deprecated Use {@link makeProject} instead.
@@ -194,6 +207,7 @@ export class Project {
       canvas,
       size = ProjectSize.FullHD,
       background = false,
+      variables = {},
     } = typeof name === 'string' ? config! : name;
 
     this.name = typeof name === 'string' ? name : '';
@@ -202,6 +216,7 @@ export class Project {
     this.creationStack = new Error().stack ?? '';
     this.setCanvas(canvas);
     this.setSize(size);
+    this.setVariables(variables);
     this.background = background;
 
     if (audio) {

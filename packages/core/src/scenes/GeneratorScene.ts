@@ -7,6 +7,7 @@ import {
 } from '../threading';
 import {Meta} from '../Meta';
 import {TimeEvents} from './TimeEvents';
+import {Variables} from './Variables';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
@@ -41,6 +42,7 @@ export abstract class GeneratorScene<T>
   public readonly project: Project;
   public readonly meta: Meta<SceneMetadata>;
   public readonly timeEvents: TimeEvents;
+  public readonly variables: Variables;
   public random: Random;
   public creationStack?: string;
 
@@ -113,6 +115,7 @@ export abstract class GeneratorScene<T>
 
     decorate(this.runnerFactory, threadable(this.name));
     this.timeEvents = new TimeEvents(this);
+    this.variables = new Variables(this);
 
     let seed = this.meta.getData().seed;
     if (typeof seed !== 'number') {
@@ -263,6 +266,7 @@ export abstract class GeneratorScene<T>
     } else {
       this.state = SceneState.Initial;
     }
+    this.variables.destroySignals();
     this.afterReset.dispatch();
     await this.next();
   }
