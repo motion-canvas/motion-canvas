@@ -43,8 +43,13 @@ class MotionCanvasPlayer extends HTMLElement {
   }
 
   private get variables() {
-    const attr = this.getAttribute('variables');
-    return attr ? JSON.parse(attr) : {};
+    try {
+      const attr = this.getAttribute('variables');
+      return attr ? JSON.parse(attr) : {};
+    } catch {
+      this.project.logger.warn(`Project variables could not be parsed.`);
+      return {};
+    }
   }
 
   private readonly root: ShadowRoot;
