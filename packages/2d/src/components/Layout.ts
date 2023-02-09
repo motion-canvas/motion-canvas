@@ -3,7 +3,6 @@ import {
   computed,
   initial,
   inspectable,
-  inherited,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -41,9 +40,9 @@ import {drawLine, lineTo} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
+  isDefault,
   SignalValue,
   SimpleSignal,
-  SimpleInheritedSignal,
 } from '@motion-canvas/core/lib/signals';
 
 export interface LayoutProps extends NodeProps {
@@ -159,13 +158,12 @@ export class Layout extends Node {
   @initial(null)
   @signal()
   public declare readonly fontFamily: SimpleSignal<string | null, this>;
-  @inherited()
-  public declare readonly fontSize: SimpleInheritedSignal<number, this>;
+  @signal()
+  public declare readonly fontSize: SimpleSignal<number, this>;
 
   protected computeFontSize(): number {
-    return Number(
-      this.computeStyles().getPropertyValue('font-size').slice(0, -2),
-    );
+    this.requestLayoutUpdate();
+    return Number(this.styles.getPropertyValue('font-size').slice(0, -2));
   }
 
   @initial(null)
@@ -174,9 +172,18 @@ export class Layout extends Node {
   @initial(null)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number | null, this>;
-  @initial(null)
   @signal()
-  public declare readonly lineHeight: SimpleSignal<number | null, this>;
+  public declare readonly lineHeight: SimpleSignal<number, this>;
+
+  protected computeLineHeight(): number {
+    this.requestLayoutUpdate();
+    const styleHeight = Number(
+      this.styles.getPropertyValue('line-height').slice(0, -2),
+    );
+    const minHeight = this.fontSize() * 1.2;
+    return styleHeight < minHeight ? minHeight : styleHeight;
+  }
+
   @initial(null)
   @signal()
   public declare readonly letterSpacing: SimpleSignal<number | null, this>;
@@ -526,12 +533,6 @@ export class Layout extends Node {
     return this.getComputedLayout().size;
   }
 
-  @computed()
-  protected computeStyles(): CSSStyleDeclaration {
-    this.requestLayoutUpdate();
-    return getComputedStyle(this.element);
-  }
-
   /**
    * Find the closest layout root and apply any new layout changes.
    */
@@ -751,11 +752,13 @@ export class Layout extends Node {
   @computed()
   protected applyFont() {
     this.element.style.fontFamily = this.parseValue(this.fontFamily());
-    this.element.style.fontSize = this.fontSize.isInheriting()
+    this.element.style.fontSize = isDefault(this.fontSize)
       ? ''
       : this.parsePixels(this.fontSize());
     this.element.style.fontStyle = this.parseValue(this.fontStyle());
-    this.element.style.lineHeight = this.parsePixels(this.lineHeight());
+    this.element.style.lineHeight = isDefault(this.lineHeight)
+      ? ''
+      : this.parsePixels(this.lineHeight());
     this.element.style.fontWeight = this.parseValue(this.fontWeight());
     this.element.style.letterSpacing = this.parsePixels(this.letterSpacing());
 

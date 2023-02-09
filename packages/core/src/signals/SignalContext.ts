@@ -49,6 +49,7 @@ export class SignalContext<
   TValue extends TSetterValue = TSetterValue,
   TOwner = void,
 > extends DependencyContext<TOwner> {
+  public compute?: () => TValue;
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
   protected parser: (value: TSetterValue) => TValue = value => <TValue>value;

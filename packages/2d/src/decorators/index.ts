@@ -4,6 +4,5 @@ export * from './compound';
 export * from './computed';
 export * from './filtersSignal';
 export * from './initializers';
-export * from './inherited';
 export * from './signal';
 export * from './vector2Signal';

@@ -27,5 +27,12 @@ export function patchSignal<TSetterValue, TValue extends TSetterValue>(
     if (tweener) {
       signal.doTween = tweener.bind(owner);
     }
+    const computer = owner?.[`compute${capitalize(name)}`];
+    if (computer) {
+      signal.compute = computer.bind(owner);
+      if (signal['initial'] === undefined) {
+        signal.setInitial(signal.compute!);
+      }
+    }
   }
 }
