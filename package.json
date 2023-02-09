@@ -38,7 +38,9 @@
     "husky": "^8.0.0",
     "lerna": "^5.3.0",
     "lint-staged": "^13.0.3",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "typescript": "^4.9.5",
+    "vite": "^3.2.5"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",

@@ -31,8 +31,7 @@
     "clsx": "^1.2.1",
     "highlight.js": "^11.7.0",
     "preact": "10.7.3",
-    "source-map-js": "^1.0.2",
-    "typescript": "^4.6.4",
-    "vite": "^3.0.4"
+    "sass": "^1.58.0",
+    "source-map-js": "^1.0.2"
   }
 }

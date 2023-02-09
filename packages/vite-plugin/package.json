@@ -23,9 +23,7 @@
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
-    "@types/mime-types": "^2.1.1",
-    "typescript": "^4.7.4",
-    "vite": "^3.0.9"
+    "@types/mime-types": "^2.1.1"
   },
   "dependencies": {
     "mime-types": "^2.1.35"
