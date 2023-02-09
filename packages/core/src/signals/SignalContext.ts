@@ -55,7 +55,7 @@ export class SignalContext<
   protected parser: (value: TSetterValue) => TValue = value => <TValue>value;
 
   public constructor(
-    private initial: SignalValue<TSetterValue> | undefined,
+    public initial: SignalValue<TSetterValue> | undefined,
     private readonly interpolation: InterpolationFunction<TValue>,
     owner: TOwner = <TOwner>(<unknown>undefined),
   ) {
@@ -88,10 +88,6 @@ export class SignalContext<
 
   protected wrap(value: SignalValue<TSetterValue>): SignalValue<TValue> {
     return isReactive(value) ? () => this.parse(value()) : this.parse(value);
-  }
-
-  public setInitial(value: SignalValue<TSetterValue>) {
-    this.initial = value;
   }
 
   public setParser(value: (value: TSetterValue) => TValue) {

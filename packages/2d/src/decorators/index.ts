@@ -1,4 +1,5 @@
 export * from './canvasStyleSignal';
+export * from './computedStyle';
 export * from './colorSignal';
 export * from './compound';
 export * from './computed';

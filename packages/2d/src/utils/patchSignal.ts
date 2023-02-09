@@ -30,8 +30,8 @@ export function patchSignal<TSetterValue, TValue extends TSetterValue>(
     const computer = owner?.[`compute${capitalize(name)}`];
     if (computer) {
       signal.compute = computer.bind(owner);
-      if (signal['initial'] === undefined) {
-        signal.setInitial(signal.compute!);
+      if (signal.initial === undefined) {
+        signal.initial = signal.compute!;
       }
     }
   }

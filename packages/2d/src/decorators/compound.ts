@@ -54,7 +54,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
       for (const [key, property] of meta.compoundEntries) {
         patchSignal(signal[key].context, undefined, instance, property);
         if (property in context.defaults) {
-          signal[key].context.setInitial(context.defaults[property]);
+          signal[key].context.initial = context.defaults[property];
         }
       }
 

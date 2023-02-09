@@ -1,6 +1,7 @@
 import {
   cloneable,
   computed,
+  computedStyle,
   initial,
   inspectable,
   signal,
@@ -31,6 +32,7 @@ import {
   FlexWrap,
   LayoutMode,
   Length,
+  LetterSpacing,
   TextWrap,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
@@ -155,38 +157,34 @@ export class Layout extends Node {
   @signal()
   public declare readonly columnGap: SimpleSignal<Length, this>;
 
-  @initial(null)
+  @computedStyle('font-family')
   @signal()
-  public declare readonly fontFamily: SimpleSignal<string | null, this>;
+  public declare readonly fontFamily: SimpleSignal<string, this>;
+  @computedStyle('font-size', parseFloat)
   @signal()
   public declare readonly fontSize: SimpleSignal<number, this>;
-
-  protected computeFontSize(): number {
-    this.requestLayoutUpdate();
-    return Number(this.styles.getPropertyValue('font-size').slice(0, -2));
-  }
-
-  @initial(null)
+  @computedStyle('font-style')
   @signal()
-  public declare readonly fontStyle: SimpleSignal<string | null, this>;
-  @initial(null)
+  public declare readonly fontStyle: SimpleSignal<string, this>;
+  @computedStyle('font-weight', Number)
   @signal()
-  public declare readonly fontWeight: SimpleSignal<number | null, this>;
-  @signal()
-  public declare readonly lineHeight: SimpleSignal<number, this>;
-
-  protected computeLineHeight(): number {
-    this.requestLayoutUpdate();
-    const styleHeight = Number(
-      this.styles.getPropertyValue('line-height').slice(0, -2),
-    );
+  public declare readonly fontWeight: SimpleSignal<number, this>;
+  @computedStyle('line-height', function (this: Layout, i) {
+    const styleHeight = parseFloat(i);
     const minHeight = this.fontSize() * 1.2;
     return styleHeight < minHeight ? minHeight : styleHeight;
-  }
-
-  @initial(null)
+  })
   @signal()
-  public declare readonly letterSpacing: SimpleSignal<number | null, this>;
+  public declare readonly lineHeight: SimpleSignal<number, this>;
+  @computedStyle('letter-spacing', i => {
+    if (i === 'normal') {
+      return 'normal';
+    }
+    return parseFloat(i);
+  })
+  @signal()
+  public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
+
   @initial(null)
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
@@ -751,16 +749,26 @@ export class Layout extends Node {
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = this.parseValue(this.fontFamily());
+    this.element.style.fontFamily = isDefault(this.fontFamily)
+      ? ''
+      : this.fontFamily();
     this.element.style.fontSize = isDefault(this.fontSize)
       ? ''
-      : this.parsePixels(this.fontSize());
-    this.element.style.fontStyle = this.parseValue(this.fontStyle());
+      : `${this.fontSize()}px`;
+    this.element.style.fontStyle = isDefault(this.fontStyle)
+      ? ''
+      : this.fontStyle();
     this.element.style.lineHeight = isDefault(this.lineHeight)
       ? ''
-      : this.parsePixels(this.lineHeight());
-    this.element.style.fontWeight = this.parseValue(this.fontWeight());
-    this.element.style.letterSpacing = this.parsePixels(this.letterSpacing());
+      : `${this.lineHeight()}px`;
+    this.element.style.fontWeight = isDefault(this.fontWeight)
+      ? ''
+      : this.fontWeight().toString();
+    this.element.style.letterSpacing = isDefault(this.letterSpacing)
+      ? ''
+      : this.letterSpacing() === 'normal'
+      ? 'normal'
+      : `${this.letterSpacing()}px`;
 
     const wrap = this.textWrap();
     this.element.style.whiteSpace =
