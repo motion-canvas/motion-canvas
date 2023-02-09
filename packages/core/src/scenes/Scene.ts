@@ -1,6 +1,7 @@
 import type {Project} from '../Project';
 import {Meta, Metadata} from '../Meta';
 import {SavedTimeEvent, TimeEvents} from './TimeEvents';
+import {Variables} from './Variables';
 import {
   SubscribableEvent,
   SubscribableValueEvent,
@@ -122,6 +123,7 @@ export interface Scene<T = unknown> {
    */
   readonly project: Project;
   readonly timeEvents: TimeEvents;
+  readonly variables: Variables;
   readonly random: Random;
   readonly meta: Meta<SceneMetadata>;
   creationStack?: string;

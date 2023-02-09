@@ -1,0 +1,38 @@
+---
+slug: /project-variables
+---
+
+# Project variables
+
+Making animations dynamic can be achieved using project variables. These could
+be used for light/dark themes, changing Node styling or editing text content.
+Project variables make use of signals - allowing variables to be updated during
+animations.
+
+Adding variables via the player component can be done by passing a stringified
+json object to the variables attribute:
+
+```html
+<motion-canvas-player
+  src="/@id/__x00__virtual:template"
+  style="aspect-ratio: 16 / 9"
+  variables='{"circleFill":"red"}'
+></motion-canvas-player>
+```
+
+They can also be added using makeProject():
+
+```ts
+export default makeProject({
+  scenes: [example],
+  background: '#141414',
+  variables: {circleFill: 'red'},
+});
+```
+
+Accessing the variables inside of a scene is through
+[`useScene()`](/api/core/utils#useScene):
+
+```ts
+const circleFill = useScene().variables.get('circleFill');
+```
