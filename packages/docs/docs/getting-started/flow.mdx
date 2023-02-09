@@ -69,7 +69,7 @@ export default makeScene2D(function* (view) {
   yield* flicker(circle());
 });
 
-function* flicker(circle: Circle) {
+function* flicker(circle: Circle): Generator {
   circle.fill('red');
   yield;
   circle.fill('blue');
