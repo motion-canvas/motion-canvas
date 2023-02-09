@@ -13,6 +13,8 @@ In this guide, we'll create a simple animation using Motion Canvas.
 
 ### Prerequisites
 
+Open the CLI (command line interface)
+
 Make sure that [Node.js](https://nodejs.org/) version 16 or greater is installed
 on your machine.
 
@@ -28,14 +30,21 @@ node -v
 
 ### Creating a new project
 
+Navigate to whichever directory you would like your new animation folder 
+to be placed.  
+
 Run the following command in order to scaffold a new Motion Canvas project:
 
 ```bash
 npm init @motion-canvas
 ```
 
-Answer the prompts to name your project and select which language you would like
-to use; either TypeScript or plain JavaScript.
+Enter the name of your project (Ex] my-first-animation)
+
+Enter the project path (Ex] my-first-animation)
+
+Select which language you would like to use (TypeScript or plain 
+JavaScript)
 
 :::tip
 
@@ -44,7 +53,13 @@ we're using throughout this documentation.
 
 :::
 
-To complete the scaffolding process, run the following command in your newly
+A new folder with the title of your project should appear in the directory 
+that you selected.
+
+Next, change into your newly created project directory.
+(Ex] cd my-first-animation)
+
+Run the following command in your newly
 created project directory:
 
 ```shell
@@ -67,7 +82,7 @@ animation, but for now there's not much to see.
 
 The scaffolding command will create several files for you, but for now we're
 going to focus on `src/scenes/example.tsx`, which is where we can add our
-animations. Open `example.tsx` in a text editor, and replace all code in the
+animations. Open `example.tsx` in a text editor (Ex] nano example.tsx), and replace all code in the
 file with the following snippet.
 
 <CodeBlock language="tsx" title="src/scenes/example.tsx">
@@ -96,6 +111,17 @@ animate across the screen.
 
 Depending on the size of your browser, you may want to zoom the preview out by
 scrolling down on your mouse wheel while hovering over the preview panel.
+
+If you do not see the circle animation in the preview pane, try the following:
+
+1. Open up a new terminal window
+
+2. Navigate to the directory where you created your animation project (Ex] my-first-animation)
+
+3. Run npm run serve
+
+4. Copy and paste the new preview link with the new port number (Ex] http://localhost:9001/)
+in a new browser tab.
 
 ### Explanation
 
