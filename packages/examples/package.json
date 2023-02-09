@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",
-    "@motion-canvas/vite-plugin": "*",
-    "vite": "^3.0.5"
+    "@motion-canvas/vite-plugin": "*"
   }
 }

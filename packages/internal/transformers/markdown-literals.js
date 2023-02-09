@@ -42,7 +42,7 @@ const transformerProgram = program => context => sourceFile => {
       const moduleSymbol = typeChecker.getSymbolAtLocation(
         node.moduleSpecifier,
       );
-      if (moduleSymbol.escapedName !== '"*.md"') {
+      if (moduleSymbol?.escapedName !== '"*.md"') {
         return node;
       }
 
