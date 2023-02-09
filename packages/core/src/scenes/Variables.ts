@@ -13,7 +13,7 @@ export class Variables {
    *
    * @param name - The name of the variable.
    */
-  public get<T>(name: string, initial: T): SimpleSignal<T> | null {
+  public get<T>(name: string, initial: T): SimpleSignal<T> {
     const variables = this.scene.project.getVariables();
     if (!(name in variables)) {
       this.scene.project.logger.warn(
