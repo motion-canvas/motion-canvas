@@ -1,0 +1,46 @@
+.root {
+  display: flex;
+  align-items: center;
+  transition: opacity var(--ifm-transition-fast);
+}
+
+.loading ~ .root {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ifm-font-color-base);
+  transition: background var(--ifm-transition-fast);
+  margin-right: var(--ifm-button-padding-vertical);
+}
+
+.icon:hover {
+  background-color: var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+}
+
+.badge {
+  padding: 0 var(--ifm-button-padding-vertical);
+  background-color: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  border: 1px solid var(--ifm-color-emphasis-300);
+  transition: opacity var(--ifm-transition-fast);
+}
+
+.loading .badge {
+  opacity: 0;
+}
+
+@media screen and (max-width: 540px) {
+  .badge {
+    display: none;
+  }
+}

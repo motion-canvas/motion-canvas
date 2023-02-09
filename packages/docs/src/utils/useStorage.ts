@@ -1,0 +1,23 @@
+import {useCallback, useMemo, useState} from 'react';
+import useIsBrowser from '@docusaurus/useIsBrowser';
+
+export default function useStorage<T>(key: string, initialState: T) {
+  const isBrowser = useIsBrowser();
+  const savedState = useMemo(() => {
+    const savedState = isBrowser && localStorage.getItem(key);
+    return savedState ? JSON.parse(savedState) : initialState;
+  }, [key]);
+  const [state, setState] = useState<T>(savedState);
+
+  const updateState = useCallback(
+    (newState: T) => {
+      if (key && isBrowser) {
+        localStorage.setItem(key, JSON.stringify(newState));
+      }
+      setState(newState);
+    },
+    [setState, key],
+  );
+
+  return [state, updateState];
+}
