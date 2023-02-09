@@ -51,6 +51,18 @@ export class Video extends Rect {
     super(props);
   }
 
+  public isPlaying(): boolean {
+    return this.playing();
+  }
+
+  public getCurrentTime(): number {
+    return this.time();
+  }
+
+  public getDuration(): number {
+    return this.video().duration;
+  }
+
   protected override desiredSize(): SerializedVector2<Length> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
