@@ -66,6 +66,12 @@ in this case it's a cubic equation. Knowing that, a function called
 `easeOutQuad` would make the object start with full speed and then slow down
 at the end using a quadratic equation.
 
+The effects of a particular easing function can be visualised by animating the `y`
+coordinate of an object as time changes with a constant rate, such as bouncing 
+it in and out.
+
+<AnimationPlayer small name="tweening-visualiser" />
+
 Because using timing functions to map a range of values is a really common
 pattern, it's possible to skip `map` entirely and pass the range to the
 timing function itself:
