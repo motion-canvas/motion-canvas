@@ -27,7 +27,7 @@ export interface ProjectConfig {
   canvas?: HTMLCanvasElement;
   size?: Vector2;
   background?: string | false;
-  variables?: {[key: string]: any};
+  variables?: Record<string, unknown>;
 }
 
 export enum PlaybackState {
@@ -149,11 +149,9 @@ export class Project {
     return this.size;
   }
 
-  public setVariables(variables: object) {
+  public setVariables(variables: Record<string, unknown>) {
     this.variables = variables;
-    if (this.scenes.current[0]) {
-      this.scenes.current[0].variables.updateSignals();
-    }
+    this.currentScene.current?.variables.updateSignals();
   }
 
   public getVariables(): {[key: string]: any} {
@@ -182,7 +180,7 @@ export class Project {
   private previousBufferContext: CanvasRenderingContext2D | null = null;
   private exportCounter = 0;
   private size = Vector2.zero;
-  private variables: {[key: string]: any} = {};
+  private variables: Record<string, unknown> = {};
 
   /**
    * @deprecated Use {@link makeProject} instead.

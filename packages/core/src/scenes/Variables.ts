@@ -1,17 +1,19 @@
 import type {Scene} from './Scene';
-import {createSignal, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {createSignal, SimpleSignal} from '../signals';
 
 export class Variables {
   private signals: {[key: string]: SimpleSignal<any>} = {};
 
-  public constructor(private readonly scene: Scene) {}
+  public constructor(private readonly scene: Scene) {
+    scene.onReset.subscribe(this.handleReset);
+  }
 
   /**
    * Get variable signal if exists or create signal if not
    *
    * @param name - The name of the variable.
    */
-  public get(name: string) {
+  public get<T>(name: string): SimpleSignal<T> | null {
     const variables = this.scene.project.getVariables();
     if (!(name in variables)) {
       this.scene.project.logger.warn(
@@ -39,9 +41,9 @@ export class Variables {
   };
 
   /**
-   * Destroy all stored signals.
+   * Reset all stored signals.
    */
-  public destroySignals = () => {
+  public handleReset = () => {
     this.signals = {};
   };
 }

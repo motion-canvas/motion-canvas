@@ -266,7 +266,6 @@ export abstract class GeneratorScene<T>
     } else {
       this.state = SceneState.Initial;
     }
-    this.variables.destroySignals();
     this.afterReset.dispatch();
     await this.next();
   }
