@@ -13,13 +13,13 @@ export class Variables {
    *
    * @param name - The name of the variable.
    */
-  public get<T>(name: string): SimpleSignal<T> | null {
+  public get<T>(name: string, initial: T): SimpleSignal<T> | null {
     const variables = this.scene.project.getVariables();
     if (!(name in variables)) {
       this.scene.project.logger.warn(
         `Variable ${name} has not been set in project ${this.scene.project.name}`,
       );
-      return null;
+      this.signals[name] = createSignal(initial);
     }
     if (!(name in this.signals)) {
       this.signals[name] = createSignal(variables[name]);
