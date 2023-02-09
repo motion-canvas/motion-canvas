@@ -15,7 +15,6 @@
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",
-    "@motion-canvas/vite-plugin": "*",
-    "@types/puppeteer": "^7.0.4"
+    "@motion-canvas/vite-plugin": "*"
   }
 }
