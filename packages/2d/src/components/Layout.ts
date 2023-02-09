@@ -3,6 +3,7 @@ import {
   computed,
   initial,
   inspectable,
+  inherited,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -42,6 +43,7 @@ import {
   createSignal,
   SignalValue,
   SimpleSignal,
+  SimpleInheritedSignal,
 } from '@motion-canvas/core/lib/signals';
 
 export interface LayoutProps extends NodeProps {
@@ -157,9 +159,15 @@ export class Layout extends Node {
   @initial(null)
   @signal()
   public declare readonly fontFamily: SimpleSignal<string | null, this>;
-  @initial(null)
-  @signal()
-  public declare readonly fontSize: SimpleSignal<number | null, this>;
+  @inherited()
+  public declare readonly fontSize: SimpleInheritedSignal<number, this>;
+
+  protected computeFontSize(): number {
+    return Number(
+      this.computeStyles().getPropertyValue('font-size').slice(0, -2),
+    );
+  }
+
   @initial(null)
   @signal()
   public declare readonly fontStyle: SimpleSignal<string | null, this>;
@@ -518,6 +526,12 @@ export class Layout extends Node {
     return this.getComputedLayout().size;
   }
 
+  @computed()
+  protected computeStyles(): CSSStyleDeclaration {
+    this.requestLayoutUpdate();
+    return getComputedStyle(this.element);
+  }
+
   /**
    * Find the closest layout root and apply any new layout changes.
    */
@@ -737,7 +751,9 @@ export class Layout extends Node {
   @computed()
   protected applyFont() {
     this.element.style.fontFamily = this.parseValue(this.fontFamily());
-    this.element.style.fontSize = this.parsePixels(this.fontSize());
+    this.element.style.fontSize = this.fontSize.isInheriting()
+      ? ''
+      : this.parsePixels(this.fontSize());
     this.element.style.fontStyle = this.parseValue(this.fontStyle());
     this.element.style.lineHeight = this.parsePixels(this.lineHeight());
     this.element.style.fontWeight = this.parseValue(this.fontWeight());

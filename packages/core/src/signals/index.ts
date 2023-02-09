@@ -10,6 +10,7 @@ export * from './createComputed';
 export * from './createComputedAsync';
 export * from './createSignal';
 export * from './isReactive';
+export * from './InheritedSignalContext';
 export * from './SignalContext';
 export * from './DependencyContext';
 export * from './types';
