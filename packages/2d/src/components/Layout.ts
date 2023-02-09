@@ -169,13 +169,9 @@ export class Layout extends Node {
   @computedStyle('font-weight', Number)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
-  @computedStyle('line-height', function (this: Layout, i) {
-    const styleHeight = parseFloat(i);
-    const minHeight = this.fontSize() * 1.2;
-    return styleHeight < minHeight ? minHeight : styleHeight;
-  })
+  @initial('120%')
   @signal()
-  public declare readonly lineHeight: SimpleSignal<number, this>;
+  public declare readonly lineHeight: SimpleSignal<Length, this>;
   @computedStyle('letter-spacing', i => {
     if (i === 'normal') {
       return 'normal';
@@ -758,9 +754,10 @@ export class Layout extends Node {
     this.element.style.fontStyle = isDefault(this.fontStyle)
       ? ''
       : this.fontStyle();
-    this.element.style.lineHeight = isDefault(this.lineHeight)
-      ? ''
-      : `${this.lineHeight()}px`;
+    this.element.style.lineHeight =
+      typeof this.lineHeight() === 'string'
+        ? String(Number((this.lineHeight() as string).slice(0, -1)) / 100)
+        : `${this.lineHeight()}px`;
     this.element.style.fontWeight = isDefault(this.fontWeight)
       ? ''
       : this.fontWeight().toString();
