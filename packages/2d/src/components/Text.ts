@@ -77,10 +77,9 @@ export class Text extends Shape {
     text: string,
     rect: Rect,
   ) {
-    const y =
-      rect.y +
-      rect.height / 2 +
-      context.measureText(text).fontBoundingBoxDescent;
+    const y = rect.y + rect.height / 2;
+    const oldBaseline = context.textBaseline;
+    context.textBaseline = 'middle';
 
     if (this.lineWidth() <= 0) {
       context.fillText(text, rect.x, y);
@@ -91,6 +90,8 @@ export class Text extends Shape {
       context.fillText(text, rect.x, y);
       context.strokeText(text, rect.x, y);
     }
+
+    context.textBaseline = oldBaseline;
   }
 
   protected override updateLayout() {
