@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/motion-canvas/motion-canvas/compare/v2.1.0...v2.2.0) (2023-02-09)
+
+
+### Features
+
+* **2d:** add video component property getter ([#240](https://github.com/motion-canvas/motion-canvas/issues/240)) ([59de5ab](https://github.com/motion-canvas/motion-canvas/commit/59de5ab2c089589773a2f9ad7588eda7d72693a7))
+* project variables ([#255](https://github.com/motion-canvas/motion-canvas/issues/255)) ([4883295](https://github.com/motion-canvas/motion-canvas/commit/488329525939928af52b4a4d8488f1e1cd4cf6f7))
+
+
+
+
+
 # [2.1.0](https://github.com/motion-canvas/motion-canvas/compare/v2.0.0...v2.1.0) (2023-02-07)
 
 
