@@ -32,6 +32,7 @@ export function PlaybackControls() {
         }
         switch (event.key) {
           case ' ':
+            event.preventDefault();
             player.togglePlayback();
             break;
           case 'ArrowLeft':
