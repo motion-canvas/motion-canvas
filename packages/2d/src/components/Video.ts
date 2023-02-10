@@ -18,6 +18,7 @@ import {
 export interface VideoProps extends RectProps {
   src?: SignalValue<string>;
   alpha?: SignalValue<number>;
+  smoothing?: SignalValue<boolean>;
   time?: SignalValue<number>;
   play?: boolean;
 }
@@ -31,6 +32,10 @@ export class Video extends Rect {
   @initial(1)
   @signal()
   public declare readonly alpha: SimpleSignal<number, this>;
+
+  @initial(true)
+  @signal()
+  public declare readonly smoothing: SimpleSignal<boolean, this>;
 
   @initial(0)
   @signal()
@@ -166,7 +171,7 @@ export class Video extends Rect {
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
-      context.imageSmoothingEnabled = this.antialiased();
+      context.imageSmoothingEnabled = this.smoothing();
       drawImage(context, video, rect);
       context.restore();
     }
