@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@motion-canvas/core": "^2.2.0",
-    "code-fns": "^0.8.2"
+    "code-fns": "^0.8.2",
+    "mathjax-full": "^3.2.2"
   }
 }
