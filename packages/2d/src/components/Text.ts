@@ -78,7 +78,7 @@ export class Text extends Shape {
     rect: Rect,
   ) {
     const y = rect.y + rect.height / 2;
-    const oldBaseline = context.textBaseline;
+    context.save();
     context.textBaseline = 'middle';
 
     if (this.lineWidth() <= 0) {
@@ -91,20 +91,26 @@ export class Text extends Shape {
       context.strokeText(text, rect.x, y);
     }
 
-    context.textBaseline = oldBaseline;
+    context.restore();
   }
 
   protected override updateLayout() {
     this.applyFont();
     this.applyFlex();
 
-    const wrap = this.styles.whiteSpace !== 'nowrap';
+    const wrap =
+      this.styles.whiteSpace !== 'nowrap' && this.styles.whiteSpace !== 'pre';
     const text = this.text();
 
     if (wrap && Text.segmenter) {
       this.element.innerText = '';
       for (const word of Text.segmenter.segment(text)) {
         this.element.appendChild(document.createTextNode(word.segment));
+      }
+    } else if (this.styles.whiteSpace === 'pre') {
+      this.element.innerText = '';
+      for (const line of text.split('\n')) {
+        this.element.appendChild(document.createTextNode(line + '\n'));
       }
     } else {
       this.element.innerHTML = this.text();
