@@ -12,3 +12,15 @@ export function computedStyle<T>(
     };
   };
 }
+
+export function computedFontStyle<T>(
+  styleName: string,
+  parse: (value: string) => T = value => value as T,
+): PropertyDecorator {
+  return (target: any, key) => {
+    target[`compute${capitalize(<string>key)}`] = function (this: Layout) {
+      this.requestFontUpdate();
+      return parse.apply(this, [this.styles.getPropertyValue(styleName)]);
+    };
+  };
+}

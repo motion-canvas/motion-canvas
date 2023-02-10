@@ -63,7 +63,7 @@ export class Video extends Rect {
     return this.video().duration;
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<Length | null> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.video();
@@ -182,9 +182,9 @@ export class Video extends Rect {
   protected override applyFlex() {
     super.applyFlex();
     const video = this.video();
-    this.element.style.aspectRatio = this.parseValue(
-      this.ratio() ?? video.videoWidth / video.videoHeight,
-    );
+    this.element.style.aspectRatio = (
+      this.ratio() ?? video.videoWidth / video.videoHeight
+    ).toString();
   }
 
   protected setCurrentTime(value: number) {

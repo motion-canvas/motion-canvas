@@ -39,7 +39,7 @@ export class Image extends Rect {
     super(props);
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<Length | null> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.image();
@@ -120,9 +120,9 @@ export class Image extends Rect {
   protected override applyFlex() {
     super.applyFlex();
     const image = this.image();
-    this.element.style.aspectRatio = this.parseValue(
-      this.ratio() ?? image.naturalWidth / image.naturalHeight,
-    );
+    this.element.style.aspectRatio = (
+      this.ratio() ?? image.naturalWidth / image.naturalHeight
+    ).toString();
   }
 
   /**

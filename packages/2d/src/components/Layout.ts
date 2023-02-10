@@ -1,7 +1,7 @@
 import {
   cloneable,
   computed,
-  computedStyle,
+  computedFontStyle,
   initial,
   inspectable,
   signal,
@@ -105,16 +105,16 @@ export class Layout extends Node {
 
   @initial(null)
   @signal()
-  public declare readonly maxWidth: SimpleSignal<Length, this>;
+  public declare readonly maxWidth: SimpleSignal<Length | null, this>;
   @initial(null)
   @signal()
-  public declare readonly maxHeight: SimpleSignal<Length, this>;
+  public declare readonly maxHeight: SimpleSignal<Length | null, this>;
   @initial(null)
   @signal()
-  public declare readonly minWidth: SimpleSignal<Length, this>;
+  public declare readonly minWidth: SimpleSignal<Length | null, this>;
   @initial(null)
   @signal()
-  public declare readonly minHeight: SimpleSignal<Length, this>;
+  public declare readonly minHeight: SimpleSignal<Length | null, this>;
   @initial(null)
   @signal()
   public declare readonly ratio: SimpleSignal<number | null, this>;
@@ -130,7 +130,7 @@ export class Layout extends Node {
   public declare readonly direction: SimpleSignal<FlexDirection, this>;
   @initial(null)
   @signal()
-  public declare readonly basis: SimpleSignal<FlexBasis, this>;
+  public declare readonly basis: SimpleSignal<FlexBasis | null, this>;
   @initial(0)
   @signal()
   public declare readonly grow: SimpleSignal<number, this>;
@@ -157,22 +157,22 @@ export class Layout extends Node {
   @signal()
   public declare readonly columnGap: SimpleSignal<Length, this>;
 
-  @computedStyle('font-family')
+  @computedFontStyle('font-family')
   @signal()
   public declare readonly fontFamily: SimpleSignal<string, this>;
-  @computedStyle('font-size', parseFloat)
+  @computedFontStyle('font-size', parseFloat)
   @signal()
   public declare readonly fontSize: SimpleSignal<number, this>;
-  @computedStyle('font-style')
+  @computedFontStyle('font-style')
   @signal()
   public declare readonly fontStyle: SimpleSignal<string, this>;
-  @computedStyle('font-weight', Number)
+  @computedFontStyle('font-weight', Number)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
   @initial('120%')
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
-  @computedStyle('letter-spacing', i => {
+  @computedFontStyle('letter-spacing', i => {
     if (i === 'normal') {
       return 'normal';
     }
@@ -181,7 +181,9 @@ export class Layout extends Node {
   @signal()
   public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
 
-  @initial(null)
+  @computedFontStyle('white-space', i => {
+    return i === 'pre' ? 'pre' : i === 'normal';
+  })
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
 
@@ -353,12 +355,12 @@ export class Layout extends Node {
 
   @inspectable(false)
   @signal()
-  protected declare readonly customWidth: SimpleSignal<Length, this>;
+  protected declare readonly customWidth: SimpleSignal<Length | null, this>;
   @inspectable(false)
   @signal()
-  protected declare readonly customHeight: SimpleSignal<Length, this>;
+  protected declare readonly customHeight: SimpleSignal<Length | null, this>;
   @computed()
-  protected desiredSize(): SerializedVector2<Length> {
+  protected desiredSize(): SerializedVector2<Length | null> {
     return {
       x: this.customWidth(),
       y: this.customHeight(),
@@ -683,18 +685,11 @@ export class Layout extends Node {
     this.position(this.position().add(newOffset).sub(oldOffset));
   }
 
-  protected parseValue(value: number | string | null): string {
-    return value === null ? '' : value.toString();
-  }
-
   protected parsePixels(value: number | null): string {
     return value === null ? '' : `${value}px`;
   }
 
-  protected parseLength(value: null | number | string): string {
-    if (value === null) {
-      return '';
-    }
+  protected parseLength(value: number | string): string {
     if (typeof value === 'string') {
       return value;
     }
@@ -706,13 +701,18 @@ export class Layout extends Node {
     this.element.style.position = this.isLayoutRoot() ? 'absolute' : 'relative';
 
     const size = this.desiredSize();
-    this.element.style.width = this.parseLength(size.x);
-    this.element.style.height = this.parseLength(size.y);
-    this.element.style.maxWidth = this.parseLength(this.maxWidth());
-    this.element.style.minWidth = this.parseLength(this.minWidth());
-    this.element.style.maxHeight = this.parseLength(this.maxHeight());
-    this.element.style.minWidth = this.parseLength(this.minWidth());
-    this.element.style.aspectRatio = this.parseValue(this.ratio());
+    this.element.style.width = size.x === null ? '' : this.parseLength(size.x);
+    this.element.style.height = size.y === null ? '' : this.parseLength(size.y);
+    this.element.style.maxWidth =
+      this.maxWidth() === null ? '' : this.parseLength(this.maxWidth()!);
+    this.element.style.minWidth =
+      this.minWidth() === null ? '' : this.parseLength(this.minWidth()!);
+    this.element.style.maxHeight =
+      this.maxHeight() === null ? '' : this.parseLength(this.maxHeight()!);
+    this.element.style.minHeight =
+      this.minHeight() === null ? '' : this.parseLength(this.minHeight()!);
+    this.element.style.aspectRatio =
+      this.ratio() === null ? '' : this.ratio()!.toString();
 
     this.element.style.marginTop = this.parsePixels(this.margin.top());
     this.element.style.marginBottom = this.parsePixels(this.margin.bottom());
@@ -725,21 +725,25 @@ export class Layout extends Node {
     this.element.style.paddingRight = this.parsePixels(this.padding.right());
 
     this.element.style.flexDirection = this.direction();
-    this.element.style.flexBasis = this.parseLength(this.basis());
+    this.element.style.flexBasis =
+      this.basis() === null ? '' : this.parseLength(this.basis()!);
     this.element.style.flexWrap = this.wrap();
 
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
-    this.element.style.rowGap = this.parseLength(this.rowGap());
-    this.element.style.columnGap = this.parseLength(this.columnGap());
-    this.element.style.gap = this.parseLength(this.gap());
+    this.element.style.rowGap =
+      this.rowGap() === null ? '' : this.parseLength(this.rowGap());
+    this.element.style.columnGap =
+      this.columnGap() === null ? '' : this.parseLength(this.columnGap());
+    this.element.style.gap =
+      this.gap() === null ? '' : this.parseLength(this.gap());
 
     if (this.sizeLockCounter() > 0) {
       this.element.style.flexGrow = '0';
       this.element.style.flexShrink = '0';
     } else {
-      this.element.style.flexGrow = this.parseValue(this.grow());
-      this.element.style.flexShrink = this.parseValue(this.shrink());
+      this.element.style.flexGrow = this.grow().toString();
+      this.element.style.flexShrink = this.shrink().toString();
     }
   }
 
@@ -767,15 +771,16 @@ export class Layout extends Node {
       ? 'normal'
       : `${this.letterSpacing()}px`;
 
-    const wrap = this.textWrap();
-    this.element.style.whiteSpace =
-      wrap === null
-        ? ''
-        : typeof wrap === 'boolean'
-        ? wrap
-          ? 'normal'
-          : 'nowrap'
-        : wrap;
+    if (isDefault(this.textWrap)) {
+      this.element.style.whiteSpace = '';
+    } else {
+      const wrap = this.textWrap();
+      if (typeof wrap === 'boolean') {
+        this.element.style.whiteSpace = wrap ? 'normal' : 'nowrap';
+      } else {
+        this.element.style.whiteSpace = wrap;
+      }
+    }
   }
 
   public override hit(position: Vector2): Node | null {

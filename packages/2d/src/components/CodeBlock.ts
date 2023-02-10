@@ -131,7 +131,7 @@ export class CodeBlock extends Shape {
     return new Vector2(width, parseFloat(this.styles.lineHeight));
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<Length | null> {
     const custom = super.desiredSize();
     const tokensSize = this.getTokensSize(this.parsed());
     return {

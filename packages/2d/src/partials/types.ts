@@ -11,8 +11,7 @@ export type FlexBasis =
   | 'content'
   | 'max-content'
   | 'min-content'
-  | 'fit-content'
-  | null;
+  | 'fit-content';
 
 export type FlexJustify =
   | 'normal'
@@ -34,7 +33,7 @@ export type FlexAlign =
 
 export type LetterSpacing = number | 'normal';
 
-export type TextWrap = boolean | 'pre' | null;
+export type TextWrap = boolean | 'pre';
 
 export type LayoutMode = boolean | null;
 
@@ -46,9 +45,8 @@ export type LayoutMode = boolean | null;
  * - `number` - the desired length in pixels
  * - `${number}%` - a string with the desired length in percents, for example
  *                  `'50%'`
- * - `null` - an automatic length (equivalent to `auto` in CSS)
  */
-export type Length = number | `${number}%` | null;
+export type Length = number | `${number}%`;
 
 export type PossibleCanvasStyle = null | PossibleColor | Gradient | Pattern;
 export type CanvasStyle = null | Color | Gradient | Pattern;
