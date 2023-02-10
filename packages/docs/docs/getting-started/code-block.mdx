@@ -1,0 +1,249 @@
+---
+sidebar_position: 12
+slug: /code-block
+---
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import signalSource from '!!raw-loader!@motion-canvas/examples/src/scenes/node-signal';
+
+# CodeBlock
+
+<AnimationPlayer banner name="code-block" />
+
+The `CodeBlock` component is used to present syntax highlighted code. It can
+automatically highlight many common languages, and, once displayed, that code
+can be modified in place to present changes to the viewer. Modified code will
+animate from the prior code to the new code by removing old code, translating
+the remaining code, and inserting new code. You may also "select" code in order
+to call attention to some important snippet.
+
+## Using the component
+
+To display code, set the `code` and `language` property.
+
+```ts
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+yield view.add(
+  <CodeBlock language="c#" code={`Console.WriteLine("Hello World!")`} />,
+);
+```
+
+You can find a list of available languages in the [Starry Night][languages]
+repository—the library used for syntax highlighting. The default language is
+`tsx`, the language of Motion Canvas, which we will use for the rest of this
+guide.
+
+Note that unlike most components, you must `yield` any call to `add` which
+includes a `CodeBlock`. This prompts Motion Canvas to prepare the syntax
+highlighter.
+
+```tsx
+yield view.add(<CodeBlock />);
+```
+
+### Indentation
+
+For convenience, the indentation of code will be automatically adjust whenever
+the code starts with a new line.
+
+```tsx
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+yield view.add(
+  // note that the ` bracket is followed by a new line
+  <CodeBlock
+    code={`
+      console.log('Hello World!')
+        // more indented
+      // less indented`}
+  />,
+);
+```
+
+```tsx
+console.log('Hello World!');
+// more indented
+// less indented
+```
+
+The indentation is then set by the least indented code.
+
+```tsx
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+yield view.add(
+  <CodeBlock
+    // note that the ` bracket is followed by a new line
+    code={`
+      console.log('Hello World!')
+    // less indented
+      // more indented`}
+  />,
+);
+```
+
+````tsx
+  console.log('Hello World!');
+// less indented
+  // more indented
+`
+### Selection
+
+Code may be "selected" to call attention to it.
+The default behavior is to desaturate any unselected text.
+
+A selection can be made using the `selection` property when the `CodeBlock` is first created.
+Selections are specified using two `[line, position]` arrays, where `line` and `position` are zero indexed, and `position` is an insert position between characters.
+So `[[0, 5], [1, 2]]` will select the sixth character on the first line through to the second character on the second line.
+
+The following code will select `myBool` out of the code snippet.
+```tsx
+yield view.add(<CodeBlock code={`var myBool;`} selection={[[0, 4], [0, 10]]} />);
+````
+
+It is often simpler to use the `word` utility function to select code with a
+position and a length.
+
+```tsx
+import {CodeBlock, word} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+const codeRef = createRef();
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool = true;`} />);
+
+// line 0, character 13, 4 characters long
+yield * codeRef().selection(word(0, 13, 4));
+// "true" is selected
+```
+
+Finally, you can use the `lines` function to select whole lines of code.
+
+```tsx
+import {CodeBlock, lines} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+const codeRef = createRef();
+yield view.add(
+  <CodeBlock
+    ref={codeRef}
+    code={`
+      // first line
+      // second line
+      // third line`}
+  />,
+);
+
+// second line only
+yield * codeRef().selection(line(1));
+// second and third line (line 1 to line 2)
+yield * codeRef().selection(line(1, 2));
+```
+
+To remove a selection, you must set the selected range from `[0, 0]` to
+`[Infinity, Infinity]` to select all text. This is most easily performed by
+setting the selection to `lines(0, Infinity)`.
+
+### Animating code
+
+You may insert, remove, or edit the displayed code, any of which will animate
+the code to its new state. All of these changes are performed with the `edit`
+method on a `CodeBlock` instance.
+
+To insert code, start by using `createRef` to store your `CodeBlock` instance
+for future edits. Then call `edit` with an imbedded `insert` call to add the new
+code.
+
+```tsx
+import {CodeBlock, insert} from '@motion-canvas/2d/lib/components/CodeBlock';
+import {createRef} from '@motion-canvas/core/lib/utils';
+
+const codeRef = createRef<CodeBlock>();
+
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool;`} />);
+
+// duration of 1.2 seconds
+yield * codeRef().edit(1.2)`var myBool${insert(' = true')};`;
+```
+
+```tsx
+var myBool;
+// will animate to
+var myBool = true;
+```
+
+Removing code is similar, only with the provided code being removed during the
+animation.
+
+```tsx
+import {CodeBlock, remove} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool = true;`} />);
+
+yield * codeRef().edit(1.2)`var myBool${remove(' = true')};`;
+```
+
+```tsx
+var myBool = true;
+// will animate to
+var myBool;
+```
+
+Finally, replacing code combines removal and insertion into one call.
+
+```tsx
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool = true;`} />);
+
+yield * codeRef().edit(1.2)`var myBool = ${edit('true', 'false')};`;
+```
+
+```tsx
+var myBool = true;
+// will animate to
+var myBool = false;
+```
+
+Editing code will update your selection to highlight the changes. If you would
+like to retain your selection through an animation, use `edit(duration, false)`.
+
+```tsx
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool;`} />);
+
+// note the second argument to edit
+yield * codeRef().edit(1.2, false)`var myBool${insert(' = true')};`;
+```
+
+You may apply multiple edits to a code block over the course of a video, each
+modifying the prior code to a new state.
+
+```tsx
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool;`} />);
+
+yield * codeRef().edit(1.2)`var myBool${insert(' = true')};`;
+yield * waitFor(1);
+yield * codeRef().edit(1.2)`var myBool = ${edit('true', 'false')};`;
+yield * waitFor(1);
+yield * codeRef().edit(1.2)`var myBool${remove(' = false')};`;
+```
+
+```tsx
+// the displayed code will animate through
+var myBool;
+var myBool = true;
+var myBool = false;
+var myBool;
+```
+
+You can also apply multiple changes to a code block in one `edit`, such that all
+changes are applied simultaniously.
+
+```tsx
+yield view.add(<CodeBlock ref={codeRef} code={`var myBool;`} />);
+
+yield *
+  codeRef().edit(1.2)`${edit('var', 'const')} myBool${insert(' = true')};`;
+```
+
+```tsx
+var myBool;
+// will animate to
+const myBool = true;
+```

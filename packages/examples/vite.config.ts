@@ -11,6 +11,7 @@ export default defineConfig({
         './src/tweening-color.ts',
         './src/tweening-vector.ts',
         './src/node-signal.ts',
+        './src/code-block.ts',
         './src/random.ts',
         './src/layout.ts',
         './src/layout-group.ts',
