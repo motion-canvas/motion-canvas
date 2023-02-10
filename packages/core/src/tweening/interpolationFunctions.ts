@@ -1,3 +1,4 @@
+import {useLogger} from '../utils';
 import {Vector2} from '../types';
 
 export interface InterpolationFunction<T, Rest extends any[] = any[]> {
@@ -56,6 +57,10 @@ export function deepLerp<
   TFrom extends Record<any, unknown>,
   TTo extends Record<any, unknown>,
 >(from: TFrom, to: TTo, value: number): TFrom | TTo;
+export function deepLerp<
+  TFrom extends Record<any, unknown>,
+  TTo extends Record<any, unknown>,
+>(from: TFrom, to: TTo, value: number, suppressWarnings: boolean): TFrom | TTo;
 /**
  * Interpolate between any two values, including objects, arrays, and Maps.
  *
@@ -66,11 +71,27 @@ export function deepLerp<
  * @returns A value matching the structure of from and to.
  */
 export function deepLerp<T>(from: T, to: T, value: number): T;
-export function deepLerp(from: any, to: any, value: number): any {
+export function deepLerp<T>(
+  from: T,
+  to: T,
+  value: number,
+  suppressWarnings: boolean,
+): T;
+export function deepLerp(
+  from: any,
+  to: any,
+  value: number,
+  suppressWarnings = false,
+): any {
   if (value === 0) return from;
   if (value === 1) return to;
 
-  if (typeof from === 'undefined' || typeof to === 'undefined') {
+  if (from == undefined || to == undefined) {
+    if (!suppressWarnings) {
+      useLogger().warn(
+        `Attempting to lerp ${from} -> ${to} may result in unexpected behavior.`,
+      );
+    }
     return undefined;
   }
 
@@ -102,7 +123,7 @@ export function deepLerp(from: any, to: any, value: number): any {
       if (from instanceof Map && to instanceof Map) {
         const result = new Map();
         for (const key of new Set([...from.keys(), ...to.keys()])) {
-          const inter = deepLerp(from.get(key), to.get(key), value);
+          const inter = deepLerp(from.get(key), to.get(key), value, true);
           if (inter !== undefined) result.set(key, inter);
         }
         return toObject ? Object.fromEntries(result) : result;
