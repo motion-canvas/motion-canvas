@@ -8,6 +8,12 @@
   background-color: var(--theme);
 }
 
+.select {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .controls {
   display: flex;
   justify-content: center;
