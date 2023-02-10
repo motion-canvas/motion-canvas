@@ -87,12 +87,12 @@ export enum SceneRenderEvent {
   BeforeRender,
   /**
    * Occurs at the beginning of a render when the Scene's
-   * {@link utils~useContext} handlers are applied.
+   * {@link utils.useContext} handlers are applied.
    */
   BeginRender,
   /**
    * Occurs at the end of a render when the Scene's
-   * {@link utils~useContextAfter} handlers are applied.
+   * {@link utils.useContextAfter} handlers are applied.
    */
   FinishRender,
   /**

@@ -295,7 +295,7 @@ export class Layout extends Node {
    * A size is a two-dimensional vector, where `x` represents the `width`, and `y`
    * represents the `height`.
    *
-   * The value of both x and y is of type {@link partials~Length} which is
+   * The value of both x and y is of type {@link partials.Length} which is
    * either:
    * - `number` - the desired length in pixels
    * - `${number}%` - a string with the desired length in percents, for example

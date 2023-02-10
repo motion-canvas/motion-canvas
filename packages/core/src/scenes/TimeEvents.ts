@@ -14,7 +14,7 @@ export interface TimeEvent {
    * was registered.
    *
    * @remarks
-   * In other words, the moment at which {@link flow~waitUntil} for this event
+   * In other words, the moment at which {@link flow.waitUntil} for this event
    * was invoked.
    */
   initialTime: number;
