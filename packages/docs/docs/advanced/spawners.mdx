@@ -77,4 +77,8 @@ yield* all(...spawnedCircles.map(function* (circle) {
 }));
 ```
 
+Be aware that the references returned by a call to `children()` may be invalidated
+when the number of spawned objects changes, and accessing the invalidated objects 
+may cause undefined behavior. Try not to save references to spawned objects for too long,
+and use `children()` wherever possible to get the updated list of spawned objects.
 
