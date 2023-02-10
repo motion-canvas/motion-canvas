@@ -62,5 +62,19 @@ const pool = range(64).map(i => (
   <Circle x={i * 32} width={32} height={32} fill={'lightseagreen'} />
 ));
 
-view.add(<Layout layout spawner={() => pool.slice(0, count())} />);
+const layout = createRef<Layout>();
+view.add(<Layout layout ref={layout} spawner={() => pool.slice(0, count())} />);
 ```
+
+Apart from the spawner function, the pool should never be accessed directly.
+Use the `children()` signal of the parent object to get references to the spawned objects:
+
+```tsx
+// ... continuing from above ...
+let spawnedCircles = layout().children() as Circle[];
+yield* all(...spawnedCircles.map(function* (circle) {
+  yield* circle.scale(1.5, 1).to(1, 1);
+}));
+```
+
+
