@@ -62,7 +62,6 @@ export function PlaybackControls() {
   return (
     <div className={clsx(styles.controls, state.render && styles.disabled)}>
       <Select
-        className={clsx(styles.select)}
         title="Playback speed"
         options={[
           {value: 0.25, text: 'x0.25'},

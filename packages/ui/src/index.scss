@@ -25,6 +25,10 @@
   font-size: 14px;
   accent-color: var(--theme);
 
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
   &::-webkit-scrollbar {
     width: 16px;
     height: 16px;
