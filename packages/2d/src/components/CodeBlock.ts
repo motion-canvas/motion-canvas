@@ -1,7 +1,15 @@
 import {computed, initial, parser, signal} from '../decorators';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
-import {CodeTree, parse, diff, ready, MorphToken, Token} from 'code-fns';
+import {
+  CodeTree,
+  parse,
+  diff,
+  ready,
+  MorphToken,
+  Token,
+  CodeStyle,
+} from 'code-fns';
 import {
   clampRemap,
   easeInOutSine,
@@ -30,6 +38,7 @@ export interface CodeProps extends ShapeProps {
   children?: CodeTree | string;
   code?: SignalValue<CodeTree | string>;
   selection?: CodeRange[];
+  theme?: CodeStyle;
 }
 
 export interface CodeModification {
@@ -59,6 +68,10 @@ export class CodeBlock extends Shape {
   })
   @signal()
   public declare readonly code: Signal<CodeTree | string, CodeTree, this>;
+
+  @initial(undefined)
+  @signal()
+  public declare readonly theme: Signal<CodeStyle | null, CodeStyle, this>;
 
   @initial(lines(0, Infinity))
   @signal()
@@ -92,7 +105,7 @@ export class CodeBlock extends Shape {
       return [];
     }
 
-    return parse(this.code());
+    return parse(this.code(), {codeStyle: this.theme()});
   }
 
   public constructor({children, ...rest}: CodeProps) {
@@ -253,13 +266,13 @@ export class CodeBlock extends Shape {
     const autoWidth = this.customWidth() === null;
     const autoHeight = this.customHeight() === null;
     const fromSize = this.size();
-    const toSize = this.getTokensSize(parse(code));
+    const toSize = this.getTokensSize(parse(code, {codeStyle: this.theme()}));
 
     const beginning = 0.2;
     const ending = 0.8;
 
     this.codeProgress(0);
-    this.diffed = diff(this.code(), code);
+    this.diffed = diff(this.code(), code, {codeStyle: this.theme()});
     yield* tween(
       time,
       value => {
