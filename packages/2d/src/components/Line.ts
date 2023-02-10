@@ -84,7 +84,7 @@ export class Line extends Shape {
     this
   >;
 
-  protected override desiredSize(): SerializedVector2<Length | null> {
+  protected override desiredSize(): SerializedVector2<Length> {
     return this.childrenRect().size;
   }
 

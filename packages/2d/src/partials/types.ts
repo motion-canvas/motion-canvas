@@ -11,7 +11,8 @@ export type FlexBasis =
   | 'content'
   | 'max-content'
   | 'min-content'
-  | 'fit-content';
+  | 'fit-content'
+  | null;
 
 export type FlexJustify =
   | 'normal'
@@ -46,7 +47,7 @@ export type LayoutMode = boolean | null;
  * - `${number}%` - a string with the desired length in percents, for example
  *                  `'50%'`
  */
-export type Length = number | `${number}%`;
+export type Length = number | `${number}%` | null;
 
 export type PossibleCanvasStyle = null | PossibleColor | Gradient | Pattern;
 export type CanvasStyle = null | Color | Gradient | Pattern;

@@ -105,16 +105,16 @@ export class Layout extends Node {
 
   @initial(null)
   @signal()
-  public declare readonly maxWidth: SimpleSignal<Length | null, this>;
+  public declare readonly maxWidth: SimpleSignal<Length, this>;
   @initial(null)
   @signal()
-  public declare readonly maxHeight: SimpleSignal<Length | null, this>;
+  public declare readonly maxHeight: SimpleSignal<Length, this>;
   @initial(null)
   @signal()
-  public declare readonly minWidth: SimpleSignal<Length | null, this>;
+  public declare readonly minWidth: SimpleSignal<Length, this>;
   @initial(null)
   @signal()
-  public declare readonly minHeight: SimpleSignal<Length | null, this>;
+  public declare readonly minHeight: SimpleSignal<Length, this>;
   @initial(null)
   @signal()
   public declare readonly ratio: SimpleSignal<number | null, this>;
@@ -130,7 +130,7 @@ export class Layout extends Node {
   public declare readonly direction: SimpleSignal<FlexDirection, this>;
   @initial(null)
   @signal()
-  public declare readonly basis: SimpleSignal<FlexBasis | null, this>;
+  public declare readonly basis: SimpleSignal<FlexBasis, this>;
   @initial(0)
   @signal()
   public declare readonly grow: SimpleSignal<number, this>;
@@ -355,12 +355,12 @@ export class Layout extends Node {
 
   @inspectable(false)
   @signal()
-  protected declare readonly customWidth: SimpleSignal<Length | null, this>;
+  protected declare readonly customWidth: SimpleSignal<Length, this>;
   @inspectable(false)
   @signal()
-  protected declare readonly customHeight: SimpleSignal<Length | null, this>;
+  protected declare readonly customHeight: SimpleSignal<Length, this>;
   @computed()
-  protected desiredSize(): SerializedVector2<Length | null> {
+  protected desiredSize(): SerializedVector2<Length> {
     return {
       x: this.customWidth(),
       y: this.customHeight(),
@@ -689,7 +689,10 @@ export class Layout extends Node {
     return value === null ? '' : `${value}px`;
   }
 
-  protected parseLength(value: number | string): string {
+  protected parseLength(value: number | string | null): string {
+    if (value === null) {
+      return '';
+    }
     if (typeof value === 'string') {
       return value;
     }
@@ -701,16 +704,12 @@ export class Layout extends Node {
     this.element.style.position = this.isLayoutRoot() ? 'absolute' : 'relative';
 
     const size = this.desiredSize();
-    this.element.style.width = size.x === null ? '' : this.parseLength(size.x);
-    this.element.style.height = size.y === null ? '' : this.parseLength(size.y);
-    this.element.style.maxWidth =
-      this.maxWidth() === null ? '' : this.parseLength(this.maxWidth()!);
-    this.element.style.minWidth =
-      this.minWidth() === null ? '' : this.parseLength(this.minWidth()!);
-    this.element.style.maxHeight =
-      this.maxHeight() === null ? '' : this.parseLength(this.maxHeight()!);
-    this.element.style.minHeight =
-      this.minHeight() === null ? '' : this.parseLength(this.minHeight()!);
+    this.element.style.width = this.parseLength(size.x);
+    this.element.style.height = this.parseLength(size.y);
+    this.element.style.maxWidth = this.parseLength(this.maxWidth());
+    this.element.style.minWidth = this.parseLength(this.minWidth());
+    this.element.style.maxHeight = this.parseLength(this.maxHeight());
+    this.element.style.minHeight = this.parseLength(this.minHeight()!);
     this.element.style.aspectRatio =
       this.ratio() === null ? '' : this.ratio()!.toString();
 
@@ -725,18 +724,14 @@ export class Layout extends Node {
     this.element.style.paddingRight = this.parsePixels(this.padding.right());
 
     this.element.style.flexDirection = this.direction();
-    this.element.style.flexBasis =
-      this.basis() === null ? '' : this.parseLength(this.basis()!);
+    this.element.style.flexBasis = this.parseLength(this.basis()!);
     this.element.style.flexWrap = this.wrap();
 
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
-    this.element.style.rowGap =
-      this.rowGap() === null ? '' : this.parseLength(this.rowGap());
-    this.element.style.columnGap =
-      this.columnGap() === null ? '' : this.parseLength(this.columnGap());
-    this.element.style.gap =
-      this.gap() === null ? '' : this.parseLength(this.gap());
+    this.element.style.rowGap = this.parseLength(this.rowGap());
+    this.element.style.columnGap = this.parseLength(this.columnGap());
+    this.element.style.gap = this.parseLength(this.gap());
 
     if (this.sizeLockCounter() > 0) {
       this.element.style.flexGrow = '0';

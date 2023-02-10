@@ -63,7 +63,7 @@ export class Video extends Rect {
     return this.video().duration;
   }
 
-  protected override desiredSize(): SerializedVector2<Length | null> {
+  protected override desiredSize(): SerializedVector2<Length> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.video();

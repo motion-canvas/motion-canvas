@@ -39,7 +39,7 @@ export class Image extends Rect {
     super(props);
   }
 
-  protected override desiredSize(): SerializedVector2<Length | null> {
+  protected override desiredSize(): SerializedVector2<Length> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.image();
