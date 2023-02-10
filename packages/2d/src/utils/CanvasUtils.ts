@@ -39,6 +39,8 @@ export function drawRoundRect(
   context: CanvasRenderingContext2D | Path2D,
   rect: Rect,
   radius: Spacing,
+  smoothCorners: boolean,
+  cornerSharpness: number,
 ) {
   if (
     radius.top === 0 &&
@@ -69,6 +71,56 @@ export function drawRoundRect(
     radius.top,
     rect,
   );
+
+  if (smoothCorners === true) {
+    const sharpness = (radius: number): number => {
+      const val = radius * cornerSharpness;
+      return radius - val;
+    };
+
+    context.moveTo(rect.left + topLeft, rect.top);
+    context.lineTo(rect.right - topRight, rect.top);
+
+    context.bezierCurveTo(
+      rect.right - sharpness(topRight),
+      rect.top,
+      rect.right,
+      rect.top + sharpness(topRight),
+      rect.right,
+      rect.top + topRight,
+    );
+    context.lineTo(rect.right, rect.bottom - bottomRight);
+
+    context.bezierCurveTo(
+      rect.right,
+      rect.bottom - sharpness(bottomRight),
+      rect.right - sharpness(bottomRight),
+      rect.bottom,
+      rect.right - bottomRight,
+      rect.bottom,
+    );
+    context.lineTo(rect.left + bottomRight, rect.bottom);
+
+    context.bezierCurveTo(
+      rect.left + sharpness(bottomLeft),
+      rect.bottom,
+      rect.left,
+      rect.bottom - sharpness(bottomLeft),
+      rect.left,
+      rect.bottom - bottomLeft,
+    );
+    context.lineTo(rect.left, rect.top + topLeft);
+
+    context.bezierCurveTo(
+      rect.left,
+      rect.top + sharpness(topLeft),
+      rect.left + sharpness(topLeft),
+      rect.top,
+      rect.left + topLeft,
+      rect.top,
+    );
+    return;
+  }
 
   context.moveTo(rect.left + topLeft, rect.top);
   context.arcTo(rect.right, rect.top, rect.right, rect.bottom, topRight);
