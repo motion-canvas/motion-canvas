@@ -18,7 +18,6 @@ import {
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
   alpha?: SignalValue<number>;
-  smoothing?: SignalValue<boolean>;
 }
 
 export class Image extends Rect {
@@ -30,10 +29,6 @@ export class Image extends Rect {
   @initial(1)
   @signal()
   public declare readonly alpha: SimpleSignal<number, this>;
-
-  @initial(true)
-  @signal()
-  public declare readonly smoothing: SimpleSignal<boolean, this>;
 
   public constructor(props: ImageProps) {
     super(props);
@@ -92,7 +87,7 @@ export class Image extends Rect {
     const image = this.image();
     context.canvas.width = image.naturalWidth;
     context.canvas.height = image.naturalHeight;
-    context.imageSmoothingEnabled = this.smoothing();
+    context.imageSmoothingEnabled = this.antialiased();
     context.drawImage(image, 0, 0);
 
     return context;
@@ -110,7 +105,7 @@ export class Image extends Rect {
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
-      context.imageSmoothingEnabled = this.smoothing();
+      context.imageSmoothingEnabled = this.antialiased();
       drawImage(context, this.image(), rect);
       context.restore();
     }
