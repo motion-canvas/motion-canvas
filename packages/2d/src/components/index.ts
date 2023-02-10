@@ -1,4 +1,5 @@
 export * from './Circle';
+export * from './Icon';
 export * from './Image';
 export * from './Grid';
 export * from './Latex';
