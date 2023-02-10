@@ -5,6 +5,7 @@
  */
 
 export * from './capitalize';
+export * from './debug';
 export * from './deprecate';
 export * from './DetailedError';
 export * from './errorToLog';
