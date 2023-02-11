@@ -4,10 +4,7 @@
   "useWorkspaces": true,
   "private": false,
   "version": "2.2.0",
-  "ignoreChanges": [
-    "**/*.test.ts",
-    "**/*.md"
-  ],
+  "ignoreChanges": ["**/*.test.ts", "**/*.md"],
   "message": "ci(release): %v [skip ci]",
   "conventionalCommits": true,
   "createRelease": "github"

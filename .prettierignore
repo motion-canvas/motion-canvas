@@ -5,6 +5,8 @@ static
 .git
 .docusaurus
 .github
+packages/docs/build
+packages/docs/src/generated
 package.json
 package-lock.json
 CHANGELOG.md

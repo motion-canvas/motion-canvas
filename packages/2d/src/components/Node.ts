@@ -33,12 +33,10 @@ import {Filter} from '../partials';
 import {filtersSignal, FiltersSignal} from '../decorators/filtersSignal';
 import {
   createSignal,
-  Signal,
   DependencyContext,
   SignalValue,
   SimpleSignal,
   isReactive,
-  Computed,
 } from '@motion-canvas/core/lib/signals';
 
 export interface NodeProps {

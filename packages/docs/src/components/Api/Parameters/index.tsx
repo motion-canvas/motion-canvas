@@ -2,7 +2,7 @@ import React, {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 import Summary from '@site/src/components/Api/Comment/Summary';
 import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
-import {useApiFinder, useApiLookup} from '@site/src/contexts/api';
+import {useApiFinder} from '@site/src/contexts/api';
 
 export default function Parameters({parameters}: {parameters: number[]}) {
   const find = useApiFinder();
