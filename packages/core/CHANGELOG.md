@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
+
+
+### Features
+
+* **core:** add `debug` helper function ([#293](https://github.com/motion-canvas/motion-canvas/issues/293)) ([b870873](https://github.com/motion-canvas/motion-canvas/commit/b8708732af0fc08d9ff9eeecbbb77d65f1b36eb8))
+* **core:** additional easing functions ([#274](https://github.com/motion-canvas/motion-canvas/issues/274)) ([f81ce43](https://github.com/motion-canvas/motion-canvas/commit/f81ce43019fe253e99f4ab6311c2251b40e2eae3))
+* **core:** disallow tweening to/from undefined values ([#257](https://github.com/motion-canvas/motion-canvas/issues/257)) ([d4bb791](https://github.com/motion-canvas/motion-canvas/commit/d4bb79145300b52c4b4d101df2afaff5ea11a9e9))
+
+
+
+
+
 # [2.2.0](https://github.com/motion-canvas/motion-canvas/compare/v2.1.0...v2.2.0) (2023-02-09)
 
 

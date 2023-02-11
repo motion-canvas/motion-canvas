@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
+
+
+### Bug Fixes
+
+* **ui:** fix play-pause button ([#299](https://github.com/motion-canvas/motion-canvas/issues/299)) ([191f54a](https://github.com/motion-canvas/motion-canvas/commit/191f54a0a5a9de2fd2dc27bffc6d21d692ce6f72))
+* **ui:** remove glossy <select> effect in Safari ([#292](https://github.com/motion-canvas/motion-canvas/issues/292)) ([9c062b2](https://github.com/motion-canvas/motion-canvas/commit/9c062b26e48fbdb1905daae25a3fb34df82307d3))
+
+
+
+
+
 # [2.2.0](https://github.com/motion-canvas/motion-canvas/compare/v2.1.0...v2.2.0) (2023-02-09)
 
 **Note:** Version bump only for package @motion-canvas/ui
