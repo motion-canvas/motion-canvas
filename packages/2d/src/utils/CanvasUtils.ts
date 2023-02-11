@@ -72,7 +72,7 @@ export function drawRoundRect(
     rect,
   );
 
-  if (smoothCorners === true) {
+  if (smoothCorners) {
     const sharpness = (radius: number): number => {
       const val = radius * cornerSharpness;
       return radius - val;
@@ -99,7 +99,7 @@ export function drawRoundRect(
       rect.right - bottomRight,
       rect.bottom,
     );
-    context.lineTo(rect.left + bottomRight, rect.bottom);
+    context.lineTo(rect.left + bottomLeft, rect.bottom);
 
     context.bezierCurveTo(
       rect.left + sharpness(bottomLeft),

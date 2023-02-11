@@ -23,7 +23,7 @@ export class Rect extends Shape {
   @signal()
   public declare readonly smoothCorners: SimpleSignal<boolean, this>;
 
-  @initial(0.62)
+  @initial(0.6)
   @signal()
   public declare readonly cornerSharpness: SimpleSignal<number, this>;
 
