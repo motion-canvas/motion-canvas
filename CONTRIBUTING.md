@@ -20,11 +20,11 @@ out the necessary information.
 ## Proposing a Change
 
 If you intend to change the public API, make any non-trivial changes to the
-implementation, or create brand new guides in the documentation, make sure to
+implementation, or create brand-new guides in the documentation, make sure to
 [create an issue][new-feature] first. This will let us discuss a proposal before
 you put significant effort into it. After a proposal has been discussed it may
-receive the [accepted][label-accepted] label indicating that it's ready to be
-implemented.
+receive the [`c-accepted`][label-accepted] label indicating that it's ready to
+be implemented.
 
 If you're only fixing a bug or a typo, it's fine to submit a pull request right
 away without creating an issue, but make sure it contains a clear and concise
@@ -32,11 +32,12 @@ description of the bug.
 
 ## Working on Issues
 
-Before you start working on an issue make sure that no one has claimed it yet.
-Otherwise, you may duplicate other people's efforts. If somebody claims an issue
-but doesn't follow up for more than two weeks, it’s fine to take it over, but
-you should still leave a comment. You should also leave a comment on any issue
-you're working on, to let others know.
+Before you start working on an issue make sure that it has been accepted
+(indicated by a [`c-accepted`][label-accepted] label) and that no one has
+claimed it yet. Otherwise, you may duplicate other people's efforts. If somebody
+claims an issue but doesn't follow up for more than two weeks, it’s fine to take
+it over, but you should still leave a comment. You should also leave a comment
+on any issue you're working on, to let others know.
 
 ## Semantic Versioning
 
@@ -57,8 +58,8 @@ Motion Canvas follows [semantic versioning][semver].
    ```
    When committing the changes, our git hooks should automatically run Prettier
    and ESLint for you. If, for some reason, hooks are not supported in your
-   working environement, you can run these tools using `npm run prettier` and
-   `npm run eslint` respectively.
+   working environement, you can run these tools using `npm run prettier:fix`
+   and `npm run eslint:fix` respectively.
 5. Push your branch to GitHub:
    ```shell
    git push origin my-fix-branch
@@ -111,4 +112,5 @@ This Contribution Guide was partially inspired by [React][react] and
   https://github.com/angular/angular/blob/main/CONTRIBUTING.md#commit
 [angular]: https://github.com/angular/angular/blob/main/CONTRIBUTING.md
 [react]: https://reactjs.org/docs/how-to-contribute.html
-[label-accepted]: https://github.com/motion-canvas/motion-canvas/labels/accepted
+[label-accepted]:
+  https://github.com/motion-canvas/motion-canvas/labels/c-accepted

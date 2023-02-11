@@ -51,11 +51,11 @@ happening.
 
 ## Controlling animation duration
 
-Aside from specifying _when_ something should happen, Time Events can also be used to 
-control _how long_ something should last. You can use the 
-[`useDuration`](/api/core/utils#useDuration) function to retrieve the duration of an event
-and use it in your animation:
+Aside from specifying _when_ something should happen, Time Events can also be
+used to control _how long_ something should last. You can use the
+[`useDuration`](/api/core/utils#useDuration) function to retrieve the duration
+of an event and use it in your animation:
 
 ```ts
-yield* circle().scale(2, useDuration('event'));
+yield * circle().scale(2, useDuration('event'));
 ```

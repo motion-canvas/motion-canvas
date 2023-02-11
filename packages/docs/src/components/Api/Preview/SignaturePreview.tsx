@@ -7,7 +7,7 @@ import Type from '@site/src/components/Api/Type';
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
-import {getUrl, useApiFinder, useApiLookup} from '@site/src/contexts/api';
+import {getUrl, useApiFinder} from '@site/src/contexts/api';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
 
 export default function SignaturePreview({
