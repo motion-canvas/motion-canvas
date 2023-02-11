@@ -16,6 +16,8 @@ export default defineConfig({
         './src/layout.ts',
         './src/layout-group.ts',
         './src/positioning.ts',
+        './src/media-image.ts',
+        './src/media-video.ts',
       ],
     }),
   ],
