@@ -112,7 +112,6 @@ export function PlaybackControls() {
         render={(framerate, paused) => (
           <Input
             title="Current framerate"
-            size={4}
             readOnly
             value={paused ? 'PAUSED' : `${framerate} FPS`}
           />
