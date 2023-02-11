@@ -1,25 +1,13 @@
 import {capitalize} from '@motion-canvas/core/lib/utils';
 import {Layout} from 'components';
 
-export function computedStyle<T>(
+export function defaultStyle<T>(
   styleName: string,
   parse: (value: string) => T = value => value as T,
 ): PropertyDecorator {
   return (target: any, key) => {
-    target[`compute${capitalize(<string>key)}`] = function (this: Layout) {
+    target[`getDefault${capitalize(<string>key)}`] = function (this: Layout) {
       this.requestLayoutUpdate();
-      return parse.apply(this, [this.styles.getPropertyValue(styleName)]);
-    };
-  };
-}
-
-export function computedFontStyle<T>(
-  styleName: string,
-  parse: (value: string) => T = value => value as T,
-): PropertyDecorator {
-  return (target: any, key) => {
-    target[`compute${capitalize(<string>key)}`] = function (this: Layout) {
-      this.requestFontUpdate();
       return parse.apply(this, [this.styles.getPropertyValue(styleName)]);
     };
   };

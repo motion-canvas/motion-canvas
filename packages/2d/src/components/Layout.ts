@@ -1,7 +1,7 @@
 import {
   cloneable,
   computed,
-  computedFontStyle,
+  defaultStyle,
   initial,
   inspectable,
   signal,
@@ -42,7 +42,6 @@ import {drawLine, lineTo} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
-  isDefault,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -157,22 +156,22 @@ export class Layout extends Node {
   @signal()
   public declare readonly columnGap: SimpleSignal<Length, this>;
 
-  @computedFontStyle('font-family')
+  @defaultStyle('font-family')
   @signal()
   public declare readonly fontFamily: SimpleSignal<string, this>;
-  @computedFontStyle('font-size', parseFloat)
+  @defaultStyle('font-size', parseFloat)
   @signal()
   public declare readonly fontSize: SimpleSignal<number, this>;
-  @computedFontStyle('font-style')
+  @defaultStyle('font-style')
   @signal()
   public declare readonly fontStyle: SimpleSignal<string, this>;
-  @computedFontStyle('font-weight', Number)
+  @defaultStyle('font-weight', Number)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
   @initial('120%')
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
-  @computedFontStyle('letter-spacing', i => {
+  @defaultStyle('letter-spacing', i => {
     if (i === 'normal') {
       return 'normal';
     }
@@ -181,7 +180,7 @@ export class Layout extends Node {
   @signal()
   public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
 
-  @computedFontStyle('white-space', i => {
+  @defaultStyle('white-space', i => {
     return i === 'pre' ? 'pre' : i === 'normal';
   })
   @signal()
@@ -744,29 +743,29 @@ export class Layout extends Node {
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = isDefault(this.fontFamily)
+    this.element.style.fontFamily = this.fontFamily.isDefault()
       ? ''
       : this.fontFamily();
-    this.element.style.fontSize = isDefault(this.fontSize)
+    this.element.style.fontSize = this.fontSize.isDefault()
       ? ''
       : `${this.fontSize()}px`;
-    this.element.style.fontStyle = isDefault(this.fontStyle)
+    this.element.style.fontStyle = this.fontStyle.isDefault()
       ? ''
       : this.fontStyle();
     this.element.style.lineHeight =
       typeof this.lineHeight() === 'string'
         ? String(Number((this.lineHeight() as string).slice(0, -1)) / 100)
         : `${this.lineHeight()}px`;
-    this.element.style.fontWeight = isDefault(this.fontWeight)
+    this.element.style.fontWeight = this.fontWeight.isDefault()
       ? ''
       : this.fontWeight().toString();
-    this.element.style.letterSpacing = isDefault(this.letterSpacing)
+    this.element.style.letterSpacing = this.letterSpacing.isDefault()
       ? ''
       : this.letterSpacing() === 'normal'
       ? 'normal'
       : `${this.letterSpacing()}px`;
 
-    if (isDefault(this.textWrap)) {
+    if (this.textWrap.isDefault()) {
       this.element.style.whiteSpace = '';
     } else {
       const wrap = this.textWrap();

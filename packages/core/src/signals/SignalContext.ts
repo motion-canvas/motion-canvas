@@ -41,6 +41,11 @@ export interface Signal<
    */
   save(): TOwner;
 
+  /**
+   * {@inheritDoc SignalContext.isDefault}
+   */
+  isDefault(): boolean;
+
   context: TContext;
 }
 
@@ -49,7 +54,7 @@ export class SignalContext<
   TValue extends TSetterValue = TSetterValue,
   TOwner = void,
 > extends DependencyContext<TOwner> {
-  public compute?: () => TValue;
+  public default?: () => TValue;
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
   protected parser: (value: TSetterValue) => TValue = value => <TValue>value;
@@ -66,6 +71,9 @@ export class SignalContext<
     });
     Object.defineProperty(this.invokable, 'save', {
       value: this.save.bind(this),
+    });
+    Object.defineProperty(this.invokable, 'isDefault', {
+      value: this.isDefault.bind(this),
     });
 
     if (this.initial !== undefined) {
@@ -252,6 +260,37 @@ export class SignalContext<
    */
   public save() {
     return this.set(this.get());
+  }
+
+  /**
+   * Checks if the signal is currently using the `default()` method
+   * as its value.
+   *
+   * @example
+   * ```ts
+   * class Example extends Node {
+   *   // ...
+   *   @signal()
+   *   declare public readonly value: SimpleSignal<number, this>
+   *
+   *   public getDefaultValue() {
+   *     return 8;
+   *   }
+   *   // ...
+   * }
+   *
+   * let example = new Example();
+   * example.value();            // 7
+   * example.value.isDefault();  // true
+   *
+   * example.value(0);
+   * example.value();            // 8
+   * example.value.isDefault();  // false
+   * ```
+   */
+  public isDefault() {
+    this.collect();
+    return this.default !== undefined && this.current === this.default;
   }
 
   /**
