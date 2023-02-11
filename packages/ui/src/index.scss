@@ -25,10 +25,6 @@
   font-size: 14px;
   accent-color: var(--theme);
 
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  appearance: none;
-
   &::-webkit-scrollbar {
     width: 16px;
     height: 16px;
@@ -74,4 +70,12 @@ button {
   appearance: none;
   border: 0;
   padding: 0;
+}
+
+select {
+  background: url("data:image/svg+xml;charset=UTF-8,%3csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M16.71 10.71L15.29 9.28998L12 12.59L8.71001 9.28998L7.29001 10.71L12 15.41L16.71 10.71Z' fill='gray'/%3e%3c/svg%3e")
+    no-repeat 100% 50%;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
 }
