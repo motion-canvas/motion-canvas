@@ -19,6 +19,7 @@ export default defineConfig({
         './src/positioning.ts',
         './src/media-image.ts',
         './src/media-video.ts',
+        './src/components.ts',
       ],
     }),
   ],
