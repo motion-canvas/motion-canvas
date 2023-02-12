@@ -48,7 +48,7 @@ Motion Canvas follows [semantic versioning][semver].
 1. Fork the motion-canvas/motion-canvas repo.
 2. In your forked repo, create a new branch for your changes:
    ```shell
-   git checkout -b my-fix-branch master
+   git checkout -b my-fix-branch main
    ```
 3. Update the code.
 4. Commit your changes using a **descriptive commit message** that follows the
