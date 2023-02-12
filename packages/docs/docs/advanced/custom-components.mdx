@@ -4,14 +4,14 @@ slug: /custom-components
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
-import source from '!!raw-loader!@motion-canvas/examples/src/scenes/components-switch';
+import source from '!!raw-loader!@motion-canvas/examples/src/components/Switch';
 
 # Components
 
 <AnimationPlayer name="components" banner />
 
-Components are classes like [Rect](/api/2d/components/Rect) and
-[Circle](/api/2d/component/Rect) that can abstract rendering and data
+Components are classes like [`Rect`](/api/2d/components/Rect) and
+[`Circle`](/api/2d/components/Circle) that can abstract rendering and data
 functionality into reusable, modular pieces. To use a component in a scene, add
 it to the view and provide arguments to the component.
 
@@ -21,7 +21,7 @@ it to the view and provide arguments to the component.
 
 To define what arguments a component will take, first define an interface. All
 properties of the interface must be wrapped in
-[SignalValue<>](/api/core/signals#SignalValue) as such:
+[`SignalValue<>`](/api/core/signals#SignalValue) as such:
 
 ```tsx
 //  You can extend an existing props interface
@@ -32,7 +32,7 @@ properties of the interface must be wrapped in
 export interface SwitchProps extends NodeProps {
   initialState?: SignalValue<boolean>;
 
-  // We dont use color here because we want
+  // We don't use color here because we want
   // to be able to pass hex strings and rgb
   // values to accent rather than a `Color`
   accent?: SignalValue<PossibleColor>;
@@ -40,18 +40,22 @@ export interface SwitchProps extends NodeProps {
 ```
 
 Next, create a class for your components. The component class must extend
-[Node](/api/2d/components/Node) or one of its subclasses. If you dont want to
+[`Node`](/api/2d/components/Node) or one of its subclasses. If you don't want to
 inherit any methods from an existing component, extend your class from `Node`.
 We advise extending from the component most similar to the component you are
 building. For instance, if you were to make a component including a
-[Layout](/api/2d/components/Layout), you should extend
-[Layout](/api/2d/components/Layout) and
-[LayoutProps](/api/2d/components/LayoutProps).
+[`Layout`](/api/2d/components/Layout), you should extend
+[`Layout`](/api/2d/components/Layout) and
+[`LayoutProps`](/api/2d/components/LayoutProps).
 
 ```tsx
-export interface SwitchProps extends NodeProps { ... }
+export interface SwitchProps extends NodeProps {
+  // properties
+}
 
-export class Switch extends Node { ... }
+export class Switch extends Node {
+  // implementation
+}
 ```
 
 To use the properties defined in the interface, your class _must_ contain a
@@ -63,21 +67,21 @@ Here is an example of how you would define such properties:
 
 ```tsx
 export class Switch extends Node {
-    // @initial - optional, sets the property to an
-    // initial value if it was not provided.
-    // The @initial decorator is optional.
-    @initial(false)
-    // @signal - is required by motion canvas
-    // for every prop that was passed in.
-    @signal()
-    public declare readonly initialState: SimpleSignal<boolean, this>
+  // @initial - optional, sets the property to an
+  // initial value if it was not provided.
+  @initial(false)
+  // @signal - is required by motion canvas
+  // for every prop that was passed in.
+  @signal()
+  public declare readonly initialState: SimpleSignal<boolean, this>;
 
-    @initial("#68ABDF")
-    @signal()
-    public declare readonly accent: ColorSignal<this>
-
-    ...
-
+  @initial('#68ABDF')
+  // @colorSignal - some complex types provide a dedicated decorator for
+  // signals that takes care of parsing.
+  // In this case, `accent` will automatically convert strings into `Color`s
+  @colorSignal()
+  public declare readonly accent: ColorSignal<this>;
+  // ...
 }
 ```
 
@@ -91,20 +95,21 @@ register the signal to the class. Properties must be initialised with the
 Normal properties can be defined as normal. For example:
 
 ```tsx
-public constructor(props?: SwitchProps) {
+export class Switch extends Node {
+  public constructor(props?: SwitchProps) {
     super({
-        // If you wanted to ensure that layout was always
-        // true for this component, you could add it here
-        // as such:
-
-        //layout: true
-        ...props
-    })
-    ...
+      // If you wanted to ensure that layout was always
+      // true for this component, you could add it here
+      // as such:
+      // layout: true
+      ...props,
+    });
+    // ...
+  }
 }
 ```
 
-The `props` parameter can also be useful outside of the `super()` call to access
+The `props` parameter can also be useful outside the `super()` call to access
 your data elsewhere. For example, if you were building a component to display an
 array, you could use props to set the color of every
 [Rect](/api/2d/components/Rect) in the array.
@@ -113,19 +118,15 @@ Now we can add elements to the view by using `this.add()`, much like you would
 add to a scene's view:
 
 ```tsx
-public constructor(props?: SwitchProps) {
-
-    ...
-
+export class Switch extends Node {
+  public constructor(props?: SwitchProps) {
+    // ...
     this.add(
-            <Rect
-                ...
-            >
-                <Circle
-                    ...
-                />
-            </Rect>
-    )
+      <Rect>
+        <Circle />
+      </Rect>,
+    );
+  }
 }
 ```
 
@@ -134,17 +135,19 @@ wanting to animate a component easily. Here is an example of a method for
 toggling our switch:
 
 ```tsx
-public* toggle(Duration: number) {
+export class Switch extends Node {
+  // ...
+  public *toggle(duration: number) {
     yield* all(
-        tween(Duration, value => {
-            ...
-        }),
-
-        tween(Duration, value => {
-            ...
-        })
-    )
-    this.isOn = !this.isOn
+      tween(duration, value => {
+        // ...
+      }),
+      tween(duration, value => {
+        // ...
+      }),
+    );
+    this.isOn = !this.isOn;
+  }
 }
 ```
 
