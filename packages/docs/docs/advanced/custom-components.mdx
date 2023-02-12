@@ -80,7 +80,6 @@ export class Switch extends Node {
 
 }
 ```
-
 Notice how colors are wrapped in `ColorSignal<>` while any other type (even
 user-defined ones) are wrapped in `SimpleSignal<>`. The type does not need to be
 passed to color signal as Motion Canvas knows that it must be of a
@@ -89,13 +88,6 @@ register the signal to the class. Properties must be initialised with the
 `public`, `declare` and `readonly` keywords.
 
 Normal properties can be defined as normal. For example:
-
-```tsx
-private isOn: boolean;
-```
-
-Every component _requires_ a constructor. The format of the constructor will
-always look similar to this, with optional argument for the properties:
 
 ```tsx
 public constructor(props?: SwitchProps) {
