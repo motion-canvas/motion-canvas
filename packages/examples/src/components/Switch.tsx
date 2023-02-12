@@ -5,7 +5,7 @@ import {
   ColorSignal,
   PossibleColor,
 } from '@motion-canvas/core/lib/types/Color';
-import {initial, signal} from '@motion-canvas/2d/lib/decorators';
+import {colorSignal, initial, signal} from '@motion-canvas/2d/lib/decorators';
 import {
   createSignal,
   SignalValue,
@@ -25,7 +25,7 @@ export class Switch extends Node {
   public declare readonly initialState: SimpleSignal<boolean, this>;
 
   @initial('#68ABDF')
-  @signal()
+  @colorSignal()
   public declare readonly accent: ColorSignal<this>;
 
   private isOn: boolean;
@@ -59,9 +59,9 @@ export class Switch extends Node {
     );
   }
 
-  public *toggle(Duration: number) {
+  public *toggle(duration: number) {
     yield* all(
-      tween(Duration, value => {
+      tween(duration, value => {
         const oldColor = this.isOn ? this.accent() : this.offColor;
         const newColor = this.isOn ? this.offColor : this.accent();
 
@@ -70,7 +70,7 @@ export class Switch extends Node {
         );
       }),
 
-      tween(Duration, value => {
+      tween(duration, value => {
         const currentPos = this.indicator().position();
 
         this.indicatorPosition(
