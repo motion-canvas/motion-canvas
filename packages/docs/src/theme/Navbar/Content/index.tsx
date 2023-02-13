@@ -9,7 +9,6 @@ import NavbarColorModeToggle from '@theme/Navbar/ColorModeToggle';
 import SearchBar from '@theme/SearchBar';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarLogo from '@theme/Navbar/Logo';
-import NavbarSearch from '@theme/Navbar/Search';
 import styles from './styles.module.css';
 import GitHubLink from '@site/src/components/NavbarLink/GitHub';
 import DiscordLink from '@site/src/components/NavbarLink/Discord';
@@ -48,12 +47,10 @@ export default function NavbarContent() {
       }
       right={
         <>
+          <SearchBar />
           <NavbarColorModeToggle className={styles.colorModeToggle} />
           <GitHubLink />
           <DiscordLink />
-          <NavbarSearch>
-            <SearchBar />
-          </NavbarSearch>
         </>
       }
     />

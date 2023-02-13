@@ -99,6 +99,11 @@ const config = {
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Motion Canvas. Built with Docusaurus.`,
       },
+      algolia: {
+        appId: 'Q6Z7BJ83RF',
+        apiKey: '825d6a74e138e6e1378e9669b22720f0',
+        indexName: 'motion-canvasio',
+      },
       prism: {
         theme: require('./config/lightCodeTheme'),
         darkTheme: require('./config/darkCodeTheme'),
@@ -111,6 +116,7 @@ const config = {
         customCss: require.resolve('./src/css/custom.css'),
       },
     ],
+    '@docusaurus/theme-search-algolia',
     '@docusaurus/theme-mermaid',
   ],
   plugins: [
