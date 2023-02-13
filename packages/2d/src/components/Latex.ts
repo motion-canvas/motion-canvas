@@ -6,6 +6,7 @@ import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
 import {initial, signal} from '../decorators';
 import {
+  createComputed,
   DependencyContext,
   SignalValue,
   SimpleSignal,
@@ -14,6 +15,8 @@ import {OptionList} from 'mathjax-full/js/util/Options';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {Logger} from '@motion-canvas/core';
+import {Rect, SerializedVector2} from '@motion-canvas/core/lib/types';
+import {Length} from '../partials';
 
 const adaptor = liteAdaptor();
 RegisterHTMLHandler(adaptor);
@@ -42,15 +45,27 @@ interface MathJaxRect extends MathJaxShapeBase {
 
 type MathJaxShape = MathJaxPath | MathJaxRect;
 
+interface MathJaxGraphic {
+  width: number;
+  height: number;
+  shapes: MathJaxShape[];
+}
+
 export interface LatexProps extends ShapeProps {
   tex?: SignalValue<string>;
   renderProps?: SignalValue<OptionList>;
 }
 
 export class Latex extends Shape {
-  private static shapeContentsPool: Record<string, MathJaxShape[]> = {};
-
-  private readonly imageElement = document.createElement('img');
+  private static mathJaxCharacterHeight = createComputed(() => {
+    useLogger().info('Calculate x char height');
+    const svg = adaptor.innerHTML(jaxDocument.convert('x'));
+    const container = document.createElement('div');
+    container.innerHTML = svg;
+    const viewBox = container.querySelector('svg')!.viewBox;
+    return viewBox.baseVal.height;
+  });
+  private static graphicContentsPool: Record<string, MathJaxGraphic> = {};
 
   @initial({})
   @signal()
@@ -71,7 +86,6 @@ export class Latex extends Shape {
     const [x, y] = parentPosition;
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) {
-        useLogger().error('continue');
         continue;
       }
       const position = [x, y];
@@ -109,12 +123,11 @@ export class Latex extends Shape {
     }
   }
 
-  private latexToShapes(tex: string) {
+  private latexToGraphic(tex: string): MathJaxGraphic {
     const src = `${this.tex()}::${JSON.stringify(this.options())}`;
-    if (Latex.shapeContentsPool[src]) return Latex.shapeContentsPool[src];
+    if (Latex.graphicContentsPool[src]) return Latex.graphicContentsPool[src];
 
     const svgStr = adaptor.innerHTML(jaxDocument.convert(tex, this.options));
-    useLogger().info('Shape length ' + svgStr);
 
     const container = document.createElement('div');
     container.innerHTML = svgStr;
@@ -131,22 +144,40 @@ export class Latex extends Shape {
     const viewBox = svgRoot.viewBox.baseVal;
     const svgElement = container.querySelector('g')!;
 
-    const shapes = Array.from(
-      this.extractSVGElementShape(svgElement, [0, viewBox.y], svgRoot),
-    );
-    useLogger().info('Shape length ' + shapes.length);
-    Latex.shapeContentsPool[src] = shapes;
+    const graphic: MathJaxGraphic = {
+      width: viewBox.width,
+      height: viewBox.height,
+      shapes: Array.from(
+        this.extractSVGElementShape(svgElement, [0, viewBox.y], svgRoot),
+      ),
+    };
+    Latex.graphicContentsPool[src] = graphic;
 
-    return shapes;
+    return graphic;
+  }
+
+  protected override desiredSize(): SerializedVector2<Length> {
+    const custom = super.desiredSize();
+    const scaleFactor = 0.05;
+    const {width, height} = this.latexToGraphic(this.tex());
+    useLogger().info(JSON.stringify(custom) + ' ' + width + ' ' + height);
+    return {
+      x: custom.x ?? width * scaleFactor,
+      y: custom.y ?? height * scaleFactor,
+    };
   }
 
   protected override draw(context: CanvasRenderingContext2D): void {
-    const shapes = this.latexToShapes(this.tex());
-    context.fillStyle = '#000';
+    const rect = Rect.fromSizeCentered(this.size());
+
+    const {width, height, shapes} = this.latexToGraphic(this.tex());
     const scaleFactor = 0.05;
+
+    context.translate(rect.left, rect.top);
 
     context.scale(scaleFactor, -scaleFactor);
     for (const shape of shapes) {
+      context.save();
       const [x, y] = shape.position;
       context.translate(x, y);
       if (shape.type == 'path') {
@@ -155,7 +186,7 @@ export class Latex extends Shape {
       } else {
         context.fillRect(0, 0, shape.width, shape.height);
       }
-      context.translate(-x, -y);
+      context.restore();
     }
   }
 
