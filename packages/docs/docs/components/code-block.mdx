@@ -1,5 +1,5 @@
 ---
-sidebar_position: 12
+sidebar_position: 1
 slug: /code-block
 ---
 
@@ -11,11 +11,11 @@ import signalSource from '!!raw-loader!@motion-canvas/examples/src/scenes/node-s
 <AnimationPlayer banner name="code-block" />
 
 The `CodeBlock` component is used to present syntax highlighted code. It can
-automatically highlight many common languages, and, once displayed, that code
-can be modified in place to present changes to the viewer. Modified code will
-animate from the prior code to the new code by removing old code, translating
-the remaining code, and inserting new code. You may also "select" code in order
-to call attention to some important snippet.
+automatically highlight many common languages. That code can then be modified
+in place to present changes to the viewer. Modified code will animate from the
+prior code to the new code by removing old code, translating the remaining
+code, and inserting new code. You may also "select" code in order to call
+attention to important snippets.
 
 ## Using the component
 
@@ -61,9 +61,10 @@ yield view.add(
 );
 ```
 
+<!-- prettier-ignore -->
 ```tsx
 console.log('Hello World!');
-// more indented
+  // more indented
 // less indented
 ```
 
@@ -73,8 +74,8 @@ The indentation is then set by the least indented code.
 import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(
+  // note that the ` bracket is followed by a new line
   <CodeBlock
-    // note that the ` bracket is followed by a new line
     code={`
       console.log('Hello World!')
     // less indented
@@ -83,38 +84,39 @@ yield view.add(
 );
 ```
 
-````tsx
+<!-- prettier-ignore -->
+```tsx
   console.log('Hello World!');
 // less indented
   // more indented
-`
+```
 ### Selection
 
-Code may be "selected" to call attention to it.
-The default behavior is to desaturate any unselected text.
+Code may be "selected" to call attention to it. The default behavior is to
+desaturate any unselected text.
 
-A selection can be made using the `selection` property when the `CodeBlock` is first created.
-Selections are specified using two `[line, position]` arrays, where `line` and `position` are zero indexed, and `position` is an insert position between characters.
-So `[[0, 5], [1, 2]]` will select the sixth character on the first line through to the second character on the second line.
+A selection can be made using the `selection` property when the `CodeBlock` is
+first created. Selections are specified using two `[line, position]` arrays,
+where `line` and `position` are zero indexed, and `position` is an insert
+position between characters. So `[[0, 5], [1, 2]]` will select the sixth
+character on the first line through to the second character on the second line.
 
 The following code will select `myBool` out of the code snippet.
 ```tsx
 yield view.add(<CodeBlock code={`var myBool;`} selection={[[0, 4], [0, 10]]} />);
-````
-
-It is often simpler to use the `word` utility function to select code with a
-position and a length.
-
-```tsx
-import {CodeBlock, word} from '@motion-canvas/2d/lib/components/CodeBlock';
-
-const codeRef = createRef();
-yield view.add(<CodeBlock ref={codeRef} code={`var myBool = true;`} />);
-
-// line 0, character 13, 4 characters long
-yield * codeRef().selection(word(0, 13, 4));
-// "true" is selected
 ```
+
+It is often better, however, to use one of the three provided utility functions
+for selection. Though they all return a two by two array of numbers, they can
+be more descriptive than an array literal.
+
+The first and most commonly used  is the `range` function. `range(0, 4, 0, 10)` is
+equivalent to `[[0, 4], [0, 10]]`, making `range` a direct substitute for an
+array literal.
+
+The second is the `word` function, which creates a range on a single line using
+a position and a length. So `word(2, 4, 6)` will make a selection on the third
+line, starting at the fifth character, and selecting a total of six characters.
 
 Finally, you can use the `lines` function to select whole lines of code.
 
@@ -149,7 +151,7 @@ the code to its new state. All of these changes are performed with the `edit`
 method on a `CodeBlock` instance.
 
 To insert code, start by using `createRef` to store your `CodeBlock` instance
-for future edits. Then call `edit` with an imbedded `insert` call to add the new
+for future edits. Then call `edit` with an embedded `insert` call to add the new
 code.
 
 ```tsx
@@ -224,8 +226,8 @@ yield * waitFor(1);
 yield * codeRef().edit(1.2)`var myBool${remove(' = false')};`;
 ```
 
+The proceeding code will animate through
 ```tsx
-// the displayed code will animate through
 var myBool;
 var myBool = true;
 var myBool = false;
@@ -233,7 +235,7 @@ var myBool;
 ```
 
 You can also apply multiple changes to a code block in one `edit`, such that all
-changes are applied simultaniously.
+changes are applied simultaneously.
 
 ```tsx
 yield view.add(<CodeBlock ref={codeRef} code={`var myBool;`} />);
@@ -247,3 +249,5 @@ var myBool;
 // will animate to
 const myBool = true;
 ```
+
+[languages]: https://github.com/wooorm/starry-night#languages

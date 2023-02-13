@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 2
 slug: /nodes
 ---
 
@@ -7,15 +7,13 @@ import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
 import texSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tex';
 
-# Nodes
-
-## LaTeX
+# LaTeX
 
 <CodeBlock language="tsx">{texSource}</CodeBlock>
 
 <AnimationPlayer small name="tex" />
 
-### A note on tweening LaTeX
+## A note on tweening LaTeX
 
 Because we use a canvas renderer, we're rendering the LaTeX to an image instead
 using a full graphics backend to render the TeX. This means that for all intents
