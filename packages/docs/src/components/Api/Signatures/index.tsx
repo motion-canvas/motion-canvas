@@ -8,7 +8,7 @@ import Comment from '@site/src/components/Api/Comment';
 import TypeParameters from '@site/src/components/Api/TypeParameters';
 import type {JSONOutput} from 'typedoc';
 import Parameters from '@site/src/components/Api/Parameters';
-import {useApiFinder, useApiLookup} from '@site/src/contexts/api';
+import {useApiFinder} from '@site/src/contexts/api';
 
 export default function Signatures({
   signatures,

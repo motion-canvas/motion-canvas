@@ -12,8 +12,8 @@ import source from '!!raw-loader!@motion-canvas/examples/src/scenes/random';
 
 Randomly generated values can be used to create a sense of variety and
 unpredictability in your animation. In Motion Canvas, it's achieved using the
-[`useRandom()`](/api/core/utils#useRandom) function.
-It returns a random number generator (RNG) for the current scene:
+[`useRandom()`](/api/core/utils#useRandom) function. It returns a random number
+generator (RNG) for the current scene:
 
 ```ts
 import {useRandom} from '@motion-canvas/core/lib/utils';
@@ -22,9 +22,9 @@ const random = useRandom();
 const integer = random.nextInt(0, 10);
 ```
 
-In this case, calling `nextInt()` will return an integer in the range from
-0 to 10 (exclusive). Check the [`Random` api](/api/core/scenes/Random) to see
-all available methods.
+In this case, calling `nextInt()` will return an integer in the range from 0 to
+10 (exclusive). Check the [`Random` api](/api/core/scenes/Random) to see all
+available methods.
 
 Unlike `Math.random()`, `useRandom()` is completely reproducible - each time the
 animation is played the generated values will be exactly the same. The seed used
@@ -37,7 +37,7 @@ your needs:
 const random = useRandom(123);
 ```
 
-The animation at the top of this page uses a random number generator to vary
-the height of rectangles and make them look like a sound-wave:
+The animation at the top of this page uses a random number generator to vary the
+height of rectangles and make them look like a sound-wave:
 
 <CodeBlock language="tsx">{source}</CodeBlock>

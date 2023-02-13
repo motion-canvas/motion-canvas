@@ -33,12 +33,10 @@ import {Filter} from '../partials';
 import {filtersSignal, FiltersSignal} from '../decorators/filtersSignal';
 import {
   createSignal,
-  Signal,
   DependencyContext,
   SignalValue,
   SimpleSignal,
   isReactive,
-  Computed,
 } from '@motion-canvas/core/lib/signals';
 
 export interface NodeProps {
@@ -377,6 +375,7 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  private view2D: View2D;
   private realChildren: Node[] = [];
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
@@ -384,7 +383,9 @@ export class Node implements Promisable<Node> {
   public readonly creationStack?: string;
 
   public constructor({children, spawner, key, ...rest}: NodeProps) {
-    this.key = useScene2D()?.registerNode(this, key) ?? key ?? '';
+    const scene = useScene2D();
+    this.key = scene.registerNode(this, key);
+    this.view2D = scene.getView();
     this.creationStack = new Error().stack;
     initialize(this, {defaults: rest});
     for (const {signal} of this) {
@@ -527,9 +528,8 @@ export class Node implements Promisable<Node> {
     return new DOMMatrix();
   }
 
-  @computed()
   public view(): View2D | null {
-    return this.parent()?.view() ?? null;
+    return this.view2D;
   }
 
   /**

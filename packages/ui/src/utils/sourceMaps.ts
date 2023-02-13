@@ -8,7 +8,10 @@ const stackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
   : /@(.*):([0-9]+):([0-9]+)/;
 const cache = new Map<string, SourceMapConsumer>();
 
-async function getSourceMap(file: string, search = ''): Promise<SourceMapConsumer> {
+async function getSourceMap(
+  file: string,
+  search = '',
+): Promise<SourceMapConsumer> {
   const key = `${file}.map${search}`;
   if (cache.has(key)) {
     return cache.get(key);

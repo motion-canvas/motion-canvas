@@ -16,7 +16,7 @@ module.exports = () => ({
   name: 'docusaurus-typedoc-plugin',
   async loadContent() {
     const dir = './src/generated';
-    if (fs.existsSync(dir)) {
+    if (fs.existsSync(dir) && process.env.NODE_ENV !== 'production') {
       const api = JSON.parse(
         await fs.promises.readFile(`${dir}/api.json`, 'utf8'),
       );

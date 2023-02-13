@@ -1,0 +1,47 @@
+---
+slug: version-2.3.0
+title: Motion Canvas v2.3.0
+authors: aarthificial
+---
+
+### Features
+
+- A new [`LaTeX`](/docs/nodes) node!
+  ([#228](https://github.com/motion-canvas/motion-canvas/issues/228))
+  ([4c26d2a](https://github.com/motion-canvas/motion-canvas/commit/4c26d2aaf0c697486639aa917cd5c585d3d0ea74))
+- CodeBlock themes (documentation coming soon)
+  ([#279](https://github.com/motion-canvas/motion-canvas/issues/279))
+  ([fe34fa8](https://github.com/motion-canvas/motion-canvas/commit/fe34fa8ebfe66cd356fb1c3d85adedef11e03b45))
+- An [antialiased](/api/2d/components/Shape#antialiased) property for Shapes
+  ([#282](https://github.com/motion-canvas/motion-canvas/issues/282))
+  ([7c6905d](https://github.com/motion-canvas/motion-canvas/commit/7c6905d72c6c2f49e10f0a80704c0afe3504d01b))
+- [Smooth corners](/api/2d/components/Rect#smoothCorners) and
+  [sharpness control](/api/2d/components/Rect#cornerSharpness) for Rects
+  ([#310](https://github.com/motion-canvas/motion-canvas/issues/310))
+  ([f7fbefd](https://github.com/motion-canvas/motion-canvas/commit/f7fbefd27f7f6972cfb5a45a68e5d0aed9593ae4))
+- A simpler [`debug`](/api/core/utils#debug) function
+  ([#293](https://github.com/motion-canvas/motion-canvas/issues/293))
+  ([b870873](https://github.com/motion-canvas/motion-canvas/commit/b8708732af0fc08d9ff9eeecbbb77d65f1b36eb8))
+- Multiple new [easing functions](/api/core/tweening#createEaseInBack)
+  ([#274](https://github.com/motion-canvas/motion-canvas/issues/274))
+  ([f81ce43](https://github.com/motion-canvas/motion-canvas/commit/f81ce43019fe253e99f4ab6311c2251b40e2eae3))
+- Tweening to/from undefined values now warns the user
+  ([#257](https://github.com/motion-canvas/motion-canvas/issues/257))
+  ([d4bb791](https://github.com/motion-canvas/motion-canvas/commit/d4bb79145300b52c4b4d101df2afaff5ea11a9e9))
+- API documentation is always re-build when in `build` mode
+  ([#298](https://github.com/motion-canvas/motion-canvas/issues/298))
+  ([27a4d96](https://github.com/motion-canvas/motion-canvas/commit/27a4d96593d8e925385252b0d6f62646cd9fa6d5)),
+  closes [#294](https://github.com/motion-canvas/motion-canvas/issues/294)
+
+### Bug Fixes
+
+- `textWrap={'pre'}` now works in Firefox
+  ([#287](https://github.com/motion-canvas/motion-canvas/issues/287))
+  ([cb07f4b](https://github.com/motion-canvas/motion-canvas/commit/cb07f4bdf07edc8a086b934ca5ab769682b9a010))
+- Using space to play/pause the animation when focused on the play button now
+  works properly
+  ([#299](https://github.com/motion-canvas/motion-canvas/issues/299))
+  ([191f54a](https://github.com/motion-canvas/motion-canvas/commit/191f54a0a5a9de2fd2dc27bffc6d21d692ce6f72))
+- The glossy effect on the select element has been removed in Safari
+  ([#292](https://github.com/motion-canvas/motion-canvas/issues/292))
+  ([9c062b2](https://github.com/motion-canvas/motion-canvas/commit/9c062b26e48fbdb1905daae25a3fb34df82307d3))

@@ -9,13 +9,15 @@ import signalSource from '!!raw-loader!@motion-canvas/examples/src/scenes/node-s
 
 # Signals
 
-Signals represent a value that may change over time.
-They can be used to define dependencies between the state of the animation.
-This way, when a value changes, all other values that depend on it get automatically updated.
+Signals represent a value that may change over time. They can be used to define
+dependencies between the state of the animation. This way, when a value changes,
+all other values that depend on it get automatically updated.
 
 ## Overview
 
-Signals for primitive types are created using the [`createSignal()`](/api/core/signals#createSignal) function, where the first argument specifies their initial value:
+Signals for primitive types are created using the
+[`createSignal()`](/api/core/signals#createSignal) function, where the first
+argument specifies their initial value:
 
 ```ts
 import {createSignal} from '@motion-canvas/core/lib/signals';
@@ -23,7 +25,8 @@ import {createSignal} from '@motion-canvas/core/lib/signals';
 const signal = createSignal(0);
 ```
 
-Additionally, each complex type has a static `createSignal()` method that can be used to create a signal for said type:
+Additionally, each complex type has a static `createSignal()` method that can be
+used to create a signal for said type:
 
 ```ts
 import {Vector2} from '@motion-canvas/core/lib/types';
@@ -39,8 +42,8 @@ const circle = <Circle />;
 const signal = circle.fill;
 ```
 
-Once created, signals can be invoked to perform one of the three possible actions
-(The action is chosen based on the number of arguments):
+Once created, signals can be invoked to perform one of the three possible
+actions (The action is chosen based on the number of arguments):
 
 1. retrieve the value:
    ```ts
@@ -55,7 +58,8 @@ Once created, signals can be invoked to perform one of the three possible action
    yield * signal(2, 0.3);
    ```
 
-Instead of the actual value, a signal can be provided with a function that computes the value dynamically. Consider the following example:
+Instead of the actual value, a signal can be provided with a function that
+computes the value dynamically. Consider the following example:
 
 ```ts
 const radius = createSignal(1);
@@ -70,7 +74,8 @@ Here, the `area` signal uses the `radius` signal to compute its value.
 
 ## Explanation
 
-To better understand how signals work, let's modify the example from before to see when exactly the area is calculated:
+To better understand how signals work, let's modify the example from before to
+see when exactly the area is calculated:
 
 ```ts
 const radius = createSignal(1);
@@ -92,27 +97,41 @@ This demonstrates three important aspects of signals:
 
 ### Laziness
 
-Signals are only calculated when their value is requested. The first `"area recalculated!"` message is logged to console only after `area()` is called.
+Signals are only calculated when their value is requested. The first
+`"area recalculated!"` message is logged to console only after `area()` is
+called.
 
 ### Caching
 
-Once the signal is calculated, its value is saved and then returned during subsequent calls to `area()`. That's why nothing is logged to the console during the second call. This aspect of signals makes them perfect for caching computationally heavy operations. In fact, Motion Canvas uses signals internally to cache things such as matrices.
+Once the signal is calculated, its value is saved and then returned during
+subsequent calls to `area()`. That's why nothing is logged to the console during
+the second call. This aspect of signals makes them perfect for caching
+computationally heavy operations. In fact, Motion Canvas uses signals internally
+to cache things such as matrices.
 
 ### Dependency tracking
 
-The `area` signal keeps track of other signals it depends on. When we change the `radius` signal, the `area` signal is notified about that. But it doesn't get recalculated immediately - laziness is still at play. We can modify the radius however many times we want, but the `area` will be recalculated only once its value is requested again by calling `area()`.
+The `area` signal keeps track of other signals it depends on. When we change the
+`radius` signal, the `area` signal is notified about that. But it doesn't get
+recalculated immediately - laziness is still at play. We can modify the radius
+however many times we want, but the `area` will be recalculated only once its
+value is requested again by calling `area()`.
 
 ## Complex example
 
-We can use the fact that properties of nodes are represented by signals to construct scenes that automatically update when the data changes. Following the previous example, let's create a visualisation for the area of the circle:
+We can use the fact that properties of nodes are represented by signals to
+construct scenes that automatically update when the data changes. Following the
+previous example, let's create a visualisation for the area of the circle:
 
 <AnimationPlayer small name="node-signal" />
 
-Below you'll find the code used to create this animation. We highlighted all the places where signals are used:
+Below you'll find the code used to create this animation. We highlighted all the
+places where signals are used:
 
 <CodeBlock language="tsx">{signalSource}</CodeBlock>
 
-With this setup, all we need to do is animate the `radius` signal, and the rest of the scene will adjust accordingly:
+With this setup, all we need to do is animate the `radius` signal, and the rest
+of the scene will adjust accordingly:
 
 ```ts
 yield * radius(4, 2).to(3, 2);

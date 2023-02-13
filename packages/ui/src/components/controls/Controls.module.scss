@@ -51,7 +51,7 @@
 .select,
 .input,
 .button {
-  background: var(--surface-color-light);
+  background-color: var(--surface-color-light);
   color: rgba(255, 255, 255, 0.6);
   border: 0;
   border-radius: 4px;
@@ -94,7 +94,7 @@
     font-size: 0;
     flex-grow: 0;
     flex-basis: 0;
-    padding-left: 12px;
+    padding-left: 16px;
     border-radius: 0 4px 4px 0;
   }
 }

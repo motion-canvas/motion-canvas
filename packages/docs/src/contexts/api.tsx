@@ -1,4 +1,4 @@
-import React, {FunctionComponent, ReactNode, useContext} from 'react';
+import React, {ReactNode, useContext} from 'react';
 import type {JSONOutput} from 'typedoc';
 
 declare module 'typedoc' {

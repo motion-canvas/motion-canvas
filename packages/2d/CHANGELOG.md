@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
+
+
+### Bug Fixes
+
+* **2d:** make Text respect textWrap=pre ([#287](https://github.com/motion-canvas/motion-canvas/issues/287)) ([cb07f4b](https://github.com/motion-canvas/motion-canvas/commit/cb07f4bdf07edc8a086b934ca5ab769682b9a010))
+
+
+### Features
+
+* **2d:** add antialiased signal to Shape ([#282](https://github.com/motion-canvas/motion-canvas/issues/282)) ([7c6905d](https://github.com/motion-canvas/motion-canvas/commit/7c6905d72c6c2f49e10f0a80704c0afe3504d01b))
+* **2d:** add LaTeX component ([#228](https://github.com/motion-canvas/motion-canvas/issues/228)) ([4c26d2a](https://github.com/motion-canvas/motion-canvas/commit/4c26d2aaf0c697486639aa917cd5c585d3d0ea74))
+* **2d:** add smooth corners and sharpness to rect ([#310](https://github.com/motion-canvas/motion-canvas/issues/310)) ([f7fbefd](https://github.com/motion-canvas/motion-canvas/commit/f7fbefd27f7f6972cfb5a45a68e5d0aed9593ae4))
+* added a theme property to the CodeBlock component ([#279](https://github.com/motion-canvas/motion-canvas/issues/279)) ([fe34fa8](https://github.com/motion-canvas/motion-canvas/commit/fe34fa8ebfe66cd356fb1c3d85adedef11e03b45))
+
+
+
+
+
 # [2.2.0](https://github.com/motion-canvas/motion-canvas/compare/v2.1.0...v2.2.0) (2023-02-09)
 
 

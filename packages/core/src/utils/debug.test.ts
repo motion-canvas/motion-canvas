@@ -1,8 +1,7 @@
 import {describe, test, beforeEach, expect, vi} from 'vitest';
 import {setProject, useLogger, debug} from '../utils';
-import {Project, ProjectMetadata} from '../Project';
-import {Meta} from '../Meta';
-import {LogLevel, LogPayload} from '../Logger';
+import {Project} from '../Project';
+import {LogLevel} from '../Logger';
 import {Rect, Vector2} from '../types';
 
 describe('debug()', () => {

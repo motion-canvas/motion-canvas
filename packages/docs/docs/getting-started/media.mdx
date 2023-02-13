@@ -1,0 +1,179 @@
+---
+sidebar_position: 13
+slug: /media
+---
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+
+# Media
+
+In this chapter we will take a look at all the different types of media Motion
+Canvas lets you add to your animations.
+
+## Audio
+
+One type of media Motion Canvas supports is audio. To add an audio track to your
+animation you need to edit your `project.ts` file. First we need to import the
+audio file we want to use as follows:
+
+```ts
+// my-animation/
+// ├─ audio/
+// │  └─ voice.mp3
+// ├─ src/
+// ...
+import audio from '../audio/voice.mp3';
+```
+
+Once imported we need to let Motion Canvas know that we want to use this audio
+file. We can do this by specifying the
+[`audio`](/api/core/index/ProjectConfig#audio) property in the
+[`ProjectConfiguration`](/api/core/index/ProjectConfig):
+
+```ts
+export default makeProject({
+  // ...
+  audio: audio,
+});
+```
+
+If we open the editor now, we should see that your audio track has been added.
+
+![](@site/static/img/media/editor-audio-track.png)
+
+However, it's not always ideal to start with the audio at the beginning.
+Sometimes it's better to start with a bit of delay. This can be done by using
+the [`audioOffset`](/api/core/index/ProjectConfig#audioOffset) property and
+specifying a amount of seconds.
+
+```ts
+export default makeProject({
+  // ...
+  audio: audio,
+  audioOffset: 1.5, // delays the audio by 1.5 second
+});
+```
+
+![](@site/static/img/media/editor-audio-track-delayed.png)
+
+### Supported Formats
+
+A list of supported file formats can be found
+[here](https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Audio_codecs#common_codecs)
+
+## Images
+
+Another type of media Motion Canvas supports are images. To use an image in the
+animation, we need to import the image:
+
+```ts
+// my-animation/
+// ├─ images/
+// │  └─ example.png
+// ├─ src/
+// ...
+import examplePng from '../../images/example.png';
+```
+
+Then we can use Motion Canvas [`Image`](/api/2d/components/Image) component to
+display the image:
+
+```tsx
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Image} from '@motion-canvas/2d/lib/components';
+
+import examplePng from '../../images/example.png';
+
+export default makeScene2D(function* (view) {
+  view.add(<Image src={examplePng} />);
+});
+```
+
+Images can also be animated like every other component in Motion Canvas. For
+this, we need to create a [`Reference`](/docs/references) and pass that to the
+[`Image`](/api/2d/components/Image):
+
+```tsx
+// ...
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const imageRef = createRef<Image>();
+
+  view.add(<Image ref={imageRef} src={examplePng} scale={2} />);
+
+  yield* all(
+    imageRef().scale(2.5, 1.5).to(2, 1.5),
+    imageRef().absoluteRotation(90, 1.5).to(0, 1.5),
+  );
+});
+```
+
+<AnimationPlayer name="media-image" small />
+
+### Supported Formats
+
+A list of supported file formats can be found
+[here](https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Image_types)
+
+## Video
+
+Videos in Motion Canvas work similar to images. First, we need to import our
+video we want to display:
+
+```ts
+// my-animation/
+// ├─ videos/
+// │  └─ example.mp4
+// ├─ src/
+// ...
+import exampleMp4 from '../../videos/example.mp4';
+```
+
+Then we can use Motion Canvas [`Video`](/api/2d/components/Video) component to
+display the video as follows:
+
+```tsx
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Video} from '@motion-canvas/2d/lib/components';
+
+import exampleMp4 from '../../videos/example.mp4';
+
+export default makeScene2D(function* (view) {
+  view.add(<Video ref={videoRef} src={exampleMp4} />);
+});
+```
+
+However this will only display the video and will not play it. In order to play
+the video we need to create a [`Reference`](/docs/references) to the element.
+
+```tsx
+// ...
+import {createRef} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const videoRef = createRef<Video>();
+
+  view.add(<Video ref={videoRef} src={exampleMp4} />);
+});
+```
+
+Now that we have a [`Reference`](/docs/references) to the
+[`Video`](/api/2d/components/Video) element, we can use it to animate the video,
+as well as [`play`](/api/2d/components/Video#play) and
+[`pause`](/api/2d/components/Video#pause) it.
+
+```ts
+export default makeScene2D(function* (view) {
+  // ...
+
+  videoRef().play();
+  yield* videoRef().scale(1.25, 1.5).to(1, 1.5);
+});
+```
+
+### Supported Formats
+
+A list of supported file formats can be found
+[here](https://developer.mozilla.org/en-US/docs/Web/Media/Formats/Containers)
