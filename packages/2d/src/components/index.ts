@@ -1,3 +1,4 @@
+export * from './Camera';
 export * from './Circle';
 export * from './Image';
 export * from './Grid';
