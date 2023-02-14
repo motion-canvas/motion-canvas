@@ -79,7 +79,7 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
               title={data.title}
               href={data.url}
               id={data.id}
-              className={clsx(styles.tab, !data.url && styles.disabled)}
+              className={clsx(styles.tab)}
               target="_blank"
             >
               {data.icon}
