@@ -4,7 +4,7 @@ import {SVG} from 'mathjax-full/js/output/svg';
 import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
-import {initial, signal} from '../decorators';
+import {computed, initial, signal} from '../decorators';
 import {
   createComputed,
   DependencyContext,
@@ -57,9 +57,8 @@ export interface LatexProps extends ShapeProps {
 }
 
 export class Latex extends Shape {
-  private static mathJaxCharacterHeight = createComputed(() => {
-    useLogger().info('Calculate x char height');
-    const svg = adaptor.innerHTML(jaxDocument.convert('x'));
+  private static mathJaxCharacterWidth = createComputed(() => {
+    const svg = adaptor.innerHTML(jaxDocument.convert('X'));
     const container = document.createElement('div');
     container.innerHTML = svg;
     const viewBox = container.querySelector('svg')!.viewBox;
@@ -156,11 +155,26 @@ export class Latex extends Shape {
     return graphic;
   }
 
+  @computed()
+  private scaleFactor() {
+    // From CodeBlock
+    this.requestFontUpdate();
+    const context = this.cacheCanvas();
+    context.save();
+    this.applyStyle(context);
+    context.font = this.styles.font;
+    const textMetric = context.measureText('X');
+    const charHeight =
+      textMetric.actualBoundingBoxAscent + textMetric.actualBoundingBoxDescent;
+    context.restore();
+
+    return charHeight / Latex.mathJaxCharacterWidth();
+  }
+
   protected override desiredSize(): SerializedVector2<Length> {
     const custom = super.desiredSize();
-    const scaleFactor = 0.05;
+    const scaleFactor = this.scaleFactor();
     const {width, height} = this.latexToGraphic(this.tex());
-    useLogger().info(JSON.stringify(custom) + ' ' + width + ' ' + height);
     return {
       x: custom.x ?? width * scaleFactor,
       y: custom.y ?? height * scaleFactor,
@@ -170,8 +184,8 @@ export class Latex extends Shape {
   protected override draw(context: CanvasRenderingContext2D): void {
     const rect = Rect.fromSizeCentered(this.size());
 
-    const {width, height, shapes} = this.latexToGraphic(this.tex());
-    const scaleFactor = 0.05;
+    const {shapes} = this.latexToGraphic(this.tex());
+    const scaleFactor = this.scaleFactor();
 
     context.translate(rect.left, rect.top);
 
@@ -189,43 +203,4 @@ export class Latex extends Shape {
       context.restore();
     }
   }
-
-  // protected override image(): HTMLImageElement {
-  //   // Render props may change the look of the TeX, so we need to cache both
-  //   // source and render props together.
-  //   const src = `${this.tex()}::${JSON.stringify(this.options())}`;
-  //   if (Latex.svgContentsPool[src]) {
-  //     this.imageElement.src = Latex.svgContentsPool[src];
-  //     return this.imageElement;
-  //   }
-
-  //   // Convert to TeX, look for any errors
-  //   const tex = this.tex();
-  //   const svg = adaptor.innerHTML(jaxDocument.convert(tex, this.options()));
-  //   if (svg.includes('data-mjx-error')) {
-  //     const errors = svg.match(/data-mjx-error="(.*?)"/);
-  //     if (errors && errors.length > 0) {
-  //       useLogger().error(`Invalid MathJax: ${errors[1]}`);
-  //     }
-  //   }
-
-  //   // Encode to raw base64 image format
-  //   const text = `data:image/svg+xml;base64,${btoa(
-  //     `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n${svg}`,
-  //   )}`;
-  //   Latex.svgContentsPool[src] = text;
-  //   const image = document.createElement('img');
-  //   image.src = text;
-  //   image.src = text;
-  //   if (!image.complete) {
-  //     DependencyContext.collectPromise(
-  //       new Promise((resolve, reject) => {
-  //         image.addEventListener('load', resolve);
-  //         image.addEventListener('error', reject);
-  //       }),
-  //     );
-  //   }
-
-  //   return image;
-  // }
 }
