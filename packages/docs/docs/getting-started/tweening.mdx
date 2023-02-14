@@ -25,7 +25,7 @@ In the example above, we animate the x coordinate of our circle from `-300` to
 The [`tween`](/api/core/tweening#tween) function takes two parameters. The first
 one specifies the tween duration in seconds. The second is a callback function
 that will be called each frame the tween takes place. The `value` parameter it
-recieves is a number ranging from `0` to `1`, informing us about the progress of
+receives is a number ranging from `0` to `1`, informing us about the progress of
 the tween. We can use it to calculate the values that our tween animates. In the
 case of our circle, we use the `map` function to map the `value` range from
 `[0, 1]` to `[-300, 300]` and set it as the `x` coordinate:
