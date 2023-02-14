@@ -10,7 +10,9 @@ export default makeScene2D(function* (view) {
     <Circle ref={circle} width={320} height={320} fill={'lightseagreen'} />,
   );
 
-  yield* waitUntil('circle');
+  yield* waitUntil('circle'); // Fine
+  yield* waitUntil('test'); // Fine
+  yield* waitUntil('test'); // console.log("Double: " + test)
   yield* circle().scale(2, 2).to(1, 2);
 
   yield* waitFor(5);

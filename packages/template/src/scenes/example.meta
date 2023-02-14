@@ -4,6 +4,10 @@
     {
       "name": "circle",
       "targetTime": 3
+    },
+    {
+      "name": "test",
+      "targetTime": 3
     }
   ],
   "seed": 3073416149

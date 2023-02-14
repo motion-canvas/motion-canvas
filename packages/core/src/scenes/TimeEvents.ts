@@ -57,6 +57,8 @@ export class TimeEvents {
 
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
+  private handledReset = false;
+  private collisionLookup: string[] = [];
   private previousReference: SavedTimeEvent[] | undefined = [];
   private didEventsChange = false;
   private preserveTiming = true;
@@ -67,6 +69,7 @@ export class TimeEvents {
 
     scene.onReloaded.subscribe(this.handleReload);
     scene.onRecalculated.subscribe(this.handleRecalculated);
+    scene.onReset.subscribe(this.handleReset);
     scene.meta.onDataChanged.subscribe(this.handleMetaChanged, false);
   }
 
@@ -109,6 +112,8 @@ export class TimeEvents {
    * @internal
    */
   public register(name: string): number {
+    this.collisionLookup.push(name);
+
     const initialTime = this.scene.project.framesToSeconds(
       this.scene.project.frame - this.scene.firstFrame,
     );
@@ -167,6 +172,7 @@ export class TimeEvents {
    */
   private handleReload = () => {
     this.registeredEvents = {};
+    this.collisionLookup = [];
   };
 
   /**
@@ -191,6 +197,17 @@ export class TimeEvents {
         timeEvents: this.previousReference,
       });
     }
+  };
+
+  private handleReset = () => {
+    Object.values(this.registeredEvents).map(event => {
+      const inArray = this.collisionLookup.indexOf(event.name);
+      if (inArray != -1) {
+        this.collisionLookup.splice(inArray, 1);
+      }
+    });
+    this.collisionLookup.map(event => console.log('Double: ' + event));
+    this.collisionLookup = [];
   };
 
   /**
