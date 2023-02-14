@@ -1,6 +1,5 @@
 import type {Scene, SceneMetadata} from './Scene';
 import {ValueDispatcher} from '../events';
-import {useLogger} from '../utils';
 
 /**
  * Represents a time event at runtime.
@@ -115,12 +114,10 @@ export class TimeEvents {
     if (!this.collisionLookup.has(name)) {
       this.collisionLookup.add(name);
     } else {
-      useLogger().error(
-        'name: "' +
-          name +
-          '"' +
-          ' has already been used for another event name.',
-      );
+      this.scene.project.logger.error({
+        message: `name "${name}" has already been used for another event name.`,
+        stack: new Error().stack,
+      });
       return 0;
     }
 
