@@ -388,8 +388,18 @@ export class Node implements Promisable<Node> {
     this.view2D = scene.getView();
     this.creationStack = new Error().stack;
     initialize(this, {defaults: rest});
-    for (const {signal} of this) {
+    for (const {key, signal, meta} of this) {
       signal.reset();
+      if ((<any>rest)[key] !== undefined) {
+        signal((<any>rest)[key]);
+      }
+      if (meta.compoundEntries !== undefined) {
+        for (const [key, property] of meta.compoundEntries) {
+          if (property in rest) {
+            (<any>signal)[key]((<any>rest)[property]);
+          }
+        }
+      }
     }
     this.add(children);
     if (spawner) {

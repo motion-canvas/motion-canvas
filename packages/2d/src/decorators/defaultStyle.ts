@@ -8,7 +8,11 @@ export function defaultStyle<T>(
   return (target: any, key) => {
     target[`getDefault${capitalize(<string>key)}`] = function (this: Layout) {
       this.requestLayoutUpdate();
-      return parse.apply(this, [this.styles.getPropertyValue(styleName)]);
+      const old = (<any>this.element.style)[styleName];
+      (<any>this.element.style)[styleName] = '';
+      const ret = parse.apply(this, [this.styles.getPropertyValue(styleName)]);
+      (<any>this.element.style)[styleName] = old;
+      return ret;
     };
   };
 }

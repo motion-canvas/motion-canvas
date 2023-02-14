@@ -10,7 +10,7 @@ export type SignalGenerator<
 };
 
 export interface SignalSetter<TValue, TOwner = void> {
-  (value: SignalValue<TValue>): TOwner;
+  (value: SignalValue<TValue> | symbol): TOwner;
 }
 
 export interface SignalGetter<TValue> {
@@ -19,7 +19,7 @@ export interface SignalGetter<TValue> {
 
 export interface SignalTween<TSetterValue, TValue extends TSetterValue> {
   (
-    value: SignalValue<TSetterValue>,
+    value: SignalValue<TSetterValue> | symbol,
     time: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<TValue>,

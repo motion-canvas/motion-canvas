@@ -44,7 +44,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
       const signalContext = new CompoundSignalContext(
         Object.keys(entries),
         meta.parser,
-        context.defaults[key] ?? meta.default,
+        meta.default,
         meta.interpolationFunction ?? deepLerp,
         instance,
       );
@@ -53,9 +53,6 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
 
       for (const [key, property] of meta.compoundEntries) {
         patchSignal(signal[key].context, undefined, instance, property);
-        if (property in context.defaults) {
-          signal[key].context.initial = context.defaults[property];
-        }
       }
 
       instance[key] = signal;

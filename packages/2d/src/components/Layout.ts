@@ -743,29 +743,29 @@ export class Layout extends Node {
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = this.fontFamily.isDefault()
+    this.element.style.fontFamily = this.fontFamily.isInitial()
       ? ''
       : this.fontFamily();
-    this.element.style.fontSize = this.fontSize.isDefault()
+    this.element.style.fontSize = this.fontSize.isInitial()
       ? ''
       : `${this.fontSize()}px`;
-    this.element.style.fontStyle = this.fontStyle.isDefault()
+    this.element.style.fontStyle = this.fontStyle.isInitial()
       ? ''
       : this.fontStyle();
     this.element.style.lineHeight =
       typeof this.lineHeight() === 'string'
         ? String(Number((this.lineHeight() as string).slice(0, -1)) / 100)
         : `${this.lineHeight()}px`;
-    this.element.style.fontWeight = this.fontWeight.isDefault()
+    this.element.style.fontWeight = this.fontWeight.isInitial()
       ? ''
       : this.fontWeight().toString();
-    this.element.style.letterSpacing = this.letterSpacing.isDefault()
+    this.element.style.letterSpacing = this.letterSpacing.isInitial()
       ? ''
       : this.letterSpacing() === 'normal'
       ? 'normal'
       : `${this.letterSpacing()}px`;
 
-    if (this.textWrap.isDefault()) {
+    if (this.textWrap.isInitial()) {
       this.element.style.whiteSpace = '';
     } else {
       const wrap = this.textWrap();

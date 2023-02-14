@@ -42,9 +42,9 @@ export interface Signal<
   save(): TOwner;
 
   /**
-   * {@inheritDoc SignalContext.isDefault}
+   * {@inheritDoc SignalContext.isInitial}
    */
-  isDefault(): boolean;
+  isInitial(): boolean;
 
   context: TContext;
 }
@@ -54,7 +54,10 @@ export class SignalContext<
   TValue extends TSetterValue = TSetterValue,
   TOwner = void,
 > extends DependencyContext<TOwner> {
-  public default?: () => TValue;
+  public static readonly DEFAULT = Symbol.for(
+    '@motion-canvas/core/signals/default',
+  );
+
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
   protected parser: (value: TSetterValue) => TValue = value => <TValue>value;
@@ -72,8 +75,8 @@ export class SignalContext<
     Object.defineProperty(this.invokable, 'save', {
       value: this.save.bind(this),
     });
-    Object.defineProperty(this.invokable, 'isDefault', {
-      value: this.isDefault.bind(this),
+    Object.defineProperty(this.invokable, 'isInitial', {
+      value: this.isInitial.bind(this),
     });
 
     if (this.initial !== undefined) {
@@ -106,12 +109,17 @@ export class SignalContext<
     this.markDirty();
   }
 
-  public set(value: SignalValue<TSetterValue>): TOwner {
+  public set(value: SignalValue<TSetterValue> | symbol): TOwner {
+    if (value === SignalContext.DEFAULT) {
+      value = this.initial!;
+    }
+    const resolvedValue = value as SignalValue<TSetterValue>;
+
     if (this.current === value) {
       return this.owner;
     }
 
-    this.current = value;
+    this.current = resolvedValue;
     this.markDirty();
 
     if (this.dependencies.size > 0) {
@@ -119,8 +127,8 @@ export class SignalContext<
       this.dependencies.clear();
     }
 
-    if (!isReactive(value)) {
-      this.last = this.parse(value);
+    if (!isReactive(resolvedValue)) {
+      this.last = this.parse(resolvedValue);
     }
 
     return this.owner;
@@ -148,7 +156,7 @@ export class SignalContext<
   }
 
   protected override invoke(
-    value?: SignalValue<TSetterValue>,
+    value?: SignalValue<TSetterValue> | symbol,
     duration?: number,
     timingFunction: TimingFunction = easeInOutCubic,
     interpolationFunction: InterpolationFunction<TValue> = this.interpolation,
@@ -173,7 +181,7 @@ export class SignalContext<
     before?: ThreadGenerator,
   ) {
     const animate = (
-      value: SignalValue<TSetterValue>,
+      value: SignalValue<TSetterValue> | symbol,
       duration: number,
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
@@ -199,13 +207,18 @@ export class SignalContext<
   }
 
   protected *tween(
-    value: SignalValue<TSetterValue>,
+    value: SignalValue<TSetterValue> | symbol,
     duration: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<TValue>,
   ): ThreadGenerator {
+    if (value === SignalContext.DEFAULT) {
+      value = this.initial!;
+    }
+    const resolvedValue = value as SignalValue<TSetterValue>;
+
     yield* this.doTween(
-      this.parse(isReactive(value) ? value() : value),
+      this.parse(isReactive(resolvedValue) ? resolvedValue() : resolvedValue),
       duration,
       timingFunction,
       interpolationFunction,
@@ -263,34 +276,24 @@ export class SignalContext<
   }
 
   /**
-   * Checks if the signal is currently using the `default()` method
-   * as its value.
+   * Checks if the signal is currently using its initial value.
    *
    * @example
    * ```ts
-   * class Example extends Node {
-   *   // ...
-   *   @signal()
-   *   declare public readonly value: SimpleSignal<number, this>
    *
-   *   public getDefaultValue() {
-   *     return 8;
-   *   }
-   *   // ...
-   * }
+   * const signal = createSignal(0);
+   * signal.isInitial(); // true
    *
-   * let example = new Example();
-   * example.value();            // 7
-   * example.value.isDefault();  // true
+   * signal(5);
+   * signal.isInitial(); // false
    *
-   * example.value(0);
-   * example.value();            // 8
-   * example.value.isDefault();  // false
+   * signal(SignalContext.DEFAULT);
+   * signal.isInitial(); // true
    * ```
    */
-  public isDefault() {
+  public isInitial() {
     this.collect();
-    return this.default !== undefined && this.current === this.default;
+    return this.current === this.initial;
   }
 
   /**

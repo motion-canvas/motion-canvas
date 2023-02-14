@@ -3,7 +3,7 @@ import {
   InterpolationFunction,
 } from '@motion-canvas/core/lib/tweening';
 import {addInitializer} from './initializers';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {capitalize, useLogger} from '@motion-canvas/core/lib/utils';
 import {patchSignal} from '../utils/patchSignal';
 import {SignalContext} from '@motion-canvas/core/lib/signals';
 
@@ -88,8 +88,10 @@ export function signal<T>(): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMetaOrCreate<T>(target, key);
     addInitializer(target, (instance: any, context: any) => {
+      const getDefault =
+        instance[`getDefault${capitalize(key as string)}`]?.bind(instance);
       const signal = new SignalContext<T, T, any>(
-        context.defaults[key] ?? meta.default,
+        getDefault ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
         instance,
       );

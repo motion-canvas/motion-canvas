@@ -27,12 +27,5 @@ export function patchSignal<TSetterValue, TValue extends TSetterValue>(
     if (tweener) {
       signal.doTween = tweener.bind(owner);
     }
-    const computer = owner?.[`getDefault${capitalize(name)}`];
-    if (computer) {
-      signal.default = computer.bind(owner);
-      if (signal.initial === undefined) {
-        signal.initial = signal.default!;
-      }
-    }
   }
 }
