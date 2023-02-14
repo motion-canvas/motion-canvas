@@ -8,6 +8,7 @@ import {useEffect, useRef, useState} from 'preact/hooks';
 import {shake} from '../animations';
 import {useStorage} from '../../hooks';
 import {MotionCanvas, Bug, Tune, VideoSettings, Schedule} from '../icons';
+import {Docs} from '../icons/Docs';
 
 interface SidebarProps {
   setOpen?: (value: boolean) => void;
@@ -90,6 +91,13 @@ export function Sidebar({setOpen}: SidebarProps) {
         }}
         {{
           type: TabType.Space,
+        }}
+        {{
+          title: 'Docs',
+          id: 'docs-external-link',
+          type: TabType.ExternalLink,
+          icon: <Docs />,
+          url: 'https://motion-canvas.github.io/docs/',
         }}
       </Tabs>
     </>
