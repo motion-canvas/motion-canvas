@@ -1,5 +1,6 @@
 import type {Scene, SceneMetadata} from './Scene';
 import {ValueDispatcher} from '../events';
+import {useLogger} from '../utils';
 
 /**
  * Represents a time event at runtime.
@@ -57,8 +58,7 @@ export class TimeEvents {
 
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
-  private handledReset = false;
-  private collisionLookup: string[] = [];
+  private collisionLookup = new Set<string>();
   private previousReference: SavedTimeEvent[] | undefined = [];
   private didEventsChange = false;
   private preserveTiming = true;
@@ -112,7 +112,17 @@ export class TimeEvents {
    * @internal
    */
   public register(name: string): number {
-    this.collisionLookup.push(name);
+    if (!this.collisionLookup.has(name)) {
+      this.collisionLookup.add(name);
+    } else {
+      useLogger().error(
+        'name: "' +
+          name +
+          '"' +
+          ' has already been used for another event name.',
+      );
+      return 0;
+    }
 
     const initialTime = this.scene.project.framesToSeconds(
       this.scene.project.frame - this.scene.firstFrame,
@@ -172,7 +182,7 @@ export class TimeEvents {
    */
   private handleReload = () => {
     this.registeredEvents = {};
-    this.collisionLookup = [];
+    this.collisionLookup.clear();
   };
 
   /**
@@ -200,14 +210,7 @@ export class TimeEvents {
   };
 
   private handleReset = () => {
-    Object.values(this.registeredEvents).map(event => {
-      const inArray = this.collisionLookup.indexOf(event.name);
-      if (inArray != -1) {
-        this.collisionLookup.splice(inArray, 1);
-      }
-    });
-    this.collisionLookup.map(event => console.log('Double: ' + event));
-    this.collisionLookup = [];
+    this.collisionLookup.clear();
   };
 
   /**

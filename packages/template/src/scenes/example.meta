@@ -3,11 +3,7 @@
   "timeEvents": [
     {
       "name": "circle",
-      "targetTime": 3
-    },
-    {
-      "name": "test",
-      "targetTime": 3
+      "targetTime": 0.9940212833664561
     }
   ],
   "seed": 3073416149
