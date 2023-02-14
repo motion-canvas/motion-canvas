@@ -111,15 +111,15 @@ export class TimeEvents {
    * @internal
    */
   public register(name: string): number {
-    if (!this.collisionLookup.has(name)) {
-      this.collisionLookup.add(name);
-    } else {
+    if (this.collisionLookup.has(name)) {
       this.scene.project.logger.error({
         message: `name "${name}" has already been used for another event name.`,
         stack: new Error().stack,
       });
       return 0;
     }
+
+    this.collisionLookup.add(name);
 
     const initialTime = this.scene.project.framesToSeconds(
       this.scene.project.frame - this.scene.firstFrame,
