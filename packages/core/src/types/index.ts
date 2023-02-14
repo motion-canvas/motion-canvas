@@ -7,6 +7,7 @@
 export * from './Canvas';
 export * from './Color';
 export * from './Matrix';
+export * from './Matrix2D';
 export * from './Origin';
 export * from './Rect';
 export * from './Spacing';
