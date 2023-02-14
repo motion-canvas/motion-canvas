@@ -7,14 +7,12 @@ import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
 import {computed, initial, signal} from '../decorators';
 import {
   createComputed,
-  DependencyContext,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
-import {Logger} from '@motion-canvas/core';
 import {Rect, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {Length} from '../partials';
 
@@ -28,7 +26,7 @@ const jaxDocument = mathjax.document('', {
 
 interface MathJaxShapeBase {
   type: 'path' | 'rect';
-  position: number[];
+  position: SerializedVector2;
 }
 
 interface MathJaxPath extends MathJaxShapeBase {
@@ -39,15 +37,13 @@ interface MathJaxPath extends MathJaxShapeBase {
 
 interface MathJaxRect extends MathJaxShapeBase {
   type: 'rect';
-  width: number;
-  height: number;
+  size: SerializedVector2;
 }
 
 type MathJaxShape = MathJaxPath | MathJaxRect;
 
 interface MathJaxGraphic {
-  width: number;
-  height: number;
+  size: SerializedVector2;
   shapes: MathJaxShape[];
 }
 
@@ -79,23 +75,23 @@ export class Latex extends Shape {
 
   private *extractSVGElementShape(
     element: SVGElement,
-    parentPosition: number[],
+    parentPosition: SerializedVector2,
     svgRoot: Element,
   ): Generator<MathJaxShape> {
-    const [x, y] = parentPosition;
+    const {x, y} = parentPosition;
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) {
         continue;
       }
-      const position = [x, y];
+      const position: SerializedVector2 = {x, y};
       const transform = child.transform.baseVal.consolidate();
       if (transform) {
         const matrix = transform.matrix;
         if (matrix.a !== 1 || matrix.d !== 1)
           throw Error('Unknown transformation');
 
-        position[0] += matrix.e;
-        position[1] += matrix.f;
+        position.x += matrix.e;
+        position.y += matrix.f;
       }
       if (child.tagName == 'g')
         yield* this.extractSVGElementShape(child, position, svgRoot);
@@ -110,13 +106,15 @@ export class Latex extends Shape {
           name: hrefElement.id,
         };
       } else if (child.tagName == 'rect') {
-        position[0] += parseFloat(child.getAttribute('x')!);
-        position[1] += parseFloat(child.getAttribute('y')!);
+        position.x += parseFloat(child.getAttribute('x')!);
+        position.y += parseFloat(child.getAttribute('y')!);
         yield {
           type: 'rect',
           position,
-          width: parseFloat(child.getAttribute('width')!),
-          height: parseFloat(child.getAttribute('height')!),
+          size: {
+            x: parseFloat(child.getAttribute('width')!),
+            y: parseFloat(child.getAttribute('height')!),
+          },
         };
       }
     }
@@ -144,10 +142,12 @@ export class Latex extends Shape {
     const svgElement = container.querySelector('g')!;
 
     const graphic: MathJaxGraphic = {
-      width: viewBox.width,
-      height: viewBox.height,
+      size: {
+        x: viewBox.width,
+        y: viewBox.height,
+      },
       shapes: Array.from(
-        this.extractSVGElementShape(svgElement, [0, viewBox.y], svgRoot),
+        this.extractSVGElementShape(svgElement, {x: 0, y: viewBox.y}, svgRoot),
       ),
     };
     Latex.graphicContentsPool[src] = graphic;
@@ -174,10 +174,10 @@ export class Latex extends Shape {
   protected override desiredSize(): SerializedVector2<Length> {
     const custom = super.desiredSize();
     const scaleFactor = this.scaleFactor();
-    const {width, height} = this.latexToGraphic(this.tex());
+    const {x, y} = this.latexToGraphic(this.tex()).size;
     return {
-      x: custom.x ?? width * scaleFactor,
-      y: custom.y ?? height * scaleFactor,
+      x: custom.x ?? x * scaleFactor,
+      y: custom.y ?? y * scaleFactor,
     };
   }
 
@@ -192,13 +192,13 @@ export class Latex extends Shape {
     context.scale(scaleFactor, -scaleFactor);
     for (const shape of shapes) {
       context.save();
-      const [x, y] = shape.position;
+      const {x, y} = shape.position;
       context.translate(x, y);
       if (shape.type == 'path') {
         const p = new Path2D(shape.data);
         context.fill(p);
       } else {
-        context.fillRect(0, 0, shape.width, shape.height);
+        context.fillRect(0, 0, shape.size.x, shape.size.y);
       }
       context.restore();
     }
