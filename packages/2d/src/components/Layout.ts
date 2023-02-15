@@ -165,7 +165,7 @@ export class Layout extends Node {
   @defaultStyle('font-style')
   @signal()
   public declare readonly fontStyle: SimpleSignal<string, this>;
-  @defaultStyle('font-weight', Number)
+  @defaultStyle('font-weight', parseInt)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
   @initial('120%')
@@ -754,7 +754,7 @@ export class Layout extends Node {
       : this.fontStyle();
     this.element.style.lineHeight =
       typeof this.lineHeight() === 'string'
-        ? String(Number((this.lineHeight() as string).slice(0, -1)) / 100)
+        ? (parseFloat(this.lineHeight() as string) / 100).toString()
         : `${this.lineHeight()}px`;
     this.element.style.fontWeight = this.fontWeight.isInitial()
       ? ''

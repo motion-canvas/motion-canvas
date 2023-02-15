@@ -13,3 +13,4 @@ export * from './isReactive';
 export * from './SignalContext';
 export * from './DependencyContext';
 export * from './types';
+export * from './symbols';

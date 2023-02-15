@@ -35,7 +35,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
     meta.compound = true;
     meta.compoundEntries = Object.entries(entries);
 
-    addInitializer(target, (instance: any, context: any) => {
+    addInitializer(target, (instance: any) => {
       if (!meta.parser) {
         useLogger().error(`Missing parser decorator for "${key.toString()}"`);
         return;

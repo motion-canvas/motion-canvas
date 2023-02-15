@@ -16,6 +16,7 @@ import {
   SignalValue,
 } from './types';
 import {isReactive} from './isReactive';
+import {DEFAULT} from './symbols';
 
 export type SimpleSignal<TValue, TReturn = void> = Signal<
   TValue,
@@ -54,10 +55,6 @@ export class SignalContext<
   TValue extends TSetterValue = TSetterValue,
   TOwner = void,
 > extends DependencyContext<TOwner> {
-  public static readonly DEFAULT = Symbol.for(
-    '@motion-canvas/core/signals/default',
-  );
-
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
   protected parser: (value: TSetterValue) => TValue = value => <TValue>value;
@@ -113,8 +110,8 @@ export class SignalContext<
     this.markDirty();
   }
 
-  public set(value: SignalValue<TSetterValue> | symbol): TOwner {
-    if (value === SignalContext.DEFAULT) {
+  public set(value: SignalValue<TSetterValue> | typeof DEFAULT): TOwner {
+    if (value === DEFAULT) {
       value = this.initial!;
     }
     const resolvedValue = value as SignalValue<TSetterValue>;
@@ -160,7 +157,7 @@ export class SignalContext<
   }
 
   protected override invoke(
-    value?: SignalValue<TSetterValue> | symbol,
+    value?: SignalValue<TSetterValue> | typeof DEFAULT,
     duration?: number,
     timingFunction: TimingFunction = easeInOutCubic,
     interpolationFunction: InterpolationFunction<TValue> = this.interpolation,
@@ -185,7 +182,7 @@ export class SignalContext<
     before?: ThreadGenerator,
   ) {
     const animate = (
-      value: SignalValue<TSetterValue> | symbol,
+      value: SignalValue<TSetterValue> | typeof DEFAULT,
       duration: number,
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
@@ -211,12 +208,12 @@ export class SignalContext<
   }
 
   protected *tween(
-    value: SignalValue<TSetterValue> | symbol,
+    value: SignalValue<TSetterValue> | typeof DEFAULT,
     duration: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<TValue>,
   ): ThreadGenerator {
-    if (value === SignalContext.DEFAULT) {
+    if (value === DEFAULT) {
       value = this.initial!;
     }
     const resolvedValue = value as SignalValue<TSetterValue>;
@@ -280,7 +277,7 @@ export class SignalContext<
   }
 
   /**
-   * Checks if the signal is currently using its initial value.
+   * Check if the signal is currently using its initial value.
    *
    * @example
    * ```ts
@@ -291,7 +288,7 @@ export class SignalContext<
    * signal(5);
    * signal.isInitial(); // false
    *
-   * signal(SignalContext.DEFAULT);
+   * signal(DEFAULT);
    * signal.isInitial(); // true
    * ```
    */

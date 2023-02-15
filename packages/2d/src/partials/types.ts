@@ -46,6 +46,7 @@ export type LayoutMode = boolean | null;
  * - `number` - the desired length in pixels
  * - `${number}%` - a string with the desired length in percents, for example
  *                  `'50%'`
+ * - `null` - an automatic length (equivalent to `auto` in CSS)
  */
 export type Length = number | `${number}%` | null;
 

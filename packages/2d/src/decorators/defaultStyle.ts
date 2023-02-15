@@ -10,7 +10,7 @@ export function defaultStyle<T>(
       this.requestLayoutUpdate();
       const old = (<any>this.element.style)[styleName];
       (<any>this.element.style)[styleName] = '';
-      const ret = parse.apply(this, [this.styles.getPropertyValue(styleName)]);
+      const ret = parse.call(this, this.styles.getPropertyValue(styleName));
       (<any>this.element.style)[styleName] = old;
       return ret;
     };

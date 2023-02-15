@@ -87,7 +87,7 @@ export function getPropertiesOf(
 export function signal<T>(): PropertyDecorator {
   return (target: any, key) => {
     const meta = getPropertyMetaOrCreate<T>(target, key);
-    addInitializer(target, (instance: any, context: any) => {
+    addInitializer(target, (instance: any) => {
       const getDefault =
         instance[`getDefault${capitalize(key as string)}`]?.bind(instance);
       const signal = new SignalContext<T, T, any>(
