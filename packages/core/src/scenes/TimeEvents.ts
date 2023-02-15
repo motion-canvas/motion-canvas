@@ -57,6 +57,7 @@ export class TimeEvents {
 
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
+  private collisionLookup = new Set<string>();
   private previousReference: SavedTimeEvent[] | undefined = [];
   private didEventsChange = false;
   private preserveTiming = true;
@@ -67,6 +68,7 @@ export class TimeEvents {
 
     scene.onReloaded.subscribe(this.handleReload);
     scene.onRecalculated.subscribe(this.handleRecalculated);
+    scene.onReset.subscribe(this.handleReset);
     scene.meta.onDataChanged.subscribe(this.handleMetaChanged, false);
   }
 
@@ -109,6 +111,16 @@ export class TimeEvents {
    * @internal
    */
   public register(name: string): number {
+    if (this.collisionLookup.has(name)) {
+      this.scene.project.logger.error({
+        message: `name "${name}" has already been used for another event name.`,
+        stack: new Error().stack,
+      });
+      return 0;
+    }
+
+    this.collisionLookup.add(name);
+
     const initialTime = this.scene.project.framesToSeconds(
       this.scene.project.frame - this.scene.firstFrame,
     );
@@ -167,6 +179,7 @@ export class TimeEvents {
    */
   private handleReload = () => {
     this.registeredEvents = {};
+    this.collisionLookup.clear();
   };
 
   /**
@@ -191,6 +204,10 @@ export class TimeEvents {
         timeEvents: this.previousReference,
       });
     }
+  };
+
+  private handleReset = () => {
+    this.collisionLookup.clear();
   };
 
   /**
