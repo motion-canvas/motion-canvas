@@ -8,7 +8,7 @@ import {useProject, useThread} from '@motion-canvas/core/lib/utils';
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {
   DependencyContext,
   SignalValue,
@@ -63,7 +63,7 @@ export class Video extends Rect {
     return this.video().duration;
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.video();

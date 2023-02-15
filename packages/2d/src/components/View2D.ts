@@ -25,7 +25,7 @@ export class View2D extends Layout {
       composite: true,
       fontFamily: 'Roboto',
       fontSize: 48,
-      lineHeight: 64,
+      lineHeight: '120%',
       textWrap: false,
       fontStyle: 'normal',
       ...props,
