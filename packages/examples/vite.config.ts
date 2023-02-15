@@ -21,6 +21,7 @@ export default defineConfig({
         './src/media-image.ts',
         './src/media-video.ts',
         './src/components.ts',
+        './src/logging.ts',
       ],
     }),
   ],

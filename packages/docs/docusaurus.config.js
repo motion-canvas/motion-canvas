@@ -157,6 +157,10 @@ const config = {
             name: 'quickstart',
             url: 'Quickstart example',
           },
+          {
+            name: 'logging',
+            url: 'Logging example',
+          },
         ],
       },
     ],
