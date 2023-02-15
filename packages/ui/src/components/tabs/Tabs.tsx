@@ -6,6 +6,7 @@ import clsx from 'clsx';
 
 export enum TabType {
   Link,
+  ExternalLink,
   Pane,
   Space,
 }
@@ -23,6 +24,13 @@ type Tab =
       type: TabType.Link;
       icon: ComponentChildren;
       url?: string;
+      title?: string;
+      id?: string;
+    }
+  | {
+      type: TabType.ExternalLink;
+      icon: ComponentChildren;
+      url: string;
       title?: string;
       id?: string;
     }
@@ -63,6 +71,16 @@ export function Tabs({children, tab, onToggle}: TabsProps) {
               href={data.url}
               id={data.id}
               className={clsx(styles.tab, !data.url && styles.disabled)}
+            >
+              {data.icon}
+            </a>
+          ) : data.type === TabType.ExternalLink ? (
+            <a
+              title={data.title}
+              href={data.url}
+              id={data.id}
+              className={clsx(styles.tab)}
+              target="_blank"
             >
               {data.icon}
             </a>
