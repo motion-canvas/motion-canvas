@@ -332,13 +332,18 @@ export class Project {
     this.previousScene = null;
 
     const speed = this._speed;
-    this._speed = 1;
     this.frame = 0;
     const scenes = [...this.scenes.current];
-    for (const scene of scenes) {
-      await scene.recalculate();
+
+    try {
+      this._speed = 1;
+      for (const scene of scenes) {
+        await scene.recalculate();
+      }
+    } finally {
+      this._speed = speed;
     }
-    this._speed = speed;
+
     this.scenes.current = scenes;
   }
 
