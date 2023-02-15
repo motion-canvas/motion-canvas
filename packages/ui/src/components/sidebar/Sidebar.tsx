@@ -54,6 +54,13 @@ export function Sidebar({setOpen}: SidebarProps) {
           url: window.location.pathname === '/' ? undefined : '../',
         }}
         {{
+          title: 'Docs',
+          id: 'docs-external-link',
+          type: TabType.ExternalLink,
+          icon: <Docs />,
+          url: 'https://motion-canvas.github.io/docs/',
+        }}
+        {{
           type: TabType.Space,
         }}
         {{
@@ -91,13 +98,6 @@ export function Sidebar({setOpen}: SidebarProps) {
         }}
         {{
           type: TabType.Space,
-        }}
-        {{
-          title: 'Docs',
-          id: 'docs-external-link',
-          type: TabType.ExternalLink,
-          icon: <Docs />,
-          url: 'https://motion-canvas.github.io/docs/',
         }}
       </Tabs>
     </>
