@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0-alpha.0) (2023-02-15)
+
+
+### Bug Fixes
+
+* **2d:** fix layout calculation for nodes not explicitly added to view ([#331](https://github.com/motion-canvas/motion-canvas/issues/331)) ([528e2d5](https://github.com/motion-canvas/motion-canvas/commit/528e2d5a0abec99819e022d2848b256ece9f869a))
+* **core:** playback speed is reset after saving with faulty code ([#204](https://github.com/motion-canvas/motion-canvas/issues/204)). ([#339](https://github.com/motion-canvas/motion-canvas/issues/339)) ([6771e5e](https://github.com/motion-canvas/motion-canvas/commit/6771e5e17edcdc4cce074d7da0962cf71ba6c228))
+* **docs:** fix search ([#336](https://github.com/motion-canvas/motion-canvas/issues/336)) ([e44ec02](https://github.com/motion-canvas/motion-canvas/commit/e44ec02539a67f099471a6aa84f673a236494687))
+* **vite-plugin:** fix js template ([#337](https://github.com/motion-canvas/motion-canvas/issues/337)) ([3b33d73](https://github.com/motion-canvas/motion-canvas/commit/3b33d73416541d491b633bada29f085f5489f6c2))
+
+
+### Features
+
+* **2d:** add default computed values for signals ([#259](https://github.com/motion-canvas/motion-canvas/issues/259)) ([18f61a6](https://github.com/motion-canvas/motion-canvas/commit/18f61a668420dec8afba52d52a6557e7a7919ba2))
+* **core:** add Matrix2D type ([#340](https://github.com/motion-canvas/motion-canvas/issues/340)) ([66b41e6](https://github.com/motion-canvas/motion-canvas/commit/66b41e6beaca5c2ba4b6bd1a7e68ca16d183b0e9))
+* **core:** error double event name ([#341](https://github.com/motion-canvas/motion-canvas/issues/341)) ([053b2a6](https://github.com/motion-canvas/motion-canvas/commit/053b2a6c22c4e726e3962fdaf0a2e8d149889a9b))
+* **docs:** add search ([#335](https://github.com/motion-canvas/motion-canvas/issues/335)) ([48f74a6](https://github.com/motion-canvas/motion-canvas/commit/48f74a60d54cc52c7f069a9ec39071c99163bd19))
+* **docs:** added CodeBlock documentation ([#302](https://github.com/motion-canvas/motion-canvas/issues/302)) ([73f7221](https://github.com/motion-canvas/motion-canvas/commit/73f7221536e09d5cf77f75ca173d1a7637d5b98f))
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 
