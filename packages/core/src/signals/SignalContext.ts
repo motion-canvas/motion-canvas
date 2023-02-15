@@ -114,13 +114,12 @@ export class SignalContext<
     if (value === DEFAULT) {
       value = this.initial!;
     }
-    const resolvedValue = value as SignalValue<TSetterValue>;
 
     if (this.current === value) {
       return this.owner;
     }
 
-    this.current = resolvedValue;
+    this.current = value;
     this.markDirty();
 
     if (this.dependencies.size > 0) {
@@ -128,8 +127,8 @@ export class SignalContext<
       this.dependencies.clear();
     }
 
-    if (!isReactive(resolvedValue)) {
-      this.last = this.parse(resolvedValue);
+    if (!isReactive(value)) {
+      this.last = this.parse(value);
     }
 
     return this.owner;
@@ -216,10 +215,9 @@ export class SignalContext<
     if (value === DEFAULT) {
       value = this.initial!;
     }
-    const resolvedValue = value as SignalValue<TSetterValue>;
 
     yield* this.doTween(
-      this.parse(isReactive(resolvedValue) ? resolvedValue() : resolvedValue),
+      this.parse(isReactive(value) ? value() : value),
       duration,
       timingFunction,
       interpolationFunction,
