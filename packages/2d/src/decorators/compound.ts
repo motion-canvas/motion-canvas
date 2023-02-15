@@ -35,7 +35,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
     meta.compound = true;
     meta.compoundEntries = Object.entries(entries);
 
-    addInitializer(target, (instance: any, context: any) => {
+    addInitializer(target, (instance: any) => {
       if (!meta.parser) {
         useLogger().error(`Missing parser decorator for "${key.toString()}"`);
         return;
@@ -44,7 +44,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
       const signalContext = new CompoundSignalContext(
         Object.keys(entries),
         meta.parser,
-        context.defaults[key] ?? meta.default,
+        meta.default,
         meta.interpolationFunction ?? deepLerp,
         instance,
       );
@@ -53,9 +53,6 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
 
       for (const [key, property] of meta.compoundEntries) {
         patchSignal(signal[key].context, undefined, instance, property);
-        if (property in context.defaults) {
-          signal[key].context.setInitial(context.defaults[property]);
-        }
       }
 
       instance[key] = signal;

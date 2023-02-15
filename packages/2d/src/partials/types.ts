@@ -32,7 +32,9 @@ export type FlexAlign =
   | 'stretch'
   | 'baseline';
 
-export type TextWrap = boolean | 'pre' | null;
+export type LetterSpacing = number | 'normal';
+
+export type TextWrap = boolean | 'pre';
 
 export type LayoutMode = boolean | null;
 

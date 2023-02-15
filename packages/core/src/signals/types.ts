@@ -1,5 +1,6 @@
 import type {InterpolationFunction, TimingFunction} from '../tweening';
 import type {ThreadGenerator} from '../threading';
+import {DEFAULT} from './symbols';
 
 export type SignalValue<TValue> = TValue | (() => TValue);
 export type SignalGenerator<
@@ -10,7 +11,7 @@ export type SignalGenerator<
 };
 
 export interface SignalSetter<TValue, TOwner = void> {
-  (value: SignalValue<TValue>): TOwner;
+  (value: SignalValue<TValue> | typeof DEFAULT): TOwner;
 }
 
 export interface SignalGetter<TValue> {
@@ -19,7 +20,7 @@ export interface SignalGetter<TValue> {
 
 export interface SignalTween<TSetterValue, TValue extends TSetterValue> {
   (
-    value: SignalValue<TSetterValue>,
+    value: SignalValue<TSetterValue> | typeof DEFAULT,
     time: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<TValue>,

@@ -16,6 +16,7 @@ import {
   SignalValue,
 } from './types';
 import {isReactive} from './isReactive';
+import {DEFAULT} from './symbols';
 
 export type SimpleSignal<TValue, TReturn = void> = Signal<
   TValue,
@@ -41,6 +42,11 @@ export interface Signal<
    */
   save(): TOwner;
 
+  /**
+   * {@inheritDoc SignalContext.isInitial}
+   */
+  isInitial(): boolean;
+
   context: TContext;
 }
 
@@ -65,6 +71,9 @@ export class SignalContext<
     });
     Object.defineProperty(this.invokable, 'save', {
       value: this.save.bind(this),
+    });
+    Object.defineProperty(this.invokable, 'isInitial', {
+      value: this.isInitial.bind(this),
     });
 
     if (this.initial !== undefined) {
@@ -101,7 +110,11 @@ export class SignalContext<
     this.markDirty();
   }
 
-  public set(value: SignalValue<TSetterValue>): TOwner {
+  public set(value: SignalValue<TSetterValue> | typeof DEFAULT): TOwner {
+    if (value === DEFAULT) {
+      value = this.initial!;
+    }
+
     if (this.current === value) {
       return this.owner;
     }
@@ -143,7 +156,7 @@ export class SignalContext<
   }
 
   protected override invoke(
-    value?: SignalValue<TSetterValue>,
+    value?: SignalValue<TSetterValue> | typeof DEFAULT,
     duration?: number,
     timingFunction: TimingFunction = easeInOutCubic,
     interpolationFunction: InterpolationFunction<TValue> = this.interpolation,
@@ -168,7 +181,7 @@ export class SignalContext<
     before?: ThreadGenerator,
   ) {
     const animate = (
-      value: SignalValue<TSetterValue>,
+      value: SignalValue<TSetterValue> | typeof DEFAULT,
       duration: number,
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
@@ -194,11 +207,15 @@ export class SignalContext<
   }
 
   protected *tween(
-    value: SignalValue<TSetterValue>,
+    value: SignalValue<TSetterValue> | typeof DEFAULT,
     duration: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<TValue>,
   ): ThreadGenerator {
+    if (value === DEFAULT) {
+      value = this.initial!;
+    }
+
     yield* this.doTween(
       this.parse(isReactive(value) ? value() : value),
       duration,
@@ -255,6 +272,27 @@ export class SignalContext<
    */
   public save() {
     return this.set(this.get());
+  }
+
+  /**
+   * Check if the signal is currently using its initial value.
+   *
+   * @example
+   * ```ts
+   *
+   * const signal = createSignal(0);
+   * signal.isInitial(); // true
+   *
+   * signal(5);
+   * signal.isInitial(); // false
+   *
+   * signal(DEFAULT);
+   * signal.isInitial(); // true
+   * ```
+   */
+  public isInitial() {
+    this.collect();
+    return this.current === this.initial;
   }
 
   /**

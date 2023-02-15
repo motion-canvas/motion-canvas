@@ -1,6 +1,7 @@
 import {
   cloneable,
   computed,
+  defaultStyle,
   initial,
   inspectable,
   signal,
@@ -31,6 +32,7 @@ import {
   FlexWrap,
   LayoutMode,
   Length,
+  LetterSpacing,
   TextWrap,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
@@ -154,25 +156,33 @@ export class Layout extends Node {
   @signal()
   public declare readonly columnGap: SimpleSignal<Length, this>;
 
-  @initial(null)
+  @defaultStyle('font-family')
   @signal()
-  public declare readonly fontFamily: SimpleSignal<string | null, this>;
-  @initial(null)
+  public declare readonly fontFamily: SimpleSignal<string, this>;
+  @defaultStyle('font-size', parseFloat)
   @signal()
-  public declare readonly fontSize: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly fontSize: SimpleSignal<number, this>;
+  @defaultStyle('font-style')
   @signal()
-  public declare readonly fontStyle: SimpleSignal<string | null, this>;
-  @initial(null)
+  public declare readonly fontStyle: SimpleSignal<string, this>;
+  @defaultStyle('font-weight', parseInt)
   @signal()
-  public declare readonly fontWeight: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly fontWeight: SimpleSignal<number, this>;
+  @initial('120%')
   @signal()
-  public declare readonly lineHeight: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly lineHeight: SimpleSignal<Length, this>;
+  @defaultStyle('letter-spacing', i => {
+    if (i === 'normal') {
+      return 'normal';
+    }
+    return parseFloat(i);
+  })
   @signal()
-  public declare readonly letterSpacing: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
+
+  @defaultStyle('white-space', i => {
+    return i === 'pre' ? 'pre' : i === 'normal';
+  })
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
 
@@ -674,15 +684,11 @@ export class Layout extends Node {
     this.position(this.position().add(newOffset).sub(oldOffset));
   }
 
-  protected parseValue(value: number | string | null): string {
-    return value === null ? '' : value.toString();
-  }
-
   protected parsePixels(value: number | null): string {
     return value === null ? '' : `${value}px`;
   }
 
-  protected parseLength(value: null | number | string): string {
+  protected parseLength(value: number | string | null): string {
     if (value === null) {
       return '';
     }
@@ -702,8 +708,9 @@ export class Layout extends Node {
     this.element.style.maxWidth = this.parseLength(this.maxWidth());
     this.element.style.minWidth = this.parseLength(this.minWidth());
     this.element.style.maxHeight = this.parseLength(this.maxHeight());
-    this.element.style.minWidth = this.parseLength(this.minWidth());
-    this.element.style.aspectRatio = this.parseValue(this.ratio());
+    this.element.style.minHeight = this.parseLength(this.minHeight()!);
+    this.element.style.aspectRatio =
+      this.ratio() === null ? '' : this.ratio()!.toString();
 
     this.element.style.marginTop = this.parsePixels(this.margin.top());
     this.element.style.marginBottom = this.parsePixels(this.margin.bottom());
@@ -716,7 +723,7 @@ export class Layout extends Node {
     this.element.style.paddingRight = this.parsePixels(this.padding.right());
 
     this.element.style.flexDirection = this.direction();
-    this.element.style.flexBasis = this.parseLength(this.basis());
+    this.element.style.flexBasis = this.parseLength(this.basis()!);
     this.element.style.flexWrap = this.wrap();
 
     this.element.style.justifyContent = this.justifyContent();
@@ -729,29 +736,45 @@ export class Layout extends Node {
       this.element.style.flexGrow = '0';
       this.element.style.flexShrink = '0';
     } else {
-      this.element.style.flexGrow = this.parseValue(this.grow());
-      this.element.style.flexShrink = this.parseValue(this.shrink());
+      this.element.style.flexGrow = this.grow().toString();
+      this.element.style.flexShrink = this.shrink().toString();
     }
   }
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = this.parseValue(this.fontFamily());
-    this.element.style.fontSize = this.parsePixels(this.fontSize());
-    this.element.style.fontStyle = this.parseValue(this.fontStyle());
-    this.element.style.lineHeight = this.parsePixels(this.lineHeight());
-    this.element.style.fontWeight = this.parseValue(this.fontWeight());
-    this.element.style.letterSpacing = this.parsePixels(this.letterSpacing());
+    this.element.style.fontFamily = this.fontFamily.isInitial()
+      ? ''
+      : this.fontFamily();
+    this.element.style.fontSize = this.fontSize.isInitial()
+      ? ''
+      : `${this.fontSize()}px`;
+    this.element.style.fontStyle = this.fontStyle.isInitial()
+      ? ''
+      : this.fontStyle();
+    this.element.style.lineHeight =
+      typeof this.lineHeight() === 'string'
+        ? (parseFloat(this.lineHeight() as string) / 100).toString()
+        : `${this.lineHeight()}px`;
+    this.element.style.fontWeight = this.fontWeight.isInitial()
+      ? ''
+      : this.fontWeight().toString();
+    this.element.style.letterSpacing = this.letterSpacing.isInitial()
+      ? ''
+      : this.letterSpacing() === 'normal'
+      ? 'normal'
+      : `${this.letterSpacing()}px`;
 
-    const wrap = this.textWrap();
-    this.element.style.whiteSpace =
-      wrap === null
-        ? ''
-        : typeof wrap === 'boolean'
-        ? wrap
-          ? 'normal'
-          : 'nowrap'
-        : wrap;
+    if (this.textWrap.isInitial()) {
+      this.element.style.whiteSpace = '';
+    } else {
+      const wrap = this.textWrap();
+      if (typeof wrap === 'boolean') {
+        this.element.style.whiteSpace = wrap ? 'normal' : 'nowrap';
+      } else {
+        this.element.style.whiteSpace = wrap;
+      }
+    }
   }
 
   public override hit(position: Vector2): Node | null {

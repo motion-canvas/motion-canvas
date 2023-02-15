@@ -120,9 +120,9 @@ export class Image extends Rect {
   protected override applyFlex() {
     super.applyFlex();
     const image = this.image();
-    this.element.style.aspectRatio = this.parseValue(
-      this.ratio() ?? image.naturalWidth / image.naturalHeight,
-    );
+    this.element.style.aspectRatio = (
+      this.ratio() ?? image.naturalWidth / image.naturalHeight
+    ).toString();
   }
 
   /**
