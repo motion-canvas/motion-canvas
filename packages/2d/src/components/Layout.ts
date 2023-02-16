@@ -31,9 +31,11 @@ import {
   FlexJustify,
   FlexWrap,
   LayoutMode,
-  Length,
+  DesiredLength,
   LetterSpacing,
   TextWrap,
+  Length,
+  LengthLimit,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -42,6 +44,7 @@ import {drawLine, lineTo} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
+  Signal,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -52,10 +55,10 @@ export interface LayoutProps extends NodeProps {
 
   width?: SignalValue<Length>;
   height?: SignalValue<Length>;
-  maxWidth?: SignalValue<Length>;
-  maxHeight?: SignalValue<Length>;
-  minWidth?: SignalValue<Length>;
-  minHeight?: SignalValue<Length>;
+  maxWidth?: SignalValue<LengthLimit>;
+  maxHeight?: SignalValue<LengthLimit>;
+  minWidth?: SignalValue<LengthLimit>;
+  minHeight?: SignalValue<LengthLimit>;
   ratio?: SignalValue<number>;
 
   marginTop?: SignalValue<number>;
@@ -86,11 +89,11 @@ export interface LayoutProps extends NodeProps {
   fontSize?: SignalValue<number>;
   fontStyle?: SignalValue<string>;
   fontWeight?: SignalValue<number>;
-  lineHeight?: SignalValue<number>;
+  lineHeight?: SignalValue<Length>;
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<TextWrap>;
 
-  size?: SignalValue<PossibleVector2>;
+  size?: SignalValue<PossibleVector2<Length>>;
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
   offset?: SignalValue<PossibleVector2>;
@@ -104,16 +107,16 @@ export class Layout extends Node {
 
   @initial(null)
   @signal()
-  public declare readonly maxWidth: SimpleSignal<Length, this>;
+  public declare readonly maxWidth: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly maxHeight: SimpleSignal<Length, this>;
+  public declare readonly maxHeight: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly minWidth: SimpleSignal<Length, this>;
+  public declare readonly minWidth: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly minHeight: SimpleSignal<Length, this>;
+  public declare readonly minHeight: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
   public declare readonly ratio: SimpleSignal<number | null, this>;
@@ -146,15 +149,15 @@ export class Layout extends Node {
   @initial('normal')
   @signal()
   public declare readonly alignItems: SimpleSignal<FlexAlign, this>;
-  @initial(null)
-  @signal()
-  public declare readonly gap: SimpleSignal<Length, this>;
-  @initial(null)
-  @signal()
-  public declare readonly rowGap: SimpleSignal<Length, this>;
-  @initial(null)
-  @signal()
-  public declare readonly columnGap: SimpleSignal<Length, this>;
+  @initial(0)
+  @vector2Signal({x: 'columnGap', y: 'rowGap'})
+  public declare readonly gap: Vector2LengthSignal<this>;
+  public get columnGap(): Signal<Length, number, this> {
+    return this.gap.x;
+  }
+  public get rowGap(): Signal<Length, number, this> {
+    return this.gap.y;
+  }
 
   @defaultStyle('font-family')
   @signal()
@@ -168,7 +171,7 @@ export class Layout extends Node {
   @defaultStyle('font-weight', parseInt)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
-  @initial('120%')
+  @defaultStyle('line-height', parseFloat)
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
   @defaultStyle('letter-spacing', i => {
@@ -217,6 +220,11 @@ export class Layout extends Node {
     this.customY(value);
   }
 
+  @inspectable(false)
+  @initial(null)
+  @signal()
+  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
+
   protected getWidth(): number {
     return this.computedSize().width;
   }
@@ -256,6 +264,11 @@ export class Layout extends Node {
     this.size.x(value);
     lock && this.releaseSize();
   }
+
+  @inspectable(false)
+  @initial(null)
+  @signal()
+  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
 
   protected getHeight(): number {
     return this.computedSize().height;
@@ -351,15 +364,22 @@ export class Layout extends Node {
   @initial({x: null, y: null})
   @vector2Signal({x: 'width', y: 'height'})
   public declare readonly size: Vector2LengthSignal<this>;
+  public get width(): Signal<Length, number, this> {
+    return this.size.x;
+  }
+  public get height(): Signal<Length, number, this> {
+    return this.size.y;
+  }
 
-  @inspectable(false)
-  @signal()
-  protected declare readonly customWidth: SimpleSignal<Length, this>;
-  @inspectable(false)
-  @signal()
-  protected declare readonly customHeight: SimpleSignal<Length, this>;
+  /**
+   * Get the desired size of this node.
+   *
+   * @remarks
+   * This method can be used to control the size using external factors.
+   * By default, the returned size is the same as the one declared by the user.
+   */
   @computed()
-  protected desiredSize(): SerializedVector2<Length> {
+  protected desiredSize(): SerializedVector2<DesiredLength> {
     return {
       x: this.customWidth(),
       y: this.customHeight(),
@@ -728,9 +748,8 @@ export class Layout extends Node {
 
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
-    this.element.style.rowGap = this.parseLength(this.rowGap());
-    this.element.style.columnGap = this.parseLength(this.columnGap());
-    this.element.style.gap = this.parseLength(this.gap());
+    this.element.style.columnGap = this.parseLength(this.gap.x());
+    this.element.style.rowGap = this.parseLength(this.gap.y());
 
     if (this.sizeLockCounter() > 0) {
       this.element.style.flexGrow = '0';
@@ -752,10 +771,15 @@ export class Layout extends Node {
     this.element.style.fontStyle = this.fontStyle.isInitial()
       ? ''
       : this.fontStyle();
-    this.element.style.lineHeight =
-      typeof this.lineHeight() === 'string'
-        ? (parseFloat(this.lineHeight() as string) / 100).toString()
-        : `${this.lineHeight()}px`;
+    if (this.lineHeight.isInitial()) {
+      this.element.style.lineHeight = '';
+    } else {
+      const lineHeight = this.lineHeight();
+      this.element.style.lineHeight =
+        typeof lineHeight === 'string'
+          ? (parseFloat(lineHeight as string) / 100).toString()
+          : `${lineHeight}px`;
+    }
     this.element.style.fontWeight = this.fontWeight.isInitial()
       ? ''
       : this.fontWeight().toString();

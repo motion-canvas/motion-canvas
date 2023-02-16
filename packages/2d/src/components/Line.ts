@@ -14,7 +14,7 @@ import {
   Vector2,
 } from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {Layout} from './Layout';
 import {
   CurveDrawingInfo,
@@ -84,7 +84,7 @@ export class Line extends Shape {
     this
   >;
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     return this.childrenRect().size;
   }
 

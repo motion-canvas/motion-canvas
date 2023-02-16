@@ -8,7 +8,7 @@ import {
 } from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {
   DependencyContext,
   SignalValue,
@@ -39,7 +39,7 @@ export class Image extends Rect {
     super(props);
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.image();
