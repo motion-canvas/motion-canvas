@@ -4,7 +4,7 @@
 const config = {
   title: 'Motion Canvas',
   tagline: 'Visualize complex ideas programmatically',
-  url: 'https://motion-canvas.github.io',
+  url: 'https://motioncanvas.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
