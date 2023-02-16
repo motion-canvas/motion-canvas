@@ -92,7 +92,7 @@ export interface Spring {
   mass: number;
   stiffness: number;
   damping: number;
-  initalVelocity?: number;
+  initialVelocity?: number;
 }
 
 export function makeSpring(
