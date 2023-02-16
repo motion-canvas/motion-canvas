@@ -296,13 +296,16 @@ export default ({
           return;
         }
 
-        if (req.url === '/') {
+        const url = req.url
+          ? new URL(req.url, `http://${req.headers.host}`)
+          : undefined;
+        if (url?.pathname === '/') {
           res.setHeader('Content-Type', 'text/html');
           res.end(createHtml('/@id/__x00__virtual:editor'));
           return;
         }
 
-        const name = req.url?.slice(1);
+        const name = url?.pathname?.slice(1);
         if (name && name in projectLookup) {
           res.setHeader('Content-Type', 'text/html');
           res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
