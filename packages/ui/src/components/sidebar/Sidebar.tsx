@@ -58,7 +58,7 @@ export function Sidebar({setOpen}: SidebarProps) {
           id: 'docs-external-link',
           type: TabType.ExternalLink,
           icon: <Docs />,
-          url: 'https://motion-canvas.github.io/docs/',
+          url: 'https://motioncanvas.io/docs/',
         }}
         {{
           type: TabType.Space,

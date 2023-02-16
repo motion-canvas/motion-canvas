@@ -79,4 +79,4 @@ help make Motion Canvas better.
   https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token
 [template]: https://github.com/motion-canvas/project-template#using-the-template
 [discord]: https://discord.gg/XnnWTrHYAW
-[docs]: https://motion-canvas.github.io/docs/quickstart
+[docs]: https://motioncanvas.io/docs/quickstart
