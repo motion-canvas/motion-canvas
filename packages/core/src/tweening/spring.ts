@@ -60,9 +60,10 @@ export function* spring(
     // apply velocity to the position
     position += velocity * timeStep;
 
-    // the simulation would run forever but is often barely noticable after some seconds
-    // we fix this by checking if the delta delta between $to and $position is smaller than the given $settleTolerance
-    // but we also need to check if the velocity is below the tolerance too
+    // The simulation would run forever but is often barely noticeable after
+    // some seconds. We fix this by checking if the delta between `to` and
+    // `position` is smaller than the given `settleTolerance`. But we also need
+    // to check if the velocity is below the tolerance too.
     if (
       Math.abs(to) - Math.abs(position) < settleTolerance &&
       Math.abs(velocity) < settleTolerance
