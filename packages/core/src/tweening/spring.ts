@@ -51,7 +51,8 @@ export function* spring(
   while (!settled) {
     const positionDelta = position - to;
 
-    // using hooks law: F=-kx; with k being the spring constant and x the offset to the settling position
+    // Using hooks law: F=-kx; with k being the spring constant and x the offset 
+    // to the settling position
     const force = -spring.stiffness * positionDelta - spring.damping * velocity;
 
     //updating the velocity
