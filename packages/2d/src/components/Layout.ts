@@ -44,6 +44,7 @@ import {drawLine, lineTo} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
+  Signal,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -149,17 +150,13 @@ export class Layout extends Node {
   @signal()
   public declare readonly alignItems: SimpleSignal<FlexAlign, this>;
   @initial(0)
-  @signal()
-  public declare readonly gap: SimpleSignal<Length, this>;
-  @signal()
-  public declare readonly rowGap: SimpleSignal<Length, this>;
-  protected getDefaultRowGap() {
-    return this.gap();
+  @vector2Signal({x: 'columnGap', y: 'rowGap'})
+  public declare readonly gap: Vector2LengthSignal<this>;
+  public get columnGap(): Signal<Length, number, this> {
+    return this.gap.x;
   }
-  @signal()
-  public declare readonly columnGap: SimpleSignal<Length, this>;
-  protected getDefaultColumnGap() {
-    return this.gap();
+  public get rowGap(): Signal<Length, number, this> {
+    return this.gap.y;
   }
 
   @defaultStyle('font-family')
@@ -367,6 +364,12 @@ export class Layout extends Node {
   @initial({x: null, y: null})
   @vector2Signal({x: 'width', y: 'height'})
   public declare readonly size: Vector2LengthSignal<this>;
+  public get width(): Signal<Length, number, this> {
+    return this.size.x;
+  }
+  public get height(): Signal<Length, number, this> {
+    return this.size.y;
+  }
 
   /**
    * Get the desired size of this node.
@@ -745,8 +748,8 @@ export class Layout extends Node {
 
     this.element.style.justifyContent = this.justifyContent();
     this.element.style.alignItems = this.alignItems();
-    this.element.style.rowGap = this.parseLength(this.rowGap());
-    this.element.style.columnGap = this.parseLength(this.columnGap());
+    this.element.style.columnGap = this.parseLength(this.gap.x());
+    this.element.style.rowGap = this.parseLength(this.gap.y());
 
     if (this.sizeLockCounter() > 0) {
       this.element.style.flexGrow = '0';
