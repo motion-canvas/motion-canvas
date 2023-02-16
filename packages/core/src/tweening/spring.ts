@@ -18,7 +18,7 @@ export function* spring(
   };
 
   if (spring.mass <= 0) {
-    useLogger().error(new Error('Spring mass must be greater 0.'));
+    useLogger().error(new Error('Spring mass must be greater than 0.'));
     return;
   }
   if (spring.stiffness < 0) {
