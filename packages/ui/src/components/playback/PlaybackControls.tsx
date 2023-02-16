@@ -46,6 +46,11 @@ export function PlaybackControls() {
             break;
           case 'ArrowRight':
             event.preventDefault();
+            if (event.shiftKey) {
+              player.requestSeek(state.endFrame);
+              return;
+            }
+
             player.requestNextFrame();
             break;
           case 'm':
