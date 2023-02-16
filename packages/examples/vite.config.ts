@@ -22,6 +22,7 @@ export default defineConfig({
         './src/media-video.ts',
         './src/components.ts',
         './src/logging.ts',
+        './src/transitions.ts',
       ],
     }),
   ],
