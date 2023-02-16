@@ -109,10 +109,10 @@ export function makeSpring(
   };
 }
 
-export const beatSpring: Spring = makeSpring(0.13, 5.7, 1.2, 10.0);
-export const ploppSpring: Spring = makeSpring(0.2, 20.0, 0.68, 0.0);
-export const bounceSpring: Spring = makeSpring(0.08, 4.75, 0.05, 0.0);
-export const swingSpring: Spring = makeSpring(0.39, 19.85, 2.82, 0.0);
-export const jumpSpring: Spring = makeSpring(0.04, 10.0, 0.7, 8.0);
-export const strikeSpring: Spring = makeSpring(0.03, 20.0, 0.9, 4.8);
-export const smoothSpring: Spring = makeSpring(0.16, 15.35, 1.88, 0.0);
+export const BeatSpring: Spring = makeSpring(0.13, 5.7, 1.2, 10.0);
+export const PlopSpring: Spring = makeSpring(0.2, 20.0, 0.68, 0.0);
+export const BounceSpring: Spring = makeSpring(0.08, 4.75, 0.05, 0.0);
+export const SwingSpring: Spring = makeSpring(0.39, 19.85, 2.82, 0.0);
+export const JumpSpring: Spring = makeSpring(0.04, 10.0, 0.7, 8.0);
+export const StrikeSpring: Spring = makeSpring(0.03, 20.0, 0.9, 4.8);
+export const SmoothSpring: Spring = makeSpring(0.16, 15.35, 1.88, 0.0);
