@@ -2,15 +2,50 @@ import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
 import {useProject, useThread, useLogger} from '../utils';
 
+type ProgressFunction = (value: number, time: number) => void;
+
 decorate(spring, threadable());
+export function spring(
+  spring: Spring | null,
+  from: number,
+  to: number,
+  settleTolerance: number,
+  onProgress: ProgressFunction,
+  onEnd?: ProgressFunction,
+): ThreadGenerator;
+
+export function spring(
+  spring: Spring | null,
+  from: number,
+  to: number,
+  onProgress: ProgressFunction,
+  onEnd?: ProgressFunction,
+): ThreadGenerator;
+
 export function* spring(
   spring: Spring | null,
   from: number,
   to: number,
-  settleTolerance: number | null,
-  onProgress: (value: number, time: number) => void,
-  onEnd?: (value: number, time: number) => void,
+  settleToleranceOrOnProgress: number | ProgressFunction,
+  onProgressOrOnEnd?: ProgressFunction,
+  onEnd?: ProgressFunction,
 ): ThreadGenerator {
+  const settleTolerance =
+    typeof settleToleranceOrOnProgress === 'number'
+      ? settleToleranceOrOnProgress
+      : 0.001;
+
+  onEnd =
+    typeof settleToleranceOrOnProgress === 'number' ? onEnd : onProgressOrOnEnd;
+
+  const onProgress: ProgressFunction = (value: number, time: number) => {
+    if (typeof settleToleranceOrOnProgress === 'function') {
+      settleToleranceOrOnProgress(value, time);
+    } else if (typeof onProgressOrOnEnd === 'function') {
+      onProgressOrOnEnd(value, time);
+    }
+  };
+
   spring = spring ?? {
     mass: 0.05,
     stiffness: 10,
@@ -40,26 +75,79 @@ export function* spring(
   const startTime = thread.time();
 
   // figure out the step length for each frame
-  const timeStep = 1 / project.framerate;
 
-  settleTolerance = settleTolerance ?? 0.001;
   let position = from;
-  let velocity = spring.initalVelocity ?? 0;
+  let velocity = spring.initialVelocity ?? 0;
   let settled = false;
 
-  onProgress(from, 0);
-  while (!settled) {
+  const update = (dt: number) => {
+    if (spring === null) {
+      return;
+    }
     const positionDelta = position - to;
 
-    // Using hooks law: F=-kx; with k being the spring constant and x the offset 
+    // Using hooks law: F=-kx; with k being the spring constant and x the offset
     // to the settling position
     const force = -spring.stiffness * positionDelta - spring.damping * velocity;
 
     //updating the velocity
-    velocity += (force / spring.mass) * timeStep;
+    velocity += (force / spring.mass) * dt;
 
     // apply velocity to the position
-    position += velocity * timeStep;
+    position += velocity * dt;
+  };
+
+  // Set simulation constant framerate
+  const simulationFrames = 120;
+
+  // Calculate a timestep based on on the simulation framerate
+  const timeStep = 1 / simulationFrames;
+
+  // Calculate the number steps needed for each frame of the project
+  const stepsPerFrame = simulationFrames / project.framerate;
+
+  let lastUpdate = startTime;
+
+  onProgress(from, 0);
+
+  // That is a stash we push leftover timesteps to
+  let accumulation = 0;
+
+  while (!settled) {
+    // We wait until the thread starts to account for offsets like
+    // `waitFor(0.005)`
+
+    const timeOffset = project.time - lastUpdate;
+
+    if (timeOffset <= 0) {
+      yield;
+      continue;
+    }
+    lastUpdate = project.time;
+
+    // Add the timeSteps for the current frame to the stash
+    accumulation += stepsPerFrame * timeStep;
+
+    let divider = 1;
+
+    // For the case we have uneven `timeStep` sizes, like when we have a
+    // framerate of 25 and a simulation framerate of 60 we end up having
+    // 2.4 steps per frame. So we just make substeps until the stash
+    // has less then 0.001 steps left.
+    while (divider < 10000) {
+      // Calculate the substep size based on the divider
+      const step = timeStep / divider;
+
+      // Sub step until there are no longer sub steps available
+      while (accumulation / step >= 1) {
+        update(step);
+        // remove the substeps from the stash
+        accumulation -= step;
+      }
+
+      // Increase the divider
+      divider *= 10;
+    }
 
     // The simulation would run forever but is often barely noticeable after
     // some seconds. We fix this by checking if the delta between `to` and
@@ -72,20 +160,14 @@ export function* spring(
       settled = true;
     }
 
-    const time = project.time - startTime;
     const value = position;
 
-    if (time > 0) {
-      onProgress(value, time);
-    }
+    onProgress(value, project.time - startTime);
     yield;
   }
-  const endTime = thread.time();
 
-  thread.time(endTime);
-
-  onProgress(to, endTime);
-  onEnd?.(to, endTime);
+  onProgress(to, project.time - startTime);
+  onEnd?.(to, project.time - startTime);
 }
 
 export interface Spring {
@@ -99,13 +181,13 @@ export function makeSpring(
   mass: number,
   stiffness: number,
   damping: number,
-  initalVelocity?: number,
+  initialVelocity?: number,
 ): Spring {
   return {
     mass,
     stiffness,
     damping,
-    initalVelocity,
+    initialVelocity,
   };
 }
 
