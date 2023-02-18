@@ -1,9 +1,10 @@
-import {initial, interpolation, signal} from '../decorators';
+import {computed, initial, interpolation, signal} from '../decorators';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {Rect} from '@motion-canvas/core/lib/types';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {View2D} from './View2D';
 
 export interface TextProps extends ShapeProps {
   children?: string;
@@ -12,8 +13,12 @@ export interface TextProps extends ShapeProps {
 
 export class Text extends Shape {
   protected static segmenter;
+  protected static formatter: HTMLDivElement;
 
   static {
+    this.formatter = document.createElement('div');
+    View2D.shadowRoot.append(this.formatter);
+
     try {
       this.segmenter = new (Intl as any).Segmenter(undefined, {
         granularity: 'grapheme',
@@ -94,26 +99,31 @@ export class Text extends Shape {
     context.restore();
   }
 
+  @computed()
+  protected formattedText() {
+    Text.formatter.innerText = this.text();
+    return Text.formatter.innerText;
+  }
+
   protected override updateLayout() {
     this.applyFont();
     this.applyFlex();
 
     const wrap =
       this.styles.whiteSpace !== 'nowrap' && this.styles.whiteSpace !== 'pre';
-    const text = this.text();
 
     if (wrap && Text.segmenter) {
       this.element.innerText = '';
-      for (const word of Text.segmenter.segment(text)) {
+      for (const word of Text.segmenter.segment(this.formattedText())) {
         this.element.appendChild(document.createTextNode(word.segment));
       }
     } else if (this.styles.whiteSpace === 'pre') {
       this.element.innerText = '';
-      for (const line of text.split('\n')) {
+      for (const line of this.text().split('\n')) {
         this.element.appendChild(document.createTextNode(line + '\n'));
       }
     } else {
-      this.element.innerHTML = this.text();
+      this.element.innerText = this.formattedText();
     }
 
     if (wrap && !Text.segmenter) {
