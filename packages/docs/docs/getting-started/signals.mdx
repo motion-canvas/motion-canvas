@@ -117,6 +117,51 @@ recalculated immediately - laziness is still at play. We can modify the radius
 however many times we want, but the `area` will be recalculated only once its
 value is requested again by calling `area()`.
 
+## `DEFAULT` values
+
+Signals keep track of the initial values specified during creation. At any time,
+we can reset a signal to its initial value by passing the
+[`DEFAULT`](/api/core/signals#DEFAULT) symbol to it:
+
+```ts
+import {DEFAULT, createSignal} from '@motion-canvas/core/lib/signals';
+
+const signal = createSignal(3); // <- initial value is 3
+signal(2);
+signal(); // <- value is now 2
+signal(DEFAULT);
+signal(); // <- value is reset back to 3
+```
+
+We can also use the [`DEFAULT`](/api/core/signals#DEFAULT) symbol for
+[tweening](/docs/tweening):
+
+```ts
+yield * signal(DEFAULT, 2);
+```
+
+Resetting to the default value is especially useful with node properties. In the
+example below, we set the [`lineHeight`](/api/2d/components/Layout#lineHeight)
+of the [`Text`](/api/2d/components/Text) node to `150%`. This will override its
+default value, which would be simply inherited from its parent:
+
+```tsx
+const text = createRef<Text>();
+view.add(
+  <Text lineHeight={'150%'} ref={text}>
+    Hello world!
+  </Text>,
+);
+```
+
+If we want to reset the [`lineHeight`](/api/2d/components/Layout#lineHeight)
+back to the default, inherited value, we can do so with
+[`DEFAULT`](/api/core/signals#DEFAULT):
+
+```ts
+text().lineHeight(DEFAULT);
+```
+
 ## Complex example
 
 We can use the fact that properties of nodes are represented by signals to
