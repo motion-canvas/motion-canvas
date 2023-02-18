@@ -33,9 +33,9 @@ export function Sidebar({setOpen}: SidebarProps) {
 
   useEffect(() => {
     if (inspectedElement && tab !== -1) {
-      setTab(2);
+      setTab(3);
     }
-  }, [inspectedElement]);
+  }, [!inspectedElement]);
 
   return (
     <>
