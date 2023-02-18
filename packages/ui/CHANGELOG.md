@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **ui:** fix inspector tab ([#374](https://github.com/motion-canvas/motion-canvas/issues/374)) ([c4cb378](https://github.com/motion-canvas/motion-canvas/commit/c4cb378c2f9d972bb41542bbe3b3aa314fa1f3ad))
+
+
+### Features
+
+* **ui:** add external link to docs ([#346](https://github.com/motion-canvas/motion-canvas/issues/346)) ([fc4ee5d](https://github.com/motion-canvas/motion-canvas/commit/fc4ee5d028312904ed9e11c5341ac00f36e7242b))
+* **ui:** shift + right arrow moves to last frame ([#354](https://github.com/motion-canvas/motion-canvas/issues/354)) ([4b81709](https://github.com/motion-canvas/motion-canvas/commit/4b8170971400c5bf4fe690a58d3f44c3e1d00b94)), closes [#353](https://github.com/motion-canvas/motion-canvas/issues/353)
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 

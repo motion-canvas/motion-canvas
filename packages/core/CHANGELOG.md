@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **core:** playback speed is reset after saving with faulty code ([#204](https://github.com/motion-canvas/motion-canvas/issues/204)). ([#339](https://github.com/motion-canvas/motion-canvas/issues/339)) ([6771e5e](https://github.com/motion-canvas/motion-canvas/commit/6771e5e17edcdc4cce074d7da0962cf71ba6c228))
+
+
+### Features
+
+* **2d:** add default computed values for signals ([#259](https://github.com/motion-canvas/motion-canvas/issues/259)) ([18f61a6](https://github.com/motion-canvas/motion-canvas/commit/18f61a668420dec8afba52d52a6557e7a7919ba2))
+* **core:** add Matrix2D type ([#340](https://github.com/motion-canvas/motion-canvas/issues/340)) ([66b41e6](https://github.com/motion-canvas/motion-canvas/commit/66b41e6beaca5c2ba4b6bd1a7e68ca16d183b0e9))
+* **core:** error double event name ([#341](https://github.com/motion-canvas/motion-canvas/issues/341)) ([053b2a6](https://github.com/motion-canvas/motion-canvas/commit/053b2a6c22c4e726e3962fdaf0a2e8d149889a9b))
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 

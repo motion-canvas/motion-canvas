@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **vite-plugin:** ignore query param in devserver ([#351](https://github.com/motion-canvas/motion-canvas/issues/351)) ([5644d72](https://github.com/motion-canvas/motion-canvas/commit/5644d72d36adcdc817f0856aaff0be5507338cb8))
+
+
+
+
+
 # [2.2.0](https://github.com/motion-canvas/motion-canvas/compare/v2.1.0...v2.2.0) (2023-02-09)
 
 **Note:** Version bump only for package @motion-canvas/vite-plugin

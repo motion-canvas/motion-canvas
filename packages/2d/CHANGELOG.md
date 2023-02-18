@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **2d:** fix Gradient and Pattern signals ([#376](https://github.com/motion-canvas/motion-canvas/issues/376)) ([6e0dc8a](https://github.com/motion-canvas/motion-canvas/commit/6e0dc8af8d19f93fd6a42addca2b3a2958b4dd33))
+* **2d:** fix layout calculation for nodes not explicitly added to view ([#331](https://github.com/motion-canvas/motion-canvas/issues/331)) ([528e2d5](https://github.com/motion-canvas/motion-canvas/commit/528e2d5a0abec99819e022d2848b256ece9f869a))
+* **2d:** format whitespaces according to HTML ([#372](https://github.com/motion-canvas/motion-canvas/issues/372)) ([83fb565](https://github.com/motion-canvas/motion-canvas/commit/83fb565742d98f060c0400c8cbaf9961b69f34d0)), closes [#370](https://github.com/motion-canvas/motion-canvas/issues/370)
+* typo on codeblock remove comments ([#368](https://github.com/motion-canvas/motion-canvas/issues/368)) ([2025adc](https://github.com/motion-canvas/motion-canvas/commit/2025adc6e7aa11d81b6f5f6989e8eae18cf86cb7))
+
+
+### Features
+
+* **2d:** add default computed values for signals ([#259](https://github.com/motion-canvas/motion-canvas/issues/259)) ([18f61a6](https://github.com/motion-canvas/motion-canvas/commit/18f61a668420dec8afba52d52a6557e7a7919ba2))
+* **2d:** add moveBelow, moveAbove and moveTo methods to Node ([#365](https://github.com/motion-canvas/motion-canvas/issues/365)) ([16752a3](https://github.com/motion-canvas/motion-canvas/commit/16752a3b8ae7461b33d6208a9675729f374e8324))
+* **2d:** unify layout properties ([#355](https://github.com/motion-canvas/motion-canvas/issues/355)) ([3cae97e](https://github.com/motion-canvas/motion-canvas/commit/3cae97ea704d0533020fa87326dacadcc037d517)), closes [#352](https://github.com/motion-canvas/motion-canvas/issues/352)
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 
