@@ -72,11 +72,8 @@ export function* spring(
   const project = useProject();
   const thread = useThread();
 
-  // figure out the step length for each frame
-
   let position = from;
   let velocity = spring.initialVelocity ?? 0;
-  let settled = false;
 
   const update = (dt: number) => {
     if (spring === null) {
@@ -88,10 +85,9 @@ export function* spring(
     // to the settling position
     const force = -spring.stiffness * positionDelta - spring.damping * velocity;
 
-    //updating the velocity
+    // Update the velocity based on the given timestep
     velocity += (force / spring.mass) * dt;
 
-    // apply velocity to the position
     position += velocity * dt;
   };
 
@@ -106,6 +102,7 @@ export function* spring(
   const startTime = thread.time();
   let simulationTime = startTime;
 
+  let settled = false;
   while (!settled) {
     while (simulationTime < project.time) {
       const difference = project.time - simulationTime;
@@ -118,20 +115,20 @@ export function* spring(
         simulationTime += timeStep;
       }
 
-      // perform the check during every iteration:
+      // Perform the check during every iteration:
       if (
         Math.abs(to - position) < settleTolerance &&
         Math.abs(velocity) < settleTolerance
       ) {
-        // set the thread time to simulation time:
+        // Set the thread time to simulation time:
         thread.time(simulationTime);
         settled = true;
-        // break out when settled
+        // Break out when settled
         break;
       }
     }
 
-    // only yield if we haven't settled yet.
+    // Only yield if we haven't settled yet.
     if (!settled) {
       onProgress(position, project.time - startTime);
       yield;
