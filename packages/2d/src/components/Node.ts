@@ -21,7 +21,11 @@ import {
   ColorSignal,
   SimpleVector2Signal,
 } from '@motion-canvas/core/lib/types';
-import {DetailedError, ReferenceReceiver} from '@motion-canvas/core/lib/utils';
+import {
+  DetailedError,
+  ReferenceReceiver,
+  useLogger,
+} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
@@ -729,6 +733,115 @@ export class Node implements Promisable<Node> {
    */
   public moveToBottom(): this {
     return this.move(-Infinity);
+  }
+
+  /**
+   * Move the node to the provided position relative to its siblings.
+   *
+   * @remarks
+   * If the node is getting moved to a lower position, it will be placed below
+   * the sibling that's currently at the provided index (if any).
+   * If the node is getting moved to a higher position, it will be placed above
+   * the sibling that's currently at the provided index (if any).
+   *
+   * @param index - The index to move the node to.
+   */
+  public moveTo(index: number): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    const currentIndex = parent.children().indexOf(this);
+    const by = index - currentIndex;
+
+    return this.move(by);
+  }
+
+  /**
+   * Move the node below the provided node in the parent's layout.
+   *
+   * @remarks
+   * The node will be moved below the provided node and from then on will be
+   * rendered below it. By default, if the node is already positioned lower than
+   * the sibling node, it will not get moved.
+   *
+   * @param node - The sibling node below which to move.
+   * @param directlyBelow - Whether the node should be positioned directly below
+   *                        the sibling. When true, will move the node even if
+   *                        it is already positioned below the sibling.
+   */
+  public moveBelow(node: Node, directlyBelow = false): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    if (node.parent() !== parent) {
+      useLogger().error(
+        "Cannot position nodes relative to each other if they don't belong to the same parent.",
+      );
+      return this;
+    }
+
+    const children = parent.children();
+    const ownIndex = children.indexOf(this);
+    const otherIndex = children.indexOf(node);
+
+    if (!directlyBelow && ownIndex < otherIndex) {
+      // Nothing to do if the node is already positioned below the target node.
+      // We could move the node so it's directly below the sibling node, but
+      // that might suddenly move it on top of other nodes. This is likely
+      // not what the user wanted to happen when calling this method.
+      return this;
+    }
+
+    const by = otherIndex - ownIndex - 1;
+
+    return this.move(by);
+  }
+
+  /**
+   * Move the node above the provided node in the parent's layout.
+   *
+   * @remarks
+   * The node will be moved above the provided node and from then on will be
+   * rendered on top of it. By default, if the node is already positioned
+   * higher than the sibling node, it will not get moved.
+   *
+   * @param node - The sibling node below which to move.
+   * @param directlyAbove - Whether the node should be positioned directly above the
+   *                        sibling. When true, will move the node even if it is
+   *                        already positioned above the sibling.
+   */
+  public moveAbove(node: Node, directlyAbove = false): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    if (node.parent() !== parent) {
+      useLogger().error(
+        "Cannot position nodes relative to each other if they don't belong to the same parent.",
+      );
+      return this;
+    }
+
+    const children = parent.children();
+    const ownIndex = children.indexOf(this);
+    const otherIndex = children.indexOf(node);
+
+    if (!directlyAbove && ownIndex > otherIndex) {
+      // Nothing to do if the node is already positioned above the target node.
+      // We could move the node so it's directly above the sibling node, but
+      // that might suddenly move it below other nodes. This is likely not what
+      // the user wanted to happen when calling this method.
+      return this;
+    }
+
+    const by = otherIndex - ownIndex + 1;
+
+    return this.move(by);
   }
 
   /**
