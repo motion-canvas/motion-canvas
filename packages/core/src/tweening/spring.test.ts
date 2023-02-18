@@ -25,7 +25,6 @@ describe('spring()', () => {
         },
         0,
         300,
-        null,
         x => {
           // do nothing
         },
@@ -43,7 +42,6 @@ describe('spring()', () => {
         },
         0,
         300,
-        null,
         x => {
           // do nothing
         },
@@ -61,7 +59,6 @@ describe('spring()', () => {
         },
         0,
         300,
-        null,
         x => {
           // do nothing
         },
@@ -105,7 +102,6 @@ describe('spring()', () => {
         },
         0,
         300,
-        null,
         x => {
           // do nothing
         },
@@ -113,13 +109,13 @@ describe('spring()', () => {
       time = useTime();
     });
 
-    project.framerate = 30;
+    project.framerate = 10;
     project.frame = 0;
     for (const _ of task) {
       project.frame++;
     }
 
-    expect(project.frame).toBe(42);
+    expect(project.frame).toBe(19);
     expect(time).toBeCloseTo(1.5, 0);
   });
 });
