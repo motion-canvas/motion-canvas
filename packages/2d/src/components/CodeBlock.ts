@@ -456,7 +456,7 @@ export function insert(content: string): CodeModification {
  * @remarks
  * Should be used in conjunction with {@link CodeBlock.edit}.
  *
- * @param content - The code to insert.
+ * @param content - The code to remove.
  */
 export function remove(content: string): CodeModification {
   return {
