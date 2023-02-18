@@ -72,8 +72,6 @@ export function* spring(
   const project = useProject();
   const thread = useThread();
 
-  const startTime = thread.time();
-
   // figure out the step length for each frame
 
   let position = from;
@@ -103,67 +101,41 @@ export function* spring(
   // Calculate a timestep based on on the simulation framerate
   const timeStep = 1 / simulationFrames;
 
-  // Calculate the number steps needed for each frame of the project
-  const stepsPerFrame = simulationFrames / project.framerate;
-
-  let lastUpdate = startTime;
-
   onProgress(from, 0);
 
-  // That is a stash we push leftover timesteps to
-  let accumulation = 0;
+  const startTime = thread.time();
+  let simulationTime = startTime;
 
   while (!settled) {
-    // We wait until the thread starts to account for offsets like
-    // `waitFor(0.005)`
+    while (simulationTime < project.time) {
+      const difference = project.time - simulationTime;
 
-    const timeOffset = project.time - lastUpdate;
-
-    if (timeOffset <= 0) {
-      yield;
-      continue;
-    }
-    lastUpdate = project.time;
-
-    // Add the timeSteps for the current frame to the stash
-    accumulation += stepsPerFrame * timeStep;
-
-    let divider = 1;
-
-    // For the case we have uneven `timeStep` sizes, like when we have a
-    // framerate of 25 and a simulation framerate of 60 we end up having
-    // 2.4 steps per frame. So we just make substeps until the stash
-    // has less then 0.001 steps left.
-    while (divider < 10000) {
-      // Calculate the substep size based on the divider
-      const step = timeStep / divider;
-
-      // Sub step until there are no longer sub steps available
-      while (accumulation / step >= 1) {
-        update(step);
-        // remove the substeps from the stash
-        accumulation -= step;
+      if (timeStep > difference) {
+        update(difference);
+        simulationTime = project.time;
+      } else {
+        update(timeStep);
+        simulationTime += timeStep;
       }
 
-      // Increase the divider
-      divider *= 10;
+      // perform the check during every iteration:
+      if (
+        Math.abs(to - position) < settleTolerance &&
+        Math.abs(velocity) < settleTolerance
+      ) {
+        // set the thread time to simulation time:
+        thread.time(simulationTime);
+        settled = true;
+        // break out when settled
+        break;
+      }
     }
 
-    // The simulation would run forever but is often barely noticeable after
-    // some seconds. We fix this by checking if the delta between `to` and
-    // `position` is smaller than the given `settleTolerance`. But we also need
-    // to check if the velocity is below the tolerance too.
-    if (
-      Math.abs(to) - Math.abs(position) < settleTolerance &&
-      Math.abs(velocity) < settleTolerance
-    ) {
-      settled = true;
+    // only yield if we haven't settled yet.
+    if (!settled) {
+      onProgress(position, project.time - startTime);
+      yield;
     }
-
-    const value = position;
-
-    onProgress(value, project.time - startTime);
-    yield;
   }
 
   onProgress(to, project.time - startTime);

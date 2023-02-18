@@ -115,7 +115,7 @@ describe('spring()', () => {
       project.frame++;
     }
 
-    expect(project.frame).toBe(19);
+    expect(project.frame).toBe(18);
     expect(time).toBeCloseTo(1.5, 0);
   });
 });
