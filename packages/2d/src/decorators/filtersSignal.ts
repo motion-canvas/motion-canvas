@@ -109,12 +109,12 @@ export class FiltersSignalContext<TOwner> extends SignalContext<
   }
 }
 
-export function filtersSignal<T>(): PropertyDecorator {
+export function filtersSignal(): PropertyDecorator {
   return (target: any, key) => {
-    const meta = getPropertyMetaOrCreate<T>(target, key);
-    addInitializer(target, (instance: any, context: any) => {
+    const meta = getPropertyMetaOrCreate<Filter[]>(target, key);
+    addInitializer(target, (instance: any) => {
       instance[key] = new FiltersSignalContext(
-        context.defaults[key] ?? meta.default ?? [],
+        meta.default ?? [],
         instance,
       ).toSignal();
     });

@@ -2,7 +2,7 @@ import {
   deepLerp,
   InterpolationFunction,
 } from '@motion-canvas/core/lib/tweening';
-import {addInitializer} from './initializers';
+import {addInitializer, initialize} from './initializers';
 import {capitalize, useLogger} from '@motion-canvas/core/lib/utils';
 import {patchSignal} from '../utils/patchSignal';
 import {SignalContext} from '@motion-canvas/core/lib/signals';
@@ -63,6 +63,23 @@ export function getPropertiesOf(
   }
 
   return {};
+}
+
+export function initializeSignals(instance: any, props: Record<string, any>) {
+  initialize(instance);
+  for (const [key, meta] of Object.entries(getPropertiesOf(instance))) {
+    const signal = instance[key];
+    if (props[key] !== undefined) {
+      signal(props[key]);
+    }
+    if (meta.compoundEntries !== undefined) {
+      for (const [key, property] of meta.compoundEntries) {
+        if (property in props) {
+          signal[key](props[property]);
+        }
+      }
+    }
+  }
 }
 
 /**

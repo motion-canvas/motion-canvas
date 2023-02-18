@@ -4,7 +4,7 @@ import {
   computed,
   getPropertiesOf,
   initial,
-  initialize,
+  initializeSignals,
   inspectable,
   signal,
   vector2Signal,
@@ -391,20 +391,7 @@ export class Node implements Promisable<Node> {
     this.key = scene.registerNode(this, key);
     this.view2D = scene.getView();
     this.creationStack = new Error().stack;
-    initialize(this, {defaults: rest});
-    for (const {key, signal, meta} of this) {
-      signal.reset();
-      if ((<any>rest)[key] !== undefined) {
-        signal((<any>rest)[key]);
-      }
-      if (meta.compoundEntries !== undefined) {
-        for (const [key, property] of meta.compoundEntries) {
-          if (property in rest) {
-            (<any>signal)[key]((<any>rest)[property]);
-          }
-        }
-      }
-    }
+    initializeSignals(this, rest);
     this.add(children);
     if (spawner) {
       this.children(spawner);

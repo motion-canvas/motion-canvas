@@ -1,7 +1,6 @@
-import {initial, signal} from '../decorators/signal';
+import {initial, initializeSignals, signal} from '../decorators/signal';
 import {vector2Signal} from '../decorators/vector2Signal';
 import {computed} from '../decorators/computed';
-import {initialize} from '../decorators/initializers';
 import {
   Color,
   PossibleColor,
@@ -60,7 +59,7 @@ export class Gradient {
   public declare readonly stops: SimpleSignal<GradientStop[], this>;
 
   public constructor(props: GradientProps) {
-    initialize(this, {defaults: props});
+    initializeSignals(this, props);
   }
 
   @computed()
