@@ -1,6 +1,6 @@
 const INITIALIZERS = Symbol.for('@motion-canvas/2d/decorators/initializers');
 
-export type Initializer<T> = (instance: T, context: any) => void;
+export type Initializer<T> = (instance: T, context?: any) => void;
 
 export function addInitializer<T>(target: any, initializer: Initializer<T>) {
   if (!target[INITIALIZERS]) {
@@ -18,7 +18,7 @@ export function addInitializer<T>(target: any, initializer: Initializer<T>) {
   target[INITIALIZERS].push(initializer);
 }
 
-export function initialize(target: any, context: any) {
+export function initialize(target: any, context?: any) {
   if (target[INITIALIZERS]) {
     try {
       target[INITIALIZERS].forEach((initializer: Initializer<any>) =>
