@@ -121,11 +121,7 @@ export class SignalContext<
 
     this.current = value;
     this.markDirty();
-
-    if (this.dependencies.size > 0) {
-      this.dependencies.forEach(dep => dep.unsubscribe(this.markDirty));
-      this.dependencies.clear();
-    }
+    this.clearDependencies();
 
     if (!isReactive(value)) {
       this.last = this.parse(value);
@@ -136,8 +132,7 @@ export class SignalContext<
 
   public get(): TValue {
     if (this.event.isRaised() && isReactive(this.current)) {
-      this.dependencies.forEach(dep => dep.unsubscribe(this.markDirty));
-      this.dependencies.clear();
+      this.clearDependencies();
       this.startCollecting();
       try {
         this.last = this.parse(this.current());
@@ -235,6 +230,13 @@ export class SignalContext<
     yield* tween(duration, v => {
       this.set(interpolationFunction(from, value, timingFunction(v)));
     });
+  }
+
+  public override dispose() {
+    super.dispose();
+    this.initial = undefined;
+    this.current = undefined;
+    this.last = undefined;
   }
 
   /**

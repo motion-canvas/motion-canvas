@@ -1,37 +1,22 @@
 import {
-  FullSceneDescription,
   GeneratorScene,
   Inspectable,
   InspectedAttributes,
   InspectedElement,
   Scene,
   SceneRenderEvent,
-  ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
 import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
-  private readonly view: View2D;
+  private view: View2D | null = null;
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
 
-  public constructor(
-    description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
-  ) {
-    super(description);
-    startScene(this);
-    const size = this.getSize();
-    this.view = new View2D({
-      position: size.scale(0.5),
-      size,
-    });
-    endScene(this);
-  }
-
   public getView(): View2D {
-    return this.view;
+    return this.view!;
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -39,7 +24,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
-    this.view.render(context);
+    this.getView().render(context);
     this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
     context.restore();
     this.renderLifecycle.dispatch([SceneRenderEvent.AfterRender, context]);
@@ -52,16 +37,21 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     }
     this.registeredNodes = {};
     this.nodeCounters = {};
-    this.registerNode(this.view, this.view.key);
+
+    startScene(this);
     const size = this.getSize();
-    this.view.position(size.scale(0.5));
-    this.view.size(size);
+    this.view = new View2D({
+      position: size.scale(0.5),
+      size,
+    });
+    endScene(this);
+
     return super.reset(previousScene);
   }
 
   public inspectPosition(x: number, y: number): InspectedElement | null {
     startScene(this);
-    const node = this.view.hit(new Vector2(x, y))?.key ?? null;
+    const node = this.getView().hit(new Vector2(x, y))?.key ?? null;
     endScene(this);
     return node;
   }

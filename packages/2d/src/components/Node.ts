@@ -379,7 +379,7 @@ export class Node implements Promisable<Node> {
     }
   }
 
-  private view2D: View2D;
+  protected view2D: View2D;
   private realChildren: Node[] = [];
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
@@ -870,7 +870,9 @@ export class Node implements Promisable<Node> {
    * node to be garbage collected.
    */
   public dispose() {
-    // do nothing
+    for (const {signal} of this) {
+      signal.context.dispose();
+    }
   }
 
   /**
