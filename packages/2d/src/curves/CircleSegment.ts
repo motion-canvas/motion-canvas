@@ -1,5 +1,6 @@
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Segment} from './Segment';
+import {clamp} from '@motion-canvas/core/lib/tweening';
 
 export class CircleSegment extends Segment {
   private readonly length: number;
@@ -13,7 +14,7 @@ export class CircleSegment extends Segment {
     private counter: boolean,
   ) {
     super();
-    this.angle = Math.acos(from.dot(to));
+    this.angle = Math.acos(clamp(-1, 1, from.dot(to)));
     this.length = Math.abs(this.angle * radius);
   }
 
