@@ -1,6 +1,6 @@
-import {Layout, LayoutProps} from './Layout';
+import {Rect, RectProps} from './Rect';
 
-export class View2D extends Layout {
+export class View2D extends Rect {
   public static frameID = 'motion-canvas-2d-frame';
   public static shadowRoot: ShadowRoot;
 
@@ -20,7 +20,7 @@ export class View2D extends Layout {
     View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
   }
 
-  public constructor(props: LayoutProps) {
+  public constructor(props: RectProps) {
     super({
       composite: true,
       fontFamily: 'Roboto',
