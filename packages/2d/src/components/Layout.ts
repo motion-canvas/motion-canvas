@@ -444,8 +444,8 @@ export class Layout extends Node {
   @signal()
   public declare readonly clip: SimpleSignal<boolean, this>;
 
-  public readonly element: HTMLElement;
-  public readonly styles: CSSStyleDeclaration;
+  public element: HTMLElement;
+  public styles: CSSStyleDeclaration;
 
   protected readonly sizeLockCounter = createSignal(0);
 
@@ -799,6 +799,15 @@ export class Layout extends Node {
         this.element.style.whiteSpace = wrap;
       }
     }
+  }
+
+  public override dispose() {
+    super.dispose();
+    this.sizeLockCounter.context.dispose();
+    this.element.remove();
+    this.element.innerHTML = '';
+    this.element = null as unknown as HTMLElement;
+    this.styles = null as unknown as CSSStyleDeclaration;
   }
 
   public override hit(position: Vector2): Node | null {

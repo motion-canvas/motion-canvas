@@ -30,6 +30,7 @@ export class View2D extends Rect {
       fontStyle: 'normal',
       ...props,
     });
+    this.view2D = this;
 
     View2D.shadowRoot.append(this.element);
     this.applyFlex();
@@ -41,7 +42,7 @@ export class View2D extends Rect {
 
   public override dispose() {
     this.removeChildren();
-    this.element.innerText = '';
+    super.dispose();
   }
 
   public override render(context: CanvasRenderingContext2D) {
