@@ -69,6 +69,7 @@ export function initializeSignals(instance: any, props: Record<string, any>) {
   initialize(instance);
   for (const [key, meta] of Object.entries(getPropertiesOf(instance))) {
     const signal = instance[key];
+    signal.reset();
     if (props[key] !== undefined) {
       signal(props[key]);
     }
