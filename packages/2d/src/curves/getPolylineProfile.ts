@@ -2,6 +2,7 @@ import {Vector2} from '@motion-canvas/core/lib/types';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {CircleSegment} from './CircleSegment';
+import {clamp} from '@motion-canvas/core/lib/tweening';
 
 export function getPolylineProfile(
   points: Vector2[],
@@ -33,7 +34,7 @@ export function getPolylineProfile(
     const centerToEnd = end.sub(center);
     const startVector = centerToStart.normalized;
     const endVector = centerToEnd.normalized;
-    const angleBetween = Math.acos(startVector.dot(endVector));
+    const angleBetween = Math.acos(clamp(-1, 1, startVector.dot(endVector)));
     const angleTan = Math.tan(angleBetween / 2);
 
     const safeRadius = Math.min(

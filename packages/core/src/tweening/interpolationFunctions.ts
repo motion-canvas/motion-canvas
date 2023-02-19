@@ -178,7 +178,9 @@ export function arcLerp(
     flip = !flip;
   }
 
-  const normalized = flip ? Math.acos(1 - value) : Math.asin(value);
+  const normalized = flip
+    ? Math.acos(clamp(-1, 1, 1 - value))
+    : Math.asin(value);
   const radians = map(normalized, map(0, Math.PI / 2, value), ratio);
 
   let xValue = Math.sin(radians);
