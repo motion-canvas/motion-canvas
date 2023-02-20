@@ -10,6 +10,7 @@ import {TOCItem} from '@docusaurus/mdx-loader';
 import Tooltip from '@site/src/components/Tooltip';
 import type {JSONOutput} from 'typedoc';
 import {ReflectionKind} from './ReflectionKind';
+import useIsBrowser from '@docusaurus/useIsBrowser';
 
 interface ApiItemProps {
   route: {
@@ -23,6 +24,8 @@ export default function ApiItem({route}: ApiItemProps): JSX.Element {
   const reflection: JSONOutput.DeclarationReflection =
     lookup[route.reflectionId];
   const [filters] = useFilters();
+
+  const isBrowser = useIsBrowser();
   const toc = useMemo(() => {
     const toc: TOCItem[] = [];
     if (!reflection.groups || reflection.kind === ReflectionKind.Project) {
@@ -38,7 +41,11 @@ export default function ApiItem({route}: ApiItemProps): JSX.Element {
       if (group.children) {
         for (const id of group.children) {
           const child = lookup[id];
-          if (!child || child.hasOwnPage || !matchFilters(filters, child)) {
+          if (
+            !child ||
+            child.hasOwnPage ||
+            (isBrowser && !matchFilters(filters, child))
+          ) {
             continue;
           }
           toc.push({
@@ -50,7 +57,7 @@ export default function ApiItem({route}: ApiItemProps): JSX.Element {
       }
     }
     return toc;
-  }, [reflection, filters]);
+  }, [filters, reflection, isBrowser]);
 
   return (
     <DocProvider
