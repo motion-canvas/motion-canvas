@@ -14,6 +14,7 @@ import {
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
+import {viaProxy} from '@motion-canvas/core/lib/utils';
 
 export interface ImageProps extends RectProps {
   src?: SignalValue<string>;
@@ -54,12 +55,13 @@ export class Image extends Rect {
 
   @computed()
   protected image(): HTMLImageElement {
-    const src = this.src();
+    const src = viaProxy(this.src());
     if (Image.pool[src]) {
       return Image.pool[src];
     }
 
     const image = document.createElement('img');
+    image.crossOrigin = 'anonymous';
     image.src = src;
     if (!image.complete) {
       DependencyContext.collectPromise(

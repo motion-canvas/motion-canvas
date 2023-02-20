@@ -25,10 +25,10 @@ import {
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {
-  FlexAlign,
+  FlexItems,
   FlexBasis,
   FlexDirection,
-  FlexJustify,
+  FlexContent,
   FlexWrap,
   LayoutMode,
   DesiredLength,
@@ -79,8 +79,10 @@ export interface LayoutProps extends NodeProps {
   shrink?: SignalValue<number>;
   wrap?: SignalValue<FlexWrap>;
 
-  justifyContent?: SignalValue<FlexJustify>;
-  alignItems?: SignalValue<FlexAlign>;
+  justifyContent?: SignalValue<FlexContent>;
+  alignContent?: SignalValue<FlexContent>;
+  alignItems?: SignalValue<FlexItems>;
+  alignSelf?: SignalValue<FlexItems>;
   rowGap?: SignalValue<Length>;
   columnGap?: SignalValue<Length>;
   gap?: SignalValue<Length>;
@@ -145,10 +147,16 @@ export class Layout extends Node {
 
   @initial('normal')
   @signal()
-  public declare readonly justifyContent: SimpleSignal<FlexJustify, this>;
+  public declare readonly justifyContent: SimpleSignal<FlexContent, this>;
   @initial('normal')
   @signal()
-  public declare readonly alignItems: SimpleSignal<FlexAlign, this>;
+  public declare readonly alignContent: SimpleSignal<FlexContent, this>;
+  @initial('normal')
+  @signal()
+  public declare readonly alignItems: SimpleSignal<FlexItems, this>;
+  @initial('normal')
+  @signal()
+  public declare readonly alignSelf: SimpleSignal<FlexItems, this>;
   @initial(0)
   @vector2Signal({x: 'columnGap', y: 'rowGap'})
   public declare readonly gap: Vector2LengthSignal<this>;
@@ -747,7 +755,9 @@ export class Layout extends Node {
     this.element.style.flexWrap = this.wrap();
 
     this.element.style.justifyContent = this.justifyContent();
+    this.element.style.alignContent = this.alignContent();
     this.element.style.alignItems = this.alignItems();
+    this.element.style.alignSelf = this.alignSelf();
     this.element.style.columnGap = this.parseLength(this.gap.x());
     this.element.style.rowGap = this.parseLength(this.gap.y());
 

@@ -14,7 +14,7 @@ export type FlexBasis =
   | 'fit-content'
   | null;
 
-export type FlexJustify =
+export type FlexContent =
   | 'normal'
   | 'center'
   | 'start'
@@ -24,7 +24,7 @@ export type FlexJustify =
   | 'space-evenly'
   | 'stretch';
 
-export type FlexAlign =
+export type FlexItems =
   | 'normal'
   | 'center'
   | 'start'

@@ -13,3 +13,4 @@ export * from './noop';
 export * from './run';
 export * from './scheduling';
 export * from './sequence';
+export * from './while';

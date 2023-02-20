@@ -13,7 +13,7 @@ export default function ApiPage(props: Props) {
           {...props}
           versionMetadata={{
             version: 'current',
-            pluginId: 'typedoc',
+            pluginId: 'default',
             className: '',
             badge: false,
             docs: {},

@@ -6,7 +6,7 @@ const config = {
   tagline: 'Visualize complex ideas programmatically',
   url: 'https://motioncanvas.io',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'log',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'motion-canvas',
@@ -103,7 +103,6 @@ const config = {
         appId: 'Q6Z7BJ83RF',
         apiKey: '825d6a74e138e6e1378e9669b22720f0',
         indexName: 'motion-canvasio',
-        contextualSearch: false,
       },
       prism: {
         theme: require('./config/lightCodeTheme'),
@@ -121,6 +120,7 @@ const config = {
     '@docusaurus/theme-mermaid',
   ],
   plugins: [
+    './typedoc',
     [
       '@docusaurus/plugin-content-docs',
       {
@@ -144,7 +144,6 @@ const config = {
     '@docusaurus/plugin-content-pages',
     '@docusaurus/plugin-debug',
     '@docusaurus/plugin-sitemap',
-    './typedoc',
     [
       './editor',
       {

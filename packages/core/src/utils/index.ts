@@ -19,3 +19,4 @@ export * from './useThread';
 export * from './useTime';
 export * from './useContext';
 export * from './useDuration';
+export * from './proxyUtils';

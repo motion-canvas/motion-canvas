@@ -2,8 +2,8 @@
   "version": 1,
   "timeEvents": [
     {
-      "name": "circle",
-      "targetTime": 3
+      "name": "vibrate",
+      "targetTime": 3.7198263888888894
     }
   ],
   "seed": 3073416149

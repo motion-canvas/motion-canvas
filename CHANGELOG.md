@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+
+### Bug Fixes
+
+* **2d:** handle division by zero in lines ([#407](https://github.com/motion-canvas/motion-canvas/issues/407)) ([a17871a](https://github.com/motion-canvas/motion-canvas/commit/a17871a2ce63dd5bb32bc719037327c4e9dde217))
+
+
+### Features
+
+* **2d:** add Icon Component ([#306](https://github.com/motion-canvas/motion-canvas/issues/306)) ([3479631](https://github.com/motion-canvas/motion-canvas/commit/3479631ef34e39f90a8d8de441317672be1840d9)), closes [#305](https://github.com/motion-canvas/motion-canvas/issues/305)
+* **2d:** add save and restore methods to nodes ([#406](https://github.com/motion-canvas/motion-canvas/issues/406)) ([870e194](https://github.com/motion-canvas/motion-canvas/commit/870e1947d97382bc6d82857c077140bbef7cf7e8))
+* **2d:** add z-index property to nodes ([#398](https://github.com/motion-canvas/motion-canvas/issues/398)) ([4280af3](https://github.com/motion-canvas/motion-canvas/commit/4280af3b4b7bd5970fe5e743949a0fcca2c314f3))
+* add missing flexbox properties ([#405](https://github.com/motion-canvas/motion-canvas/issues/405)) ([4e78b4b](https://github.com/motion-canvas/motion-canvas/commit/4e78b4b2fe4df42ce0a8da6fd41ad38b0104e7f5))
+* **docs:** improve the release blog ([#410](https://github.com/motion-canvas/motion-canvas/issues/410)) ([f56bbdb](https://github.com/motion-canvas/motion-canvas/commit/f56bbdb4a95e62035f277737ea5fba675e591270))
+* upgrade code-fns for new theme options and lazy loading ([#401](https://github.com/motion-canvas/motion-canvas/issues/401)) ([8965ab1](https://github.com/motion-canvas/motion-canvas/commit/8965ab1bef8b6ae919c8001d0527f5793293b285)), closes [#396](https://github.com/motion-canvas/motion-canvas/issues/396) [#322](https://github.com/motion-canvas/motion-canvas/issues/322)
+* **vite-plugin:** add CORS Proxy ([#357](https://github.com/motion-canvas/motion-canvas/issues/357)) ([a3c5822](https://github.com/motion-canvas/motion-canvas/commit/a3c58228b7d3dab08fc27414d19870d35773b280)), closes [#338](https://github.com/motion-canvas/motion-canvas/issues/338)
+
+
+
+
+
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+
+### Bug Fixes
+
+* **2d:** fix signal initialization ([#382](https://github.com/motion-canvas/motion-canvas/issues/382)) ([ea36e79](https://github.com/motion-canvas/motion-canvas/commit/ea36e791a20bfd1b491ffa9917be686c51bc3899))
+* **2d:** handle floating point errors in acos ([#381](https://github.com/motion-canvas/motion-canvas/issues/381)) ([5bca8fd](https://github.com/motion-canvas/motion-canvas/commit/5bca8fd0bbdcf28f2793c124b7d6b0afd560c4b8))
+* plug memory leaks ([#385](https://github.com/motion-canvas/motion-canvas/issues/385)) ([de0af00](https://github.com/motion-canvas/motion-canvas/commit/de0af00a7d2e019e2a933791c62b7901755be7b0))
+* support color to null tweening ([#387](https://github.com/motion-canvas/motion-canvas/issues/387)) ([02e9f22](https://github.com/motion-canvas/motion-canvas/commit/02e9f22027a1c3a85ffcc259aeca913318fb6f54))
+
+
+### Features
+
+* **2d:** add closed property for circle ([#378](https://github.com/motion-canvas/motion-canvas/issues/378)) ([62a9605](https://github.com/motion-canvas/motion-canvas/commit/62a9605d4c54e7bf2d2d44d47bf769f5b27378a5))
+* **2d:** make `View2D` extend `Rect` ([#379](https://github.com/motion-canvas/motion-canvas/issues/379)) ([93db5fc](https://github.com/motion-canvas/motion-canvas/commit/93db5fc41617c0902e85fda90fbfc930c2b4634b))
+* **core:** add fadeTransition ([#384](https://github.com/motion-canvas/motion-canvas/issues/384)) ([a248785](https://github.com/motion-canvas/motion-canvas/commit/a248785e87d1c6ebc08581f4fda6be428a89824c))
+* **core:** add spring interpolation ([#356](https://github.com/motion-canvas/motion-canvas/issues/356)) ([1463b15](https://github.com/motion-canvas/motion-canvas/commit/1463b1592e22fad9d8298c11270e2099119e2229))
+* **core:** add step parameter to range function ([#373](https://github.com/motion-canvas/motion-canvas/issues/373)) ([923209a](https://github.com/motion-canvas/motion-canvas/commit/923209a4106c8e7f570853dcc47a10e65e0d04d8))
+
+
+
+
+
 # [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
 
 

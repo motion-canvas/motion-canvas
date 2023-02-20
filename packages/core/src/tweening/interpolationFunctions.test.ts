@@ -89,4 +89,17 @@ describe('deepLerp', () => {
     expect(deepLerp(...args)).toEqual(Vector2.lerp(...args));
     expect(spy).toHaveBeenCalledTimes(2);
   });
+
+  test('returns the from boolean until a value of 0.5', () => {
+    expect(deepLerp(true, false, 0)).toBe(true);
+    expect(deepLerp(true, false, 0.25)).toBe(true);
+    expect(deepLerp(true, false, 0.499999)).toBe(true);
+  });
+
+  test('returns the to boolean after a value of 0.5 or greater', () => {
+    expect(deepLerp(true, false, 0.5)).toBe(false);
+    expect(deepLerp(true, false, 0.75)).toBe(false);
+    expect(deepLerp(true, false, 0.99999)).toBe(false);
+    expect(deepLerp(true, false, 1)).toBe(false);
+  });
 });

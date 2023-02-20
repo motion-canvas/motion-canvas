@@ -103,6 +103,10 @@ export function deepLerp(
     return textLerp(from, to, value);
   }
 
+  if (typeof from === 'boolean' && typeof to === 'boolean') {
+    return value < 0.5 ? from : to;
+  }
+
   if ('lerp' in from) {
     return from.lerp(to, value);
   }

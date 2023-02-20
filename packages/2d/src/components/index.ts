@@ -1,4 +1,5 @@
 export * from './Circle';
+export * from './Icon';
 export * from './Image';
 export * from './Grid';
 export * from './Latex';
@@ -11,3 +12,4 @@ export * from './Text';
 export * from './types';
 export * from './Video';
 export * from './View2D';
+export * from './CodeBlock';
