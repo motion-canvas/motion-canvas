@@ -27,8 +27,8 @@ declare module 'chroma-js' {
   interface ColorStatic {
     symbol: symbol;
     lerp(
-      from: ColorInterface | string,
-      to: ColorInterface | string,
+      from: ColorInterface | string | null,
+      to: ColorInterface | string | null,
       value: number,
       colorSpace?: ColorSpace,
     ): ColorInterface;
@@ -48,18 +48,35 @@ Color.symbol = Color.prototype.symbol = Symbol.for(
 );
 
 Color.lerp = Color.prototype.lerp = (
-  from: Color | string,
-  to: Color | string,
+  from: Color | string | null,
+  to: Color | string | null,
   value: number,
   colorSpace: InterpolationMode = 'lch',
 ) => {
-  return mix(from, to, value, colorSpace);
+  if (typeof from === 'string') {
+    from = new Color(from);
+  }
+  if (typeof to === 'string') {
+    to = new Color(to);
+  }
+
+  const fromIsColor = from instanceof Color;
+  const toIsColor = to instanceof Color;
+
+  if (!fromIsColor) {
+    from = toIsColor ? (to as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
+  }
+  if (!toIsColor) {
+    to = fromIsColor ? (from as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
+  }
+
+  return mix(from as Color, to as Color, value, colorSpace);
 };
 
 Color.createLerp = Color.prototype.createLerp =
   (colorSpace: InterpolationMode) =>
-  (from: Color | string, to: Color | string, value: number) =>
-    mix(from, to, value, colorSpace);
+  (from: Color | string | null, to: Color | string | null, value: number) =>
+    Color.lerp(from, to, value, colorSpace);
 
 Color.createSignal = (
   initial?: SignalValue<PossibleColor>,
