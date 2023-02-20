@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+
+### Bug Fixes
+
+* **2d:** fix signal initialization ([#382](https://github.com/motion-canvas/motion-canvas/issues/382)) ([ea36e79](https://github.com/motion-canvas/motion-canvas/commit/ea36e791a20bfd1b491ffa9917be686c51bc3899))
+* **2d:** handle floating point errors in acos ([#381](https://github.com/motion-canvas/motion-canvas/issues/381)) ([5bca8fd](https://github.com/motion-canvas/motion-canvas/commit/5bca8fd0bbdcf28f2793c124b7d6b0afd560c4b8))
+* plug memory leaks ([#385](https://github.com/motion-canvas/motion-canvas/issues/385)) ([de0af00](https://github.com/motion-canvas/motion-canvas/commit/de0af00a7d2e019e2a933791c62b7901755be7b0))
+* support color to null tweening ([#387](https://github.com/motion-canvas/motion-canvas/issues/387)) ([02e9f22](https://github.com/motion-canvas/motion-canvas/commit/02e9f22027a1c3a85ffcc259aeca913318fb6f54))
+
+
+### Features
+
+* **2d:** add closed property for circle ([#378](https://github.com/motion-canvas/motion-canvas/issues/378)) ([62a9605](https://github.com/motion-canvas/motion-canvas/commit/62a9605d4c54e7bf2d2d44d47bf769f5b27378a5))
+* **2d:** make `View2D` extend `Rect` ([#379](https://github.com/motion-canvas/motion-canvas/issues/379)) ([93db5fc](https://github.com/motion-canvas/motion-canvas/commit/93db5fc41617c0902e85fda90fbfc930c2b4634b))
+
+
+
+
+
 # [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
 
 
