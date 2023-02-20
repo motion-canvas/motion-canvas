@@ -6,6 +6,7 @@ slug: /tweening
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
 import linearSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-linear';
+import springSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-spring';
 
 # Tweening
 
@@ -32,7 +33,7 @@ case of our circle, we use the `map` function to map the `value` range from
 
 <AnimationPlayer small name="tweening-linear" />
 
-## Timing functions
+### Timing functions
 
 At the moment, our animation feels a bit unnatural. The speed with which the
 `value` parameter changes is constant, which in turn makes the circle move with
@@ -81,7 +82,7 @@ map(-300, 300, easeInOutCubic(value));
 easeInOutCubic(value, -300, 300);
 ```
 
-## Interpolation functions
+### Interpolation functions
 
 So far, we've only animated a single, numeric value. The
 [`map`](/api/core/tweening#map) function can be used to interpolate between two
@@ -134,7 +135,7 @@ yield *
 
 <AnimationPlayer small name="tweening-vector" />
 
-## Tweening properties
+### Tweening properties
 
 The [`tween`](/api/core/tweening#tween) function is useful when we need to
 orchestrate complex animations. However, there's a better way of tweening
@@ -197,3 +198,65 @@ yield *
     Vector2.arcLerp,
   );
 ```
+
+## `spring` function
+
+The [`spring`](/api/core/tweening#spring) function allows us to interpolate
+between two values using Hooke's law. We need to provide it with the description
+of our spring and the `from` and `to` values. You can think of it as having a
+spring in resting position (the `to` value), stretching it all the way to the
+starting position (the `from` value), and then letting it go. The movement of
+the spring as it tries to reach the equilibrium is what we can use to dive our
+animations.
+
+In the example below, we use springs to animate a position of a circle, but this
+method can be used for more things than just position.
+
+<CodeBlock language="tsx">{springSource}</CodeBlock>
+
+<AnimationPlayer small name="tweening-spring" />
+
+### Spring description
+
+The first argument of the [`spring`](/api/core/tweening#spring) function expects
+an object that describes the physical properties of our spring. Motion Canvas
+ships with a few useful presets that you can use, such as `PlopSpring` and
+`SmoothSpring`. But it's possible to define your own spring:
+
+```ts
+const MySpring = {
+  mass: 0.04,
+  stiffness: 10.0,
+  damping: 0.7,
+  initialVelocity: 8.0,
+};
+```
+
+- `mass` - Describes the inertia of the spring. How much force is required to
+  accelerate and decelerate it.
+- `stiffness` - The coefficient of the spring. Usually represented by `k` in
+  Hooke's equation. It describes how stiff the spring is.
+- `damping` - Over time, damping causes the spring to lose energy and eventually
+  settle in equilibrium. You can set it to `0` to create a spring that
+  oscillates indefinitely.
+- `initialVelocity` - The initial velocity of the spring. You can set the `from`
+  and `to` positions to the same value and give the spring some initial velocity
+  to make it oscillate in place.
+
+### Settle tolerance
+
+Notice how in our spring example, we provided the first spring with an
+additional value:
+
+```ts
+yield * spring(PlopSpring, -400, 400, 1 /*...*/);
+//                               here ^
+```
+
+This optional argument is called `settleTolerance` and is used to define the
+minimal distance from the `to` value the spring should reach to be considered
+settled. The generator created by the [`spring`](/api/core/tweening#spring)
+function finishes **only** when the spring settles. By adjusting the tolerance
+we can make the animation finish faster, depending on our needs. In our example
+we animate the position so a tolerance of `1` means that the spring needs to be
+at most `1` pixel away from the `to` value.
