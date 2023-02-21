@@ -11,7 +11,15 @@ import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 export interface RectProps extends ShapeProps {
   radius?: SignalValue<PossibleSpacing>;
+
+  /**
+   * {@inheritDoc Rect.smoothCorners}
+   */
   smoothCorners?: SignalValue<boolean>;
+
+  /**
+   * {@inheritDoc Rect.cornerSharpness}
+   */
   cornerSharpness?: SignalValue<number>;
 }
 
@@ -37,7 +45,6 @@ export class Rect extends Shape {
    *   smoothCorners={true}
    * />
    * ```
-   *
    */
   @initial(false)
   @signal()
