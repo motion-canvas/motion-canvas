@@ -386,7 +386,9 @@ export class Node implements Promisable<Node> {
 
   @computed()
   protected sortedChildren(): Node[] {
-    return this.children().sort((a, b) => Math.sign(a.zIndex() - b.zIndex()));
+    return [...this.children()].sort((a, b) =>
+      Math.sign(a.zIndex() - b.zIndex()),
+    );
   }
 
   protected view2D: View2D;
