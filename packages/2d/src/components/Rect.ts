@@ -19,10 +19,48 @@ export class Rect extends Shape {
   @spacingSignal('radius')
   public declare readonly radius: SpacingSignal<this>;
 
+  /**
+   * Will set the corner drawing method to smooth corners.
+   *
+   * @remarks
+   * Smooth corners are drawn continuously by a bezìer curves, rather than by a
+   * quarter circle.
+   *
+   * When `smoothCorners` is set to `true`, the sharpness of the curve can be
+   * controlled by the {@link Rect.cornerSharpness}.
+   *
+   * @example
+   * ```tsx
+   * <Rect
+   *   width={300}
+   *   height={300}
+   *   smoothCorners={true}
+   * />
+   * ```
+   *
+   */
   @initial(false)
   @signal()
   public declare readonly smoothCorners: SimpleSignal<boolean, this>;
 
+  /**
+   * Controlls the sharpness of the corners. {@link Rect.smoothCorners} must
+   * be set to `true`.
+   *
+   * @remarks
+   * By default the `cornerSharpness` is set to `0.6` which represents smooth,
+   * circle-like rounding. At `0` the edges are squared off.
+   *
+   * @example
+   * ```tsx
+   * <Rect
+   *   width={300}
+   *   height={300}
+   *   smoothCorners={true}
+   *   cornerSharpness={0.7}
+   * />
+   * ```
+   */
   @initial(0.6)
   @signal()
   public declare readonly cornerSharpness: SimpleSignal<number, this>;
