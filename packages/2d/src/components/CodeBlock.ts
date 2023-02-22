@@ -9,6 +9,8 @@ import {
   MorphToken,
   Token,
   CodeStyle,
+  Theme,
+  Lang,
 } from 'code-fns';
 import {
   clampRemap,
@@ -21,8 +23,8 @@ import {threadable} from '@motion-canvas/core/lib/decorators';
 import {DesiredLength} from '../partials';
 import {SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {
-  createComputedAsync,
   createSignal,
+  DependencyContext,
   Signal,
   SignalValue,
   SimpleSignal,
@@ -34,11 +36,12 @@ type CodePoint = [number, number];
 type CodeRange = [CodePoint, CodePoint];
 
 export interface CodeProps extends ShapeProps {
-  language?: string;
+  language?: Lang;
   children?: CodeTree | string;
   code?: SignalValue<CodeTree | string>;
   selection?: CodeRange[];
   theme?: CodeStyle;
+  stockTheme?: Theme;
 }
 
 export interface CodeModification {
@@ -47,14 +50,44 @@ export interface CodeModification {
 }
 
 export class CodeBlock extends Shape {
-  private static initialized = createComputedAsync(
-    () => ready().then(() => true),
-    false,
-  );
-
   @initial('tsx')
   @signal()
-  public declare readonly language: SimpleSignal<string, this>;
+  public declare readonly language: SimpleSignal<Lang, this>;
+
+  @initial(undefined)
+  @signal()
+  public declare readonly stockTheme: SimpleSignal<Theme | undefined, this>;
+
+  protected static loadedLanguages = new Map<Lang, boolean>();
+  protected static loadedThemes = new Map<Theme, boolean>();
+
+  @computed()
+  protected isReady() {
+    const language = this.language();
+    const theme = this.stockTheme();
+    if (
+      !CodeBlock.loadedLanguages.has(language) ||
+      (theme != null && !CodeBlock.loadedThemes.has(theme))
+    ) {
+      DependencyContext.collectPromise(
+        ready({
+          languages: [language],
+          themes: theme != null ? [theme] : [],
+        }).then(() => {
+          CodeBlock.loadedLanguages.set(language, true);
+          if (theme != null) {
+            CodeBlock.loadedThemes.set(theme, true);
+          }
+        }),
+      );
+      return false;
+    }
+
+    return (
+      CodeBlock.loadedLanguages.get(language) &&
+      (theme == null || CodeBlock.loadedThemes.get(theme))
+    );
+  }
 
   @initial('')
   @parser(function (this: CodeBlock, value: CodeTree | string): CodeTree {
@@ -101,11 +134,14 @@ export class CodeBlock extends Shape {
 
   @computed()
   protected parsed() {
-    if (!CodeBlock.initialized()) {
+    if (!this.isReady()) {
       return [];
     }
 
-    return parse(this.code(), {codeStyle: this.theme()});
+    return parse(
+      {...this.code(), language: this.language()},
+      {codeStyle: this.theme(), theme: this.stockTheme()},
+    );
   }
 
   public constructor({children, ...rest}: CodeProps) {
@@ -169,7 +205,7 @@ export class CodeBlock extends Shape {
 
   protected override collectAsyncResources(): void {
     super.collectAsyncResources();
-    CodeBlock.initialized();
+    this.isReady();
   }
 
   public set(strings: string[], ...rest: any[]) {
@@ -261,18 +297,23 @@ export class CodeBlock extends Shape {
     timingFunction: TimingFunction,
   ) {
     if (typeof code === 'function') throw new Error();
-    if (!CodeBlock.initialized()) return;
+    if (!this.isReady()) return;
 
     const autoWidth = this.customWidth() === null;
     const autoHeight = this.customHeight() === null;
     const fromSize = this.size();
-    const toSize = this.getTokensSize(parse(code, {codeStyle: this.theme()}));
+    const toSize = this.getTokensSize(
+      parse(code, {codeStyle: this.theme(), theme: this.stockTheme()}),
+    );
 
     const beginning = 0.2;
     const ending = 0.8;
 
     this.codeProgress(0);
-    this.diffed = diff(this.code(), code, {codeStyle: this.theme()});
+    this.diffed = diff(this.code(), code, {
+      codeStyle: this.theme(),
+      theme: this.stockTheme(),
+    });
     yield* tween(
       time,
       value => {
@@ -301,7 +342,7 @@ export class CodeBlock extends Shape {
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
-    if (!CodeBlock.initialized()) return;
+    if (!this.isReady()) return;
 
     this.requestFontUpdate();
     this.applyStyle(context);
