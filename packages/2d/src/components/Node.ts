@@ -56,6 +56,7 @@ export interface NodeProps {
   scaleX?: SignalValue<number>;
   scaleY?: SignalValue<number>;
   scale?: SignalValue<PossibleVector2>;
+  zIndex?: SignalValue<number>;
 
   opacity?: SignalValue<number>;
   filters?: SignalValue<Filter[]>;
@@ -248,6 +249,10 @@ export class Node implements Promisable<Node> {
     return scale.div(parentScale);
   }
 
+  @initial(0)
+  @signal()
+  public declare readonly zIndex: SimpleSignal<number, this>;
+
   @initial(false)
   @signal()
   public declare readonly cache: SimpleSignal<boolean, this>;
@@ -377,6 +382,13 @@ export class Node implements Promisable<Node> {
     } else {
       this.realChildren = children;
     }
+  }
+
+  @computed()
+  protected sortedChildren(): Node[] {
+    return [...this.children()].sort((a, b) =>
+      Math.sign(a.zIndex() - b.zIndex()),
+    );
   }
 
   protected view2D: View2D;
@@ -1148,7 +1160,7 @@ export class Node implements Promisable<Node> {
   }
 
   protected drawChildren(context: CanvasRenderingContext2D) {
-    for (const child of this.children()) {
+    for (const child of this.sortedChildren()) {
       child.render(context);
     }
   }
