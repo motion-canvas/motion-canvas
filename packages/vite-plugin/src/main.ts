@@ -4,6 +4,11 @@ import fs from 'fs';
 import {Readable} from 'stream';
 import mime from 'mime-types';
 import projectInstance from './__logs__/project-instance.md';
+import {
+  motionCanvasCorsProxy,
+  MotionCanvasCorsProxyOptions,
+  setupEnvVarsForProxy,
+} from './proxy-middleware';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -67,6 +72,16 @@ export interface MotionCanvasPluginConfig {
    * @default '\@motion-canvas/ui'
    */
   editor?: string;
+  /**
+   * Configuration of the Proxy used for remote sources
+   *
+   * @remarks
+   * This passes configuration to Motion Canvas' proxy.
+   * Note that the proxy is disabled by default.
+   * You can either pass `true` and a config object
+   * to enable it.
+   **/
+  proxy?: boolean | MotionCanvasCorsProxyOptions;
 }
 
 interface ProjectData {
@@ -79,6 +94,7 @@ export default ({
   output = './output',
   bufferedAssets = /\.(wav|ogg)$/,
   editor = '@motion-canvas/ui',
+  proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
   const editorPath = path.dirname(require.resolve(editor));
   const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
@@ -89,6 +105,7 @@ export default ({
   const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
 
   const resolvedEditorId = '\0virtual:editor';
+
   const timeStamps: Record<string, number> = {};
   const outputPath = path.resolve(output);
   const projects: ProjectData[] = [];
@@ -115,6 +132,9 @@ export default ({
       );
     }
   }
+
+  // Initialize the Proxy Module
+  setupEnvVarsForProxy(proxy);
 
   return {
     name: 'motion-canvas',
@@ -314,6 +334,14 @@ export default ({
 
         next();
       });
+
+      // if proxy is unset (undefined), or set to false,
+      // it will not register its middleware — as a result, no
+      // proxy is started.
+      if (proxy !== false && proxy !== undefined) {
+        motionCanvasCorsProxy(server.middlewares, proxy === true ? {} : proxy);
+      }
+
       server.ws.on('motion-canvas:meta', async ({source, data}, client) => {
         timeStamps[source] = Date.now();
         await fs.promises.writeFile(
