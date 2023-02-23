@@ -43,6 +43,7 @@ export class Text extends Shape {
   protected override draw(context: CanvasRenderingContext2D) {
     this.requestFontUpdate();
     this.applyStyle(context);
+    this.applyText(context);
     context.font = this.styles.font;
 
     const parentRect = this.element.getBoundingClientRect();

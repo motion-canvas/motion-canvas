@@ -65,6 +65,11 @@ export abstract class Shape extends Layout {
     super(props);
   }
 
+  protected applyText(context: CanvasRenderingContext2D) {
+    context.direction = this.textDirection();
+    this.element.dir = this.textDirection();
+  }
+
   protected applyStyle(context: CanvasRenderingContext2D) {
     context.fillStyle = resolveCanvasStyle(this.fill(), context);
     context.strokeStyle = resolveCanvasStyle(this.stroke(), context);
