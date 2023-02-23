@@ -1,6 +1,5 @@
-import type {Project} from '../Project';
-import {Meta, Metadata} from '../Meta';
-import {SavedTimeEvent, TimeEvents} from './TimeEvents';
+import {Logger, PlaybackStatus} from '../app';
+import {TimeEvents} from './TimeEvents';
 import {Variables} from './Variables';
 import {
   SubscribableEvent,
@@ -10,11 +9,7 @@ import {
 import {Vector2} from '../types';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Random} from './Random';
-
-export interface SceneMetadata extends Metadata {
-  timeEvents: SavedTimeEvent[];
-  seed: number;
-}
+import {SceneMetadata} from './SceneMetadata';
 
 /**
  * The constructor used when creating new scenes.
@@ -49,6 +44,7 @@ export interface SceneDescription<T = unknown> {
    * The stack trace at the moment of creation.
    */
   stack?: string;
+  meta: SceneMetadata;
 }
 
 /**
@@ -58,9 +54,22 @@ export interface SceneDescription<T = unknown> {
  */
 export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   name: string;
-  meta: Meta<SceneMetadata>;
-  project: Project;
+  size: Vector2;
+  variables: Variables;
+  playback: PlaybackStatus;
+  logger: Logger;
   onReplaced: ValueDispatcher<FullSceneDescription<T>>;
+}
+
+/**
+ * A part of the {@link SceneDescription} that can be updated during reload.
+ *
+ * @typeParam T - The type of the configuration object.
+ */
+export interface SceneDescriptionReload<T = unknown> {
+  size?: Vector2;
+  config?: T;
+  stack?: string;
 }
 
 export type DescriptionOf<TScene> = TScene extends Scene<infer TConfig>
@@ -121,11 +130,12 @@ export interface Scene<T = unknown> {
   /**
    * Reference to the project.
    */
-  readonly project: Project;
+  readonly playback: PlaybackStatus;
   readonly timeEvents: TimeEvents;
+  readonly logger: Logger;
   readonly variables: Variables;
   readonly random: Random;
-  readonly meta: Meta<SceneMetadata>;
+  readonly meta: SceneMetadata;
   creationStack?: string;
 
   /**
@@ -201,9 +211,9 @@ export interface Scene<T = unknown> {
    *
    * Should trigger {@link onReloaded}.
    *
-   * @param config - If present, a new configuration object.
+   * @param description - If present, an updated version of the description.
    */
-  reload(config?: T): void;
+  reload(description?: SceneDescriptionReload<T>): void;
 
   /**
    * Recalculate the scene.
@@ -218,7 +228,7 @@ export interface Scene<T = unknown> {
    *
    * Should trigger {@link onRecalculated}.
    */
-  recalculate(): Promise<void>;
+  recalculate(setFrame: (frame: number) => void): Promise<void>;
 
   /**
    * Progress this scene one frame forward.
@@ -253,6 +263,11 @@ export interface Scene<T = unknown> {
    * Is this scene in the {@link SceneState.Finished} state?
    */
   isFinished(): boolean;
+
+  /**
+   * Enter the {@link SceneState.Initial} state.
+   */
+  enterInitial(): void;
 
   /**
    * Enter the {@link SceneState.AfterTransitionIn} state.

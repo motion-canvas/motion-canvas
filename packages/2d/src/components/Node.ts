@@ -549,7 +549,7 @@ export class Node implements Promisable<Node> {
     return new DOMMatrix();
   }
 
-  public view(): View2D | null {
+  public view(): View2D {
     return this.view2D;
   }
 

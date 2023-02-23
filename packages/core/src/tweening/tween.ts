@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import {useProject, useThread} from '../utils';
+import {usePlayback, useThread} from '../utils';
 
 decorate(tween, threadable());
 export function* tween(
@@ -8,7 +8,7 @@ export function* tween(
   onProgress: (value: number, time: number) => void,
   onEnd?: (value: number, time: number) => void,
 ): ThreadGenerator {
-  const project = useProject();
+  const project = usePlayback();
   const thread = useThread();
 
   const startTime = thread.time();

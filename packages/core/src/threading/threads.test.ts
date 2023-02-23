@@ -1,13 +1,13 @@
-import {describe, test, beforeEach, expect} from 'vitest';
+import {describe, test, expect, beforeAll, afterAll} from 'vitest';
 import {threads} from './threads';
 import {noop, run} from '../flow';
-import {setProject} from '../utils';
-import {Project} from '../Project';
+import {endPlayback, startPlayback} from '../utils';
+import {PlaybackManager, PlaybackStatus} from '../app';
 
 describe('threads()', () => {
-  beforeEach(() => {
-    setProject(new Project({name: 'tests', scenes: []}));
-  });
+  const status = new PlaybackStatus(new PlaybackManager());
+  beforeAll(() => startPlayback(status));
+  afterAll(() => endPlayback(status));
 
   test('Execution order', () => {
     const order: number[] = [];

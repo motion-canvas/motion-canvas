@@ -1,11 +1,11 @@
 import {useCallback, useMemo, useState} from 'preact/hooks';
-import {usePlayer} from '../contexts';
+import {useApplication} from '../contexts';
 
 export function useStorage<T>(
   id: string,
   initialState: T = null,
 ): [T, (newState: T) => void, boolean] {
-  const name = usePlayer().project.name;
+  const name = useApplication().project.name;
   const key = `${name}-${id}`;
   const [savedState, wasLoaded] = useMemo(() => {
     const savedState = localStorage.getItem(key);

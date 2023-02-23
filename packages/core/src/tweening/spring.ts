@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import {useProject, useThread, useLogger} from '../utils';
+import {usePlayback, useThread, useLogger} from '../utils';
 
 type ProgressFunction = (value: number, time: number) => void;
 
@@ -69,7 +69,7 @@ export function* spring(
     return;
   }
 
-  const project = useProject();
+  const project = usePlayback();
   const thread = useThread();
 
   let position = from;

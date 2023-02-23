@@ -1,8 +1,15 @@
 import {Rect, RectProps} from './Rect';
+import {initial, signal} from '../decorators';
+import {PlaybackState} from '@motion-canvas/core';
+import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 export class View2D extends Rect {
   public static frameID = 'motion-canvas-2d-frame';
   public static shadowRoot: ShadowRoot;
+
+  @initial(PlaybackState.Paused)
+  @signal()
+  public declare readonly playbackState: SimpleSignal<PlaybackState, this>;
 
   static {
     let frame = document.querySelector<HTMLDivElement>(`#${View2D.frameID}`);
@@ -55,7 +62,7 @@ export class View2D extends Rect {
     this.updateLayout();
   }
 
-  public override view(): View2D | null {
+  public override view(): View2D {
     return this;
   }
 }

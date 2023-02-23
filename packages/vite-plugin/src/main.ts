@@ -3,7 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import {Readable} from 'stream';
 import mime from 'mime-types';
-import projectInstance from './__logs__/project-instance.md';
 import {
   motionCanvasCorsProxy,
   MotionCanvasCorsProxyOptions,
@@ -181,10 +180,10 @@ export default ({
 
           return source(
             `import {ValueDispatcher} from '@motion-canvas/core/lib/events';`,
-            `import meta from './${metaFile}';`,
+            `import metaFile from './${metaFile}';`,
             `import description from './${sceneFile}';`,
             `description.name = '${name}';`,
-            `description.meta = meta;`,
+            `metaFile.attach(description.meta);`,
             `if (import.meta.hot) {`,
             `  description.onReplaced = import.meta.hot.data.onReplaced;`,
             `}`,
@@ -206,23 +205,13 @@ export default ({
           await createMeta(path.join(dir, metaFile));
 
           return source(
-            `import {Project} from '@motion-canvas/core';`,
-            `import meta from './${metaFile}';`,
+            `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
-            `const factory = () => {`,
-            `  if (config instanceof Project) {`,
-            `    config.meta = meta;`,
-            `    config.name = '${name}';`,
-            `    config.logger.warn({`,
-            `      message: 'A project instance was exported instead of a project factory.',`,
-            `      remarks: \`${projectInstance}\`,`,
-            `      stack: config.creationStack,`,
-            `    });`,
-            `    return config;`,
-            `  }`,
-            `  return new Project('${name}', meta, config);`,
-            `}`,
-            `export default factory;`,
+            `metaFile.attach(config.meta)`,
+            `export default {`,
+            `  name: '${name}',`,
+            `  ...config,`,
+            `};`,
           );
         }
       }
@@ -267,12 +256,12 @@ export default ({
       if (ext === '.meta') {
         const sourceFile = viteConfig.command === 'build' ? false : `'${id}'`;
         return source(
-          `import {Meta} from '@motion-canvas/core/lib';`,
+          `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
           `let meta;`,
           `if (import.meta.hot) {`,
           `  meta = import.meta.hot.data.meta;`,
           `}`,
-          `meta ??= new Meta('${name}', ${sourceFile}, ${code});`,
+          `meta ??= new MetaFile('${name}', ${sourceFile});`,
           `if (import.meta.hot) {`,
           `  import.meta.hot.accept();`,
           `  import.meta.hot.data.meta = meta;`,

@@ -1,4 +1,5 @@
 import {
+  createSceneMetadata,
   DescriptionOf,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
@@ -12,5 +13,6 @@ export function makeScene2D(
     klass: Scene2D,
     config: runner,
     stack: new Error().stack,
+    meta: createSceneMetadata(),
   };
 }

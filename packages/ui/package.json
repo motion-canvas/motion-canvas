@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "type": "tsc -w",
     "showcase": "tsc && vite build -c vite.showcase.ts",
     "preview": "vite preview"
   },

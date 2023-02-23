@@ -578,7 +578,7 @@ export class Layout extends Node {
   protected appendedToView() {
     const root = this.isLayoutRoot();
     if (root) {
-      this.view()?.element.append(this.element);
+      this.view().element.append(this.element);
     }
 
     return root;

@@ -264,4 +264,8 @@ export class Vector2 implements Type {
   public serialize(): SerializedVector2 {
     return {x: this.x, y: this.y};
   }
+
+  public exactlyEquals(other: Vector2): boolean {
+    return this.y === other.y && this.x === other.y;
+  }
 }

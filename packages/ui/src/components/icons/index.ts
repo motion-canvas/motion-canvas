@@ -1,3 +1,4 @@
+export * from './AccountTree';
 export * from './Add';
 export * from './Bug';
 export * from './Clear';
@@ -14,6 +15,7 @@ export * from './SkipNext';
 export * from './SkipPrevious';
 export * from './Tune';
 export * from './UnfoldMore';
+export * from './Videocam';
 export * from './VideoSettings';
 export * from './VolumeOff';
 export * from './VolumeOn';

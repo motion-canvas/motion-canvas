@@ -19,8 +19,12 @@ export function startScene(scene: Scene) {
 
 export function endScene(scene: Scene) {
   if (sceneStack.pop() !== scene) {
-    throw new Error('startScene/endScene was called out of order.');
+    throw new Error('startScene/endScene were called out of order.');
   }
+}
+
+export function useLogger() {
+  return sceneStack.at(-1)?.logger ?? console;
 }
 
 /**

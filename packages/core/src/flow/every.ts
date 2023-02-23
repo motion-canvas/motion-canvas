@@ -1,6 +1,6 @@
 import {ThreadGenerator} from '../threading';
 import {decorate, threadable} from '../decorators';
-import {useProject} from '../utils';
+import {usePlayback} from '../utils';
 
 /**
  * A callback called by {@link EveryTimer} every N seconds.
@@ -48,7 +48,7 @@ export function every(interval: number, callback: EveryCallback): EveryTimer {
   let changed = false;
   decorate(everyRunner, threadable('every'));
   function* everyRunner(): ThreadGenerator {
-    const project = useProject();
+    const project = usePlayback();
     let acc = 0;
     let tick = 0;
     callback(tick);

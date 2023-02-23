@@ -14,6 +14,7 @@
     "ui:build": "npm run build -w packages/ui",
     "ui:serve": "npm run dev -w packages/ui",
     "ui:showcase": "npm run showcase -w packages/ui",
+    "ui:type": "npm run type -w packages/ui",
     "template:serve": "npm run serve -w packages/template",
     "template:build": "npm run build -w packages/template",
     "examples:serve": "npm run serve -w packages/examples",
