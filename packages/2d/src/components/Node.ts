@@ -29,7 +29,12 @@ import {
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
-import {TimingFunction} from '@motion-canvas/core/lib/tweening';
+import {
+  deepLerp,
+  easeInOutCubic,
+  TimingFunction,
+  tween,
+} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
@@ -42,6 +47,8 @@ import {
   SimpleSignal,
   isReactive,
 } from '@motion-canvas/core/lib/signals';
+
+export type NodeState = NodeProps & Record<string, any>;
 
 export interface NodeProps {
   ref?: ReferenceReceiver<any>;
@@ -392,6 +399,7 @@ export class Node implements Promisable<Node> {
   }
 
   protected view2D: View2D;
+  private stateStack: NodeState[] = [];
   private realChildren: Node[] = [];
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
@@ -927,14 +935,13 @@ export class Node implements Promisable<Node> {
    * @param customProps - Properties to override.
    */
   public snapshotClone(customProps: NodeProps = {}): this {
-    const props: NodeProps & Record<string, any> = {...customProps};
+    const props: NodeProps & Record<string, any> = {
+      ...this.getState(),
+      ...customProps,
+    };
+
     if (this.children().length > 0) {
       props.children ??= this.children().map(child => child.snapshotClone());
-    }
-
-    for (const {key, meta, signal} of this) {
-      if (!meta.cloneable || key in props) continue;
-      props[key] = signal();
     }
 
     return this.instantiate(props);
@@ -1254,12 +1261,115 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Return a snapshot of the node's current signal values.
+   *
+   * @remarks
+   * This method will calculate the values of any reactive properties of the
+   * node at the time the method is called.
+   */
+  public getState(): NodeState {
+    const state: NodeState = {};
+    for (const {key, meta, signal} of this) {
+      if (!meta.cloneable || key in state) continue;
+      state[key] = signal();
+    }
+    return state;
+  }
+
+  /**
+   * Apply the given state to the node, setting all matching signal values to
+   * the provided values.
+   *
+   * @param state - The state to apply to the node.
+   */
+  public applyState(state: NodeState) {
+    for (const key in state) {
+      const signal = this.signalByKey(key);
+      if (signal) {
+        signal(state[key]);
+      }
+    }
+  }
+
+  /**
+   * Push a snapshot of the node's current state onto the node's state stack.
+   *
+   * @remarks
+   * This method can be used together with the {@link restore} method to save a
+   * node's current state and later restore it. It is possible to store more
+   * than one state by calling `save` method multiple times.
+   */
+  public save(): void {
+    this.stateStack.push(this.getState());
+  }
+
+  /**
+   * Restore the node to its last saved state.
+   *
+   * @remarks
+   * This method can be used together with the {@link save} method to restore a
+   * node to a previously saved state. Restoring a node to a previous state
+   * removes that state from the state stack.
+   *
+   * @example
+   * ```tsx
+   * const node = <Circle width={100} height={100} fill={"lightseagreen"} />
+   *
+   * view.add(node);
+   *
+   * // Save the node's current state
+   * node.save();
+   *
+   * // Modify some of the node's properties
+   * yield* node.scale(2, 1);
+   * yield* node.fill('hotpink', 1);
+   *
+   * // Restore the node to its saved state over 1 second
+   * yield* node.restore(1);
+   * ```
+   *
+   * @param duration - The duration of the transition
+   * @param timing - The timing function to use for the transition
+   */
+  public restore(duration: number, timing: TimingFunction = easeInOutCubic) {
+    const state = this.stateStack.pop();
+
+    if (state === undefined) {
+      return;
+    }
+
+    const currentState = this.getState();
+    for (const key in state) {
+      // Filter out any properties that haven't changed between the current and
+      // previous states so we don't perform unnecessary tweens.
+      if (currentState[key] === state[key]) {
+        delete state[key];
+      }
+    }
+
+    return tween(duration, value => {
+      const t = timing(value);
+
+      const nextState = Object.keys(state).reduce((newState, key) => {
+        newState[key] = deepLerp(currentState[key], state[key], t);
+        return newState;
+      }, {} as NodeState);
+
+      this.applyState(nextState);
+    });
+  }
+
   public *[Symbol.iterator]() {
     for (const key in this.properties) {
       const meta = this.properties[key];
-      const signal = (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
+      const signal = this.signalByKey(key);
       yield {meta, signal, key};
     }
+  }
+
+  private signalByKey(key: string): SimpleSignal<any> {
+    return (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
   }
 }
 
