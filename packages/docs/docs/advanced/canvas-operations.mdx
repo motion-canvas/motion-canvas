@@ -1,0 +1,95 @@
+---
+sidebar_position: 5
+slug: /canvas-operations
+---
+
+import AnimationPlayer from "@site/src/components/AnimationPlayer"
+
+# Canvas Operations
+
+Because Motion Canvas is build ontop of the Browser's 2D Rendering Context, 
+one can make use several canvas operations that are provided by the Browser.
+
+## Filters
+
+<AnimationPlayer name="canvas-operations-filters" />
+
+Every Component accepts a list of filters.
+You can find a list of all filters the Browser can understand on [MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter).
+
+
+
+All filters available in Motion Canvas can be found under `@motion-canvas/2d/lib/partials` ([API Documentation](/api/2d/partials#Functions)).
+Note that some filters, like `opacity`, can be set directly on the Node, and as are not exported from `partials`.
+
+
+`filters` accepts an array. This means that you can stack multiple filters onto a single Node.
+The order in which you add them does matter, as can be seen below:
+
+
+<AnimationPlayer name="canvas-operations-filters-stacking" />
+
+You can see that for example the green trail turns yellow on the right side while remaining green on the left.
+
+## Masking and Composite Operations
+
+Composite Operations define how two layers are stacked ontop of each other.
+This way it is possible to define Masks. 
+MDN has a [great visualisation of all Composite Operations](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations). 
+
+If you are familiar with Adobe After Effects, 
+you might know about [Track Mattes](https://helpx.adobe.com/after-effects/using/track-mattes-and-traveling-mattes.html). 
+Track Mattes allow you to define a Background "Color" Layer, and a Foreground "Stencil" Layer. 
+The Alpha Matte Layer for example will multiply the background's color by the stencil's alpha value.
+
+The same effect can be achieved in Motion Canvas with the help of Composite Operations using `source-in` and `source-out`.
+
+
+
+Create a new cached Node that contains 2 children, the "stencil", and the "value" layers.
+```tsx
+const yOffset = createSignal(0);
+yield scene.add(<Background/>);
+yield scene.add(
+  <Node cache>
+    {/** This is your "stencil". It determines if something is visible or not */}
+    <AnimatedMotionCanvasIcon ... />
+    {/** This is your "value". It determines the output color if the stencil doesn't block it */}
+    <Img y={yOffset} src={exampleImage}
+      {/* 'source-in' for alpha stencil, 'source-out' for inverted alpha stencil*/}
+      compositeOperation={'source-in'}
+    />
+  </Node>
+);
+
+yield* yOffset(100, 2);
+yield* yOffset(-100, 2);
+```
+
+<AnimationPlayer name="canvas-operations-alpha-matte" />
+
+## Cached Nodes
+
+Both Filters and Composite Operations require a cached node. Filters can set it automatically, 
+while Composite Operations require you to set it explicitly on the parent Node.
+
+A cached node and its children are rendered on an offscreen canvas first, before getting added to the main scene.  
+For filters this is needed because they are applied to the entire canvas.
+By creating a new canvas and moving the elements that should get affected by the filters over, 
+applying filters to the entire "new" canvas, and then moving back the result, 
+you effectively only apply the filters to the moved elements.
+
+:::caution Performance Implications
+  If you care about playback performance, 
+  for example because you want to embed the Scene on a website, 
+  try to minimize the use of cached nodes as each cached node means a 
+  separate offscreen canvas.
+:::
+
+To turn a Node into a cached node, simply pass the `cache` property
+```tsx
+<Node cache>
+...
+</Node>
+``` 
+Note that all Components inherit from `Node`, so you can set the property on them directly.
