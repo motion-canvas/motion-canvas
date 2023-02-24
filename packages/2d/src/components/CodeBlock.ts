@@ -54,7 +54,7 @@ export class CodeBlock extends Shape {
   @signal()
   public declare readonly language: SimpleSignal<Lang, this>;
 
-  @initial(undefined)
+  @initial(null)
   @signal()
   public declare readonly stockTheme: SimpleSignal<Theme | undefined, this>;
 
@@ -64,23 +64,24 @@ export class CodeBlock extends Shape {
   @computed()
   protected isReady() {
     const language = this.language();
-    const theme = this.stockTheme();
-    if (
-      !CodeBlock.loadedLanguages.has(language) ||
-      (theme != null && !CodeBlock.loadedThemes.has(theme))
-    ) {
+    if (!CodeBlock.loadedLanguages.has(language)) {
+      CodeBlock.loadedLanguages.set(language, false);
       DependencyContext.collectPromise(
-        ready({
-          languages: [language],
-          themes: theme != null ? [theme] : [],
-        }).then(() => {
+        ready({languages: [language]}).then(() => {
           CodeBlock.loadedLanguages.set(language, true);
-          if (theme != null) {
-            CodeBlock.loadedThemes.set(theme, true);
-          }
         }),
       );
       return false;
+    }
+
+    const theme = this.stockTheme();
+    if (theme != null && !CodeBlock.loadedThemes.has(theme)) {
+      CodeBlock.loadedThemes.set(theme, false);
+      DependencyContext.collectPromise(
+        ready({themes: [theme]}).then(() => {
+          CodeBlock.loadedThemes.set(theme, true);
+        }),
+      );
     }
 
     return (
@@ -102,7 +103,7 @@ export class CodeBlock extends Shape {
   @signal()
   public declare readonly code: Signal<CodeTree | string, CodeTree, this>;
 
-  @initial(undefined)
+  @initial(null)
   @signal()
   public declare readonly theme: Signal<CodeStyle | null, CodeStyle, this>;
 
