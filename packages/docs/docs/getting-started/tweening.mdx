@@ -6,6 +6,7 @@ slug: /tweening
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
 import linearSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-linear';
+import saveRestoreSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-save-restore';
 import springSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-spring';
 
 # Tweening
@@ -260,3 +261,38 @@ function finishes **only** when the spring settles. By adjusting the tolerance
 we can make the animation finish faster, depending on our needs. In our example
 we animate the position so a tolerance of `1` means that the spring needs to be
 at most `1` pixel away from the `to` value.
+
+## Saving and restoring states
+
+All nodes provide a [`save`](/api/2d/components/Node#save) method which allows
+us to save a snapshot of the node's current state. We can then use the
+[`restore`](/api/2d/components/Node#restore) method at a later point in our
+animation to restore the node to the previously saved state.
+
+```ts
+// highlight-next-line
+circle().save();
+yield * circle().position(new Vector2(300, -200), 2);
+// highlight-next-line
+yield * circle().restore(1);
+```
+
+It is also possible to provide a custom [timing function](/api/core/tweening) to
+the [`restore`](/api/2d/components/Node#restore) method.
+
+```ts
+yield * circle().restore(1, linear);
+```
+
+Node states get stored on a stack. This makes it possible to save more than one
+state by invoking the [`save`](/api/2d/components/Node#save) method multiple
+times. When calling [`restore`](/api/2d/components/Node#restore), the node will
+be restored to the most recently saved state by popping the top entry in the
+state stack. If there is no saved state, this method does nothing.
+
+The example below shows a more complete example of how we can store and restore
+multiple states across an animation.
+
+<CodeBlock language="tsx">{saveRestoreSource}</CodeBlock>
+
+<AnimationPlayer small name="tweening-save-restore" />
