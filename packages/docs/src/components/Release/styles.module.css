@@ -1,0 +1,24 @@
+.contributor {
+  display: inline-flex;
+  background-color: var(--ifm-background-surface-color);
+  vertical-align: middle;
+  margin-left: calc(-20px - 0.6rem);
+  margin-right: 0.6rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.pr {
+  display: inline-flex;
+  background-color: var(--ifm-background-surface-color);
+  border-radius: 10px;
+  vertical-align: middle;
+  line-height: 20px;
+  padding: 0 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.element {
+  list-style: none;
+  margin-bottom: 0.5rem;
+}
