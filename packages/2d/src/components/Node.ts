@@ -890,6 +890,7 @@ export class Node implements Promisable<Node> {
    * node to be garbage collected.
    */
   public dispose() {
+    this.stateStack = [];
     for (const {signal} of this) {
       signal.context.dispose();
     }
