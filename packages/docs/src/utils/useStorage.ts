@@ -5,7 +5,14 @@ export default function useStorage<T>(key: string, initialState: T) {
   const isBrowser = useIsBrowser();
   const savedState = useMemo(() => {
     const savedState = isBrowser && localStorage.getItem(key);
-    return savedState ? JSON.parse(savedState) : initialState;
+    if (savedState) {
+      try {
+        return JSON.parse(savedState);
+      } catch (_) {
+        localStorage.removeItem(key);
+      }
+    }
+    return initialState;
   }, [key]);
   const [state, setState] = useState<T>(savedState);
 

@@ -1,5 +1,6 @@
-import styles from '@site/src/components/Release/styles.module.css';
 import React, {ReactNode} from 'react';
+import styles from '@site/src/components/Release/styles.module.css';
+import Heading from '@theme/Heading';
 
 export interface IssueGroupProps {
   type: 'feat' | 'fix';
@@ -7,14 +8,21 @@ export interface IssueGroupProps {
 }
 
 const titles = {
-  feat: 'New features',
-  fix: 'Fixed bugs',
+  feat: 'New features 🎉',
+  fix: 'Fixed bugs 🐛',
+};
+
+const ids = {
+  feat: 'new-features',
+  fix: 'fixed-bugs',
 };
 
 export default function IssueGroup({type, children}: IssueGroupProps) {
   return (
     <>
-      <h3>{titles[type]}</h3>
+      <Heading id={ids[type]} as="h3">
+        {titles[type]}
+      </Heading>
       <ul className={styles.group}>{children}</ul>
     </>
   );
