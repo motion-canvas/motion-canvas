@@ -145,9 +145,9 @@ yield view.add(
 );
 
 // second line only
-yield * codeRef().selection(line(1));
+yield * codeRef().selection(lines(1));
 // second and third line (line 1 to line 2)
-yield * codeRef().selection(line(1, 2));
+yield * codeRef().selection(lines(1, 2));
 ```
 
 To remove a selection, you must set the selected range from `[0, 0]` to
