@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+
+### Bug Fixes
+
+* **2d:** handle division by zero in lines ([#407](https://github.com/motion-canvas/motion-canvas/issues/407)) ([a17871a](https://github.com/motion-canvas/motion-canvas/commit/a17871a2ce63dd5bb32bc719037327c4e9dde217))
+
+
+### Features
+
+* **2d:** add Icon Component ([#306](https://github.com/motion-canvas/motion-canvas/issues/306)) ([3479631](https://github.com/motion-canvas/motion-canvas/commit/3479631ef34e39f90a8d8de441317672be1840d9)), closes [#305](https://github.com/motion-canvas/motion-canvas/issues/305)
+* **2d:** add save and restore methods to nodes ([#406](https://github.com/motion-canvas/motion-canvas/issues/406)) ([870e194](https://github.com/motion-canvas/motion-canvas/commit/870e1947d97382bc6d82857c077140bbef7cf7e8))
+* **2d:** add z-index property to nodes ([#398](https://github.com/motion-canvas/motion-canvas/issues/398)) ([4280af3](https://github.com/motion-canvas/motion-canvas/commit/4280af3b4b7bd5970fe5e743949a0fcca2c314f3))
+* add missing flexbox properties ([#405](https://github.com/motion-canvas/motion-canvas/issues/405)) ([4e78b4b](https://github.com/motion-canvas/motion-canvas/commit/4e78b4b2fe4df42ce0a8da6fd41ad38b0104e7f5))
+* **docs:** improve the release blog ([#410](https://github.com/motion-canvas/motion-canvas/issues/410)) ([f56bbdb](https://github.com/motion-canvas/motion-canvas/commit/f56bbdb4a95e62035f277737ea5fba675e591270))
+* upgrade code-fns for new theme options and lazy loading ([#401](https://github.com/motion-canvas/motion-canvas/issues/401)) ([8965ab1](https://github.com/motion-canvas/motion-canvas/commit/8965ab1bef8b6ae919c8001d0527f5793293b285)), closes [#396](https://github.com/motion-canvas/motion-canvas/issues/396) [#322](https://github.com/motion-canvas/motion-canvas/issues/322)
+* **vite-plugin:** add CORS Proxy ([#357](https://github.com/motion-canvas/motion-canvas/issues/357)) ([a3c5822](https://github.com/motion-canvas/motion-canvas/commit/a3c58228b7d3dab08fc27414d19870d35773b280)), closes [#338](https://github.com/motion-canvas/motion-canvas/issues/338)
+
+
+
+
+
 # [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
 
 
