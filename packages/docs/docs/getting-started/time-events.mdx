@@ -29,6 +29,8 @@ through the editor. With the use of [`waitUntil`](/api/core/flow#waitUntil) you
 can pause the animation without specifying the actual duration:
 
 ```ts
+useScene().timeEvents.register('event');
+
 yield * animationOne();
 yield * waitUntil('event'); // wait for an event called "event"
 yield * animationTwo();
