@@ -88,7 +88,7 @@ export function AudioTrack() {
       );
     }
 
-    context.lineWidth = 2;
+    context.lineWidth = 1;
     context.lineJoin = 'round';
     context.strokeStyle = '#444';
     context.stroke();
