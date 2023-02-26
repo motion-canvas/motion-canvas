@@ -16,6 +16,7 @@ export function Rendering() {
   const {width, height} = player.project.getSize();
 
   const scales = [
+    {value: 0.25, text: '0.25x (Quarter)'},
     {value: 0.5, text: `0.5x (Half)`},
     {value: 1, text: `1.0x (Full)`},
     {value: 2, text: `2.0x (Double)`},
