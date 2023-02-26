@@ -1,5 +1,5 @@
 import {CanvasStyle, Gradient, Pattern, PossibleCanvasStyle} from '../partials';
-import {Color, Rect, Spacing, Vector2} from '@motion-canvas/core/lib/types';
+import {Color, BBox, Spacing, Vector2} from '@motion-canvas/core/lib/types';
 
 export function canvasStyleParser(style: PossibleCanvasStyle) {
   if (style === null) {
@@ -37,7 +37,7 @@ export function resolveCanvasStyle(
 
 export function drawRoundRect(
   context: CanvasRenderingContext2D | Path2D,
-  rect: Rect,
+  rect: BBox,
   radius: Spacing,
   smoothCorners: boolean,
   cornerSharpness: number,
@@ -133,7 +133,7 @@ function adjustRectRadius(
   radius: number,
   horizontal: number,
   vertical: number,
-  rect: Rect,
+  rect: BBox,
 ): number {
   const width =
     radius + horizontal > rect.width
@@ -149,35 +149,35 @@ function adjustRectRadius(
 
 export function drawRect(
   context: CanvasRenderingContext2D | Path2D,
-  rect: Rect,
+  rect: BBox,
 ) {
   context.rect(rect.x, rect.y, rect.width, rect.height);
 }
 
-export function fillRect(context: CanvasRenderingContext2D, rect: Rect) {
+export function fillRect(context: CanvasRenderingContext2D, rect: BBox) {
   context.fillRect(rect.x, rect.y, rect.width, rect.height);
 }
 
-export function strokeRect(context: CanvasRenderingContext2D, rect: Rect) {
+export function strokeRect(context: CanvasRenderingContext2D, rect: BBox) {
   context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 }
 
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  destination: Rect,
+  destination: BBox,
 ): void;
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  source: Rect,
-  destination: Rect,
+  source: BBox,
+  destination: BBox,
 ): void;
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  first: Rect,
-  second?: Rect,
+  first: BBox,
+  second?: BBox,
 ): void {
   if (second) {
     context.drawImage(

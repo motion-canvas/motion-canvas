@@ -13,7 +13,7 @@ import {
   originToOffset,
   PossibleSpacing,
   PossibleVector2,
-  Rect,
+  BBox,
   SerializedVector2,
   SpacingSignal,
   Vector2,
@@ -530,25 +530,25 @@ export class Layout extends Node {
     return matrix;
   }
 
-  protected getComputedLayout(): Rect {
-    return new Rect(this.element.getBoundingClientRect());
+  protected getComputedLayout(): BBox {
+    return new BBox(this.element.getBoundingClientRect());
   }
 
   @computed()
   public computedPosition(): Vector2 {
     this.requestLayoutUpdate();
-    const rect = this.getComputedLayout();
+    const box = this.getComputedLayout();
 
     const position = new Vector2(
-      rect.x + (rect.width / 2) * this.offset.x(),
-      rect.y + (rect.height / 2) * this.offset.y(),
+      box.x + (box.width / 2) * this.offset.x(),
+      box.y + (box.height / 2) * this.offset.y(),
     );
 
     const parent = this.parentTransform();
     if (parent) {
       const parentRect = parent.getComputedLayout();
-      position.x -= parentRect.x + (parentRect.width - rect.width) / 2;
-      position.y -= parentRect.y + (parentRect.height - rect.height) / 2;
+      position.x -= parentRect.x + (parentRect.width - box.width) / 2;
+      position.y -= parentRect.y + (parentRect.height - box.height) / 2;
     }
 
     return position;
@@ -627,8 +627,8 @@ export class Layout extends Node {
     this.applyFont();
   }
 
-  protected override getCacheRect(): Rect {
-    return Rect.fromSizeCentered(this.computedSize());
+  protected override getCacheBBox(): BBox {
+    return BBox.fromSizeCentered(this.computedSize());
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -653,12 +653,12 @@ export class Layout extends Node {
   ) {
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
-    const rect = Rect.fromSizeCentered(size);
-    const layout = rect.transformCorners(matrix);
-    const padding = rect
+    const box = BBox.fromSizeCentered(size);
+    const layout = box.transformCorners(matrix);
+    const padding = box
       .addSpacing(this.padding().scale(-1))
       .transformCorners(matrix);
-    const margin = rect.addSpacing(this.margin()).transformCorners(matrix);
+    const margin = box.addSpacing(this.margin()).transformCorners(matrix);
 
     context.beginPath();
     drawLine(context, margin);
@@ -826,7 +826,7 @@ export class Layout extends Node {
 
   public override hit(position: Vector2): Node | null {
     const local = position.transformAsPoint(this.localToParent().inverse());
-    if (this.cacheRect().includes(local)) {
+    if (this.cacheBBox().includes(local)) {
       return super.hit(position) ?? this;
     }
 

@@ -4,27 +4,27 @@ import {Type} from './Type';
 import {Spacing} from './Spacing';
 import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 
-export type SerializedRect = {
+export type SerializedBBox = {
   x: number;
   y: number;
   width: number;
   height: number;
 };
 
-export type PossibleRect =
-  | SerializedRect
+export type PossibleBBox =
+  | SerializedBBox
   | [number, number, number, number]
   | Vector2
   | undefined;
 
 export type RectSignal<T> = CompoundSignal<
-  PossibleRect,
-  Rect,
+  PossibleBBox,
+  BBox,
   'x' | 'y' | 'width' | 'height',
   T
 >;
 
-export class Rect implements Type {
+export class BBox implements Type {
   public static readonly symbol = Symbol.for('@motion-canvas/core/types/Rect');
 
   public x = 0;
@@ -33,22 +33,22 @@ export class Rect implements Type {
   public height = 0;
 
   public static createSignal(
-    initial?: SignalValue<PossibleRect>,
-    interpolation: InterpolationFunction<Rect> = Rect.lerp,
+    initial?: SignalValue<PossibleBBox>,
+    interpolation: InterpolationFunction<BBox> = BBox.lerp,
   ): RectSignal<void> {
     return new CompoundSignalContext(
       ['x', 'y', 'width', 'height'],
-      (value: PossibleRect) => new Rect(value),
+      (value: PossibleBBox) => new BBox(value),
       initial,
       interpolation,
     ).toSignal();
   }
 
   public static lerp(
-    from: Rect,
-    to: Rect,
-    value: number | Vector2 | Rect,
-  ): Rect {
+    from: BBox,
+    to: BBox,
+    value: number | Vector2 | BBox,
+  ): BBox {
     let valueX;
     let valueY;
     let valueWidth;
@@ -65,7 +65,7 @@ export class Rect implements Type {
       valueHeight = value.height;
     }
 
-    return new Rect(
+    return new BBox(
       map(from.x, to.x, valueX),
       map(from.y, to.y, valueY),
       map(from.width, to.width, valueWidth),
@@ -74,8 +74,8 @@ export class Rect implements Type {
   }
 
   public static arcLerp(
-    from: Rect,
-    to: Rect,
+    from: BBox,
+    to: BBox,
     value: number,
     reverse = false,
     ratio?: number,
@@ -83,14 +83,14 @@ export class Rect implements Type {
     ratio ??=
       (from.position.sub(to.position).ctg + from.size.sub(to.size).ctg) / 2;
 
-    return Rect.lerp(from, to, arcLerp(value, reverse, ratio));
+    return BBox.lerp(from, to, arcLerp(value, reverse, ratio));
   }
 
-  public static fromSizeCentered(size: Vector2): Rect {
-    return new Rect(-size.width / 2, -size.height / 2, size.width, size.height);
+  public static fromSizeCentered(size: Vector2): BBox {
+    return new BBox(-size.width / 2, -size.height / 2, size.width, size.height);
   }
 
-  public static fromPoints(...points: Vector2[]): Rect {
+  public static fromPoints(...points: Vector2[]): BBox {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
@@ -111,37 +111,37 @@ export class Rect implements Type {
       }
     }
 
-    return new Rect(minX, minY, maxX - minX, maxY - minY);
+    return new BBox(minX, minY, maxX - minX, maxY - minY);
   }
 
-  public static fromRects(...rects: Rect[]): Rect {
+  public static fromBBoxes(...boxes: BBox[]): BBox {
     let minX = Infinity;
     let minY = Infinity;
     let maxX = -Infinity;
     let maxY = -Infinity;
 
-    for (const r of rects) {
-      const right = r.x + r.width;
+    for (const box of boxes) {
+      const right = box.x + box.width;
       if (right > maxX) {
         maxX = right;
       }
-      if (r.x < minX) {
-        minX = r.x;
+      if (box.x < minX) {
+        minX = box.x;
       }
-      const bottom = r.y + r.height;
+      const bottom = box.y + box.height;
       if (bottom > maxY) {
         maxY = bottom;
       }
-      if (r.y < minY) {
-        minY = r.y;
+      if (box.y < minY) {
+        minY = box.y;
       }
     }
 
-    return new Rect(minX, minY, maxX - minX, maxY - minY);
+    return new BBox(minX, minY, maxX - minX, maxY - minY);
   }
 
-  public lerp(to: Rect, value: number | Vector2 | Rect) {
-    return Rect.lerp(this, to, value);
+  public lerp(to: BBox, value: number | Vector2 | BBox) {
+    return BBox.lerp(this, to, value);
   }
 
   public get position() {
@@ -216,7 +216,7 @@ export class Rect implements Type {
   }
 
   public get pixelPerfect() {
-    return new Rect(
+    return new BBox(
       Math.floor(this.x),
       Math.floor(this.y),
       Math.ceil(this.width + 1),
@@ -225,11 +225,11 @@ export class Rect implements Type {
   }
 
   public constructor();
-  public constructor(from: PossibleRect);
+  public constructor(from: PossibleBBox);
   public constructor(position: Vector2, size: Vector2);
   public constructor(x: number, y?: number, width?: number, height?: number);
   public constructor(
-    one?: PossibleRect | number,
+    one?: PossibleBBox | number,
     two: Vector2 | number = 0,
     three = 0,
     four = 0,
@@ -272,8 +272,8 @@ export class Rect implements Type {
     this.height = one.height;
   }
 
-  public transform(matrix: DOMMatrix): Rect {
-    return new Rect(
+  public transform(matrix: DOMMatrix): BBox {
+    return new BBox(
       this.position.transformAsPoint(matrix),
       this.size.transform(matrix),
     );
@@ -284,7 +284,7 @@ export class Rect implements Type {
   }
 
   public expand(amount: number) {
-    return new Rect(
+    return new BBox(
       this.x - amount,
       this.y - amount,
       this.width + amount * 2,
@@ -293,7 +293,7 @@ export class Rect implements Type {
   }
 
   public addSpacing(spacing: Spacing) {
-    const result = new Rect(this);
+    const result = new BBox(this);
     result.left -= spacing.left;
     result.top -= spacing.top;
     result.right += spacing.right;
@@ -312,10 +312,10 @@ export class Rect implements Type {
   }
 
   public toSymbol(): symbol {
-    return Rect.symbol;
+    return BBox.symbol;
   }
 
-  public serialize(): SerializedRect {
+  public serialize(): SerializedBBox {
     return {x: this.x, y: this.y, width: this.width, height: this.height};
   }
 }

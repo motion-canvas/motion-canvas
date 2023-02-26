@@ -12,7 +12,7 @@ import {
 } from '../decorators';
 import {
   Vector2,
-  Rect,
+  BBox,
   transformScalar,
   PossibleColor,
   transformAngle,
@@ -593,7 +593,7 @@ export class Node implements Promisable<Node> {
    *   </Layout>
    * );
    *
-   * node.insert(<Text />, 1);
+   * node.insert(<Txt />, 1);
    * ```
    *
    * Result:
@@ -1009,7 +1009,7 @@ export class Node implements Promisable<Node> {
   @computed()
   protected cachedCanvas() {
     const context = this.cacheCanvas();
-    const cache = this.cacheRect();
+    const cache = this.cacheBBox();
     context.canvas.width = cache.width;
     context.canvas.height = cache.height;
     context.resetTransform();
@@ -1020,22 +1020,22 @@ export class Node implements Promisable<Node> {
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node.
+   * Get a bounding box for the contents rendered by this node.
    *
    * @remarks
-   * The returned rectangle should be in local space.
+   * The returned bounding box should be in local space.
    */
-  protected getCacheRect(): Rect {
-    return new Rect();
+  protected getCacheBBox(): BBox {
+    return new BBox();
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node as well
+   * Get a bounding box for the contents rendered by this node as well
    * as its children.
    */
   @computed()
-  public cacheRect(): Rect {
-    const cache = this.getCacheRect();
+  public cacheBBox(): BBox {
+    const cache = this.getCacheBBox();
     const children = this.children();
     if (children.length === 0) {
       return cache.pixelPerfect;
@@ -1043,30 +1043,30 @@ export class Node implements Promisable<Node> {
 
     const points: Vector2[] = cache.corners;
     for (const child of children) {
-      const childCache = child.fullCacheRect();
+      const childCache = child.fullCacheBBox();
       const childMatrix = child.localToParent();
       points.push(
         ...childCache.corners.map(r => r.transformAsPoint(childMatrix)),
       );
     }
 
-    return Rect.fromPoints(...points).pixelPerfect;
+    return BBox.fromPoints(...points).pixelPerfect;
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node (including
+   * Get a bounding box for the contents rendered by this node (including
    * effects applied after caching).
    *
    * @remarks
-   * The returned rectangle should be in local space.
+   * The returned bounding box should be in local space.
    */
   @computed()
-  protected fullCacheRect(): Rect {
+  protected fullCacheBBox(): BBox {
     const matrix = this.compositeToLocal();
     const shadowOffset = this.shadowOffset().transform(matrix);
     const shadowBlur = transformScalar(this.shadowBlur(), matrix);
 
-    const result = this.cacheRect().expand(
+    const result = this.cacheBBox().expand(
       this.filters.blur() * 2 + shadowBlur,
     );
 
@@ -1132,7 +1132,7 @@ export class Node implements Promisable<Node> {
     this.transformContext(context);
 
     if (this.requiresCache()) {
-      const cacheRect = this.cacheRect();
+      const cacheRect = this.cacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
@@ -1189,12 +1189,12 @@ export class Node implements Promisable<Node> {
    * @param matrix - A local-to-screen matrix.
    */
   public drawOverlay(context: CanvasRenderingContext2D, matrix: DOMMatrix) {
-    const rect = this.cacheRect().transformCorners(matrix);
-    const cache = this.getCacheRect().transformCorners(matrix);
+    const box = this.cacheBBox().transformCorners(matrix);
+    const cache = this.getCacheBBox().transformCorners(matrix);
     context.strokeStyle = 'white';
     context.lineWidth = 1;
     context.beginPath();
-    drawLine(context, rect);
+    drawLine(context, box);
     context.closePath();
     context.stroke();
 

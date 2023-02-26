@@ -1,7 +1,4 @@
-import {
-  Rect as RectType,
-  SerializedVector2,
-} from '@motion-canvas/core/lib/types';
+import {BBox, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {computed, initial, signal} from '../decorators';
 import {useThread} from '@motion-canvas/core/lib/utils';
@@ -166,13 +163,13 @@ export class Video extends Rect {
           ? this.fastSeekedVideo()
           : this.seekedVideo();
 
-      const rect = RectType.fromSizeCentered(this.computedSize());
+      const box = BBox.fromSizeCentered(this.computedSize());
       context.save();
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
       context.imageSmoothingEnabled = this.smoothing();
-      drawImage(context, video, rect);
+      drawImage(context, video, box);
       context.restore();
     }
 

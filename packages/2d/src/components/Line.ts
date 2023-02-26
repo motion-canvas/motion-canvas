@@ -9,7 +9,7 @@ import {
 } from '@motion-canvas/core/lib/signals';
 import {
   PossibleVector2,
-  Rect,
+  BBox,
   SerializedVector2,
   Vector2,
 } from '@motion-canvas/core/lib/types';
@@ -85,7 +85,7 @@ export class Line extends Shape {
   >;
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
-    return this.childrenRect().size;
+    return this.childrenBBox().size;
   }
 
   public constructor(props: LineProps) {
@@ -100,7 +100,7 @@ export class Line extends Shape {
   }
 
   @computed()
-  protected childrenRect() {
+  protected childrenBBox() {
     const custom = this.points();
     const points = custom
       ? custom.map(
@@ -110,7 +110,7 @@ export class Line extends Shape {
           .filter(child => !(child instanceof Layout) || child.isLayoutRoot())
           .map(child => child.position());
 
-    return Rect.fromPoints(...points);
+    return BBox.fromPoints(...points);
   }
 
   @computed()
@@ -224,21 +224,21 @@ export class Line extends Shape {
     context.lineDashOffset -= arcLength / 2;
   }
 
-  protected override getComputedLayout(): Rect {
-    const rect = super.getComputedLayout();
-    rect.position = rect.position.sub(this.childrenRect().center);
-    return rect;
+  protected override getComputedLayout(): BBox {
+    const box = super.getComputedLayout();
+    box.position = box.position.sub(this.childrenBBox().center);
+    return box;
   }
 
   protected override getPath(): Path2D {
     return this.curveDrawingInfo().path;
   }
 
-  protected override getCacheRect(): Rect {
-    const rect = this.childrenRect();
+  protected override getCacheBBox(): BBox {
+    const box = this.childrenBBox();
     const arrowSize = this.arrowSize();
     const lineWidth = this.lineWidth();
-    return rect.expand(Math.max(0, arrowSize, lineWidth / 2));
+    return box.expand(Math.max(0, arrowSize, lineWidth / 2));
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
@@ -283,7 +283,7 @@ export class Line extends Shape {
     context: CanvasRenderingContext2D,
     matrix: DOMMatrix,
   ) {
-    const rect = this.childrenRect().transformCorners(matrix);
+    const box = this.childrenBBox().transformCorners(matrix);
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
 
@@ -320,7 +320,7 @@ export class Line extends Shape {
     context.stroke();
 
     context.beginPath();
-    drawLine(context, rect);
+    drawLine(context, box);
     context.closePath();
     context.stroke();
   }

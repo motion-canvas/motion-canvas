@@ -2,16 +2,16 @@ import {computed, initial, interpolation, signal} from '../decorators';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
-import {Rect} from '@motion-canvas/core/lib/types';
+import {BBox} from '@motion-canvas/core/lib/types';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {View2D} from './View2D';
 
-export interface TextProps extends ShapeProps {
+export interface TxtProps extends ShapeProps {
   children?: string;
   text?: SignalValue<string>;
 }
 
-export class Text extends Shape {
+export class Txt extends Shape {
   protected static segmenter;
   protected static formatter: HTMLDivElement;
 
@@ -33,7 +33,7 @@ export class Text extends Shape {
   @signal()
   public declare readonly text: SimpleSignal<string, this>;
 
-  public constructor({children, ...rest}: TextProps) {
+  public constructor({children, ...rest}: TxtProps) {
     super(rest);
     if (children) {
       this.text(children);
@@ -50,7 +50,7 @@ export class Text extends Shape {
     const {width, height} = this.size();
     const range = document.createRange();
     let line = '';
-    const lineRect = new Rect();
+    const lineRect = new BBox();
     for (const childNode of this.element.childNodes) {
       if (!childNode.textContent) {
         continue;
@@ -81,20 +81,20 @@ export class Text extends Shape {
   protected drawText(
     context: CanvasRenderingContext2D,
     text: string,
-    rect: Rect,
+    box: BBox,
   ) {
-    const y = rect.y + rect.height / 2;
+    const y = box.y + box.height / 2;
     context.save();
     context.textBaseline = 'middle';
 
     if (this.lineWidth() <= 0) {
-      context.fillText(text, rect.x, y);
+      context.fillText(text, box.x, y);
     } else if (this.strokeFirst()) {
-      context.strokeText(text, rect.x, y);
-      context.fillText(text, rect.x, y);
+      context.strokeText(text, box.x, y);
+      context.fillText(text, box.x, y);
     } else {
-      context.fillText(text, rect.x, y);
-      context.strokeText(text, rect.x, y);
+      context.fillText(text, box.x, y);
+      context.strokeText(text, box.x, y);
     }
 
     context.restore();
@@ -102,8 +102,8 @@ export class Text extends Shape {
 
   @computed()
   protected formattedText() {
-    Text.formatter.innerText = this.text();
-    return Text.formatter.innerText;
+    Txt.formatter.innerText = this.text();
+    return Txt.formatter.innerText;
   }
 
   protected override updateLayout() {
@@ -113,9 +113,9 @@ export class Text extends Shape {
     const wrap =
       this.styles.whiteSpace !== 'nowrap' && this.styles.whiteSpace !== 'pre';
 
-    if (wrap && Text.segmenter) {
+    if (wrap && Txt.segmenter) {
       this.element.innerText = '';
-      for (const word of Text.segmenter.segment(this.formattedText())) {
+      for (const word of Txt.segmenter.segment(this.formattedText())) {
         this.element.appendChild(document.createTextNode(word.segment));
       }
     } else if (this.styles.whiteSpace === 'pre') {
@@ -127,7 +127,7 @@ export class Text extends Shape {
       this.element.innerText = this.formattedText();
     }
 
-    if (wrap && !Text.segmenter) {
+    if (wrap && !Txt.segmenter) {
       useLogger().warn({
         message: 'Wrapping is not supported',
         inspect: this.key,

@@ -1,6 +1,6 @@
 import {
   PossibleSpacing,
-  Rect as RectType,
+  BBox,
   SpacingSignal,
 } from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
@@ -81,14 +81,14 @@ export class Rect extends Shape {
     const radius = this.radius();
     const smoothCorners = this.smoothCorners();
     const cornerSharpness = this.cornerSharpness();
-    const rect = RectType.fromSizeCentered(this.size());
-    drawRoundRect(path, rect, radius, smoothCorners, cornerSharpness);
+    const box = BBox.fromSizeCentered(this.size());
+    drawRoundRect(path, box, radius, smoothCorners, cornerSharpness);
 
     return path;
   }
 
-  protected override getCacheRect(): RectType {
-    return super.getCacheRect().expand(this.rippleSize());
+  protected override getCacheBBox(): BBox {
+    return super.getCacheBBox().expand(this.rippleSize());
   }
 
   protected override getRipplePath(): Path2D {
@@ -97,8 +97,8 @@ export class Rect extends Shape {
     const radius = this.radius().addScalar(rippleSize);
     const smoothCorners = this.smoothCorners();
     const cornerSharpness = this.cornerSharpness();
-    const rect = RectType.fromSizeCentered(this.size()).expand(rippleSize);
-    drawRoundRect(path, rect, radius, smoothCorners, cornerSharpness);
+    const box = BBox.fromSizeCentered(this.size()).expand(rippleSize);
+    drawRoundRect(path, box, radius, smoothCorners, cornerSharpness);
 
     return path;
   }

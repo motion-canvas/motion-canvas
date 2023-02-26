@@ -5,7 +5,7 @@ import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
 import {initial, signal} from '../decorators';
-import {Image, ImageProps} from './Image';
+import {Img, ImgProps} from './Img';
 import {
   DependencyContext,
   SignalValue,
@@ -22,12 +22,12 @@ const jaxDocument = mathjax.document('', {
   OutputJax: new SVG({fontCache: 'local'}),
 });
 
-export interface LatexProps extends ImageProps {
+export interface LatexProps extends ImgProps {
   tex?: SignalValue<string>;
   renderProps?: SignalValue<OptionList>;
 }
 
-export class Latex extends Image {
+export class Latex extends Img {
   private static svgContentsPool: Record<string, string> = {};
 
   private readonly imageElement = document.createElement('img');
