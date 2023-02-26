@@ -28,10 +28,10 @@
     "@motion-canvas/core": "^2.6.0"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.3.0",
+    "@preact/preset-vite": "^2.5.0",
     "clsx": "^1.2.1",
     "highlight.js": "^11.7.0",
-    "preact": "10.7.3",
+    "preact": "^10.13.0",
     "sass": "^1.58.0",
     "source-map-js": "^1.0.2"
   }
