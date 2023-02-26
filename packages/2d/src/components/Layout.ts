@@ -94,6 +94,7 @@ export interface LayoutProps extends NodeProps {
   lineHeight?: SignalValue<Length>;
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<TextWrap>;
+  textDirection?: SignalValue<CanvasDirection>;
 
   size?: SignalValue<PossibleVector2<Length>>;
   offsetX?: SignalValue<number>;
@@ -196,6 +197,9 @@ export class Layout extends Node {
   })
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
+  @initial('inherit')
+  @signal()
+  public declare readonly textDirection: SimpleSignal<CanvasDirection, this>;
 
   @cloneable(false)
   @inspectable(false)
