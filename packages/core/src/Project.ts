@@ -270,13 +270,12 @@ export class Project {
     this.transformCanvas(this.bufferContext);
     await this.currentScene.current?.render(this.bufferContext);
 
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     if (this.background) {
       this.context.save();
       this.context.fillStyle = this.background;
       this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
       this.context.restore();
-    } else {
-      this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     if (this.previousScene) {
