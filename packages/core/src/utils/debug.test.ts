@@ -1,6 +1,6 @@
 import {describe, test, beforeEach, expect, vi} from 'vitest';
 import {useLogger, debug, startScene} from '../utils';
-import {Rect, Vector2} from '../types';
+import {BBox, Vector2} from '../types';
 import {Logger, LogLevel} from '../app';
 import {Scene} from '../scenes';
 
@@ -17,11 +17,11 @@ describe('debug()', () => {
     ['NaN', NaN, {message: 'NaN'}],
     ['Vector2', Vector2.one, {message: '{"x":1,"y":1}', object: Vector2.one}],
     [
-      'Rect',
-      new Rect([10, 20, 30, 40]),
+      'BBox',
+      new BBox([10, 20, 30, 40]),
       {
         message: '{"x":10,"y":20,"width":30,"height":40}',
-        object: new Rect([10, 20, 30, 40]),
+        object: new BBox([10, 20, 30, 40]),
       },
     ],
     [

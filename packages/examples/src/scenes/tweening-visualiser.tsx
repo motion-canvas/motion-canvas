@@ -5,7 +5,7 @@ import {
   Line,
   Node,
   Layout,
-  Text,
+  Txt,
 } from '@motion-canvas/2d/lib/components';
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {all, waitFor} from '@motion-canvas/core/lib/flow';
@@ -52,19 +52,19 @@ export default makeScene2D(function* (view) {
 
         {/* Tracker */}
         <Layout y={() => value() * -500 + 650}>
-          <Text
+          <Txt
             fill={'#DDD'}
             text={() => value().toFixed(2).toString()}
             fontWeight={300}
             fontSize={30}
             x={-55}
             y={3}
-          ></Text>
+          ></Txt>
           <Circle size={30} fill={'#DDD'}></Circle>
         </Layout>
 
         {/* Label */}
-        <Text
+        <Txt
           y={400}
           x={-160}
           fontWeight={400}
@@ -73,7 +73,7 @@ export default makeScene2D(function* (view) {
           fontFamily={'Candara'}
           fill={'#DDD'}
           text={'VALUE'}
-        ></Text>
+        ></Txt>
       </Node>
 
       {/* Horizontal */}
@@ -94,17 +94,17 @@ export default makeScene2D(function* (view) {
         {/* Tracker */}
         <Layout y={800} x={() => time() * 500 + 150}>
           <Circle size={30} fill={'#DDD'}></Circle>
-          <Text
+          <Txt
             fill={'#DDD'}
             text={() => (time() * TIME).toFixed(2).toString()}
             fontWeight={300}
             fontSize={30}
             y={50}
-          ></Text>
+          ></Txt>
         </Layout>
 
         {/* Label */}
-        <Text
+        <Txt
           y={900}
           x={400}
           fontWeight={400}
@@ -113,7 +113,7 @@ export default makeScene2D(function* (view) {
           fontFamily={'Candara'}
           fill={'#DDD'}
           text={'TIME'}
-        ></Text>
+        ></Txt>
       </Node>
     </Node>,
   );

@@ -1,4 +1,4 @@
-import {Rect, Vector2} from '../types';
+import {BBox, Vector2} from '../types';
 import {useScene} from '../utils';
 import {useTransition} from './useTransition';
 import {clampRemap, easeInOutCubic, linear} from '../tweening';
@@ -12,7 +12,7 @@ import {ThreadGenerator} from '../threading';
  * @param area - The area on which to zoom in.
  * @param duration - The duration of the transition.
  */
-export function* zoomInTransition(area: Rect, duration = 0.6): ThreadGenerator {
+export function* zoomInTransition(area: BBox, duration = 0.6): ThreadGenerator {
   const scale = useScene().getSize().div(area.size);
 
   const currentPosition = Vector2.createSignal(area.position);

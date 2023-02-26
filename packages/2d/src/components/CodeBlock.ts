@@ -126,7 +126,7 @@ export class CodeBlock extends Shape {
 
   @initial(0.32)
   @signal()
-  public declare readonly selectionOpacity: SimpleSignal<number, this>;
+  public declare readonly unselectedOpacity: SimpleSignal<number, this>;
 
   private codeProgress = createSignal<number | null>(null);
   private selectionProgress = createSignal<number | null>(null);
@@ -353,11 +353,11 @@ export class CodeBlock extends Shape {
     const w = context.measureText('X').width;
     const size = this.computedSize();
     const progress = this.codeProgress();
-    const selectionOpacity = this.selectionOpacity();
+    const unselectedOpacity = this.unselectedOpacity();
     const globalAlpha = context.globalAlpha;
 
     const getSelectionAlpha = (x: number, y: number) =>
-      map(selectionOpacity, 1, this.selectionStrength(x, y));
+      map(unselectedOpacity, 1, this.selectionStrength(x, y));
 
     const drawToken = (
       code: string,

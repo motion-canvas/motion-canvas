@@ -1,4 +1,4 @@
-import {Rect, Text} from '@motion-canvas/2d/lib/components';
+import {Rect, Txt} from '@motion-canvas/2d/lib/components';
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {all, waitFor} from '@motion-canvas/core/lib/flow';
 import {slideTransition} from '@motion-canvas/core/lib/transitions';
@@ -7,7 +7,7 @@ import {Direction} from '@motion-canvas/core/lib/types';
 
 export default makeScene2D(function* (view) {
   const rect = createRef<Rect>();
-  const text = createRef<Text>();
+  const text = createRef<Txt>();
 
   view.add(
     <Rect
@@ -19,7 +19,7 @@ export default makeScene2D(function* (view) {
       alignItems={'center'}
       justifyContent={'center'}
     >
-      <Text
+      <Txt
         ref={text}
         fontSize={160}
         fontWeight={700}
@@ -27,7 +27,7 @@ export default makeScene2D(function* (view) {
         fontFamily={'"JetBrains Mono", monospace'}
       >
         SECOND SCENE
-      </Text>
+      </Txt>
     </Rect>,
   );
 

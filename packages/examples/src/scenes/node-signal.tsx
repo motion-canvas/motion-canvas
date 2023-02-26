@@ -1,5 +1,5 @@
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle, Text, Line} from '@motion-canvas/2d/lib/components';
+import {Circle, Txt, Line} from '@motion-canvas/2d/lib/components';
 import {createSignal} from '@motion-canvas/core/lib/signals';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {waitFor} from '@motion-canvas/core/lib/flow';
@@ -41,7 +41,7 @@ export default makeScene2D(function* (view) {
         lineWidth={8}
         stroke={'#242424'}
       />
-      <Text
+      <Txt
         // highlight-start
         text={() => `r = ${radius().toFixed(2)}`}
         x={() => (radius() * scale) / 2}
@@ -49,7 +49,7 @@ export default makeScene2D(function* (view) {
         fill={'#242424'}
         {...textStyle}
       />
-      <Text
+      <Txt
         // highlight-start
         text={() => `A = ${area().toFixed(2)}`}
         y={() => radius() * scale}

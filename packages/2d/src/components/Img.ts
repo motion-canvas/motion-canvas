@@ -2,7 +2,7 @@ import {computed, initial, signal} from '../decorators';
 import {
   Color,
   PossibleVector2,
-  Rect as RectType,
+  BBox,
   SerializedVector2,
   Vector2,
 } from '@motion-canvas/core/lib/types';
@@ -16,13 +16,13 @@ import {
 } from '@motion-canvas/core/lib/signals';
 import {viaProxy} from '@motion-canvas/core/lib/utils';
 
-export interface ImageProps extends RectProps {
+export interface ImgProps extends RectProps {
   src?: SignalValue<string>;
   alpha?: SignalValue<number>;
   smoothing?: SignalValue<boolean>;
 }
 
-export class Image extends Rect {
+export class Img extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 
   @signal()
@@ -36,7 +36,7 @@ export class Image extends Rect {
   @signal()
   public declare readonly smoothing: SimpleSignal<boolean, this>;
 
-  public constructor(props: ImageProps) {
+  public constructor(props: ImgProps) {
     super(props);
   }
 
@@ -56,8 +56,8 @@ export class Image extends Rect {
   @computed()
   protected image(): HTMLImageElement {
     const src = viaProxy(this.src());
-    if (Image.pool[src]) {
-      return Image.pool[src];
+    if (Img.pool[src]) {
+      return Img.pool[src];
     }
 
     const image = document.createElement('img');
@@ -71,7 +71,7 @@ export class Image extends Rect {
         }),
       );
     }
-    Image.pool[src] = image;
+    Img.pool[src] = image;
 
     return image;
   }
@@ -107,13 +107,13 @@ export class Image extends Rect {
     }
     const alpha = this.alpha();
     if (alpha > 0) {
-      const rect = RectType.fromSizeCentered(this.computedSize());
+      const box = BBox.fromSizeCentered(this.computedSize());
       context.save();
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
       context.imageSmoothingEnabled = this.smoothing();
-      drawImage(context, this.image(), rect);
+      drawImage(context, this.image(), box);
       context.restore();
     }
     this.drawChildren(context);

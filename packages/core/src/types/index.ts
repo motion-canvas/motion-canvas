@@ -9,7 +9,7 @@ export * from './Color';
 export * from './Matrix';
 export * from './Matrix2D';
 export * from './Origin';
-export * from './Rect';
+export * from './BBox';
 export * from './Spacing';
 export * from './Type';
 export * from './Vector';

@@ -20,7 +20,7 @@ import {
 } from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
-import {Rect, Vector2} from '../types';
+import {BBox, Vector2} from '../types';
 import {SceneState} from './SceneState';
 import {Random} from './Random';
 import {DependencyContext} from '../signals';
@@ -146,8 +146,8 @@ export abstract class GeneratorScene<T>
       iterations++;
       await Promise.all(promises.map(handle => handle.promise));
       context.save();
-      const rect = Rect.fromSizeCentered(this.getSize());
-      context.clearRect(rect.x, rect.y, rect.width, rect.height);
+      const box = BBox.fromSizeCentered(this.getSize());
+      context.clearRect(box.x, box.y, box.width, box.height);
       this.draw(context);
       context.restore();
 
