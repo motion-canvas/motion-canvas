@@ -17,7 +17,6 @@ decorate(loopUntil, threadable());
  *
  * @param event - The event.
  * @param tasks - A list of tasks to run.
- *
  */
 export function* loopUntil(
   event: string,
@@ -25,14 +24,14 @@ export function* loopUntil(
 ): ThreadGenerator {
   const scene = useScene();
   const frames = scene.timeEvents.register(event);
-  let iterator = 0;
+  let iteration = 0;
   while (scene.project.frame < frames) {
-    const generator = factory(iterator);
+    const generator = factory(iteration);
     if (generator) {
       yield* generator;
     } else {
       yield;
     }
-    iterator += 1;
+    iteration += 1;
   }
 }
