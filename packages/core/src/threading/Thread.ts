@@ -1,5 +1,5 @@
 import {ThreadGenerator} from './ThreadGenerator';
-import {endThread, startThread, useProject} from '../utils';
+import {endThread, startThread, usePlayback} from '../utils';
 import {createSignal} from '../signals';
 import {setTaskName} from './names';
 
@@ -45,9 +45,9 @@ export class Thread {
      */
     public readonly runner: ThreadGenerator,
   ) {
-    const project = useProject();
-    this.frameDuration = project.framesToSeconds(1);
-    this.time(project.time);
+    const playback = usePlayback();
+    this.frameDuration = playback.framesToSeconds(1);
+    this.time(playback.time);
   }
 
   /**
@@ -65,7 +65,8 @@ export class Thread {
    * Prepare the thread for the next update cycle.
    */
   public update() {
-    this.time(this.time() + useProject().framesToSeconds(1));
+    const playback = usePlayback();
+    this.time(this.time() + playback.framesToSeconds(1) * playback.speed);
     this.children = this.children.filter(child => !child.canceled);
   }
 

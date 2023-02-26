@@ -109,6 +109,24 @@
   -moz-appearance: textfield;
 }
 
+.color {
+  display: flex;
+  padding-left: 0;
+  align-items: center;
+
+  input {
+    width: 0;
+    flex-shrink: 1;
+    flex-grow: 1;
+    margin: 0 8px 0 0;
+    padding-left: 8px;
+    appearance: none;
+    border: 0;
+    background-color: transparent;
+    color: inherit;
+  }
+}
+
 .colorPreview {
   width: 16px;
   height: 16px;

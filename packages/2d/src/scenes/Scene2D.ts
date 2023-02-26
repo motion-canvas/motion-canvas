@@ -1,10 +1,12 @@
 import {
+  FullSceneDescription,
   GeneratorScene,
   Inspectable,
   InspectedAttributes,
   InspectedElement,
   Scene,
   SceneRenderEvent,
+  ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
 import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
@@ -15,8 +17,20 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
 
+  public constructor(
+    description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
+  ) {
+    super(description);
+    this.recreateView();
+  }
+
   public getView(): View2D {
     return this.view!;
+  }
+
+  public override next(): Promise<void> {
+    this.getView()?.playbackState(this.playback.state);
+    return super.next();
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -24,6 +38,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
+    this.getView().playbackState(this.playback.state);
     this.getView().render(context);
     this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
     context.restore();
@@ -37,14 +52,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     }
     this.registeredNodes = {};
     this.nodeCounters = {};
-
-    startScene(this);
-    const size = this.getSize();
-    this.view = new View2D({
-      position: size.scale(0.5),
-      size,
-    });
-    endScene(this);
+    this.recreateView();
 
     return super.reset(previousScene);
   }
@@ -104,5 +112,15 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   public getNode(key: any): Node | null {
     if (typeof key !== 'string') return null;
     return this.registeredNodes[key] ?? null;
+  }
+
+  protected recreateView() {
+    startScene(this);
+    const size = this.getSize();
+    this.view = new View2D({
+      position: size.scale(0.5),
+      size,
+    });
+    endScene(this);
   }
 }

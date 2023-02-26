@@ -107,6 +107,7 @@ export class DependencyContext<TOwner = void>
 
   public dispose() {
     this.clearDependencies();
+    this.event.clear();
     this.owner = null as TOwner;
   }
 

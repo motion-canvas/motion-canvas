@@ -5,7 +5,7 @@
  * the Proxy instead.
  */
 
-import {useLogger} from './useProject';
+import {useLogger} from './useScene';
 
 /**
  * Route the given url through a local proxy.

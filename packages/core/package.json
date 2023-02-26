@@ -2,7 +2,7 @@
   "name": "@motion-canvas/core",
   "version": "2.6.0",
   "description": "Web-based tool for creating animations programmatically",
-  "main": "lib/index.js",
+  "main": "lib/app/index.js",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",

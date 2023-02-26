@@ -1,9 +1,9 @@
+import {LogLevel, LogPayload, Logger} from '@motion-canvas/core';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useRef} from 'preact/hooks';
-import {LogLevel, LogPayload, Project} from '@motion-canvas/core/lib';
 import {ValueDispatcher} from '@motion-canvas/core/lib/events';
-import {useProject} from './project';
-import {useSubscribableValue} from '../hooks';
+import {useSubscribable, useSubscribableValue} from '../hooks';
+import {useApplication} from './application';
 
 export class LoggerManager {
   public get onErrorLogged() {
@@ -16,13 +16,9 @@ export class LoggerManager {
   }
   private readonly logs = new ValueDispatcher<LogPayload[]>([]);
 
-  private readonly logger;
-
-  public constructor(project: Project) {
-    this.logger = project.logger;
-    this.logs.current = project.logger.history;
+  public constructor(private readonly logger: Logger) {
+    this.logs.current = logger.history;
     this.logger.onLogged.subscribe(this.handleLog);
-    project.onReloaded.subscribe(this.clear);
   }
 
   public readonly clear = () => {
@@ -54,9 +50,10 @@ export interface LoggerProviderProps {
   children: ComponentChildren;
 }
 export function LoggerProvider({children}: LoggerProviderProps) {
-  const project = useProject();
+  const {project, player} = useApplication();
   const manager = useRef<LoggerManager | null>(null);
-  manager.current ??= new LoggerManager(project);
+  manager.current ??= new LoggerManager(project.logger);
+  useSubscribable(player.onRecalculated, () => manager.current.clear(), []);
 
   return (
     <LoggerContext.Provider value={manager.current}>

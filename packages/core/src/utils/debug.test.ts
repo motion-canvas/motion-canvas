@@ -1,12 +1,12 @@
 import {describe, test, beforeEach, expect, vi} from 'vitest';
-import {setProject, useLogger, debug} from '../utils';
-import {Project} from '../Project';
-import {LogLevel} from '../Logger';
+import {useLogger, debug, startScene} from '../utils';
 import {Rect, Vector2} from '../types';
+import {Logger, LogLevel} from '../app';
+import {Scene} from '../scenes';
 
 describe('debug()', () => {
   beforeEach(() => {
-    setProject(new Project({name: 'test', scenes: []}));
+    startScene({logger: new Logger()} as Scene);
   });
 
   test.each([
@@ -38,7 +38,7 @@ describe('debug()', () => {
     ['Empty Objects', {}, {message: '{}', object: {}}],
   ])('log: %s', (_, payload, expected) => {
     const spy = vi.fn();
-    useLogger().onLogged.subscribe(spy);
+    (useLogger() as Logger).onLogged.subscribe(spy);
 
     debug(payload);
 

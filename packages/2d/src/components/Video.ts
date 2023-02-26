@@ -4,7 +4,7 @@ import {
 } from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {computed, initial, signal} from '../decorators';
-import {useProject, useThread} from '@motion-canvas/core/lib/utils';
+import {useThread} from '@motion-canvas/core/lib/utils';
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
@@ -162,7 +162,7 @@ export class Video extends Rect {
     const alpha = this.alpha();
     if (alpha > 0) {
       const video =
-        useProject().playbackState() === PlaybackState.Playing
+        this.view().playbackState() === PlaybackState.Playing
           ? this.fastSeekedVideo()
           : this.seekedVideo();
 

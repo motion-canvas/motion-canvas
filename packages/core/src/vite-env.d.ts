@@ -4,7 +4,7 @@ import 'vite/types/customEvent';
 
 declare module 'vite/types/customEvent' {
   interface CustomEventMap {
-    'motion-canvas:meta': {source: string; data: import('./Meta').Metadata};
+    'motion-canvas:meta': {source: string; data: any};
     'motion-canvas:meta-ack': {source: string};
     'motion-canvas:export': {
       frame: number;

@@ -1,4 +1,4 @@
-import type {Scene, SceneMetadata} from './Scene';
+import type {Scene} from './Scene';
 import {ValueDispatcher} from '../events';
 
 /**
@@ -58,18 +58,18 @@ export class TimeEvents {
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
   private collisionLookup = new Set<string>();
-  private previousReference: SavedTimeEvent[] | undefined = [];
+  private previousReference: SavedTimeEvent[] = [];
   private didEventsChange = false;
   private preserveTiming = true;
 
   public constructor(private readonly scene: Scene) {
-    this.previousReference = scene.meta.getData().timeEvents ?? [];
+    this.previousReference = scene.meta.timeEvents.get();
     this.load(this.previousReference);
 
     scene.onReloaded.subscribe(this.handleReload);
     scene.onRecalculated.subscribe(this.handleRecalculated);
     scene.onReset.subscribe(this.handleReset);
-    scene.meta.onDataChanged.subscribe(this.handleMetaChanged, false);
+    scene.meta.timeEvents.onChanged.subscribe(this.handleMetaChanged, false);
   }
 
   public get(name: string) {
@@ -112,7 +112,7 @@ export class TimeEvents {
    */
   public register(name: string): number {
     if (this.collisionLookup.has(name)) {
-      this.scene.project.logger.error({
+      this.scene.logger.error({
         message: `name "${name}" has already been used for another event name.`,
         stack: new Error().stack,
       });
@@ -121,8 +121,8 @@ export class TimeEvents {
 
     this.collisionLookup.add(name);
 
-    const initialTime = this.scene.project.framesToSeconds(
-      this.scene.project.frame - this.scene.firstFrame,
+    const initialTime = this.scene.playback.framesToSeconds(
+      this.scene.playback.frame - this.scene.firstFrame,
     );
     if (!this.lookup[name]) {
       this.didEventsChange = true;
@@ -170,7 +170,7 @@ export class TimeEvents {
 
     return (
       this.scene.firstFrame +
-      this.scene.project.secondsToFrames(this.lookup[name].targetTime)
+      this.scene.playback.secondsToFrames(this.lookup[name].targetTime)
     );
   }
 
@@ -200,9 +200,7 @@ export class TimeEvents {
           targetTime: event.targetTime,
         }),
       );
-      this.scene.meta.setDataSync({
-        timeEvents: this.previousReference,
-      });
+      this.scene.meta.timeEvents.set(this.previousReference);
     }
   };
 
@@ -213,13 +211,13 @@ export class TimeEvents {
   /**
    * Called when the meta of the parent scene changes.
    */
-  private handleMetaChanged = (data: SceneMetadata) => {
+  private handleMetaChanged = (data: SavedTimeEvent[]) => {
     // Ignore the event if `timeEvents` hasn't changed.
     // This may happen when another part of metadata has changed triggering
     // this event.
-    if (data.timeEvents === this.previousReference) return;
-    this.previousReference = data.timeEvents;
-    this.load(data.timeEvents ?? []);
+    if (data === this.previousReference) return;
+    this.previousReference = data;
+    this.load(data);
     this.scene.reload();
   };
 

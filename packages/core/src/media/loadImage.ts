@@ -27,7 +27,7 @@ export function loadAnimation(sources: string[]): Promise<HTMLImageElement[]> {
 
 export function getImageData(image: ImageDataSource) {
   canvas ??= document.createElement('canvas');
-  context ??= getContext(canvas);
+  context ??= getContext({willReadFrequently: true}, canvas);
 
   canvas.width = image.width;
   canvas.height = image.height;

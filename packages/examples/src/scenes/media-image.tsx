@@ -8,7 +8,7 @@ import logoSvg from '@motion-canvas/examples/assets/logo.svg';
 export default makeScene2D(function* (view) {
   const imageRef = createRef<Image>();
 
-  view.add(<Image ref={imageRef} src={logoSvg} scale={2} />);
+  yield view.add(<Image ref={imageRef} src={logoSvg} scale={2} />);
 
   yield* all(
     imageRef().scale(2.5, 1.5).to(2, 1.5),

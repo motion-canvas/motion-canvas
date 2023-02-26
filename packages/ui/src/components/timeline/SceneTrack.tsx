@@ -2,7 +2,7 @@ import styles from './Timeline.module.scss';
 
 import type {Scene} from '@motion-canvas/core/lib/scenes';
 import {useScenes, useSubscribableValue} from '../../hooks';
-import {usePlayer, useTimelineContext} from '../../contexts';
+import {useApplication, useTimelineContext} from '../../contexts';
 import {useMemo} from 'preact/hooks';
 import {findAndOpenFirstUserFile} from '../../utils';
 
@@ -23,7 +23,7 @@ interface SceneClipProps {
 }
 
 function SceneClip({scene}: SceneClipProps) {
-  const player = usePlayer();
+  const {player, meta} = useApplication();
   const {framesToPercents, framesToPixels, offset} = useTimelineContext();
   const cachedData = useSubscribableValue(scene.onCacheChanged);
 
@@ -49,7 +49,10 @@ function SceneClip({scene}: SceneClipProps) {
       onMouseUp={event => {
         if (event.button === 1) {
           event.stopPropagation();
-          player.setRange(cachedData.firstFrame, cachedData.lastFrame - 1);
+          meta.shared.range.set([
+            player.status.framesToSeconds(cachedData.firstFrame),
+            player.status.framesToSeconds(cachedData.lastFrame),
+          ]);
         }
       }}
     >

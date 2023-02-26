@@ -4,30 +4,34 @@ import {
   useCurrentScene,
   useDocumentEvent,
   useDrag,
+  usePreviewSettings,
+  useSharedSettings,
   useSize,
+  useStateChange,
   useStorage,
   useSubscribable,
-  usePlayerState,
-  useStateChange,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
-import {useInspection, usePlayer} from '../../contexts';
+import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
+import {PreviewStage} from './PreviewStage';
 
 const ZOOM_SPEED = 0.1;
 
-export function View() {
-  const player = usePlayer();
+export function EditorPreview() {
+  const {player} = useApplication();
   const scene = useCurrentScene();
   const containerRef = useRef<HTMLDivElement>();
-  const viewportRef = useRef<HTMLCanvasElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
-  const playerState = usePlayerState();
+  const settings = {
+    ...useSharedSettings(),
+    ...usePreviewSettings(),
+  };
 
   const [state, setState, wasStateLoaded] = useStorage<ViewportState>(
     'viewport',
@@ -44,14 +48,16 @@ export function View() {
 
   const resetZoom = useCallback(() => {
     const rect = containerRef.current.getBoundingClientRect();
-    const {width, height} = player.project.getSize();
+    const {width, height} = size;
     let zoom = rect.height / height;
     if (width * zoom > rect.width) {
       zoom = rect.width / width;
     }
-    zoom /= playerState.scale;
-    setState({...state, zoom, x: 0, y: 0});
-  }, [state, player, playerState.scale]);
+    zoom /= settings.resolutionScale;
+    if (!isNaN(zoom) && zoom > 0 && zoom < Infinity) {
+      setState({...state, zoom, x: 0, y: 0});
+    }
+  }, [state, player, settings.resolutionScale]);
 
   const [handleDrag, isDragging] = useDrag(
     useCallback(
@@ -81,22 +87,18 @@ export function View() {
     }
   }, [wasStateLoaded]);
 
-  useEffect(() => {
-    player.project.setCanvas(viewportRef.current);
-  }, [playerState.colorSpace]);
-
   useStateChange(
     ([scale]) => {
-      const zoom = (state.zoom * scale) / playerState.scale;
+      const zoom = (state.zoom * scale) / settings.resolutionScale;
       if (!isNaN(zoom) && zoom > 0) {
         setState({...state, zoom});
       }
     },
-    [playerState.scale],
+    [settings.resolutionScale],
   );
 
   useSubscribable(
-    player.onReloaded,
+    player.onRecalculated,
     () => overlayRef.current.animate(highlight(), {duration: 300}),
     [],
   );
@@ -152,13 +154,12 @@ export function View() {
               y: event.y - size.y,
             };
 
-            const projectSize = player.project.getSize();
             position.x -= state.x + size.width / 2;
             position.y -= state.y + size.height / 2;
-            position.x /= state.zoom * playerState.scale;
-            position.y /= state.zoom * playerState.scale;
-            position.x += projectSize.width / 2;
-            position.y += projectSize.height / 2;
+            position.x /= state.zoom * settings.resolutionScale;
+            position.y /= state.zoom * settings.resolutionScale;
+            position.x += settings.size.width / 2;
+            position.y += settings.size.height / 2;
 
             setInspectedElement(scene.inspectPosition(position.x, position.y));
           } else {
@@ -184,7 +185,7 @@ export function View() {
       >
         <div
           className={
-            player.project.background
+            settings.background?.alpha() === 1
               ? styles.canvasOutline
               : styles.alphaBackground
           }
@@ -193,11 +194,7 @@ export function View() {
             outlineWidth: `${1 / state.zoom}px`,
           }}
         >
-          <canvas
-            className={styles.preview}
-            key={playerState.colorSpace}
-            ref={viewportRef}
-          />
+          <PreviewStage />
         </div>
         <Grid />
         <Debug />
