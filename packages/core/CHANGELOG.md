@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **core:** clear semi-transparent backgrounds ([#424](https://github.com/motion-canvas/motion-canvas/issues/424)) ([1ebff1c](https://github.com/motion-canvas/motion-canvas/commit/1ebff1c92bebce56d11c61eb9dadca47f5a80ac1)), closes [#423](https://github.com/motion-canvas/motion-canvas/issues/423)
+* **core:** fix Vector2.exactlyEquals ([#437](https://github.com/motion-canvas/motion-canvas/issues/437)) ([028d264](https://github.com/motion-canvas/motion-canvas/commit/028d26499d8f3fb34500b22e8dcde2d080c2e2b0))
+* **core:** render only within the range ([#436](https://github.com/motion-canvas/motion-canvas/issues/436)) ([36ccebe](https://github.com/motion-canvas/motion-canvas/commit/36ccebe5321d84eeaa16f8b74a79c1001ee7ac0b))
+
+
+### Code Refactoring
+
+* introduce improved names ([#425](https://github.com/motion-canvas/motion-canvas/issues/425)) ([4a2188d](https://github.com/motion-canvas/motion-canvas/commit/4a2188d339587fa658b2134befc3fe63c835c5d7))
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+
+
+### BREAKING CHANGES
+
+* multiple name changes
+
+To avoid collisions, names of certain classes have changed:
+- `Text => Txt`
+- `Image => Img`
+- `Rect (type) => BBox`
+
+Cache related methods of `Node` have changed:
+- `getCacheRect => getCacheBBox`
+- `cacheRect => cacheBBox`
+- `fullCacheRect => fullCacheBBox`
+
+The `CodeBlock` property has changed:
+- `CodeBlock.selectionOpacity => CodeBlock.unselectedOpacity`
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
 # [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
 
 

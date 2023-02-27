@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **2d:** fix performance issue with audio track ([#427](https://github.com/motion-canvas/motion-canvas/issues/427)) ([c993770](https://github.com/motion-canvas/motion-canvas/commit/c993770937ddfdf0ac39b144a1f79f1a300f7899))
+* **ui:** correctly reset zoom ([#432](https://github.com/motion-canvas/motion-canvas/issues/432)) ([a33ee14](https://github.com/motion-canvas/motion-canvas/commit/a33ee14dfac3e1fe24c89d76631e23fe4cb625a6))
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+* **ui:** add quarter resolution ([#421](https://github.com/motion-canvas/motion-canvas/issues/421)) ([d0160d0](https://github.com/motion-canvas/motion-canvas/commit/d0160d0d5ef76ffb0d3591566891b5efa4061744))
+
+
+### BREAKING CHANGES
+
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
 # [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
 
 **Note:** Version bump only for package @motion-canvas/ui
