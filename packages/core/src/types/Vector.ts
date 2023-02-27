@@ -266,6 +266,6 @@ export class Vector2 implements Type {
   }
 
   public exactlyEquals(other: Vector2): boolean {
-    return this.y === other.y && this.x === other.y;
+    return this.x === other.x && this.y === other.y;
   }
 }

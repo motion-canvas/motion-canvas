@@ -19,7 +19,7 @@ export class Stage {
   private background: string | null = null;
   private resolutionScale = 1;
   private colorSpace: CanvasColorSpace = 'srgb';
-  private size = new Vector2(1920, 1080);
+  private size = Vector2.zero;
 
   public readonly finalBuffer: HTMLCanvasElement;
   private readonly currentBuffer: HTMLCanvasElement;
