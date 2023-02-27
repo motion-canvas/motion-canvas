@@ -19,6 +19,7 @@ import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
 import {PreviewStage} from './PreviewStage';
+import clsx from 'clsx';
 
 const ZOOM_SPEED = 0.1;
 
@@ -48,7 +49,7 @@ export function EditorPreview() {
 
   const resetZoom = useCallback(() => {
     const rect = containerRef.current.getBoundingClientRect();
-    const {width, height} = size;
+    const {width, height} = settings.size;
     let zoom = rect.height / height;
     if (width * zoom > rect.width) {
       zoom = rect.width / width;
@@ -140,7 +141,7 @@ export function EditorPreview() {
   return (
     <ViewportContext.Provider value={state}>
       <div
-        className={styles.viewport}
+        className={clsx(styles.viewport, state.zoom > 1 && styles.pixelated)}
         ref={containerRef}
         onContextMenu={event => {
           event.preventDefault();
