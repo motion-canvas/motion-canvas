@@ -28,7 +28,7 @@ Inside `global.css`, import the font using `@import url(your link)`.
 Then, in `project.ts`, import the css file.
 
 ```ts
-import {makeProject} from '@motion-canvas/core/lib';
+import {makeProject} from '@motion-canvas/core';
 
 import example from './scenes/example?scene';
 
@@ -36,7 +36,6 @@ import './global.css'; // <- import the css
 
 export default makeProject({
   scenes: [example],
-  background: '#141414',
 });
 ```
 
