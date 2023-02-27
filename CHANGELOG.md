@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.1](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0-alpha.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **2d:** fix initial value of endOffset ([#433](https://github.com/motion-canvas/motion-canvas/issues/433)) ([9fe82b3](https://github.com/motion-canvas/motion-canvas/commit/9fe82b3d21ba0150a2378e541a4652ca707c2d15))
+* **2d:** fix performance issue with audio track ([#427](https://github.com/motion-canvas/motion-canvas/issues/427)) ([c993770](https://github.com/motion-canvas/motion-canvas/commit/c993770937ddfdf0ac39b144a1f79f1a300f7899))
+* **2d:** textDirection property for RTL/LTR text ([#404](https://github.com/motion-canvas/motion-canvas/issues/404)) ([f240b1b](https://github.com/motion-canvas/motion-canvas/commit/f240b1bd140a884f6901b7cfcb97ce3e9ce4b48d))
+* **core:** clear semi-transparent backgrounds ([#424](https://github.com/motion-canvas/motion-canvas/issues/424)) ([1ebff1c](https://github.com/motion-canvas/motion-canvas/commit/1ebff1c92bebce56d11c61eb9dadca47f5a80ac1)), closes [#423](https://github.com/motion-canvas/motion-canvas/issues/423)
+* **ui:** correctly reset zoom ([#432](https://github.com/motion-canvas/motion-canvas/issues/432)) ([a33ee14](https://github.com/motion-canvas/motion-canvas/commit/a33ee14dfac3e1fe24c89d76631e23fe4cb625a6))
+
+
+### Code Refactoring
+
+* introduce improved names ([#425](https://github.com/motion-canvas/motion-canvas/issues/425)) ([4a2188d](https://github.com/motion-canvas/motion-canvas/commit/4a2188d339587fa658b2134befc3fe63c835c5d7))
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+* **ui:** add quarter resolution ([#421](https://github.com/motion-canvas/motion-canvas/issues/421)) ([d0160d0](https://github.com/motion-canvas/motion-canvas/commit/d0160d0d5ef76ffb0d3591566891b5efa4061744))
+
+
+### Reverts
+
+* feat: upgrade code-fns for new theme options and lazy loading ([#435](https://github.com/motion-canvas/motion-canvas/issues/435)) ([3f5e439](https://github.com/motion-canvas/motion-canvas/commit/3f5e43968f7add7c6322c9c8358d3b6fc178c2fe))
+
+
+### BREAKING CHANGES
+
+* multiple name changes
+
+To avoid collisions, names of certain classes have changed:
+- `Text => Txt`
+- `Image => Img`
+- `Rect (type) => BBox`
+
+Cache related methods of `Node` have changed:
+- `getCacheRect => getCacheBBox`
+- `cacheRect => cacheBBox`
+- `fullCacheRect => fullCacheBBox`
+
+The `CodeBlock` property has changed:
+- `CodeBlock.selectionOpacity => CodeBlock.unselectedOpacity`
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
 # [3.0.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0-alpha.0) (2023-02-26)
 
 
