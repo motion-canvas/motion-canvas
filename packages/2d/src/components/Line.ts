@@ -18,10 +18,10 @@ import {DesiredLength} from '../partials';
 import {Layout} from './Layout';
 import {
   CurveDrawingInfo,
-  CurveProfile,
-  getPolylineProfile,
-  getPointAtDistance,
   CurvePoint,
+  CurveProfile,
+  getPointAtDistance,
+  getPolylineProfile,
 } from '../curves';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import lineWithoutPoints from './__logs__/line-without-points.md';
@@ -90,13 +90,7 @@ export class Line extends Shape {
 
   public constructor(props: LineProps) {
     super(props);
-    if (props.children === undefined && props.points === undefined) {
-      useLogger().warn({
-        message: 'No points specified for the line',
-        remarks: lineWithoutPoints,
-        inspect: this.key,
-      });
-    }
+    this.validateProps(props);
   }
 
   @computed()
@@ -199,6 +193,10 @@ export class Line extends Shape {
       }
     }
 
+    if (this.end() === 1 && this.closed()) {
+      path.closePath();
+    }
+
     return {
       startPoint: startPoint ?? Vector2.zero,
       startTangent: startTangent ?? Vector2.up,
@@ -228,6 +226,16 @@ export class Line extends Shape {
     const box = super.getComputedLayout();
     box.position = box.position.sub(this.childrenBBox().center);
     return box;
+  }
+
+  protected validateProps(props: LineProps) {
+    if (props.children === undefined && props.points === undefined) {
+      useLogger().warn({
+        message: 'No points specified for the line',
+        remarks: lineWithoutPoints,
+        inspect: this.key,
+      });
+    }
   }
 
   protected override getPath(): Path2D {

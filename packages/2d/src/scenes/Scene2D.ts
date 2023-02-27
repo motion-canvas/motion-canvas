@@ -95,12 +95,14 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   ): void {
     const node = this.getNode(element);
     if (node) {
-      node.drawOverlay(
-        context,
-        matrix
-          .scale(1 / this.resolutionScale, 1 / this.resolutionScale)
-          .multiplySelf(node.localToWorld()),
-      );
+      this.execute(() => {
+        node.drawOverlay(
+          context,
+          matrix
+            .scale(1 / this.resolutionScale, 1 / this.resolutionScale)
+            .multiplySelf(node.localToWorld()),
+        );
+      });
     }
   }
 
