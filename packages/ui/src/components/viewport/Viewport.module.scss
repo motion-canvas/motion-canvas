@@ -20,6 +20,10 @@
   canvas {
     display: block;
   }
+
+  &.pixelated canvas {
+    image-rendering: pixelated;
+  }
 }
 
 .renderingPreview {
