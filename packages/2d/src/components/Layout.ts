@@ -146,16 +146,16 @@ export class Layout extends Node {
   @signal()
   public declare readonly wrap: SimpleSignal<FlexWrap, this>;
 
-  @initial('normal')
+  @initial('start')
   @signal()
   public declare readonly justifyContent: SimpleSignal<FlexContent, this>;
   @initial('normal')
   @signal()
   public declare readonly alignContent: SimpleSignal<FlexContent, this>;
-  @initial('normal')
+  @initial('stretch')
   @signal()
   public declare readonly alignItems: SimpleSignal<FlexItems, this>;
-  @initial('normal')
+  @initial('auto')
   @signal()
   public declare readonly alignSelf: SimpleSignal<FlexItems, this>;
   @initial(0)

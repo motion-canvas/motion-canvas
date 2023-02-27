@@ -15,7 +15,6 @@ export type FlexBasis =
   | null;
 
 export type FlexContent =
-  | 'normal'
   | 'center'
   | 'start'
   | 'end'
@@ -24,13 +23,7 @@ export type FlexContent =
   | 'space-evenly'
   | 'stretch';
 
-export type FlexItems =
-  | 'normal'
-  | 'center'
-  | 'start'
-  | 'end'
-  | 'stretch'
-  | 'baseline';
+export type FlexItems = 'center' | 'start' | 'end' | 'stretch' | 'baseline';
 
 export type LetterSpacing = number | 'normal';
 
