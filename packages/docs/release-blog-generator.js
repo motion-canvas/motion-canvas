@@ -23,7 +23,11 @@ async function gitLog(from, to) {
 
 async function gitTags() {
   const tags = await runBash('git tag');
-  return tags.trim().split('\n').reverse();
+  return tags
+    .trim()
+    .split('\n')
+    .reverse()
+    .filter(tag => !tag.includes('-alpha'));
 }
 
 function getDate() {
