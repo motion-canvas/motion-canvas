@@ -65,7 +65,7 @@ export class Line extends Shape {
   @signal()
   public declare readonly end: SimpleSignal<number, this>;
 
-  @initial(1)
+  @initial(0)
   @signal()
   public declare readonly endOffset: SimpleSignal<number, this>;
 
