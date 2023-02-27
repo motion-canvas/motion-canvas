@@ -10,7 +10,7 @@ decorate(loopUntil, threadable());
  * @example
  * ```ts
  * yield* loopUntil(
- *   'vibrate', 
+ *   'vibrate',
  *   () => circle().position.x(-10, 0.1).to(10, 0.1)
  * );
  * ```
