@@ -191,7 +191,7 @@ export class Renderer {
             lastRefresh = performance.now();
             await new Promise(resolve => setTimeout(resolve, 0));
           }
-          if (this.playback.finished || this.playback.frame > to) {
+          if (this.playback.finished || this.playback.frame >= to) {
             finished = true;
           }
           if (signal.aborted) {
