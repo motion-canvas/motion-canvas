@@ -1,0 +1,26 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  padding: 8px;
+  overflow-x: hidden;
+  height: 32px;
+}
+.action {
+  height: 32px;
+}
+
+.key {
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  margin-right: 4px;
+  padding: 2px 4px;
+}
+
+.separator {
+  color: var(--surface-color-light);
+  padding: 0px 4px;
+}
+
+.shortcut {
+  flex: none;
+}

@@ -8,6 +8,7 @@ import clsx from 'clsx';
 interface ResizeableLayoutProps {
   start: ComponentChild;
   end: ComponentChild;
+  footer: ComponentChild;
   vertical?: boolean;
   size?: number;
   id?: string;
@@ -17,6 +18,7 @@ interface ResizeableLayoutProps {
 export function ResizeableLayout({
   start,
   end,
+  footer,
   vertical = false,
   size = 0.3,
   id = null,
@@ -57,6 +59,7 @@ export function ResizeableLayout({
       </div>
       <div onMouseDown={handleDrag} className={styles.separator} />
       <div className={styles.right}>{end}</div>
+      <div className={styles.right}>{footer}</div>
     </div>
   );
 }
