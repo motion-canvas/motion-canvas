@@ -69,7 +69,7 @@ export class Circle extends Shape {
    * This property can be used together with {@link startAngle} to turn this
    * circle into a sector (when using fill) or an arc (when using stroke).
    *
-   * @default 0
+   * @defaultValue 0
    */
   @initial(0)
   @signal()
@@ -82,7 +82,7 @@ export class Circle extends Shape {
    * This property can be used together with {@link endAngle} to turn this
    * circle into a sector (when using fill) or an arc (when using stroke).
    *
-   * @default 360
+   * @defaultValue 360
    */
   @initial(360)
   @signal()
@@ -116,7 +116,7 @@ export class Circle extends Shape {
    * />
    * ```
    *
-   * @default false
+   * @defaultValue false
    */
   @initial(false)
   @signal()

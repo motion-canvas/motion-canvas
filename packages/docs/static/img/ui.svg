@@ -58,9 +58,9 @@
             <g id="scene1" serif:id="scene" transform="matrix(14,0,0,14,145,109.11)"></g>
             <text x="103px" y="109.11px"
                   style="font-family:'JetBrainsMono-Regular', 'JetBrains Mono', monospace;font-size:14px;fill:#fff;fill-opacity:0.6;">scene</text></g>
-        <g id="range"><path d="M640,48l-557,0c-2.208,0 -4,1.792 -4,4l-0,22c-0,2.208 1.792,4 4,4l557,0l0,-30Z" style="fill:#1e3a4f;"/>
-            <path d="M79,73.9l0,0.002c0,2.263 1.835,4.098 4.098,4.098c50.804,0 556.902,0 556.902,0"
-                  style="fill:none;stroke:#32a1f6;stroke-width:2px;"/></g>
+        <g id="range">
+            <path d="M740,48l-657,0c-2.208,0 -4,1.792 -4,4l-0,22c-0,2.208 1.792,4 4,4l557,0" fill="#242424" stroke="#444" stroke-width="2"/>
+        </g>
         <g id="event"><path d="M407,144c-0,-6.627 -5.373,-12 -12,-12c-26.121,0 -87.879,0 -114,0c-6.627,0 -12,5.373 -12,12c0,0 0,0 0,0c0,6.627 5.373,12 12,12c26.121,0 87.879,0 114,0c6.627,-0 12,-5.373 12,-12c0,0 0,0 0,-0Z" style="fill:#274358;"/>
             <path d="M431,144c-0,-6.627 -5.373,-12 -12,-12l-48,0l0,12c0,3.183 1.264,6.235 3.515,8.485c2.25,2.251 5.302,3.515 8.485,3.515l36,0c6.627,0 12,-5.373 12,-12l0,-0Z"
                   style="fill:#33a6ff;"/>

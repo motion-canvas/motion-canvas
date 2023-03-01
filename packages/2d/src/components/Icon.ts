@@ -44,7 +44,7 @@ export class Icon extends Img {
    *   Value can be either RGB or RGBA: `#bada55`, `#bada55aa` (latter is partially transparent)
    *   The shorthand version (e.g. `#abc` for `#aabbcc` is also possible.)
    *
-   * @default 'white'
+   * @defaultValue 'white'
    */
   @initial('white')
   @colorSignal()
