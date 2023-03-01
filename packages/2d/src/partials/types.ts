@@ -32,8 +32,6 @@ export type FlexItems =
   | 'stretch'
   | 'baseline';
 
-export type LetterSpacing = number | 'normal';
-
 export type TextWrap = boolean | 'pre';
 
 export type LayoutMode = boolean | null;

@@ -45,6 +45,9 @@ export class Txt extends Shape {
     this.applyStyle(context);
     this.applyText(context);
     context.font = this.styles.font;
+    if ('letterSpacing' in context) {
+      context.letterSpacing = `${this.letterSpacing()}px`;
+    }
 
     const parentRect = this.element.getBoundingClientRect();
     const {width, height} = this.size();
