@@ -58,10 +58,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   public inspectPosition(x: number, y: number): InspectedElement | null {
-    startScene(this);
-    const node = this.getView().hit(new Vector2(x, y))?.key ?? null;
-    endScene(this);
-    return node;
+    return this.execute(
+      () => this.getView().hit(new Vector2(x, y))?.key ?? null,
+    );
   }
 
   public validateInspection(
@@ -115,12 +114,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   protected recreateView() {
-    startScene(this);
-    const size = this.getSize();
-    this.view = new View2D({
-      position: size.scale(0.5),
-      size,
+    this.execute(() => {
+      const size = this.getSize();
+      this.view = new View2D({
+        position: size.scale(0.5),
+        size,
+      });
     });
-    endScene(this);
   }
 }

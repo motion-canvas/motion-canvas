@@ -141,19 +141,17 @@ export abstract class GeneratorScene<T>
   public async render(context: CanvasRenderingContext2D): Promise<void> {
     let promises = DependencyContext.consumePromises();
     let iterations = 0;
-    startScene(this);
     do {
       iterations++;
       await Promise.all(promises.map(handle => handle.promise));
       context.save();
       const box = BBox.fromSizeCentered(this.getSize());
       context.clearRect(box.x, box.y, box.width, box.height);
-      this.draw(context);
+      this.execute(() => this.draw(context));
       context.restore();
 
       promises = DependencyContext.consumePromises();
     } while (promises.length > 0 && iterations < 10);
-    endScene(this);
 
     if (iterations > 1) {
       this.logger.debug(`render iterations: ${iterations}`);
@@ -222,30 +220,23 @@ export abstract class GeneratorScene<T>
       return;
     }
 
-    startScene(this);
-    startPlayback(this.playback);
-    let done = false;
-    try {
-      let result = this.runner.next();
-      this.update();
-      while (result.value) {
-        if (isPromisable(result.value)) {
-          result = this.runner.next(await result.value.toPromise());
-        } else if (isPromise(result.value)) {
-          result = this.runner.next(await result.value);
-        } else {
-          this.logger.warn({
-            message: 'Invalid value yielded by the scene.',
-            object: result.value,
-          });
-          result = this.runner.next(result.value);
-        }
-        this.update();
+    let result = this.execute(() => this.runner!.next());
+    this.update();
+    while (result.value) {
+      if (isPromisable(result.value)) {
+        const value = await result.value.toPromise();
+        result = this.execute(() => this.runner!.next(value));
+      } else if (isPromise(result.value)) {
+        const value = await result.value;
+        result = this.execute(() => this.runner!.next(value));
+      } else {
+        this.logger.warn({
+          message: 'Invalid value yielded by the scene.',
+          object: result.value,
+        });
+        result = this.execute(() => this.runner!.next(result.value));
       }
-      done = !!result.done;
-    } finally {
-      endPlayback(this.playback);
-      endScene(this);
+      this.update();
     }
 
     const promises = DependencyContext.consumePromises();
@@ -260,7 +251,7 @@ export abstract class GeneratorScene<T>
       });
     }
 
-    if (done) {
+    if (result.done) {
       this.state = SceneState.Finished;
     }
   }
@@ -340,5 +331,28 @@ export abstract class GeneratorScene<T>
 
   public isCached() {
     return this.cached;
+  }
+
+  /**
+   * Invoke the given callback in the context of this scene.
+   *
+   * @remarks
+   * This method makes sure that the context of this scene is globally available
+   * during the execution of the callback.
+   *
+   * @param callback - The callback to invoke.
+   */
+  protected execute<T>(callback: () => T): T {
+    let result: T;
+    startScene(this);
+    startPlayback(this.playback);
+    try {
+      result = callback();
+    } finally {
+      endPlayback(this.playback);
+      endScene(this);
+    }
+
+    return result;
   }
 }
