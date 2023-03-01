@@ -111,6 +111,5 @@ export default makeScene2D(function* (scene) {
     </Layout>,
   );
 
-  //scene.add(<AnimatedMotionCanvasIcon timePassed={t} scale={1} />)
   yield* t(2, 6, linear);
 });
