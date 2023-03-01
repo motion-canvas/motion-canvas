@@ -25,8 +25,6 @@ export type FlexContent =
 
 export type FlexItems = 'center' | 'start' | 'end' | 'stretch' | 'baseline';
 
-export type LetterSpacing = number | 'normal';
-
 export type TextWrap = boolean | 'pre';
 
 export type LayoutMode = boolean | null;

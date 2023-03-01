@@ -32,7 +32,6 @@ import {
   FlexWrap,
   LayoutMode,
   DesiredLength,
-  LetterSpacing,
   TextWrap,
   Length,
   LengthLimit,
@@ -183,18 +182,11 @@ export class Layout extends Node {
   @defaultStyle('line-height', parseFloat)
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
-  @defaultStyle('letter-spacing', i => {
-    if (i === 'normal') {
-      return 'normal';
-    }
-    return parseFloat(i);
-  })
+  @defaultStyle('letter-spacing', i => (i === 'normal' ? 0 : parseFloat(i)))
   @signal()
-  public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
+  public declare readonly letterSpacing: SimpleSignal<number, this>;
 
-  @defaultStyle('white-space', i => {
-    return i === 'pre' ? 'pre' : i === 'normal';
-  })
+  @defaultStyle('white-space', i => (i === 'pre' ? 'pre' : i === 'normal'))
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
   @initial('inherit')
@@ -799,8 +791,6 @@ export class Layout extends Node {
       : this.fontWeight().toString();
     this.element.style.letterSpacing = this.letterSpacing.isInitial()
       ? ''
-      : this.letterSpacing() === 'normal'
-      ? 'normal'
       : `${this.letterSpacing()}px`;
 
     if (this.textWrap.isInitial()) {
