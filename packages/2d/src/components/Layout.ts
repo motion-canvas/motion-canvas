@@ -94,6 +94,7 @@ export interface LayoutProps extends NodeProps {
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<TextWrap>;
   textDirection?: SignalValue<CanvasDirection>;
+  textAlign?: SignalValue<CanvasTextAlign>;
 
   size?: SignalValue<PossibleVector2<Length>>;
   offsetX?: SignalValue<number>;
@@ -192,6 +193,9 @@ export class Layout extends Node {
   @initial('inherit')
   @signal()
   public declare readonly textDirection: SimpleSignal<CanvasDirection, this>;
+  @defaultStyle('text-align')
+  @signal()
+  public declare readonly textAlign: SimpleSignal<CanvasTextAlign, this>;
 
   @cloneable(false)
   @inspectable(false)
@@ -792,6 +796,10 @@ export class Layout extends Node {
     this.element.style.letterSpacing = this.letterSpacing.isInitial()
       ? ''
       : `${this.letterSpacing()}px`;
+
+    this.element.style.textAlign = this.textAlign.isInitial()
+      ? ''
+      : this.textAlign();
 
     if (this.textWrap.isInitial()) {
       this.element.style.whiteSpace = '';
