@@ -170,8 +170,16 @@ export interface Scene<T = unknown> {
   get onRecalculated(): SubscribableEvent<void>;
 
   /**
-   * The scene's {@link LifecycleEvents}.
+   * The {@link scenes.LifecycleEvents} of this scene.
    */
+  get lifecycleEvents(): LifecycleEvents;
+
+  /**
+   * The {@link scenes.LifecycleEvents} of this scene.
+   *
+   * @deprecated Use {@link lifecycleEvents} instead.
+   */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   get LifecycleEvents(): LifecycleEvents;
 
   /**

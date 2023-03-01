@@ -9,7 +9,7 @@ import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
 import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
 import {useApiFinder} from '@site/src/contexts/api';
 
-const mainKeyword = {
+const MainKeyword = {
   [ReflectionKind.Namespace]: 'namespace',
   [ReflectionKind.Enum]: 'enum',
   [ReflectionKind.Class]: 'class',
@@ -25,7 +25,7 @@ export default function ClassPreview({
   return (
     <>
       <FlagsPreview flags={reflection.flags} />
-      <Token type="keyword">{mainKeyword[reflection.kind]} </Token>
+      <Token type="keyword">{MainKeyword[reflection.kind]} </Token>
       <Token type="class-name">{reflection.name}</Token>
       {!!reflection.typeParameters?.length && (
         <TokenList type={ListType.Angle}>

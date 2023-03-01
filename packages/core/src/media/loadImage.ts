@@ -1,7 +1,7 @@
 import {getContext} from '../utils';
 
-let canvas: HTMLCanvasElement;
-let context: CanvasRenderingContext2D;
+let Canvas: HTMLCanvasElement;
+let Context: CanvasRenderingContext2D;
 
 export type ImageDataSource = CanvasImageSource & {
   width: number;
@@ -26,13 +26,13 @@ export function loadAnimation(sources: string[]): Promise<HTMLImageElement[]> {
 }
 
 export function getImageData(image: ImageDataSource) {
-  canvas ??= document.createElement('canvas');
-  context ??= getContext({willReadFrequently: true}, canvas);
+  Canvas ??= document.createElement('canvas');
+  Context ??= getContext({willReadFrequently: true}, Canvas);
 
-  canvas.width = image.width;
-  canvas.height = image.height;
-  context.clearRect(0, 0, image.width, image.height);
-  context.drawImage(image, 0, 0);
+  Canvas.width = image.width;
+  Canvas.height = image.height;
+  Context.clearRect(0, 0, image.width, image.height);
+  Context.drawImage(image, 0, 0);
 
-  return context.getImageData(0, 0, image.width, image.height);
+  return Context.getImageData(0, 0, image.width, image.height);
 }

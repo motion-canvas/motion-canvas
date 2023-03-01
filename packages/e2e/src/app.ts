@@ -3,7 +3,7 @@ import puppeteer, {Page} from 'puppeteer';
 import {fileURLToPath} from 'url';
 import {createServer} from 'vite';
 
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
+const Root = fileURLToPath(new URL('.', import.meta.url));
 
 export interface App {
   page: Page;
@@ -14,8 +14,8 @@ export async function start(): Promise<App> {
   const [browser, server] = await Promise.all([
     puppeteer.launch(),
     createServer({
-      root: __dirname,
-      configFile: path.resolve(__dirname, '../vite.config.ts'),
+      root: Root,
+      configFile: path.resolve(Root, '../vite.config.ts'),
       server: {
         port: 9000,
       },
