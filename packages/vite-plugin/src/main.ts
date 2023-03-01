@@ -27,13 +27,13 @@ export interface MotionCanvasPluginConfig {
    * })
    * ```
    *
-   * @default './src/project.ts'
+   * @defaultValue './src/project.ts'
    */
   project?: string | string[];
   /**
    * A directory path to which the animation will be rendered.
    *
-   * @default './output'
+   * @defaultValue './output'
    */
   output?: string;
   /**
@@ -49,7 +49,7 @@ export interface MotionCanvasPluginConfig {
    * there. This leaves the original files open for modification with hot module
    * replacement still working.
    *
-   * @default /\.(wav|ogg)$/
+   * @defaultValue /\.(wav|ogg)$/
    */
   bufferedAssets?: RegExp | false;
   /**
@@ -68,7 +68,7 @@ export interface MotionCanvasPluginConfig {
    * - `index` - Receives a list of all projects as its first argument and
    *             creates the initial page for selecting a project.
    *
-   * @default '\@motion-canvas/ui'
+   * @defaultValue '\@motion-canvas/ui'
    */
   editor?: string;
   /**

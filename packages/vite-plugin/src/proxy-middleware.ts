@@ -31,7 +31,7 @@ export interface MotionCanvasCorsProxyOptions {
    * Pass an empty Array to allow all types of resources, although this is not
    * recommended.
    *
-   * @default ["image/*", "video/*"]
+   * @defaultValue ["image/*", "video/*"]
    */
   allowedMimeTypes?: string[];
   /**

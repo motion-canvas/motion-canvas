@@ -31,6 +31,10 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
     () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
     [comment],
   );
+  const defaultValue = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@defaultValue'),
+    [comment],
+  );
   const deprecated = useMemo(
     () => comment?.blockTags?.find(({tag}) => tag === '@deprecated'),
     [comment],
@@ -65,6 +69,12 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
             <div className={styles.clearFix}></div>
           </Collapsible>
           <div className={clsx(styles.clearFix, styles.inverse)}></div>
+        </>
+      )}
+      {defaultValue && (
+        <>
+          Default Value:{' '}
+          <code>{defaultValue.content.map(part => part.text).join('')}</code>
         </>
       )}
       {deprecated && (
