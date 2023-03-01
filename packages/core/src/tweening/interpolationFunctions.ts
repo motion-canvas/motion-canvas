@@ -1,8 +1,8 @@
 import {useLogger} from '../utils';
 import {Vector2} from '../types';
 
-export interface InterpolationFunction<T, Rest extends any[] = any[]> {
-  (from: T, to: T, value: number, ...args: Rest): T;
+export interface InterpolationFunction<T, TRest extends any[] = any[]> {
+  (from: T, to: T, value: number, ...args: TRest): T;
 }
 
 export function textLerp(from: string, to: string, value: number) {

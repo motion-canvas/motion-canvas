@@ -39,6 +39,7 @@ declare module 'chroma-js' {
     ): ColorSignal<void>;
   }
   interface ChromaStatic {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     Color: ColorStatic & (new (color: PossibleColor) => ColorInterface);
   }
 }

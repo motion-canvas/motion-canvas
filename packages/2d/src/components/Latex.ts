@@ -14,11 +14,13 @@ import {
 import {OptionList} from 'mathjax-full/js/util/Options';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 
-const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
+const Adaptor = liteAdaptor();
+RegisterHTMLHandler(Adaptor);
 
-const jaxDocument = mathjax.document('', {
+const JaxDocument = mathjax.document('', {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   InputJax: new TeX({packages: AllPackages}),
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   OutputJax: new SVG({fontCache: 'local'}),
 });
 
@@ -54,7 +56,7 @@ export class Latex extends Img {
 
     // Convert to TeX, look for any errors
     const tex = this.tex();
-    const svg = adaptor.innerHTML(jaxDocument.convert(tex, this.options()));
+    const svg = Adaptor.innerHTML(JaxDocument.convert(tex, this.options()));
     if (svg.includes('data-mjx-error')) {
       const errors = svg.match(/data-mjx-error="(.*?)"/);
       if (errors && errors.length > 0) {

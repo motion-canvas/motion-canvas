@@ -8,7 +8,7 @@ import YouTubeVideo from '@site/src/components/YouTubeVideo';
 
 import UI from '@site/static/img/ui.svg';
 
-const codeSample = `export makeScene(function* (view) {
+const CodeSample = `export makeScene(function* (view) {
   const circle = createRef<Circle>();
   view.add(
     <Circle 
@@ -75,7 +75,7 @@ export default function HomepageFeatures(): JSX.Element {
             </a>
           </p>
         </Feature>
-        <Feature content={<CodeBlock language="tsx">{codeSample}</CodeBlock>}>
+        <Feature content={<CodeBlock language="tsx">{CodeSample}</CodeBlock>}>
           <h3>
             <b>Procedural</b> for a Change
           </h3>

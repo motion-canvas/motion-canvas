@@ -92,7 +92,14 @@ export abstract class GeneratorScene<T>
   }
   private readonly afterReset = new EventDispatcher<void>();
 
-  public readonly LifecycleEvents: LifecycleEvents = new LifecycleEvents(this);
+  public readonly lifecycleEvents: LifecycleEvents = new LifecycleEvents(this);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public get LifecycleEvents() {
+    this.logger.warn(
+      'LifecycleEvents is deprecated. Use lifecycleEvents instead.',
+    );
+    return this.lifecycleEvents;
+  }
 
   public get previous() {
     return this.previousScene;

@@ -24,7 +24,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
@@ -41,7 +41,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
@@ -58,7 +58,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
@@ -99,7 +99,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );

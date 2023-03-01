@@ -8,7 +8,6 @@ import {
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Node, View2D} from '../components';
 

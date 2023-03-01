@@ -208,7 +208,7 @@ class MotionCanvasPlayer extends HTMLElement {
     this.setState(State.Ready);
   }
 
-  private attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+  private attributeChangedCallback(name: string, _: any, newValue: any) {
     switch (name) {
       case 'auto':
         this.setPlaying(this.playing);

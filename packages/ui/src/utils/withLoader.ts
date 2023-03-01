@@ -1,4 +1,4 @@
-let loaderCount = 0;
+let LoaderCount = 0;
 
 /**
  * Execute a given async function while displaying a loading indication.
@@ -6,13 +6,13 @@ let loaderCount = 0;
  * @param callback - A function to execute.
  */
 export async function withLoader(callback: () => Promise<unknown>) {
-  loaderCount++;
+  LoaderCount++;
   document.body.classList.add('wait');
   try {
     await callback();
   } finally {
-    loaderCount--;
-    if (loaderCount == 0) {
+    LoaderCount--;
+    if (LoaderCount == 0) {
       document.body.classList.remove('wait');
     }
   }

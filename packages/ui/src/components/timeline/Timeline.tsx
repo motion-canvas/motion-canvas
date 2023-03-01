@@ -59,7 +59,7 @@ export function Timeline() {
     [rect.width, scale],
   );
 
-  const ZOOM_MAX = (MAX_FRAME_SIZE / sizes.viewLength) * duration;
+  const zoomMax = (MAX_FRAME_SIZE / sizes.viewLength) * duration;
 
   const conversion = useMemo(
     () => ({
@@ -113,7 +113,7 @@ export function Timeline() {
         newScale *= prevWidth / rect.width;
       }
       if (!isNaN(newScale) && duration > 0) {
-        setScale(clamp(ZOOM_MIN, ZOOM_MAX, newScale));
+        setScale(clamp(ZOOM_MIN, zoomMax, newScale));
       }
     },
     [duration / fps, rect.width],
@@ -159,8 +159,8 @@ export function Timeline() {
               newScale = ZOOM_MIN;
               ratio = newScale / scale;
             }
-            if (newScale > ZOOM_MAX) {
-              newScale = ZOOM_MAX;
+            if (newScale > zoomMax) {
+              newScale = zoomMax;
               ratio = newScale / scale;
             }
             if (newScale === scale) {

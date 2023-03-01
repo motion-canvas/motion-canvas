@@ -17,7 +17,7 @@ export enum Separator {
   Ampersand = ' & ',
 }
 
-const classes: Record<ListType, string> = {
+const Classes: Record<ListType, string> = {
   [ListType.None]: styles.none,
   [ListType.Angle]: styles.angle,
   [ListType.Curly]: styles.curly,
@@ -35,7 +35,7 @@ export default function TokenList({
   separator?: Separator;
 }) {
   return (
-    <span className={clsx(styles.list, classes[type ?? ListType.None])}>
+    <span className={clsx(styles.list, Classes[type ?? ListType.None])}>
       <span
         className={clsx(
           styles.elements,

@@ -12,25 +12,25 @@ type FiltersContext = [Filters, (value: Filters) => void];
 
 const FILTERS_KEY = 'api-filters';
 
-const storedValue = ExecutionEnvironment.canUseDOM
+const StoredValue = ExecutionEnvironment.canUseDOM
   ? localStorage.getItem(FILTERS_KEY)
   : null;
-const defaultValue = storedValue
-  ? JSON.parse(storedValue)
+const DefaultValue = StoredValue
+  ? JSON.parse(StoredValue)
   : {
       inherited: true,
       private: false,
     };
 
 const Context = React.createContext<FiltersContext>([
-  defaultValue,
+  DefaultValue,
   () => {
     // do nothing
   },
 ]);
 
 export function FiltersProvider({children}: {children: ReactNode}) {
-  const [filters, setFilters] = useState<Filters>(defaultValue);
+  const [filters, setFilters] = useState<Filters>(DefaultValue);
   const isBrowser = useIsBrowser();
 
   return (

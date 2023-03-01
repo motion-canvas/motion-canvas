@@ -8,7 +8,7 @@ import {useScene} from './useScene';
 export function useContext(
   callback: (ctx: CanvasRenderingContext2D) => void,
 ): () => void {
-  return useScene().LifecycleEvents.onBeginRender.subscribe(callback);
+  return useScene().lifecycleEvents.onBeginRender.subscribe(callback);
 }
 
 /**
@@ -19,5 +19,5 @@ export function useContext(
 export function useContextAfter(
   callback: (ctx: CanvasRenderingContext2D) => void,
 ): () => void {
-  return useScene().LifecycleEvents.onFinishRender.subscribe(callback);
+  return useScene().lifecycleEvents.onFinishRender.subscribe(callback);
 }
