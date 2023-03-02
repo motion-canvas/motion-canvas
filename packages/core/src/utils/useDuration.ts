@@ -26,6 +26,5 @@ import {useScene} from './useScene';
  */
 export function useDuration(name: string): number {
   const scene = useScene();
-  scene.timeEvents.register(name);
-  return scene.timeEvents.get(name).offset;
+  return scene.timeEvents.register(name);
 }

@@ -1,5 +1,5 @@
 import {MetaField, ObjectMetaField} from '../meta';
-import {SavedTimeEvent} from './TimeEvents';
+import {SerializedTimeEvent} from './timeEvents';
 import {Random} from './Random';
 
 /**
@@ -8,7 +8,7 @@ import {Random} from './Random';
 export function createSceneMetadata() {
   return new ObjectMetaField('scene', {
     version: new MetaField('version', 1),
-    timeEvents: new MetaField<SavedTimeEvent[]>('time events', []),
+    timeEvents: new MetaField<SerializedTimeEvent[]>('time events', []),
     seed: new MetaField('seed', Random.createSeed()),
   });
 }

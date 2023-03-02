@@ -8,6 +8,7 @@ import {Exporter} from './Exporter';
 import {CanvasOutputMimeType, Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
+import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
 
 export interface RendererSettings extends StageSettings {
   name: string;
@@ -75,6 +76,7 @@ export class Renderer {
         logger: this.project.logger,
         playback: this.status,
         size: new Vector2(1920, 1080),
+        timeEventsClass: ReadOnlyTimeEvents,
       });
       scenes.push(scene);
     }

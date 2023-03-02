@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import {usePlayback, useScene, useThread} from '../utils';
+import {useDuration, usePlayback, useThread} from '../utils';
 
 decorate(waitUntil, threadable());
 /**
@@ -22,12 +22,7 @@ export function* waitUntil(
   event: string,
   after?: ThreadGenerator,
 ): ThreadGenerator {
-  const scene = useScene();
-  const frames = scene.timeEvents.register(event);
-
-  while (scene.playback.frame < frames) {
-    yield;
-  }
+  yield* waitFor(useDuration(event));
 
   if (after) {
     yield* after;
@@ -54,14 +49,13 @@ export function* waitFor(
   seconds = 0,
   after?: ThreadGenerator,
 ): ThreadGenerator {
-  const project = usePlayback();
   const thread = useThread();
-  const step = project.framesToSeconds(1);
+  const step = usePlayback().framesToSeconds(1);
 
   const targetTime = thread.time() + seconds;
   // subtracting the step is not necessary, but it keeps the thread time ahead
   // of the project time.
-  while (targetTime - step > project.time) {
+  while (targetTime - step > thread.fixed) {
     yield;
   }
   thread.time(targetTime);

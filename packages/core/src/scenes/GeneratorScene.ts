@@ -6,7 +6,7 @@ import {
   threads,
 } from '../threading';
 import {Logger, PlaybackStatus} from '../app';
-import {TimeEvents} from './TimeEvents';
+import {TimeEvents} from './timeEvents';
 import {Variables} from './Variables';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {decorate, threadable} from '../decorators';
@@ -125,7 +125,7 @@ export abstract class GeneratorScene<T>
     this.creationStack = description.stack;
 
     decorate(this.runnerFactory, threadable(this.name));
-    this.timeEvents = new TimeEvents(this);
+    this.timeEvents = new description.timeEventsClass(this);
     this.variables = new Variables(this);
 
     this.random = new Random(this.meta.seed.get());
@@ -264,12 +264,6 @@ export abstract class GeneratorScene<T>
   }
 
   public async reset(previousScene: Scene | null = null) {
-    if (this.cache.current.firstFrame !== this.playback.frame) {
-      this.cache.current = {
-        ...this.cache.current,
-        firstFrame: this.playback.frame,
-      };
-    }
     this.counters = {};
     this.previousScene = previousScene;
     this.random = new Random(this.meta.seed.get());
