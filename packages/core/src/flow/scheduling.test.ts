@@ -5,6 +5,7 @@ import {endPlayback, startPlayback, useTime} from '../utils';
 import {threads} from '../threading';
 import {waitFor} from './scheduling';
 import {PlaybackManager, PlaybackStatus} from '../app';
+import {all} from './all';
 
 describe('waitFor()', () => {
   const playback = new PlaybackManager();
@@ -47,6 +48,24 @@ describe('waitFor()', () => {
       yield* waitFor(0.15);
       yield* waitFor(0.15);
       yield* waitFor(0.15);
+      time = useTime();
+    });
+
+    playback.fps = 10;
+    playback.frame = 0;
+    for (const _ of task) {
+      playback.frame++;
+    }
+
+    expect(playback.frame).toBe(4);
+    expect(time).toBeCloseTo(0.45);
+  });
+
+  test('Accumulated time offset from concurrent threads', () => {
+    let time = NaN;
+    const task = threads(function* () {
+      yield* waitFor(0.15);
+      yield* all(waitFor(0.3), waitFor(0.15));
       time = useTime();
     });
 

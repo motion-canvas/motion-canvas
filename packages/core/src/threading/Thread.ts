@@ -85,6 +85,7 @@ export class Thread {
     child.parent = this;
     child.isCanceled = false;
     child.time(this.time());
+    child.fixedTime = this.fixedTime;
     this.children.push(child);
 
     setTaskName(child.runner, `unknown ${this.children.length}`);
