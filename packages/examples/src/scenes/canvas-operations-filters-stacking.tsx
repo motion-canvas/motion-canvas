@@ -9,6 +9,7 @@ import {
   Layout,
   Rect,
   Txt,
+  TxtProps,
 } from '@motion-canvas/2d/lib/components';
 import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
@@ -34,11 +35,22 @@ export default makeScene2D(function* (scene) {
     return `${left}.${right}`;
   };
 
+  const commonTxtValues: Partial<TxtProps> = {
+    fontFamily: 'monospace',
+    fill: 'white',
+    fontSize: 40,
+  };
+  const commonTxtValuesSmall: Partial<TxtProps> = {
+    fontFamily: 'monospace',
+    fontSize: 35,
+    fontWeight: 600,
+  };
+
   const saturateValue = createSignal(1);
   const contrastValue = createSignal(1);
 
   scene.add(
-    <Layout x={-600} y={-200}>
+    <Layout position={[-600, -200]}>
       <AnimatedMotionCanvasIcon
         filters={[saturate(saturateValue), contrast(contrastValue)]}
         timePassed={t}
@@ -51,26 +63,22 @@ export default makeScene2D(function* (scene) {
         code={`<AnimatedMotionCanvasIcon\n  filters={[\n    saturation(        ),\n    contrast(        )\n  ]}\n/>`}
       />
       <Txt
+        {...commonTxtValuesSmall}
         position={[120, 325]}
-        fontSize={35}
         fill={'#ffa'}
-        fontWeight={600}
-        fontFamily={'monospace'}
         text={() => createTextValue(saturateValue(), 1, 2)}
       />
       <Txt
+        {...commonTxtValuesSmall}
         position={[80, 370]}
-        fontSize={35}
         fill={'#aff'}
-        fontWeight={600}
-        fontFamily={'monospace'}
         text={() => createTextValue(contrastValue(), 1, 2)}
       />
     </Layout>,
   );
 
   scene.add(
-    <Layout x={600} y={-200}>
+    <Layout position={[600, -200]}>
       <AnimatedMotionCanvasIcon
         filters={[contrast(contrastValue), saturate(saturateValue)]}
         timePassed={t}
@@ -83,19 +91,15 @@ export default makeScene2D(function* (scene) {
         code={`<AnimatedMotionCanvasIcon\n  filters={[\n    contrast(        ),\n    saturation(        )\n  ]}\n/>`}
       />
       <Txt
+        {...commonTxtValuesSmall}
         position={[80, 325]}
-        fontSize={35}
         fill={'#aff'}
-        fontWeight={600}
-        fontFamily={'monospace'}
         text={() => createTextValue(contrastValue(), 1, 2)}
       />
       <Txt
+        {...commonTxtValuesSmall}
         position={[120, 370]}
-        fontSize={35}
         fill={'#ffa'}
-        fontWeight={600}
-        fontFamily={'monospace'}
         text={() => createTextValue(saturateValue(), 1, 2)}
       />
     </Layout>,
@@ -103,68 +107,21 @@ export default makeScene2D(function* (scene) {
 
   scene.add(
     <Layout y={-100}>
-      <Grid
-        width={400}
-        height={400}
-        stroke={'gray'}
-        lineWidth={1}
-        spacing={100}
-      />
-      <Grid
-        width={400}
-        height={400}
-        stroke={'#333'}
-        lineWidth={1}
-        spacing={50}
-      />
+      <Grid size={400} stroke={'gray'} lineWidth={1} spacing={100} />
+      <Grid size={400} stroke={'#333'} lineWidth={1} spacing={50} />
       <Rect width={400} height={400} stroke={'gray'} lineWidth={5} />
       <Txt
+        {...commonTxtValues}
         text={'saturation'}
         rotation={-90}
         x={-250}
-        fontFamily={'monospace'}
         fill={'#ffa'}
-        fontSize={40}
       />
-      <Txt
-        text={'contrast'}
-        y={250}
-        fontFamily={'monospace'}
-        fill={'#aff'}
-        fontSize={40}
-      />
-      <Txt
-        text={'1'}
-        x={-200}
-        y={250}
-        fontFamily={'monospace'}
-        fill={'white'}
-        fontSize={40}
-      />
-      <Txt
-        text={'1'}
-        y={200}
-        x={-250}
-        fontFamily={'monospace'}
-        fill={'white'}
-        fontSize={40}
-      />
-      <Txt
-        text={'5'}
-        y={-200}
-        x={-250}
-        fontFamily={'monospace'}
-        fill={'white'}
-        fontSize={40}
-      />
-      <Txt
-        text={'5'}
-        x={200}
-        y={250}
-        fontFamily={'monospace'}
-        fill={'white'}
-        fontSize={40}
-      />
+      <Txt {...commonTxtValues} text={'contrast'} y={250} fill={'#aff'} />
+      <Txt {...commonTxtValues} text={'1'} position={[-200, 250]} />
+      <Txt {...commonTxtValues} text={'1'} position={[-250, 200]} />
+      <Txt {...commonTxtValues} text={'5'} position={[-250, -200]} />
+      <Txt {...commonTxtValues} text={'5'} position={[200, 250]} />
       <Circle
         x={() => -200 + (contrastValue() - 1) * 100}
         y={() => 200 - (saturateValue() - 1) * 100}

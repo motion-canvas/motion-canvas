@@ -74,7 +74,6 @@ export default makeScene2D(function* (scene) {
       <CodeBlock
         fontSize={25}
         lineHeight={40}
-        x={0}
         language="tsx"
         code={
           "<Layout>\n  <AnimatedMotionCanvasIcon />\n  <Img src={...} y={offset}\n    compositeOperation={'source-in'}\n  />\n</Layout>"
@@ -90,8 +89,7 @@ export default makeScene2D(function* (scene) {
         }
       />
       <Txt
-        y={100}
-        x={750}
+        position={[750, 100]}
         textWrap="pre"
         lineHeight={29}
         text={'Picture by Federico Bottos\n(@landscapeplaces on Unsplash)'}

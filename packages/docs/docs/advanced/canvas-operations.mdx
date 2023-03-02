@@ -7,7 +7,7 @@ import AnimationPlayer from '@site/src/components/AnimationPlayer';
 
 # Canvas Operations
 
-Because Motion Canvas is build ontop of the Browser's 2D Rendering Context, one
+Because Motion Canvas is build ontop of the Browser's 2D Rendering Context, we
 can make use several canvas operations that are provided by the Browser.
 
 ## Filters
@@ -21,8 +21,8 @@ the Browser can understand on
 All filters available in Motion Canvas can be found under
 `@motion-canvas/2d/lib/partials`
 ([API Documentation](/api/2d/partials#Functions)). Note that some filters, like
-`opacity`, can be set directly on the Node, and as are not exported from
-`partials`.
+`opacity`, can be set directly on the [`Node`](/api/2d/components/Node#opacity),
+and as a result are not exported from [partials](/api/2d/partials#Functions).
 
 `filters` accepts an array. This means that you can stack multiple filters onto
 a single Node. The order in which you add them does matter, as can be seen
@@ -48,8 +48,8 @@ background's color by the stencil's alpha value.
 The same effect can be achieved in Motion Canvas with the help of Composite
 Operations using `source-in` and `source-out`.
 
-Create a new cached Node that contains 2 children, the "stencil", and the
-"value" layers.
+Create a new cached [`Node`](/api/2d/components/Node) that contains 2 children,
+the "stencil", and the "value" layers.
 
 ```tsx
 const yOffset = createSignal(0);
@@ -71,29 +71,40 @@ yield* yOffset(-100, 2);
 ```
 
 <AnimationPlayer name="canvas-operations-alpha-matte" />
+An example of how composite operations are used to create a mask. The Motion Canvas
+Icon acts as the stencil, the image in the back as the value.
 
 ## Cached Nodes
 
-Both Filters and Composite Operations require a cached node. Filters can set it
-automatically, while Composite Operations require you to set it explicitly on
-the parent Node.
+Both Filters and Composite Operations require a cached
+[`Node`](/api/2d/components/Node). Filters can set it automatically, while
+Composite Operations require you to set it explicitly on the parent
+[`Node`](/api/2d/components/Node).
 
-A cached node and its children are rendered on an offscreen canvas first, before
-getting added to the main scene.  
+A cached [`Node`](/api/2d/components/Node) and its children are rendered on an
+offscreen canvas first, before getting added to the main scene.  
 For filters this is needed because they are applied to the entire canvas. By
 creating a new canvas and moving the elements that should get affected by the
 filters over, applying filters to the entire "new" canvas, and then moving back
 the result, you effectively only apply the filters to the moved elements.
 
-:::caution Performance Implications If you care about playback performance, for
+<!-- Prettier merges header with text -->
+<!-- prettier-ignore -->
+:::caution Performance Implications 
+If you care about playback performance, for
 example because you want to embed the Scene on a website, try to minimize the
-use of cached nodes as each cached node means a separate offscreen canvas. :::
+use of cached Nodes as each cached [`Node`](/api/2d/components/Node) means a separate offscreen canvas.
 
-To turn a Node into a cached node, simply pass the `cache` property
+<!-- prettier-ignore -->
+:::
+
+To turn a [`Node`](/api/2d/components/Node) into a cached Node, simply pass the
+[`cache`](/api/2d/components/NodeProps/#cache) property
 
 ```tsx
 <Node cache>...</Node>
+<Node cache={true}>...</Node>
 ```
 
-Note that all Components inherit from `Node`, so you can set the property on
-them directly.
+Note that all Components inherit from [`Node`](/api/2d/components/Node), so you
+can set the property on them directly.
