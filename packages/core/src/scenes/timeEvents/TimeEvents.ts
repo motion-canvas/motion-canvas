@@ -25,10 +25,12 @@ export interface TimeEvents {
    * Register a time event.
    *
    * @param name - The name of the event.
+   * @param initialTime - Time in seconds, relative to the beginning of the
+   *                      scene, at which the event was registered.
    *
    * @returns The duration of the event in seconds.
    *
    * @internal
    */
-  register(name: string): number;
+  register(name: string, initialTime: number): number;
 }

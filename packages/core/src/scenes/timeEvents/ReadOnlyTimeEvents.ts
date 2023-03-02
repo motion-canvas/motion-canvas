@@ -2,7 +2,6 @@ import type {Scene} from '../Scene';
 import type {TimeEvent} from './TimeEvent';
 import type {TimeEvents} from './TimeEvents';
 import {ValueDispatcher} from '../../events';
-import {useThread} from '../../utils';
 
 /**
  * Manages time events during rendering and presentation.
@@ -22,13 +21,13 @@ export class ReadOnlyTimeEvents implements TimeEvents {
     // do nothing
   }
 
-  public register(name: string): number {
+  public register(name: string, initialTime: number): number {
     let duration = this.lookup.get(name);
     if (duration === undefined) {
       const event = this.scene.meta.timeEvents
         .get()
         .find(event => event.name === name);
-      duration = event ? event.targetTime - useThread().time() : 0;
+      duration = event ? event.targetTime - initialTime : 0;
       this.lookup.set(name, duration);
     }
 

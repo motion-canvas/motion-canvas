@@ -3,7 +3,6 @@ import type {TimeEvents} from './TimeEvents';
 import type {TimeEvent} from './TimeEvent';
 import type {SerializedTimeEvent} from './SerializedTimeEvent';
 import {ValueDispatcher} from '../../events';
-import {useThread} from '../../utils';
 
 /**
  * Manages time events during editing.
@@ -47,7 +46,7 @@ export class EditableTimeEvents implements TimeEvents {
     this.scene.reload();
   }
 
-  public register(name: string): number {
+  public register(name: string, initialTime: number): number {
     if (this.collisionLookup.has(name)) {
       this.scene.logger.error({
         message: `name "${name}" has already been used for another event name.`,
@@ -57,8 +56,6 @@ export class EditableTimeEvents implements TimeEvents {
     }
 
     this.collisionLookup.add(name);
-
-    const initialTime = useThread().time();
     if (!this.lookup[name]) {
       this.didEventsChange = true;
       this.lookup[name] = {
