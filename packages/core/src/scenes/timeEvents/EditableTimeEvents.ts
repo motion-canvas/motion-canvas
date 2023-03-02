@@ -1,55 +1,14 @@
-import type {Scene} from './Scene';
-import {ValueDispatcher} from '../events';
+import type {Scene} from '../Scene';
+import type {TimeEvents} from './TimeEvents';
+import type {TimeEvent} from './TimeEvent';
+import type {SerializedTimeEvent} from './SerializedTimeEvent';
+import {ValueDispatcher} from '../../events';
+import {useThread} from '../../utils';
 
 /**
- * Represents a time event at runtime.
+ * Manages time events during editing.
  */
-export interface TimeEvent {
-  /**
-   * Name of the event.
-   */
-  name: string;
-  /**
-   * Time in seconds, relative to the beginning of the scene, at which the event
-   * was registered.
-   *
-   * @remarks
-   * In other words, the moment at which {@link flow.waitUntil} for this event
-   * was invoked.
-   */
-  initialTime: number;
-  /**
-   * Time in seconds, relative to the beginning of the scene, at which the event
-   * should end.
-   */
-  targetTime: number;
-  /**
-   * Duration of the event in seconds.
-   */
-  offset: number;
-  /**
-   * Stack trace at the moment of registration.
-   */
-  stack?: string;
-}
-
-/**
- * Represents a time event stored in a meta file.
- */
-export interface SavedTimeEvent {
-  name: string;
-  targetTime: number;
-}
-
-/**
- * Manages time events for a given scene.
- */
-export class TimeEvents {
-  /**
-   * Triggered when time events change.
-   *
-   * @eventProperty
-   */
+export class EditableTimeEvents implements TimeEvents {
   public get onChanged() {
     return this.events.subscribable;
   }
@@ -58,7 +17,7 @@ export class TimeEvents {
   private registeredEvents: Record<string, TimeEvent> = {};
   private lookup: Record<string, TimeEvent> = {};
   private collisionLookup = new Set<string>();
-  private previousReference: SavedTimeEvent[] = [];
+  private previousReference: SerializedTimeEvent[] = [];
   private didEventsChange = false;
   private preserveTiming = true;
 
@@ -72,19 +31,6 @@ export class TimeEvents {
     scene.meta.timeEvents.onChanged.subscribe(this.handleMetaChanged, false);
   }
 
-  public get(name: string) {
-    return this.registeredEvents[name] ?? null;
-  }
-
-  /**
-   * Change the time offset of the given event.
-   *
-   * @param name - The name of the event.
-   * @param offset - The time offset in seconds.
-   * @param preserve - Whether the timing of the consecutive events should be
-   *                   preserved. When set to `true` their offsets will be
-   *                   adjusted to keep them in place.
-   */
   public set(name: string, offset: number, preserve = true) {
     if (!this.lookup[name] || this.lookup[name].offset === offset) {
       return;
@@ -101,15 +47,6 @@ export class TimeEvents {
     this.scene.reload();
   }
 
-  /**
-   * Register a time event.
-   *
-   * @param name - The name of the event.
-   *
-   * @returns The absolute frame at which the event should occur.
-   *
-   * @internal
-   */
   public register(name: string): number {
     if (this.collisionLookup.has(name)) {
       this.scene.logger.error({
@@ -121,9 +58,7 @@ export class TimeEvents {
 
     this.collisionLookup.add(name);
 
-    const initialTime = this.scene.playback.framesToSeconds(
-      this.scene.playback.frame - this.scene.firstFrame,
-    );
+    const initialTime = useThread().time();
     if (!this.lookup[name]) {
       this.didEventsChange = true;
       this.lookup[name] = {
@@ -168,10 +103,7 @@ export class TimeEvents {
 
     this.registeredEvents[name] = this.lookup[name];
 
-    return (
-      this.scene.firstFrame +
-      this.scene.playback.secondsToFrames(this.lookup[name].targetTime)
-    );
+    return this.lookup[name].offset;
   }
 
   /**
@@ -211,7 +143,7 @@ export class TimeEvents {
   /**
    * Called when the meta of the parent scene changes.
    */
-  private handleMetaChanged = (data: SavedTimeEvent[]) => {
+  private handleMetaChanged = (data: SerializedTimeEvent[]) => {
     // Ignore the event if `timeEvents` hasn't changed.
     // This may happen when another part of metadata has changed triggering
     // this event.
@@ -221,7 +153,7 @@ export class TimeEvents {
     this.scene.reload();
   };
 
-  private load(events: SavedTimeEvent[]) {
+  private load(events: SerializedTimeEvent[]) {
     for (const event of events) {
       const previous = this.lookup[event.name] ?? {
         name: event.name,
