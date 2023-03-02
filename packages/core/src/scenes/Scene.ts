@@ -10,6 +10,7 @@ import type {Vector2} from '../types';
 import type {LifecycleEvents} from './LifecycleEvents';
 import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
+import type {Slides} from './Slides';
 
 /**
  * The constructor used when creating new scenes.
@@ -133,6 +134,7 @@ export interface Scene<T = unknown> {
    */
   readonly playback: PlaybackStatus;
   readonly timeEvents: TimeEvents;
+  readonly slides: Slides;
   readonly logger: Logger;
   readonly variables: Variables;
   readonly random: Random;

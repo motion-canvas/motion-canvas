@@ -1,10 +1,10 @@
-import {Project} from './Project';
+import type {Project} from './Project';
+import type {Exporter} from './Exporter';
+import type {Scene} from '../scenes';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
-import {Scene} from '../scenes';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {ImageExporter} from './ImageExporter';
-import {Exporter} from './Exporter';
 import {CanvasOutputMimeType, Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';

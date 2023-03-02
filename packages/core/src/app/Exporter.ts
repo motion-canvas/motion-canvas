@@ -1,4 +1,4 @@
-import {RendererResult, RendererSettings} from './Renderer';
+import type {RendererResult, RendererSettings} from './Renderer';
 
 /**
  * The main interface for implementing custom exporters.

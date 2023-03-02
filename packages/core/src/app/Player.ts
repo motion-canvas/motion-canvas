@@ -189,8 +189,8 @@ export class Player {
     if (recalculate) {
       this.playback.reload();
       this.frame.current = frame;
-      await this.requestRecalculation();
-      this.requestSeek(frame);
+      this.requestRecalculation();
+      this.requestedSeek = frame;
     }
   }
 
@@ -414,9 +414,14 @@ export class Player {
       }
     }
 
+    // Pause if a new slide has just started.
+    if (!state.paused && this.playback.currentScene.slides.isWaiting()) {
+      this.togglePlayback(false);
+      state.paused = true;
+    }
+
     // Draw the project
     await this.render.dispatch();
-
     this.frame.current = this.playback.frame;
 
     this.request();
