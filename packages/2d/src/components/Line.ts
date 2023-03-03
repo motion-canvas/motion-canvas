@@ -238,7 +238,22 @@ export class Line extends Shape {
     const box = this.childrenBBox();
     const arrowSize = this.arrowSize();
     const lineWidth = this.lineWidth();
-    return box.expand(Math.max(0, arrowSize, lineWidth / 2));
+    const radius = this.radius();
+    const join = this.lineJoin();
+    const cap = this.lineCap();
+
+    let coefficient = 0.5;
+    if (radius === 0 && join === 'miter') {
+      const {minSin} = this.profile();
+      if (minSin > 0) {
+        coefficient = Math.max(coefficient, 0.5 / minSin);
+      }
+    }
+    if (cap === 'square') {
+      coefficient = Math.max(coefficient, 0.5 * 1.4143);
+    }
+
+    return box.expand(Math.max(0, arrowSize, lineWidth * coefficient));
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
