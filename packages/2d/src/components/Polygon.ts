@@ -1,17 +1,39 @@
+import {
+  // PossibleSpacing,
+  BBox,
+  // SpacingSignal,
+} from '@motion-canvas/core/lib/types';
 import {Shape, ShapeProps} from './Shape';
 import {initial, signal} from '../decorators';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 
+function drawPolygon(
+  path: CanvasRenderingContext2D | Path2D,
+  rect: BBox,
+  // width: number,
+  // height: number,
+  sides: number,
+) {
+  const width = rect.width / 2;
+  const height = rect.height / 2;
+  for (let i = 0; i <= sides; i += 1) {
+    const theta = (i * 2 * Math.PI) / sides;
+    const x = width * Math.sin(theta);
+    const y = -height * Math.cos(theta);
+    if (i == 0) {
+      path.moveTo(x, y);
+    } else {
+      path.lineTo(x, y);
+    }
+  }
+  path.closePath();
+}
+
 export interface PolygonProps extends ShapeProps {
   /**
-   * {@inheritDoc Polygon.nSides}
+   * {@inheritDoc Polygon.sides}
    */
-  nSides?: SignalValue<number>;
-
-  /**
-   * {@inheritDoc Polygon.angle}
-   */
-  angle?: SignalValue<number>;
+  sides?: SignalValue<number>;
 }
 
 export class Polygon extends Shape {
@@ -37,7 +59,7 @@ export class Polygon extends Shape {
    *   y={0}
    *   width={320}
    *   height={320}
-   *   nSides={6}
+   *   sides={6}
    *   stroke={'#fff'}
    *   lineWidth={8}
    *   fill={'lightseagreen'}
@@ -46,32 +68,7 @@ export class Polygon extends Shape {
    */
   @initial(6)
   @signal()
-  public declare readonly nSides: SimpleSignal<number, this>;
-
-  /**
-   * Changes the starting angle (in degrees) of the polygon.
-   *
-   * @remarks
-   * Use this to change the apparent rotation of the polygon.
-   *
-   * @example
-   * ```tsx
-   * <Polygon
-   *   x={0}
-   *   y={0}
-   *   width={320}
-   *   height={320}
-   *   nSides={6}
-   *   angle={30}
-   *   stroke={'#fff'}
-   *   lineWidth={8}
-   *   fill={'lightseagreen'}
-   * />
-   * ```
-   */
-  @initial(0)
-  @signal()
-  public declare readonly angle: SimpleSignal<number, this>;
+  public declare readonly sides: SimpleSignal<number, this>;
 
   public constructor(props: PolygonProps) {
     super(props);
@@ -79,26 +76,22 @@ export class Polygon extends Shape {
 
   protected override getPath(): Path2D {
     const path = new Path2D();
-    const angle = (this.angle() / 360) * 2 * Math.PI;
-    const width = this.width() / 2;
-    const height = this.height() / 2;
-    const nSides = this.nSides();
-    let x0 = 0;
-    let y0 = 0;
+    const sides = this.sides();
 
-    for (let i = 0; i <= nSides; i += 1) {
-      const theta = (i * 2 * Math.PI) / nSides - angle;
-      const x = width * Math.sin(theta);
-      const y = -height * Math.cos(theta);
-      if (i == 0) {
-        path.moveTo(x, y);
-        x0 = x;
-        y0 = y;
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.lineTo(x0, y0);
+    const box = BBox.fromSizeCentered(this.size());
+    drawPolygon(path, box, sides);
+
+    return path;
+  }
+  protected override getRipplePath(): Path2D {
+    const path = new Path2D();
+    const sides = this.sides();
+    const rippleSize = this.rippleSize();
+
+    // const box = BBox.fromSizeCentered(this.size());
+    const box = BBox.fromSizeCentered(this.size()).expand(rippleSize);
+    drawPolygon(path, box, sides);
+
     return path;
   }
 }
