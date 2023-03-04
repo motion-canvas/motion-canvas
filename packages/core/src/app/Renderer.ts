@@ -166,6 +166,7 @@ export class Renderer {
     settings = (await this.exporter.configure(settings)) ?? settings;
     this.stage.configure(settings);
     this.playback.fps = settings.fps;
+    this.playback.state = PlaybackState.Rendering;
     const from = this.status.secondsToFrames(settings.range[0]);
     const to = this.status.secondsToFrames(settings.range[1]);
 
