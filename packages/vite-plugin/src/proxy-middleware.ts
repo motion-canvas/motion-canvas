@@ -72,8 +72,8 @@ export function motionCanvasCorsProxy(
   config: MotionCanvasCorsProxyOptions,
 ) {
   // Set the default config if no config was provided
-  config.allowedMimeTypes ??= ['image/*', 'video/*'];
-  config.allowListHosts ??= [];
+  config.allowedMimeTypes ?? (config.allowedMimeTypes = ['image/*', 'video/*']);
+  config.allowListHosts ?? (config.allowListHosts = []);
 
   // Check the Mime Types to have a correct structure (left/right)
   // not having them in the correct format would crash the Middleware
