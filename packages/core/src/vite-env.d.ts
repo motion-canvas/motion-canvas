@@ -12,6 +12,7 @@ declare module 'vite/types/customEvent' {
       mimeType: string;
       project: string;
       isStill: boolean;
+      sceneName?: string;
     };
     'motion-canvas:export-ack': {frame: number};
     'motion-canvas:assets': {urls: string[]};

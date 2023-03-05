@@ -69,6 +69,16 @@ export function RenderingSettings() {
           />
         </Group>
       )}
+      <Group>
+        <Label>{meta.rendering.groupByScene.name}</Label>
+        <Input
+          type="checkbox"
+          checked={Boolean(state.groupByScene)}
+          onChange={() => {
+            meta.rendering.groupByScene.set(!state.groupByScene);
+          }}
+        />
+      </Group>
     </>
   );
 }

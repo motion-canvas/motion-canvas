@@ -15,6 +15,7 @@ export class ImageExporter implements Exporter {
   private name = 'unknown';
   private quality = 1;
   private fileType: CanvasOutputMimeType = 'image/png';
+  private groupByScene = false;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -28,6 +29,7 @@ export class ImageExporter implements Exporter {
     this.name = settings.name;
     this.quality = settings.quality;
     this.fileType = settings.fileType;
+    this.groupByScene = settings.groupByScene;
   }
 
   public async start() {
@@ -37,6 +39,7 @@ export class ImageExporter implements Exporter {
   public async handleFrame(
     canvas: HTMLCanvasElement,
     frame: number,
+    sceneName: string,
     signal: AbortSignal,
   ) {
     if (this.frameLookup.has(frame)) {
@@ -62,6 +65,7 @@ export class ImageExporter implements Exporter {
         data: canvas.toDataURL(this.fileType, this.quality),
         mimeType: this.fileType,
         project: this.name,
+        sceneName: this.groupByScene ? sceneName : undefined,
       });
     }
   }

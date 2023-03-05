@@ -16,6 +16,7 @@ export interface RendererSettings extends StageSettings {
   fps: number;
   fileType: CanvasOutputMimeType;
   quality: number;
+  groupByScene: boolean;
 }
 
 export enum RendererState {
@@ -235,6 +236,7 @@ export class Renderer {
     await this.exporter.handleFrame(
       this.stage.finalBuffer,
       this.playback.frame,
+      this.playback.currentScene.name,
       signal,
     );
   }
