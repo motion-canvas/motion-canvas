@@ -4,10 +4,9 @@ import {useContext, useState} from 'preact/hooks';
 export type Shortcut = {
   key: string;
   action: string;
-  isGlobal?: boolean;
 };
 
-export type ShortcutModules = 'global' | 'timeline' | 'none';
+export type ShortcutModules = 'global' | 'timeline' | 'viewport' | 'none';
 type ShortcutsByModule = Record<ShortcutModules, Shortcut[]>;
 type ShortcutsState = {
   currentModule: ShortcutModules;
@@ -17,15 +16,21 @@ type ShortcutsState = {
 
 const initialshortcuts: ShortcutsByModule = {
   global: [
-    {key: 'Space', action: 'Toggle playback', isGlobal: true},
-    {key: '←', action: 'Previous frame', isGlobal: true},
-    {key: '→', action: 'Next frame', isGlobal: true},
-    {key: 'Shift + ←', action: 'Reset to first frame', isGlobal: true},
-    {key: 'Shift + →', action: 'Seek to last frame', isGlobal: true},
-    {key: 'm', action: 'Toggle audio', isGlobal: true},
-    {key: 'l', action: 'Toggle loop', isGlobal: true},
+    {key: 'Space', action: 'Toggle playback'},
+    {key: '<-', action: 'Previous frame'},
+    {key: '->', action: 'Next frame'},
+    {key: 'Shift + <-', action: 'Reset to first frame'},
+    {key: 'Shift + ->', action: 'Seek to last frame'},
+    {key: 'M', action: 'Toggle audio'},
+    {key: 'L', action: 'Toggle loop'},
   ],
-  timeline: [{key: 'f', action: 'Focus Playhead'}],
+  viewport: [
+    {key: '0', action: 'Reset zoom'},
+    {key: '=', action: 'Zoom in'},
+    {key: '-', action: 'Zoom out'},
+    {key: "'", action: 'Toggle grid'},
+  ],
+  timeline: [{key: 'F', action: 'Focus playhead'}],
   none: [],
 };
 

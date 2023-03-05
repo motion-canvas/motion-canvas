@@ -1,26 +1,26 @@
 .root {
   display: flex;
-  flex-direction: row;
-  padding: 8px;
+  padding: 4px;
   overflow-x: hidden;
-  height: 32px;
-}
-.action {
-  height: 32px;
-}
-
-.key {
-  border: 1px solid var(--blue);
-  border-radius: 4px;
-  margin-right: 4px;
-  padding: 2px 4px;
-}
-
-.separator {
-  color: var(--surface-color-light);
-  padding: 0px 4px;
 }
 
 .shortcut {
-  flex: none;
+  &:not(:last-child) {
+    border-right: 2px solid var(--surface-color);
+    padding-right: 8px;
+    margin-right: 8px;
+  }
+}
+
+.action {
+  font-size: 12px;
+}
+
+.key {
+  background-color: var(--surface-color-hover);
+  font-weight: bold;
+  border-radius: 4px;
+  margin-right: 4px;
+  padding: 0 4px;
+  font-size: 12px;
 }

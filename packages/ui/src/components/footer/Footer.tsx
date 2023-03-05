@@ -5,17 +5,13 @@ export function Footer() {
   const {shortcuts, currentModule} = useShortcuts();
   return (
     <div className={styles.root}>
-      {shortcuts[currentModule].map(({key, action, isGlobal}, index, arr) =>
-        isGlobal ? null : (
-          <div className={styles.shortcut}>
-            <span className={styles.key}>{key}</span>
-            <span className={styles.action}>{action}</span>
-            {index < arr.length - 1 && (
-              <span className={styles.separator}>|</span>
-            )}
-          </div>
-        ),
-      )}
+      {shortcuts[currentModule].map(({key, action}, index, arr) => (
+        <div>
+          <span className={styles.key}>{key}</span>
+          <span className={styles.action}>{action}</span>
+          {index < arr.length - 1}
+        </div>
+      ))}
     </div>
   );
 }

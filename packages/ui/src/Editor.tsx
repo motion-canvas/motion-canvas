@@ -25,8 +25,12 @@ export function Editor() {
           end={<Viewport />}
         />
       }
-      end={<Timeline />}
-      footer={<Footer />}
+      end={
+        <div>
+          <Timeline />
+          <Footer />
+        </div>
+      }
     />
   ) : (
     <PresentationMode />
