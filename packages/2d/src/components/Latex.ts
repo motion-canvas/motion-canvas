@@ -16,7 +16,7 @@ import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {Rect, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {Length} from '../partials';
-import {map, tween} from '@motion-canvas/core/lib/tweening';
+import {clampRemap, map, tween} from '@motion-canvas/core/lib/tweening';
 import diffSequence from 'diff-sequences';
 
 const adaptor = liteAdaptor();
@@ -233,21 +233,27 @@ export class Latex extends Shape {
         this.drawMathShape(context, shape);
       }
     } else {
+      const beginning = 0.2;
+      const ending = 0.8;
+      const overlap = 0.15;
       const diff = this.diffed!;
 
+      const remapped = clampRemap(beginning, ending, 0, 1, progress);
       for (const shape of diff.changed) {
         const position: SerializedVector2 = {
-          x: map(shape.from.position.x, shape.to.position.x, progress),
-          y: map(shape.from.position.y, shape.to.position.y, progress),
+          x: map(shape.from.position.x, shape.to.position.x, remapped),
+          y: map(shape.from.position.y, shape.to.position.y, remapped),
         };
         this.drawMathShape(context, shape.from, position);
       }
 
       const globalAlpha = context.globalAlpha;
-      context.globalAlpha = globalAlpha * progress;
+      context.globalAlpha =
+        globalAlpha * clampRemap(ending - overlap, 1, 0, 1, progress);
       for (const shape of diff.inserted) this.drawMathShape(context, shape);
 
-      context.globalAlpha = globalAlpha * (1 - progress);
+      context.globalAlpha =
+        globalAlpha * clampRemap(0, beginning + overlap, 1, 0, progress);
       for (const shape of diff.deleted) this.drawMathShape(context, shape);
     }
   }
@@ -342,10 +348,14 @@ export class Latex extends Shape {
     const autoHeight = this.customHeight() == null;
     const scaleFactor = this.scaleFactor();
 
+    const beginning = 0.2;
+    const ending = 0.8;
+
     this.texProgress(0);
     yield* tween(
       time,
       value => {
+        const remapped = clampRemap(beginning, ending, 0, 1, value);
         this.texProgress(value);
 
         if (autoWidth)
@@ -353,7 +363,7 @@ export class Latex extends Shape {
             map(
               diff.fromSize.x * scaleFactor,
               diff.toSize.x * scaleFactor,
-              value,
+              remapped,
             ),
           );
 
@@ -362,7 +372,7 @@ export class Latex extends Shape {
             map(
               diff.fromSize.y * scaleFactor,
               diff.toSize.y * scaleFactor,
-              value,
+              remapped,
             ),
           );
       },
