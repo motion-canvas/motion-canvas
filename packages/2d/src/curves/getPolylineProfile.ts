@@ -2,6 +2,7 @@ import {Vector2} from '@motion-canvas/core/lib/types';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {CircleSegment} from './CircleSegment';
+import {clamp} from '@motion-canvas/core/lib/tweening';
 
 export function getPolylineProfile(
   points: Vector2[],
@@ -11,6 +12,7 @@ export function getPolylineProfile(
   const profile: CurveProfile = {
     arcLength: 0,
     segments: [],
+    minSin: 1,
   };
 
   if (points.length === 0) {
@@ -33,8 +35,9 @@ export function getPolylineProfile(
     const centerToEnd = end.sub(center);
     const startVector = centerToStart.normalized;
     const endVector = centerToEnd.normalized;
-    const angleBetween = Math.acos(startVector.dot(endVector));
+    const angleBetween = Math.acos(clamp(-1, 1, startVector.dot(endVector)));
     const angleTan = Math.tan(angleBetween / 2);
+    const angleSin = Math.sin(angleBetween / 2);
 
     const safeRadius = Math.min(
       radius,
@@ -42,8 +45,8 @@ export function getPolylineProfile(
       angleTan * centerToEnd.magnitude * (i === points.length - 1 ? 1 : 0.5),
     );
 
-    const circleOffsetDistance = safeRadius / Math.sin(angleBetween / 2);
-    const pointOffsetDistance = safeRadius / angleTan;
+    const circleOffsetDistance = angleSin === 0 ? 0 : safeRadius / angleSin;
+    const pointOffsetDistance = angleTan === 0 ? 0 : safeRadius / angleTan;
     const circleDistance = startVector
       .add(endVector)
       .scale(1 / 2)
@@ -68,6 +71,8 @@ export function getPolylineProfile(
 
     profile.arcLength += line.arcLength;
     profile.arcLength += circle.arcLength;
+
+    profile.minSin = Math.min(profile.minSin, Math.abs(angleSin));
 
     last = center.add(endVector.scale(pointOffsetDistance));
   }

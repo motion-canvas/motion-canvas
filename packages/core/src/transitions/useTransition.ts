@@ -19,8 +19,10 @@ export function useTransition(
   const scene = useScene();
   const prior = scene.previous;
 
-  const unsubPrev = prior?.LifecycleEvents.onBeforeRender.subscribe(previous);
-  const unsubNext = scene.LifecycleEvents.onBeforeRender.subscribe(current);
+  const unsubPrev = prior?.lifecycleEvents.onBeforeRender.subscribe(previous);
+  const unsubNext = scene.lifecycleEvents.onBeforeRender.subscribe(current);
+
+  scene.enterInitial();
 
   return () => {
     scene.enterAfterTransitionIn();

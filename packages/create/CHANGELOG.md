@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.2](https://github.com/motion-canvas/motion-canvas/compare/v3.0.1...v3.0.2) (2023-02-27)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.0.1](https://github.com/motion-canvas/motion-canvas/compare/v3.0.0...v3.0.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **create:** update templates ([#439](https://github.com/motion-canvas/motion-canvas/issues/439)) ([8483557](https://github.com/motion-canvas/motion-canvas/commit/8483557f0a3ca7914aafacceab5d466abba59df0))
+
+
+
+
+
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **vite-plugin:** fix js template ([#337](https://github.com/motion-canvas/motion-canvas/issues/337)) ([3b33d73](https://github.com/motion-canvas/motion-canvas/commit/3b33d73416541d491b633bada29f085f5489f6c2))
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 **Note:** Version bump only for package @motion-canvas/create

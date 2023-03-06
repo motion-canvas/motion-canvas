@@ -12,6 +12,7 @@ if (ExecutionEnvironment.canUseDOM) {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       'motion-canvas-player': MotionCanvasPlayerProps & ComponentProps<'div'>;
     }
   }

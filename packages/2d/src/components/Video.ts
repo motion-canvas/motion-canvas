@@ -1,14 +1,11 @@
-import {
-  Rect as RectType,
-  SerializedVector2,
-} from '@motion-canvas/core/lib/types';
+import {BBox, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {computed, initial, signal} from '../decorators';
-import {useProject, useThread} from '@motion-canvas/core/lib/utils';
+import {useThread} from '@motion-canvas/core/lib/utils';
 import {PlaybackState} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {
   DependencyContext,
   SignalValue,
@@ -63,7 +60,7 @@ export class Video extends Rect {
     return this.video().duration;
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
     if (custom.x === null && custom.y === null) {
       const image = this.video();
@@ -162,17 +159,17 @@ export class Video extends Rect {
     const alpha = this.alpha();
     if (alpha > 0) {
       const video =
-        useProject().playbackState() === PlaybackState.Playing
+        this.view().playbackState() === PlaybackState.Playing
           ? this.fastSeekedVideo()
           : this.seekedVideo();
 
-      const rect = RectType.fromSizeCentered(this.computedSize());
+      const box = BBox.fromSizeCentered(this.computedSize());
       context.save();
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
       context.imageSmoothingEnabled = this.smoothing();
-      drawImage(context, video, rect);
+      drawImage(context, video, box);
       context.restore();
     }
 
@@ -182,9 +179,9 @@ export class Video extends Rect {
   protected override applyFlex() {
     super.applyFlex();
     const video = this.video();
-    this.element.style.aspectRatio = this.parseValue(
-      this.ratio() ?? video.videoWidth / video.videoHeight,
-    );
+    this.element.style.aspectRatio = (
+      this.ratio() ?? video.videoWidth / video.videoHeight
+    ).toString();
   }
 
   protected setCurrentTime(value: number) {

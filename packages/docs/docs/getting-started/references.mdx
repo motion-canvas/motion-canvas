@@ -185,14 +185,14 @@ function Label({
   refs,
   children,
 }: {
-  refs: {rect: Rect; text: Text};
+  refs: {rect: Rect; text: Txt};
   children: string;
 }) {
   return (
     // highlight-next-line
     <Rect ref={makeRef(refs, 'rect')}>
       // highlight-next-line
-      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+      <Txt ref={makeRef(refs, 'text')}>{children}</Txt>
     </Rect>
   );
 }
@@ -222,12 +222,12 @@ function Label({
   children,
 }: {
   // highlight-next-line
-  refs: {rect: Rect; text: Text};
+  refs: {rect: Rect; text: Txt};
   children: string;
 }) {
   return (
     <Rect ref={makeRef(refs, 'rect')}>
-      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+      <Txt ref={makeRef(refs, 'text')}>{children}</Txt>
     </Rect>
   );
 }
@@ -251,12 +251,12 @@ function Label({
   children,
 }: {
   // highlight-next-line
-  refs: {rect: Rect; text: Text};
+  refs: {rect: Rect; text: Txt};
   children: string;
 }) {
   return (
     <Rect ref={makeRef(refs, 'rect')}>
-      <Text ref={makeRef(refs, 'text')}>{children}</Text>
+      <Txt ref={makeRef(refs, 'text')}>{children}</Txt>
     </Rect>
   );
 }

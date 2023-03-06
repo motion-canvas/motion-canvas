@@ -1,0 +1,58 @@
+---
+slug: version-2.5.0
+title: Motion Canvas v2.5.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'gustavneustadt'} pr={356}>
+    New{' '}
+    <Link to="/docs/tweening#spring-function">
+      <code>spring</code>
+    </Link>{' '}
+    interpolation.
+  </Issue>
+  <Issue user={'aarthificial'} pr={378}>
+    <Link to="/api/2d/components/Circle#closed">
+      <code>closed</code>
+    </Link>{' '}
+    property lets you make wedges using <code>Circle</code>s.
+  </Issue>
+  <Issue user={'DanielBreiner'} pr={384}>
+    New{' '}
+    <Link to="/docs/transitions#fadetransition">
+      <code>fadeTransition</code>
+    </Link>
+    .
+  </Issue>
+  <Issue user={'ksassnowski'} pr={373}>
+    The{' '}
+    <Link to="/api/core/utils#range">
+      <code>range</code>
+    </Link>{' '}
+    function now accepts an additional <code>step</code> parameter.
+  </Issue>
+  <Issue user={'dariasc'} pr={379}>
+    <code>View2D</code> now extends <code>Rect</code> allowing you to change the
+    background color of a scene using the <code>fill</code> property.
+  </Issue>
+</IssueGroup>
+<hr />
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={387}>
+    Support <code>Color</code> to <code>null</code> tweening.
+  </Issue>
+  <Issue user={'aarthificial'} pr={385}>
+    Plug memory leaks.
+  </Issue>
+  <Issue user={'aarthificial'} pr={382}>
+    Fix signal initialization.
+  </Issue>
+  <Issue user={'aarthificial'} pr={381}>
+    Handle floating point errors in acos.
+  </Issue>
+</IssueGroup>

@@ -1,8 +1,15 @@
-import {Layout, LayoutProps} from './Layout';
+import {Rect, RectProps} from './Rect';
+import {initial, signal} from '../decorators';
+import {PlaybackState} from '@motion-canvas/core';
+import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 
-export class View2D extends Layout {
+export class View2D extends Rect {
   public static frameID = 'motion-canvas-2d-frame';
   public static shadowRoot: ShadowRoot;
+
+  @initial(PlaybackState.Paused)
+  @signal()
+  public declare readonly playbackState: SimpleSignal<PlaybackState, this>;
 
   static {
     let frame = document.querySelector<HTMLDivElement>(`#${View2D.frameID}`);
@@ -20,16 +27,17 @@ export class View2D extends Layout {
     View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
   }
 
-  public constructor(props: LayoutProps) {
+  public constructor(props: RectProps) {
     super({
       composite: true,
       fontFamily: 'Roboto',
       fontSize: 48,
-      lineHeight: 64,
+      lineHeight: '120%',
       textWrap: false,
       fontStyle: 'normal',
       ...props,
     });
+    this.view2D = this;
 
     View2D.shadowRoot.append(this.element);
     this.applyFlex();
@@ -41,7 +49,7 @@ export class View2D extends Layout {
 
   public override dispose() {
     this.removeChildren();
-    this.element.innerText = '';
+    super.dispose();
   }
 
   public override render(context: CanvasRenderingContext2D) {
@@ -54,7 +62,7 @@ export class View2D extends Layout {
     this.updateLayout();
   }
 
-  public override view(): View2D | null {
+  public override view(): View2D {
     return this;
   }
 }

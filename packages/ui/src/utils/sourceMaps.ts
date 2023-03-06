@@ -2,24 +2,24 @@ import {SourceMapConsumer} from 'source-map-js';
 import {withLoader} from './withLoader';
 import highlight from 'highlight.js';
 
-const externalFileRegex = /^\/(@fs|@id|node_modules)\//;
-const stackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
+const ExternalFileRegex = /^\/(@fs|@id|node_modules)\//;
+const StackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
   ? /^ +at.* \(?(.*):([0-9]+):([0-9]+)/
   : /@(.*):([0-9]+):([0-9]+)/;
-const cache = new Map<string, SourceMapConsumer>();
+const Cache = new Map<string, SourceMapConsumer>();
 
 async function getSourceMap(
   file: string,
   search = '',
 ): Promise<SourceMapConsumer> {
   const key = `${file}.map${search}`;
-  if (cache.has(key)) {
-    return cache.get(key);
+  if (Cache.has(key)) {
+    return Cache.get(key);
   }
 
   const response = await fetch(`${file}.map${search}`);
   const consumer = new SourceMapConsumer(await response.json());
-  cache.set(key, consumer);
+  Cache.set(key, consumer);
   return consumer;
 }
 
@@ -46,7 +46,7 @@ export async function resolveStackTrace(
 ): Promise<StackTraceEntry[] | StackTraceEntry> {
   const result: StackTraceEntry[] = [];
   for (const textLine of stack.split('\n')) {
-    const match = textLine.match(stackTraceRegex);
+    const match = textLine.match(StackTraceRegex);
     if (!match) continue;
     const [, uri, line, column] = match;
     const parsed = new URL(uri);
@@ -56,10 +56,10 @@ export async function resolveStackTrace(
       uri,
       line: parseInt(line),
       column: parseInt(column),
-      isExternal: externalFileRegex.test(file),
+      isExternal: ExternalFileRegex.test(file),
     };
 
-    if (!externalFileRegex.test(file)) {
+    if (!ExternalFileRegex.test(file)) {
       try {
         const sourceMap = await getSourceMap(file, parsed.search);
         const position = sourceMap.originalPositionFor(entry);

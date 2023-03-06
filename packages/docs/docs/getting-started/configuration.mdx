@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 11
 slug: /configuration
 ---
 
@@ -99,3 +99,22 @@ lead to a directory containing the following files:
   user interface.
 - `index` - Receives a list of all projects as its first argument and creates
   the initial page for selecting a project.
+
+### `proxy`
+
+- Type: `boolean | MotionCanvasCorsProxyOptions`
+- Default: `false`
+
+The configuration of the Proxy used for remote sources.
+
+This passes configuration to Motion Canvas' proxy. The proxy is disabled by
+default. You can either pass `true` or a config object to enable it.
+
+- `allowedMimeTypes?: string[]` - Set which types of resources are allowed by
+  default. Catchall on the right side is supported. Pass an empty Array to allow
+  all types of resources, although this is not recommended. Defaults to
+  `["image/*", "video/*"]`.
+- `allowListHosts?: string[]` - Set which hosts are allowed Note that the host
+  is everything to the left of the first `/`, and to the right of the protocol
+  `https://`. AllowList is not used by default, although you should consider
+  setting up just the relevant hosts.

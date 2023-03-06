@@ -1,6 +1,5 @@
-import {initial, signal} from '../decorators/signal';
+import {initial, initializeSignals, signal} from '../decorators/signal';
 import {computed} from '../decorators/computed';
-import {initialize} from '../decorators/initializers';
 import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 export type CanvasRepetition =
@@ -24,7 +23,7 @@ export class Pattern {
   public declare readonly repetition: SimpleSignal<CanvasRepetition, this>;
 
   public constructor(props: PatternProps) {
-    initialize(this, {defaults: props});
+    initializeSignals(this, props);
   }
 
   @computed()

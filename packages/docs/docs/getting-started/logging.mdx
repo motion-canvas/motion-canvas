@@ -1,0 +1,80 @@
+---
+sidebar_position: 12
+slug: /logging
+---
+
+# Logging
+
+One method of debugging your code or animation flow is using logging messages.
+For this, motion-canvas has its own built-in way to log messages.
+
+To get a reference to the Logger in motion-canvas you can use the `useLogger`
+function:
+
+```tsx
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {useLogger} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const logger = useLogger();
+  // ...
+});
+```
+
+## Basic
+
+Now that we know how to get a reference to the `Logger` we can take a look at
+different ways to log messages. On way is to use standard logging functions like
+`debug`, `info`, `warn` and `error` and simply log a string:
+
+```tsx
+logger.debug('Just here to debug some code.');
+logger.info('All fine just a little info.');
+logger.warn('Be careful somethis has gone wrong.');
+logger.error('Ups. An error occured.');
+```
+
+These messages get then displayed in the UI under the `Console` tab on the left
+side.
+
+## Payloads
+
+In some cases you might want to have a bit more detail in your log messages like
+a `stacktrace` or an `object`. That's where
+[`LogPayloads`](/api/core/index/LogPayload) come in. These can be used to
+provide more information to your log messages.
+
+```ts
+logger.debug({
+  message: 'Some more advanced logging',
+  remarks: 'Some remarks about this log. Can also contain <b>HTML</b> tags.',
+  object: {
+    someProperty: 'some property value',
+  },
+  durationMs: 200,
+  stack: new Error('').stack,
+});
+```
+
+This creates a collapsed log message in the UI which can be expanded to view all
+the details provided.
+
+![](/img/logpayload-message.png)
+
+:::tip
+
+If you quickly want to debug something you can also `debug()`. That way you
+don't have to `useLogger` manually and create a payload.
+
+:::
+
+## Profiling
+
+Besides logging messages its also possible to profile certain sections of code
+with the [`Logger`](/api/core/index/Logger):
+
+```ts
+logger.profile('id'); // <-- starts the profiling
+// some expensive calculation
+logger.profile('id'); // <-- ends the profiling
+```

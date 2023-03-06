@@ -5,26 +5,26 @@ import {
   ThreadGenerator,
   threads,
 } from '../threading';
-import {Meta} from '../Meta';
-import {TimeEvents} from './TimeEvents';
+import {Logger, PlaybackStatus} from '../app';
+import {TimeEvents} from './timeEvents';
 import {Variables} from './Variables';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import {Project} from '../Project';
 import {decorate, threadable} from '../decorators';
-import {endScene, setProject, startScene} from '../utils';
+import {endPlayback, endScene, startPlayback, startScene} from '../utils';
 import {
   CachedSceneData,
   FullSceneDescription,
   Scene,
-  SceneMetadata,
+  SceneDescriptionReload,
   SceneRenderEvent,
 } from './Scene';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Threadable} from './Threadable';
-import {Rect, Vector2} from '../types';
+import {BBox, Vector2} from '../types';
 import {SceneState} from './SceneState';
 import {Random} from './Random';
 import {DependencyContext} from '../signals';
+import {SceneMetadata} from './SceneMetadata';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -39,8 +39,9 @@ export abstract class GeneratorScene<T>
   implements Scene<ThreadGeneratorFactory<T>>, Threadable
 {
   public readonly name: string;
-  public readonly project: Project;
-  public readonly meta: Meta<SceneMetadata>;
+  public readonly playback: PlaybackStatus;
+  public readonly logger: Logger;
+  public readonly meta: SceneMetadata;
   public readonly timeEvents: TimeEvents;
   public readonly variables: Variables;
   public random: Random;
@@ -91,7 +92,14 @@ export abstract class GeneratorScene<T>
   }
   private readonly afterReset = new EventDispatcher<void>();
 
-  public readonly LifecycleEvents: LifecycleEvents = new LifecycleEvents(this);
+  public readonly lifecycleEvents: LifecycleEvents = new LifecycleEvents(this);
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  public get LifecycleEvents() {
+    this.logger.warn(
+      'LifecycleEvents is deprecated. Use lifecycleEvents instead.',
+    );
+    return this.lifecycleEvents;
+  }
 
   public get previous() {
     return this.previousScene;
@@ -103,27 +111,24 @@ export abstract class GeneratorScene<T>
   private state: SceneState = SceneState.Initial;
   private cached = false;
   private counters: Record<string, number> = {};
+  private size: Vector2;
 
   public constructor(
     description: FullSceneDescription<ThreadGeneratorFactory<T>>,
   ) {
     this.name = description.name;
-    this.project = description.project;
+    this.size = description.size;
+    this.logger = description.logger;
+    this.playback = description.playback;
     this.meta = description.meta;
     this.runnerFactory = description.config;
     this.creationStack = description.stack;
 
     decorate(this.runnerFactory, threadable(this.name));
-    this.timeEvents = new TimeEvents(this);
+    this.timeEvents = new description.timeEventsClass(this);
     this.variables = new Variables(this);
 
-    let seed = this.meta.getData().seed;
-    if (typeof seed !== 'number') {
-      seed = Random.createSeed();
-      this.meta.setDataSync({seed});
-    }
-
-    this.random = new Random(seed);
+    this.random = new Random(this.meta.seed.get());
   }
 
   public abstract getView(): T;
@@ -143,42 +148,50 @@ export abstract class GeneratorScene<T>
   public async render(context: CanvasRenderingContext2D): Promise<void> {
     let promises = DependencyContext.consumePromises();
     let iterations = 0;
-    startScene(this);
     do {
       iterations++;
       await Promise.all(promises.map(handle => handle.promise));
       context.save();
-      const rect = Rect.fromSizeCentered(this.getSize());
-      context.clearRect(rect.x, rect.y, rect.width, rect.height);
-      this.draw(context);
+      const box = BBox.fromSizeCentered(this.getSize());
+      context.clearRect(box.x, box.y, box.width, box.height);
+      this.execute(() => this.draw(context));
       context.restore();
 
       promises = DependencyContext.consumePromises();
     } while (promises.length > 0 && iterations < 10);
-    endScene(this);
 
     if (iterations > 1) {
-      this.project.logger.debug(`render iterations: ${iterations}`);
+      this.logger.debug(`render iterations: ${iterations}`);
     }
   }
 
   protected abstract draw(context: CanvasRenderingContext2D): void;
 
-  public reload(runnerFactory?: ThreadGeneratorFactory<T>) {
-    if (runnerFactory) {
-      this.runnerFactory = runnerFactory;
+  public reload({
+    config,
+    size,
+    stack,
+  }: SceneDescriptionReload<ThreadGeneratorFactory<T>> = {}) {
+    if (config) {
+      this.runnerFactory = config;
+    }
+    if (size) {
+      this.size = size;
+    }
+    if (stack) {
+      this.creationStack = stack;
     }
     this.cached = false;
     this.reloaded.dispatch();
   }
 
-  public async recalculate() {
+  public async recalculate(setFrame: (frame: number) => void) {
     const cached = this.cache.current;
-    cached.firstFrame = this.project.frame;
+    cached.firstFrame = this.playback.frame;
     cached.lastFrame = cached.firstFrame + cached.duration;
 
     if (this.isCached()) {
-      this.project.frame = cached.lastFrame;
+      setFrame(cached.lastFrame);
       this.cache.current = {...cached};
       return;
     }
@@ -190,9 +203,9 @@ export abstract class GeneratorScene<T>
         cached.transitionDuration < 0 &&
         this.state === SceneState.AfterTransitionIn
       ) {
-        cached.transitionDuration = this.project.frame - cached.firstFrame;
+        cached.transitionDuration = this.playback.frame - cached.firstFrame;
       }
-      this.project.frame++;
+      setFrame(this.playback.frame + 1);
       await this.next();
     }
 
@@ -200,7 +213,7 @@ export abstract class GeneratorScene<T>
       cached.transitionDuration = 0;
     }
 
-    cached.lastFrame = this.project.frame;
+    cached.lastFrame = this.playback.frame;
     cached.duration = cached.lastFrame - cached.firstFrame;
     // Prevent the page from becoming unresponsive.
     await new Promise(resolve => setTimeout(resolve, 0));
@@ -214,30 +227,29 @@ export abstract class GeneratorScene<T>
       return;
     }
 
-    startScene(this);
-    setProject(this.project);
-    let result = this.runner.next();
+    let result = this.execute(() => this.runner!.next());
     this.update();
     while (result.value) {
       if (isPromisable(result.value)) {
-        result = this.runner.next(await result.value.toPromise());
+        const value = await result.value.toPromise();
+        result = this.execute(() => this.runner!.next(value));
       } else if (isPromise(result.value)) {
-        result = this.runner.next(await result.value);
+        const value = await result.value;
+        result = this.execute(() => this.runner!.next(value));
       } else {
-        this.project.logger.warn({
+        this.logger.warn({
           message: 'Invalid value yielded by the scene.',
           object: result.value,
         });
-        result = this.runner.next(result.value);
+        result = this.execute(() => this.runner!.next(result.value));
       }
       this.update();
     }
-    endScene(this);
 
     const promises = DependencyContext.consumePromises();
     if (promises.length > 0) {
       await Promise.all(promises.map(handle => handle.promise));
-      this.project.logger.error({
+      this.logger.error({
         message:
           'Tried to access an asynchronous property before the node was ready. ' +
           'Make sure to yield the node before accessing the property.',
@@ -254,24 +266,20 @@ export abstract class GeneratorScene<T>
   public async reset(previousScene: Scene | null = null) {
     this.counters = {};
     this.previousScene = previousScene;
-    this.random = new Random(this.meta.getData().seed!);
+    this.random = new Random(this.meta.seed.get());
     this.runner = threads(
       () => this.runnerFactory(this.getView()),
       thread => {
         this.thread.current = thread;
       },
     );
-    if (this.cache.current.transitionDuration === 0) {
-      this.state = SceneState.AfterTransitionIn;
-    } else {
-      this.state = SceneState.Initial;
-    }
+    this.state = SceneState.AfterTransitionIn;
     this.afterReset.dispatch();
     await this.next();
   }
 
   public getSize(): Vector2 {
-    return this.project.getSize();
+    return this.size;
   }
 
   public isAfterTransitionIn(): boolean {
@@ -289,11 +297,21 @@ export abstract class GeneratorScene<T>
     return this.state === SceneState.Finished;
   }
 
+  public enterInitial() {
+    if (this.state === SceneState.AfterTransitionIn) {
+      this.state = SceneState.Initial;
+    } else {
+      this.logger.warn(
+        `Scene ${this.name} entered initial in an unexpected state: ${this.state}`,
+      );
+    }
+  }
+
   public enterAfterTransitionIn() {
     if (this.state === SceneState.Initial) {
       this.state = SceneState.AfterTransitionIn;
     } else {
-      this.project.logger.warn(
+      this.logger.warn(
         `Scene ${this.name} transitioned in an unexpected state: ${this.state}`,
       );
     }
@@ -306,7 +324,7 @@ export abstract class GeneratorScene<T>
     ) {
       this.state = SceneState.CanTransitionOut;
     } else {
-      this.project.logger.warn(
+      this.logger.warn(
         `Scene ${this.name} was marked as finished in an unexpected state: ${this.state}`,
       );
     }
@@ -314,5 +332,28 @@ export abstract class GeneratorScene<T>
 
   public isCached() {
     return this.cached;
+  }
+
+  /**
+   * Invoke the given callback in the context of this scene.
+   *
+   * @remarks
+   * This method makes sure that the context of this scene is globally available
+   * during the execution of the callback.
+   *
+   * @param callback - The callback to invoke.
+   */
+  protected execute<T>(callback: () => T): T {
+    let result: T;
+    startScene(this);
+    startPlayback(this.playback);
+    try {
+      result = callback();
+    } finally {
+      endPlayback(this.playback);
+      endScene(this);
+    }
+
+    return result;
   }
 }

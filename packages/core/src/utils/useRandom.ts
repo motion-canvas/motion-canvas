@@ -15,6 +15,6 @@ export function useRandom(): Random;
 export function useRandom(seed: number, fixed?: boolean): Random;
 export function useRandom(seed?: number, fixed = true): Random {
   return typeof seed === 'number'
-    ? new Random(fixed ? seed : seed + useScene().meta.getData().seed)
+    ? new Random(fixed ? seed : seed + useScene().meta.seed.get())
     : useScene().random;
 }

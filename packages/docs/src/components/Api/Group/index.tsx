@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo} from 'react';
 import {useLocation} from '@docusaurus/router';
 import {ApiLookup, useApiLookup} from '@site/src/contexts/api';
-import {useTabGroupChoice} from '@docusaurus/theme-common/internal';
 import Heading from '@theme/Heading';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -55,7 +54,6 @@ export default function Group({
 }) {
   const location = useLocation();
   const lookup = useApiLookup(project);
-  const {setTabGroupChoices} = useTabGroupChoice();
   const hash = location.hash.split('-')[0].slice(1);
   const [filters] = useFilters();
 
@@ -73,7 +71,8 @@ export default function Group({
     const hash = location.hash.split('-')[0].slice(1);
     for (const category of categories) {
       if (category.anchors.includes(hash)) {
-        setTabGroupChoices(group.title, category.title);
+        // TODO Find a way to select the current tab
+        // setTabGroupChoices(group.title, category.title);
         return;
       }
     }

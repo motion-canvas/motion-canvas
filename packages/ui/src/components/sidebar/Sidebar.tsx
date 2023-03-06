@@ -1,13 +1,15 @@
 import {Badge, Tabs, TabType} from '../tabs';
 import {Properties} from './Properties';
-import {Rendering} from './Rendering';
+import {VideoSettings} from './VideoSettings';
 import {Threads} from './Threads';
 import {Console} from '../console';
 import {useInspection, useLogger} from '../../contexts';
 import {useEffect, useRef, useState} from 'preact/hooks';
 import {shake} from '../animations';
 import {useStorage} from '../../hooks';
-import {MotionCanvas, Bug, Tune, VideoSettings, Schedule} from '../icons';
+import {MotionCanvas, Bug, Videocam, AccountTree} from '../icons';
+import {Docs} from '../icons/Docs';
+import {ViewTimeline} from '../icons/ViewTimeline';
 
 interface SidebarProps {
   setOpen?: (value: boolean) => void;
@@ -32,9 +34,9 @@ export function Sidebar({setOpen}: SidebarProps) {
 
   useEffect(() => {
     if (inspectedElement && tab !== -1) {
-      setTab(2);
+      setTab(4);
     }
-  }, [inspectedElement]);
+  }, [!inspectedElement]);
 
   return (
     <>
@@ -53,27 +55,34 @@ export function Sidebar({setOpen}: SidebarProps) {
           url: window.location.pathname === '/' ? undefined : '../',
         }}
         {{
-          type: TabType.Space,
+          title: 'Docs',
+          id: 'docs-external-link',
+          type: TabType.ExternalLink,
+          icon: <Docs />,
+          url: 'https://motioncanvas.io/docs/',
         }}
         {{
-          title: 'Inspector',
-          id: 'inspector-tab',
-          type: TabType.Pane,
-          icon: <Tune />,
-          pane: <Properties />,
+          type: TabType.Space,
         }}
         {{
           title: 'Video Settings',
           id: 'rendering-tab',
           type: TabType.Pane,
-          icon: <VideoSettings />,
-          pane: <Rendering />,
+          icon: <Videocam />,
+          pane: <VideoSettings />,
+        }}
+        {{
+          title: 'Inspector',
+          id: 'inspector-tab',
+          type: TabType.Pane,
+          icon: <AccountTree />,
+          pane: <Properties />,
         }}
         {{
           title: 'Thread Debugger',
           id: 'threads-tab',
           type: TabType.Pane,
-          icon: <Schedule />,
+          icon: <ViewTimeline />,
           pane: <Threads />,
         }}
         {{

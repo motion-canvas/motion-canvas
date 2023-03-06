@@ -1,12 +1,12 @@
 import type {Scene} from '../scenes';
 
-const sceneStack: Scene[] = [];
+const SceneStack: Scene[] = [];
 
 /**
  * Get a reference to the current scene.
  */
 export function useScene(): Scene {
-  const scene = sceneStack.at(-1);
+  const scene = SceneStack.at(-1);
   if (!scene) {
     throw new Error('The scene is not available in the current context.');
   }
@@ -14,13 +14,17 @@ export function useScene(): Scene {
 }
 
 export function startScene(scene: Scene) {
-  sceneStack.push(scene);
+  SceneStack.push(scene);
 }
 
 export function endScene(scene: Scene) {
-  if (sceneStack.pop() !== scene) {
-    throw new Error('startScene/endScene was called out of order.');
+  if (SceneStack.pop() !== scene) {
+    throw new Error('startScene/endScene were called out of order.');
   }
+}
+
+export function useLogger() {
+  return SceneStack.at(-1)?.logger ?? console;
 }
 
 /**

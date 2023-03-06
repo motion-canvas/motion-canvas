@@ -19,11 +19,13 @@ import {Length} from '../partials';
 import {clampRemap, map, tween} from '@motion-canvas/core/lib/tweening';
 import diffSequence from 'diff-sequences';
 
-const adaptor = liteAdaptor();
-RegisterHTMLHandler(adaptor);
+const Adaptor = liteAdaptor();
+RegisterHTMLHandler(Adaptor);
 
-const jaxDocument = mathjax.document('', {
+const JaxDocument = mathjax.document('', {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   InputJax: new TeX({packages: AllPackages}),
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   OutputJax: new SVG({fontCache: 'local'}),
 });
 

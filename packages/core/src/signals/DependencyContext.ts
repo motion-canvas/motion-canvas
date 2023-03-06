@@ -56,7 +56,7 @@ export class DependencyContext<TOwner = void>
   protected event = new FlagDispatcher();
   protected markDirty = () => this.event.raise();
 
-  public constructor(protected readonly owner: TOwner) {
+  public constructor(protected owner: TOwner) {
     this.invokable = this.invoke.bind(this);
 
     Object.defineProperty(this.invokable, 'context', {
@@ -92,12 +92,23 @@ export class DependencyContext<TOwner = void>
     }
   }
 
+  protected clearDependencies() {
+    this.dependencies.forEach(dep => dep.unsubscribe(this.markDirty));
+    this.dependencies.clear();
+  }
+
   protected collect() {
     const signal = DependencyContext.collectionStack.at(-1);
     if (signal) {
       signal.dependencies.add(this.event.subscribable);
       this.event.subscribe(signal.markDirty);
     }
+  }
+
+  public dispose() {
+    this.clearDependencies();
+    this.event.clear();
+    this.owner = null as TOwner;
   }
 
   public async toPromise(): Promise<this> {

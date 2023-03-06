@@ -1,0 +1,28 @@
+.contributor {
+  display: inline-flex;
+  background-color: var(--ifm-background-surface-color);
+  vertical-align: text-top;
+  margin-left: calc(-20px - 0.5rem);
+  margin-right: 0.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.pr {
+  display: inline-flex;
+  background-color: var(--ifm-background-surface-color);
+  border-radius: 10px;
+  vertical-align: text-top;
+  line-height: 20px;
+  padding: 0 0.5rem;
+  margin-left: 0.25rem;
+}
+
+.group {
+  margin-bottom: 2rem;
+}
+
+.element {
+  margin-bottom: 1rem;
+  list-style: none;
+}

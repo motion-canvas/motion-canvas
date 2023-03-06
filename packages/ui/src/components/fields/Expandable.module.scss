@@ -1,0 +1,17 @@
+.root {
+  border-top: 1px solid var(--background-color);
+}
+
+.title {
+  padding: 8px 0;
+  line-height: 24px;
+  user-select: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  padding-bottom: 16px;
+}

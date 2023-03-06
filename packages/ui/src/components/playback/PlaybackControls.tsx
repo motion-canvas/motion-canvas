@@ -1,11 +1,10 @@
 import styles from './Playback.module.scss';
 
-import {IconButton, IconCheckbox} from '../controls';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
-import {Select, Input} from '../controls';
+import {IconButton, IconCheckbox, Input, Select} from '../controls';
+import {useDocumentEvent, usePlayerState, useRendererState} from '../../hooks';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
-import {usePlayer} from '../../contexts';
+import {useApplication} from '../../contexts';
 import clsx from 'clsx';
 import React from 'react';
 import {
@@ -18,10 +17,12 @@ import {
   VolumeOff,
   VolumeOn,
 } from '../icons';
+import {RendererState} from '@motion-canvas/core';
 
 export function PlaybackControls() {
-  const player = usePlayer();
+  const {player, renderer, meta, project} = useApplication();
   const state = usePlayerState();
+  const rendererState = useRendererState();
 
   useDocumentEvent(
     'keydown',
@@ -46,6 +47,11 @@ export function PlaybackControls() {
             break;
           case 'ArrowRight':
             event.preventDefault();
+            if (event.shiftKey) {
+              player.requestSeek(Infinity);
+              return;
+            }
+
             player.requestNextFrame();
             break;
           case 'm':
@@ -56,12 +62,17 @@ export function PlaybackControls() {
             break;
         }
       },
-      [state],
+      [player],
     ),
   );
 
   return (
-    <div className={clsx(styles.controls, state.render && styles.disabled)}>
+    <div
+      className={clsx(
+        styles.controls,
+        rendererState === RendererState.Working && styles.disabled,
+      )}
+    >
       <Select
         title="Playback speed"
         options={[
@@ -113,13 +124,27 @@ export function PlaybackControls() {
           <Input
             title="Current framerate"
             readOnly
-            value={paused ? 'PAUSED' : `${framerate} FPS`}
+            value={
+              rendererState === RendererState.Working
+                ? 'RENDERING'
+                : paused
+                ? 'PAUSED'
+                : `${framerate} FPS`
+            }
           />
         )}
       />
       <IconButton
         title="Save snapshot"
-        onClick={() => player.exportCurrentFrame()}
+        onClick={() =>
+          renderer.renderFrame(
+            {
+              ...meta.getFullRenderingSettings(),
+              name: project.name,
+            },
+            player.playback.frame,
+          )
+        }
       >
         <PhotoCamera />
       </IconButton>

@@ -2,6 +2,7 @@ import {decorate, threadable} from '../decorators';
 import {Thread} from './Thread';
 import {isThreadGenerator, ThreadGenerator} from './ThreadGenerator';
 import {setTaskName} from './names';
+import {usePlayback} from '../utils';
 
 /**
  * Check if the given value is a [Promise][promise].
@@ -55,6 +56,7 @@ export function* threads(
   factory: ThreadsFactory,
   callback?: ThreadsCallback,
 ): ThreadGenerator {
+  const playback = usePlayback();
   const root = factory();
   setTaskName(root, 'root');
   const rootThread = new Thread(root);
@@ -64,6 +66,7 @@ export function* threads(
   while (threads.length > 0) {
     const newThreads = [];
     const queue = [...threads];
+    const dt = playback.framesToSeconds(1) * playback.speed;
 
     while (queue.length > 0) {
       const thread = queue.pop();
@@ -88,7 +91,7 @@ export function* threads(
         thread.value = yield result.value;
         queue.push(thread);
       } else {
-        thread.update();
+        thread.update(dt);
         newThreads.unshift(thread);
       }
     }

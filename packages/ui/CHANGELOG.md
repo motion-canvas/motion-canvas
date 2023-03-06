@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/motion-canvas/motion-canvas/compare/v3.0.0...v3.0.1) (2023-02-27)
+
+
+### Bug Fixes
+
+* **create:** update templates ([#439](https://github.com/motion-canvas/motion-canvas/issues/439)) ([8483557](https://github.com/motion-canvas/motion-canvas/commit/8483557f0a3ca7914aafacceab5d466abba59df0))
+
+
+
+
+
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **2d:** fix performance issue with audio track ([#427](https://github.com/motion-canvas/motion-canvas/issues/427)) ([c993770](https://github.com/motion-canvas/motion-canvas/commit/c993770937ddfdf0ac39b144a1f79f1a300f7899))
+* **ui:** correctly reset zoom ([#432](https://github.com/motion-canvas/motion-canvas/issues/432)) ([a33ee14](https://github.com/motion-canvas/motion-canvas/commit/a33ee14dfac3e1fe24c89d76631e23fe4cb625a6))
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+* **ui:** add quarter resolution ([#421](https://github.com/motion-canvas/motion-canvas/issues/421)) ([d0160d0](https://github.com/motion-canvas/motion-canvas/commit/d0160d0d5ef76ffb0d3591566891b5efa4061744))
+
+
+### BREAKING CHANGES
+
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+
+
+
+
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+
+
+
+
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **ui:** fix inspector tab ([#374](https://github.com/motion-canvas/motion-canvas/issues/374)) ([c4cb378](https://github.com/motion-canvas/motion-canvas/commit/c4cb378c2f9d972bb41542bbe3b3aa314fa1f3ad))
+
+
+### Features
+
+* **ui:** add external link to docs ([#346](https://github.com/motion-canvas/motion-canvas/issues/346)) ([fc4ee5d](https://github.com/motion-canvas/motion-canvas/commit/fc4ee5d028312904ed9e11c5341ac00f36e7242b))
+* **ui:** shift + right arrow moves to last frame ([#354](https://github.com/motion-canvas/motion-canvas/issues/354)) ([4b81709](https://github.com/motion-canvas/motion-canvas/commit/4b8170971400c5bf4fe690a58d3f44c3e1d00b94)), closes [#353](https://github.com/motion-canvas/motion-canvas/issues/353)
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 

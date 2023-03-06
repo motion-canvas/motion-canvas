@@ -1,9 +1,10 @@
 ---
-sidebar_position: 9
+sidebar_position: 10
 slug: /transitions
 ---
 
 import ApiSnippet from '@site/src/components/Api/ApiSnippet';
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
 
 # Transitions
 
@@ -11,21 +12,63 @@ Transitions allow you to customize the way scenes transition from one into
 another. A transition is an animation performed at the beginning of the scene.
 It can modify the context of both the current and the previous scene.
 
+## Before we start
+
+<div className='row'>
+  <div className='col'>
+
+Make sure your project contains at least two scenes. In this example, we've
+prepared `firstScene.tsx` and `secondScene.tsx`, and configured our project to
+display one after the other. We'll be setting up our transitions in the second
+scene.
+
+Make sure to put something different in both scenes to easier see the
+transitions.
+
+  </div>
+  <div className='col'>
+
+```
+my-animation/
+└─ src/
+   ├─ scenes/
+   │  ├─ firstScene.tsx
+   │  └─ secondScene.tsx
+   └─ project.ts
+```
+
+  </div>
+</div>
+
 ## Pre-made transitions
 
 Motion Canvas comes with a set of common transitions in a form of easy-to-use
-generator. To use them, yield the transition generator at the beggining of the
-scene:
+generators. To use them, `yield*` the transition generator at the beginning of
+the new scene:
 
-```ts
+```tsx title="src/scenes/secondScene.tsx"
 export default makeScene2D(function* (view) {
+  // set up the scene:
+  view.add(/* your nodes here */);
+
   // perform a slide transition to the left:
   yield* slideTransition(Direction.Left);
+
   // proceed with the animation
+  yield* waitFor(3);
 });
 ```
 
-The available transitions are:
+<AnimationPlayer small name={'transitions'} />
+
+:::caution
+
+Make sure to add nodes to the view before yielding the transition generator.
+Otherwise, your scene will remain empty until the transition ends.
+
+:::
+
+All available transitions are listed below:
 
 ### `slideTransition`
 
@@ -40,6 +83,11 @@ The available transitions are:
 ### `zoomOutTransition`
 
 <ApiSnippet url={'/api/core/transitions#zoomOutTransition'} />
+<hr />
+
+### `fadeTransition`
+
+<ApiSnippet url={'/api/core/transitions#fadeTransition'} />
 <hr />
 
 ## Custom transitions

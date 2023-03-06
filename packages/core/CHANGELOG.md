@@ -3,6 +3,101 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+
+### Bug Fixes
+
+* **core:** clear semi-transparent backgrounds ([#424](https://github.com/motion-canvas/motion-canvas/issues/424)) ([1ebff1c](https://github.com/motion-canvas/motion-canvas/commit/1ebff1c92bebce56d11c61eb9dadca47f5a80ac1)), closes [#423](https://github.com/motion-canvas/motion-canvas/issues/423)
+* **core:** fix Vector2.exactlyEquals ([#437](https://github.com/motion-canvas/motion-canvas/issues/437)) ([028d264](https://github.com/motion-canvas/motion-canvas/commit/028d26499d8f3fb34500b22e8dcde2d080c2e2b0))
+* **core:** render only within the range ([#436](https://github.com/motion-canvas/motion-canvas/issues/436)) ([36ccebe](https://github.com/motion-canvas/motion-canvas/commit/36ccebe5321d84eeaa16f8b74a79c1001ee7ac0b))
+
+
+### Code Refactoring
+
+* introduce improved names ([#425](https://github.com/motion-canvas/motion-canvas/issues/425)) ([4a2188d](https://github.com/motion-canvas/motion-canvas/commit/4a2188d339587fa658b2134befc3fe63c835c5d7))
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+
+
+### BREAKING CHANGES
+
+* multiple name changes
+
+To avoid collisions, names of certain classes have changed:
+- `Text => Txt`
+- `Image => Img`
+- `Rect (type) => BBox`
+
+Cache related methods of `Node` have changed:
+- `getCacheRect => getCacheBBox`
+- `cacheRect => cacheBBox`
+- `fullCacheRect => fullCacheBBox`
+
+The `CodeBlock` property has changed:
+- `CodeBlock.selectionOpacity => CodeBlock.unselectedOpacity`
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+
+### Features
+
+* **2d:** add save and restore methods to nodes ([#406](https://github.com/motion-canvas/motion-canvas/issues/406)) ([870e194](https://github.com/motion-canvas/motion-canvas/commit/870e1947d97382bc6d82857c077140bbef7cf7e8))
+* **vite-plugin:** add CORS Proxy ([#357](https://github.com/motion-canvas/motion-canvas/issues/357)) ([a3c5822](https://github.com/motion-canvas/motion-canvas/commit/a3c58228b7d3dab08fc27414d19870d35773b280)), closes [#338](https://github.com/motion-canvas/motion-canvas/issues/338)
+
+
+
+
+
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+
+### Bug Fixes
+
+* **2d:** handle floating point errors in acos ([#381](https://github.com/motion-canvas/motion-canvas/issues/381)) ([5bca8fd](https://github.com/motion-canvas/motion-canvas/commit/5bca8fd0bbdcf28f2793c124b7d6b0afd560c4b8))
+* plug memory leaks ([#385](https://github.com/motion-canvas/motion-canvas/issues/385)) ([de0af00](https://github.com/motion-canvas/motion-canvas/commit/de0af00a7d2e019e2a933791c62b7901755be7b0))
+* support color to null tweening ([#387](https://github.com/motion-canvas/motion-canvas/issues/387)) ([02e9f22](https://github.com/motion-canvas/motion-canvas/commit/02e9f22027a1c3a85ffcc259aeca913318fb6f54))
+
+
+### Features
+
+* **core:** add fadeTransition ([#384](https://github.com/motion-canvas/motion-canvas/issues/384)) ([a248785](https://github.com/motion-canvas/motion-canvas/commit/a248785e87d1c6ebc08581f4fda6be428a89824c))
+* **core:** add spring interpolation ([#356](https://github.com/motion-canvas/motion-canvas/issues/356)) ([1463b15](https://github.com/motion-canvas/motion-canvas/commit/1463b1592e22fad9d8298c11270e2099119e2229))
+* **core:** add step parameter to range function ([#373](https://github.com/motion-canvas/motion-canvas/issues/373)) ([923209a](https://github.com/motion-canvas/motion-canvas/commit/923209a4106c8e7f570853dcc47a10e65e0d04d8))
+
+
+
+
+
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+
+### Bug Fixes
+
+* **core:** playback speed is reset after saving with faulty code ([#204](https://github.com/motion-canvas/motion-canvas/issues/204)). ([#339](https://github.com/motion-canvas/motion-canvas/issues/339)) ([6771e5e](https://github.com/motion-canvas/motion-canvas/commit/6771e5e17edcdc4cce074d7da0962cf71ba6c228))
+
+
+### Features
+
+* **2d:** add default computed values for signals ([#259](https://github.com/motion-canvas/motion-canvas/issues/259)) ([18f61a6](https://github.com/motion-canvas/motion-canvas/commit/18f61a668420dec8afba52d52a6557e7a7919ba2))
+* **core:** add Matrix2D type ([#340](https://github.com/motion-canvas/motion-canvas/issues/340)) ([66b41e6](https://github.com/motion-canvas/motion-canvas/commit/66b41e6beaca5c2ba4b6bd1a7e68ca16d183b0e9))
+* **core:** error double event name ([#341](https://github.com/motion-canvas/motion-canvas/issues/341)) ([053b2a6](https://github.com/motion-canvas/motion-canvas/commit/053b2a6c22c4e726e3962fdaf0a2e8d149889a9b))
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 

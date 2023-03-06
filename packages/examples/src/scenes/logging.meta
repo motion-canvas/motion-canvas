@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "timeEvents": [
+    {
+      "name": "basic logging",
+      "targetTime": 0.9814062499999999
+    },
+    {
+      "name": "logging payloads",
+      "targetTime": 1.9671614583333334
+    },
+    {
+      "name": "profiling",
+      "targetTime": 2.985234375
+    }
+  ],
+  "seed": 1707918003
+}

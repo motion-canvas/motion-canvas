@@ -4,7 +4,7 @@ import {
   computed,
   getPropertiesOf,
   initial,
-  initialize,
+  initializeSignals,
   inspectable,
   signal,
   vector2Signal,
@@ -12,7 +12,7 @@ import {
 } from '../decorators';
 import {
   Vector2,
-  Rect,
+  BBox,
   transformScalar,
   PossibleColor,
   transformAngle,
@@ -21,11 +21,20 @@ import {
   ColorSignal,
   SimpleVector2Signal,
 } from '@motion-canvas/core/lib/types';
-import {DetailedError, ReferenceReceiver} from '@motion-canvas/core/lib/utils';
+import {
+  DetailedError,
+  ReferenceReceiver,
+  useLogger,
+} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
-import {TimingFunction} from '@motion-canvas/core/lib/tweening';
+import {
+  deepLerp,
+  easeInOutCubic,
+  TimingFunction,
+  tween,
+} from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
@@ -38,6 +47,8 @@ import {
   SimpleSignal,
   isReactive,
 } from '@motion-canvas/core/lib/signals';
+
+export type NodeState = NodeProps & Record<string, any>;
 
 export interface NodeProps {
   ref?: ReferenceReceiver<any>;
@@ -52,6 +63,7 @@ export interface NodeProps {
   scaleX?: SignalValue<number>;
   scaleY?: SignalValue<number>;
   scale?: SignalValue<PossibleVector2>;
+  zIndex?: SignalValue<number>;
 
   opacity?: SignalValue<number>;
   filters?: SignalValue<Filter[]>;
@@ -244,6 +256,10 @@ export class Node implements Promisable<Node> {
     return scale.div(parentScale);
   }
 
+  @initial(0)
+  @signal()
+  public declare readonly zIndex: SimpleSignal<number, this>;
+
   @initial(false)
   @signal()
   public declare readonly cache: SimpleSignal<boolean, this>;
@@ -375,6 +391,15 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  @computed()
+  protected sortedChildren(): Node[] {
+    return [...this.children()].sort((a, b) =>
+      Math.sign(a.zIndex() - b.zIndex()),
+    );
+  }
+
+  protected view2D: View2D;
+  private stateStack: NodeState[] = [];
   private realChildren: Node[] = [];
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
@@ -382,12 +407,11 @@ export class Node implements Promisable<Node> {
   public readonly creationStack?: string;
 
   public constructor({children, spawner, key, ...rest}: NodeProps) {
-    this.key = useScene2D()?.registerNode(this, key) ?? key ?? '';
+    const scene = useScene2D();
+    this.key = scene.registerNode(this, key);
+    this.view2D = scene.getView();
     this.creationStack = new Error().stack;
-    initialize(this, {defaults: rest});
-    for (const {signal} of this) {
-      signal.reset();
-    }
+    initializeSignals(this, rest);
     this.add(children);
     if (spawner) {
       this.children(spawner);
@@ -525,9 +549,8 @@ export class Node implements Promisable<Node> {
     return new DOMMatrix();
   }
 
-  @computed()
-  public view(): View2D | null {
-    return this.parent()?.view() ?? null;
+  public view(): View2D {
+    return this.view2D;
   }
 
   /**
@@ -570,7 +593,7 @@ export class Node implements Promisable<Node> {
    *   </Layout>
    * );
    *
-   * node.insert(<Text />, 1);
+   * node.insert(<Txt />, 1);
    * ```
    *
    * Result:
@@ -720,6 +743,115 @@ export class Node implements Promisable<Node> {
   }
 
   /**
+   * Move the node to the provided position relative to its siblings.
+   *
+   * @remarks
+   * If the node is getting moved to a lower position, it will be placed below
+   * the sibling that's currently at the provided index (if any).
+   * If the node is getting moved to a higher position, it will be placed above
+   * the sibling that's currently at the provided index (if any).
+   *
+   * @param index - The index to move the node to.
+   */
+  public moveTo(index: number): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    const currentIndex = parent.children().indexOf(this);
+    const by = index - currentIndex;
+
+    return this.move(by);
+  }
+
+  /**
+   * Move the node below the provided node in the parent's layout.
+   *
+   * @remarks
+   * The node will be moved below the provided node and from then on will be
+   * rendered below it. By default, if the node is already positioned lower than
+   * the sibling node, it will not get moved.
+   *
+   * @param node - The sibling node below which to move.
+   * @param directlyBelow - Whether the node should be positioned directly below
+   *                        the sibling. When true, will move the node even if
+   *                        it is already positioned below the sibling.
+   */
+  public moveBelow(node: Node, directlyBelow = false): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    if (node.parent() !== parent) {
+      useLogger().error(
+        "Cannot position nodes relative to each other if they don't belong to the same parent.",
+      );
+      return this;
+    }
+
+    const children = parent.children();
+    const ownIndex = children.indexOf(this);
+    const otherIndex = children.indexOf(node);
+
+    if (!directlyBelow && ownIndex < otherIndex) {
+      // Nothing to do if the node is already positioned below the target node.
+      // We could move the node so it's directly below the sibling node, but
+      // that might suddenly move it on top of other nodes. This is likely
+      // not what the user wanted to happen when calling this method.
+      return this;
+    }
+
+    const by = otherIndex - ownIndex - 1;
+
+    return this.move(by);
+  }
+
+  /**
+   * Move the node above the provided node in the parent's layout.
+   *
+   * @remarks
+   * The node will be moved above the provided node and from then on will be
+   * rendered on top of it. By default, if the node is already positioned
+   * higher than the sibling node, it will not get moved.
+   *
+   * @param node - The sibling node below which to move.
+   * @param directlyAbove - Whether the node should be positioned directly above the
+   *                        sibling. When true, will move the node even if it is
+   *                        already positioned above the sibling.
+   */
+  public moveAbove(node: Node, directlyAbove = false): this {
+    const parent = this.parent();
+    if (!parent) {
+      return this;
+    }
+
+    if (node.parent() !== parent) {
+      useLogger().error(
+        "Cannot position nodes relative to each other if they don't belong to the same parent.",
+      );
+      return this;
+    }
+
+    const children = parent.children();
+    const ownIndex = children.indexOf(this);
+    const otherIndex = children.indexOf(node);
+
+    if (!directlyAbove && ownIndex > otherIndex) {
+      // Nothing to do if the node is already positioned above the target node.
+      // We could move the node so it's directly above the sibling node, but
+      // that might suddenly move it below other nodes. This is likely not what
+      // the user wanted to happen when calling this method.
+      return this;
+    }
+
+    const by = otherIndex - ownIndex + 1;
+
+    return this.move(by);
+  }
+
+  /**
    * Change the parent of this node while keeping the absolute transform.
    *
    * @remarks
@@ -758,7 +890,10 @@ export class Node implements Promisable<Node> {
    * node to be garbage collected.
    */
   public dispose() {
-    // do nothing
+    this.stateStack = [];
+    for (const {signal} of this) {
+      signal.context.dispose();
+    }
   }
 
   /**
@@ -801,14 +936,13 @@ export class Node implements Promisable<Node> {
    * @param customProps - Properties to override.
    */
   public snapshotClone(customProps: NodeProps = {}): this {
-    const props: NodeProps & Record<string, any> = {...customProps};
+    const props: NodeProps & Record<string, any> = {
+      ...this.getState(),
+      ...customProps,
+    };
+
     if (this.children().length > 0) {
       props.children ??= this.children().map(child => child.snapshotClone());
-    }
-
-    for (const {key, meta, signal} of this) {
-      if (!meta.cloneable || key in props) continue;
-      props[key] = signal();
     }
 
     return this.instantiate(props);
@@ -875,7 +1009,7 @@ export class Node implements Promisable<Node> {
   @computed()
   protected cachedCanvas() {
     const context = this.cacheCanvas();
-    const cache = this.cacheRect();
+    const cache = this.cacheBBox();
     context.canvas.width = cache.width;
     context.canvas.height = cache.height;
     context.resetTransform();
@@ -886,22 +1020,22 @@ export class Node implements Promisable<Node> {
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node.
+   * Get a bounding box for the contents rendered by this node.
    *
    * @remarks
-   * The returned rectangle should be in local space.
+   * The returned bounding box should be in local space.
    */
-  protected getCacheRect(): Rect {
-    return new Rect();
+  protected getCacheBBox(): BBox {
+    return new BBox();
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node as well
+   * Get a bounding box for the contents rendered by this node as well
    * as its children.
    */
   @computed()
-  public cacheRect(): Rect {
-    const cache = this.getCacheRect();
+  public cacheBBox(): BBox {
+    const cache = this.getCacheBBox();
     const children = this.children();
     if (children.length === 0) {
       return cache.pixelPerfect;
@@ -909,30 +1043,30 @@ export class Node implements Promisable<Node> {
 
     const points: Vector2[] = cache.corners;
     for (const child of children) {
-      const childCache = child.fullCacheRect();
+      const childCache = child.fullCacheBBox();
       const childMatrix = child.localToParent();
       points.push(
         ...childCache.corners.map(r => r.transformAsPoint(childMatrix)),
       );
     }
 
-    return Rect.fromPoints(...points).pixelPerfect;
+    return BBox.fromPoints(...points).pixelPerfect;
   }
 
   /**
-   * Get a rectangle encapsulating the contents rendered by this node (including
+   * Get a bounding box for the contents rendered by this node (including
    * effects applied after caching).
    *
    * @remarks
-   * The returned rectangle should be in local space.
+   * The returned bounding box should be in local space.
    */
   @computed()
-  protected fullCacheRect(): Rect {
+  protected fullCacheBBox(): BBox {
     const matrix = this.compositeToLocal();
     const shadowOffset = this.shadowOffset().transform(matrix);
     const shadowBlur = transformScalar(this.shadowBlur(), matrix);
 
-    const result = this.cacheRect().expand(
+    const result = this.cacheBBox().expand(
       this.filters.blur() * 2 + shadowBlur,
     );
 
@@ -998,7 +1132,7 @@ export class Node implements Promisable<Node> {
     this.transformContext(context);
 
     if (this.requiresCache()) {
-      const cacheRect = this.cacheRect();
+      const cacheRect = this.cacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
@@ -1034,7 +1168,7 @@ export class Node implements Promisable<Node> {
   }
 
   protected drawChildren(context: CanvasRenderingContext2D) {
-    for (const child of this.children()) {
+    for (const child of this.sortedChildren()) {
       child.render(context);
     }
   }
@@ -1055,12 +1189,12 @@ export class Node implements Promisable<Node> {
    * @param matrix - A local-to-screen matrix.
    */
   public drawOverlay(context: CanvasRenderingContext2D, matrix: DOMMatrix) {
-    const rect = this.cacheRect().transformCorners(matrix);
-    const cache = this.getCacheRect().transformCorners(matrix);
+    const box = this.cacheBBox().transformCorners(matrix);
+    const cache = this.getCacheBBox().transformCorners(matrix);
     context.strokeStyle = 'white';
     context.lineWidth = 1;
     context.beginPath();
-    drawLine(context, rect);
+    drawLine(context, box);
     context.closePath();
     context.stroke();
 
@@ -1128,12 +1262,115 @@ export class Node implements Promisable<Node> {
     return this;
   }
 
+  /**
+   * Return a snapshot of the node's current signal values.
+   *
+   * @remarks
+   * This method will calculate the values of any reactive properties of the
+   * node at the time the method is called.
+   */
+  public getState(): NodeState {
+    const state: NodeState = {};
+    for (const {key, meta, signal} of this) {
+      if (!meta.cloneable || key in state) continue;
+      state[key] = signal();
+    }
+    return state;
+  }
+
+  /**
+   * Apply the given state to the node, setting all matching signal values to
+   * the provided values.
+   *
+   * @param state - The state to apply to the node.
+   */
+  public applyState(state: NodeState) {
+    for (const key in state) {
+      const signal = this.signalByKey(key);
+      if (signal) {
+        signal(state[key]);
+      }
+    }
+  }
+
+  /**
+   * Push a snapshot of the node's current state onto the node's state stack.
+   *
+   * @remarks
+   * This method can be used together with the {@link restore} method to save a
+   * node's current state and later restore it. It is possible to store more
+   * than one state by calling `save` method multiple times.
+   */
+  public save(): void {
+    this.stateStack.push(this.getState());
+  }
+
+  /**
+   * Restore the node to its last saved state.
+   *
+   * @remarks
+   * This method can be used together with the {@link save} method to restore a
+   * node to a previously saved state. Restoring a node to a previous state
+   * removes that state from the state stack.
+   *
+   * @example
+   * ```tsx
+   * const node = <Circle width={100} height={100} fill={"lightseagreen"} />
+   *
+   * view.add(node);
+   *
+   * // Save the node's current state
+   * node.save();
+   *
+   * // Modify some of the node's properties
+   * yield* node.scale(2, 1);
+   * yield* node.fill('hotpink', 1);
+   *
+   * // Restore the node to its saved state over 1 second
+   * yield* node.restore(1);
+   * ```
+   *
+   * @param duration - The duration of the transition
+   * @param timing - The timing function to use for the transition
+   */
+  public restore(duration: number, timing: TimingFunction = easeInOutCubic) {
+    const state = this.stateStack.pop();
+
+    if (state === undefined) {
+      return;
+    }
+
+    const currentState = this.getState();
+    for (const key in state) {
+      // Filter out any properties that haven't changed between the current and
+      // previous states so we don't perform unnecessary tweens.
+      if (currentState[key] === state[key]) {
+        delete state[key];
+      }
+    }
+
+    return tween(duration, value => {
+      const t = timing(value);
+
+      const nextState = Object.keys(state).reduce((newState, key) => {
+        newState[key] = deepLerp(currentState[key], state[key], t);
+        return newState;
+      }, {} as NodeState);
+
+      this.applyState(nextState);
+    });
+  }
+
   public *[Symbol.iterator]() {
     for (const key in this.properties) {
       const meta = this.properties[key];
-      const signal = (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
+      const signal = this.signalByKey(key);
       yield {meta, signal, key};
     }
+  }
+
+  private signalByKey(key: string): SimpleSignal<any> {
+    return (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
   }
 }
 

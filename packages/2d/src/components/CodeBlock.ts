@@ -18,7 +18,7 @@ import {
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {
   createComputedAsync,
@@ -92,7 +92,7 @@ export class CodeBlock extends Shape {
 
   @initial(0.32)
   @signal()
-  public declare readonly selectionOpacity: SimpleSignal<number, this>;
+  public declare readonly unselectedOpacity: SimpleSignal<number, this>;
 
   private codeProgress = createSignal<number | null>(null);
   private selectionProgress = createSignal<number | null>(null);
@@ -131,7 +131,7 @@ export class CodeBlock extends Shape {
     return new Vector2(width, parseFloat(this.styles.lineHeight));
   }
 
-  protected override desiredSize(): SerializedVector2<Length> {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
     const tokensSize = this.getTokensSize(this.parsed());
     return {
@@ -311,11 +311,11 @@ export class CodeBlock extends Shape {
     const w = context.measureText('X').width;
     const size = this.computedSize();
     const progress = this.codeProgress();
-    const selectionOpacity = this.selectionOpacity();
+    const unselectedOpacity = this.unselectedOpacity();
     const globalAlpha = context.globalAlpha;
 
     const getSelectionAlpha = (x: number, y: number) =>
-      map(selectionOpacity, 1, this.selectionStrength(x, y));
+      map(unselectedOpacity, 1, this.selectionStrength(x, y));
 
     const drawToken = (
       code: string,
@@ -456,7 +456,7 @@ export function insert(content: string): CodeModification {
  * @remarks
  * Should be used in conjunction with {@link CodeBlock.edit}.
  *
- * @param content - The code to insert.
+ * @param content - The code to remove.
  */
 export function remove(content: string): CodeModification {
   return {

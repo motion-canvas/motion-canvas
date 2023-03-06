@@ -1,10 +1,10 @@
 {
   "name": "@motion-canvas/create",
-  "version": "2.3.0",
+  "version": "3.0.2",
   "description": "Quickly scaffold Motion Canvas projects",
   "main": "index.js",
   "author": "motion-canvas",
-  "homepage": "https://motion-canvas.github.io/",
+  "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "type": "module",
@@ -20,10 +20,10 @@
     "url": "https://github.com/motion-canvas/motion-canvas.git"
   },
   "devDependencies": {
-    "@motion-canvas/2d": "^2.3.0",
-    "@motion-canvas/core": "^2.3.0",
-    "@motion-canvas/ui": "^2.3.0",
-    "@motion-canvas/vite-plugin": "^2.2.0"
+    "@motion-canvas/2d": "^3.0.2",
+    "@motion-canvas/core": "^3.0.0",
+    "@motion-canvas/ui": "^3.0.1",
+    "@motion-canvas/vite-plugin": "^3.0.0"
   },
   "dependencies": {
     "prompts": "^2.4.2"

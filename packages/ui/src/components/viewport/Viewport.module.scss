@@ -16,21 +16,32 @@
   flex-grow: 1;
 
   background-color: #000000;
+
+  canvas {
+    display: block;
+  }
+
+  &.pixelated canvas {
+    image-rendering: pixelated;
+  }
 }
 
-.alphaBackground {
+.renderingPreview {
+  canvas {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.alphaBackground canvas {
   background-color: rgba(0, 0, 0, 0.16);
   background-size: 80px;
   background-position: center;
   background-image: url('../../img/grid.svg');
 }
 
-.canvasOutline {
+.canvasOutline canvas {
   outline: 1px solid var(--surface-color);
-}
-
-.preview {
-  display: block;
 }
 
 .overlay {

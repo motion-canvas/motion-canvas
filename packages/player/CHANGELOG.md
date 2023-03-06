@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
+
+
+### Features
+
+* new playback architecture ([#402](https://github.com/motion-canvas/motion-canvas/issues/402)) ([bbe3e2a](https://github.com/motion-canvas/motion-canvas/commit/bbe3e2a24de068a88f49ed7a2f13e9717039733b)), closes [#166](https://github.com/motion-canvas/motion-canvas/issues/166)
+
+
+### BREAKING CHANGES
+
+* `makeProject` no longer accepts some settings.
+
+Settings such as `background` and `audioOffset` are now stored in the project
+meta file.
+
+
+
+
+
+# [2.6.0](https://github.com/motion-canvas/motion-canvas/compare/v2.5.0...v2.6.0) (2023-02-24)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [2.5.0](https://github.com/motion-canvas/motion-canvas/compare/v2.4.0...v2.5.0) (2023-02-20)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [2.4.0](https://github.com/motion-canvas/motion-canvas/compare/v2.3.0...v2.4.0) (2023-02-18)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
 # [2.3.0](https://github.com/motion-canvas/motion-canvas/compare/v2.2.0...v2.3.0) (2023-02-11)
 
 **Note:** Version bump only for package @motion-canvas/player

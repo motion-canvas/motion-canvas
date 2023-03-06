@@ -1,6 +1,7 @@
 import {
   cloneable,
   computed,
+  defaultStyle,
   initial,
   inspectable,
   signal,
@@ -12,7 +13,7 @@ import {
   originToOffset,
   PossibleSpacing,
   PossibleVector2,
-  Rect,
+  BBox,
   SerializedVector2,
   SpacingSignal,
   Vector2,
@@ -24,14 +25,16 @@ import {
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {
-  FlexAlign,
+  FlexItems,
   FlexBasis,
   FlexDirection,
-  FlexJustify,
+  FlexContent,
   FlexWrap,
   LayoutMode,
-  Length,
+  DesiredLength,
   TextWrap,
+  Length,
+  LengthLimit,
 } from '../partials';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
@@ -40,6 +43,7 @@ import {drawLine, lineTo} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
+  Signal,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -50,10 +54,10 @@ export interface LayoutProps extends NodeProps {
 
   width?: SignalValue<Length>;
   height?: SignalValue<Length>;
-  maxWidth?: SignalValue<Length>;
-  maxHeight?: SignalValue<Length>;
-  minWidth?: SignalValue<Length>;
-  minHeight?: SignalValue<Length>;
+  maxWidth?: SignalValue<LengthLimit>;
+  maxHeight?: SignalValue<LengthLimit>;
+  minWidth?: SignalValue<LengthLimit>;
+  minHeight?: SignalValue<LengthLimit>;
   ratio?: SignalValue<number>;
 
   marginTop?: SignalValue<number>;
@@ -74,8 +78,10 @@ export interface LayoutProps extends NodeProps {
   shrink?: SignalValue<number>;
   wrap?: SignalValue<FlexWrap>;
 
-  justifyContent?: SignalValue<FlexJustify>;
-  alignItems?: SignalValue<FlexAlign>;
+  justifyContent?: SignalValue<FlexContent>;
+  alignContent?: SignalValue<FlexContent>;
+  alignItems?: SignalValue<FlexItems>;
+  alignSelf?: SignalValue<FlexItems>;
   rowGap?: SignalValue<Length>;
   columnGap?: SignalValue<Length>;
   gap?: SignalValue<Length>;
@@ -84,11 +90,13 @@ export interface LayoutProps extends NodeProps {
   fontSize?: SignalValue<number>;
   fontStyle?: SignalValue<string>;
   fontWeight?: SignalValue<number>;
-  lineHeight?: SignalValue<number>;
+  lineHeight?: SignalValue<Length>;
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<TextWrap>;
+  textDirection?: SignalValue<CanvasDirection>;
+  textAlign?: SignalValue<CanvasTextAlign>;
 
-  size?: SignalValue<PossibleVector2>;
+  size?: SignalValue<PossibleVector2<Length>>;
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
   offset?: SignalValue<PossibleVector2>;
@@ -102,16 +110,16 @@ export class Layout extends Node {
 
   @initial(null)
   @signal()
-  public declare readonly maxWidth: SimpleSignal<Length, this>;
+  public declare readonly maxWidth: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly maxHeight: SimpleSignal<Length, this>;
+  public declare readonly maxHeight: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly minWidth: SimpleSignal<Length, this>;
+  public declare readonly minWidth: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
-  public declare readonly minHeight: SimpleSignal<Length, this>;
+  public declare readonly minHeight: SimpleSignal<LengthLimit, this>;
   @initial(null)
   @signal()
   public declare readonly ratio: SimpleSignal<number | null, this>;
@@ -138,43 +146,56 @@ export class Layout extends Node {
   @signal()
   public declare readonly wrap: SimpleSignal<FlexWrap, this>;
 
+  @initial('start')
+  @signal()
+  public declare readonly justifyContent: SimpleSignal<FlexContent, this>;
   @initial('normal')
   @signal()
-  public declare readonly justifyContent: SimpleSignal<FlexJustify, this>;
-  @initial('normal')
+  public declare readonly alignContent: SimpleSignal<FlexContent, this>;
+  @initial('stretch')
   @signal()
-  public declare readonly alignItems: SimpleSignal<FlexAlign, this>;
-  @initial(null)
+  public declare readonly alignItems: SimpleSignal<FlexItems, this>;
+  @initial('auto')
   @signal()
-  public declare readonly gap: SimpleSignal<Length, this>;
-  @initial(null)
-  @signal()
-  public declare readonly rowGap: SimpleSignal<Length, this>;
-  @initial(null)
-  @signal()
-  public declare readonly columnGap: SimpleSignal<Length, this>;
+  public declare readonly alignSelf: SimpleSignal<FlexItems, this>;
+  @initial(0)
+  @vector2Signal({x: 'columnGap', y: 'rowGap'})
+  public declare readonly gap: Vector2LengthSignal<this>;
+  public get columnGap(): Signal<Length, number, this> {
+    return this.gap.x;
+  }
+  public get rowGap(): Signal<Length, number, this> {
+    return this.gap.y;
+  }
 
-  @initial(null)
+  @defaultStyle('font-family')
   @signal()
-  public declare readonly fontFamily: SimpleSignal<string | null, this>;
-  @initial(null)
+  public declare readonly fontFamily: SimpleSignal<string, this>;
+  @defaultStyle('font-size', parseFloat)
   @signal()
-  public declare readonly fontSize: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly fontSize: SimpleSignal<number, this>;
+  @defaultStyle('font-style')
   @signal()
-  public declare readonly fontStyle: SimpleSignal<string | null, this>;
-  @initial(null)
+  public declare readonly fontStyle: SimpleSignal<string, this>;
+  @defaultStyle('font-weight', parseInt)
   @signal()
-  public declare readonly fontWeight: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly fontWeight: SimpleSignal<number, this>;
+  @defaultStyle('line-height', parseFloat)
   @signal()
-  public declare readonly lineHeight: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly lineHeight: SimpleSignal<Length, this>;
+  @defaultStyle('letter-spacing', i => (i === 'normal' ? 0 : parseFloat(i)))
   @signal()
-  public declare readonly letterSpacing: SimpleSignal<number | null, this>;
-  @initial(null)
+  public declare readonly letterSpacing: SimpleSignal<number, this>;
+
+  @defaultStyle('white-space', i => (i === 'pre' ? 'pre' : i === 'normal'))
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
+  @initial('inherit')
+  @signal()
+  public declare readonly textDirection: SimpleSignal<CanvasDirection, this>;
+  @defaultStyle('text-align')
+  @signal()
+  public declare readonly textAlign: SimpleSignal<CanvasTextAlign, this>;
 
   @cloneable(false)
   @inspectable(false)
@@ -206,6 +227,11 @@ export class Layout extends Node {
   protected setY(value: SignalValue<number>) {
     this.customY(value);
   }
+
+  @inspectable(false)
+  @initial(null)
+  @signal()
+  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
 
   protected getWidth(): number {
     return this.computedSize().width;
@@ -246,6 +272,11 @@ export class Layout extends Node {
     this.size.x(value);
     lock && this.releaseSize();
   }
+
+  @inspectable(false)
+  @initial(null)
+  @signal()
+  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
 
   protected getHeight(): number {
     return this.computedSize().height;
@@ -295,7 +326,7 @@ export class Layout extends Node {
    * A size is a two-dimensional vector, where `x` represents the `width`, and `y`
    * represents the `height`.
    *
-   * The value of both x and y is of type {@link partials~Length} which is
+   * The value of both x and y is of type {@link partials.Length} which is
    * either:
    * - `number` - the desired length in pixels
    * - `${number}%` - a string with the desired length in percents, for example
@@ -341,15 +372,22 @@ export class Layout extends Node {
   @initial({x: null, y: null})
   @vector2Signal({x: 'width', y: 'height'})
   public declare readonly size: Vector2LengthSignal<this>;
+  public get width(): Signal<Length, number, this> {
+    return this.size.x;
+  }
+  public get height(): Signal<Length, number, this> {
+    return this.size.y;
+  }
 
-  @inspectable(false)
-  @signal()
-  protected declare readonly customWidth: SimpleSignal<Length, this>;
-  @inspectable(false)
-  @signal()
-  protected declare readonly customHeight: SimpleSignal<Length, this>;
+  /**
+   * Get the desired size of this node.
+   *
+   * @remarks
+   * This method can be used to control the size using external factors.
+   * By default, the returned size is the same as the one declared by the user.
+   */
   @computed()
-  protected desiredSize(): SerializedVector2<Length> {
+  protected desiredSize(): SerializedVector2<DesiredLength> {
     return {
       x: this.customWidth(),
       y: this.customHeight(),
@@ -414,8 +452,8 @@ export class Layout extends Node {
   @signal()
   public declare readonly clip: SimpleSignal<boolean, this>;
 
-  public readonly element: HTMLElement;
-  public readonly styles: CSSStyleDeclaration;
+  public element: HTMLElement;
+  public styles: CSSStyleDeclaration;
 
   protected readonly sizeLockCounter = createSignal(0);
 
@@ -488,25 +526,25 @@ export class Layout extends Node {
     return matrix;
   }
 
-  protected getComputedLayout(): Rect {
-    return new Rect(this.element.getBoundingClientRect());
+  protected getComputedLayout(): BBox {
+    return new BBox(this.element.getBoundingClientRect());
   }
 
   @computed()
   public computedPosition(): Vector2 {
     this.requestLayoutUpdate();
-    const rect = this.getComputedLayout();
+    const box = this.getComputedLayout();
 
     const position = new Vector2(
-      rect.x + (rect.width / 2) * this.offset.x(),
-      rect.y + (rect.height / 2) * this.offset.y(),
+      box.x + (box.width / 2) * this.offset.x(),
+      box.y + (box.height / 2) * this.offset.y(),
     );
 
     const parent = this.parentTransform();
     if (parent) {
       const parentRect = parent.getComputedLayout();
-      position.x -= parentRect.x + (parentRect.width - rect.width) / 2;
-      position.y -= parentRect.y + (parentRect.height - rect.height) / 2;
+      position.x -= parentRect.x + (parentRect.width - box.width) / 2;
+      position.y -= parentRect.y + (parentRect.height - box.height) / 2;
     }
 
     return position;
@@ -536,7 +574,7 @@ export class Layout extends Node {
   protected appendedToView() {
     const root = this.isLayoutRoot();
     if (root) {
-      this.view()?.element.append(this.element);
+      this.view().element.append(this.element);
     }
 
     return root;
@@ -585,8 +623,8 @@ export class Layout extends Node {
     this.applyFont();
   }
 
-  protected override getCacheRect(): Rect {
-    return Rect.fromSizeCentered(this.computedSize());
+  protected override getCacheBBox(): BBox {
+    return BBox.fromSizeCentered(this.computedSize());
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -611,12 +649,12 @@ export class Layout extends Node {
   ) {
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
-    const rect = Rect.fromSizeCentered(size);
-    const layout = rect.transformCorners(matrix);
-    const padding = rect
+    const box = BBox.fromSizeCentered(size);
+    const layout = box.transformCorners(matrix);
+    const padding = box
       .addSpacing(this.padding().scale(-1))
       .transformCorners(matrix);
-    const margin = rect.addSpacing(this.margin()).transformCorners(matrix);
+    const margin = box.addSpacing(this.margin()).transformCorners(matrix);
 
     context.beginPath();
     drawLine(context, margin);
@@ -674,15 +712,11 @@ export class Layout extends Node {
     this.position(this.position().add(newOffset).sub(oldOffset));
   }
 
-  protected parseValue(value: number | string | null): string {
-    return value === null ? '' : value.toString();
-  }
-
   protected parsePixels(value: number | null): string {
     return value === null ? '' : `${value}px`;
   }
 
-  protected parseLength(value: null | number | string): string {
+  protected parseLength(value: number | string | null): string {
     if (value === null) {
       return '';
     }
@@ -702,8 +736,9 @@ export class Layout extends Node {
     this.element.style.maxWidth = this.parseLength(this.maxWidth());
     this.element.style.minWidth = this.parseLength(this.minWidth());
     this.element.style.maxHeight = this.parseLength(this.maxHeight());
-    this.element.style.minWidth = this.parseLength(this.minWidth());
-    this.element.style.aspectRatio = this.parseValue(this.ratio());
+    this.element.style.minHeight = this.parseLength(this.minHeight()!);
+    this.element.style.aspectRatio =
+      this.ratio() === null ? '' : this.ratio()!.toString();
 
     this.element.style.marginTop = this.parsePixels(this.margin.top());
     this.element.style.marginBottom = this.parsePixels(this.margin.bottom());
@@ -716,47 +751,80 @@ export class Layout extends Node {
     this.element.style.paddingRight = this.parsePixels(this.padding.right());
 
     this.element.style.flexDirection = this.direction();
-    this.element.style.flexBasis = this.parseLength(this.basis());
+    this.element.style.flexBasis = this.parseLength(this.basis()!);
     this.element.style.flexWrap = this.wrap();
 
     this.element.style.justifyContent = this.justifyContent();
+    this.element.style.alignContent = this.alignContent();
     this.element.style.alignItems = this.alignItems();
-    this.element.style.rowGap = this.parseLength(this.rowGap());
-    this.element.style.columnGap = this.parseLength(this.columnGap());
-    this.element.style.gap = this.parseLength(this.gap());
+    this.element.style.alignSelf = this.alignSelf();
+    this.element.style.columnGap = this.parseLength(this.gap.x());
+    this.element.style.rowGap = this.parseLength(this.gap.y());
 
     if (this.sizeLockCounter() > 0) {
       this.element.style.flexGrow = '0';
       this.element.style.flexShrink = '0';
     } else {
-      this.element.style.flexGrow = this.parseValue(this.grow());
-      this.element.style.flexShrink = this.parseValue(this.shrink());
+      this.element.style.flexGrow = this.grow().toString();
+      this.element.style.flexShrink = this.shrink().toString();
     }
   }
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = this.parseValue(this.fontFamily());
-    this.element.style.fontSize = this.parsePixels(this.fontSize());
-    this.element.style.fontStyle = this.parseValue(this.fontStyle());
-    this.element.style.lineHeight = this.parsePixels(this.lineHeight());
-    this.element.style.fontWeight = this.parseValue(this.fontWeight());
-    this.element.style.letterSpacing = this.parsePixels(this.letterSpacing());
+    this.element.style.fontFamily = this.fontFamily.isInitial()
+      ? ''
+      : this.fontFamily();
+    this.element.style.fontSize = this.fontSize.isInitial()
+      ? ''
+      : `${this.fontSize()}px`;
+    this.element.style.fontStyle = this.fontStyle.isInitial()
+      ? ''
+      : this.fontStyle();
+    if (this.lineHeight.isInitial()) {
+      this.element.style.lineHeight = '';
+    } else {
+      const lineHeight = this.lineHeight();
+      this.element.style.lineHeight =
+        typeof lineHeight === 'string'
+          ? (parseFloat(lineHeight as string) / 100).toString()
+          : `${lineHeight}px`;
+    }
+    this.element.style.fontWeight = this.fontWeight.isInitial()
+      ? ''
+      : this.fontWeight().toString();
+    this.element.style.letterSpacing = this.letterSpacing.isInitial()
+      ? ''
+      : `${this.letterSpacing()}px`;
 
-    const wrap = this.textWrap();
-    this.element.style.whiteSpace =
-      wrap === null
-        ? ''
-        : typeof wrap === 'boolean'
-        ? wrap
-          ? 'normal'
-          : 'nowrap'
-        : wrap;
+    this.element.style.textAlign = this.textAlign.isInitial()
+      ? ''
+      : this.textAlign();
+
+    if (this.textWrap.isInitial()) {
+      this.element.style.whiteSpace = '';
+    } else {
+      const wrap = this.textWrap();
+      if (typeof wrap === 'boolean') {
+        this.element.style.whiteSpace = wrap ? 'normal' : 'nowrap';
+      } else {
+        this.element.style.whiteSpace = wrap;
+      }
+    }
+  }
+
+  public override dispose() {
+    super.dispose();
+    this.sizeLockCounter.context.dispose();
+    this.element.remove();
+    this.element.innerHTML = '';
+    this.element = null as unknown as HTMLElement;
+    this.styles = null as unknown as CSSStyleDeclaration;
   }
 
   public override hit(position: Vector2): Node | null {
     const local = position.transformAsPoint(this.localToParent().inverse());
-    if (this.cacheRect().includes(local)) {
+    if (this.cacheBBox().includes(local)) {
       return super.hit(position) ?? this;
     }
 

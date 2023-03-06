@@ -176,7 +176,7 @@ async function parseTypes(options, projectName, externalProject) {
           }
         }
 
-        return reference.href;
+        return reference?.href;
       }
     }
 

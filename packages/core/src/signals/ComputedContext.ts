@@ -21,10 +21,14 @@ export class ComputedContext<TValue> extends DependencyContext<any> {
     return this.invokable;
   }
 
+  public override dispose() {
+    super.dispose();
+    this.last = undefined;
+  }
+
   protected override invoke(...args: any[]): TValue {
     if (this.event.isRaised()) {
-      this.dependencies.forEach(dep => dep.unsubscribe(this.markDirty));
-      this.dependencies.clear();
+      this.clearDependencies();
       this.startCollecting();
       try {
         this.last = this.factory(...args);

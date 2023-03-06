@@ -1,8 +1,8 @@
 import {useLogger} from '../utils';
 import {Vector2} from '../types';
 
-export interface InterpolationFunction<T, Rest extends any[] = any[]> {
-  (from: T, to: T, value: number, ...args: Rest): T;
+export interface InterpolationFunction<T, TRest extends any[] = any[]> {
+  (from: T, to: T, value: number, ...args: TRest): T;
 }
 
 export function textLerp(from: string, to: string, value: number) {
@@ -103,6 +103,10 @@ export function deepLerp(
     return textLerp(from, to, value);
   }
 
+  if (typeof from === 'boolean' && typeof to === 'boolean') {
+    return value < 0.5 ? from : to;
+  }
+
   if ('lerp' in from) {
     return from.lerp(to, value);
   }
@@ -178,7 +182,9 @@ export function arcLerp(
     flip = !flip;
   }
 
-  const normalized = flip ? Math.acos(1 - value) : Math.asin(value);
+  const normalized = flip
+    ? Math.acos(clamp(-1, 1, 1 - value))
+    : Math.asin(value);
   const radians = map(normalized, map(0, Math.PI / 2, value), ratio);
 
   let xValue = Math.sin(radians);

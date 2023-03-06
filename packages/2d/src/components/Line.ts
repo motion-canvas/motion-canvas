@@ -9,12 +9,12 @@ import {
 } from '@motion-canvas/core/lib/signals';
 import {
   PossibleVector2,
-  Rect,
+  BBox,
   SerializedVector2,
   Vector2,
 } from '@motion-canvas/core/lib/types';
 import {clamp} from '@motion-canvas/core/lib/tweening';
-import {Length} from '../partials';
+import {DesiredLength} from '../partials';
 import {Layout} from './Layout';
 import {
   CurveDrawingInfo,
@@ -65,7 +65,7 @@ export class Line extends Shape {
   @signal()
   public declare readonly end: SimpleSignal<number, this>;
 
-  @initial(1)
+  @initial(0)
   @signal()
   public declare readonly endOffset: SimpleSignal<number, this>;
 
@@ -84,8 +84,8 @@ export class Line extends Shape {
     this
   >;
 
-  protected override desiredSize(): SerializedVector2<Length> {
-    return this.childrenRect().size;
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
+    return this.childrenBBox().size;
   }
 
   public constructor(props: LineProps) {
@@ -100,7 +100,7 @@ export class Line extends Shape {
   }
 
   @computed()
-  protected childrenRect() {
+  protected childrenBBox() {
     const custom = this.points();
     const points = custom
       ? custom.map(
@@ -110,7 +110,7 @@ export class Line extends Shape {
           .filter(child => !(child instanceof Layout) || child.isLayoutRoot())
           .map(child => child.position());
 
-    return Rect.fromPoints(...points);
+    return BBox.fromPoints(...points);
   }
 
   @computed()
@@ -224,21 +224,36 @@ export class Line extends Shape {
     context.lineDashOffset -= arcLength / 2;
   }
 
-  protected override getComputedLayout(): Rect {
-    const rect = super.getComputedLayout();
-    rect.position = rect.position.sub(this.childrenRect().center);
-    return rect;
+  protected override getComputedLayout(): BBox {
+    const box = super.getComputedLayout();
+    box.position = box.position.sub(this.childrenBBox().center);
+    return box;
   }
 
   protected override getPath(): Path2D {
     return this.curveDrawingInfo().path;
   }
 
-  protected override getCacheRect(): Rect {
-    const rect = this.childrenRect();
+  protected override getCacheBBox(): BBox {
+    const box = this.childrenBBox();
     const arrowSize = this.arrowSize();
     const lineWidth = this.lineWidth();
-    return rect.expand(Math.max(0, arrowSize, lineWidth / 2));
+    const radius = this.radius();
+    const join = this.lineJoin();
+    const cap = this.lineCap();
+
+    let coefficient = 0.5;
+    if (radius === 0 && join === 'miter') {
+      const {minSin} = this.profile();
+      if (minSin > 0) {
+        coefficient = Math.max(coefficient, 0.5 / minSin);
+      }
+    }
+    if (cap === 'square') {
+      coefficient = Math.max(coefficient, 0.5 * 1.4143);
+    }
+
+    return box.expand(Math.max(0, arrowSize, lineWidth * coefficient));
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
@@ -283,7 +298,7 @@ export class Line extends Shape {
     context: CanvasRenderingContext2D,
     matrix: DOMMatrix,
   ) {
-    const rect = this.childrenRect().transformCorners(matrix);
+    const box = this.childrenBBox().transformCorners(matrix);
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
 
@@ -320,7 +335,7 @@ export class Line extends Shape {
     context.stroke();
 
     context.beginPath();
-    drawLine(context, rect);
+    drawLine(context, box);
     context.closePath();
     context.stroke();
   }
