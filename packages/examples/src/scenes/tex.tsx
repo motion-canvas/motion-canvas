@@ -9,13 +9,28 @@ export default makeScene2D(function* (view) {
     <Latex
       ref={tex}
       tex="{\color{white} x = \sin \left( \frac{\pi}{2} \right)}"
-      y={0}
-      width={400} // height and width can calculate based on each other
+      y={0} // height and width can calculate based on each other
     />,
   );
 
   yield* waitFor(2);
+  yield* tex().tweenTex(
+    '{\\color{white} x = \\sin \\left( \\frac{\\pi}{2} \\right) + 3}',
+    1,
+  );
+  yield* tex().tweenTex(
+    '{\\color{white} x = 1 + \\sin \\left( \\frac{\\pi}{2} \\right) + 3}',
+    1,
+  );
+  yield* tex().tweenTex(
+    '{\\color{white} x = 3 + \\sin \\left( \\frac{\\pi}{2} \\right) + 1}',
+    1,
+  );
   yield* tex().opacity(0, 1);
   yield* waitFor(2);
   yield* tex().opacity(1, 1);
+  yield* tex().tweenTex(
+    '{\\color{white} x = \\sin \\left( \\frac{\\pi}{2} \\right)}',
+    8,
+  );
 });
