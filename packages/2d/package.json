@@ -28,6 +28,7 @@
   "dependencies": {
     "@motion-canvas/core": "^2.3.0",
     "code-fns": "^0.8.2",
+    "diff-sequences": "^29.4.3",
     "mathjax-full": "^3.2.2"
   }
 }

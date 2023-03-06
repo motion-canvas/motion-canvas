@@ -17,6 +17,7 @@ import {Shape, ShapeProps} from './Shape';
 import {Rect, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {Length} from '../partials';
 import {map, tween} from '@motion-canvas/core/lib/tweening';
+import diffSequence from 'diff-sequences';
 
 const adaptor = liteAdaptor();
 RegisterHTMLHandler(adaptor);
@@ -254,33 +255,60 @@ export class Latex extends Shape {
   private diffTex(from: string, to: string): MathJaxGraphicDiff {
     const oldGraphic = this.latexToGraphic(from);
     const newGraphic = this.latexToGraphic(to);
+
     const diff: MathJaxGraphicDiff = {
       fromSize: oldGraphic.size,
       toSize: newGraphic.size,
-      inserted: [...newGraphic.shapes],
+      inserted: [],
       deleted: [],
       changed: [],
     };
-    for (const oldShape of oldGraphic.shapes) {
-      const matchedShapeIndex = diff.inserted.findIndex(shape => {
-        if (oldShape.type !== shape.type) return false;
+
+    const aShapes = oldGraphic.shapes;
+    const bShapes = newGraphic.shapes;
+    const aLength = aShapes.length;
+    const bLength = bShapes.length;
+    let aIndex = 0;
+    let bIndex = 0;
+
+    diffSequence(
+      aLength,
+      bLength,
+      (aIndex, bIndex) => {
+        const aShape = aShapes[aIndex];
+        const bShape = bShapes[bIndex];
+        if (aShape.type !== bShape.type) return false;
         if (
-          shape.type == 'path' &&
-          oldShape.type == 'path' &&
-          shape.name !== oldShape.name
+          bShape.type == 'path' &&
+          aShape.type == 'path' &&
+          bShape.name !== aShape.name
         )
           return false;
 
         return true;
-      });
-      if (matchedShapeIndex >= 0) {
-        const newShape = diff.inserted.splice(matchedShapeIndex, 1)[0];
-        diff.changed.push({
-          from: oldShape,
-          to: newShape,
-        });
-      } else diff.deleted.push(oldShape);
-    }
+      },
+      (nCommon, aCommon, bCommon) => {
+        if (aIndex !== aCommon)
+          diff.deleted.push(...aShapes.slice(aIndex, aCommon));
+        if (bIndex !== bCommon)
+          diff.inserted.push(...bShapes.slice(bIndex, bCommon));
+
+        aIndex = aCommon;
+        bIndex = bCommon;
+        for (let x = 0; x < nCommon; x++) {
+          diff.changed.push({
+            from: aShapes[aIndex],
+            to: bShapes[bIndex],
+          });
+          aIndex++;
+          bIndex++;
+        }
+      },
+    );
+
+    if (aIndex !== aLength) diff.deleted.push(...aShapes.slice(aIndex));
+
+    if (bIndex !== bShapes.length) diff.inserted.push(...bShapes.slice(bIndex));
 
     return diff;
   }
