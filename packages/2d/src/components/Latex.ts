@@ -252,6 +252,18 @@ export class Latex extends Shape {
     }
   }
 
+  private isShapeEqual(aShape: MathJaxShape, bShape: MathJaxShape): boolean {
+    if (aShape.type !== bShape.type) return false;
+    if (
+      bShape.type == 'path' &&
+      aShape.type == 'path' &&
+      bShape.name !== aShape.name
+    )
+      return false;
+
+    return true;
+  }
+
   private diffTex(from: string, to: string): MathJaxGraphicDiff {
     const oldGraphic = this.latexToGraphic(from);
     const newGraphic = this.latexToGraphic(to);
@@ -277,15 +289,7 @@ export class Latex extends Shape {
       (aIndex, bIndex) => {
         const aShape = aShapes[aIndex];
         const bShape = bShapes[bIndex];
-        if (aShape.type !== bShape.type) return false;
-        if (
-          bShape.type == 'path' &&
-          aShape.type == 'path' &&
-          bShape.name !== aShape.name
-        )
-          return false;
-
-        return true;
+        return this.isShapeEqual(aShape, bShape);
       },
       (nCommon, aCommon, bCommon) => {
         if (aIndex !== aCommon)
@@ -310,6 +314,23 @@ export class Latex extends Shape {
 
     if (bIndex !== bShapes.length) diff.inserted.push(...bShapes.slice(bIndex));
 
+    diff.deleted = diff.deleted.filter(aShape => {
+      const bIndex = diff.inserted.findIndex(bShape =>
+        this.isShapeEqual(aShape, bShape),
+      );
+      if (bIndex >= 0) {
+        const bShape = diff.inserted[bIndex];
+        diff.inserted.splice(bIndex, 1);
+        diff.changed.push({
+          from: aShape,
+          to: bShape,
+        });
+
+        return false;
+      }
+
+      return true;
+    });
     return diff;
   }
 
