@@ -7,6 +7,7 @@ import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
 import {computed, initial, signal} from '../decorators';
 import {
   createComputed,
+  createSignal,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -15,6 +16,7 @@ import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Shape, ShapeProps} from './Shape';
 import {Rect, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {Length} from '../partials';
+import {map, tween} from '@motion-canvas/core/lib/tweening';
 
 const adaptor = liteAdaptor();
 RegisterHTMLHandler(adaptor);
@@ -47,6 +49,19 @@ interface MathJaxGraphic {
   shapes: MathJaxShape[];
 }
 
+interface MathJaxShapeChanged {
+  from: MathJaxShape;
+  to: MathJaxShape;
+}
+
+interface MathJaxGraphicDiff {
+  fromSize: SerializedVector2;
+  toSize: SerializedVector2;
+  inserted: MathJaxShape[];
+  deleted: MathJaxShape[];
+  changed: MathJaxShapeChanged[];
+}
+
 export interface LatexProps extends ShapeProps {
   tex?: SignalValue<string>;
   renderProps?: SignalValue<OptionList>;
@@ -68,6 +83,9 @@ export class Latex extends Shape {
 
   @signal()
   public declare readonly tex: SimpleSignal<string, this>;
+
+  private texProgress = createSignal<number | null>(null);
+  private diffed: MathJaxGraphicDiff | null = null;
 
   public constructor(props: LatexProps) {
     super(props);
@@ -103,7 +121,7 @@ export class Latex extends Shape {
           type: 'path',
           position,
           data: hrefElement.getAttribute('d')!,
-          name: hrefElement.id,
+          name: child.dataset.c!,
         };
       } else if (child.tagName == 'rect') {
         position.x += parseFloat(child.getAttribute('x')!);
@@ -121,7 +139,7 @@ export class Latex extends Shape {
   }
 
   private latexToGraphic(tex: string): MathJaxGraphic {
-    const src = `${this.tex()}::${JSON.stringify(this.options())}`;
+    const src = `${tex}::${JSON.stringify(this.options())}`;
     if (Latex.graphicContentsPool[src]) return Latex.graphicContentsPool[src];
 
     const svgStr = adaptor.innerHTML(jaxDocument.convert(tex, this.options));
@@ -181,26 +199,130 @@ export class Latex extends Shape {
     };
   }
 
+  private drawMathShape(
+    context: CanvasRenderingContext2D,
+    shape: MathJaxShape,
+    overridePosition: SerializedVector2 | null = null,
+  ) {
+    context.save();
+    const {x, y} = overridePosition ? overridePosition : shape.position;
+    context.translate(x, y);
+    if (shape.type == 'path') {
+      const p = new Path2D(shape.data);
+      context.fill(p);
+    } else {
+      context.fillRect(0, 0, shape.size.x, shape.size.y);
+    }
+    context.restore();
+  }
+
   protected override draw(context: CanvasRenderingContext2D): void {
     const rect = Rect.fromSizeCentered(this.size());
 
-    const {shapes} = this.latexToGraphic(this.tex());
+    const progress = this.texProgress();
     const scaleFactor = this.scaleFactor();
 
     context.translate(rect.left, rect.top);
-
     context.scale(scaleFactor, -scaleFactor);
-    for (const shape of shapes) {
-      context.save();
-      const {x, y} = shape.position;
-      context.translate(x, y);
-      if (shape.type == 'path') {
-        const p = new Path2D(shape.data);
-        context.fill(p);
-      } else {
-        context.fillRect(0, 0, shape.size.x, shape.size.y);
+
+    if (!progress) {
+      const {shapes} = this.latexToGraphic(this.tex());
+
+      for (const shape of shapes) {
+        this.drawMathShape(context, shape);
       }
-      context.restore();
+    } else {
+      const diff = this.diffed!;
+
+      for (const shape of diff.changed) {
+        const position: SerializedVector2 = {
+          x: map(shape.from.position.x, shape.to.position.x, progress),
+          y: map(shape.from.position.y, shape.to.position.y, progress),
+        };
+        this.drawMathShape(context, shape.from, position);
+      }
+
+      const globalAlpha = context.globalAlpha;
+      context.globalAlpha = globalAlpha * progress;
+      for (const shape of diff.inserted) this.drawMathShape(context, shape);
+
+      context.globalAlpha = globalAlpha * (1 - progress);
+      for (const shape of diff.deleted) this.drawMathShape(context, shape);
     }
+  }
+
+  private diffTex(from: string, to: string): MathJaxGraphicDiff {
+    const oldGraphic = this.latexToGraphic(from);
+    const newGraphic = this.latexToGraphic(to);
+    const diff: MathJaxGraphicDiff = {
+      fromSize: oldGraphic.size,
+      toSize: newGraphic.size,
+      inserted: [...newGraphic.shapes],
+      deleted: [],
+      changed: [],
+    };
+    for (const oldShape of oldGraphic.shapes) {
+      const matchedShapeIndex = diff.inserted.findIndex(shape => {
+        if (oldShape.type !== shape.type) return false;
+        if (
+          shape.type == 'path' &&
+          oldShape.type == 'path' &&
+          shape.name !== oldShape.name
+        )
+          return false;
+
+        return true;
+      });
+      if (matchedShapeIndex >= 0) {
+        const newShape = diff.inserted.splice(matchedShapeIndex, 1)[0];
+        diff.changed.push({
+          from: oldShape,
+          to: newShape,
+        });
+      } else diff.deleted.push(oldShape);
+    }
+
+    return diff;
+  }
+
+  public *tweenTex(tex: string, time: number) {
+    const diff = this.diffTex(this.tex(), tex);
+    this.diffed = diff;
+
+    const autoWidth = this.customWidth() == null;
+    const autoHeight = this.customHeight() == null;
+    const scaleFactor = this.scaleFactor();
+
+    this.texProgress(0);
+    yield* tween(
+      time,
+      value => {
+        this.texProgress(value);
+
+        if (autoWidth)
+          this.customWidth(
+            map(
+              diff.fromSize.x * scaleFactor,
+              diff.toSize.x * scaleFactor,
+              value,
+            ),
+          );
+
+        if (autoHeight)
+          this.customHeight(
+            map(
+              diff.fromSize.y * scaleFactor,
+              diff.toSize.y * scaleFactor,
+              value,
+            ),
+          );
+      },
+      () => {
+        this.texProgress(null);
+        this.tex(tex);
+        if (autoWidth) this.customWidth(null);
+        if (autoHeight) this.customHeight(null);
+      },
+    );
   }
 }
