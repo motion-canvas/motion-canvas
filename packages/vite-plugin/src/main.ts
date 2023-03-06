@@ -346,25 +346,26 @@ export default ({
       server.ws.on(
         'motion-canvas:export',
         async (
-          {frame, mimeType, data, project, isStill, sceneName = ''},
+          {data, meta: {name, frameNumber, subDirectories, mimeType}},
           client,
         ) => {
           const extension = mime.extension(mimeType);
-          const name = frame.toString().padStart(6, '0') + '.' + extension;
-          const file = isStill
-            ? path.join(outputPath, 'still', project, name)
-            : path.join(outputPath, project, sceneName, name);
+          const outputFilePath = path.join(
+            outputPath,
+            ...subDirectories,
+            `${name}.${extension}`,
+          );
+          const outputDirectory = path.dirname(outputFilePath);
 
-          const directory = path.dirname(file);
-          if (!fs.existsSync(directory)) {
-            fs.mkdirSync(directory, {recursive: true});
+          if (!fs.existsSync(outputDirectory)) {
+            fs.mkdirSync(outputDirectory, {recursive: true});
           }
 
           const base64Data = data.slice(data.indexOf(',') + 1);
-          await fs.promises.writeFile(file, base64Data, {
+          await fs.promises.writeFile(outputFilePath, base64Data, {
             encoding: 'base64',
           });
-          client.send('motion-canvas:export-ack', {frame});
+          client.send('motion-canvas:export-ack', {frame: frameNumber});
         },
       );
     },

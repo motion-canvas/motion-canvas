@@ -2,6 +2,7 @@ import type {RendererSettings} from './Renderer';
 import type {Exporter} from './Exporter';
 import type {Logger} from './Logger';
 import type {CanvasOutputMimeType} from '../types';
+import {FrameSaver} from './FrameSaver';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -12,7 +13,7 @@ const EXPORT_RETRY_DELAY = 1000;
 export class ImageExporter implements Exporter {
   private readonly frameLookup = new Map<number, Callback>();
   private frameCounter = 0;
-  private name = 'unknown';
+  private projectName = 'unknown';
   private quality = 1;
   private fileType: CanvasOutputMimeType = 'image/png';
   private groupByScene = false;
@@ -26,7 +27,7 @@ export class ImageExporter implements Exporter {
   }
 
   public async configure(settings: RendererSettings) {
-    this.name = settings.name;
+    this.projectName = settings.name;
     this.quality = settings.quality;
     this.fileType = settings.fileType;
     this.groupByScene = settings.groupByScene;
@@ -59,14 +60,19 @@ export class ImageExporter implements Exporter {
         this.frameCounter--;
         this.frameLookup.delete(frame);
       });
-      import.meta.hot!.send('motion-canvas:export', {
-        frame,
-        isStill: false,
-        data: canvas.toDataURL(this.fileType, this.quality),
-        mimeType: this.fileType,
-        project: this.name,
-        sceneName: this.groupByScene ? sceneName : undefined,
-      });
+
+      FrameSaver.saveSequenceFrame(
+        canvas.toDataURL(this.fileType, this.quality),
+        {
+          frame,
+          fileType: this.fileType,
+          projectName: this.projectName,
+          groupByScene: this.groupByScene,
+          sceneName,
+        },
+      );
+
+      return Promise.resolve();
     }
   }
 
