@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
+
+
+### Bug Fixes
+
+* **core:** fix playback state ([#471](https://github.com/motion-canvas/motion-canvas/issues/471)) ([1c259d0](https://github.com/motion-canvas/motion-canvas/commit/1c259d0d574bb56dbc8bc448300d9b94ee4d0bc4))
+* **core:** fix relative time ([#461](https://github.com/motion-canvas/motion-canvas/issues/461)) ([8d4946e](https://github.com/motion-canvas/motion-canvas/commit/8d4946ebf56590bc3934087f95955180b4901566))
+* support multiple async players ([#450](https://github.com/motion-canvas/motion-canvas/issues/450)) ([d7ec469](https://github.com/motion-canvas/motion-canvas/commit/d7ec469e747eefd909f4dd59dd713f5d86308222)), closes [#434](https://github.com/motion-canvas/motion-canvas/issues/434)
+
+
+### Features
+
+* **core:** add intersects method to BBox ([#485](https://github.com/motion-canvas/motion-canvas/issues/485)) ([604b0e7](https://github.com/motion-canvas/motion-canvas/commit/604b0e7c22b4e5d196310e650f7c764526a80712))
+* **core:** presentation mode ([#486](https://github.com/motion-canvas/motion-canvas/issues/486)) ([c4f2e48](https://github.com/motion-canvas/motion-canvas/commit/c4f2e48ae6c65804ae46edd88c29125b7f983d5c))
+* navigate to slide source ([#490](https://github.com/motion-canvas/motion-canvas/issues/490)) ([b5ae4bf](https://github.com/motion-canvas/motion-canvas/commit/b5ae4bf37076b262a20949cca030db3902186c8d))
+
+
+
+
+
 # [3.0.0](https://github.com/motion-canvas/motion-canvas/compare/v2.6.0...v3.0.0) (2023-02-27)
 
 

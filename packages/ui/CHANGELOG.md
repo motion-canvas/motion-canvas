@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
+
+
+### Features
+
+* navigate to slide source ([#490](https://github.com/motion-canvas/motion-canvas/issues/490)) ([b5ae4bf](https://github.com/motion-canvas/motion-canvas/commit/b5ae4bf37076b262a20949cca030db3902186c8d))
+* **ui:** presentation interface ([#487](https://github.com/motion-canvas/motion-canvas/issues/487)) ([1899f02](https://github.com/motion-canvas/motion-canvas/commit/1899f020fb1c0b2136de4401e6fc068bcf5e0cc4))
+
+
+
+
+
 ## [3.0.1](https://github.com/motion-canvas/motion-canvas/compare/v3.0.0...v3.0.1) (2023-02-27)
 
 

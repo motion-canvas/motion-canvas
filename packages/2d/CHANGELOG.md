@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
+
+
+### Bug Fixes
+
+* **2d:** fix cache bbox for lines ([#467](https://github.com/motion-canvas/motion-canvas/issues/467)) ([9fd1444](https://github.com/motion-canvas/motion-canvas/commit/9fd144417bb0b6301da6c522a988775f5ff142ac)), closes [#466](https://github.com/motion-canvas/motion-canvas/issues/466)
+* **2d:** fix letterSpacing ([#448](https://github.com/motion-canvas/motion-canvas/issues/448)) ([bb5ffc4](https://github.com/motion-canvas/motion-canvas/commit/bb5ffc48efa82b9db818e8e52aa35e9c2ad8ce89)), closes [#447](https://github.com/motion-canvas/motion-canvas/issues/447)
+* support multiple async players ([#450](https://github.com/motion-canvas/motion-canvas/issues/450)) ([d7ec469](https://github.com/motion-canvas/motion-canvas/commit/d7ec469e747eefd909f4dd59dd713f5d86308222)), closes [#434](https://github.com/motion-canvas/motion-canvas/issues/434)
+
+
+### Features
+
+* **2d:** add textAlign property ([#451](https://github.com/motion-canvas/motion-canvas/issues/451)) ([3d15825](https://github.com/motion-canvas/motion-canvas/commit/3d15825f3cc5a35ba081a31510741b824f3bc6ab)), closes [#303](https://github.com/motion-canvas/motion-canvas/issues/303)
+
+
+
+
+
 ## [3.0.2](https://github.com/motion-canvas/motion-canvas/compare/v3.0.1...v3.0.2) (2023-02-27)
 
 
