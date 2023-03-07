@@ -229,23 +229,28 @@ export class Vector2 implements Type {
     );
   }
 
-  public mul(vector: Vector2) {
+  public mul(possibleVector: PossibleVector2) {
+    const vector = new Vector2(possibleVector);
     return new Vector2(this.x * vector.x, this.y * vector.y);
   }
 
-  public div(vector: Vector2) {
+  public div(possibleVector: PossibleVector2) {
+    const vector = new Vector2(possibleVector);
     return new Vector2(this.x / vector.x, this.y / vector.y);
   }
 
-  public add(vector: Vector2) {
+  public add(possibleVector: PossibleVector2) {
+    const vector = new Vector2(possibleVector);
     return new Vector2(this.x + vector.x, this.y + vector.y);
   }
 
-  public sub(vector: Vector2) {
+  public sub(possibleVector: PossibleVector2) {
+    const vector = new Vector2(possibleVector);
     return new Vector2(this.x - vector.x, this.y - vector.y);
   }
 
-  public dot(vector: Vector2): number {
+  public dot(possibleVector: PossibleVector2): number {
+    const vector = new Vector2(possibleVector);
     return this.x * vector.x + this.y * vector.y;
   }
 
