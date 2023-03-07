@@ -2,6 +2,8 @@ import {Scene} from '@motion-canvas/core/lib/scenes';
 import {useSubscribableValue} from '../../hooks';
 import styles from './Timeline.module.scss';
 import clsx from 'clsx';
+import {useApplication} from '../../contexts';
+import {findAndOpenFirstUserFile} from '../../utils';
 
 export interface SlideTrackProps {
   scene: Scene;
@@ -9,6 +11,7 @@ export interface SlideTrackProps {
 }
 
 export function SlideTrack({scene, duration}: SlideTrackProps) {
+  const {player} = useApplication();
   const slides = useSubscribableValue(scene.slides.onChanged);
 
   return slides.length > 0 ? (
@@ -31,7 +34,23 @@ export function SlideTrack({scene, duration}: SlideTrackProps) {
           }}
         >
           <div className={styles.container}>
-            <div className={styles.name}>{slide.name}</div>
+            <div
+              title="Go to source"
+              className={styles.name}
+              onMouseUp={async event => {
+                event.stopPropagation();
+                if (event.button === 1) {
+                  player.requestSeek(
+                    scene.firstFrame +
+                      player.status.secondsToFrames(slide.time),
+                  );
+                } else if (event.button === 0) {
+                  await findAndOpenFirstUserFile(slide.stack);
+                }
+              }}
+            >
+              {slide.name}
+            </div>
           </div>
         </div>
       ))}
