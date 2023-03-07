@@ -1,0 +1,36 @@
+.root {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  max-height: calc(100vh - 32px);
+  width: min(360px, 30vw);
+  background-color: var(--surface-color);
+  border-radius: 4px;
+  padding: 16px;
+  overflow-y: scroll;
+}
+
+.slide {
+  display: block;
+  color: inherit;
+  line-height: 24px;
+  text-align: start;
+  padding: 4px 8px 4px 36px;
+  width: 100%;
+  user-select: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &.active {
+    color: var(--theme);
+    background-color: var(--theme-overlay);
+  }
+
+  &.inProgress {
+    color: var(--theme);
+  }
+}

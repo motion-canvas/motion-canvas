@@ -3,7 +3,7 @@ import type {JSX} from 'preact';
 import {Input} from './Input';
 import {Select, SelectProps} from './Select';
 
-export type InputSelect<T> = Omit<
+export type InputSelectProps<T> = Omit<
   JSX.HTMLAttributes<HTMLInputElement>,
   'value' | 'onChange'
 > &
@@ -14,7 +14,7 @@ export function InputSelect<T extends string | number>({
   value,
   onChange,
   ...props
-}: InputSelect<T>) {
+}: InputSelectProps<T>) {
   return (
     <div className={styles.inputSelect}>
       <Input

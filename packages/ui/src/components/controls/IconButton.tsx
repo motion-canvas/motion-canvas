@@ -7,6 +7,7 @@ interface IconButtonProps {
   title?: string;
   onClick?: () => void;
   children: ComponentChildren;
+  disabled?: boolean;
   className?: string;
 }
 
@@ -15,13 +16,18 @@ export function IconButton({
   onClick,
   title,
   className,
+  disabled,
 }: IconButtonProps) {
   return (
     <button
       title={title}
-      className={clsx(styles.iconButton, className)}
+      className={clsx(
+        styles.iconButton,
+        className,
+        disabled && styles.disabled,
+      )}
       type="button"
-      onClick={onClick}
+      onClick={disabled ? null : onClick}
     >
       {children}
     </button>

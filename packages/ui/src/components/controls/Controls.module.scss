@@ -29,6 +29,12 @@
   &:hover {
     color: #fff;
   }
+
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+    color: rgba(255, 255, 255, 0.16);
+  }
 }
 
 .group {
@@ -84,6 +90,10 @@
   flex-grow: 1;
   flex-shrink: 1;
 
+  .button {
+    border-radius: 4px 0 0 4px;
+  }
+
   .input {
     width: 0;
     border-radius: 4px 0 0 4px;
@@ -125,6 +135,12 @@
     background-color: transparent;
     color: inherit;
   }
+}
+
+.select.main {
+  background: var(--theme)
+    url("data:image/svg+xml;charset=UTF-8,%3csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M16.71 10.71L15.29 9.28998L12 12.59L8.71001 9.28998L7.29001 10.71L12 15.41L16.71 10.71Z' fill='black'/%3e%3c/svg%3e")
+    no-repeat 100% 50%;
 }
 
 .colorPreview {
