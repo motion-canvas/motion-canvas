@@ -311,6 +311,15 @@ export class BBox implements Type {
     );
   }
 
+  public intersects(other: BBox): boolean {
+    return (
+      this.left < other.right &&
+      this.right > other.left &&
+      this.top < other.bottom &&
+      this.bottom > other.top
+    );
+  }
+
   public toSymbol(): symbol {
     return BBox.symbol;
   }
