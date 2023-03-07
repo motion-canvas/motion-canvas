@@ -122,6 +122,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-width: min-content;
 
     &:hover {
       text-decoration: underline;
