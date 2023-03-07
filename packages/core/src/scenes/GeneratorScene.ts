@@ -25,6 +25,7 @@ import {SceneState} from './SceneState';
 import {Random} from './Random';
 import {DependencyContext} from '../signals';
 import {SceneMetadata} from './SceneMetadata';
+import {Slides} from './Slides';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -43,6 +44,7 @@ export abstract class GeneratorScene<T>
   public readonly logger: Logger;
   public readonly meta: SceneMetadata;
   public readonly timeEvents: TimeEvents;
+  public readonly slides: Slides;
   public readonly variables: Variables;
   public random: Random;
   public creationStack?: string;
@@ -127,6 +129,7 @@ export abstract class GeneratorScene<T>
     decorate(this.runnerFactory, threadable(this.name));
     this.timeEvents = new description.timeEventsClass(this);
     this.variables = new Variables(this);
+    this.slides = new Slides(this);
 
     this.random = new Random(this.meta.seed.get());
   }

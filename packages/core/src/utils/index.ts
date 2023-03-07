@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 
+export * from './beginSlide';
 export * from './capitalize';
 export * from './debug';
 export * from './deprecate';
