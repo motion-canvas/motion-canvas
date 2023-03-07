@@ -1,8 +1,7 @@
-import type {RendererSettings} from './Renderer';
-import type {Exporter} from './Exporter';
-import type {Logger} from './Logger';
-import type {CanvasOutputMimeType} from '../types';
-import {FrameSaver} from './FrameSaver';
+import {CanvasOutputMimeType} from '../types';
+import {Exporter} from './Exporter';
+import {Logger} from './Logger';
+import {RendererSettings} from './Renderer';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -61,18 +60,14 @@ export class ImageExporter implements Exporter {
         this.frameLookup.delete(frame);
       });
 
-      FrameSaver.saveSequenceFrame(
-        canvas.toDataURL(this.fileType, this.quality),
-        {
-          frame,
-          fileType: this.fileType,
-          projectName: this.projectName,
-          groupByScene: this.groupByScene,
-          sceneName,
-        },
-      );
-
-      return Promise.resolve();
+      import.meta.hot!.send('motion-canvas:export', {
+        frameNumber: frame,
+        data: canvas.toDataURL(this.fileType, this.quality),
+        mimeType: this.fileType,
+        subDirectories: this.groupByScene
+          ? [this.projectName, sceneName]
+          : [this.projectName],
+      });
     }
   }
 

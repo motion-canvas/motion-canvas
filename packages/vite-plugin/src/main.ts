@@ -345,10 +345,8 @@ export default ({
       });
       server.ws.on(
         'motion-canvas:export',
-        async (
-          {data, meta: {name, frameNumber, subDirectories, mimeType}},
-          client,
-        ) => {
+        async ({data, frameNumber, subDirectories, mimeType}, client) => {
+          const name = frameNumber.toString().padStart(6, '0');
           const extension = mime.extension(mimeType);
           const outputFilePath = path.join(
             outputPath,

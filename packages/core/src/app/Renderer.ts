@@ -9,7 +9,6 @@ import {CanvasOutputMimeType, Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
-import {FrameSaver} from './FrameSaver';
 
 export interface RendererSettings extends StageSettings {
   name: string;
@@ -143,14 +142,17 @@ export class Renderer {
         this.playback.previousScene,
       );
 
-      FrameSaver.saveStillFrame(
-        this.stage.finalBuffer.toDataURL(settings.fileType, settings.quality),
-        {
-          frame,
-          fileType: settings.fileType,
-          projectName: this.project.name,
-        },
-      );
+      if (import.meta.hot) {
+        import.meta.hot.send('motion-canvas:export', {
+          frameNumber: frame,
+          data: this.stage.finalBuffer.toDataURL(
+            settings.fileType,
+            settings.quality,
+          ),
+          mimeType: settings.fileType,
+          subDirectories: ['still', this.project.name],
+        });
+      }
     } catch (e: any) {
       this.project.logger.error(e);
     }

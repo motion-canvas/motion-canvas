@@ -8,12 +8,9 @@ declare module 'vite/types/customEvent' {
     'motion-canvas:meta-ack': {source: string};
     'motion-canvas:export': {
       data: string;
-      meta: {
-        name: string;
-        subDirectories: string[];
-        mimeType: string;
-        frameNumber: number;
-      };
+      subDirectories: string[];
+      mimeType: string;
+      frameNumber: number;
     };
     'motion-canvas:export-ack': {frame: number};
     'motion-canvas:assets': {urls: string[]};
