@@ -1,5 +1,5 @@
 ---
-sidebar_position: 12
+sidebar_position: 14
 slug: /rendering
 ---
 
@@ -8,29 +8,43 @@ import {PhotoCamera} from '@site/src/Icon/PhotoCamera';
 
 # Rendering
 
-To render an animation, open the Rendering tab using the <VideoSettings
+The Video Settings tab serves as the main control panel for all things related
+to the display of your animation. You can open it by pressing the <VideoSettings
   className="icon-inline"
   alt="Video Settings"
   title="Video Settings"
-/> icon. Here, you can configure the output settings of your animation as well
-as initialize the rendering process.
+/> icon. Here, you can configure various settings related to your animation,
+initialize the rendering process, and enter the presentation mode.
 
 ## Configuration
 
+### Background
+
+The background of your animation. This is the base color used to clear the
+canvas before drawing your scenes. Most color formats such as `#242424` or
+`rgba(255, 255, 255, 0.5)` are accepted. Leaving this option empty will make the
+background transparent.
+
+:::tip
+
+The project background cannot be animated. You can use the `fill` property of
+the view, instead:
+
+```ts
+export default makeScene2D(function* (view) {
+  view.fill('#242424'); // set the background of this scene
+  yield* view.fill('lightseagreen', 2); // animate it
+});
+```
+
+:::
+
 ### Range
 
-The Range is the span of frames that will be rendered. If set to a smaller range
+The range is the span of frames that will be rendered. If set to a smaller range
 than the entire length of the video, it will only render a portion of the frames
 in your animation. This can be useful for quickly rendering small changes in
 your animation.
-
-### Frame rate
-
-The frame rate at which the preview plays and the number of frames that will
-render per one second of runtime. The most common values are 24, 30, and 60,
-though any whole integer value is allowed. Motion Canvas animations are
-resilient to changes in frame rate, so most animations will not be affected by
-changing it.
 
 ### Resolution
 
@@ -39,13 +53,34 @@ render in a higher resolution or to change the aspect ratio. Note, however, that
 animations will not scale with changes in resolution, so plan ahead for any
 adjustments to resolution.
 
+### Audio offset
+
+This option is only available if you've [set up audio](/docs/media#audio) for
+the current project. It allows you to offset the start of the audio in relation
+to your animation. The value is stored in seconds. You can also adjust the
+offset by holding `SHIFT` over the audio track and dragging it left or right.
+
+### Frame rate
+
+The frame rate at which the animation plays and the number of frames that will
+render per one second of runtime. The most common values are 24, 30, and 60,
+though any whole integer value is allowed. Motion Canvas animations are
+resilient to changes in frame rate, so most animations will not be affected by
+changing it.
+
 ### Scale
 
 Scale will increase or decrease the resolution of the animation, but, unlike the
 Resolution option, the coordinates and size of animation elements will be
-adjusted as well. You may use this option to render in multiple different
-resolution densities or to adjust your output resolution after completing an
-animation.
+adjusted as well.
+
+:::tip
+
+Both Scale and Frame rate can be configured separately for the preview and the
+rendering. This lets you increase the performance of the preview (by rendering
+in smaller resolution and/or lower framerate) while rendering in high quality.
+
+:::
 
 ### Color Space
 
