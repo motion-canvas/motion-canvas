@@ -1,11 +1,18 @@
 import {ComponentChildren, createContext} from 'preact';
 import {useContext} from 'preact/hooks';
-import {Player, Renderer, Project, ProjectMetadata} from '@motion-canvas/core';
+import type {
+  Player,
+  Renderer,
+  Project,
+  Presenter,
+  ProjectMetadata,
+} from '@motion-canvas/core';
 
 interface Application {
   project: Project;
   player: Player;
   renderer: Renderer;
+  presenter: Presenter;
   meta: ProjectMetadata;
 }
 

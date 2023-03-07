@@ -1,5 +1,6 @@
 import styles from './Tabs.module.scss';
 
+import {Header} from '../layout';
 import {ComponentChildren} from 'preact';
 
 export interface PaneProps {
@@ -11,7 +12,7 @@ export interface PaneProps {
 export function Pane({title, id, children}: PaneProps) {
   return (
     <div className={styles.pane} id={id}>
-      <div className={styles.header}>{title}</div>
+      <Header>{title}</Header>
       {children}
     </div>
   );

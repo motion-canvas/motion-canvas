@@ -1,19 +1,22 @@
-import {useApplication} from '../../contexts';
+import type {Stage} from '@motion-canvas/core';
 import {useLayoutEffect, useRef} from 'preact/hooks';
 import {useSharedSettings} from '../../hooks';
 
 import styles from './Viewport.module.scss';
 import clsx from 'clsx';
 
-export function RenderingPreview() {
-  const {renderer} = useApplication();
+export interface CustomStageProps {
+  stage: Stage;
+}
+
+export function CustomStage({stage}: CustomStageProps) {
   const ref = useRef<HTMLDivElement>();
   const settings = useSharedSettings();
 
   useLayoutEffect(() => {
-    ref.current.append(renderer.stage.finalBuffer);
-    return () => renderer.stage.finalBuffer.remove();
-  }, []);
+    ref.current.append(stage.finalBuffer);
+    return () => stage.finalBuffer.remove();
+  }, [stage]);
 
   return (
     <div

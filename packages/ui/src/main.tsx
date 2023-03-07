@@ -1,7 +1,7 @@
 import './index.scss';
 
 import type {Project} from '@motion-canvas/core';
-import {Player, Renderer} from '@motion-canvas/core';
+import {Player, Presenter, Renderer} from '@motion-canvas/core';
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {Index, ProjectData} from './Index';
@@ -31,6 +31,7 @@ export function editor(project: Project) {
   });
 
   const renderer = new Renderer(project);
+  const presenter = new Presenter(project);
 
   const meta = project.meta;
   const playerKey = `${project.name}/player`;
@@ -61,6 +62,7 @@ export function editor(project: Project) {
       application={{
         player,
         renderer,
+        presenter,
         project,
         meta,
       }}
