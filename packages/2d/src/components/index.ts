@@ -7,6 +7,7 @@ export * from './Layout';
 export * from './Line';
 export * from './Node';
 export * from './Rect';
+export * from './Polygon';
 export * from './Shape';
 export * from './Txt';
 export * from './types';
