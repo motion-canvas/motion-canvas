@@ -173,9 +173,9 @@ export function drawPolygon(
     const direction = Vector2.fromRadians(theta).perpendicular;
     const vertex = direction.mul(size);
     if (i == 0) {
-      path.moveTo(vertex.x, vertex.y);
+      moveTo(path, vertex);
     } else {
-      path.lineTo(vertex.x, vertex.y);
+      lineTo(path, vertex);
     }
   }
   path.closePath();
