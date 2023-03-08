@@ -19,7 +19,7 @@
     "lib"
   ],
   "peerDependencies": {
-    "vite": "3.x"
+    "vite": "4.x"
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
