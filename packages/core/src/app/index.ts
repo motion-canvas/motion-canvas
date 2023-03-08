@@ -10,6 +10,7 @@ export * from './Logger';
 export * from './PlaybackManager';
 export * from './PlaybackStatus';
 export * from './Player';
+export * from './Presenter';
 export * from './Project';
 export * from './ProjectMetadata';
 export * from './Renderer';

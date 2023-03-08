@@ -6,7 +6,7 @@ import {
   threads,
 } from '../threading';
 import {Logger, PlaybackStatus} from '../app';
-import {TimeEvents} from './TimeEvents';
+import {TimeEvents} from './timeEvents';
 import {Variables} from './Variables';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {decorate, threadable} from '../decorators';
@@ -25,6 +25,7 @@ import {SceneState} from './SceneState';
 import {Random} from './Random';
 import {DependencyContext} from '../signals';
 import {SceneMetadata} from './SceneMetadata';
+import {Slides} from './Slides';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -43,6 +44,7 @@ export abstract class GeneratorScene<T>
   public readonly logger: Logger;
   public readonly meta: SceneMetadata;
   public readonly timeEvents: TimeEvents;
+  public readonly slides: Slides;
   public readonly variables: Variables;
   public random: Random;
   public creationStack?: string;
@@ -125,8 +127,9 @@ export abstract class GeneratorScene<T>
     this.creationStack = description.stack;
 
     decorate(this.runnerFactory, threadable(this.name));
-    this.timeEvents = new TimeEvents(this);
+    this.timeEvents = new description.timeEventsClass(this);
     this.variables = new Variables(this);
+    this.slides = new Slides(this);
 
     this.random = new Random(this.meta.seed.get());
   }
@@ -264,12 +267,6 @@ export abstract class GeneratorScene<T>
   }
 
   public async reset(previousScene: Scene | null = null) {
-    if (this.cache.current.firstFrame !== this.playback.frame) {
-      this.cache.current = {
-        ...this.cache.current,
-        firstFrame: this.playback.frame,
-      };
-    }
     this.counters = {};
     this.previousScene = previousScene;
     this.random = new Random(this.meta.seed.get());

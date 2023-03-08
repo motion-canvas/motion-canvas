@@ -1,15 +1,16 @@
-import {Logger, PlaybackStatus} from '../app';
-import {TimeEvents} from './TimeEvents';
-import {Variables} from './Variables';
-import {
+import type {Logger, PlaybackStatus} from '../app';
+import type {TimeEvents} from './timeEvents';
+import type {Variables} from './Variables';
+import type {
   SubscribableEvent,
   SubscribableValueEvent,
   ValueDispatcher,
 } from '../events';
-import {Vector2} from '../types';
-import {LifecycleEvents} from './LifecycleEvents';
-import {Random} from './Random';
-import {SceneMetadata} from './SceneMetadata';
+import type {Vector2} from '../types';
+import type {LifecycleEvents} from './LifecycleEvents';
+import type {Random} from './Random';
+import type {SceneMetadata} from './SceneMetadata';
+import type {Slides} from './Slides';
 
 /**
  * The constructor used when creating new scenes.
@@ -59,6 +60,7 @@ export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   playback: PlaybackStatus;
   logger: Logger;
   onReplaced: ValueDispatcher<FullSceneDescription<T>>;
+  timeEventsClass: new (scene: Scene) => TimeEvents;
 }
 
 /**
@@ -132,6 +134,7 @@ export interface Scene<T = unknown> {
    */
   readonly playback: PlaybackStatus;
   readonly timeEvents: TimeEvents;
+  readonly slides: Slides;
   readonly logger: Logger;
   readonly variables: Variables;
   readonly random: Random;

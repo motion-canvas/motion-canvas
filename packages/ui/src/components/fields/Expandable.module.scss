@@ -15,3 +15,7 @@
 .content {
   padding-bottom: 16px;
 }
+
+.root:last-child .content {
+  padding-bottom: 0;
+}

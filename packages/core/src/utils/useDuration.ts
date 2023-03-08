@@ -1,4 +1,5 @@
 import {useScene} from './useScene';
+import {useThread} from './useThread';
 
 /**
  * Register a time event and get its duration in seconds.
@@ -26,6 +27,6 @@ import {useScene} from './useScene';
  */
 export function useDuration(name: string): number {
   const scene = useScene();
-  scene.timeEvents.register(name);
-  return scene.timeEvents.get(name).offset;
+  const thread = useThread();
+  return scene.timeEvents.register(name, thread.time());
 }

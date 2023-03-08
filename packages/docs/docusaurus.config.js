@@ -160,6 +160,10 @@ const config = {
             name: 'logging',
             url: 'Logging example',
           },
+          {
+            name: 'presentation',
+            url: 'Presentation example',
+          },
         ],
       },
     ],

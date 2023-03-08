@@ -1,12 +1,6 @@
 import styles from './Timeline.module.scss';
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'preact/hooks';
+import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {
   useDocumentEvent,
   useDuration,
@@ -45,7 +39,7 @@ export function Timeline() {
   const [scale, setScale] = useStorage('timeline-scale', 1);
   const isReady = duration > 0;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     containerRef.current.scrollLeft = offset;
   }, [rect.width > 0 && isReady]);
 

@@ -1,6 +1,7 @@
 import styles from './Timeline.module.scss';
 
-import type {Scene, TimeEvent} from '@motion-canvas/core/lib/scenes';
+import type {Scene} from '@motion-canvas/core/lib/scenes';
+import type {TimeEvent} from '@motion-canvas/core/lib/scenes/timeEvents';
 import {useDrag} from '../../hooks';
 import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
 import {useApplication, useTimelineContext} from '../../contexts';

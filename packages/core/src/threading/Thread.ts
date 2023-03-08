@@ -1,5 +1,5 @@
 import {ThreadGenerator} from './ThreadGenerator';
-import {endThread, startThread, usePlayback} from '../utils';
+import {endThread, startThread} from '../utils';
 import {createSignal} from '../signals';
 import {setTaskName} from './names';
 
@@ -29,6 +29,18 @@ export class Thread {
   public readonly time = createSignal(0);
 
   /**
+   * The fixed time of this thread.
+   *
+   * @remarks
+   * Fixed time is a multiple of the frame duration. It can be used to account
+   * for the difference between this thread's {@link time} and the time of the
+   * current animation frame.
+   */
+  public get fixed() {
+    return this.fixedTime;
+  }
+
+  /**
    * Check if this thread or any of its ancestors has been canceled.
    */
   public get canceled(): boolean {
@@ -37,18 +49,14 @@ export class Thread {
 
   public parent: Thread | null = null;
   private isCanceled = false;
-  private readonly frameDuration: number;
+  private fixedTime = 0;
 
   public constructor(
     /**
      * The generator wrapped by this thread.
      */
     public readonly runner: ThreadGenerator,
-  ) {
-    const playback = usePlayback();
-    this.frameDuration = playback.framesToSeconds(1);
-    this.time(playback.time);
-  }
+  ) {}
 
   /**
    * Progress the wrapped generator once.
@@ -63,10 +71,12 @@ export class Thread {
 
   /**
    * Prepare the thread for the next update cycle.
+   *
+   * @param dt - The delta time of the next cycle.
    */
-  public update() {
-    const playback = usePlayback();
-    this.time(this.time() + playback.framesToSeconds(1) * playback.speed);
+  public update(dt: number) {
+    this.time(this.time() + dt);
+    this.fixedTime += dt;
     this.children = this.children.filter(child => !child.canceled);
   }
 
@@ -75,6 +85,7 @@ export class Thread {
     child.parent = this;
     child.isCanceled = false;
     child.time(this.time());
+    child.fixedTime = this.fixedTime;
     this.children.push(child);
 
     setTaskName(child.runner, `unknown ${this.children.length}`);

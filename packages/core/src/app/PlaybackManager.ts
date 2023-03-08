@@ -1,10 +1,11 @@
-import {Scene, SceneDescriptionReload} from '../scenes';
+import type {Scene, SceneDescriptionReload, Slide} from '../scenes';
 import {ValueDispatcher} from '../events';
 
 export enum PlaybackState {
   Playing,
   Rendering,
   Paused,
+  Presenting,
 }
 
 /**
@@ -44,6 +45,7 @@ export class PlaybackManager {
   public fps = 30;
   public duration = 0;
   public finished = false;
+  public slides: Slide[] = [];
 
   public previousScene: Scene | null = null;
   public state = PlaybackState.Paused;
@@ -56,6 +58,9 @@ export class PlaybackManager {
   }
 
   public set currentScene(scene: Scene) {
+    if (!scene) {
+      throw new Error('Invalid scene.');
+    }
     this.currentSceneReference ??= new ValueDispatcher<Scene>(scene);
     this.currentSceneReference.current = scene;
   }
@@ -100,6 +105,48 @@ export class PlaybackManager {
     return this.finished;
   }
 
+  public async goBack() {
+    let target = this.currentScene.slides.getCurrent();
+    if (target && this.currentScene.slides.isWaiting()) {
+      const index = this.slides.indexOf(target);
+      target = this.slides[index - 1];
+    }
+
+    await this.seekSlide(target);
+  }
+
+  public async goForward() {
+    const current = this.currentScene.slides.getCurrent();
+    const index = this.slides.indexOf(current!);
+    await this.seekSlide(this.slides[index + 1]);
+  }
+
+  public async goTo(slideId: string) {
+    await this.seekSlide(this.slides.find(slide => slide.id === slideId));
+  }
+
+  private async seekSlide(slide: Slide | null = null) {
+    if (!slide) return;
+    const {id, scene} = slide;
+
+    if (this.currentScene !== scene || this.currentScene.slides.didHappen(id)) {
+      this.previousScene = null;
+      this.currentScene = scene;
+      this.frame = this.currentScene.firstFrame;
+      this.currentScene.slides.setTarget(id);
+      await this.currentScene.reset();
+    }
+
+    this.finished = false;
+    this.currentScene.slides.setTarget(id);
+    while (!this.currentScene.slides.isWaitingFor(id) && !this.finished) {
+      this.finished = await this.next();
+    }
+    this.currentScene.slides.setTarget(null);
+
+    return this.finished;
+  }
+
   public async reset() {
     this.previousScene = null;
     this.currentScene = this.scenes.current[0];
@@ -113,6 +160,7 @@ export class PlaybackManager {
 
   public async recalculate() {
     this.previousScene = null;
+    this.slides = [];
 
     const speed = this.speed;
     this.frame = 0;
@@ -124,6 +172,7 @@ export class PlaybackManager {
         await scene.recalculate(frame => {
           this.frame = frame;
         });
+        this.slides.push(...scene.slides.onChanged.current);
         scenes.push(scene);
       }
     } finally {
@@ -145,7 +194,7 @@ export class PlaybackManager {
     this.frame += this.speed;
 
     if (this.currentScene.isFinished()) {
-      return false;
+      return true;
     }
 
     await this.currentScene.next();

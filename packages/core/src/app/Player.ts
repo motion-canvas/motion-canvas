@@ -12,6 +12,7 @@ import {Scene} from '../scenes';
 import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
+import {EditableTimeEvents} from '../scenes/timeEvents';
 
 export interface PlayerState extends Record<string, unknown> {
   paused: boolean;
@@ -151,6 +152,7 @@ export class Player {
         playback: this.status,
         logger: this.project.logger,
         size: this.size,
+        timeEventsClass: EditableTimeEvents,
       });
       description.onReplaced?.subscribe(description => {
         scene.reload(description);
@@ -187,8 +189,8 @@ export class Player {
     if (recalculate) {
       this.playback.reload();
       this.frame.current = frame;
-      await this.requestRecalculation();
-      this.requestSeek(frame);
+      this.requestRecalculation();
+      this.requestedSeek = frame;
     }
   }
 
@@ -412,9 +414,14 @@ export class Player {
       }
     }
 
+    // Pause if a new slide has just started.
+    if (!state.paused && this.playback.currentScene.slides.isWaiting()) {
+      this.togglePlayback(false);
+      state.paused = true;
+    }
+
     // Draw the project
     await this.render.dispatch();
-
     this.frame.current = this.playback.frame;
 
     this.request();

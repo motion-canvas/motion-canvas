@@ -87,46 +87,90 @@
 }
 
 .sceneTrack {
-  height: 48px;
-  padding: 4px 0;
+  padding: 8px 0;
   display: flex;
+  align-items: stretch;
+  --clip-color: var(--surface-color-light);
+  --clip-gap: 4px;
 }
 
-.sceneClip {
-  height: 48px;
-  padding: 4px;
+.clip {
+  position: relative;
 
-  .scene {
-    position: relative;
+  &::before {
+    position: absolute;
+    top: 0;
+    left: var(--clip-gap);
+    right: var(--clip-gap);
+    bottom: 0;
+    display: block;
+    content: '';
     border-radius: 4px;
-    background-color: var(--surface-color-light);
-    overflow: hidden;
+    background-color: var(--clip-color);
+  }
 
-    .transition {
-      position: absolute;
-      pointer-events: none;
-      top: 0;
-      bottom: 0;
-      left: -4px;
-      background: linear-gradient(
-        90deg,
-        rgba(36, 36, 36, 1) 0%,
-        rgba(36, 36, 36, 0) 100%
-      );
+  .container {
+    width: 100%;
+    padding: 8px 16px;
+  }
+
+  .name {
+    color: inherit;
+    cursor: pointer;
+    position: relative;
+    line-height: 24px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: min-content;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.transition {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  background: linear-gradient(
+    90deg,
+    rgba(36, 36, 36, 1) 0%,
+    rgba(36, 36, 36, 0) 100%
+  );
+}
+
+.slideTrack {
+  display: flex;
+  padding: 4px 0;
+  width: 100%;
+  --clip-color: var(--surface-color-hover);
+  --clip-gap: 2px;
+
+  .container {
+    padding: 4px 16px;
+  }
+
+  .clip {
+    &:first-child::before {
+      left: 8px;
     }
 
-    .sceneName {
-      color: inherit;
-      cursor: pointer;
-      position: relative;
-      line-height: 24px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin: 8px 12px;
+    &:last-child::before {
+      right: 8px;
+    }
 
-      &:hover {
-        text-decoration: underline;
-      }
+    &.continuation::before {
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        var(--surface-color-hover) 8px,
+        var(--surface-color-hover) 16px
+      );
     }
   }
 }

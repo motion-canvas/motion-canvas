@@ -70,4 +70,29 @@ describe('BBox', () => {
     expect(box()).toMatchObject({x: 10, y: 20, width: 400, height: 100});
     expect(box.width()).toBe(400);
   });
+
+  describe('intersects', () => {
+    test.each([
+      ['a.left > b.right', new BBox(11, 0, 10, 10), new BBox(0, 0, 10, 10)],
+      ['a.right < b.left', new BBox(0, 0, 10, 10), new BBox(11, 0, 10, 10)],
+      ['a.top > b.bottom', new BBox(0, 11, 10, 10), new BBox(0, 0, 10, 10)],
+      ['a.bottom < b.top', new BBox(0, 0, 10, 10), new BBox(11, 0, 10, 10)],
+      [
+        'boxes are touching but not overlapping',
+        new BBox(0, 0, 10, 10),
+        new BBox(10, 0, 10, 10),
+      ],
+    ])('does not intersect if %s', (_, a, b) => {
+      expect(a.intersects(b)).toBe(false);
+      expect(b.intersects(a)).toBe(false);
+    });
+
+    test('intersects', () => {
+      const a = new BBox(0, 0, 10, 10);
+      const b = new BBox(5, 5, 10, 10);
+
+      expect(a.intersects(b)).toBe(true);
+      expect(b.intersects(a)).toBe(true);
+    });
+  });
 });

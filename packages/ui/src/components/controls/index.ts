@@ -1,4 +1,5 @@
 export * from './Button';
+export * from './ButtonSelect';
 export * from './ColorInput';
 export * from './InputSelect';
 export * from './Group';

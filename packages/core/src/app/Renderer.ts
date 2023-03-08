@@ -1,13 +1,14 @@
-import {Project} from './Project';
+import type {Project} from './Project';
+import type {Exporter} from './Exporter';
+import type {Scene} from '../scenes';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
-import {Scene} from '../scenes';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {ImageExporter} from './ImageExporter';
-import {Exporter} from './Exporter';
 import {CanvasOutputMimeType, Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
+import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
 
 export interface RendererSettings extends StageSettings {
   name: string;
@@ -75,6 +76,7 @@ export class Renderer {
         logger: this.project.logger,
         playback: this.status,
         size: new Vector2(1920, 1080),
+        timeEventsClass: ReadOnlyTimeEvents,
       });
       scenes.push(scene);
     }
@@ -164,6 +166,7 @@ export class Renderer {
     settings = (await this.exporter.configure(settings)) ?? settings;
     this.stage.configure(settings);
     this.playback.fps = settings.fps;
+    this.playback.state = PlaybackState.Rendering;
     const from = this.status.secondsToFrames(settings.range[0]);
     const to = this.status.secondsToFrames(settings.range[1]);
 

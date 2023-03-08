@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import {usePlayback, useThread, useLogger} from '../utils';
+import {useThread, useLogger} from '../utils';
 
 type ProgressFunction = (value: number, time: number) => void;
 
@@ -69,7 +69,6 @@ export function* spring(
     return;
   }
 
-  const project = usePlayback();
   const thread = useThread();
 
   let position = from;
@@ -104,12 +103,12 @@ export function* spring(
 
   let settled = false;
   while (!settled) {
-    while (simulationTime < project.time) {
-      const difference = project.time - simulationTime;
+    while (simulationTime < thread.fixed) {
+      const difference = thread.fixed - simulationTime;
 
       if (timeStep > difference) {
         update(difference);
-        simulationTime = project.time;
+        simulationTime = thread.fixed;
       } else {
         update(timeStep);
         simulationTime += timeStep;
@@ -130,13 +129,13 @@ export function* spring(
 
     // Only yield if we haven't settled yet.
     if (!settled) {
-      onProgress(position, project.time - startTime);
+      onProgress(position, thread.fixed - startTime);
       yield;
     }
   }
 
-  onProgress(to, project.time - startTime);
-  onEnd?.(to, project.time - startTime);
+  onProgress(to, thread.fixed - startTime);
+  onEnd?.(to, thread.fixed - startTime);
 }
 
 export interface Spring {

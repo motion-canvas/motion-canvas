@@ -1,7 +1,7 @@
-import {CanvasOutputMimeType} from '../types';
-import {Exporter} from './Exporter';
-import {Logger} from './Logger';
-import {RendererSettings} from './Renderer';
+import type {RendererSettings} from './Renderer';
+import type {Exporter} from './Exporter';
+import type {Logger} from './Logger';
+import type {CanvasOutputMimeType} from '../types';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
