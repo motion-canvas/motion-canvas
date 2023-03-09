@@ -14,17 +14,15 @@
     padding-right: 8px;
     margin-right: 8px;
   }
-}
-
-.action {
-  font-size: 12px;
-}
-
-.key {
-  background-color: var(--surface-color-hover);
-  font-weight: bold;
-  border-radius: 4px;
-  margin-right: 4px;
-  padding: 0 4px;
-  font-size: 12px;
+  .key {
+    background-color: var(--surface-color-hover);
+    font-weight: bold;
+    border-radius: 4px;
+    margin-right: 4px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+  .action {
+    font-size: 12px;
+  }
 }
