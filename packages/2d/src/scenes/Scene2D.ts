@@ -58,7 +58,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
 
   public inspectPosition(x: number, y: number): InspectedElement | null {
     return this.execute(
-      () => this.getView().hit(new Vector2(x, y))?.key ?? null,
+      () =>
+        this.getView().hit(new Vector2(x, y).scale(this.resolutionScale))
+          ?.key ?? null,
     );
   }
 
@@ -93,7 +95,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   ): void {
     const node = this.getNode(element);
     if (node) {
-      node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+      node.drawOverlay(
+        context,
+        matrix
+          .scale(1 / this.resolutionScale, 1 / this.resolutionScale)
+          .multiplySelf(node.localToWorld()),
+      );
     }
   }
 
@@ -116,7 +123,8 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.execute(() => {
       const size = this.getSize();
       this.view = new View2D({
-        position: size.scale(0.5),
+        position: size.scale(this.resolutionScale / 2),
+        scale: this.resolutionScale,
         size,
       });
     });

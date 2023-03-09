@@ -490,27 +490,6 @@ export class Node implements Promisable<Node> {
     return matrix;
   }
 
-  @computed()
-  protected cacheMatrix(): DOMMatrix {
-    const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
-    const requiresCache = this.requiresCache();
-
-    return requiresCache ? parent.multiply(this.worldToLocal()) : parent;
-  }
-
-  @computed()
-  protected compositeMatrix(): DOMMatrix {
-    const requiresCache = this.requiresCache();
-
-    if (this.composite()) {
-      const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
-      return requiresCache ? parent : parent.multiply(this.localToWorld());
-    }
-
-    const parent = this.parent()?.compositeMatrix() ?? new DOMMatrix();
-    return requiresCache ? parent.multiply(this.worldToLocal()) : parent;
-  }
-
   /**
    * A matrix mapping composite space to world space.
    *
@@ -520,13 +499,8 @@ export class Node implements Promisable<Node> {
    * appears relative to the closes composite root.
    */
   @computed()
-  public compositeToWorld() {
-    if (this.composite()) {
-      const parent = this.parent()?.cacheMatrix() ?? new DOMMatrix();
-      return parent.multiply(this.localToWorld());
-    }
-
-    return this.parent()?.compositeMatrix() ?? new DOMMatrix();
+  public compositeToWorld(): DOMMatrix {
+    return this.compositeRoot()?.localToWorld() ?? new DOMMatrix();
   }
 
   @computed()
@@ -544,7 +518,7 @@ export class Node implements Promisable<Node> {
     if (root) {
       const worldToLocal = this.worldToLocal();
       worldToLocal.m44 = 1;
-      return root.localToWorld().multiply();
+      return root.localToWorld().multiply(worldToLocal);
     }
     return new DOMMatrix();
   }
@@ -1009,11 +983,20 @@ export class Node implements Promisable<Node> {
   @computed()
   protected cachedCanvas() {
     const context = this.cacheCanvas();
-    const cache = this.cacheBBox();
+    const cache = this.worldSpaceCacheBBox();
+    const matrix = this.localToWorld();
+
     context.canvas.width = cache.width;
     context.canvas.height = cache.height;
-    context.resetTransform();
-    context.translate(-cache.x, -cache.y);
+
+    context.setTransform(
+      matrix.a,
+      matrix.b,
+      matrix.c,
+      matrix.d,
+      matrix.e - cache.x,
+      matrix.f - cache.y,
+    );
     this.draw(context);
 
     return context;
@@ -1038,7 +1021,7 @@ export class Node implements Promisable<Node> {
     const cache = this.getCacheBBox();
     const children = this.children();
     if (children.length === 0) {
-      return cache.pixelPerfect;
+      return cache;
     }
 
     const points: Vector2[] = cache.corners;
@@ -1050,7 +1033,7 @@ export class Node implements Promisable<Node> {
       );
     }
 
-    return BBox.fromPoints(...points).pixelPerfect;
+    return BBox.fromPoints(...points);
   }
 
   /**
@@ -1085,6 +1068,37 @@ export class Node implements Promisable<Node> {
     }
 
     return result;
+  }
+
+  /**
+   * Get a bounding box in world space for the contents rendered by this node as
+   * well as its children.
+   *
+   * @remarks
+   * This is the same the bounding box returned by {@link cacheBBox} only
+   * transformed to world space.
+   */
+  @computed()
+  protected worldSpaceCacheBBox(): BBox {
+    return BBox.fromPoints(
+      ...this.cacheBBox().transformCorners(this.localToWorld()),
+    ).pixelPerfect;
+  }
+
+  /**
+   * Get the offset for this node's cache canvas.
+   *
+   * @remarks
+   * To put the cached contents in the correct position, cache canvases need to
+   * be offset relatively to the canvas they are being drawn on.
+   */
+  @computed()
+  protected cacheOffset(): Vector2 {
+    if (!this.requiresCache()) {
+      return this.parent()?.cacheOffset() ?? Vector2.zero;
+    }
+
+    return this.worldSpaceCacheBBox().position;
   }
 
   /**
@@ -1132,17 +1146,21 @@ export class Node implements Promisable<Node> {
     this.transformContext(context);
 
     if (this.requiresCache()) {
-      const cacheRect = this.cacheBBox();
+      const cacheRect = this.worldSpaceCacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
+        const offset = cacheRect.position.sub(
+          this.parent()?.cacheOffset() ?? Vector2.zero,
+        );
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
         const compositeOverride = this.compositeOverride();
-        context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
+        context.resetTransform();
+        context.drawImage(cacheContext.canvas, offset.x, offset.y);
         if (compositeOverride > 0) {
           context.save();
           context.globalAlpha *= compositeOverride;
           context.globalCompositeOperation = 'source-over';
-          context.drawImage(cacheContext.canvas, cacheRect.x, cacheRect.y);
+          context.drawImage(cacheContext.canvas, offset.x, offset.y);
           context.restore();
         }
       }
