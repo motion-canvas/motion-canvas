@@ -26,10 +26,10 @@ export function Editor() {
         />
       }
       end={
-        <div>
+        <>
           <Timeline />
           <Footer />
-        </div>
+        </>
       }
     />
   ) : (

@@ -1,6 +1,10 @@
 .root {
   display: flex;
-  padding: 4px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 1.5rem;
+  padding: 1px 4px;
   overflow-x: hidden;
 }
 
