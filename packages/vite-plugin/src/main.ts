@@ -8,6 +8,7 @@ import {
   MotionCanvasCorsProxyOptions,
   setupEnvVarsForProxy,
 } from './proxy-middleware';
+import {getVersions} from './versions';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -102,6 +103,7 @@ export default ({
     .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
     .split('{{source}}');
   const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
+  const versions = JSON.stringify(getVersions());
 
   const resolvedEditorId = '\0virtual:editor';
 
@@ -210,6 +212,7 @@ export default ({
             `metaFile.attach(config.meta)`,
             `export default {`,
             `  name: '${name}',`,
+            `  versions: ${versions},`,
             `  ...config,`,
             `};`,
           );
