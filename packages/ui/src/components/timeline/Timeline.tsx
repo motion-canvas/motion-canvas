@@ -14,7 +14,7 @@ import {Timestamps} from './Timestamps';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
 import {RangeSelector} from './RangeSelector';
-import {clamp} from '@motion-canvas/core/lib/tweening';
+import {clamp} from '../../utils';
 import {AudioTrack} from './AudioTrack';
 import {
   useApplication,

@@ -1,0 +1,26 @@
+.root {
+  padding: 0 4px;
+  position: relative;
+  display: flex;
+  gap: 8px;
+}
+
+.link {
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.main {
+    color: var(--theme);
+  }
+}
+
+.input {
+  display: none;
+}
