@@ -76,6 +76,7 @@ export class Renderer {
         logger: this.project.logger,
         playback: this.status,
         size: new Vector2(1920, 1080),
+        resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
       });
       scenes.push(scene);
@@ -132,7 +133,7 @@ export class Renderer {
       this.playback.fps = settings.fps;
       this.playback.state = PlaybackState.Rendering;
 
-      await this.reloadScenes(settings.size);
+      await this.reloadScenes(settings);
       await this.playback.reset();
       await this.playback.seek(this.status.secondsToFrames(settings.range[0]));
       await this.stage.render(
@@ -170,7 +171,7 @@ export class Renderer {
     const from = this.status.secondsToFrames(settings.range[0]);
     const to = this.status.secondsToFrames(settings.range[1]);
 
-    await this.reloadScenes(settings.size);
+    await this.reloadScenes(settings);
     if (signal.aborted) return RendererResult.Aborted;
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
@@ -212,13 +213,14 @@ export class Renderer {
     return result;
   }
 
-  private async reloadScenes(size: Vector2) {
+  private async reloadScenes(settings: RendererSettings) {
     for (let i = 0; i < this.project.scenes.length; i++) {
       const description = this.project.scenes[i];
       const scene = this.playback.onScenesRecalculated.current[i];
       scene.reload({
         config: description.onReplaced.current.config,
-        size: size,
+        size: settings.size,
+        resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
     }
