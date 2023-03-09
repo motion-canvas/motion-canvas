@@ -11,6 +11,7 @@ import {
   ApplicationProvider,
 } from './contexts';
 import {getItem, setItem} from './utils';
+import {ShortcutsProvider} from './contexts/shortcuts';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -67,11 +68,13 @@ export function editor(project: Project) {
         meta,
       }}
     >
-      <LoggerProvider>
-        <InspectionProvider>
-          <Editor />
-        </InspectionProvider>
-      </LoggerProvider>
+      <ShortcutsProvider>
+        <LoggerProvider>
+          <InspectionProvider>
+            <Editor />
+          </InspectionProvider>
+        </LoggerProvider>
+      </ShortcutsProvider>
     </ApplicationProvider>,
   );
 }

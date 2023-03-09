@@ -1,0 +1,28 @@
+.root {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 1.5rem;
+  padding: 1px 4px;
+  overflow-x: hidden;
+}
+
+.shortcut {
+  &:not(:last-child) {
+    border-right: 2px solid var(--surface-color);
+    padding-right: 8px;
+    margin-right: 8px;
+  }
+  .key {
+    background-color: var(--surface-color-hover);
+    font-weight: bold;
+    border-radius: 4px;
+    margin-right: 4px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+  .action {
+    font-size: 12px;
+  }
+}

@@ -1,5 +1,6 @@
 import {Sidebar} from './components/sidebar';
 import {Timeline} from './components/timeline';
+import {Footer} from './components/footer';
 import {Viewport} from './components/viewport';
 import {ResizeableLayout} from './components/layout';
 import {useState} from 'preact/hooks';
@@ -24,7 +25,12 @@ export function Editor() {
           end={<Viewport />}
         />
       }
-      end={<Timeline />}
+      end={
+        <>
+          <Timeline />
+          <Footer />
+        </>
+      }
     />
   ) : (
     <PresentationMode />
