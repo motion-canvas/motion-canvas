@@ -39,6 +39,7 @@ export class ImageExporter implements Exporter {
   public async handleFrame(
     canvas: HTMLCanvasElement,
     frame: number,
+    sceneFrame: number,
     sceneName: string,
     signal: AbortSignal,
   ) {
@@ -61,12 +62,14 @@ export class ImageExporter implements Exporter {
       });
 
       import.meta.hot!.send('motion-canvas:export', {
-        frameNumber: frame,
+        frame,
+        sceneFrame,
         data: canvas.toDataURL(this.fileType, this.quality),
         mimeType: this.fileType,
         subDirectories: this.groupByScene
           ? [this.projectName, sceneName]
           : [this.projectName],
+        groupByScene: this.groupByScene,
       });
     }
   }

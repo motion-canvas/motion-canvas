@@ -345,8 +345,13 @@ export default ({
       });
       server.ws.on(
         'motion-canvas:export',
-        async ({data, frameNumber, subDirectories, mimeType}, client) => {
-          const name = frameNumber.toString().padStart(6, '0');
+        async (
+          {data, frame, sceneFrame, subDirectories, mimeType, groupByScene},
+          client,
+        ) => {
+          const name = (groupByScene ? sceneFrame : frame)
+            .toString()
+            .padStart(6, '0');
           const extension = mime.extension(mimeType);
           const outputFilePath = path.join(
             outputPath,
@@ -363,7 +368,7 @@ export default ({
           await fs.promises.writeFile(outputFilePath, base64Data, {
             encoding: 'base64',
           });
-          client.send('motion-canvas:export-ack', {frame: frameNumber});
+          client.send('motion-canvas:export-ack', {frame});
         },
       );
     },

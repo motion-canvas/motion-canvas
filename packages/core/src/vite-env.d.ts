@@ -10,7 +10,9 @@ declare module 'vite/types/customEvent' {
       data: string;
       subDirectories: string[];
       mimeType: string;
-      frameNumber: number;
+      frame: number;
+      sceneFrame?: number;
+      groupByScene?: boolean;
     };
     'motion-canvas:export-ack': {frame: number};
     'motion-canvas:assets': {urls: string[]};

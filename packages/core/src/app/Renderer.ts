@@ -144,7 +144,7 @@ export class Renderer {
 
       if (import.meta.hot) {
         import.meta.hot.send('motion-canvas:export', {
-          frameNumber: frame,
+          frame,
           data: this.stage.finalBuffer.toDataURL(
             settings.fileType,
             settings.quality,
@@ -172,6 +172,7 @@ export class Renderer {
     const to = this.status.secondsToFrames(settings.range[1]);
 
     await this.reloadScenes(settings);
+    await this.playback.recalculate();
     if (signal.aborted) return RendererResult.Aborted;
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
@@ -232,9 +233,13 @@ export class Renderer {
       this.playback.currentScene!,
       this.playback.previousScene,
     );
+
+    const sceneFrame =
+      this.playback.frame - this.playback.currentScene.firstFrame;
     await this.exporter.handleFrame(
       this.stage.finalBuffer,
       this.playback.frame,
+      sceneFrame,
       this.playback.currentScene.name,
       signal,
     );
