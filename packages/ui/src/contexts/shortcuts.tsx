@@ -14,7 +14,7 @@ type ShortcutsState = {
   setCurrentModule?: (module: ShortcutModules) => void;
 };
 
-const initialshortcuts: ShortcutsByModule = {
+const InitialShortcuts: ShortcutsByModule = {
   global: [
     {key: 'Space', action: 'Toggle playback'},
     {key: '<-', action: 'Previous frame'},
@@ -36,7 +36,7 @@ const initialshortcuts: ShortcutsByModule = {
 
 const ShortcutsContext = createContext<ShortcutsState>({
   currentModule: 'none',
-  shortcuts: initialshortcuts,
+  shortcuts: InitialShortcuts,
 });
 
 export function ShortcutsProvider({children}: {children: ComponentChildren}) {
@@ -44,7 +44,7 @@ export function ShortcutsProvider({children}: {children: ComponentChildren}) {
 
   return (
     <ShortcutsContext.Provider
-      value={{currentModule, setCurrentModule, shortcuts: initialshortcuts}}
+      value={{currentModule, setCurrentModule, shortcuts: InitialShortcuts}}
     >
       {children}
     </ShortcutsContext.Provider>

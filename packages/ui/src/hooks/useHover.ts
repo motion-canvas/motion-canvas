@@ -10,12 +10,12 @@ export function useHover<T extends HTMLElement>(
 
   const ref = useRef<T>(null);
 
-  const _handleMouseOver = () => {
+  const handleMouseOverWrapper = () => {
     setValue(true);
     handleMouseOver?.();
   };
 
-  const _handleMouseOut = () => {
+  const handleMouseOutWrapper = () => {
     setValue(false);
     handleMouseOut?.();
   };
@@ -24,12 +24,12 @@ export function useHover<T extends HTMLElement>(
     () => {
       const node = ref.current;
       if (node) {
-        node.addEventListener('mouseover', _handleMouseOver);
-        node.addEventListener('mouseout', _handleMouseOut);
+        node.addEventListener('mouseover', handleMouseOverWrapper);
+        node.addEventListener('mouseout', handleMouseOutWrapper);
 
         return () => {
-          node.removeEventListener('mouseover', _handleMouseOver);
-          node.removeEventListener('mouseout', _handleMouseOut);
+          node.removeEventListener('mouseover', handleMouseOverWrapper);
+          node.removeEventListener('mouseout', handleMouseOutWrapper);
         };
       }
     },
