@@ -33,8 +33,8 @@ export function getPolylineProfile(
 
     const centerToStart = start.sub(center);
     const centerToEnd = end.sub(center);
-    const startVector = centerToStart.normalized;
-    const endVector = centerToEnd.normalized;
+    const startVector = centerToStart.normalized.safe;
+    const endVector = centerToEnd.normalized.safe;
     const angleBetween = Math.acos(clamp(-1, 1, startVector.dot(endVector)));
     const angleTan = Math.tan(angleBetween / 2);
     const angleSin = Math.sin(angleBetween / 2);
@@ -50,7 +50,7 @@ export function getPolylineProfile(
     const circleDistance = startVector
       .add(endVector)
       .scale(1 / 2)
-      .normalized.scale(circleOffsetDistance)
+      .normalized.safe.scale(circleOffsetDistance)
       .add(center);
 
     const counter = startVector.perpendicular.dot(endVector) < 0;
