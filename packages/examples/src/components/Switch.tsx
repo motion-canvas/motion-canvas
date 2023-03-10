@@ -39,13 +39,13 @@ export class Switch extends Node {
       ...props,
     });
 
-    this.indicatorPosition(this.initialState ? 50 : -50);
     this.isOn = this.initialState();
+    this.indicatorPosition(this.isOn ? 50 : -50);
 
     this.add(
       <Rect
         ref={this.container}
-        fill={this.offColor}
+        fill={this.isOn ? this.accent() : this.offColor}
         size={[200, 100]}
         radius={100}
       >
