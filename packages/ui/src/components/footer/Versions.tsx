@@ -23,7 +23,7 @@ export function Versions() {
     <div className={styles.root}>
       {isOld && (
         <a
-          href={`https://motioncanvas.io/blog/version-${'3.1.0'}`}
+          href={`https://motioncanvas.io/blog/version-${newVersion}`}
           target="_blank"
           title="See what's new"
           className={clsx(styles.link, styles.main)}
