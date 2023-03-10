@@ -22,12 +22,14 @@ export interface AnimationPlayerProps {
   banner?: boolean;
   small?: boolean;
   name: string;
+  link?: string;
 }
 
 export default function AnimationPlayer({
   name,
   banner,
   small,
+  link,
 }: AnimationPlayerProps) {
   return (
     <div
@@ -42,7 +44,7 @@ export default function AnimationPlayer({
         src={`/examples/${name}.js`}
         auto={banner}
       />
-      <AnimationLink name={name} />
+      <AnimationLink name={link || name} />
     </div>
   );
 }
