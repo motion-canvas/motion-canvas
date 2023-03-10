@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1](https://github.com/motion-canvas/motion-canvas/compare/v3.2.0...v3.2.1) (2023-03-10)
+
+
+### Bug Fixes
+
+* **ui:** fix new version link ([#505](https://github.com/motion-canvas/motion-canvas/issues/505)) ([7459e7f](https://github.com/motion-canvas/motion-canvas/commit/7459e7f8355163f3cb6a3ed791fc41a2962a186e))
+
+
+
+
+
 # [3.2.0](https://github.com/motion-canvas/motion-canvas/compare/v3.1.0...v3.2.0) (2023-03-10)
 
 

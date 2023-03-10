@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/create",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "Quickly scaffold Motion Canvas projects",
   "main": "index.js",
   "author": "motion-canvas",
@@ -22,7 +22,7 @@
   "devDependencies": {
     "@motion-canvas/2d": "^3.2.0",
     "@motion-canvas/core": "^3.2.0",
-    "@motion-canvas/ui": "^3.2.0",
+    "@motion-canvas/ui": "^3.2.1",
     "@motion-canvas/vite-plugin": "^3.2.0"
   },
   "dependencies": {
