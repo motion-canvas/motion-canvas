@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.2.1](https://github.com/motion-canvas/motion-canvas/compare/v3.2.0...v3.2.1) (2023-03-10)
+
+
+### Bug Fixes
+
+* **ui:** fix new version link ([#505](https://github.com/motion-canvas/motion-canvas/issues/505)) ([7459e7f](https://github.com/motion-canvas/motion-canvas/commit/7459e7f8355163f3cb6a3ed791fc41a2962a186e))
+
+
+
+
+
+# [3.2.0](https://github.com/motion-canvas/motion-canvas/compare/v3.1.0...v3.2.0) (2023-03-10)
+
+
+### Bug Fixes
+
+* **2d:** fix line arc length ([#503](https://github.com/motion-canvas/motion-canvas/issues/503)) ([4f1cd59](https://github.com/motion-canvas/motion-canvas/commit/4f1cd59e6bcba0b16b36be88b28a60ae46d4d9ab)), closes [#497](https://github.com/motion-canvas/motion-canvas/issues/497)
+* **docs:** invalid source code link ([#502](https://github.com/motion-canvas/motion-canvas/issues/502)) ([3588d53](https://github.com/motion-canvas/motion-canvas/commit/3588d53d45f9bc9b57aad10353d207cccdfb0dba)), closes [#499](https://github.com/motion-canvas/motion-canvas/issues/499)
+
+
+### Features
+
+* **2d:** add Polygon component ([#463](https://github.com/motion-canvas/motion-canvas/issues/463)) ([15adb3e](https://github.com/motion-canvas/motion-canvas/commit/15adb3e312a4998b44c0b9c5fe5b5236f51c71c9)), closes [#455](https://github.com/motion-canvas/motion-canvas/issues/455)
+* display current package versions ([#501](https://github.com/motion-canvas/motion-canvas/issues/501)) ([2972f67](https://github.com/motion-canvas/motion-canvas/commit/2972f673e201310e69688ab6f2c1adf1cddf2bf3))
+* **ui:** list available shortcuts ([#444](https://github.com/motion-canvas/motion-canvas/issues/444)) ([443fcc9](https://github.com/motion-canvas/motion-canvas/commit/443fcc9feb1a1ca69aecbc4db2e194ce4f50f72e))
+* use PossibleVector2 in Vector2 methods ([#478](https://github.com/motion-canvas/motion-canvas/issues/478)) ([8ccb44a](https://github.com/motion-canvas/motion-canvas/commit/8ccb44a265016e25b2b177a65d44f801c9d861f9))
+* world space cache ([#498](https://github.com/motion-canvas/motion-canvas/issues/498)) ([633e9e1](https://github.com/motion-canvas/motion-canvas/commit/633e9e140dfbbe397df6ddc1f96ed30782ddce94)), closes [#342](https://github.com/motion-canvas/motion-canvas/issues/342)
+
+
+
+
+
 # [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
 
 

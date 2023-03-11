@@ -4,6 +4,7 @@ import {ComponentChild, JSX} from 'preact';
 import {useCallback, useMemo, useRef} from 'preact/hooks';
 import {useDrag, useStorage} from '../../hooks';
 import clsx from 'clsx';
+import {clamp} from '../../utils';
 
 interface ResizeableLayoutProps {
   start: ComponentChild;
@@ -29,9 +30,10 @@ export function ResizeableLayout({
     useCallback(
       (_dx, _dy, x, y) => {
         const rect = containerRef.current.getBoundingClientRect();
-        setSize(
-          vertical ? (y - rect.y) / rect.height : (x - rect.x) / rect.width,
-        );
+        const newSize = vertical
+          ? (y - rect.y) / rect.height
+          : (x - rect.x) / rect.width;
+        setSize(clamp(0, 1, newSize));
       },
       [vertical, setSize],
     ),

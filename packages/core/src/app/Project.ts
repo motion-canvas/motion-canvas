@@ -19,6 +19,12 @@ export interface Project {
   audio?: string;
   audioOffset?: number;
   variables?: Record<string, unknown>;
+  versions: {
+    core: string;
+    two: string | null;
+    ui: string | null;
+    vitePlugin: string | null;
+  };
 }
 
 export function makeProject(settings: ProjectSettings) {

@@ -7,31 +7,30 @@ import {useState} from 'preact/hooks';
 import {usePresenterState} from './hooks';
 import {PresenterState} from '@motion-canvas/core';
 import {PresentationMode} from './components/presentation';
+import styles from './Editor.module.scss';
 
 export function Editor() {
   const state = usePresenterState();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return state === PresenterState.Initial ? (
-    <ResizeableLayout
-      id={'main-timeline'}
-      size={0.7}
-      vertical
-      start={
-        <ResizeableLayout
-          resizeable={sidebarOpen}
-          id={'sidebar-vieport'}
-          start={<Sidebar setOpen={setSidebarOpen} />}
-          end={<Viewport />}
-        />
-      }
-      end={
-        <>
-          <Timeline />
-          <Footer />
-        </>
-      }
-    />
+    <div className={styles.root}>
+      <ResizeableLayout
+        id={'main-timeline'}
+        size={0.7}
+        vertical
+        start={
+          <ResizeableLayout
+            resizeable={sidebarOpen}
+            id={'sidebar-vieport'}
+            start={<Sidebar setOpen={setSidebarOpen} />}
+            end={<Viewport />}
+          />
+        }
+        end={<Timeline />}
+      />
+      <Footer />
+    </div>
   ) : (
     <PresentationMode />
   );

@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/motion-canvas/motion-canvas/compare/v3.1.0...v3.2.0) (2023-03-10)
+
+
+### Features
+
+* display current package versions ([#501](https://github.com/motion-canvas/motion-canvas/issues/501)) ([2972f67](https://github.com/motion-canvas/motion-canvas/commit/2972f673e201310e69688ab6f2c1adf1cddf2bf3))
+* use PossibleVector2 in Vector2 methods ([#478](https://github.com/motion-canvas/motion-canvas/issues/478)) ([8ccb44a](https://github.com/motion-canvas/motion-canvas/commit/8ccb44a265016e25b2b177a65d44f801c9d861f9))
+* world space cache ([#498](https://github.com/motion-canvas/motion-canvas/issues/498)) ([633e9e1](https://github.com/motion-canvas/motion-canvas/commit/633e9e140dfbbe397df6ddc1f96ed30782ddce94)), closes [#342](https://github.com/motion-canvas/motion-canvas/issues/342)
+
+
+
+
+
 # [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
 
 

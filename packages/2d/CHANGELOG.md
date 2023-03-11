@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.2.0](https://github.com/motion-canvas/motion-canvas/compare/v3.1.0...v3.2.0) (2023-03-10)
+
+
+### Bug Fixes
+
+* **2d:** fix line arc length ([#503](https://github.com/motion-canvas/motion-canvas/issues/503)) ([4f1cd59](https://github.com/motion-canvas/motion-canvas/commit/4f1cd59e6bcba0b16b36be88b28a60ae46d4d9ab)), closes [#497](https://github.com/motion-canvas/motion-canvas/issues/497)
+
+
+### Features
+
+* **2d:** add Polygon component ([#463](https://github.com/motion-canvas/motion-canvas/issues/463)) ([15adb3e](https://github.com/motion-canvas/motion-canvas/commit/15adb3e312a4998b44c0b9c5fe5b5236f51c71c9)), closes [#455](https://github.com/motion-canvas/motion-canvas/issues/455)
+* world space cache ([#498](https://github.com/motion-canvas/motion-canvas/issues/498)) ([633e9e1](https://github.com/motion-canvas/motion-canvas/commit/633e9e140dfbbe397df6ddc1f96ed30782ddce94)), closes [#342](https://github.com/motion-canvas/motion-canvas/issues/342)
+
+
+
+
+
 # [3.1.0](https://github.com/motion-canvas/motion-canvas/compare/v3.0.2...v3.1.0) (2023-03-07)
 
 
