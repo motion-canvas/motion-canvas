@@ -35,14 +35,9 @@ npm init @motion-canvas@latest
 ```
 
 Answer the prompts to name your project and select which language you would like
-to use; either TypeScript or plain JavaScript.
-
-:::tip
-
-We recommend using TypeScript in your first project, since that's the language
-we're using throughout this documentation.
-
-:::
+to use; either TypeScript or plain JavaScript. We recommend using TypeScript in
+your first project, since that's the language we're using throughout this
+documentation.
 
 To complete the scaffolding process, run the following command in your newly
 created project directory:
@@ -76,21 +71,6 @@ file with the following snippet.
 
 Now save the file. Any changes you make are automatically picked up and
 reflected in the preview.
-
-:::caution Vite on Windows Subsystem for Linux (WSL) 2
-
-When running Vite on WSL2, file system watching does not work if a file is
-edited by Windows applications.
-
-To fix this, move the project folder into the WSL2 file system and use WSL2
-applications to edit files.  
-Accessing the Windows file system from WSL2 is slow, so this will improve
-performance.
-
-For more information view the
-[**Vite Docs**](https://vitejs.dev/config/server-options.html#server-watch).
-
-:::
 
 You should see a gray circle in the preview pane at the top right of the web
 application. Press the play button to see the circle animate across the screen.
@@ -282,6 +262,78 @@ This brings us back to our initial example:
 <CodeBlock language="tsx" title="src/scenes/example.tsx">
   {source}
 </CodeBlock>
+
+## Troubleshooting
+
+<details>
+  <summary>
+    <code>npm init @motion-canvas@latest</code> fails to execute.
+  </summary>
+
+There was [a bug in npm](https://github.com/npm/cli/issues/5175) causing the
+above command to fail. It got fixed in version `8.15.1`. You can follow
+[this guide](https://docs.npmjs.com/try-the-latest-stable-version-of-npm) to
+update your npm. Alternatively, you can use the following command instead:
+
+```bash
+npm exec @motion-canvas/create@latest
+```
+
+</details>
+<details>
+  <summary>
+    <code>npm install</code> fails with <code>code ENOENT</code>
+  </summary>
+
+If `npm install` fails with the following error:
+
+```bash
+npm ERR! code ENOENT
+npm ERR! syscall open
+npm ERR! path [path]\package.json
+npm ERR! errno -4058
+npm ERR! enoent ENOENT: no such file or directory, open '[path]\package.json'
+npm ERR! enoent This is related to npm not being able to find a file.
+npm ERR! enoent
+```
+
+Make sure that you're executing the command in the correct directory. When you
+finish bootstrapping the project with `npm init`, it will display three
+commands:
+
+```bash
+cd [path]
+npm install
+npm run serve
+```
+
+Did you run the `cd` command to switch to the directory containing your project?
+
+</details>
+<details>
+  <summary>
+    I moved the camera too far away and can't find the preview (The preview is is black)
+  </summary>
+
+You can press `0` to refocus the camera on the preview.
+
+</details>
+<details>
+  <summary>
+    File watching does not work on Windows Subsystem for Linux (WSL) 2
+  </summary>
+
+When running Vite on WSL2, file system watching does not work if a file is
+edited by Windows applications.
+
+To fix this, move the project folder into the WSL2 file system and use WSL2
+applications to edit files. Accessing the Windows file system from WSL2 is slow,
+so this will improve performance.
+
+For more information view the
+[**Vite Docs**](https://vitejs.dev/config/server-options.html#server-watch).
+
+</details>
 
 [generators]:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*

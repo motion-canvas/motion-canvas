@@ -1,0 +1,8 @@
+.root {
+  padding: var(--ifm-global-spacing);
+  background-color: var(--ifm-background-surface-color);
+  margin-bottom: 0.5rem;
+  --code-background-color: var(--ifm-background-color);
+  --ifm-code-background: var(--ifm-background-color);
+  --docusaurus-details-decoration-color: var(--ifm-color-emphasis-300);
+}
