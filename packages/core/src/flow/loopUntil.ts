@@ -23,9 +23,12 @@ export function* loopUntil(
   factory: LoopCallback,
 ): ThreadGenerator {
   const scene = useScene();
-  const frames = scene.timeEvents.register(event);
+  const thread = useThread();
+  const step = usePlayback().framesToSeconds(1);
+  const targetTime = thread.time() + scene.timeEvents.register(event);
+  
   let iteration = 0;
-  while (scene.project.frame < frames) {
+  while (targetTime - step > thread.fixed) {
     const generator = factory(iteration);
     if (generator) {
       yield* generator;
@@ -34,4 +37,5 @@ export function* loopUntil(
     }
     iteration += 1;
   }
+  thread.time(targetTime);
 }
