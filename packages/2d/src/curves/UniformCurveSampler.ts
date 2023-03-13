@@ -1,6 +1,6 @@
 import {map, remap} from '@motion-canvas/core/lib/tweening';
 import {Vector2} from '@motion-canvas/core/lib/types';
-import {BezierSegment} from './BezierSegment';
+import {PolynomialSegment} from './PolynomialSegment';
 
 export interface SampledPoint {
   t: number;
@@ -27,7 +27,7 @@ export class UniformCurveSampler {
    *                  more points get sampled, the higher the resolution–and
    *                  therefore precision–of the sampler.
    */
-  public constructor(private readonly curve: BezierSegment, samples = 20) {
+  public constructor(private readonly curve: PolynomialSegment, samples = 20) {
     this.resample(samples);
   }
 

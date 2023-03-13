@@ -21,7 +21,7 @@ import {Knot} from './Knot';
 import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {DesiredLength} from '../partials';
 import splineWithInsufficientKnots from './__logs__/spline-with-insufficient-knots.md';
-import {BezierSegment} from '../curves/BezierSegment';
+import {PolynomialSegment} from '../curves/PolynomialSegment';
 
 export interface SplineProps extends LineProps {
   /**
@@ -115,7 +115,7 @@ export class Spline extends Line {
   }
 
   protected override childrenBBox() {
-    const points = (this.profile().segments as BezierSegment[]).flatMap(
+    const points = (this.profile().segments as PolynomialSegment[]).flatMap(
       segment => segment.points,
     );
     return BBox.fromPoints(...points);
@@ -137,7 +137,7 @@ export class Spline extends Line {
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
-    const points = (this.profile().segments as BezierSegment[]).flatMap(
+    const points = (this.profile().segments as PolynomialSegment[]).flatMap(
       segment => segment.points,
     );
     return BBox.fromPoints(...points);
@@ -150,7 +150,7 @@ export class Spline extends Line {
     const size = this.computedSize();
     const box = this.cacheBBox().transformCorners(matrix);
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
-    const segments = this.profile().segments as BezierSegment[];
+    const segments = this.profile().segments as PolynomialSegment[];
 
     context.lineWidth = 1;
     context.strokeStyle = 'white';

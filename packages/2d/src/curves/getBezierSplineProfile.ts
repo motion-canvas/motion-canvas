@@ -4,9 +4,11 @@ import {KnotInfo} from './KnotInfo';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {QuadBezierSegment} from './QuadBezierSegment';
 import {clamp} from '@motion-canvas/core/lib/tweening';
-import {BezierSegment} from './BezierSegment';
+import {PolynomialSegment} from './PolynomialSegment';
 
-function isCubicSegment(segment: BezierSegment): segment is CubicBezierSegment {
+function isCubicSegment(
+  segment: PolynomialSegment,
+): segment is CubicBezierSegment {
   return segment instanceof CubicBezierSegment;
 }
 
@@ -57,10 +59,10 @@ function calculateSmoothHandles(
  */
 function updateMinSin(profile: CurveProfile) {
   for (let i = 0; i < profile.segments.length; i++) {
-    const segmentA = profile.segments[i] as BezierSegment;
+    const segmentA = profile.segments[i] as PolynomialSegment;
     const segmentB = profile.segments[
       (i + 1) % profile.segments.length
-    ] as BezierSegment;
+    ] as PolynomialSegment;
 
     // Quadratic Bézier segments will always join smoothly with the previous
     // segment. This means that we can skip the segment since it's impossible

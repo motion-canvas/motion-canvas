@@ -1,12 +1,12 @@
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {bezierCurveTo} from '../utils';
-import {BezierSegment} from './BezierSegment';
+import {PolynomialSegment} from './PolynomialSegment';
 import {Polynomial2D} from './Polynomial2D';
 
 /**
  * A spline segment representing a cubic Bézier curve.
  */
-export class CubicBezierSegment extends BezierSegment {
+export class CubicBezierSegment extends PolynomialSegment {
   private static el = document.createElementNS(
     'http://www.w3.org/2000/svg',
     'path',
@@ -36,7 +36,7 @@ export class CubicBezierSegment extends BezierSegment {
     );
   }
 
-  public split(t: number): [BezierSegment, BezierSegment] {
+  public split(t: number): [PolynomialSegment, PolynomialSegment] {
     const a = new Vector2(
       this.p0.x + (this.p1.x - this.p0.x) * t,
       this.p0.y + (this.p1.y - this.p0.y) * t,

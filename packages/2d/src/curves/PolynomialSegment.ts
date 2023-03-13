@@ -5,7 +5,7 @@ import {moveTo} from '../utils';
 import {Polynomial2D} from './Polynomial2D';
 import {CurvePoint} from './CurvePoint';
 
-export abstract class BezierSegment extends Segment {
+export abstract class PolynomialSegment extends Segment {
   protected readonly pointSampler: UniformCurveSampler;
 
   public get arcLength(): number {
@@ -40,7 +40,7 @@ export abstract class BezierSegment extends Segment {
    *
    * @param t - The t value at which to split the curve.
    */
-  public abstract split(t: number): [BezierSegment, BezierSegment];
+  public abstract split(t: number): [PolynomialSegment, PolynomialSegment];
 
   public getPoint(distance: number): [Vector2, Vector2] {
     const closestPoint = this.pointSampler.pointAtDistance(distance);
@@ -66,7 +66,7 @@ export abstract class BezierSegment extends Segment {
     end = 1,
     move = true,
   ): [Vector2, Vector2, Vector2, Vector2] {
-    let curve: BezierSegment | null = null;
+    let curve: PolynomialSegment | null = null;
     let startT = start;
     let endT = end;
     let points = this.points;
