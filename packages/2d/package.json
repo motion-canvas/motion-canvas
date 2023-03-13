@@ -9,9 +9,9 @@
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
+    "dev": "ttsc -w",
     "build": "ttsc",
     "bundle": "rollup -c rollup.config.mjs",
-    "watch": "ttsc -w",
     "test": "vitest"
   },
   "sideEffects": false,

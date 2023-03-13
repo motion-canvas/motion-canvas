@@ -10,7 +10,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "serve": "vite",
+    "dev": "vite",
     "build": "tsc && vite build"
   },
   "repository": {
