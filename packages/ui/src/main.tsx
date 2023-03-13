@@ -39,7 +39,6 @@ export function editor(project: Project) {
   const meta = project.meta;
 
   const queryString = window.location.search;
-  console.log(queryString);
   const urlParams = new URLSearchParams(queryString);
 
   const startInPresenter = urlParams.has('present')
