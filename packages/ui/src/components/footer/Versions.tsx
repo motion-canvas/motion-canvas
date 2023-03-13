@@ -3,11 +3,12 @@ import {useApplication} from '../../contexts';
 import clsx from 'clsx';
 import {useEffect} from 'preact/hooks';
 import {useState} from 'react';
+import {compareVersions} from '../../utils';
 
 export function Versions() {
   const {project} = useApplication();
   const [newVersion, setNewVersion] = useState(project.versions.core);
-  const isOld = project.versions.core.localeCompare(newVersion) < 0;
+  const isOld = compareVersions(project.versions.core, newVersion) < 0;
 
   useEffect(() => {
     const abort = new AbortController();
