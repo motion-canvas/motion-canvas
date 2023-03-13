@@ -3,6 +3,13 @@ import type {JSX} from 'preact';
 
 type InputProps = JSX.HTMLAttributes<HTMLInputElement>;
 
-export function Input(props: InputProps) {
-  return <input className={styles.input} {...props} />;
+export function Input({onChange, onChangeCapture, ...props}: InputProps) {
+  return (
+    <input
+      onChangeCapture={onChangeCapture ?? onChange}
+      onChange={onChangeCapture ? onChange : undefined}
+      className={styles.input}
+      {...props}
+    />
+  );
 }
