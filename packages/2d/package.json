@@ -10,6 +10,7 @@
   "main": "lib/scenes/index.js",
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
+    "dev": "ttsc -w",
     "build": "ttsc",
     "watch": "ttsc -w"
   },

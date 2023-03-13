@@ -8,6 +8,7 @@
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
+    "dev": "ttsc -w",
     "build": "ttsc",
     "watch": "ttsc -w"
   },
