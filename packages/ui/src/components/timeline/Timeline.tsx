@@ -119,6 +119,9 @@ export function Timeline() {
     'keydown',
     useCallback(
       event => {
+        if (document.activeElement.tagName === 'INPUT') {
+          return;
+        }
         if (event.key !== 'f') return;
         const frame = player.onFrameChanged.current;
         const maxOffset = sizes.fullLength - sizes.viewLength;
