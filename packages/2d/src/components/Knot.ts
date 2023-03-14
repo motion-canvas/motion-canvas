@@ -66,7 +66,6 @@ export class Knot extends Node {
    *
    * @defaultValue Mirrored position of the endHandle.
    */
-  @initial(() => ((<unknown>this) as Knot).getDefaultStartHandle)
   @wrapper(Vector2)
   @signal()
   public declare readonly startHandle: Vector2Signal<this>;
@@ -89,7 +88,6 @@ export class Knot extends Node {
    *
    * @defaultValue Mirrored position of the startHandle.
    */
-  @initial(() => ((<unknown>this) as Knot).getDefaultEndHandle)
   @wrapper(Vector2)
   @signal()
   public declare readonly endHandle: Vector2Signal<this>;
