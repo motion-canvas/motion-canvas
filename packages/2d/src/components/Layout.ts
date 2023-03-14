@@ -815,9 +815,11 @@ export class Layout extends Node {
 
   public override dispose() {
     super.dispose();
-    this.sizeLockCounter.context.dispose();
-    this.element.remove();
-    this.element.innerHTML = '';
+    this.sizeLockCounter?.context.dispose();
+    if (this.element) {
+      this.element.remove();
+      this.element.innerHTML = '';
+    }
     this.element = null as unknown as HTMLElement;
     this.styles = null as unknown as CSSStyleDeclaration;
   }
