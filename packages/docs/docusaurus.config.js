@@ -105,8 +105,8 @@ const config = {
         indexName: 'motion-canvasio',
       },
       prism: {
-        theme: require('./config/lightCodeTheme'),
-        darkTheme: require('./config/darkCodeTheme'),
+        theme: require('./config/codeTheme'),
+        darkTheme: require('./config/codeTheme'),
       },
     }),
   themes: [

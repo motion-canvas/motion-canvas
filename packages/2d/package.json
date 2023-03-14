@@ -6,7 +6,6 @@
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
-  "type": "module",
   "main": "lib/scenes/index.js",
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
