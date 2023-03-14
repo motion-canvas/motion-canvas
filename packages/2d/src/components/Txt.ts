@@ -92,6 +92,9 @@ export class Txt extends Shape {
     const y = box.y + box.height / 2;
     context.save();
     context.textBaseline = 'middle';
+    const clipPath = new Path2D();
+    clipPath.rect(box.x, box.y, box.width, this.getHeight());
+    context.clip(clipPath);
 
     if (this.lineWidth() <= 0) {
       context.fillText(text, box.x, y);
