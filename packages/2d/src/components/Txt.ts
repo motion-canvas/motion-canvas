@@ -18,7 +18,7 @@ export class Txt extends Shape {
     View2D.shadowRoot.append(formatter);
     return formatter;
   })
-  protected static readonly segmenter: any;
+  protected static formatter: HTMLDivElement;
 
   @lazy(() => {
     try {
@@ -29,7 +29,7 @@ export class Txt extends Shape {
       return null;
     }
   })
-  protected static formatter: HTMLDivElement;
+  protected static readonly segmenter: any;
 
   @initial('')
   @interpolation(textLerp)
