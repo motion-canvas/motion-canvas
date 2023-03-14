@@ -23,7 +23,7 @@ export abstract class PolynomialSegment extends Segment {
   }
 
   /**
-   * Evaluate the Bézier at the given t value.
+   * Evaluate the polynomial at the given t value.
    *
    * @param t - The t value at which to evaluate the curve.
    */
@@ -35,16 +35,16 @@ export abstract class PolynomialSegment extends Segment {
   }
 
   /**
-   * Split the curve into two separate cubic Bézier curves at the given t value.
-   * The two resulting curves form the same overall shape as the original curve.
+   * Split the curve into two separate polynomials at the given t value. The two
+   * resulting curves form the same overall shape as the original curve.
    *
    * @param t - The t value at which to split the curve.
    */
   public abstract split(t: number): [PolynomialSegment, PolynomialSegment];
 
-  public getPoint(distance: number): [Vector2, Vector2] {
+  public getPoint(distance: number): CurvePoint {
     const closestPoint = this.pointSampler.pointAtDistance(distance);
-    return [closestPoint.position, closestPoint.tangent];
+    return {position: closestPoint.position, tangent: closestPoint.tangent};
   }
 
   public transformPoints(matrix: DOMMatrix): Vector2[] {
@@ -52,7 +52,8 @@ export abstract class PolynomialSegment extends Segment {
   }
 
   /**
-   * Evaluate the Bézier at the given t value.
+   * Return the tangent of the point that sits at the provided t value on the
+   * curve.
    *
    * @param t - The t value at which to evaluate the curve.
    */
