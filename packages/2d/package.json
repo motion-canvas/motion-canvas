@@ -13,6 +13,7 @@
     "build": "ttsc",
     "watch": "ttsc -w"
   },
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/motion-canvas/motion-canvas.git"

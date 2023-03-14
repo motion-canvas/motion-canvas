@@ -1,4 +1,5 @@
 export * from './Circle';
+export * from './CodeBlock';
 export * from './Icon';
 export * from './Img';
 export * from './Grid';
