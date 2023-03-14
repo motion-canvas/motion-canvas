@@ -5,6 +5,7 @@ import {Shape, ShapeProps} from './Shape';
 import {BBox} from '@motion-canvas/core/lib/types';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {View2D} from './View2D';
+import {lazy} from '@motion-canvas/core/lib/decorators';
 
 export interface TxtProps extends ShapeProps {
   children?: string;
@@ -12,21 +13,23 @@ export interface TxtProps extends ShapeProps {
 }
 
 export class Txt extends Shape {
-  protected static segmenter;
-  protected static formatter: HTMLDivElement;
+  @lazy(() => {
+    const formatter = document.createElement('div');
+    View2D.shadowRoot.append(formatter);
+    return formatter;
+  })
+  protected static readonly segmenter: any;
 
-  static {
-    this.formatter = document.createElement('div');
-    View2D.shadowRoot.append(this.formatter);
-
+  @lazy(() => {
     try {
-      this.segmenter = new (Intl as any).Segmenter(undefined, {
+      return new (Intl as any).Segmenter(undefined, {
         granularity: 'grapheme',
       });
     } catch (e) {
-      // do nothing
+      return null;
     }
-  }
+  })
+  protected static formatter: HTMLDivElement;
 
   @initial('')
   @interpolation(textLerp)

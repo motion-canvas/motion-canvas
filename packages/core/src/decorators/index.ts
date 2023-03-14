@@ -5,4 +5,5 @@
  */
 
 export * from './decorate';
+export * from './lazy';
 export * from './threadable';
