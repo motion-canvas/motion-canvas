@@ -1,12 +1,12 @@
 import {Segment} from './Segment';
 import {Vector2} from '@motion-canvas/core/lib/types';
-import {UniformCurveSampler} from './UniformCurveSampler';
+import {UniformPolynomialCurveSampler} from './UniformPolynomialCurveSampler';
 import {moveTo} from '../utils';
 import {Polynomial2D} from './Polynomial2D';
 import {CurvePoint} from './CurvePoint';
 
 export abstract class PolynomialSegment extends Segment {
-  protected readonly pointSampler: UniformCurveSampler;
+  protected readonly pointSampler: UniformPolynomialCurveSampler;
 
   public get arcLength(): number {
     return this.length;
@@ -19,7 +19,7 @@ export abstract class PolynomialSegment extends Segment {
     protected readonly length: number,
   ) {
     super();
-    this.pointSampler = new UniformCurveSampler(this);
+    this.pointSampler = new UniformPolynomialCurveSampler(this);
   }
 
   /**
@@ -43,7 +43,9 @@ export abstract class PolynomialSegment extends Segment {
   public abstract split(t: number): [PolynomialSegment, PolynomialSegment];
 
   public getPoint(distance: number): CurvePoint {
-    const closestPoint = this.pointSampler.pointAtDistance(distance);
+    const closestPoint = this.pointSampler.pointAtDistance(
+      this.arcLength * distance,
+    );
     return {position: closestPoint.position, tangent: closestPoint.tangent};
   }
 
@@ -75,15 +77,14 @@ export abstract class PolynomialSegment extends Segment {
     if (start !== 0 || end !== 1) {
       const startDistance = this.length * start;
       const endDistance = this.length * end;
-      const startPoint = this.pointSampler.pointAtDistance(startDistance);
-      const endPoint = this.pointSampler.pointAtDistance(endDistance);
-      const endPointT = (endPoint.t - startPoint.t) / (1 - startPoint.t);
 
-      const [, startSegment] = this.split(startPoint.t);
-      [curve] = startSegment.split(endPointT);
+      startT = this.pointSampler.distanceToT(startDistance);
+      endT = this.pointSampler.distanceToT(endDistance);
+      endT = (endT - startT) / (1 - startT);
+
+      const [, startSegment] = this.split(startT);
+      [curve] = startSegment.split(endT);
       points = curve.points;
-      startT = startPoint.t;
-      endT = endPoint.t;
     }
 
     if (move) {
