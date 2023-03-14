@@ -866,7 +866,7 @@ export class Node implements Promisable<Node> {
   public dispose() {
     this.stateStack = [];
     for (const {signal} of this) {
-      signal.context.dispose();
+      signal?.context.dispose();
     }
   }
 

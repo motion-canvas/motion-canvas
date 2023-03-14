@@ -47,7 +47,11 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
 
   public override reset(previousScene?: Scene): Promise<void> {
     for (const key in this.registeredNodes) {
-      this.registeredNodes[key].dispose();
+      try {
+        this.registeredNodes[key].dispose();
+      } catch (e: any) {
+        this.logger.error(e);
+      }
     }
     this.registeredNodes = {};
     this.nodeCounters = {};
