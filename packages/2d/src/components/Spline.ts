@@ -137,10 +137,10 @@ export class Spline extends Line {
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
-    const points = (this.profile().segments as PolynomialSegment[]).flatMap(
-      segment => segment.points,
+    const bounds = (this.profile().segments as PolynomialSegment[]).map(
+      segment => segment.getBBox(),
     );
-    return BBox.fromPoints(...points);
+    return BBox.fromBBoxes(...bounds);
   }
 
   public override drawOverlay(

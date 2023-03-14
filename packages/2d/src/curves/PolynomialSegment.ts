@@ -1,5 +1,5 @@
 import {Segment} from './Segment';
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {BBox, Vector2} from '@motion-canvas/core/lib/types';
 import {UniformPolynomialCurveSampler} from './UniformPolynomialCurveSampler';
 import {moveTo} from '../utils';
 import {Polynomial2D} from './Polynomial2D';
@@ -20,6 +20,10 @@ export abstract class PolynomialSegment extends Segment {
   ) {
     super();
     this.pointSampler = new UniformPolynomialCurveSampler(this);
+  }
+
+  public getBBox(): BBox {
+    return this.curve.getBounds();
   }
 
   /**

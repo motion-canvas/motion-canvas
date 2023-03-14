@@ -1,4 +1,4 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {BBox, Vector2} from '@motion-canvas/core/lib/types';
 
 import {Polynomial} from './Polynomial';
 
@@ -46,5 +46,17 @@ export class Polynomial2D {
 
   public evalDerivative(t: number): Vector2 {
     return this.differentiate().eval(t);
+  }
+
+  /**
+   * Calculate the tight axis-aligned bounds of the curve in the unit interval.
+   */
+  public getBounds(): BBox {
+    const rangeX = this.x.outputRange01();
+    const rangeY = this.y.outputRange01();
+    return BBox.fromPoints(
+      new Vector2(Math.min(...rangeX), Math.max(...rangeY)),
+      new Vector2(Math.max(...rangeX), Math.min(...rangeY)),
+    );
   }
 }
