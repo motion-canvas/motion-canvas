@@ -1,5 +1,5 @@
 import {useRenderingSettings} from '../../hooks';
-import {Group, Input, InputSelect, Label, Select} from '../controls';
+import {Checkbox, Group, Input, InputSelect, Label, Select} from '../controls';
 import {useApplication} from '../../contexts';
 import type {
   CanvasColorSpace,
@@ -71,8 +71,7 @@ export function RenderingSettings() {
       )}
       <Group>
         <Label>group by scene</Label>
-        <Input
-          type="checkbox"
+        <Checkbox
           checked={state.groupByScene}
           onChange={() => {
             meta.rendering.groupByScene.set(!state.groupByScene);
