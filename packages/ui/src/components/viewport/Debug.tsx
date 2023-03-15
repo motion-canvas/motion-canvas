@@ -38,10 +38,7 @@ export function Debug() {
 
     const offset = size.scale(-0.5);
     matrix.translateSelf(state.x + state.width / 2, state.y + state.height / 2);
-    matrix.scaleSelf(
-      state.zoom * resolutionScale,
-      state.zoom * resolutionScale,
-    );
+    matrix.scaleSelf(state.zoom, state.zoom);
     matrix.translateSelf(offset.width, offset.height);
 
     return matrix;
