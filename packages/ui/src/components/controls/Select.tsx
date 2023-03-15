@@ -23,11 +23,12 @@ export function Select<T>({
       title={title}
       className={clsx(styles.select, className, main && styles.main)}
       value={options.findIndex(option => option.value === value)}
-      onChange={event =>
+      onChange={event => {
         onChange(
           options[parseInt((event.target as HTMLSelectElement).value)].value,
-        )
-      }
+        );
+        (event.target as HTMLSelectElement).blur();
+      }}
     >
       {options.map((option, index) => (
         <option key={option.value} value={index}>
