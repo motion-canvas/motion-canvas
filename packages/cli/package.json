@@ -1,0 +1,33 @@
+{
+    "name": "@motion-canvas/cli",
+    "version": "3.2.1",
+    "description": "CLI tools for Motion Canvas",
+    "main": "index.js",
+    "author": "motion-canvas",
+    "homepage": "https://motioncanvas.io/",
+    "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
+    "license": "MIT",
+    "type": "module",
+    "bin": {
+      "mc": "index.js"
+    },
+    "files": [
+      "index.js",
+      "add/*",
+      "utils/*"
+    ],
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/motion-canvas/motion-canvas.git"
+    },
+    "devDependencies": {
+      "@motion-canvas/2d": "^3.2.0",
+      "@motion-canvas/core": "^3.2.0",
+      "@motion-canvas/ui": "^3.2.1",
+      "@motion-canvas/vite-plugin": "^3.2.0"
+    },
+    "dependencies": {
+      "prompts": "^2.4.2"
+    }
+  }
+  
