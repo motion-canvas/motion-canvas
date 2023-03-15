@@ -109,6 +109,30 @@
   }
 }
 
+.checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  align-self: center;
+  border: none;
+  background-color: var(--surface-color-light);
+  border-radius: 4px;
+  appearance: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &:checked {
+    background: var(--theme) url('../../img/checkmark.svg') no-repeat;
+
+    &:hover {
+      box-shadow: 0 0 0 2px white inset;
+    }
+  }
+}
+
 .input[type='number'] {
   text-align: right;
   &::-webkit-inner-spin-button,
@@ -136,10 +160,22 @@
   }
 }
 
-.select.main {
-  background: var(--theme)
-    url("data:image/svg+xml;charset=UTF-8,%3csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M16.71 10.71L15.29 9.28998L12 12.59L8.71001 9.28998L7.29001 10.71L12 15.41L16.71 10.71Z' fill='black'/%3e%3c/svg%3e")
-    no-repeat 100% 50%;
+.select {
+  background-image: url('../../img/dropdown-light.svg');
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  background-position: 100% 50%;
+  background-size: 16px;
+  min-width: 24px;
+  padding-right: 4px;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  &.main {
+    background-color: var(--theme);
+    background-image: url('../../img/dropdown.svg');
+  }
 }
 
 .colorPreview {
