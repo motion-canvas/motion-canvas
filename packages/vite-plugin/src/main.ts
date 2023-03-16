@@ -372,7 +372,7 @@ export default ({
         },
       );
     },
-    config() {
+    config(config) {
       return {
         build: {
           assetsDir: './',
@@ -384,7 +384,7 @@ export default ({
           },
         },
         server: {
-          port: 9000,
+          port: config?.server?.port ?? 9000,
         },
         esbuild: {
           jsx: 'automatic',
