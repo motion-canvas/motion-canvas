@@ -31,6 +31,6 @@
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
     "jsdom": "^21.1.0",
-    "vitest": "^0.29.2"
+    "vitest": "^0.29.3"
   }
 }
