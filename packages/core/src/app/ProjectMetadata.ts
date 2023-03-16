@@ -26,6 +26,7 @@ function createProjectMetadata() {
       colorSpace: new MetaField('color space', 'srgb' as CanvasColorSpace),
       fileType: new MetaField('file type', 'image/png' as CanvasOutputMimeType),
       quality: new MetaField('quality', 1),
+      groupByScene: new MetaField('group by scene', false),
     }),
   };
 }
@@ -61,6 +62,7 @@ export class ProjectMetadata extends ObjectMetaField<
     range: [number, number];
     size: Vector2;
     audioOffset: number;
+    groupByScene: boolean;
   } {
     return {
       ...this.shared.get(),

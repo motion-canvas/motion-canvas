@@ -41,6 +41,12 @@
   display: flex;
   gap: 8px;
   padding: 4px 0;
+
+  & > .select,
+  & > .input,
+  & > .button {
+    flex-basis: 100%;
+  }
 }
 
 .label {
@@ -57,7 +63,7 @@
 .select,
 .input,
 .button {
-  background-color: var(--surface-color-light);
+  background-color: var(--input-background);
   color: rgba(255, 255, 255, 0.6);
   border: 0;
   border-radius: 4px;
@@ -67,11 +73,10 @@
   line-height: 24px;
   flex-shrink: 1;
   flex-grow: 1;
-  flex-basis: 100%;
   min-width: 0;
 
   &:hover {
-    background-color: var(--surface-color-hover);
+    background-color: var(--input-background-hover);
   }
 
   &.main {
@@ -104,8 +109,32 @@
     font-size: 0;
     flex-grow: 0;
     flex-basis: 0;
-    padding-left: 16px;
+    padding: 0 12px;
     border-radius: 0 4px 4px 0;
+  }
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  align-self: center;
+  border: none;
+  background-color: var(--input-background);
+  border-radius: 4px;
+  appearance: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--input-background-hover);
+  }
+
+  &:checked {
+    background: var(--theme) url('../../img/checkmark.svg') no-repeat;
+
+    &:hover {
+      box-shadow: 0 0 0 2px white inset;
+    }
   }
 }
 
@@ -136,10 +165,20 @@
   }
 }
 
-.select.main {
-  background: var(--theme)
-    url("data:image/svg+xml;charset=UTF-8,%3csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M16.71 10.71L15.29 9.28998L12 12.59L8.71001 9.28998L7.29001 10.71L12 15.41L16.71 10.71Z' fill='black'/%3e%3c/svg%3e")
-    no-repeat 100% 50%;
+.select {
+  background-image: url('../../img/dropdown-light.svg');
+  background-repeat: no-repeat;
+  background-position: calc(100% - 4px) 50%;
+  background-size: 16px;
+  padding-right: 24px;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  &.main {
+    background-color: var(--theme);
+    background-image: url('../../img/dropdown.svg');
+  }
 }
 
 .colorPreview {
@@ -161,6 +200,35 @@
 .select,
 .button {
   cursor: pointer;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space: nowrap;
+  gap: 8px;
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.54;
+  }
+
+  &.checked {
+    background-color: var(--theme);
+    color: black;
+
+    &:hover {
+      box-shadow: 0 0 0 2px inset white;
+    }
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    margin: 0 -4px;
+  }
 }
 
 .toggle {

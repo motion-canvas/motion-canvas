@@ -18,7 +18,7 @@ export function ColorInput({value, onChange}: ColorInputProps) {
         onChange={event => {
           const input = event.target as HTMLInputElement;
           const newValue = input.value;
-          if (valid(newValue)) {
+          if (!newValue || valid(newValue)) {
             onChange(newValue);
           } else {
             input.value = value?.serialize() ?? '';

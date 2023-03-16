@@ -25,7 +25,7 @@ const InitialShortcuts: ShortcutsByModule = {
     {key: 'L', action: 'Toggle loop'},
   ],
   viewport: [
-    {key: '0', action: 'Reset zoom'},
+    {key: '0', action: 'Zoom to fit'},
     {key: '=', action: 'Zoom in'},
     {key: '-', action: 'Zoom out'},
     {key: "'", action: 'Toggle grid'},

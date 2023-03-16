@@ -1,7 +1,7 @@
-import type {RendererSettings} from './Renderer';
-import type {Exporter} from './Exporter';
-import type {Logger} from './Logger';
-import type {CanvasOutputMimeType} from '../types';
+import {CanvasOutputMimeType} from '../types';
+import {Exporter} from './Exporter';
+import {Logger} from './Logger';
+import {RendererSettings} from './Renderer';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -12,9 +12,10 @@ const EXPORT_RETRY_DELAY = 1000;
 export class ImageExporter implements Exporter {
   private readonly frameLookup = new Map<number, Callback>();
   private frameCounter = 0;
-  private name = 'unknown';
+  private projectName = 'unknown';
   private quality = 1;
   private fileType: CanvasOutputMimeType = 'image/png';
+  private groupByScene = false;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -25,9 +26,10 @@ export class ImageExporter implements Exporter {
   }
 
   public async configure(settings: RendererSettings) {
-    this.name = settings.name;
+    this.projectName = settings.name;
     this.quality = settings.quality;
     this.fileType = settings.fileType;
+    this.groupByScene = settings.groupByScene;
   }
 
   public async start() {
@@ -37,6 +39,8 @@ export class ImageExporter implements Exporter {
   public async handleFrame(
     canvas: HTMLCanvasElement,
     frame: number,
+    sceneFrame: number,
+    sceneName: string,
     signal: AbortSignal,
   ) {
     if (this.frameLookup.has(frame)) {
@@ -56,12 +60,16 @@ export class ImageExporter implements Exporter {
         this.frameCounter--;
         this.frameLookup.delete(frame);
       });
+
       import.meta.hot!.send('motion-canvas:export', {
         frame,
-        isStill: false,
+        sceneFrame,
         data: canvas.toDataURL(this.fileType, this.quality),
         mimeType: this.fileType,
-        project: this.name,
+        subDirectories: this.groupByScene
+          ? [this.projectName, sceneName]
+          : [this.projectName],
+        groupByScene: this.groupByScene,
       });
     }
   }

@@ -11,7 +11,7 @@
     "@motion-canvas/core": "*",
     "jest-image-snapshot": "^6.1.0",
     "puppeteer": "^19.3.0",
-    "vitest": "^0.25.5"
+    "vitest": "^0.29.2"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",
