@@ -4,15 +4,10 @@ import {SVG} from 'mathjax-full/js/output/svg';
 import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
-import {initial, signal} from '../decorators';
-import {Img, ImgProps} from './Img';
-import {
-  DependencyContext,
-  SignalValue,
-  SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
+import {computed, initial, signal} from '../decorators';
+import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {SVGProps, SVG as SVGNode} from './SVG';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -24,15 +19,13 @@ const JaxDocument = mathjax.document('', {
   OutputJax: new SVG({fontCache: 'local'}),
 });
 
-export interface LatexProps extends ImgProps {
+export interface LatexProps extends SVGProps {
   tex?: SignalValue<string>;
   renderProps?: SignalValue<OptionList>;
 }
 
-export class Latex extends Img {
+export class Latex extends SVGNode {
   private static svgContentsPool: Record<string, string> = {};
-
-  private readonly imageElement = document.createElement('img');
 
   @initial({})
   @signal()
@@ -42,45 +35,36 @@ export class Latex extends Img {
   public declare readonly tex: SimpleSignal<string, this>;
 
   public constructor(props: LatexProps) {
-    super(props);
+    super({
+      fontSize: 48,
+      ...props,
+    });
+    this.svg(this.latexSVG);
+    this.wrapper.scale(this.scaleFactor);
   }
 
-  protected override image(): HTMLImageElement {
-    // Render props may change the look of the TeX, so we need to cache both
-    // source and render props together.
-    const src = `${this.tex()}::${JSON.stringify(this.options())}`;
-    if (Latex.svgContentsPool[src]) {
-      this.imageElement.src = Latex.svgContentsPool[src];
-      return this.imageElement;
-    }
+  @computed()
+  protected scaleFactor() {
+    return this.fontSize() / 2;
+  }
 
-    // Convert to TeX, look for any errors
-    const tex = this.tex();
-    const svg = Adaptor.innerHTML(JaxDocument.convert(tex, this.options()));
-    if (svg.includes('data-mjx-error')) {
-      const errors = svg.match(/data-mjx-error="(.*?)"/);
-      if (errors && errors.length > 0) {
-        useLogger().error(`Invalid MathJax: ${errors[1]}`);
-      }
-    }
+  @computed()
+  protected latexSVG() {
+    return this.latexToSVG(this.tex());
+  }
 
-    // Encode to raw base64 image format
-    const text = `data:image/svg+xml;base64,${btoa(
-      `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n${svg}`,
-    )}`;
-    Latex.svgContentsPool[src] = text;
-    const image = document.createElement('img');
-    image.src = text;
-    image.src = text;
-    if (!image.complete) {
-      DependencyContext.collectPromise(
-        new Promise((resolve, reject) => {
-          image.addEventListener('load', resolve);
-          image.addEventListener('error', reject);
-        }),
-      );
-    }
+  private latexToSVG(tex: string): string {
+    const src = `${tex}::${JSON.stringify(this.options())}`;
+    if (Latex.svgContentsPool[src]) return Latex.svgContentsPool[src];
 
-    return image;
+    const svg = Adaptor.innerHTML(JaxDocument.convert(tex, this.options));
+    Latex.svgContentsPool[src] = svg;
+    return svg;
+  }
+
+  public *tweenTex(tex: string, time: number) {
+    const newSVG = this.latexToSVG(tex);
+    yield* this.tweenSVG(newSVG, time);
+    this.tex(tex);
   }
 }
