@@ -384,7 +384,7 @@ export default ({
           },
         },
         server: {
-          port: config?.server?.port || 9000,
+          port: config?.server?.port ?? 9000,
         },
         esbuild: {
           jsx: 'automatic',
