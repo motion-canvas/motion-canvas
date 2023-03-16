@@ -148,7 +148,7 @@ export class Spline extends Line {
     matrix: DOMMatrix,
   ) {
     const size = this.computedSize();
-    const box = this.cacheBBox().transformCorners(matrix);
+    const box = this.childrenBBox().transformCorners(matrix);
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
     const segments = this.profile().segments as PolynomialSegment[];
 
