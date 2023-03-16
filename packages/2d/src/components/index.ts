@@ -14,3 +14,4 @@ export * from './Txt';
 export * from './types';
 export * from './Video';
 export * from './View2D';
+export * from './Path';
