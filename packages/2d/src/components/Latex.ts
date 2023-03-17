@@ -10,6 +10,7 @@ import {OptionList} from 'mathjax-full/js/util/Options';
 import {SVGProps, SVG as SVGNode} from './SVG';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
+import {useLogger} from '@motion-canvas/core/lib/utils';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -66,6 +67,12 @@ export class Latex extends SVGNode {
     if (Latex.svgContentsPool[src]) return Latex.svgContentsPool[src];
 
     const svg = Adaptor.innerHTML(JaxDocument.convert(tex, this.options));
+    if (svg.includes('data-mjx-error')) {
+      const errors = svg.match(/data-mjx-error="(.*?)"/);
+      if (errors && errors.length > 0) {
+        useLogger().error(`Invalid MathJax: ${errors[1]}`);
+      }
+    }
     Latex.svgContentsPool[src] = svg;
     return svg;
   }
