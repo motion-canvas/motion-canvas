@@ -19,7 +19,7 @@ import {View2D} from './View2D';
 
 interface ParsedSVG {
   size: Vector2;
-  nodes: Array<Node>;
+  nodes: Node[];
 }
 
 interface SVGDiff {

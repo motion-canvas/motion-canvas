@@ -29,8 +29,7 @@ export class Path extends Shape {
   @computed()
   public getPathBBox() {
     Path.pathElement.setAttribute('d', this.data());
-    const bbox = new BBox(Path.pathElement.getBBox());
-    return bbox;
+    return new BBox(Path.pathElement.getBBox());
   }
 
   protected override applyStyle(context: CanvasRenderingContext2D): void {
@@ -44,7 +43,6 @@ export class Path extends Shape {
   }
 
   protected override getPath(): Path2D {
-    const path = new Path2D(this.data());
-    return path;
+    return new Path2D(this.data());
   }
 }
