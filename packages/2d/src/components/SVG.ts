@@ -14,6 +14,8 @@ import {
 } from '@motion-canvas/core/lib/tweening';
 import {Layout} from './Layout';
 import diffSequence from 'diff-sequences';
+import {lazy} from '@motion-canvas/core/lib/decorators';
+import {View2D} from './View2D';
 
 interface ParsedSVG {
   size: Vector2;
@@ -36,6 +38,12 @@ export interface SVGProps extends ShapeProps {
 }
 
 export class SVG extends Shape {
+  @lazy(() => {
+    const element = document.createElement('div');
+    View2D.shadowRoot.appendChild(element);
+    return element;
+  })
+  protected static containerElement: HTMLDivElement;
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
   public wrapper: Node;
@@ -67,10 +75,10 @@ export class SVG extends Shape {
   }
 
   private parseSVG(svg: string): ParsedSVG {
-    const container = document.createElement('div');
-    container.innerHTML = svg;
+    SVG.containerElement.innerHTML = svg;
+    SVG.containerElement.innerHTML = svg;
 
-    const svgRoot = container.querySelector('svg')!;
+    const svgRoot = SVG.containerElement.querySelector('svg')!;
     const {x, y, width, height} = svgRoot.viewBox.baseVal;
     const viewBox = new BBox(x, y, width, height);
     const size = new Vector2(
