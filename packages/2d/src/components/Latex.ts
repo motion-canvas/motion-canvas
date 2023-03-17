@@ -8,7 +8,8 @@ import {computed, initial, signal} from '../decorators';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
 import {SVGProps, SVG as SVGNode} from './SVG';
-import {lazy} from '@motion-canvas/core/lib/decorators';
+import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
+import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -69,9 +70,15 @@ export class Latex extends SVGNode {
     return svg;
   }
 
-  public *tweenTex(tex: string, time: number) {
-    const newSVG = this.latexToSVG(tex);
-    yield* this.tweenSVG(newSVG, time);
-    this.tex(tex);
+  @threadable()
+  protected *tweenTex(
+    value: SignalValue<string>,
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const newValue = typeof value == 'string' ? value : value();
+    const newSVG = this.latexToSVG(newValue);
+    yield* this.svg(newSVG, time, timingFunction);
+    this.svg(this.latexSVG);
   }
 }

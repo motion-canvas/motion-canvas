@@ -10,11 +10,12 @@ import {Rect} from './Rect';
 import {
   clampRemap,
   easeInOutSine,
+  TimingFunction,
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {Layout} from './Layout';
 import diffSequence from 'diff-sequences';
-import {lazy} from '@motion-canvas/core/lib/decorators';
+import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {View2D} from './View2D';
 
 interface ParsedSVG {
@@ -322,8 +323,14 @@ export class SVG extends Shape {
     return node.clone(props);
   }
 
-  public *tweenSVG(svg: string, time: number) {
-    const newSVG = this.parseSVG(svg);
+  @threadable()
+  protected *tweenSvg(
+    value: SignalValue<string>,
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const newValue = typeof value == 'string' ? value : value();
+    const newSVG = this.parseSVG(newValue);
     const diff = this.diffSVG(this.parsed(), newSVG);
     const transformed = diff.transformed.map(({from, to}) => ({
       from: this.cloneNodeExact(from),
@@ -343,7 +350,8 @@ export class SVG extends Shape {
     yield* tween(
       time,
       value => {
-        const remapped = clampRemap(beginning, ending, 0, 1, value);
+        const progress = timingFunction(value);
+        const remapped = clampRemap(beginning, ending, 0, 1, progress);
         const eased = easeInOutSine(remapped);
         for (const node of transformed) {
           node.current.position(
@@ -370,23 +378,28 @@ export class SVG extends Shape {
         const scale = this.wrapper.scale();
         if (autoWidth)
           this.customWidth(
-            easeInOutSine(value, diff.fromSize.x, diff.toSize.x) * scale.x,
+            easeInOutSine(remapped, diff.fromSize.x, diff.toSize.x) * scale.x,
           );
 
         if (autoHeight)
           this.customHeight(
-            easeInOutSine(value, diff.fromSize.y, diff.toSize.y) * scale.y,
+            easeInOutSine(remapped, diff.fromSize.y, diff.toSize.y) * scale.y,
           );
 
-        const deletedOpacity = clampRemap(0, beginning + overlap, 1, 0, value);
+        const deletedOpacity = clampRemap(
+          0,
+          beginning + overlap,
+          1,
+          0,
+          progress,
+        );
         for (const node of diff.deleted) node.opacity(deletedOpacity);
 
-        const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, value);
+        const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
         for (const node of diff.inserted) node.opacity(insertedOpacity);
       },
       () => {
         this.wrapper.children(this.parsedNodes);
-        this.svg(svg);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
       },
