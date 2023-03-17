@@ -65,25 +65,43 @@ going to focus on `src/scenes/example.tsx`, which is where we can add our
 animations. Open `example.tsx` in a text editor, and replace all code in the
 file with the following snippet.
 
-<CodeBlock language="tsx" title="src/scenes/example.tsx">
-  {source}
-</CodeBlock>
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const myCircle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      ref={myCircle}
+      // try changing these properties:
+      x={-300}
+      width={140}
+      height={140}
+      fill="#e13238"
+    />,
+  );
+
+  yield* all(
+    myCircle().position.x(300, 1).to(-300, 1),
+    myCircle().fill('#e6a700', 1).to('#e13238', 1),
+  );
+});
+```
 
 Now save the file. Any changes you make are automatically picked up and
 reflected in the preview.
 
-You should see a gray circle in the preview pane at the top right of the web
+You should see a red circle in the preview pane at the top right of the web
 application. Press the play button to see the circle animate across the screen.
-
-<AnimationPlayer small name="quickstart" />
-
-Depending on the size of your browser, you may want to zoom the preview out by
-scrolling down on your mouse wheel while hovering over the preview panel.
 
 ### Explanation
 
-Each video in Motion Canvas is represented by an instance of the `Project`
-class. In our example, the project is declared in `src/project.ts`:
+Each video in Motion Canvas is represented by a project configuration object. In
+our example, this configuration is declared in `src/project.ts`:
 
 ```ts title="src/project.ts"
 import {makeProject} from '@motion-canvas/core';
@@ -118,7 +136,7 @@ scene.
 You can learn more about scenes, nodes, and this XML-like syntax in the
 [scene hierarchy](/docs/hierarchy) section. For now, what's important is that,
 in our example, we add an individual [`<Circle/>`](/api/2d/components/Circle)
-node to our scene. We make it red, set its width and height as `240` pixels and
+node to our scene. We make it red, set its width and height as `140` pixels and
 position it `300` pixels left from the center:
 
 ```tsx
@@ -127,8 +145,8 @@ view.add(
     // highlight-start
     ref={myCircle}
     x={-300}
-    width={240}
-    height={240}
+    width={140}
+    height={140}
     fill="#e13238"
   />,
 );
@@ -149,8 +167,8 @@ view.add(
     // highlight-next-line
     ref={myCircle}
     x={-300}
-    width={240}
-    height={240}
+    width={140}
+    height={140}
     fill="#e13238"
   />,
 );
@@ -175,8 +193,8 @@ example, in the circle above we defined its `fill` property as `'#e13238'`:
 <Circle
   ref={myCircle}
   x={-300}
-  width={240}
-  height={240}
+  width={140}
+  height={140}
   // highlight-next-line
   fill="#e13238"
 />
