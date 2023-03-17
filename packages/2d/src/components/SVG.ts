@@ -20,17 +20,17 @@ import {View2D} from './View2D';
 
 interface ParsedSVG {
   size: Vector2;
-  nodes: Node[];
+  nodes: Shape[];
 }
 
 interface SVGDiff {
   fromSize: Vector2;
   toSize: Vector2;
-  inserted: Array<Node>;
-  deleted: Array<Node>;
+  inserted: Shape[];
+  deleted: Shape[];
   transformed: Array<{
-    from: Node;
-    to: Node;
+    from: Shape;
+    to: Shape;
   }>;
 }
 
@@ -163,7 +163,7 @@ export class SVG extends Shape {
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<Node> {
+  ): Generator<Shape> {
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) continue;
 
@@ -181,7 +181,7 @@ export class SVG extends Shape {
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<Node> {
+  ): Generator<Shape> {
     const transformMatrix = this.getElementTransformation(
       child,
       parentTransform,
@@ -364,15 +364,13 @@ export class SVG extends Shape {
             easeInOutSine(remapped, node.from.rotation(), node.to.rotation()),
           );
 
-          if (node.current instanceof Rect) {
-            node.current.size(
-              Vector2.lerp(
-                (node.from as Layout).size(),
-                (node.to as Layout).size(),
-                eased,
-              ),
-            );
-          }
+          node.current.size(
+            Vector2.lerp(
+              (node.from as Layout).size(),
+              (node.to as Layout).size(),
+              eased,
+            ),
+          );
         }
 
         const scale = this.wrapper.scale();
