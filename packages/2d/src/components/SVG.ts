@@ -77,7 +77,6 @@ export class SVG extends Shape {
 
   private parseSVG(svg: string): ParsedSVG {
     SVG.containerElement.innerHTML = svg;
-    SVG.containerElement.innerHTML = svg;
 
     const svgRoot = SVG.containerElement.querySelector('svg')!;
     const {x, y, width, height} = svgRoot.viewBox.baseVal;
