@@ -223,7 +223,10 @@ export class Line extends Shape {
   }
 
   protected override getComputedLayout(): BBox {
-    const box = super.getComputedLayout();
+    return this.offsetComputedLayout(super.getComputedLayout());
+  }
+
+  protected offsetComputedLayout(box: BBox): BBox {
     box.position = box.position.sub(this.childrenBBox().center);
     return box;
   }

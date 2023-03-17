@@ -137,6 +137,16 @@ export class Spline extends Line {
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
+    return this.getTightBBox().size;
+  }
+
+  protected override offsetComputedLayout(box: BBox): BBox {
+    box.position = box.position.sub(this.getTightBBox().center);
+    return box;
+  }
+
+  @computed()
+  private getTightBBox(): BBox {
     const bounds = (this.profile().segments as PolynomialSegment[]).map(
       segment => segment.getBBox(),
     );
