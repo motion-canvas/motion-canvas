@@ -11,7 +11,8 @@
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
     "build": "ttsc",
-    "watch": "ttsc -w"
+    "watch": "ttsc -w",
+    "test": "vitest"
   },
   "sideEffects": false,
   "repository": {
@@ -24,7 +25,9 @@
     "tsconfig.project.json"
   ],
   "devDependencies": {
-    "@motion-canvas/internal": "0.0.0"
+    "@motion-canvas/internal": "0.0.0",
+    "jsdom": "^21.1.0",
+    "vitest": "^0.29.2"
   },
   "dependencies": {
     "@motion-canvas/core": "^3.2.0",
