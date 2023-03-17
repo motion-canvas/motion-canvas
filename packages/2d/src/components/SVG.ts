@@ -90,8 +90,8 @@ export class SVG extends Shape {
     const center = viewBox.center;
 
     const rootTransform = new DOMMatrix()
-      .scale(scale.x, scale.y)
-      .translate(-center.x, -center.y);
+      .scaleSelf(scale.x, scale.y)
+      .translateSelf(-center.x, -center.y);
 
     const nodes = Array.from(
       this.extractGroupShape(svgRoot, svgRoot, rootTransform, {}),
