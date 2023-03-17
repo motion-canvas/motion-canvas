@@ -8,6 +8,7 @@ import {computed, initial, signal} from '../decorators';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
 import {SVGProps, SVG as SVGNode} from './SVG';
+import {lazy} from '@motion-canvas/core/lib/decorators';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -25,6 +26,12 @@ export interface LatexProps extends SVGProps {
 }
 
 export class Latex extends SVGNode {
+  @lazy(() => {
+    return parseFloat(
+      window.getComputedStyle(SVGNode.containerElement).fontSize,
+    );
+  })
+  private static containerFontSize: number;
   private static svgContentsPool: Record<string, string> = {};
 
   @initial({})
@@ -45,7 +52,7 @@ export class Latex extends SVGNode {
 
   @computed()
   protected scaleFactor() {
-    return this.fontSize() / 2;
+    return this.fontSize() / Latex.containerFontSize;
   }
 
   @computed()
