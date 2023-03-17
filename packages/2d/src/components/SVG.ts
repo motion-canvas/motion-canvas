@@ -400,6 +400,12 @@ export class SVG extends Shape {
         this.wrapper.children(this.parsedNodes);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
+
+        for (const node of diff.deleted) node.dispose();
+        for (const node of transformed) {
+          node.from.dispose();
+          node.current.dispose();
+        }
       },
     );
   }
