@@ -1091,22 +1091,6 @@ export class Node implements Promisable<Node> {
   }
 
   /**
-   * Get the offset for this node's cache canvas.
-   *
-   * @remarks
-   * To put the cached contents in the correct position, cache canvases need to
-   * be offset relatively to the canvas they are being drawn on.
-   */
-  @computed()
-  protected cacheOffset(): Vector2 {
-    if (!this.requiresCache()) {
-      return this.parent()?.cacheOffset() ?? Vector2.zero;
-    }
-
-    return this.worldSpaceCacheBBox().position;
-  }
-
-  /**
    * Prepare the given context for drawing a cached node onto it.
    *
    * @remarks
@@ -1153,9 +1137,6 @@ export class Node implements Promisable<Node> {
     if (this.requiresCache()) {
       const cacheRect = this.worldSpaceCacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
-        const offset = cacheRect.position.sub(
-          this.parent()?.cacheOffset() ?? Vector2.zero,
-        );
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
         const compositeOverride = this.compositeOverride();
@@ -1168,12 +1149,20 @@ export class Node implements Promisable<Node> {
           matrix.e,
           matrix.f,
         );
-        context.drawImage(cacheContext.canvas, offset.x, offset.y);
+        context.drawImage(
+          cacheContext.canvas,
+          cacheRect.position.x,
+          cacheRect.position.y,
+        );
         if (compositeOverride > 0) {
           context.save();
           context.globalAlpha *= compositeOverride;
           context.globalCompositeOperation = 'source-over';
-          context.drawImage(cacheContext.canvas, offset.x, offset.y);
+          context.drawImage(
+            cacheContext.canvas,
+            cacheRect.position.x,
+            cacheRect.position.y,
+          );
           context.restore();
         }
       }
