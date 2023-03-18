@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.2](https://github.com/motion-canvas/motion-canvas/compare/v3.3.1...v3.3.2) (2023-03-18)
+
+### Bug Fixes
+
+- **2d:** add missing Fragment export
+  ([#553](https://github.com/motion-canvas/motion-canvas/issues/553))
+  ([229afb4](https://github.com/motion-canvas/motion-canvas/commit/229afb4fe7d95f09b480ab4a813f8dff549f381f))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.1](https://github.com/motion-canvas/motion-canvas/compare/v3.3.0...v3.3.1) (2023-03-18)
 
 ### Bug Fixes
