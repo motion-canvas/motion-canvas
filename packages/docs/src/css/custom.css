@@ -44,7 +44,6 @@
   --ifm-toc-border-color: var(--ifm-color-emphasis-300);
   --ifm-color-emphasis-300: rgba(60, 60, 60, 0.12);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --code-background-color: var(--ifm-background-surface-color);
   --ifm-code-hover-background: #f0f0f0;
   --ifm-hr-background-color: var(--ifm-color-emphasis-300);
 
@@ -60,7 +59,7 @@
   --ifm-code-selection-color: #dde8e1;
   --ifm-code-active-color: rgba(0, 0, 0, 0.04);
   --hl-color: rgb(57, 58, 52);
-  --hl-background: var(--code-background-color);
+  --hl-background: var(--ifm-background-surface-color);
   --hl-comment: #999988;
   --hl-comment-style: italic;
   --hl-keyword: #00009f;
@@ -129,7 +128,7 @@ html[data-theme='dark'] {
 }
 
 .alert {
-  --code-background-color: var(--ifm-background-color);
+  --hl-background: var(--ifm-background-color);
   background-color: var(--ifm-background-surface-color);
 }
 
