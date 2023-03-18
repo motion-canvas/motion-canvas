@@ -4,6 +4,7 @@ import {
   TimingFunction,
   tween,
 } from '../tweening';
+import {waitFor} from '../flow';
 import {errorToLog, useLogger} from '../utils';
 import {ThreadGenerator} from '../threading';
 import {run} from '../flow';
@@ -174,6 +175,7 @@ export class SignalContext<
     defaultTimingFunction: TimingFunction,
     defaultInterpolationFunction: InterpolationFunction<TValue>,
     before?: ThreadGenerator,
+    wait = false,
   ) {
     const animate = (
       value: SignalValue<TSetterValue> | typeof DEFAULT,
@@ -181,12 +183,17 @@ export class SignalContext<
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
     ) => {
-      const tween = this.tween(
+      const tweenTask = this.tween(
         value,
         duration,
         timingFunction,
         interpolationFunction,
       ) as SignalGenerator<TSetterValue, TValue>;
+      const waitTask = this.wait(duration) as SignalGenerator<
+        TSetterValue,
+        TValue
+      >;
+      const tween = wait ? waitTask : tweenTask;
       let task = tween;
       if (before) {
         task = run(function* () {
@@ -195,6 +202,12 @@ export class SignalContext<
         }) as SignalGenerator<TSetterValue, TValue>;
       }
       task.to = this.makeAnimate(timingFunction, interpolationFunction, task);
+      task.wait = this.makeAnimate(
+        timingFunction,
+        interpolationFunction,
+        task,
+        true,
+      );
       return task;
     };
 
@@ -218,6 +231,10 @@ export class SignalContext<
       interpolationFunction,
     );
     this.set(value);
+  }
+
+  protected *wait(duration: number): ThreadGenerator {
+    yield* waitFor(duration);
   }
 
   public *doTween(

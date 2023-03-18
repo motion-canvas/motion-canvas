@@ -8,6 +8,7 @@ export type SignalGenerator<
   TValue extends TSetterValue,
 > = ThreadGenerator & {
   to: SignalTween<TSetterValue, TValue>;
+  wait: SignalTween<TSetterValue, TValue>;
 };
 
 export interface SignalSetter<TValue, TOwner = void> {
