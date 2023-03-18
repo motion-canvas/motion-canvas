@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.3](https://github.com/motion-canvas/motion-canvas/compare/v3.3.2...v3.3.3) (2023-03-18)
+
+### Bug Fixes
+
+- **2d:** fix nested cache canvases
+  ([#554](https://github.com/motion-canvas/motion-canvas/issues/554))
+  ([e601441](https://github.com/motion-canvas/motion-canvas/commit/e6014413b215af6fb1a7953f8db83893d4025f0b)),
+  closes [#551](https://github.com/motion-canvas/motion-canvas/issues/551)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.2](https://github.com/motion-canvas/motion-canvas/compare/v3.3.1...v3.3.2) (2023-03-18)
 
 ### Bug Fixes
