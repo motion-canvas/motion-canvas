@@ -1080,9 +1080,14 @@ export class Node implements Promisable<Node> {
    */
   @computed()
   protected worldSpaceCacheBBox(): BBox {
-    return BBox.fromPoints(
+    const viewBBox = BBox.fromSizeCentered(this.view().size());
+    const canvasBBox = BBox.fromPoints(
+      ...viewBBox.transformCorners(this.view().localToWorld()),
+    );
+    const cacheBBox = BBox.fromPoints(
       ...this.cacheBBox().transformCorners(this.localToWorld()),
-    ).pixelPerfect;
+    );
+    return canvasBBox.intersection(cacheBBox).pixelPerfect;
   }
 
   /**
@@ -1154,7 +1159,15 @@ export class Node implements Promisable<Node> {
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
         const compositeOverride = this.compositeOverride();
-        context.resetTransform();
+        const matrix = this.worldToLocal();
+        context.transform(
+          matrix.a,
+          matrix.b,
+          matrix.c,
+          matrix.d,
+          matrix.e,
+          matrix.f,
+        );
         context.drawImage(cacheContext.canvas, offset.x, offset.y);
         if (compositeOverride > 0) {
           context.save();
