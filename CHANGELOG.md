@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.1](https://github.com/motion-canvas/motion-canvas/compare/v3.3.0...v3.3.1) (2023-03-18)
+
+### Bug Fixes
+
+- **2d:** add missing jsx dev runtime
+  ([#547](https://github.com/motion-canvas/motion-canvas/issues/547))
+  ([d61cb7d](https://github.com/motion-canvas/motion-canvas/commit/d61cb7dd24ab66ae17d5bd6f5ccb34c4fd1e7569)),
+  closes [#545](https://github.com/motion-canvas/motion-canvas/issues/545)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.3.0](https://github.com/motion-canvas/motion-canvas/compare/v3.2.1...v3.3.0) (2023-03-18)
 
 ### Bug Fixes
