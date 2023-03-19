@@ -31,7 +31,7 @@ export class CircleSegment extends Segment {
     const startAngle = this.from.radians + from * this.angle * counterFactor;
     const endAngle = this.to.radians - (1 - to) * this.angle * counterFactor;
 
-    if (Math.abs(from - to) > 0.0001) {
+    if (Math.abs(this.angle) > 0.0001) {
       context.arc(
         this.center.x,
         this.center.y,

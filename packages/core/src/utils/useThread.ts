@@ -1,5 +1,5 @@
 import type {Thread} from '../threading';
-import {DetailedError} from '../utils';
+import {DetailedError} from './DetailedError';
 
 const ThreadStack: Thread[] = [];
 

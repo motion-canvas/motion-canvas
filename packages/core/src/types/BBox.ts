@@ -320,6 +320,19 @@ export class BBox implements Type {
     );
   }
 
+  public intersection(other: BBox): BBox {
+    const bbox = new BBox();
+
+    if (this.intersects(other)) {
+      bbox.left = Math.max(this.left, other.left);
+      bbox.top = Math.max(this.top, other.top);
+      bbox.right = Math.min(this.right, other.right);
+      bbox.bottom = Math.min(this.bottom, other.bottom);
+    }
+
+    return bbox;
+  }
+
   public toSymbol(): symbol {
     return BBox.symbol;
   }

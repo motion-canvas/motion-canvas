@@ -1,12 +1,11 @@
 {
   "name": "@motion-canvas/2d",
-  "version": "3.2.0",
+  "version": "3.3.3",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
-  "type": "module",
   "main": "lib/scenes/index.js",
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
@@ -30,7 +29,7 @@
     "vitest": "^0.29.2"
   },
   "dependencies": {
-    "@motion-canvas/core": "^3.2.0",
+    "@motion-canvas/core": "^3.3.0",
     "code-fns": "^0.8.2",
     "mathjax-full": "^3.2.2"
   }
