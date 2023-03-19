@@ -11,7 +11,7 @@ export default makeScene2D(function* (view) {
   );
 
   yield* waitUntil('circle');
-  yield* circle().scale(2, 2).to(1, 2);
+  yield* circle().scale(2, 2).wait(1).to(1, 2);
 
   yield* waitFor(5);
 });

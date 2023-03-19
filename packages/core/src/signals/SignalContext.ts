@@ -15,6 +15,7 @@ import {
   SignalSetter,
   SignalTween,
   SignalValue,
+  SignalWait,
 } from './types';
 import {isReactive} from './isReactive';
 import {DEFAULT} from './symbols';
@@ -32,7 +33,8 @@ export interface Signal<
   TContext = SignalContext<TSetterValue, TValue, TOwner>,
 > extends SignalSetter<TSetterValue, TOwner>,
     SignalGetter<TValue>,
-    SignalTween<TSetterValue, TValue> {
+    SignalTween<TSetterValue, TValue>,
+    SignalWait<TSetterValue, TValue> {
   /**
    * {@inheritDoc SignalContext.reset}
    */
@@ -175,7 +177,6 @@ export class SignalContext<
     defaultTimingFunction: TimingFunction,
     defaultInterpolationFunction: InterpolationFunction<TValue>,
     before?: ThreadGenerator,
-    wait = false,
   ) {
     const animate = (
       value: SignalValue<TSetterValue> | typeof DEFAULT,
@@ -183,17 +184,12 @@ export class SignalContext<
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
     ) => {
-      const tweenTask = this.tween(
+      const tween = this.tween(
         value,
         duration,
         timingFunction,
         interpolationFunction,
       ) as SignalGenerator<TSetterValue, TValue>;
-      const waitTask = this.wait(duration) as SignalGenerator<
-        TSetterValue,
-        TValue
-      >;
-      const tween = wait ? waitTask : tweenTask;
       let task = tween;
       if (before) {
         task = run(function* () {
@@ -202,16 +198,34 @@ export class SignalContext<
         }) as SignalGenerator<TSetterValue, TValue>;
       }
       task.to = this.makeAnimate(timingFunction, interpolationFunction, task);
-      task.wait = this.makeAnimate(
-        timingFunction,
-        interpolationFunction,
-        task,
-        true,
-      );
+      task.wait = this.makeStay(timingFunction, interpolationFunction, task);
       return task;
     };
 
     return <SignalTween<TSetterValue, TValue>>animate;
+  }
+
+  protected makeStay(
+    defaultTimingFunction: TimingFunction,
+    defaultInterpolationFunction: InterpolationFunction<TValue>,
+    before: ThreadGenerator,
+  ) {
+    const stay = (
+      duration: number,
+      timingFunction = defaultTimingFunction,
+      interpolationFunction = defaultInterpolationFunction,
+    ) => {
+      const wait = this.wait(duration) as SignalGenerator<TSetterValue, TValue>;
+      const task = run(function* () {
+        yield* before;
+        yield* wait;
+      }) as SignalGenerator<TSetterValue, TValue>;
+      task.to = this.makeAnimate(timingFunction, interpolationFunction, task);
+      task.wait = this.makeStay(timingFunction, interpolationFunction, task);
+      return task;
+    };
+
+    return <SignalWait<TSetterValue, TValue>>stay;
   }
 
   protected *tween(
