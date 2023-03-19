@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.3.4](https://github.com/motion-canvas/motion-canvas/compare/v3.3.3...v3.3.4) (2023-03-19)
+
+### Bug Fixes
+
+- **core:** fix tree shaking
+  ([#555](https://github.com/motion-canvas/motion-canvas/issues/555))
+  ([8de199e](https://github.com/motion-canvas/motion-canvas/commit/8de199eaf833622a96ad746c984fb7f3a77df4b8))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.3.0](https://github.com/motion-canvas/motion-canvas/compare/v3.2.1...v3.3.0) (2023-03-18)
 
 ### Bug Fixes
