@@ -9,6 +9,7 @@ import {
   MorphToken,
   Token,
   CodeStyle,
+  Code,
 } from 'code-fns';
 import {
   clampRemap,
@@ -35,15 +36,15 @@ type CodeRange = [CodePoint, CodePoint];
 
 export interface CodeProps extends ShapeProps {
   language?: string;
-  children?: CodeTree | string;
-  code?: SignalValue<CodeTree | string>;
+  children?: Code;
+  code?: SignalValue<Code>;
   selection?: CodeRange[];
   theme?: CodeStyle;
 }
 
 export interface CodeModification {
-  from: string;
-  to: string;
+  from: Code;
+  to: Code;
 }
 
 export class CodeBlock extends Shape {
@@ -57,7 +58,7 @@ export class CodeBlock extends Shape {
   public declare readonly language: SimpleSignal<string, this>;
 
   @initial('')
-  @parser(function (this: CodeBlock, value: CodeTree | string): CodeTree {
+  @parser(function (this: CodeBlock, value: Code): CodeTree {
     return typeof value === 'string'
       ? {
           language: this.language(),
@@ -67,7 +68,7 @@ export class CodeBlock extends Shape {
       : value;
   })
   @signal()
-  public declare readonly code: Signal<CodeTree | string, CodeTree, this>;
+  public declare readonly code: Signal<Code, CodeTree, this>;
 
   @initial(undefined)
   @signal()
@@ -207,24 +208,20 @@ export class CodeBlock extends Shape {
     function* generator(
       this: CodeBlock,
       strings: TemplateStringsArray,
-      ...rest: CodeModification[]
+      ...rest: (CodeModification | Code)[]
     ): ThreadGenerator {
       const from = {
         language: this.language(),
         spans: [...strings],
         nodes: rest.map(modification =>
-          typeof modification === 'object'
-            ? modification?.from ?? modification
-            : modification,
+          isCodeModification(modification) ? modification.from : modification,
         ),
       };
       const to = {
         language: this.language(),
         spans: [...strings],
         nodes: rest.map(modification =>
-          typeof modification === 'object'
-            ? modification?.to ?? modification
-            : modification,
+          isCodeModification(modification) ? modification.to : modification,
         ),
       };
       this.code(from);
@@ -435,6 +432,15 @@ export class CodeBlock extends Shape {
   }
 }
 
+function isCodeModification(value: any): value is CodeModification {
+  return (
+    value &&
+    typeof value === 'object' &&
+    value.from !== undefined &&
+    value.to !== undefined
+  );
+}
+
 /**
  * Create a code modification that inserts a piece of code.
  *
@@ -443,7 +449,7 @@ export class CodeBlock extends Shape {
  *
  * @param content - The code to insert.
  */
-export function insert(content: string): CodeModification {
+export function insert(content: Code): CodeModification {
   return {
     from: '',
     to: content,
@@ -458,7 +464,7 @@ export function insert(content: string): CodeModification {
  *
  * @param content - The code to remove.
  */
-export function remove(content: string): CodeModification {
+export function remove(content: Code): CodeModification {
   return {
     from: content,
     to: '',
@@ -474,7 +480,7 @@ export function remove(content: string): CodeModification {
  * @param from - The code to change from.
  * @param to - The code to change to.
  */
-export function edit(from: string, to: string): CodeModification {
+export function edit(from: Code, to: Code): CodeModification {
   return {from, to};
 }
 
