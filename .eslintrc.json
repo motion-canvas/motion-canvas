@@ -52,6 +52,11 @@
         "format": ["camelCase", "PascalCase"]
       },
       {
+        "selector": "variable",
+        "modifiers": ["exported", "global"],
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+      },
+      {
         "selector": ["parameter", "variable"],
         "modifiers": ["unused"],
         "format": ["camelCase"],
