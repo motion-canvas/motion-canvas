@@ -28,6 +28,17 @@ export class MetaField<
   protected readonly value: ValueDispatcher<TValue>;
 
   /**
+   * Triggered when the field becomes disabled or enabled.
+   *
+   * @eventProperty
+   */
+  public get onDisabled() {
+    return this.disabled.subscribable;
+  }
+
+  protected readonly disabled = new ValueDispatcher(false);
+
+  /**
    * @param name - The name of this field displayed in the editor.
    * @param value - The initial value of this field.
    */
@@ -72,5 +83,14 @@ export class MetaField<
    */
   public clone(): this {
     return new (<any>this.constructor)(this.name, this.get());
+  }
+
+  /**
+   * Disable or enable the field in the editor.
+   *
+   * @param value - Whether the field should be disabled.
+   */
+  public disable(value = true) {
+    this.disabled.current = value;
   }
 }
