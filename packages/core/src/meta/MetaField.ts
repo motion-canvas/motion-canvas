@@ -15,6 +15,7 @@ export class MetaField<
    * The type of this field used by the editor to display the correct input.
    */
   public readonly type: any = undefined;
+  public spacing = false;
 
   /**
    * Triggered when the data of this field changes.
@@ -90,7 +91,18 @@ export class MetaField<
    *
    * @param value - Whether the field should be disabled.
    */
-  public disable(value = true) {
+  public disable(value = true): this {
     this.disabled.current = value;
+    return this;
+  }
+
+  /**
+   * Add or remove spacing at the beginning of this field.
+   *
+   * @param value - Whether to include the spacing.
+   */
+  public space(value = true): this {
+    this.spacing = value;
+    return this;
   }
 }

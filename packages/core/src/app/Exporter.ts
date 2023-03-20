@@ -1,9 +1,24 @@
 import type {RendererResult, RendererSettings} from './Renderer';
+import {MetaField} from '../meta';
 
 /**
  * The main interface for implementing custom exporters.
  */
 export interface Exporter {
+  /**
+   * The name of this exporter.
+   *
+   * @remarks
+   * This name will be displayed in the editor and used to store the related
+   * settings.
+   */
+  readonly name: string;
+
+  /**
+   * Create a meta field representing the options of this exporter.
+   */
+  meta(): MetaField<any>;
+
   /**
    * Prepare the rendering configuration.
    *

@@ -1,4 +1,5 @@
 import {MetaField} from './MetaField';
+import {ValueDispatcher} from '../events';
 
 export type ValueOf<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends MetaField<any, infer P> ? P : never;
@@ -25,9 +26,19 @@ class ObjectMetaFieldInternal<
 > extends MetaField<ValueOf<T>> {
   public readonly type = Object;
 
+  /**
+   * Triggered when the nested fields change.
+   *
+   * @eventProperty
+   */
+  public get onFieldsChanged() {
+    return this.event.subscribable;
+  }
+
   protected ignoreChange = false;
   protected customFields: Record<string, unknown> = {};
   protected readonly fields: Map<string, MetaField<unknown>>;
+  protected readonly event: ValueDispatcher<MetaField<unknown>[]>;
 
   public constructor(name: string, fields: T) {
     const map = new Map(Object.entries(fields));
@@ -38,6 +49,7 @@ class ObjectMetaFieldInternal<
       ) as ValueOf<T>,
     );
 
+    this.event = new ValueDispatcher([...map.values()]);
     this.fields = map;
     for (const [key, field] of this.fields) {
       Object.defineProperty(this, key, {value: field});
@@ -83,10 +95,6 @@ class ObjectMetaFieldInternal<
       ...transformed,
       ...this.customFields,
     };
-  }
-
-  public [Symbol.iterator]() {
-    return this.fields.values();
   }
 }
 

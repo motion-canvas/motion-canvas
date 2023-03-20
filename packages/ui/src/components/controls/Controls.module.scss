@@ -50,15 +50,7 @@
 }
 
 .separator {
-  flex-grow: 1;
-  padding-top: 8px;
-  line-height: 24px;
-  font-size: 12px;
-  text-transform: uppercase;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  color: rgba(255, 255, 255, 0.32);
+  height: 16px;
 }
 
 .label {
