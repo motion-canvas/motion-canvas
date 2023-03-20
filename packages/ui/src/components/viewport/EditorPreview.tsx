@@ -159,14 +159,11 @@ export function EditorPreview() {
             settings.background?.alpha() === 1
               ? styles.canvasOutline
               : styles.alphaBackground,
-            zoomToFit && styles.zoomToFit,
           )}
           style={{
-            transform: zoomToFit
-              ? undefined
-              : `translate(${state.x}px, ${state.y}px) scale(${
-                  state.zoom / settings.resolutionScale
-                })`,
+            transform: `translate(${state.x}px, ${state.y}px) scale(${
+              state.zoom / settings.resolutionScale
+            })`,
             outlineWidth: `${1 / state.zoom}px`,
           }}
         />
