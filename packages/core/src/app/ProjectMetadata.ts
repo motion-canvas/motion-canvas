@@ -1,15 +1,15 @@
 import {
-  BoolMetaField,
   ColorMetaField,
   EnumMetaField,
+  ExporterMetaField,
   MetaField,
   NumberMetaField,
   ObjectMetaField,
   RangeMetaField,
   Vector2MetaField,
 } from '../meta';
-import {CanvasColorSpace, Color, CanvasOutputMimeType, Vector2} from '../types';
-import {ColorSpaces, FileTypes, FrameRates, Scales} from './presets';
+import {CanvasColorSpace, Color, Vector2} from '../types';
+import {ColorSpaces, FrameRates, Scales} from './presets';
 import type {Project} from './Project';
 
 function createProjectMetadata(project: Project) {
@@ -29,16 +29,14 @@ function createProjectMetadata(project: Project) {
       fps: new NumberMetaField('frame rate', 60).setPresets(FrameRates),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
       colorSpace: new EnumMetaField('color space', ColorSpaces),
-      fileType: new EnumMetaField('file type', FileTypes),
-      quality: new NumberMetaField('quality (%)', 100).setRange(0, 100),
-      groupByScene: new BoolMetaField('group by scene', false),
+      exporter: new ExporterMetaField(
+        'exporter',
+        project.plugins.flatMap(plugin => plugin.exporters?.(project) ?? []),
+      ),
     }),
   };
 
   meta.shared.audioOffset.disable(!project.audio);
-  meta.rendering.fileType.onChanged.subscribe(value => {
-    meta.rendering.quality.disable(value === 'image/png');
-  });
 
   return meta;
 }
@@ -68,13 +66,14 @@ export class ProjectMetadata extends ObjectMetaField<
     fps: number;
     resolutionScale: number;
     colorSpace: CanvasColorSpace;
-    fileType: CanvasOutputMimeType;
-    quality: number;
     background: Color | null;
     range: [number, number];
     size: Vector2;
     audioOffset: number;
-    groupByScene: boolean;
+    exporter: {
+      name: string;
+      options: unknown;
+    };
   } {
     return {
       ...this.shared.get(),

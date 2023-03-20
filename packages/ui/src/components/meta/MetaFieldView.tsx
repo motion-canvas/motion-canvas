@@ -12,6 +12,7 @@ import {RangeMetaFieldView} from './RangeMetaFieldView';
 import {EnumMetaField, RangeMetaField} from '@motion-canvas/core/lib/meta';
 import {Color, Vector2} from '@motion-canvas/core/lib/types';
 import {useSubscribableValue} from '../../hooks';
+import {Separator} from '../controls';
 
 interface MetaFieldViewProps {
   field: MetaField<any>;
@@ -34,5 +35,12 @@ export function MetaFieldView({field}: MetaFieldViewProps) {
   const Field: FiledView = TYPE_MAP.get(field.type) ?? UnknownMetaFieldView;
   const disabled = useSubscribableValue(field.onDisabled);
 
-  return disabled ? <></> : <Field field={field} />;
+  return disabled ? (
+    <></>
+  ) : (
+    <>
+      {field.spacing && <Separator />}
+      <Field field={field} />
+    </>
+  );
 }

@@ -8,6 +8,7 @@ export * from './ObjectMetaField';
 export * from './BoolMetaField';
 export * from './ColorMetaField';
 export * from './EnumMetaField';
+export * from './ExporterMetaFile';
 export * from './MetaField';
 export * from './MetaFile';
 export * from './NumberMetaField';

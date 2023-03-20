@@ -13,6 +13,7 @@ import type {View2D} from '@motion-canvas/2d/lib/components';
 import {makeScene2D} from '@motion-canvas/2d';
 import {ValueDispatcher} from '@motion-canvas/core/lib/events';
 import runtime from '@site/src/components/Fiddle/runtime';
+import DefaultPlugin from '@motion-canvas/core/lib/plugin/DefaultPlugin';
 
 declare global {
   interface Window {
@@ -61,9 +62,10 @@ export function borrowPlayer(
     ProjectInstance = {
       name: 'fiddle',
       logger: new Logger(),
-      meta: new ProjectMetadata(),
+      plugins: [DefaultPlugin],
       scenes: [Description],
     } as Project;
+    ProjectInstance.meta = new ProjectMetadata(ProjectInstance);
     ProjectInstance.meta.shared.size.set([960, 960 / 4]);
 
     PlayerInstance = new Player(ProjectInstance, {

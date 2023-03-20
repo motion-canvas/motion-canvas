@@ -2,15 +2,27 @@ import {CanvasOutputMimeType} from '../types';
 import {Exporter} from './Exporter';
 import {Logger} from './Logger';
 import {RendererSettings} from './Renderer';
+import {
+  BoolMetaField,
+  EnumMetaField,
+  NumberMetaField,
+  ObjectMetaField,
+  ValueOf,
+} from '../meta';
 import {clamp} from '../tweening';
+import {FileTypes} from './presets';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
+
+type ImageExporterOptions = ValueOf<ReturnType<ImageExporter['meta']>>;
 
 /**
  * Image sequence exporter.
  */
 export class ImageExporter implements Exporter {
+  public readonly name = 'image sequence';
+
   private readonly frameLookup = new Map<number, Callback>();
   private frameCounter = 0;
   private projectName = 'unknown';
@@ -26,11 +38,26 @@ export class ImageExporter implements Exporter {
     }
   }
 
+  public meta() {
+    const meta = new ObjectMetaField(this.name, {
+      fileType: new EnumMetaField('file type', FileTypes),
+      quality: new NumberMetaField('quality', 100).setRange(0, 100),
+      groupByScene: new BoolMetaField('group by scene', false),
+    });
+
+    meta.fileType.onChanged.subscribe(value => {
+      meta.quality.disable(value === 'image/png');
+    });
+
+    return meta;
+  }
+
   public async configure(settings: RendererSettings) {
+    const options = settings.exporter.options as ImageExporterOptions;
     this.projectName = settings.name;
-    this.quality = clamp(0, 1, settings.quality / 100);
-    this.fileType = settings.fileType;
-    this.groupByScene = settings.groupByScene;
+    this.quality = clamp(0, 1, options.quality / 100);
+    this.fileType = options.fileType;
+    this.groupByScene = options.groupByScene;
   }
 
   public async start() {

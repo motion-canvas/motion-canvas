@@ -5,7 +5,7 @@ import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {ImageExporter} from './ImageExporter';
-import {CanvasOutputMimeType, Vector2} from '../types';
+import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
@@ -14,9 +14,10 @@ export interface RendererSettings extends StageSettings {
   name: string;
   range: [number, number];
   fps: number;
-  fileType: CanvasOutputMimeType;
-  quality: number;
-  groupByScene: boolean;
+  exporter: {
+    name: string;
+    options: unknown;
+  };
 }
 
 export enum RendererState {
@@ -145,11 +146,8 @@ export class Renderer {
       if (import.meta.hot) {
         import.meta.hot.send('motion-canvas:export', {
           frame,
-          data: this.stage.finalBuffer.toDataURL(
-            settings.fileType,
-            settings.quality,
-          ),
-          mimeType: settings.fileType,
+          data: this.stage.finalBuffer.toDataURL('image/png'),
+          mimeType: 'image/png',
           subDirectories: ['still', this.project.name],
         });
       }
