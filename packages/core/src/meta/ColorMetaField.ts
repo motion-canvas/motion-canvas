@@ -8,6 +8,8 @@ export class ColorMetaField extends MetaField<
   PossibleColor | null,
   Color | null
 > {
+  public readonly type = Color.symbol;
+
   public override parse(value: PossibleColor | null): Color | null {
     return value === null ? null : new Color(value);
   }

@@ -1,6 +1,6 @@
 import {MetaField} from './MetaField';
 
-type ValueOf<T extends Record<string, any>> = {
+export type ValueOf<T extends Record<string, any>> = {
   [K in keyof T]: T[K] extends MetaField<any, infer P> ? P : never;
 };
 
@@ -23,6 +23,8 @@ type CallableKeys<T> = {
 class ObjectMetaFieldInternal<
   T extends Record<string, MetaField<any>>,
 > extends MetaField<ValueOf<T>> {
+  public readonly type = Object;
+
   protected ignoreChange = false;
   protected customFields: Record<string, unknown> = {};
   protected readonly fields: Map<string, MetaField<unknown>>;
@@ -81,6 +83,10 @@ class ObjectMetaFieldInternal<
       ...transformed,
       ...this.customFields,
     };
+  }
+
+  public [Symbol.iterator]() {
+    return this.fields.values();
   }
 }
 
