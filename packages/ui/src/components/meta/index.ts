@@ -4,5 +4,7 @@ export * from './EnumMetaFieldView';
 export * from './MetaFieldView';
 export * from './NumberMetaFieldView';
 export * from './ObjectMetaFieldView';
+export * from './RangeMetaFieldView';
 export * from './StringMetaFieldView';
+export * from './UnknownMetaFieldView';
 export * from './Vector2MetaFieldView';

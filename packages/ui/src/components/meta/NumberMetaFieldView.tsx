@@ -15,6 +15,7 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
       <Label>{field.name}</Label>
       {presets.length ? (
         <InputSelect
+          type="number"
           value={value}
           onChange={value => {
             field.set(value);
@@ -24,8 +25,6 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
       ) : (
         <Input
           type="number"
-          min={0}
-          max={100}
           value={value}
           onChange={event => {
             field.set((event.target as HTMLInputElement).value);

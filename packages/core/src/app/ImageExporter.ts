@@ -2,6 +2,7 @@ import {CanvasOutputMimeType} from '../types';
 import {Exporter} from './Exporter';
 import {Logger} from './Logger';
 import {RendererSettings} from './Renderer';
+import {clamp} from '../tweening';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
@@ -27,7 +28,7 @@ export class ImageExporter implements Exporter {
 
   public async configure(settings: RendererSettings) {
     this.projectName = settings.name;
-    this.quality = settings.quality;
+    this.quality = clamp(0, 1, settings.quality / 100);
     this.fileType = settings.fileType;
     this.groupByScene = settings.groupByScene;
   }
