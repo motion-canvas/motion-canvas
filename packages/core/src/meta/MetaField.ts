@@ -12,6 +12,11 @@ export class MetaField<
   TValue extends TSerializedValue = TSerializedValue,
 > {
   /**
+   * The type of this field used by the editor to display the correct input.
+   */
+  public readonly type: any = undefined;
+
+  /**
    * Triggered when the data of this field changes.
    *
    * @eventProperty
