@@ -1,4 +1,4 @@
-import {useCallback, useMemo, useRef} from 'preact/hooks';
+import {useCallback, useMemo, useRef, useState} from 'preact/hooks';
 
 import {
   useCurrentScene,
@@ -19,7 +19,7 @@ import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
 import {PreviewStage} from './PreviewStage';
 import clsx from 'clsx';
-import {Button, Select} from '../controls';
+import {Button, Label, Select} from '../controls';
 import {Recenter, Grid as GridIcon} from '../icons';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
 
@@ -41,6 +41,10 @@ export function EditorPreview() {
   const [zoomToFit, setZoomToFit] = useStorage('viewport-zoom-to-fill', true);
   const [zoom, setZoom] = useStorage('viewport-zoom', 1);
   const [position, setPosition] = useStorage('viewport-position', {
+    x: 0,
+    y: 0,
+  });
+  const [cursorPosition, setCursorPosition] = useState({
     x: 0,
     y: 0,
   });
@@ -191,6 +195,11 @@ export function EditorPreview() {
               position.x += settings.size.width / 2;
               position.y += settings.size.height / 2;
 
+              setCursorPosition({
+                x: position.x,
+                y: position.y,
+              });
+
               setInspectedElement(
                 scene.inspectPosition(position.x, position.y),
               );
@@ -244,6 +253,13 @@ export function EditorPreview() {
           >
             <GridIcon />
           </ButtonCheckbox>
+          <div>
+            <Label>
+              {`(${cursorPosition.x.toFixed(2)},${cursorPosition.y.toFixed(
+                2,
+              )})`}
+            </Label>
+          </div>
         </div>
       </div>
     </ViewportContext.Provider>
