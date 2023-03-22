@@ -26,11 +26,21 @@ interface ParsedSVG {
 interface SVGDiff {
   fromSize: Vector2;
   toSize: Vector2;
-  inserted: Shape[];
-  deleted: Shape[];
+  inserted: Array<{
+    fromIndex: number;
+    toIndex: number;
+    shape: Shape;
+  }>;
+  deleted: Array<{
+    index: number;
+    shape: Shape;
+  }>;
   transformed: Array<{
     from: Shape;
+    fromIndex: number;
     to: Shape;
+    toIndex: number;
+    move: boolean;
   }>;
 }
 
@@ -269,16 +279,31 @@ export class SVG extends Shape {
       },
       (nCommon, aCommon, bCommon) => {
         if (aIndex !== aCommon)
-          diff.deleted.push(...aNodes.slice(aIndex, aCommon));
-        if (bIndex !== bCommon)
-          diff.inserted.push(...bNodes.slice(bIndex, bCommon));
+          aNodes.slice(aIndex, aCommon).forEach((shape, index) => {
+            diff.deleted.push({
+              index: aIndex + index,
+              shape,
+            });
+          });
+        if (bIndex !== bCommon) {
+          bNodes.slice(bIndex, bCommon).forEach((shape, index) => {
+            diff.inserted.push({
+              fromIndex: aIndex,
+              toIndex: bIndex + index,
+              shape,
+            });
+          });
+        }
 
         aIndex = aCommon;
         bIndex = bCommon;
         for (let x = 0; x < nCommon; x++) {
           diff.transformed.push({
             from: aNodes[aIndex],
+            fromIndex: aIndex,
             to: bNodes[bIndex],
+            toIndex: bIndex,
+            move: false,
           });
           aIndex++;
           bIndex++;
@@ -286,20 +311,36 @@ export class SVG extends Shape {
       },
     );
 
-    if (aIndex !== aLength) diff.deleted.push(...aNodes.slice(aIndex));
+    if (aIndex !== aLength)
+      aNodes.slice(aIndex).forEach((shape, index) =>
+        diff.deleted.push({
+          shape,
+          index: aIndex + index,
+        }),
+      );
 
-    if (bIndex !== bNodes.length) diff.inserted.push(...bNodes.slice(bIndex));
+    if (bIndex !== bNodes.length)
+      bNodes.slice(bIndex).forEach((shape, index) => {
+        diff.inserted.push({
+          fromIndex: aLength,
+          toIndex: bIndex + index,
+          shape,
+        });
+      });
 
     diff.deleted = diff.deleted.filter(aNode => {
-      const bIndex = diff.inserted.findIndex(bNode =>
-        this.isNodeEqual(aNode, bNode),
+      const insertIndex = diff.inserted.findIndex(bNode =>
+        this.isNodeEqual(aNode.shape, bNode.shape),
       );
-      if (bIndex >= 0) {
-        const bNode = diff.inserted[bIndex];
-        diff.inserted.splice(bIndex, 1);
+      if (insertIndex >= 0) {
+        const bNode = diff.inserted[insertIndex];
+        diff.inserted.splice(insertIndex, 1);
         diff.transformed.push({
-          from: aNode,
-          to: bNode,
+          from: aNode.shape,
+          fromIndex: aNode.index,
+          to: bNode.shape,
+          toIndex: bNode.toIndex,
+          move: true,
         });
 
         return false;
@@ -307,6 +348,35 @@ export class SVG extends Shape {
 
       return true;
     });
+
+    diff.inserted.forEach((value, index) => {
+      value.fromIndex += index;
+    });
+
+    const mapFrom = (index: number) =>
+      index +
+      diff.inserted.filter((node, i) => node.fromIndex - i <= index).length;
+    const deletedIndexes = diff.deleted.map(
+      (node, index) => mapFrom(node.index) - index,
+    );
+    const mapTo = (index: number) =>
+      index +
+      deletedIndexes.filter(deletedIndex => index >= deletedIndex).length;
+
+    diff.transformed.forEach(node => {
+      node.fromIndex = mapFrom(node.fromIndex);
+      node.toIndex = mapTo(node.toIndex);
+    });
+    diff.transformed = diff.transformed.sort((a, b) => {
+      const sub =
+        Math.min(a.fromIndex, a.toIndex) - Math.min(b.fromIndex, b.toIndex);
+      if (sub === 0) {
+        if (Math.sign(a.toIndex - a.fromIndex) < 0) return 1;
+        if (Math.sign(b.toIndex - b.fromIndex) < 0) return -1;
+      }
+      return sub;
+    });
+
     return diff;
   }
 
@@ -331,13 +401,25 @@ export class SVG extends Shape {
     const newValue = typeof value == 'string' ? value : value();
     const newSVG = this.parseSVG(newValue);
     const diff = this.diffSVG(this.parsed(), newSVG);
-    const transformed = diff.transformed.map(({from, to}) => ({
+
+    for (const node of diff.inserted)
+      this.wrapper.insert(node.shape, node.fromIndex);
+
+    const transformed = diff.transformed.map(({from, to, ...rest}) => ({
       from: this.cloneNodeExact(from),
       current: from,
       to,
+      ...rest,
     }));
-
-    for (const node of diff.inserted) this.wrapper.add(node);
+    let orderMoved = false;
+    const moveOrder = () => {
+      if (orderMoved) return;
+      this.wrapper.children();
+      for (const diff of transformed) {
+        diff.current.moveTo(diff.toIndex);
+      }
+      orderMoved = true;
+    };
 
     const autoWidth = this.customWidth() == null;
     const autoHeight = this.customHeight() == null;
@@ -352,6 +434,9 @@ export class SVG extends Shape {
         const progress = timingFunction(value);
         const remapped = clampRemap(beginning, ending, 0, 1, progress);
         const eased = easeInOutSine(remapped);
+
+        if (remapped > 0.5) moveOrder();
+
         for (const node of transformed) {
           node.current.position(
             Vector2.lerp(node.from.position(), node.to.position(), eased),
@@ -390,17 +475,27 @@ export class SVG extends Shape {
           0,
           progress,
         );
-        for (const node of diff.deleted) node.opacity(deletedOpacity);
+        for (const node of diff.deleted) node.shape.opacity(deletedOpacity);
 
         const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
-        for (const node of diff.inserted) node.opacity(insertedOpacity);
+        for (const node of diff.inserted) node.shape.opacity(insertedOpacity);
       },
       () => {
+        const nodes = [...this.wrapper.children()];
+        for (const deleted of diff.deleted) {
+          nodes.splice(nodes.indexOf(deleted.shape), 1);
+        }
+        nodes.forEach((node, index) => {
+          const destNode = newSVG.nodes[index];
+          if (!this.isNodeEqual(node, destNode))
+            useLogger().error('node at ' + index + ' is not equal');
+        });
+
         this.wrapper.children(this.parsedNodes);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
 
-        for (const node of diff.deleted) node.dispose();
+        for (const node of diff.deleted) node.shape.dispose();
         for (const node of transformed) {
           node.from.dispose();
           node.current.dispose();
