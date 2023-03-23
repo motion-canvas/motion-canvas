@@ -116,8 +116,9 @@ export default ({
   const projects: ProjectData[] = [];
   const projectLookup: Record<string, ProjectData> = {};
   for (const url of typeof project === 'string' ? [project] : project) {
-    const {name} = path.parse(url);
-    const metaData = getMeta(`./src/${name}.meta`);
+    const {name, dir} = path.posix.parse(url);
+    const metaFile = `${name}.meta`;
+    const metaData = getMeta(path.join(dir, metaFile));
     const data = {name: metaData?.name ?? name, fileName: name, url};
     projects.push(data);
     projectLookup[name] = data;
