@@ -18,7 +18,7 @@ export function Index({projects}: IndexProps) {
         {projects.map(project => (
           <a className={styles.element} href={`./${project.fileName}`}>
             <div className={styles.title}>
-              {project.name || project.fileName}
+              {project.name}
             </div>
             <div className={styles.subtitle}>{project.url}</div>
           </a>
