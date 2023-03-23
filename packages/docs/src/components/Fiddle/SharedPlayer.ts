@@ -81,6 +81,12 @@ export function borrowPlayer(
         PlayerInstance.playback.previousScene,
       );
     });
+    PlayerInstance.onRecalculated.subscribe(() => {
+      if (StageInstance.finalBuffer.parentElement !== CurrentParent) {
+        CurrentParent?.append(StageInstance.finalBuffer);
+        CurrentSetter(PlayerInstance);
+      }
+    });
 
     // TODO Find a way to attach the logger only for DEV:
     // ProjectInstance.logger.onLogged.subscribe(console.log);
@@ -93,9 +99,6 @@ export function borrowPlayer(
 
   PlayerInstance.activate();
   PlayerInstance.requestReset();
-
-  CurrentParent?.append(StageInstance.finalBuffer);
-  CurrentSetter(PlayerInstance);
   return PlayerInstance;
 }
 
