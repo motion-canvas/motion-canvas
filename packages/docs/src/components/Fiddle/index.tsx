@@ -62,16 +62,12 @@ export default function Fiddle({children}: FiddleProps) {
   const [initialState, setInitialState] = useState<EditorState>(null);
 
   const update = (newDoc: Text, animate = true) => {
-    if (lastDoc?.eq(newDoc)) {
-      return;
-    }
-
     borrowPlayer(setPlayer, previewRef.current);
     const newError = transform(newDoc.sliceString(0));
     setError(newError);
     if (!newError) {
       setLastDoc(newDoc);
-      if (animate) {
+      if (animate && !lastDoc?.eq(newDoc)) {
         previewRef.current.animate(highlight(), {duration: 300});
       }
     }
