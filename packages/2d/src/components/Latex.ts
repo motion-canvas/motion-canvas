@@ -83,6 +83,7 @@ export class Latex extends SVGNode {
     time: number,
     timingFunction: TimingFunction,
   ) {
+    useLogger().info(`tween from ${this.tex()} to ${value}`);
     const newValue = typeof value == 'string' ? value : value();
     const newSVG = this.latexToSVG(newValue);
     yield* this.svg(newSVG, time, timingFunction);

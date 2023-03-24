@@ -37,10 +37,11 @@ interface SVGDiff {
   }>;
   transformed: Array<{
     from: Shape;
-    fromIndex: number;
     to: Shape;
-    toIndex: number;
-    move: boolean;
+    move?: {
+      from: number;
+      to: number;
+    };
   }>;
 }
 
@@ -270,6 +271,8 @@ export class SVG extends Shape {
     const bLength = bNodes.length;
     let aIndex = 0;
     let bIndex = 0;
+    const nNodes: Shape[] = [];
+    const fNodes: Shape[] = [];
 
     diffSequence(
       aLength,
@@ -284,6 +287,8 @@ export class SVG extends Shape {
               index: aIndex + index,
               shape,
             });
+            nNodes.push(shape);
+            fNodes.push(shape);
           });
         if (bIndex !== bCommon) {
           bNodes.slice(bIndex, bCommon).forEach((shape, index) => {
@@ -292,6 +297,8 @@ export class SVG extends Shape {
               toIndex: bIndex + index,
               shape,
             });
+            nNodes.push(shape);
+            fNodes.push(shape);
           });
         }
 
@@ -300,11 +307,10 @@ export class SVG extends Shape {
         for (let x = 0; x < nCommon; x++) {
           diff.transformed.push({
             from: aNodes[aIndex],
-            fromIndex: aIndex,
             to: bNodes[bIndex],
-            toIndex: bIndex,
-            move: false,
           });
+          nNodes.push(aNodes[aIndex]);
+          fNodes.push(bNodes[bIndex]);
           aIndex++;
           bIndex++;
         }
@@ -312,12 +318,14 @@ export class SVG extends Shape {
     );
 
     if (aIndex !== aLength)
-      aNodes.slice(aIndex).forEach((shape, index) =>
+      aNodes.slice(aIndex).forEach((shape, index) => {
         diff.deleted.push({
           shape,
           index: aIndex + index,
-        }),
-      );
+        });
+        nNodes.push(shape);
+        fNodes.push(shape);
+      });
 
     if (bIndex !== bNodes.length)
       bNodes.slice(bIndex).forEach((shape, index) => {
@@ -326,8 +334,11 @@ export class SVG extends Shape {
           toIndex: bIndex + index,
           shape,
         });
+        nNodes.push(shape);
+        fNodes.push(shape);
       });
 
+    const moved: SVGDiff['transformed'] = [];
     diff.deleted = diff.deleted.filter(aNode => {
       const insertIndex = diff.inserted.findIndex(bNode =>
         this.isNodeEqual(aNode.shape, bNode.shape),
@@ -335,12 +346,15 @@ export class SVG extends Shape {
       if (insertIndex >= 0) {
         const bNode = diff.inserted[insertIndex];
         diff.inserted.splice(insertIndex, 1);
-        diff.transformed.push({
+        nNodes.splice(nNodes.indexOf(bNode.shape), 1);
+        fNodes.splice(fNodes.indexOf(aNode.shape), 1);
+        moved.push({
           from: aNode.shape,
-          fromIndex: aNode.index,
           to: bNode.shape,
-          toIndex: bNode.toIndex,
-          move: true,
+          move: {
+            from: 0,
+            to: 0,
+          },
         });
 
         return false;
@@ -353,26 +367,21 @@ export class SVG extends Shape {
       value.fromIndex += index;
     });
 
-    const mapFrom = (index: number) =>
-      index +
-      diff.inserted.filter((node, i) => node.fromIndex - i <= index).length;
-    const deletedIndexes = diff.deleted.map(
-      (node, index) => mapFrom(node.index) - index,
-    );
-    const mapTo = (index: number) =>
-      index +
-      deletedIndexes.filter(deletedIndex => index >= deletedIndex).length;
-
+    diff.transformed.push(...moved);
     diff.transformed.forEach(node => {
-      node.fromIndex = mapFrom(node.fromIndex);
-      node.toIndex = mapTo(node.toIndex);
+      node.move = {
+        from: 0,
+        to: 0,
+      };
+      node.move!.from = nNodes.indexOf(node.from);
+      node.move!.to = fNodes.indexOf(node.to);
     });
     diff.transformed = diff.transformed.sort((a, b) => {
       const sub =
-        Math.min(a.fromIndex, a.toIndex) - Math.min(b.fromIndex, b.toIndex);
+        Math.min(a.move!.from, a.move!.to) - Math.min(b.move!.from, b.move!.to);
       if (sub === 0) {
-        if (Math.sign(a.toIndex - a.fromIndex) < 0) return 1;
-        if (Math.sign(b.toIndex - b.fromIndex) < 0) return -1;
+        if (Math.sign(a.move!.to - a.move!.from) < 0) return 1;
+        if (Math.sign(b.move!.to - b.move!.from) < 0) return -1;
       }
       return sub;
     });
@@ -416,7 +425,9 @@ export class SVG extends Shape {
       if (orderMoved) return;
       this.wrapper.children();
       for (const diff of transformed) {
-        diff.current.moveTo(diff.toIndex);
+        if (!diff.move) continue;
+        useLogger().info(`move from ${diff.move.from} to ${diff.move.to}`);
+        diff.current.moveTo(diff.move.to);
       }
       orderMoved = true;
     };
