@@ -8,7 +8,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'log',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
   organizationName: 'motion-canvas',
   projectName: 'motion-canvas.github.io',
   i18n: {
@@ -105,8 +105,8 @@ const config = {
         indexName: 'motion-canvasio',
       },
       prism: {
-        theme: require('./config/lightCodeTheme'),
-        darkTheme: require('./config/darkCodeTheme'),
+        theme: require('./config/codeTheme'),
+        darkTheme: require('./config/codeTheme'),
       },
     }),
   themes: [
@@ -159,6 +159,10 @@ const config = {
           {
             name: 'logging',
             url: 'Logging example',
+          },
+          {
+            name: 'presentation',
+            url: 'Presentation example',
           },
         ],
       },

@@ -15,12 +15,32 @@ export function Expandable({title, children, open}: ExpandableProps) {
   const [isOpen, setOpen] = useStorage(`expandable-${title}`, open);
 
   return (
+    <ControlledExpandable title={title} open={isOpen} setOpen={setOpen}>
+      {children}
+    </ControlledExpandable>
+  );
+}
+
+export interface ControlledExpandableProps {
+  title: string;
+  children: ComponentChildren;
+  open: boolean;
+  setOpen: (value: boolean) => void;
+}
+
+export function ControlledExpandable({
+  title,
+  children,
+  open,
+  setOpen,
+}: ControlledExpandableProps) {
+  return (
     <div className={styles.root}>
-      <div className={styles.title} onClick={() => setOpen(!isOpen)}>
-        <Toggle open={isOpen} />
+      <div className={styles.title} onClick={() => setOpen(!open)}>
+        <Toggle open={open} />
         {title}
       </div>
-      {isOpen && <div className={styles.content}>{children}</div>}
+      {open && <div className={styles.content}>{children}</div>}
     </div>
   );
 }

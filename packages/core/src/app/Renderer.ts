@@ -5,7 +5,7 @@ import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {ImageExporter} from './ImageExporter';
-import {CanvasOutputMimeType, Vector2} from '../types';
+import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
@@ -14,8 +14,10 @@ export interface RendererSettings extends StageSettings {
   name: string;
   range: [number, number];
   fps: number;
-  fileType: CanvasOutputMimeType;
-  quality: number;
+  exporter: {
+    name: string;
+    options: unknown;
+  };
 }
 
 export enum RendererState {
@@ -76,6 +78,7 @@ export class Renderer {
         logger: this.project.logger,
         playback: this.status,
         size: new Vector2(1920, 1080),
+        resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
       });
       scenes.push(scene);
@@ -132,7 +135,7 @@ export class Renderer {
       this.playback.fps = settings.fps;
       this.playback.state = PlaybackState.Rendering;
 
-      await this.reloadScenes(settings.size);
+      await this.reloadScenes(settings);
       await this.playback.reset();
       await this.playback.seek(this.status.secondsToFrames(settings.range[0]));
       await this.stage.render(
@@ -141,15 +144,11 @@ export class Renderer {
       );
 
       if (import.meta.hot) {
-        import.meta.hot!.send('motion-canvas:export', {
+        import.meta.hot.send('motion-canvas:export', {
           frame,
-          isStill: true,
-          data: this.stage.finalBuffer.toDataURL(
-            settings.fileType,
-            settings.quality,
-          ),
-          mimeType: settings.fileType,
-          project: this.project.name,
+          data: this.stage.finalBuffer.toDataURL('image/png'),
+          mimeType: 'image/png',
+          subDirectories: ['still', this.project.name],
         });
       }
     } catch (e: any) {
@@ -170,7 +169,8 @@ export class Renderer {
     const from = this.status.secondsToFrames(settings.range[0]);
     const to = this.status.secondsToFrames(settings.range[1]);
 
-    await this.reloadScenes(settings.size);
+    await this.reloadScenes(settings);
+    await this.playback.recalculate();
     if (signal.aborted) return RendererResult.Aborted;
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
@@ -212,13 +212,14 @@ export class Renderer {
     return result;
   }
 
-  private async reloadScenes(size: Vector2) {
+  private async reloadScenes(settings: RendererSettings) {
     for (let i = 0; i < this.project.scenes.length; i++) {
       const description = this.project.scenes[i];
       const scene = this.playback.onScenesRecalculated.current[i];
       scene.reload({
         config: description.onReplaced.current.config,
-        size: size,
+        size: settings.size,
+        resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
     }
@@ -230,9 +231,14 @@ export class Renderer {
       this.playback.currentScene!,
       this.playback.previousScene,
     );
+
+    const sceneFrame =
+      this.playback.frame - this.playback.currentScene.firstFrame;
     await this.exporter.handleFrame(
       this.stage.finalBuffer,
       this.playback.frame,
+      sceneFrame,
+      this.playback.currentScene.name,
       signal,
     );
   }

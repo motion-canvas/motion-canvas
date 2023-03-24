@@ -11,6 +11,7 @@
     "core:test": "npm run test -w packages/core",
     "2d:build": "npm run build -w packages/2d",
     "2d:watch": "npm run watch -w packages/2d",
+    "2d:test": "npm run test -w packages/2d",
     "ui:build": "npm run build -w packages/ui",
     "ui:serve": "npm run dev -w packages/ui",
     "ui:showcase": "npm run showcase -w packages/ui",
@@ -44,10 +45,13 @@
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "typescript": "^4.9.5",
-    "vite": "^3.2.5"
+    "vite": "^4.1.4"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",
     "*.{js,jsx,ts,tsx,md,scss}": "prettier --write"
+  },
+  "dependencies": {
+    "@motion-canvas/core": "^3.0.0"
   }
 }

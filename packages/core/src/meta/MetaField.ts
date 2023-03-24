@@ -12,6 +12,12 @@ export class MetaField<
   TValue extends TSerializedValue = TSerializedValue,
 > {
   /**
+   * The type of this field used by the editor to display the correct input.
+   */
+  public readonly type: any = undefined;
+  public spacing = false;
+
+  /**
    * Triggered when the data of this field changes.
    *
    * @eventProperty
@@ -21,6 +27,17 @@ export class MetaField<
   }
 
   protected readonly value: ValueDispatcher<TValue>;
+
+  /**
+   * Triggered when the field becomes disabled or enabled.
+   *
+   * @eventProperty
+   */
+  public get onDisabled() {
+    return this.disabled.subscribable;
+  }
+
+  protected readonly disabled = new ValueDispatcher(false);
 
   /**
    * @param name - The name of this field displayed in the editor.
@@ -67,5 +84,25 @@ export class MetaField<
    */
   public clone(): this {
     return new (<any>this.constructor)(this.name, this.get());
+  }
+
+  /**
+   * Disable or enable the field in the editor.
+   *
+   * @param value - Whether the field should be disabled.
+   */
+  public disable(value = true): this {
+    this.disabled.current = value;
+    return this;
+  }
+
+  /**
+   * Add or remove spacing at the beginning of this field.
+   *
+   * @param value - Whether to include the spacing.
+   */
+  public space(value = true): this {
+    this.spacing = value;
+    return this;
   }
 }

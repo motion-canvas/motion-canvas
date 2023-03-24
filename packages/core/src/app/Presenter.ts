@@ -86,6 +86,7 @@ export class Presenter {
         logger: this.logger,
         playback: this.status,
         size: new Vector2(1920, 1080),
+        resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
       });
       scenes.push(scene);
@@ -159,7 +160,7 @@ export class Presenter {
     this.stage.configure(settings);
     this.playback.fps = settings.fps;
 
-    await this.reloadScenes(settings.size);
+    await this.reloadScenes(settings);
     if (signal.aborted) return;
     this.playback.state = PlaybackState.Playing;
     await this.playback.recalculate();
@@ -180,13 +181,14 @@ export class Presenter {
     });
   }
 
-  private async reloadScenes(size: Vector2) {
+  private async reloadScenes(settings: PresenterSettings) {
     for (let i = 0; i < this.project.scenes.length; i++) {
       const description = this.project.scenes[i];
       const scene = this.playback.onScenesRecalculated.current[i];
       scene.reload({
         config: description.onReplaced.current.config,
-        size: size,
+        size: settings.size,
+        resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
     }

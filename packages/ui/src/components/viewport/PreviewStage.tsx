@@ -6,8 +6,9 @@ import {
   useSharedSettings,
   useSubscribable,
 } from '../../hooks';
+import {JSX} from 'preact';
 
-export function PreviewStage() {
+export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());
   const ref = useRef<HTMLDivElement>();
   const {player} = useApplication();
@@ -35,5 +36,5 @@ export function PreviewStage() {
     return () => stage.finalBuffer.remove();
   }, []);
 
-  return <div ref={ref} />;
+  return <div ref={ref} {...props} />;
 }

@@ -1,10 +1,10 @@
 import {computed, initial, interpolation, signal} from '../decorators';
-import {useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {BBox} from '@motion-canvas/core/lib/types';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {View2D} from './View2D';
+import {lazy} from '@motion-canvas/core/lib/decorators';
 
 export interface TxtProps extends ShapeProps {
   children?: string;
@@ -12,21 +12,23 @@ export interface TxtProps extends ShapeProps {
 }
 
 export class Txt extends Shape {
-  protected static segmenter;
+  @lazy(() => {
+    const formatter = document.createElement('div');
+    View2D.shadowRoot.append(formatter);
+    return formatter;
+  })
   protected static formatter: HTMLDivElement;
 
-  static {
-    this.formatter = document.createElement('div');
-    View2D.shadowRoot.append(this.formatter);
-
+  @lazy(() => {
     try {
-      this.segmenter = new (Intl as any).Segmenter(undefined, {
+      return new (Intl as any).Segmenter(undefined, {
         granularity: 'grapheme',
       });
     } catch (e) {
-      // do nothing
+      return null;
     }
-  }
+  })
+  protected static readonly segmenter: any;
 
   @initial('')
   @interpolation(textLerp)
@@ -123,10 +125,17 @@ export class Txt extends Shape {
     const wrap =
       this.styles.whiteSpace !== 'nowrap' && this.styles.whiteSpace !== 'pre';
 
-    if (wrap && Txt.segmenter) {
+    if (wrap) {
       this.element.innerText = '';
-      for (const word of Txt.segmenter.segment(this.formattedText())) {
-        this.element.appendChild(document.createTextNode(word.segment));
+
+      if (Txt.segmenter) {
+        for (const word of Txt.segmenter.segment(this.formattedText())) {
+          this.element.appendChild(document.createTextNode(word.segment));
+        }
+      } else {
+        for (const word of this.formattedText().split('')) {
+          this.element.appendChild(document.createTextNode(word));
+        }
       }
     } else if (this.styles.whiteSpace === 'pre') {
       this.element.innerText = '';
@@ -135,13 +144,6 @@ export class Txt extends Shape {
       }
     } else {
       this.element.innerText = this.formattedText();
-    }
-
-    if (wrap && !Txt.segmenter) {
-      useLogger().warn({
-        message: 'Wrapping is not supported',
-        inspect: this.key,
-      });
     }
   }
 }

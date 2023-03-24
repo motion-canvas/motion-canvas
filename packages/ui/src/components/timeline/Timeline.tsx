@@ -1,12 +1,6 @@
 import styles from './Timeline.module.scss';
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-} from 'preact/hooks';
+import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {
   useDocumentEvent,
   useDuration,
@@ -20,7 +14,7 @@ import {Timestamps} from './Timestamps';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
 import {RangeSelector} from './RangeSelector';
-import {clamp} from '@motion-canvas/core/lib/tweening';
+import {clamp} from '../../utils';
 import {AudioTrack} from './AudioTrack';
 import {
   useApplication,
@@ -28,6 +22,7 @@ import {
   TimelineState,
 } from '../../contexts';
 import clsx from 'clsx';
+import {useShortcut} from '../../hooks/useShortcut';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -35,6 +30,7 @@ const TIMESTAMP_SPACING = 32;
 const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
+  const [hoverRef] = useShortcut<HTMLDivElement>('timeline');
   const {player} = useApplication();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
@@ -45,7 +41,7 @@ export function Timeline() {
   const [scale, setScale] = useStorage('timeline-scale', 1);
   const isReady = duration > 0;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     containerRef.current.scrollLeft = offset;
   }, [rect.width > 0 && isReady]);
 
@@ -123,6 +119,9 @@ export function Timeline() {
     'keydown',
     useCallback(
       event => {
+        if (document.activeElement.tagName === 'INPUT') {
+          return;
+        }
         if (event.key !== 'f') return;
         const frame = player.onFrameChanged.current;
         const maxOffset = sizes.fullLength - sizes.viewLength;
@@ -141,7 +140,7 @@ export function Timeline() {
 
   return (
     <TimelineContextProvider state={state}>
-      <div className={clsx(styles.root, isReady && styles.show)}>
+      <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
         <div
           className={styles.timelineWrapper}
           ref={containerRef}

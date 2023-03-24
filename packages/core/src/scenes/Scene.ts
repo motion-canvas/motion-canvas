@@ -56,6 +56,7 @@ export interface SceneDescription<T = unknown> {
 export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   name: string;
   size: Vector2;
+  resolutionScale: number;
   variables: Variables;
   playback: PlaybackStatus;
   logger: Logger;
@@ -70,6 +71,7 @@ export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
  */
 export interface SceneDescriptionReload<T = unknown> {
   size?: Vector2;
+  resolutionScale?: number;
   config?: T;
   stack?: string;
 }

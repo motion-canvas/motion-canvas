@@ -26,6 +26,7 @@ export interface PlayerSettings {
   fps: number;
   size: Vector2;
   audioOffset: number;
+  resolutionScale: number;
 }
 
 const MAX_AUDIO_DESYNC = 1 / 50;
@@ -96,6 +97,7 @@ export class Player {
   private requestedSeek = -1;
   private requestedRecalculation = true;
   private size: Vector2;
+  private resolutionScale: number;
   private active = false;
 
   private get startFrame() {
@@ -136,6 +138,7 @@ export class Player {
     this.status = new PlaybackStatus(this.playback);
     this.audio = new AudioManager(this.logger);
     this.size = settings.size ?? new Vector2(1920, 1080);
+    this.resolutionScale = settings.resolutionScale ?? 1;
     this.startTime = settings.range?.[0] ?? 0;
     this.endTime = settings.range?.[1] ?? Infinity;
     this.playback.fps = settings.fps ?? 60;
@@ -152,6 +155,7 @@ export class Player {
         playback: this.status,
         logger: this.project.logger,
         size: this.size,
+        resolutionScale: this.resolutionScale,
         timeEventsClass: EditableTimeEvents,
       });
       description.onReplaced?.subscribe(description => {
@@ -177,9 +181,16 @@ export class Player {
       frame = Math.floor(frame * ratio);
       recalculate = true;
     }
-    if (!settings.size.exactlyEquals(this.size)) {
+    if (
+      !settings.size.exactlyEquals(this.size) ||
+      settings.resolutionScale !== this.resolutionScale
+    ) {
       this.size = settings.size;
-      this.playback.reload({size: this.size});
+      this.resolutionScale = settings.resolutionScale;
+      this.playback.reload({
+        size: this.size,
+        resolutionScale: this.resolutionScale,
+      });
     }
     if (settings.audioOffset !== undefined) {
       this.audio.setOffset(settings.audioOffset);

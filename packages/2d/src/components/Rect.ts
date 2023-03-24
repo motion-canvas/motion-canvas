@@ -51,7 +51,7 @@ export class Rect extends Shape {
   public declare readonly smoothCorners: SimpleSignal<boolean, this>;
 
   /**
-   * Controlls the sharpness of the corners. {@link Rect.smoothCorners} must
+   * Controls the sharpness of the corners. {@link Rect.smoothCorners} must
    * be set to `true`.
    *
    * @remarks

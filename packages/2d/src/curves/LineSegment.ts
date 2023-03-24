@@ -1,6 +1,7 @@
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {lineTo, moveTo} from '../utils';
 import {Segment} from './Segment';
+import {CurvePoint} from './CurvePoint';
 
 export class LineSegment extends Segment {
   private readonly length: number;
@@ -33,8 +34,8 @@ export class LineSegment extends Segment {
     return [from, this.tangent.flipped, to, this.tangent];
   }
 
-  public getPoint(distance: number): [Vector2, Vector2] {
+  public getPoint(distance: number): CurvePoint {
     const point = this.from.add(this.vector.scale(distance));
-    return [point, this.tangent.flipped];
+    return {position: point, tangent: this.tangent.flipped};
   }
 }

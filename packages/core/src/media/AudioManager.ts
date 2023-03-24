@@ -9,7 +9,7 @@ export class AudioManager {
   }
   private readonly data = new ValueDispatcher<AudioData | null>(null);
 
-  private static readonly context = new AudioContext();
+  private readonly context = new AudioContext();
   private readonly audioElement: HTMLAudioElement = new Audio();
   private source: string | null = null;
   private error = false;
@@ -164,7 +164,7 @@ export class AudioManager {
 
   private decodeAudioData(buffer: ArrayBuffer): Promise<AudioBuffer> {
     return new Promise<AudioBuffer>((resolve, reject) =>
-      AudioManager.context.decodeAudioData(buffer, resolve, reject),
+      this.context.decodeAudioData(buffer, resolve, reject),
     );
   }
 }
