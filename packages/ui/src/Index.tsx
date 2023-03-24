@@ -17,9 +17,7 @@ export function Index({projects}: IndexProps) {
       <div className={styles.list}>
         {projects.map(project => (
           <a className={styles.element} href={`./${project.fileName}`}>
-            <div className={styles.title}>
-              {project.name}
-            </div>
+            <div className={styles.title}>{project.name}</div>
             <div className={styles.subtitle}>{project.url}</div>
           </a>
         ))}
