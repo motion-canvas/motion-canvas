@@ -1,5 +1,5 @@
 import {makeScene2D} from '@motion-canvas/2d';
-import {jsx} from '@motion-canvas/2d/lib/jsx-runtime';
+import {jsx, Fragment} from '@motion-canvas/2d/lib/jsx-runtime';
 import * as components from '@motion-canvas/2d/lib/components';
 import * as flow from '@motion-canvas/core/lib/flow';
 import * as utils from '@motion-canvas/core/lib/utils';
@@ -16,6 +16,8 @@ export default {
   ...types,
   ...tweening,
   ...threading,
+  _Fragment: Fragment,
   _jsx: jsx,
+  _jsxs: jsx,
   makeScene2D,
 };
