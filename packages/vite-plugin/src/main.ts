@@ -10,6 +10,7 @@ import {
 } from './proxy-middleware';
 import {getVersions} from './versions';
 import {PluginOptions, isPlugin, PLUGIN_OPTIONS} from './plugins';
+import glob from 'glob';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -115,7 +116,26 @@ export default ({
   const outputPath = path.resolve(output);
   const projects: ProjectData[] = [];
   const projectLookup: Record<string, ProjectData> = {};
-  for (const url of typeof project === 'string' ? [project] : project) {
+
+  function expandFilePaths(filePaths: string[] | string): string[] {
+    const expandedFilePaths = [];
+
+    for (const filePath of typeof filePaths === 'string'
+      ? [filePaths]
+      : filePaths) {
+      if (glob.hasMagic(filePath)) {
+        const matchingFilePaths = glob.sync(filePath);
+        expandedFilePaths.push(...matchingFilePaths);
+      } else {
+        expandedFilePaths.push(filePath);
+      }
+    }
+
+    return expandedFilePaths;
+  }
+
+  const projectList = expandFilePaths(project);
+  for (const url of projectList) {
     const {name, dir} = path.posix.parse(url);
     const metaFile = `${name}.meta`;
     const metaData = getMeta(path.join(dir, metaFile));
