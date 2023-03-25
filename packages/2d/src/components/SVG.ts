@@ -18,9 +18,14 @@ import diffSequence from 'diff-sequences';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {View2D} from './View2D';
 
-interface ParsedSVG {
+export interface SVGChildNode {
+  id: string;
+  shape: Node;
+}
+
+export interface ParsedSVG {
   size: Vector2;
-  nodes: Shape[];
+  nodes: SVGChildNode[];
 }
 
 interface SVGDiff {
@@ -28,12 +33,12 @@ interface SVGDiff {
   toSize: Vector2;
   inserted: Array<{
     fromIndex: number;
-    shape: Shape;
+    node: SVGChildNode;
   }>;
-  deleted: Array<Shape>;
+  deleted: Array<SVGChildNode>;
   transformed: Array<{
-    from: Shape;
-    to: Shape;
+    from: SVGChildNode;
+    to: SVGChildNode;
   }>;
 }
 
@@ -75,10 +80,10 @@ export class SVG extends Shape {
 
   @computed()
   private parsedNodes() {
-    return this.parsed().nodes;
+    return this.parsed().nodes.map(node => node.shape);
   }
 
-  private parseSVG(svg: string): ParsedSVG {
+  protected parseSVG(svg: string): ParsedSVG {
     SVG.containerElement.innerHTML = svg;
 
     const svgRoot = SVG.containerElement.querySelector('svg')!;
@@ -96,7 +101,7 @@ export class SVG extends Shape {
       .translateSelf(-center.x, -center.y);
 
     const nodes = Array.from(
-      this.extractGroupShape(svgRoot, svgRoot, rootTransform, {}),
+      this.extractGroupNodes(svgRoot, svgRoot, rootTransform, {}),
     );
     return {
       size,
@@ -160,16 +165,16 @@ export class SVG extends Shape {
     shape.scale(scale);
   }
 
-  private *extractGroupShape(
+  private *extractGroupNodes(
     element: SVGElement,
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<Shape> {
+  ): Generator<SVGChildNode> {
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) continue;
 
-      yield* this.extractElementShape(
+      yield* this.extractElementNodes(
         child,
         svgRoot,
         parentTransform,
@@ -178,26 +183,27 @@ export class SVG extends Shape {
     }
   }
 
-  private *extractElementShape(
+  private *extractElementNodes(
     child: SVGGraphicsElement,
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<Shape> {
+  ): Generator<SVGChildNode> {
     const transformMatrix = this.getElementTransformation(
       child,
       parentTransform,
     );
     const style = this.getElementStyle(child, inheritedStyle);
+    const id = child.id ?? '';
     if (child.tagName == 'g')
-      yield* this.extractGroupShape(child, svgRoot, transformMatrix, style);
+      yield* this.extractGroupNodes(child, svgRoot, transformMatrix, style);
     else if (child.tagName == 'use') {
       const hrefElement = svgRoot.querySelector(
         (child as SVGUseElement).href.baseVal,
       )!;
       if (!(hrefElement instanceof SVGGraphicsElement)) return;
 
-      yield* this.extractElementShape(
+      yield* this.extractElementNodes(
         hrefElement,
         svgRoot,
         transformMatrix,
@@ -218,7 +224,7 @@ export class SVG extends Shape {
         path,
         transformMatrix.translate(center.x, center.y),
       );
-      yield path;
+      yield {shape: path, id};
     } else if (child.tagName == 'rect') {
       const width = parseFloat(child.getAttribute('width') ?? '0');
       const height = parseFloat(child.getAttribute('height') ?? '0');
@@ -232,16 +238,16 @@ export class SVG extends Shape {
         rect,
         transformMatrix.translate(center.x, center.y),
       );
-      yield rect;
+      yield {shape: rect, id};
     }
   }
 
-  private isNodeEqual(aShape: Node, bShape: Node): boolean {
-    if (aShape.constructor !== bShape.constructor) return false;
+  protected isNodeEqual(aNode: SVGChildNode, bNode: SVGChildNode): boolean {
+    if (aNode.shape.constructor !== bNode.shape.constructor) return false;
     if (
-      aShape instanceof Path &&
-      bShape instanceof Path &&
-      aShape.data() !== bShape.data()
+      aNode.shape instanceof Path &&
+      bNode.shape instanceof Path &&
+      aNode.shape.data() !== bNode.shape.data()
     )
       return false;
 
@@ -279,7 +285,7 @@ export class SVG extends Shape {
           bNodes.slice(bIndex, bCommon).forEach(shape => {
             diff.inserted.push({
               fromIndex: aCommon,
-              shape,
+              node: shape,
             });
           });
         }
@@ -306,20 +312,20 @@ export class SVG extends Shape {
       bNodes.slice(bIndex).forEach(shape => {
         diff.inserted.push({
           fromIndex: aLength,
-          shape,
+          node: shape,
         });
       });
 
     diff.deleted = diff.deleted.filter(aNode => {
       const insertIndex = diff.inserted.findIndex(bNode =>
-        this.isNodeEqual(aNode, bNode.shape),
+        this.isNodeEqual(aNode, bNode.node),
       );
       if (insertIndex >= 0) {
         const bNode = diff.inserted[insertIndex];
 
         diff.transformed.push({
           from: aNode,
-          to: bNode.shape,
+          to: bNode.node,
         });
 
         diff.inserted.splice(insertIndex, 1);
@@ -359,13 +365,15 @@ export class SVG extends Shape {
     const newSVG = this.parseSVG(newValue);
     const diff = this.diffSVG(this.parsed(), newSVG);
 
-    for (const node of diff.inserted)
-      this.wrapper.insert(node.shape, node.fromIndex);
+    for (const {node, fromIndex} of diff.inserted)
+      this.wrapper.insert(node.shape, fromIndex);
 
-    const transformed = diff.transformed.map(({from, to, ...rest}) => ({
-      from: this.cloneNodeExact(from),
+    const transformed = diff.transformed.map(({from, ...rest}) => ({
+      from: {
+        id: from.id,
+        shape: this.cloneNodeExact(from.shape),
+      },
       current: from,
-      to,
       ...rest,
     }));
 
@@ -384,23 +392,27 @@ export class SVG extends Shape {
         const eased = easeInOutSine(remapped);
 
         for (const node of transformed) {
-          node.current.position(
-            Vector2.lerp(node.from.position(), node.to.position(), eased),
+          const currentShape = node.current.shape;
+          const fromShape = node.from.shape;
+          const toShape = node.to.shape;
+          currentShape.position(
+            Vector2.lerp(fromShape.position(), toShape.position(), eased),
           );
-          node.current.scale(
-            Vector2.lerp(node.from.scale(), node.to.scale(), eased),
+          currentShape.scale(
+            Vector2.lerp(fromShape.scale(), toShape.scale(), eased),
           );
-          node.current.rotation(
-            easeInOutSine(remapped, node.from.rotation(), node.to.rotation()),
+          currentShape.rotation(
+            easeInOutSine(remapped, fromShape.rotation(), toShape.rotation()),
           );
 
-          node.current.size(
-            Vector2.lerp(
-              (node.from as Layout).size(),
-              (node.to as Layout).size(),
-              eased,
-            ),
-          );
+          if (currentShape instanceof Layout)
+            currentShape.size(
+              Vector2.lerp(
+                (fromShape as Layout).size(),
+                (toShape as Layout).size(),
+                eased,
+              ),
+            );
         }
 
         const scale = this.wrapper.scale();
@@ -421,20 +433,20 @@ export class SVG extends Shape {
           0,
           progress,
         );
-        for (const node of diff.deleted) node.opacity(deletedOpacity);
+        for (const {shape} of diff.deleted) shape.opacity(deletedOpacity);
 
         const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
-        for (const node of diff.inserted) node.shape.opacity(insertedOpacity);
+        for (const {node} of diff.inserted) node.shape.opacity(insertedOpacity);
       },
       () => {
         this.wrapper.children(this.parsedNodes);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
 
-        for (const node of diff.deleted) node.dispose();
-        for (const node of transformed) {
-          node.from.dispose();
-          node.current.dispose();
+        for (const {shape} of diff.deleted) shape.dispose();
+        for (const {from, current} of transformed) {
+          from.shape.dispose();
+          current.shape.dispose();
         }
       },
     );
