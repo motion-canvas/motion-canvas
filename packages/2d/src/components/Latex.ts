@@ -11,13 +11,19 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
-import {SVGProps, SVG as SVGNode, ParsedSVG, SVGChildNode} from './SVG';
+import {
+  SVGProps,
+  SVG as SVGNode,
+  ParsedSVG,
+  SVGChildNode,
+  RawSVGChild,
+  RawSVG,
+} from './SVG';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Node} from './Node';
 import {BBox, Vector2} from '@motion-canvas/core/lib/types';
-import {Layout} from './Layout';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -42,6 +48,7 @@ export class Latex extends SVGNode {
   })
   private static containerFontSize: number;
   private static svgContentsPool: Record<string, string> = {};
+  private static texNodesPool: Record<string, RawSVG> = {};
   private svgSubTexMap: Record<string, string[]> = {};
 
   @initial({})
@@ -87,45 +94,72 @@ export class Latex extends SVGNode {
   }
 
   protected override parseSVG(svg: string): ParsedSVG {
-    const raw = super.parseSVG(svg);
     const subtexs = this.svgSubTexMap[svg]!;
+    const key = `[${subtexs.join(',')}]::${JSON.stringify(this.options())}`;
+    const cached = Latex.texNodesPool[key];
+    if (cached && (cached.size.x > 0 || cached.size.y > 0))
+      return this.buildParsedSVG(Latex.texNodesPool[key]);
+    const raw = SVGNode.parseSVGasRaw(svg);
 
-    const newNodes: SVGChildNode[] = [];
+    const newNodes: RawSVGChild[] = [];
+    let index = 0;
     for (const sub of subtexs) {
       const subsvg = this.singleTexToSVG(sub);
-      const subnodes = super.parseSVG(subsvg).nodes;
+      const subnodes = SVGNode.parseSVGasRaw(subsvg).nodes;
 
-      const children = raw.nodes
-        .splice(0, subnodes.length)
-        .map(child => child.shape);
+      const currentIndex = index + subnodes.length;
+      const children = raw.nodes.slice(index, currentIndex);
+      index = currentIndex;
+
       const points = children.reduce<Vector2[]>((prev, current) => {
-        if (current instanceof Layout) {
-          const bbox = BBox.fromSizeCentered(current.size());
-          const matrix = current.localToParent();
-          prev.push(...bbox.corners.map(x => x.transformAsPoint(matrix)));
-        }
+        prev.push(
+          ...BBox.fromSizeCentered(current.bbox.size).corners.map(x =>
+            x.transformAsPoint(current.transformation),
+          ),
+        );
         return prev;
       }, []);
       const bbox = BBox.fromPoints(...points);
-      children.forEach(ch => {
-        ch.position(ch.position().sub(bbox.center));
-      });
-      const node = new Node({
-        position: bbox.center,
-        children,
-      });
+      const center = bbox.center;
+      const parentTransformation = new DOMMatrix().translateSelf(
+        -center.x,
+        -center.y,
+      );
+      const translatedChildren = children.map<RawSVGChild>(
+        ({props, transformation, ...rest}) => {
+          const childTransformation =
+            parentTransformation.multiply(transformation);
+          return {
+            props: {
+              ...props,
+              ...SVGNode.getMatrixTransformation(childTransformation),
+            },
+            transformation: childTransformation,
+            ...rest,
+          };
+        },
+      );
+
       newNodes.push({
         id: sub,
-        shape: node,
+        type: Node,
+        props: {
+          position: bbox.center,
+        },
+        bbox,
+        transformation: parentTransformation,
+        children: translatedChildren,
       });
     }
-    if (raw.nodes.length > 0)
+    if (raw.nodes.length !== index)
       useLogger().warn('matching between Latex SVG and subtex failed');
 
-    return {
+    const rawParsed: RawSVG = {
       size: raw.size,
       nodes: newNodes,
     };
+    Latex.texNodesPool[key] = rawParsed;
+    return this.buildParsedSVG(rawParsed);
   }
 
   protected override isNodeEqual(

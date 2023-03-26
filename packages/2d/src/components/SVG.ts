@@ -2,11 +2,11 @@ import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {computed, signal} from '../decorators';
 import {Shape, ShapeProps} from './Shape';
-import {Node} from './Node';
-import {DesiredLength, PossibleCanvasStyle} from '../partials';
+import {Node, NodeProps} from './Node';
+import {DesiredLength} from '../partials';
 import {useLogger} from '@motion-canvas/core/lib/utils';
-import {Path} from './Path';
-import {Rect} from './Rect';
+import {Path, PathProps} from './Path';
+import {Rect, RectProps} from './Rect';
 import {
   clampRemap,
   easeInOutSine,
@@ -23,9 +23,23 @@ export interface SVGChildNode {
   shape: Node;
 }
 
+export interface RawSVGChild {
+  id: string;
+  type: new (props: NodeProps) => Node;
+  props: ShapeProps;
+  transformation: DOMMatrix;
+  bbox: BBox;
+  children?: RawSVGChild[];
+}
+
 export interface ParsedSVG {
   size: Vector2;
   nodes: SVGChildNode[];
+}
+
+export interface RawSVG {
+  size: Vector2;
+  nodes: RawSVGChild[];
 }
 
 interface SVGDiff {
@@ -53,6 +67,7 @@ export class SVG extends Shape {
     return element;
   })
   protected static containerElement: HTMLDivElement;
+  private static svgNodesPool: Record<string, RawSVG> = {};
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
   public wrapper: Node;
@@ -83,7 +98,36 @@ export class SVG extends Shape {
     return this.parsed().nodes.map(node => node.shape);
   }
 
+  protected buildParsedSVG(builder: RawSVG): ParsedSVG {
+    return {
+      size: builder.size,
+      nodes: builder.nodes.map(ch => this.buildRawNode(ch)),
+    };
+  }
+
+  protected buildRawNode({
+    id,
+    type,
+    props,
+    children,
+  }: RawSVGChild): SVGChildNode {
+    return {
+      id,
+      shape: new type({
+        children: children?.map(ch => this.buildRawNode(ch).shape),
+        ...this.processElementStyle(props),
+      }),
+    };
+  }
+
   protected parseSVG(svg: string): ParsedSVG {
+    return this.buildParsedSVG(SVG.parseSVGasRaw(svg));
+  }
+
+  protected static parseSVGasRaw(svg: string) {
+    const cached = SVG.svgNodesPool[svg];
+    if (cached && (cached.size.x > 0 || cached.size.y > 0)) return cached;
+
     SVG.containerElement.innerHTML = svg;
 
     const svgRoot = SVG.containerElement.querySelector('svg')!;
@@ -101,15 +145,17 @@ export class SVG extends Shape {
       .translateSelf(-center.x, -center.y);
 
     const nodes = Array.from(
-      this.extractGroupNodes(svgRoot, svgRoot, rootTransform, {}),
+      SVG.extractGroupNodes(svgRoot, svgRoot, rootTransform, {}),
     );
-    return {
+    const builder: RawSVG = {
       size,
       nodes,
     };
+    SVG.svgNodesPool[svg] = builder;
+    return builder;
   }
 
-  private getElementTransformation(
+  private static getElementTransformation(
     element: SVGGraphicsElement,
     parentTransform: DOMMatrix,
   ) {
@@ -122,21 +168,13 @@ export class SVG extends Shape {
     return transformMatrix;
   }
 
-  private parseColor(color: string | null): SignalValue<PossibleCanvasStyle> {
-    if (color == 'currentColor') return this.fill;
-    return color;
-  }
-
-  private getElementStyle(
+  private static getElementStyle(
     element: SVGGraphicsElement,
     inheritedStyle: ShapeProps,
   ): ShapeProps {
     return {
-      fill:
-        this.parseColor(element.getAttribute('fill')) ?? inheritedStyle.fill,
-      stroke:
-        this.parseColor(element.getAttribute('stroke')) ??
-        inheritedStyle.stroke,
+      fill: element.getAttribute('fill') ?? inheritedStyle.fill,
+      stroke: element.getAttribute('stroke') ?? inheritedStyle.stroke,
       lineWidth: element.hasAttribute('stroke-width')
         ? parseFloat(element.getAttribute('stroke-width')!)
         : inheritedStyle.lineWidth,
@@ -144,7 +182,15 @@ export class SVG extends Shape {
     };
   }
 
-  private applyTransformToShape(shape: Shape, transform: DOMMatrix) {
+  private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
+    return {
+      fill: fill === 'currentColor' ? this.fill : fill,
+      stroke: stroke === 'currentColor' ? this.stroke : stroke,
+      ...rest,
+    };
+  }
+
+  protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
     const position = {
       x: transform.m41,
       y: transform.m42,
@@ -160,17 +206,19 @@ export class SVG extends Shape {
       if (transform.m11 < transform.m22) scale.x = -scale.x;
       else scale.y = -scale.y;
     }
-    shape.position(position);
-    shape.rotation(rotation);
-    shape.scale(scale);
+    return {
+      position,
+      rotation,
+      scale,
+    };
   }
 
-  private *extractGroupNodes(
+  private static *extractGroupNodes(
     element: SVGElement,
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<SVGChildNode> {
+  ): Generator<RawSVGChild> {
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) continue;
 
@@ -183,27 +231,27 @@ export class SVG extends Shape {
     }
   }
 
-  private *extractElementNodes(
+  private static *extractElementNodes(
     child: SVGGraphicsElement,
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<SVGChildNode> {
-    const transformMatrix = this.getElementTransformation(
+  ): Generator<RawSVGChild> {
+    const transformMatrix = SVG.getElementTransformation(
       child,
       parentTransform,
     );
-    const style = this.getElementStyle(child, inheritedStyle);
+    const style = SVG.getElementStyle(child, inheritedStyle);
     const id = child.id ?? '';
     if (child.tagName == 'g')
-      yield* this.extractGroupNodes(child, svgRoot, transformMatrix, style);
+      yield* SVG.extractGroupNodes(child, svgRoot, transformMatrix, style);
     else if (child.tagName == 'use') {
       const hrefElement = svgRoot.querySelector(
         (child as SVGUseElement).href.baseVal,
       )!;
       if (!(hrefElement instanceof SVGGraphicsElement)) return;
 
-      yield* this.extractElementNodes(
+      yield* SVG.extractElementNodes(
         hrefElement,
         svgRoot,
         transformMatrix,
@@ -217,28 +265,40 @@ export class SVG extends Shape {
       }
       const path = new Path({
         data,
-        ...style,
       });
-      const center = path.getPathBBox().center;
-      this.applyTransformToShape(
-        path,
-        transformMatrix.translate(center.x, center.y),
-      );
-      yield {shape: path, id};
+      const bbox = path.getPathBBox();
+      const center = bbox.center;
+      const transformation = transformMatrix.translate(center.x, center.y);
+      yield {
+        id,
+        type: Path,
+        transformation,
+        bbox,
+        props: {
+          data,
+          ...SVG.getMatrixTransformation(transformation),
+          ...style,
+        } as PathProps,
+      };
     } else if (child.tagName == 'rect') {
       const width = parseFloat(child.getAttribute('width') ?? '0');
       const height = parseFloat(child.getAttribute('height') ?? '0');
-      const center = new BBox(0, 0, width, height).center;
-      const rect = new Rect({
-        width,
-        height,
-        ...style,
-      });
-      this.applyTransformToShape(
-        rect,
-        transformMatrix.translate(center.x, center.y),
-      );
-      yield {shape: rect, id};
+
+      const bbox = new BBox(0, 0, width, height);
+      const center = bbox.center;
+      const transformation = transformMatrix.translate(center.x, center.y);
+      yield {
+        id,
+        type: Rect,
+        bbox,
+        transformation,
+        props: {
+          width,
+          height,
+          ...SVG.getMatrixTransformation(transformation),
+          ...style,
+        } as RectProps,
+      };
     }
   }
 
@@ -343,11 +403,12 @@ export class SVG extends Shape {
     return diff;
   }
 
-  private cloneNodeExact(node: Node) {
+  private cloneNodeExact(node: Node, extraProps?: NodeProps) {
     const props: ShapeProps = {
       position: node.position(),
       scale: node.scale(),
       rotation: node.rotation(),
+      ...extraProps,
     };
     if (node instanceof Layout) {
       props.size = node.size();
