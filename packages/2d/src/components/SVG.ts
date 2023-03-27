@@ -14,7 +14,6 @@ import {
   tween,
 } from '@motion-canvas/core/lib/tweening';
 import {Layout} from './Layout';
-import diffSequence from 'diff-sequences';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {View2D} from './View2D';
 
@@ -45,12 +44,10 @@ export interface RawSVG {
 interface SVGDiff {
   fromSize: Vector2;
   toSize: Vector2;
-  inserted: Array<{
-    fromIndex: number;
-    node: SVGChildNode;
-  }>;
+  inserted: Array<SVGChildNode>;
   deleted: Array<SVGChildNode>;
   transformed: Array<{
+    insert: boolean;
     from: SVGChildNode;
     to: SVGChildNode;
   }>;
@@ -314,6 +311,16 @@ export class SVG extends Shape {
     return true;
   }
 
+  private getShapeMap(svg: ParsedSVG) {
+    const map: Record<string, SVGChildNode[]> = {};
+    for (const node of svg.nodes) {
+      if (!map[node.id]) map[node.id] = [];
+
+      map[node.id].push(node);
+    }
+    return map;
+  }
+
   private diffSVG(from: ParsedSVG, to: ParsedSVG): SVGDiff {
     const diff: SVGDiff = {
       fromSize: from.size,
@@ -323,82 +330,47 @@ export class SVG extends Shape {
       transformed: [],
     };
 
-    const aNodes = from.nodes;
-    const bNodes = to.nodes;
-    const aLength = aNodes.length;
-    const bLength = bNodes.length;
-    let aIndex = 0;
-    let bIndex = 0;
+    const fromMap = this.getShapeMap(from);
+    const fromKeys = Object.keys(fromMap);
+    const toMap = this.getShapeMap(to);
+    const toKeys = Object.keys(toMap);
 
-    diffSequence(
-      aLength,
-      bLength,
-      (aIndex, bIndex) => {
-        return this.isNodeEqual(aNodes[aIndex], bNodes[bIndex]);
-      },
-      (nCommon, aCommon, bCommon) => {
-        if (aIndex !== aCommon)
-          aNodes.slice(aIndex, aCommon).forEach(shape => {
-            diff.deleted.push(shape);
-          });
-        if (bIndex !== bCommon) {
-          bNodes.slice(bIndex, bCommon).forEach(shape => {
-            diff.inserted.push({
-              fromIndex: aCommon,
-              node: shape,
-            });
-          });
-        }
+    while (fromKeys.length > 0) {
+      const key = fromKeys.pop()!;
+      const fromItem = fromMap[key];
+      const toIndex = toKeys.indexOf(key);
+      if (toIndex >= 0) {
+        toKeys.splice(toIndex, 1);
+        const toItem = toMap[key];
 
-        aIndex = aCommon;
-        bIndex = bCommon;
-        for (let x = 0; x < nCommon; x++) {
+        for (let i = 0; i < Math.max(fromItem.length, toItem.length); i++) {
+          const insert = i >= fromItem.length;
+
+          const fromNode =
+            i < fromItem.length ? fromItem[i] : fromItem[fromItem.length - 1];
+          const toNode =
+            i < toItem.length ? toItem[i] : toItem[toItem.length - 1];
+
           diff.transformed.push({
-            from: aNodes[aIndex],
-            to: bNodes[bIndex],
+            insert,
+            from: fromNode,
+            to: toNode,
           });
-          aIndex++;
-          bIndex++;
         }
-      },
-    );
-
-    if (aIndex !== aLength)
-      aNodes.slice(aIndex).forEach(shape => {
-        diff.deleted.push(shape);
-      });
-
-    if (bIndex !== bNodes.length)
-      bNodes.slice(bIndex).forEach(shape => {
-        diff.inserted.push({
-          fromIndex: aLength,
-          node: shape,
-        });
-      });
-
-    diff.deleted = diff.deleted.filter(aNode => {
-      const insertIndex = diff.inserted.findIndex(bNode =>
-        this.isNodeEqual(aNode, bNode.node),
-      );
-      if (insertIndex >= 0) {
-        const bNode = diff.inserted[insertIndex];
-
-        diff.transformed.push({
-          from: aNode,
-          to: bNode.node,
-        });
-
-        diff.inserted.splice(insertIndex, 1);
-
-        return false;
+      } else {
+        for (const node of fromItem) {
+          diff.deleted.push(node);
+        }
       }
+    }
 
-      return true;
-    });
-
-    diff.inserted.forEach((value, index) => {
-      value.fromIndex += index;
-    });
+    if (toKeys.length > 0) {
+      for (const key of toKeys) {
+        for (const node of toMap[key]) {
+          diff.inserted.push(node);
+        }
+      }
+    }
 
     return diff;
   }
@@ -424,10 +396,20 @@ export class SVG extends Shape {
   ) {
     const newValue = typeof value == 'string' ? value : value();
     const newSVG = this.parseSVG(newValue);
+    const ct = Date.now();
     const diff = this.diffSVG(this.parsed(), newSVG);
+    useLogger().info(`diff time ${(Date.now() - ct) / 1000}`);
 
-    for (const {node, fromIndex} of diff.inserted)
-      this.wrapper.insert(node.shape, fromIndex);
+    for (const node of diff.inserted) this.wrapper.insert(node.shape);
+
+    for (const node of diff.transformed) {
+      if (!node.insert) continue;
+      node.from = {
+        id: node.from.id,
+        shape: this.cloneNodeExact(node.from.shape),
+      };
+      this.wrapper.insert(node.from.shape);
+    }
 
     const transformed = diff.transformed.map(({from, ...rest}) => ({
       from: {
@@ -497,7 +479,7 @@ export class SVG extends Shape {
         for (const {shape} of diff.deleted) shape.opacity(deletedOpacity);
 
         const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
-        for (const {node} of diff.inserted) node.shape.opacity(insertedOpacity);
+        for (const {shape} of diff.inserted) shape.opacity(insertedOpacity);
       },
       () => {
         this.wrapper.children(this.parsedNodes);
