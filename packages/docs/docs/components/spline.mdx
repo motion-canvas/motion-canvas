@@ -5,7 +5,6 @@ slug: /spline
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import SplineSvg from '@site/static/img/media/spline.svg';
 
 # Spline
 
@@ -37,16 +36,6 @@ export default makeScene2D(function* (view) {
 
 The `Spline` component allows us to draw and animate smooth curves through a
 series of control points.
-
-## A gentle introduction to splines
-
-This section aims to be a simple introduction to the concept of splines in
-computer graphics. Feel free to [skip this section](#defining-control-points) if
-you're already familiar with splines.
-
-<div style={{display: 'flex', justifyContent: 'center'}}>
-  <SplineSvg style={{maxWidth: '430px'}} />
-</div>
 
 ## Defining control points
 
@@ -477,10 +466,14 @@ export default makeScene2D(function* (view) {
           [300, 0],
         ]}
       />
-      <Circle
+      <Rect
         size={26}
         fill={'lightseagreen'}
         position={() => spline().getPointAtPercentage(progress()).position}
+        rotation={() =>
+          (spline().getPointAtPercentage(progress()).tangent.radians * 180) /
+          Math.PI
+        }
       />,
     </>,
   );
