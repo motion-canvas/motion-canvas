@@ -4,35 +4,42 @@ slug: /latex
 ---
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
-import CodeBlock from '@theme/CodeBlock';
-import texSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tex';
 
 # LaTeX
 
-The `Latex` component is used to show mathematical formula.
+The `Latex` component is used to show mathematical formula and animate it.
 
-<CodeBlock language="tsx">{texSource}</CodeBlock>
+<AnimationPlayer banner name="tex" />
 
-<AnimationPlayer small name="tex" />
+## Defining LaTex
 
-## LaTex Part
-
-LaTex `tex` can be an array of string. The item of array can be called LaTex
-part. Here the example:
+You can set LaTex formula to show by specifying `tex` propery:
 
 ```ts
+import {Latex} from '@motion-canvas/2d/lib/components/Latex';
+
+yield view.add(<Latex tex="a^2 + b^2 = c^2" />);
+```
+
+LaTex `tex` propery can be an array of string. The item of array can be called
+LaTex part. Splitting LaTex into several part is crucial for tweening.
+
+```ts
+yield view.add(<Latex tex={['a^2', '+', 'b^2', '=', 'c^2']} />);
+```
+
+Specifying LaTex using string or array of string will have same result. First
+code and second code will have sam result.
+
+You can also split tex into several part by enclose part of string using `{{}}`
+
+```ts
+tex('{{a^2}} + {{b^2}} = {{c^2}}');
+//equal to
 tex(['a^2', '+', 'b^2', '=', 'c^2']);
 ```
 
-LaTex `tex` can also be string. You can enclose the part of string using `{{}}`
-to split tex into several part. Here the example:
-
-```ts
-tex('{{a^2}} + {{b^2}} = {{c^2}}']);
-```
-
-The first and second code result equal image. You can also use the syntax in
-array item like this:
+You can also use the syntax in array item like this:
 
 ```ts
 tex('{{a}}^2', '+',  '{{b}}^2', '=', '{{c}}^2']);
@@ -40,18 +47,72 @@ tex('{{a}}^2', '+',  '{{b}}^2', '=', '{{c}}^2']);
 tex(['a','^2', '+', 'b', '^2', '=', 'c', '^2']);
 ```
 
+## Fill Color
+
+To set color of tex you can set `fill` propery to any color you want.
+
+:::note
+
+You must set fill, if not tex will not appear.
+
+:::
+
+## Font Size
+
+To set size of tex you can set `fontSize` property. Size of this component will
+equal to size of `Txt` component that have same `fontSize`.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const fontSize = createSignal(48);
+  view.add(
+    <Rect layout direction="column" alignItems="center" gap="25px">
+      <Latex tex="y = mx + c" fill="white" fontSize={fontSize} />
+      <Txt fill="white" fontSize={fontSize}>
+        Normal text
+      </Txt>
+    </Rect>,
+  );
+
+  yield* fontSize(24, 1);
+  yield* fontSize(48, 1);
+});
+```
+
 ## Animating LaTex
 
 We can animate LaTex by tweening `tex` propery. To enable deletion, insertion
-and transformation animation you must split tex into several part.
+and transformation animation you must split tex into several part. When you do
+not split tex into several part, only fade in and fade out animation will
+happen.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="1 + 2" fill="white" />);
+
+  yield* waitFor(0.5);
+  yield* tex().tex('2 + 3 + 4', 1);
+});
+```
 
 Tex part that only exist in source tex is considered deleted and is animated
 using fade in. Tex part that only exist in target tex is considered inserted and
 is animated using fade out. Tex part that coexist in source and destionation tex
 will be transformed from source to target.
 
+```tsx editor
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="{{1}} + {{2}}" fill="white" />);
+
+  yield* waitFor(0.5);
+  yield* tex().tex(['2', '+', '3', '+', '4'], 1);
+});
+```
+
 When any part of the tex whose numbers in the source and target do not match,
-all the part of the tex will be transformed (Number of tex greater than 0). For
-example source has 2 `+` part and target has 3 `+` part, there no insertion,
-instead second `+` part from source is transformed into second and third `+`
-part from target.
+all the part of the tex will be transformed (Number of part greater than 0). In
+the example above, source has 1 `+` part and target has 2 `+` part, there no
+insertion, instead a `+` part of source is transformed into first and second `+`
+part of target.
