@@ -170,9 +170,9 @@ export default ({
       if (id.startsWith(resolvedRendererId)) {
         if (projects.length === 1) {
           return source(
-            `import {renderer} from '${editor}';`,
+            `import {render} from '${editor}';`,
             `import project from '${projects[0].url}?project';`,
-            `renderer(project);`,
+            `render(project);`,
           );
         }
       }
