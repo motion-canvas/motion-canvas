@@ -27,12 +27,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          token: ${{secrets.PUBLISH_TOKEN}}
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
           cache: npm
-      - run: git remote set-url origin https://${{ secrets.PUBLISH_TOKEN }}@github.com/motion-canvas/motion-canvas
       - run: git config --global user.email "129169430+motion-canvas-bot@users.noreply.github.com"
       - run: git config --global user.name "motion-canvas-bot"
       - run: npm ci
