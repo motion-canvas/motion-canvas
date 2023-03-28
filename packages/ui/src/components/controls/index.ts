@@ -4,6 +4,7 @@ export * from './Checkbox';
 export * from './ColorInput';
 export * from './InputSelect';
 export * from './Group';
+export * from './Separator';
 export * from './Input';
 export * from './IconButton';
 export * from './IconCheckbox';

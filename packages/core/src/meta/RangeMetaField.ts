@@ -13,6 +13,11 @@ export class RangeMetaField extends MetaField<
   [number, number | null],
   [number, number]
 > {
+  public static readonly symbol = Symbol.for(
+    '@motion-canvas/core/meta/RangeMetaField',
+  );
+  public readonly type = RangeMetaField.symbol;
+
   public override parse(value: [number, number | null]): [number, number] {
     return this.parseRange(Infinity, value[0], value[1] ?? Infinity);
   }

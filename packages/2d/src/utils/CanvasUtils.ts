@@ -266,3 +266,27 @@ export function arc(
     counterclockwise,
   );
 }
+
+export function bezierCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint1: Vector2,
+  controlPoint2: Vector2,
+  to: Vector2,
+) {
+  context.bezierCurveTo(
+    controlPoint1.x,
+    controlPoint1.y,
+    controlPoint2.x,
+    controlPoint2.y,
+    to.x,
+    to.y,
+  );
+}
+
+export function quadraticCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint: Vector2,
+  to: Vector2,
+) {
+  context.quadraticCurveTo(controlPoint.x, controlPoint.y, to.x, to.y);
+}

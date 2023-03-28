@@ -1,8 +1,8 @@
 export * from './Circle';
-export * from './CodeBlock';
 export * from './Icon';
 export * from './Img';
 export * from './Grid';
+export * from './Knot';
 export * from './Latex';
 export * from './Layout';
 export * from './Line';
@@ -10,6 +10,7 @@ export * from './Node';
 export * from './Rect';
 export * from './Polygon';
 export * from './Shape';
+export * from './Spline';
 export * from './Txt';
 export * from './types';
 export * from './Video';

@@ -33,7 +33,7 @@
         "leadingUnderscore": "forbid",
         "trailingUnderscore": "forbid",
         "filter": {
-          "regex": "^__html$",
+          "regex": "^(__html)$",
           "match": false
         }
       },
@@ -50,6 +50,11 @@
         "selector": "variable",
         "modifiers": ["exported"],
         "format": ["camelCase", "PascalCase"]
+      },
+      {
+        "selector": "variable",
+        "modifiers": ["exported", "global"],
+        "format": ["camelCase", "PascalCase", "UPPER_CASE"]
       },
       {
         "selector": ["parameter", "variable"],

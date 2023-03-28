@@ -228,97 +228,6 @@ export class Layout extends Node {
     this.customY(value);
   }
 
-  @inspectable(false)
-  @initial(null)
-  @signal()
-  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
-
-  protected getWidth(): number {
-    return this.computedSize().width;
-  }
-  protected setWidth(value: SignalValue<Length>) {
-    this.customWidth(value);
-  }
-
-  @threadable()
-  protected *tweenWidth(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const width = this.desiredSize().x;
-    const lock = typeof width !== 'number' || typeof value !== 'number';
-    let from: number;
-    if (lock) {
-      from = this.size.x();
-    } else {
-      from = width;
-    }
-
-    let to: number;
-    if (lock) {
-      this.size.x(value);
-      to = this.size.x();
-    } else {
-      to = value;
-    }
-
-    this.size.x(from);
-    lock && this.lockSize();
-    yield* tween(time, value =>
-      this.size.x(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.size.x(value);
-    lock && this.releaseSize();
-  }
-
-  @inspectable(false)
-  @initial(null)
-  @signal()
-  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
-
-  protected getHeight(): number {
-    return this.computedSize().height;
-  }
-  protected setHeight(value: SignalValue<Length>) {
-    this.customHeight(value);
-  }
-
-  @threadable()
-  protected *tweenHeight(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const height = this.desiredSize().y;
-    const lock = typeof height !== 'number' || typeof value !== 'number';
-
-    let from: number;
-    if (lock) {
-      from = this.size.y();
-    } else {
-      from = height;
-    }
-
-    let to: number;
-    if (lock) {
-      this.size.y(value);
-      to = this.size.y();
-    } else {
-      to = value;
-    }
-
-    this.size.y(from);
-    lock && this.lockSize();
-    yield* tween(time, value =>
-      this.size.y(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.size.y(value);
-    lock && this.releaseSize();
-  }
-
   /**
    * Represents the size of this node.
    *
@@ -377,6 +286,95 @@ export class Layout extends Node {
   }
   public get height(): Signal<Length, number, this> {
     return this.size.y;
+  }
+
+  @inspectable(false)
+  @signal()
+  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
+
+  protected getWidth(): number {
+    return this.computedSize().width;
+  }
+  protected setWidth(value: SignalValue<Length>) {
+    this.customWidth(value);
+  }
+
+  @threadable()
+  protected *tweenWidth(
+    value: SignalValue<Length>,
+    time: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<Length>,
+  ): ThreadGenerator {
+    const width = this.desiredSize().x;
+    const lock = typeof width !== 'number' || typeof value !== 'number';
+    let from: number;
+    if (lock) {
+      from = this.size.x();
+    } else {
+      from = width;
+    }
+
+    let to: number;
+    if (lock) {
+      this.size.x(value);
+      to = this.size.x();
+    } else {
+      to = value;
+    }
+
+    this.size.x(from);
+    lock && this.lockSize();
+    yield* tween(time, value =>
+      this.size.x(interpolationFunction(from, to, timingFunction(value))),
+    );
+    this.size.x(value);
+    lock && this.releaseSize();
+  }
+
+  @inspectable(false)
+  @signal()
+  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
+
+  protected getHeight(): number {
+    return this.computedSize().height;
+  }
+  protected setHeight(value: SignalValue<Length>) {
+    this.customHeight(value);
+  }
+
+  @threadable()
+  protected *tweenHeight(
+    value: SignalValue<Length>,
+    time: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<Length>,
+  ): ThreadGenerator {
+    const height = this.desiredSize().y;
+    const lock = typeof height !== 'number' || typeof value !== 'number';
+
+    let from: number;
+    if (lock) {
+      from = this.size.y();
+    } else {
+      from = height;
+    }
+
+    let to: number;
+    if (lock) {
+      this.size.y(value);
+      to = this.size.y();
+    } else {
+      to = value;
+    }
+
+    this.size.y(from);
+    lock && this.lockSize();
+    yield* tween(time, value =>
+      this.size.y(interpolationFunction(from, to, timingFunction(value))),
+    );
+    this.size.y(value);
+    lock && this.releaseSize();
   }
 
   /**

@@ -2,21 +2,23 @@ import {usePresenterState, useRendererState, useStorage} from '../../hooks';
 import {ButtonSelect, Group, Label} from '../controls';
 import {Pane} from '../tabs';
 import {useApplication} from '../../contexts';
-import {PreviewSettings, RenderingSettings, SharedSettings} from '../settings';
 import {Expandable} from '../fields';
 import {PresenterState, RendererState} from '@motion-canvas/core';
+import {MetaFieldView} from '../meta';
 
 export function VideoSettings() {
+  const {meta} = useApplication();
+
   return (
     <Pane title="Video Settings" id="settings-pane">
-      <Expandable title="General" open>
-        <SharedSettings />
+      <Expandable title={meta.shared.name} open>
+        <MetaFieldView field={meta.shared} />
       </Expandable>
-      <Expandable title="Preview">
-        <PreviewSettings />
+      <Expandable title={meta.preview.name}>
+        <MetaFieldView field={meta.preview} />
       </Expandable>
-      <Expandable title="Rendering">
-        <RenderingSettings />
+      <Expandable title={meta.rendering.name}>
+        <MetaFieldView field={meta.rendering} />
       </Expandable>
       <Group>
         <Label />

@@ -1,0 +1,105 @@
+.root {
+  border-radius: var(--ifm-code-border-radius);
+  overflow: hidden;
+  box-shadow: var(--ifm-global-shadow-lw);
+  margin-bottom: var(--ifm-leading);
+}
+
+.progress {
+  height: 1px;
+  margin-bottom: -1px;
+  position: relative;
+  z-index: 1;
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+.controls {
+  background-color: var(--ifm-background-surface-color);
+  display: flex;
+  border-bottom: 1px solid var(--ifm-color-emphasis-300);
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.section {
+  width: 33.333%;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+}
+
+.section:first-child {
+  justify-content: start;
+}
+
+.section:last-child {
+  justify-content: end;
+}
+
+.icon {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ifm-font-color-base);
+  transition: background var(--ifm-transition-fast);
+}
+
+.icon:hover {
+  background-color: var(--ifm-color-emphasis-200);
+  color: var(--ifm-font-color-base);
+}
+
+.controls button {
+  appearance: none;
+  background-color: unset;
+  border: none;
+}
+
+.error {
+  border-radius: 0;
+  margin: 0;
+  border-top: 1px solid var(--ifm-color-danger-dark);
+  border-bottom: 1px solid var(--ifm-color-danger-dark);
+}
+
+.editor {
+}
+
+.root .editor .source {
+  display: none;
+  margin-bottom: 0;
+  padding-left: 38px;
+}
+
+.root .editor .source:first-child:last-child {
+  display: block;
+}
+
+.preview {
+  aspect-ratio: 4;
+  background-color: var(--ifm-background-surface-color);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview canvas {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.button {
+  cursor: pointer;
+  height: 2rem;
+  padding: var(--ifm-button-padding-vertical);
+  color: var(--ifm-font-color-base);
+  gap: 0.5rem;
+  display: flex;
+  align-items: center;
+}

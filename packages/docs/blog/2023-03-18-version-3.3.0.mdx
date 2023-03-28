@@ -1,0 +1,64 @@
+---
+slug: version-3.3.0
+title: Motion Canvas v3.3.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} pr={542}>
+    New{' '}
+    <Link to="/docs/quickstart#programming-an-animation">Fiddle Editor</Link>{' '}
+    let's you play around with Motion Canvas directly in the browser.
+  </Issue>
+  <Issue user={'aarthificial'} pr={531}>
+    Information about the current zoom level is now displayed in the top-left
+    corner of the viewport. You can choose one of the predefined zoom levels or
+    toggle "zoom to fit".
+  </Issue>
+  <Issue user={'misclicl'} pr={477}>
+    The <Link to="/docs/rendering#group-by-scene">group by scene</Link>{' '}
+    rendering option lets you render scenes into separate image sequences.
+  </Issue>
+  <Issue user={'aarthificial'} pr={532}>
+    Button titles now include their corresponding shortcuts.
+  </Issue>
+  <Issue user={'guifeliper'} pr={495}>
+    Vite has been updated to v4.
+  </Issue>
+  <Issue user={'aarthificial'} pr={523}>
+    Tree shaking now works correctly.
+  </Issue>
+  <Issue user={'aarthificial'} pr={534}>
+    Custom fields added to meta files are now preserved.
+  </Issue>
+  <Issue user={'aarthificial'} pr={529}>
+    Checkboxes use a custom style.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={544}>
+    The size of cache canvases is limited to the size of the project.
+  </Issue>
+  <Issue user={'AshishBarvaliya'} pr={541}>
+    <Link to="/api/2d/components/Layout#textWrap">
+      <code>textWrap</code>
+    </Link>{' '}
+    now works in Firefox.
+  </Issue>
+  <Issue user={'AshishBarvaliya'} pr={538}>
+    The port at which Motion Canvas is served can now be changed.
+  </Issue>
+  <Issue user={'AshishBarvaliya'} pr={520}>
+    The editor correctly detects new versions.
+  </Issue>
+  <Issue user={'AshishBarvaliya'} pr={521}>
+    Keyboard shortcuts are now ignored when inputting text.
+  </Issue>
+  <Issue user={'aarthificial'} pr={524}>
+    Runtime errors no longer corrupt the editor's state.
+  </Issue>
+</IssueGroup>

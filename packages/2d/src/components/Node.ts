@@ -1080,25 +1080,14 @@ export class Node implements Promisable<Node> {
    */
   @computed()
   protected worldSpaceCacheBBox(): BBox {
-    return BBox.fromPoints(
+    const viewBBox = BBox.fromSizeCentered(this.view().size());
+    const canvasBBox = BBox.fromPoints(
+      ...viewBBox.transformCorners(this.view().localToWorld()),
+    );
+    const cacheBBox = BBox.fromPoints(
       ...this.cacheBBox().transformCorners(this.localToWorld()),
-    ).pixelPerfect;
-  }
-
-  /**
-   * Get the offset for this node's cache canvas.
-   *
-   * @remarks
-   * To put the cached contents in the correct position, cache canvases need to
-   * be offset relatively to the canvas they are being drawn on.
-   */
-  @computed()
-  protected cacheOffset(): Vector2 {
-    if (!this.requiresCache()) {
-      return this.parent()?.cacheOffset() ?? Vector2.zero;
-    }
-
-    return this.worldSpaceCacheBBox().position;
+    );
+    return canvasBBox.intersection(cacheBBox).pixelPerfect;
   }
 
   /**
@@ -1148,19 +1137,32 @@ export class Node implements Promisable<Node> {
     if (this.requiresCache()) {
       const cacheRect = this.worldSpaceCacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
-        const offset = cacheRect.position.sub(
-          this.parent()?.cacheOffset() ?? Vector2.zero,
-        );
         this.setupDrawFromCache(context);
         const cacheContext = this.cachedCanvas();
         const compositeOverride = this.compositeOverride();
-        context.resetTransform();
-        context.drawImage(cacheContext.canvas, offset.x, offset.y);
+        const matrix = this.worldToLocal();
+        context.transform(
+          matrix.a,
+          matrix.b,
+          matrix.c,
+          matrix.d,
+          matrix.e,
+          matrix.f,
+        );
+        context.drawImage(
+          cacheContext.canvas,
+          cacheRect.position.x,
+          cacheRect.position.y,
+        );
         if (compositeOverride > 0) {
           context.save();
           context.globalAlpha *= compositeOverride;
           context.globalCompositeOperation = 'source-over';
-          context.drawImage(cacheContext.canvas, offset.x, offset.y);
+          context.drawImage(
+            cacheContext.canvas,
+            cacheRect.position.x,
+            cacheRect.position.y,
+          );
           context.restore();
         }
       }

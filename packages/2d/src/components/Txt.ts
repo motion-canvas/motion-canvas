@@ -1,5 +1,4 @@
 import {computed, initial, interpolation, signal} from '../decorators';
-import {useLogger} from '@motion-canvas/core/lib/utils';
 import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
 import {BBox} from '@motion-canvas/core/lib/types';
@@ -126,10 +125,17 @@ export class Txt extends Shape {
     const wrap =
       this.styles.whiteSpace !== 'nowrap' && this.styles.whiteSpace !== 'pre';
 
-    if (wrap && Txt.segmenter) {
+    if (wrap) {
       this.element.innerText = '';
-      for (const word of Txt.segmenter.segment(this.formattedText())) {
-        this.element.appendChild(document.createTextNode(word.segment));
+
+      if (Txt.segmenter) {
+        for (const word of Txt.segmenter.segment(this.formattedText())) {
+          this.element.appendChild(document.createTextNode(word.segment));
+        }
+      } else {
+        for (const word of this.formattedText().split('')) {
+          this.element.appendChild(document.createTextNode(word));
+        }
       }
     } else if (this.styles.whiteSpace === 'pre') {
       this.element.innerText = '';
@@ -138,13 +144,6 @@ export class Txt extends Shape {
       }
     } else {
       this.element.innerText = this.formattedText();
-    }
-
-    if (wrap && !Txt.segmenter) {
-      useLogger().warn({
-        message: 'Wrapping is not supported',
-        inspect: this.key,
-      });
     }
   }
 }

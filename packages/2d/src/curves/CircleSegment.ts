@@ -1,6 +1,7 @@
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Segment} from './Segment';
 import {clamp} from '@motion-canvas/core/lib/tweening';
+import {CurvePoint} from './CurvePoint';
 
 export class CircleSegment extends Segment {
   private readonly length: number;
@@ -31,7 +32,7 @@ export class CircleSegment extends Segment {
     const startAngle = this.from.radians + from * this.angle * counterFactor;
     const endAngle = this.to.radians - (1 - to) * this.angle * counterFactor;
 
-    if (Math.abs(from - to) > 0.0001) {
+    if (Math.abs(this.angle) > 0.0001) {
       context.arc(
         this.center.x,
         this.center.y,
@@ -53,15 +54,15 @@ export class CircleSegment extends Segment {
     ];
   }
 
-  public getPoint(distance: number): [Vector2, Vector2] {
+  public getPoint(distance: number): CurvePoint {
     const counterFactor = this.counter ? -1 : 1;
     const angle = this.from.radians + distance * this.angle * counterFactor;
 
     const tangent = Vector2.fromRadians(angle);
 
-    return [
-      this.center.add(tangent.scale(this.radius)),
-      this.counter ? tangent : tangent.flipped,
-    ];
+    return {
+      position: this.center.add(tangent.scale(this.radius)),
+      tangent: this.counter ? tangent : tangent.flipped,
+    };
   }
 }
