@@ -1,6 +1,9 @@
 import * as path from 'path';
 import puppeteer from 'puppeteer';
 import {createServer} from 'vite';
+import {fileURLToPath} from 'url';
+
+const Root = fileURLToPath(new URL('.', import.meta.url));
 
 (async () => {
   console.log('Rendering...');
@@ -8,8 +11,8 @@ import {createServer} from 'vite';
   const [browser] = await Promise.all([
     puppeteer.launch({headless: false}),
     createServer({
-      root: __dirname,
-      configFile: path.resolve(__dirname, '../vite.config.ts'),
+      root: Root,
+      configFile: path.resolve(Root, '../vite.config.ts'),
       server: {
         port: 9000,
       },
@@ -17,5 +20,5 @@ import {createServer} from 'vite';
   ]);
 
   const page = await browser.newPage();
-  await page.goto('http://localhost:9000/project');
+  await page.goto('http://localhost:9000/project/renderer');
 })();

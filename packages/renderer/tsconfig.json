@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
-    "outDir": "lib",
+    "outDir": "dist",
     "strict": true,
-    "module": "commonjs",
+    "module": "esnext",
     "esModuleInterop": true,
-    "target": "es2021",
+    "target": "esnext",
     "moduleResolution": "node",
     "declaration": true,
     "allowSyntheticDefaultImports": true,

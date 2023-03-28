@@ -5,9 +5,10 @@
   "author": "Tim Hawkins <timothyhaydenhawkins@gmail.com>",
   "homepage": "https://motioncanvas.io/",
   "license": "MIT",
-  "main": "lib/main.js",
+  "main": "dist/main.js",
+  "type": "module",
   "directories": {
-    "lib": "lib",
+    "dist": "dist",
     "test": "__tests__"
   },
   "files": [
@@ -20,7 +21,7 @@
   "scripts": {
     "build": "ttsc",
     "watch": "ttsc -w",
-    "render": "node ./lib/render.js"
+    "render": "node ./dist/render.js"
   },
   "bugs": {
     "url": "https://github.com/motion-canvas/motion-canvas/issues"
