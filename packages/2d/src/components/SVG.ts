@@ -385,6 +385,11 @@ export class SVG extends Shape {
       yield from.data(to.data(), time, timing);
     if (from instanceof Layout && to instanceof Layout)
       yield from.size(to.size(), time, timing);
+    if (from instanceof Shape && to instanceof Shape) {
+      yield from.fill(to.fill(), time, timing);
+      yield from.stroke(to.stroke(), time, timing);
+      yield from.lineWidth(to.lineWidth(), time, timing);
+    }
 
     const fromChildren = from.children();
     const toChildren = to.children();
