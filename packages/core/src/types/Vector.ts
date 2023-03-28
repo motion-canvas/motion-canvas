@@ -1,7 +1,7 @@
 import {arcLerp, InterpolationFunction} from '../tweening';
 import {map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
-import {Type} from './Type';
+import {EPSILON, Type} from './Type';
 import {
   CompoundSignal,
   CompoundSignalContext,
@@ -117,8 +117,37 @@ export class Vector2 implements Type {
     return new Vector2(Math.cos(radians), Math.sin(radians));
   }
 
+  /**
+   * Return the angle in radians between the vector described by x and y and the
+   * positive x-axis.
+   *
+   * @param x - The x component of the vector.
+   * @param y - The y component of the vector.
+   */
+  public static radians(x: number, y: number) {
+    return Math.atan2(y, x);
+  }
+
+  /**
+   * Return the angle in degrees between the vector described by x and y and the
+   * positive x-axis.
+   *
+   * @param x - The x component of the vector.
+   * @param y - The y component of the vector.
+   *
+   * @remarks
+   * The returned angle will be between -180 and 180 degrees.
+   */
+  public static degrees(x: number, y: number) {
+    return (Vector2.radians(x, y) * 180) / Math.PI;
+  }
+
   public static magnitude(x: number, y: number) {
     return Math.sqrt(x * x + y * y);
+  }
+
+  public static squaredMagnitude(x: number, y: number) {
+    return x * x + y * y;
   }
 
   public get width(): number {
@@ -141,6 +170,10 @@ export class Vector2 implements Type {
     return Vector2.magnitude(this.x, this.y);
   }
 
+  public get squaredMagnitude(): number {
+    return Vector2.squaredMagnitude(this.x, this.y);
+  }
+
   public get normalized(): Vector2 {
     return this.scale(1 / Vector2.magnitude(this.x, this.y));
   }
@@ -161,8 +194,21 @@ export class Vector2 implements Type {
     return new Vector2(this.y, -this.x);
   }
 
+  /**
+   * Return the angle in radians between the vector and the positive x-axis.
+   */
   public get radians() {
-    return Math.atan2(this.y, this.x);
+    return Vector2.radians(this.x, this.y);
+  }
+
+  /**
+   * Return the angle in degrees between the vector and the positive x-axis.
+   *
+   * @remarks
+   * The returned angle will be between -180 and 180 degrees.
+   */
+  public get degrees() {
+    return Vector2.degrees(this.x, this.y);
   }
 
   public get ctg(): number {
@@ -270,7 +316,34 @@ export class Vector2 implements Type {
     return {x: this.x, y: this.y};
   }
 
+  /**
+   * Check if two vectors are exactly equal to each other.
+   *
+   * @remarks
+   * If you need to compensate for floating point inaccuracies, use the
+   * {@link equals} method, instead.
+   *
+   * @param other - The vector to compare.
+   */
   public exactlyEquals(other: Vector2): boolean {
     return this.x === other.x && this.y === other.y;
+  }
+
+  /**
+   * Check if two vectors are equal to each other.
+   *
+   * @remarks
+   * This method allows passing an allowed error margin when comparing vectors
+   * to compensate for floating point inaccuracies. To check if two vectors are
+   * exactly equal, use the {@link exactlyEquals} method, instead.
+   *
+   * @param other - The vector to compare.
+   * @param threshold - The allowed error threshold when comparing the vectors.
+   */
+  public equals(other: Vector2, threshold = EPSILON): boolean {
+    return (
+      Math.abs(this.x - other.x) <= threshold + Number.EPSILON &&
+      Math.abs(this.y - other.y) <= threshold + Number.EPSILON
+    );
   }
 }

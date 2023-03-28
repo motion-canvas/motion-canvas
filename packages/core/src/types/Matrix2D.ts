@@ -1,4 +1,4 @@
-import {EPSILON} from './Matrix';
+import {Type, EPSILON} from './Type';
 import {PossibleVector2, Vector2} from './Vector';
 
 export type PossibleMatrix2D =
@@ -28,7 +28,11 @@ export type PossibleMatrix2D =
  *   - (rA)^-1 = r^-1 A^-1, r != 0 does not hold for a Matrix2D
  *   - r(AB) = (rA)B = A(rB) does not hold for a Matrix2D
  */
-export class Matrix2D {
+export class Matrix2D implements Type {
+  public static readonly symbol = Symbol.for(
+    '@motion-canvas/core/types/Matrix2D',
+  );
+
   public readonly values: Float32Array = new Float32Array(6);
   public static readonly identity: Matrix2D = new Matrix2D(1, 0, 0, 1, 0, 0);
   public static readonly zero: Matrix2D = new Matrix2D(0, 0, 0, 0, 0, 0);
@@ -657,14 +661,23 @@ export class Matrix2D {
     );
   }
 
+  public toSymbol(): symbol {
+    return Matrix2D.symbol;
+  }
+
   public equals(other: Matrix2D, threshold: number = EPSILON): boolean {
     return (
-      Math.abs(this.values[0] - other.values[0]) <= threshold &&
-      Math.abs(this.values[1] - other.values[1]) <= threshold &&
-      Math.abs(this.values[2] - other.values[2]) <= threshold &&
-      Math.abs(this.values[3] - other.values[3]) <= threshold &&
-      Math.abs(this.values[4] - other.values[4]) <= threshold &&
-      Math.abs(this.values[5] - other.values[5]) <= threshold
+      Math.abs(this.values[0] - other.values[0]) <=
+        threshold + Number.EPSILON &&
+      Math.abs(this.values[1] - other.values[1]) <=
+        threshold + Number.EPSILON &&
+      Math.abs(this.values[2] - other.values[2]) <=
+        threshold + Number.EPSILON &&
+      Math.abs(this.values[3] - other.values[3]) <=
+        threshold + Number.EPSILON &&
+      Math.abs(this.values[4] - other.values[4]) <=
+        threshold + Number.EPSILON &&
+      Math.abs(this.values[5] - other.values[5]) <= threshold + Number.EPSILON
     );
   }
 
