@@ -11,14 +11,7 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
-import {
-  SVGProps,
-  SVG as SVGNode,
-  ParsedSVG,
-  SVGChildNode,
-  RawSVGChild,
-  RawSVG,
-} from './SVG';
+import {SVGProps, SVG as SVGNode, ParsedSVG, RawSVGChild, RawSVG} from './SVG';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
@@ -141,13 +134,6 @@ export class Latex extends SVGNode {
     };
     Latex.texNodesPool[key] = newSVG;
     return this.buildParsedSVG(newSVG);
-  }
-
-  protected override isNodeEqual(
-    aNode: SVGChildNode,
-    bNode: SVGChildNode,
-  ): boolean {
-    return aNode.id === bNode.id;
   }
 
   private texToSvg(subtexs: string[]) {

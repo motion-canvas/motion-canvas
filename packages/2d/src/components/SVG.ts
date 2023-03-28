@@ -295,18 +295,6 @@ export class SVG extends Shape {
     }
   }
 
-  protected isNodeEqual(aNode: SVGChildNode, bNode: SVGChildNode): boolean {
-    if (aNode.shape.constructor !== bNode.shape.constructor) return false;
-    if (
-      aNode.shape instanceof Path &&
-      bNode.shape instanceof Path &&
-      aNode.shape.data() !== bNode.shape.data()
-    )
-      return false;
-
-    return true;
-  }
-
   private getShapeMap(svg: ParsedSVG) {
     const map: Record<string, SVGChildNode[]> = {};
     for (const node of svg.nodes) {
