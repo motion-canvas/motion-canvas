@@ -27,8 +27,6 @@ export interface RawSVGChild {
   id: string;
   type: new (props: NodeProps) => Node;
   props: ShapeProps;
-  transformation: DOMMatrix;
-  bbox: BBox;
   children?: RawSVGChild[];
 }
 
@@ -277,8 +275,6 @@ export class SVG extends Shape {
       yield {
         id: id || 'path',
         type: Path,
-        transformation,
-        bbox,
         props: {
           data,
           ...SVG.getMatrixTransformation(transformation),
@@ -295,8 +291,6 @@ export class SVG extends Shape {
       yield {
         id: id || 'rect',
         type: Rect,
-        bbox,
-        transformation,
         props: {
           width,
           height,
@@ -468,9 +462,7 @@ export class SVG extends Shape {
   ) {
     const newValue = typeof value == 'string' ? value : value();
     const newSVG = this.parseSVG(newValue);
-    const ct = Date.now();
     const diff = this.diffSVG(this.parsed(), newSVG);
-    useLogger().info(`diff time ${(Date.now() - ct) / 1000}`);
 
     for (const node of diff.inserted) this.wrapper.insert(node.shape);
 
