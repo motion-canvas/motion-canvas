@@ -263,7 +263,7 @@ export class SVG extends Shape {
       const path = new Path({
         data,
       });
-      const bbox = path.getPathBBox();
+      const bbox = path.getCurrentPathBBox();
       const center = bbox.center;
       const transformation = transformMatrix.translate(center.x, center.y);
       yield {
