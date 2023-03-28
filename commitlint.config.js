@@ -14,6 +14,7 @@ module.exports = {
         'examples',
         'legacy',
         'player',
+        'renderer',
         'ui',
         'vite-plugin',
       ],
