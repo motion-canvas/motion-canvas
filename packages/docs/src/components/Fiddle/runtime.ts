@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {makeScene2D} from '@motion-canvas/2d';
 import {jsx, Fragment} from '@motion-canvas/2d/lib/jsx-runtime';
 import * as components from '@motion-canvas/2d/lib/components';

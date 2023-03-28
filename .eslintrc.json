@@ -33,7 +33,7 @@
         "leadingUnderscore": "forbid",
         "trailingUnderscore": "forbid",
         "filter": {
-          "regex": "^(__html|_jsx|_jsxs|_Fragment)$",
+          "regex": "^(__html)$",
           "match": false
         }
       },

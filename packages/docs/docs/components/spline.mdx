@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 slug: /spline
 ---
 
@@ -34,8 +34,8 @@ export default makeScene2D(function* (view) {
 });
 ```
 
-The `Spline` component allows us to draw and animate smooth curves through a
-series of control points.
+The [`Spline`][spline] component allows us to draw and animate smooth curves
+through a series of control points.
 
 ## Defining control points
 
@@ -220,9 +220,8 @@ property.
 ```
 
 `auto` should be a value between `0` and `1` and represents the percentage of
-how much to blend between the user-provided handles and auto-calculated handles.
-A value of `1` means to use the auto handles while a value of `0` means using
-the user handles.
+how much to blend between the user-provided handles (`0`) and auto-calculated
+handles (`1`).
 
 :::tip
 
@@ -248,7 +247,7 @@ export default makeScene2D(function* (view) {
   const knots: Knot[] = [];
 
   view.add(
-    <Spline lineWidth={16} stroke={'lightseagreen'} closed>
+    <Spline lineWidth={16} stroke={'lightseagreen'} lineJoin={'round'} closed>
       <Knot
         ref={makeRef(knots, 0)}
         position={[-50, -80]}
@@ -335,18 +334,26 @@ export default makeScene2D(function* (view) {
 
 ### Animating the knots of a spline
 
-Since the `Knot` node is a regular Motion Canvas component, it can be animated
-in much the same way as other components.
+`Knot`s can be animated in much the same way as other components.
 
 :::note
 
 Animating a spline's knots is only possible when using the
-[Knot](#using-knot-nodes) component, not when using the `points` property.
+[`Knot`](#using-knot-nodes) component, not when using the `points` property.
 
 :::
 
 Below are a few examples of interesting effects that can be achieved by
 animating different properties of knots.
+
+:::tip
+
+You can think of `startHandle` and `endHandle` as being the children of the
+Knot—changing the knot's position, rotation and scale will also transform the
+handles. The only exceptions are `auto` handles which are unaffected by these
+transformations.
+
+:::
 
 <Tabs>
   <TabItem value='position' label='Position' default>
@@ -382,16 +389,6 @@ export default makeScene2D(function* (view) {
 
   <TabItem value="rotation" label="Rotation">
 
-Since `startHandle` and `endHandle` are relative to the knot, rotating the knot
-will also change the handle positions.
-
-:::caution
-
-Note that animating a knot's `rotation` is only possible if its `auto` value is
-less than `1`.
-
-:::
-
 ```tsx editor
 export default makeScene2D(function* (view) {
   const knot = createRef<Knot>();
@@ -411,16 +408,6 @@ export default makeScene2D(function* (view) {
   </TabItem>
 
   <TabItem value="scale" label="Scale">
-
-Since `startHandle` and `endHandle` are relative to the knot, scaling the knot
-will also change the handle positions.
-
-:::caution
-
-Note that animating a knot's `scale` is only possible if its `auto` value is
-less than `1`.
-
-:::
 
 ```tsx editor
 export default makeScene2D(function* (view) {
@@ -444,9 +431,8 @@ export default makeScene2D(function* (view) {
 
 ### Animating objects along a spline
 
-Splines are often used to animate objects along a path. The same is possible in
-Motion Canvas by using the `getPointAtPercentage` method of the `Spline`
-component.
+Splines can be useful to model the path that an object should follow. You can
+use the `getPointAtPercentage` method to achieve this.
 
 ```tsx editor
 export default makeScene2D(function* (view) {
@@ -486,6 +472,7 @@ The `getPointAtPercentage` method returns a [`CurvePoint`][curve-point] object
 which contains the position of the point that sits at the given percentage along
 the spline's arclength as well as the point's tangent vector.
 
+[spline]: /api/2d/components/Spline
 [knot]: /api/2d/components/Knot
 [line]: /api/2d/components/Line
 [cardinal-spline]:
