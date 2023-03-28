@@ -457,8 +457,7 @@ export default makeScene2D(function* (view) {
         fill={'lightseagreen'}
         position={() => spline().getPointAtPercentage(progress()).position}
         rotation={() =>
-          (spline().getPointAtPercentage(progress()).tangent.radians * 180) /
-          Math.PI
+          spline().getPointAtPercentage(progress()).tangent.degrees
         }
       />,
     </>,
