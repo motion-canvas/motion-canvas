@@ -267,7 +267,7 @@ export class SVG extends Shape {
       const center = bbox.center;
       const transformation = transformMatrix.translate(center.x, center.y);
       yield {
-        id,
+        id: id || 'path',
         type: Path,
         transformation,
         bbox,
@@ -285,7 +285,7 @@ export class SVG extends Shape {
       const center = bbox.center;
       const transformation = transformMatrix.translate(center.x, center.y);
       yield {
-        id,
+        id: id || 'rect',
         type: Rect,
         bbox,
         transformation,

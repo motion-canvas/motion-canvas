@@ -93,23 +93,38 @@ export class Latex extends SVGNode {
     return subtexs.join('');
   }
 
+  private getNodeCharacterId({id}: RawSVGChild) {
+    if (!id.includes('-')) return id;
+    return id.substring(id.lastIndexOf('-') + 1);
+  }
+
   protected override parseSVG(svg: string): ParsedSVG {
     const subtexs = this.svgSubTexMap[svg]!;
     const key = `[${subtexs.join(',')}]::${JSON.stringify(this.options())}`;
     const cached = Latex.texNodesPool[key];
     if (cached && (cached.size.x > 0 || cached.size.y > 0))
       return this.buildParsedSVG(Latex.texNodesPool[key]);
-    const raw = SVGNode.parseSVGasRaw(svg);
+    const oldSVG = SVGNode.parseSVGasRaw(svg);
+    const oldNodes = [...oldSVG.nodes];
 
     const newNodes: RawSVGChild[] = [];
-    let index = 0;
     for (const sub of subtexs) {
-      const subsvg = this.singleTexToSVG(sub);
+      const subsvg = this.subTexToSVG(sub);
       const subnodes = SVGNode.parseSVGasRaw(subsvg).nodes;
 
-      const currentIndex = index + subnodes.length;
-      const children = raw.nodes.slice(index, currentIndex);
-      index = currentIndex;
+      const firstId = this.getNodeCharacterId(subnodes[0]);
+      const spliceIndex = oldNodes.findIndex(
+        node => this.getNodeCharacterId(node) === firstId,
+      );
+      const children = oldNodes.splice(spliceIndex, subnodes.length);
+
+      if (children.length == 1) {
+        newNodes.push({
+          ...children[0],
+          id: sub,
+        });
+        continue;
+      }
 
       const points = children.reduce<Vector2[]>((prev, current) => {
         prev.push(
@@ -151,15 +166,15 @@ export class Latex extends SVGNode {
         children: translatedChildren,
       });
     }
-    if (raw.nodes.length !== index)
-      useLogger().warn('matching between Latex SVG and subtex failed');
+    if (oldNodes.length > 0)
+      useLogger().error('matching between Latex SVG and subtex failed');
 
-    const rawParsed: RawSVG = {
-      size: raw.size,
+    const newSVG: RawSVG = {
+      size: oldSVG.size,
       nodes: newNodes,
     };
-    Latex.texNodesPool[key] = rawParsed;
-    return this.buildParsedSVG(rawParsed);
+    Latex.texNodesPool[key] = newSVG;
+    return this.buildParsedSVG(newSVG);
   }
 
   protected override isNodeEqual(
@@ -174,6 +189,31 @@ export class Latex extends SVGNode {
     const svg = this.singleTexToSVG(singleTex);
     this.svgSubTexMap[svg] = subtexs;
     return svg;
+  }
+
+  private subTexToSVG(subtex: string) {
+    let tex = subtex.trim();
+    if (
+      ['\\overline', '\\sqrt', '\\sqrt{'].includes(tex) ||
+      tex.endsWith('_') ||
+      tex.endsWith('^') ||
+      tex.endsWith('dot')
+    )
+      tex += '{\\quad}';
+
+    if (tex === '\\substack') tex = '\\quad';
+
+    const numLeft = tex.match(/\\left[()[\]|.\\]/g)?.length ?? 0;
+    const numRight = tex.match(/\\right[()[\]|.\\]/g)?.length ?? 0;
+    if (numLeft !== numRight) {
+      tex = tex.replace(/\\left/g, '\\big').replace(/\\right/g, '\\big');
+    }
+
+    const hasArrayBegin = tex.includes('\\begin{array}');
+    const hasArrayEnd = tex.includes('\\end{array}');
+    if (hasArrayBegin !== hasArrayEnd) tex = '';
+
+    return this.singleTexToSVG(tex);
   }
 
   private singleTexToSVG(tex: string): string {
