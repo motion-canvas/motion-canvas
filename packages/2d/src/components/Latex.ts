@@ -23,7 +23,7 @@ import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Node} from './Node';
-import {BBox, Vector2} from '@motion-canvas/core/lib/types';
+import {BBox} from '@motion-canvas/core/lib/types';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -126,44 +126,13 @@ export class Latex extends SVGNode {
         continue;
       }
 
-      const points = children.reduce<Vector2[]>((prev, current) => {
-        prev.push(
-          ...BBox.fromSizeCentered(current.bbox.size).corners.map(x =>
-            x.transformAsPoint(current.transformation),
-          ),
-        );
-        return prev;
-      }, []);
-      const bbox = BBox.fromPoints(...points);
-      const center = bbox.center;
-      const parentTransformation = new DOMMatrix().translateSelf(
-        -center.x,
-        -center.y,
-      );
-      const translatedChildren = children.map<RawSVGChild>(
-        ({props, transformation, ...rest}) => {
-          const childTransformation =
-            parentTransformation.multiply(transformation);
-          return {
-            props: {
-              ...props,
-              ...SVGNode.getMatrixTransformation(childTransformation),
-            },
-            transformation: childTransformation,
-            ...rest,
-          };
-        },
-      );
-
       newNodes.push({
         id: sub,
         type: Node,
-        props: {
-          position: bbox.center,
-        },
-        bbox,
-        transformation: parentTransformation,
-        children: translatedChildren,
+        props: {},
+        children,
+        transformation: new DOMMatrix(),
+        bbox: new BBox(),
       });
     }
     if (oldNodes.length > 0)

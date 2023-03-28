@@ -375,17 +375,54 @@ export class SVG extends Shape {
     return diff;
   }
 
-  private cloneNodeExact(node: Node, extraProps?: NodeProps) {
+  private cloneNodeExact(node: Node) {
     const props: ShapeProps = {
       position: node.position(),
       scale: node.scale(),
       rotation: node.rotation(),
-      ...extraProps,
+      children: node.children().map(child => this.cloneNodeExact(child)),
     };
     if (node instanceof Layout) {
       props.size = node.size();
     }
     return node.clone(props);
+  }
+
+  protected transformNode(
+    currentShape: Node,
+    fromShape: Node,
+    toShape: Node,
+    progress: number,
+  ) {
+    const eased = easeInOutSine(progress);
+    currentShape.position(
+      Vector2.lerp(fromShape.position(), toShape.position(), eased),
+    );
+    currentShape.scale(Vector2.lerp(fromShape.scale(), toShape.scale(), eased));
+    currentShape.rotation(
+      easeInOutSine(progress, fromShape.rotation(), toShape.rotation()),
+    );
+
+    if (currentShape instanceof Layout)
+      currentShape.size(
+        Vector2.lerp(
+          (fromShape as Layout).size(),
+          (toShape as Layout).size(),
+          eased,
+        ),
+      );
+
+    const currentChildren = currentShape.children();
+    const fromChildren = fromShape.children();
+    const toChildren = toShape.children();
+    for (let i = 0; i < currentChildren.length; i++) {
+      this.transformNode(
+        currentChildren[i],
+        fromChildren[i],
+        toChildren[i],
+        progress,
+      );
+    }
   }
 
   @threadable()
@@ -432,30 +469,14 @@ export class SVG extends Shape {
       value => {
         const progress = timingFunction(value);
         const remapped = clampRemap(beginning, ending, 0, 1, progress);
-        const eased = easeInOutSine(remapped);
 
         for (const node of transformed) {
-          const currentShape = node.current.shape;
-          const fromShape = node.from.shape;
-          const toShape = node.to.shape;
-          currentShape.position(
-            Vector2.lerp(fromShape.position(), toShape.position(), eased),
+          this.transformNode(
+            node.current.shape,
+            node.from.shape,
+            node.to.shape,
+            remapped,
           );
-          currentShape.scale(
-            Vector2.lerp(fromShape.scale(), toShape.scale(), eased),
-          );
-          currentShape.rotation(
-            easeInOutSine(remapped, fromShape.rotation(), toShape.rotation()),
-          );
-
-          if (currentShape instanceof Layout)
-            currentShape.size(
-              Vector2.lerp(
-                (fromShape as Layout).size(),
-                (toShape as Layout).size(),
-                eased,
-              ),
-            );
         }
 
         const scale = this.wrapper.scale();
