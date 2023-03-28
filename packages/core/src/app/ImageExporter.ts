@@ -1,20 +1,34 @@
-import type {RendererSettings} from './Renderer';
-import type {Exporter} from './Exporter';
-import type {Logger} from './Logger';
-import type {CanvasOutputMimeType} from '../types';
+import {CanvasOutputMimeType} from '../types';
+import {Exporter} from './Exporter';
+import {Logger} from './Logger';
+import {RendererSettings} from './Renderer';
+import {
+  BoolMetaField,
+  EnumMetaField,
+  NumberMetaField,
+  ObjectMetaField,
+  ValueOf,
+} from '../meta';
+import {clamp} from '../tweening';
+import {FileTypes} from './presets';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;
+
+type ImageExporterOptions = ValueOf<ReturnType<ImageExporter['meta']>>;
 
 /**
  * Image sequence exporter.
  */
 export class ImageExporter implements Exporter {
+  public readonly name = 'image sequence';
+
   private readonly frameLookup = new Map<number, Callback>();
   private frameCounter = 0;
-  private name = 'unknown';
+  private projectName = 'unknown';
   private quality = 1;
   private fileType: CanvasOutputMimeType = 'image/png';
+  private groupByScene = false;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -24,10 +38,26 @@ export class ImageExporter implements Exporter {
     }
   }
 
+  public meta() {
+    const meta = new ObjectMetaField(this.name, {
+      fileType: new EnumMetaField('file type', FileTypes),
+      quality: new NumberMetaField('quality', 100).setRange(0, 100),
+      groupByScene: new BoolMetaField('group by scene', false),
+    });
+
+    meta.fileType.onChanged.subscribe(value => {
+      meta.quality.disable(value === 'image/png');
+    });
+
+    return meta;
+  }
+
   public async configure(settings: RendererSettings) {
-    this.name = settings.name;
-    this.quality = settings.quality;
-    this.fileType = settings.fileType;
+    const options = settings.exporter.options as ImageExporterOptions;
+    this.projectName = settings.name;
+    this.quality = clamp(0, 1, options.quality / 100);
+    this.fileType = options.fileType;
+    this.groupByScene = options.groupByScene;
   }
 
   public async start() {
@@ -37,6 +67,8 @@ export class ImageExporter implements Exporter {
   public async handleFrame(
     canvas: HTMLCanvasElement,
     frame: number,
+    sceneFrame: number,
+    sceneName: string,
     signal: AbortSignal,
   ) {
     if (this.frameLookup.has(frame)) {
@@ -56,12 +88,16 @@ export class ImageExporter implements Exporter {
         this.frameCounter--;
         this.frameLookup.delete(frame);
       });
+
       import.meta.hot!.send('motion-canvas:export', {
         frame,
-        isStill: false,
+        sceneFrame,
         data: canvas.toDataURL(this.fileType, this.quality),
         mimeType: this.fileType,
-        project: this.name,
+        subDirectories: this.groupByScene
+          ? [this.projectName, sceneName]
+          : [this.projectName],
+        groupByScene: this.groupByScene,
       });
     }
   }

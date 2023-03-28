@@ -86,34 +86,37 @@ export function PlaybackControls() {
         onChange={speed => player.setSpeed(speed)}
       />
       <IconCheckbox
-        titleOn="Mute audio"
-        titleOff="Unmute audio"
+        titleOn="Mute audio [M]"
+        titleOff="Unmute audio [M]"
         checked={!state.muted}
         onChange={value => player.toggleAudio(value)}
       >
         {state.muted ? <VolumeOff /> : <VolumeOn />}
       </IconCheckbox>
       <IconButton
-        title="Previous frame"
+        title="Previous frame [Left arrow]"
         onClick={() => player.requestPreviousFrame()}
       >
         <SkipPrevious />
       </IconButton>
       <IconCheckbox
         main
-        titleOn="Pause"
-        titleOff="Play"
+        titleOn="Pause [Space]"
+        titleOff="Play [Space]"
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
       >
         {state.paused ? <PlayArrow /> : <Pause />}
       </IconCheckbox>
-      <IconButton title="Next frame" onClick={() => player.requestNextFrame()}>
+      <IconButton
+        title="Next frame [Right arrow]"
+        onClick={() => player.requestNextFrame()}
+      >
         <SkipNext />
       </IconButton>
       <IconCheckbox
-        titleOn="Loop video (Enabled)"
-        titleOff="Loop video (Disabled)"
+        titleOn="Disable looping [L]"
+        titleOff="Enable looping [L]"
         checked={state.loop}
         onChange={() => player.toggleLoop()}
       >

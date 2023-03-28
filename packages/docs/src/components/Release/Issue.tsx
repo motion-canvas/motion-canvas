@@ -5,7 +5,7 @@ import PullRequest from '@site/src/components/Release/PullRequest';
 
 export interface IssueProps {
   user: string;
-  pr: number;
+  pr?: number;
   children: ReactNode | ReactNode[];
 }
 
@@ -14,7 +14,7 @@ export default function Issue({user, pr, children}: IssueProps) {
     <li className={styles.element}>
       <Contributor name={user} />
       {children}
-      <PullRequest id={pr} />
+      {pr && <PullRequest id={pr} />}
     </li>
   );
 }

@@ -1,9 +1,24 @@
 import type {RendererResult, RendererSettings} from './Renderer';
+import {MetaField} from '../meta';
 
 /**
  * The main interface for implementing custom exporters.
  */
 export interface Exporter {
+  /**
+   * The name of this exporter.
+   *
+   * @remarks
+   * This name will be displayed in the editor and used to store the related
+   * settings.
+   */
+  readonly name: string;
+
+  /**
+   * Create a meta field representing the options of this exporter.
+   */
+  meta(): MetaField<any>;
+
   /**
    * Prepare the rendering configuration.
    *
@@ -35,11 +50,15 @@ export interface Exporter {
    *
    * @param canvas - A canvas containing the rendered frame.
    * @param frame - The frame number.
+   * @param sceneFrame - The frame number within the scene.
+   * @param sceneName - The name of the scene with which the frame is associated.
    * @param signal - An abort signal triggered if the user aborts the rendering.
    */
   handleFrame(
     canvas: HTMLCanvasElement,
     frame: number,
+    sceneFrame: number,
+    sceneName: string,
     signal: AbortSignal,
   ): Promise<void>;
 

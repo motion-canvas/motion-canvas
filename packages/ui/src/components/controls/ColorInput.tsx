@@ -2,6 +2,9 @@ import styles from './Controls.module.scss';
 import clsx from 'clsx';
 import {ColorPreview} from './ColorPreview';
 import {Color} from '@motion-canvas/core/lib/types';
+import {valid} from 'chroma-js';
+import {Input} from './Input';
+import {shake} from '../animations';
 
 export interface ColorInputProps {
   value: Color | null;
@@ -11,8 +14,19 @@ export interface ColorInputProps {
 export function ColorInput({value, onChange}: ColorInputProps) {
   return (
     <div className={clsx(styles.input, styles.color)}>
-      <input
-        onChange={event => onChange((event.target as HTMLInputElement).value)}
+      <Input
+        onChange={event => {
+          const input = event.target as HTMLInputElement;
+          const newValue = input.value;
+          if (!newValue || valid(newValue)) {
+            onChange(newValue);
+          } else {
+            input.value = value?.serialize() ?? '';
+            input.parentElement.animate(shake(2), {
+              duration: 300,
+            });
+          }
+        }}
         placeholder="none"
         type="text"
         value={value?.serialize() ?? ''}

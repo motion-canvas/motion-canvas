@@ -162,6 +162,25 @@ export function strokeRect(context: CanvasRenderingContext2D, rect: BBox) {
   context.strokeRect(rect.x, rect.y, rect.width, rect.height);
 }
 
+export function drawPolygon(
+  path: CanvasRenderingContext2D | Path2D,
+  rect: BBox,
+  sides: number,
+) {
+  const size = rect.size.scale(0.5);
+  for (let i = 0; i <= sides; i++) {
+    const theta = (i * 2 * Math.PI) / sides;
+    const direction = Vector2.fromRadians(theta).perpendicular;
+    const vertex = direction.mul(size);
+    if (i == 0) {
+      moveTo(path, vertex);
+    } else {
+      lineTo(path, vertex);
+    }
+  }
+  path.closePath();
+}
+
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
@@ -246,4 +265,28 @@ export function arc(
     endAngle,
     counterclockwise,
   );
+}
+
+export function bezierCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint1: Vector2,
+  controlPoint2: Vector2,
+  to: Vector2,
+) {
+  context.bezierCurveTo(
+    controlPoint1.x,
+    controlPoint1.y,
+    controlPoint2.x,
+    controlPoint2.y,
+    to.x,
+    to.y,
+  );
+}
+
+export function quadraticCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint: Vector2,
+  to: Vector2,
+) {
+  context.quadraticCurveTo(controlPoint.x, controlPoint.y, to.x, to.y);
 }

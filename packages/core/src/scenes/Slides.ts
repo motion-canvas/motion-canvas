@@ -7,6 +7,7 @@ export interface Slide {
   name: string;
   time: number;
   scene: Scene;
+  stack?: string;
 }
 
 export class Slides {
@@ -80,6 +81,7 @@ export class Slides {
           name,
           time: initialTime,
           scene: this.scene,
+          stack: new Error().stack,
         });
       }
 

@@ -4,19 +4,21 @@ import {CurrentTime} from '../playback/CurrentTime';
 import {EditorPreview} from './EditorPreview';
 import styles from './Viewport.module.scss';
 import {useApplication} from '../../contexts';
-import {RenderingPreview} from './RenderingPreview';
+import {CustomStage} from './CustomStage';
 import {RendererState} from '@motion-canvas/core';
+import {useShortcut} from '../../hooks/useShortcut';
 
 export function Viewport() {
-  const {player} = useApplication();
+  const [hoverRef] = useShortcut<HTMLDivElement>('viewport');
+  const {player, renderer} = useApplication();
   const duration = useDuration();
   const {speed} = usePlayerState();
   const state = useRendererState();
 
   return (
-    <div className={styles.root}>
+    <div ref={hoverRef} className={styles.root}>
       {state === RendererState.Working ? (
-        <RenderingPreview />
+        <CustomStage stage={renderer.stage} />
       ) : (
         <EditorPreview />
       )}

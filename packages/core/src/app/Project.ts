@@ -1,10 +1,12 @@
 import {FullSceneDescription} from '../scenes';
 import {Logger} from './Logger';
-import {ProjectMetadata} from './ProjectMetadata';
+import type {ProjectMetadata} from './ProjectMetadata';
+import type {Plugin} from '../plugin';
 
 export interface ProjectSettings {
   name?: string;
   scenes: FullSceneDescription[];
+  plugins?: Plugin[];
   logger?: Logger;
   audio?: string;
   audioOffset?: number;
@@ -14,17 +16,24 @@ export interface ProjectSettings {
 export interface Project {
   name: string;
   scenes: FullSceneDescription[];
+  plugins: Plugin[];
   logger: Logger;
   meta: ProjectMetadata;
   audio?: string;
   audioOffset?: number;
   variables?: Record<string, unknown>;
+  versions: {
+    core: string;
+    two: string | null;
+    ui: string | null;
+    vitePlugin: string | null;
+  };
 }
 
 export function makeProject(settings: ProjectSettings) {
   return {
     logger: new Logger(),
-    meta: new ProjectMetadata(),
+    plugins: [],
     ...settings,
   };
 }

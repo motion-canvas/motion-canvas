@@ -107,6 +107,7 @@ export abstract class GeneratorScene<T>
     return this.previousScene;
   }
 
+  protected resolutionScale: number;
   private runnerFactory: ThreadGeneratorFactory<T>;
   private previousScene: Scene | null = null;
   private runner: ThreadGenerator | null = null;
@@ -120,6 +121,7 @@ export abstract class GeneratorScene<T>
   ) {
     this.name = description.name;
     this.size = description.size;
+    this.resolutionScale = description.resolutionScale;
     this.logger = description.logger;
     this.playback = description.playback;
     this.meta = description.meta;
@@ -174,12 +176,16 @@ export abstract class GeneratorScene<T>
     config,
     size,
     stack,
+    resolutionScale,
   }: SceneDescriptionReload<ThreadGeneratorFactory<T>> = {}) {
     if (config) {
       this.runnerFactory = config;
     }
     if (size) {
       this.size = size;
+    }
+    if (resolutionScale) {
+      this.resolutionScale = resolutionScale;
     }
     if (stack) {
       this.creationStack = stack;

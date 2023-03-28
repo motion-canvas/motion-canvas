@@ -1,0 +1,479 @@
+---
+sidebar_position: 3
+slug: /spline
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Spline
+
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Spline, Knot} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {waitFor} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const spline = createRef<Spline>();
+
+  view.add(
+    <Spline ref={spline} lineWidth={4} fill={'#e13238'} closed>
+      <Knot position={[-120, -30]} startHandle={[0, 70]} />
+      <Knot
+        position={[0, -50]}
+        startHandle={[-40, -60]}
+        endHandle={[40, -60]}
+      />
+      <Knot position={[120, -30]} startHandle={[0, -70]} />
+      <Knot position={[0, 100]} startHandle={[5, 0]} />
+    </Spline>,
+  );
+
+  yield* spline().scale(0.9, 0.6).to(1, 0.4);
+});
+```
+
+The [`Spline`][spline] component allows us to draw and animate smooth curves
+through a series of control points.
+
+## Defining control points
+
+In order to draw a spline, we need to specify what its knots are. The `Spline`
+component provides multiple ways of specifying these control points which we
+will go through in this section.
+
+### Using the `points` property
+
+The easiest way to define a spline's knots is by passing an array of positions
+via the spline's `points` property. Each point will be treated as the position
+of one of the spline's knots.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  view.add(
+    <Spline
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      points={[
+        [-300, 0],
+        [-150, -100],
+        [150, 100],
+        [300, 0],
+      ]}
+    />,
+  );
+});
+```
+
+The result is a curve that smoothly passes through each of the provided points.
+
+:::info
+
+Remember to provide a `lineWidth` and `stroke` to the spline as it won't be
+visible otherwise. Alternatively, you may also specify a `fill` color.
+
+:::
+
+We can alter the shape of the curve by passing a value between `0` and `1` to
+the `smoothness` property.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const spline = createRef<Spline>();
+
+  view.add(
+    <Spline
+      ref={spline}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      smoothness={0.4}
+      points={[
+        [-300, 0],
+        [-150, -100],
+        [150, 100],
+        [300, 0],
+      ]}
+    />,
+  );
+
+  yield* spline().smoothness(0, 1).to(1, 1).to(0.4, 1);
+});
+```
+
+While defining the knots in this way is very simple and can be enough for simple
+curves, there is an important limitation to this method: we cannot alter the
+position of the knot's handles. Instead, the handles get calculated
+automatically so that the curve passes smoothly through each point without any
+sharp or sudden turns.
+
+:::info Fun fact
+
+The auto handles are calculated based on the positions of a knot's two
+neighboring knots. A spline that calculates the handle positions of its knots in
+this way is called a [Cardinal Spline][cardinal-spline].
+
+:::
+
+Let's look at the second way of defining knots to learn how we can more finely
+control the shape of our spline.
+
+### Using `Knot` nodes
+
+The second way of defining knots is by—fittingly—using the [Knot][knot] node.
+The same spline from above can also be written like this.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  view.add(
+    <Spline lineWidth={6} stroke={'lightseagreen'}>
+      <Knot position={[-300, 0]} />
+      <Knot position={[-150, -100]} />
+      <Knot position={[150, 100]} />
+      <Knot position={[300, 0]} />
+    </Spline>,
+  );
+});
+```
+
+As you can see, we get the exact same shape we did when using the `points`
+property. The advantage of defining the knots with `Knot` nodes is that it also
+allows us to control the positions of each knot's handles via the `startHandle`
+and `endHandle` properties.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  view.add(
+    <Spline lineWidth={6} stroke={'lightseagreen'}>
+      <Knot position={[-300, 0]} />
+      <Knot position={[-150, -100]} endHandle={[-100, 0]} />
+      <Knot position={[150, 100]} startHandle={[100, 0]} />
+      <Knot position={[300, 0]} />
+    </Spline>,
+  );
+});
+```
+
+Note that handle positions are relative to the knot's position.
+
+:::note
+
+Similar to using the `points` property, if no explicit handles are provided for
+a knot, the handles get calculated automatically so that the curve smoothly
+passes through the knot.
+
+:::
+
+#### Mirrored handles
+
+Handles are mirrored by default. This means that when we provide only one of the
+handles of a knot, the other one will implicitly be set to a flipped version of
+the provided handle.
+
+```tsx
+<Knot startHandle={[100, 50]} />
+// Is the same as
+<Knot startHandle={[100, 50]} endHandle={[-100, -50]} />
+```
+
+#### Broken knots
+
+Providing both `startHandle` and `endHandle` results in a so-called **broken
+knot**. Broken knots are very useful because they allow us to add sharp corners
+to our spline.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  view.add(
+    <Spline lineWidth={16} stroke={'lightseagreen'} closed>
+      <Knot position={[-50, -80]} startHandle={[0, 20]} endHandle={[90, 0]} />
+      <Knot position={[50, 0]} />
+      <Knot position={[-50, 80]} startHandle={[90, 0]} endHandle={[0, -20]} />
+    </Spline>,
+  );
+});
+```
+
+#### Blending between user handles and calculated handles
+
+By default, the auto-calculated handles get ignored when at least one of the
+`startHandle` or `endHandle` properties is provided. However, it is possible to
+blend between user-provided and auto-calculated handles by using the `auto`
+property.
+
+```tsx {6,13}
+<Spline lineWidth={16} stroke={'lightseagreen'} closed>
+  <Knot
+    position={[-50, -80]}
+    startHandle={[0, 20]}
+    endHandle={[90, 0]}
+    auto={0.5}
+  />
+  <Knot position={[50, 0]} />
+  <Knot
+    position={[-50, 80]}
+    startHandle={[90, 0]}
+    endHandle={[0, -20]}
+    auto={0.5}
+  />
+</Spline>
+```
+
+`auto` should be a value between `0` and `1` and represents the percentage of
+how much to blend between the user-provided handles (`0`) and auto-calculated
+handles (`1`).
+
+:::tip
+
+`auto` is a compound signal, which means you can specify `startHandleAuto` and
+`endHandleAuto` to individually control the blend of each handle.
+
+```tsx {5-6}
+<Knot
+  position={[0, 0]}
+  startHandle={[-50, -50]}
+  endHandle={[30, 0]}
+  startHandleAuto={0.3}
+  endHandleAuto={0.8}
+/>
+```
+
+:::
+
+Since `auto` is a signal, it can also be animated.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const knots: Knot[] = [];
+
+  view.add(
+    <Spline lineWidth={16} stroke={'lightseagreen'} lineJoin={'round'} closed>
+      <Knot
+        ref={makeRef(knots, 0)}
+        position={[-50, -80]}
+        startHandle={[0, 20]}
+        endHandle={[90, 0]}
+      />
+      <Knot position={[50, 0]} />
+      <Knot
+        ref={makeRef(knots, 1)}
+        position={[-50, 80]}
+        startHandle={[90, 0]}
+        endHandle={[0, -20]}
+      />
+    </Spline>,
+  );
+
+  yield* all(...knots.map(knot => knot.auto(1, 1).to(0, 1)));
+});
+```
+
+## Animating splines
+
+While animating splines isn't too different from animating any other node, this
+section aims to illustrate a few of the most common use cases.
+
+### Drawing splines
+
+Similar to the [`Line`][line] component, the `Spline` node provides `start` and
+`end` signals which allow us to control the segment of the curve that should be
+visible. Both `start` and `end` are values between `0` and `1` and represent the
+percentage of the spline's arclength from which to start drawing from.
+
+```tsx {7-8}
+<Spline
+  points={[
+    [-300, 0],
+    [-150, -100],
+    [150, 100],
+  ]}
+  start={0.4}
+  end={0.8}
+/>
+```
+
+The example above would draw the spline starting at 40% of the spline's
+arclength (`start={0.4}`) and draw it up until 80% of the spline's arclength
+(`end={0.8}`).
+
+:::note
+
+When using `start` and `end` in conjunction with `startOffset` and `endOffset`,
+`start` and `end` will be relative to the _remaining_ length of the spline after
+taking the offset into account.
+
+:::
+
+We can then animate drawing a spline by tweening these properties:
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const spline = createRef<Spline>();
+
+  view.add(
+    <Spline
+      ref={spline}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      points={[
+        [-300, 0],
+        [-150, -100],
+        [150, 100],
+        [300, 0],
+      ]}
+      end={0}
+    />,
+  );
+
+  yield* spline().end(1, 1.5);
+  yield* spline().start(1, 1.5).to(0.5, 1);
+  yield* spline().end(0.5, 1);
+  yield* all(spline().start(0, 1.5), spline().end(1, 1.5));
+});
+```
+
+### Animating the knots of a spline
+
+`Knot`s can be animated in much the same way as other components.
+
+:::note
+
+Animating a spline's knots is only possible when using the
+[`Knot`](#using-knot-nodes) component, not when using the `points` property.
+
+:::
+
+Below are a few examples of interesting effects that can be achieved by
+animating different properties of knots.
+
+:::tip
+
+You can think of `startHandle` and `endHandle` as being the children of the
+Knot—changing the knot's position, rotation and scale will also transform the
+handles. The only exceptions are `auto` handles which are unaffected by these
+transformations.
+
+:::
+
+<Tabs>
+  <TabItem value='position' label='Position' default>
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const knotPositions: PossibleVector2[] = [
+    [-200, 0],
+    [-100, -80],
+    [0, 80],
+    [100, -80],
+    [200, 0],
+  ];
+  const knots: Knot[] = [];
+
+  view.add(
+    <Spline lineWidth={6} stroke={'lightseagreen'}>
+      {knotPositions.map((pos, i) => (
+        <Knot ref={makeRef(knots, i)} position={pos} />
+      ))}
+    </Spline>,
+  );
+
+  yield* all(
+    knots[1].position.y(80, 1).to(-80, 1),
+    knots[2].position.y(-80, 1).to(80, 1),
+    knots[3].position.y(80, 1).to(-80, 1),
+  );
+});
+```
+
+  </TabItem>
+
+  <TabItem value="rotation" label="Rotation">
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const knot = createRef<Knot>();
+
+  view.add(
+    <Spline lineWidth={6} stroke={'lightseagreen'}>
+      <Knot position={[-100, 30]} />
+      <Knot ref={knot} position={[0, -50]} startHandle={[-70, 0]} />
+      <Knot position={[100, 30]} />
+    </Spline>,
+  );
+
+  yield* knot().rotation(360, 3, linear).to(0, 3);
+});
+```
+
+  </TabItem>
+
+  <TabItem value="scale" label="Scale">
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const knot = createRef<Knot>();
+
+  view.add(
+    <Spline lineWidth={6} stroke={'lightseagreen'}>
+      <Knot position={[-100, 30]} />
+      <Knot ref={knot} position={[0, -50]} startHandle={[-70, 0]} />
+      <Knot position={[100, 30]} />
+    </Spline>,
+  );
+
+  yield* knot().scale(3, 2).to(0.2, 2).to(1, 1);
+});
+```
+
+  </TabItem>
+
+</Tabs>
+
+### Animating objects along a spline
+
+Splines can be useful to model the path that an object should follow. You can
+use the `getPointAtPercentage` method to achieve this.
+
+```tsx editor
+export default makeScene2D(function* (view) {
+  const spline = createRef<Spline>();
+  const progress = createSignal(0);
+
+  view.add(
+    <>
+      <Spline
+        ref={spline}
+        lineWidth={6}
+        stroke={'lightgray'}
+        points={[
+          [-300, 0],
+          [-150, -100],
+          [150, 100],
+          [300, 0],
+        ]}
+      />
+      <Rect
+        size={26}
+        fill={'lightseagreen'}
+        position={() => spline().getPointAtPercentage(progress()).position}
+        rotation={() =>
+          spline().getPointAtPercentage(progress()).tangent.degrees
+        }
+      />,
+    </>,
+  );
+
+  yield* progress(1, 2).to(0, 2);
+});
+```
+
+The `getPointAtPercentage` method returns a [`CurvePoint`][curve-point] object
+which contains the position of the point that sits at the given percentage along
+the spline's arclength as well as the point's tangent vector.
+
+[spline]: /api/2d/components/Spline
+[knot]: /api/2d/components/Knot
+[line]: /api/2d/components/Line
+[cardinal-spline]:
+  https://en.wikipedia.org/wiki/Cubic_Hermite_spline#Cardinal_spline
+[curve-point]: /api/2d/curves/CurvePoint
