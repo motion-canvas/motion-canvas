@@ -11,8 +11,7 @@
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
     "dev": "ttsc -w",
-    "build": "ttsc",
-    "watch": "ttsc -w"
+    "build": "ttsc"
   },
   "repository": {
     "type": "git",

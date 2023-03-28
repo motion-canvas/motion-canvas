@@ -9,8 +9,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "ttsc -w",
-    "build": "ttsc",
-    "watch": "ttsc -w"
+    "build": "ttsc"
   },
   "repository": {
     "type": "git",
