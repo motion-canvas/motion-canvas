@@ -1,7 +1,7 @@
 import {arcLerp, InterpolationFunction} from '../tweening';
 import {map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
-import {Type} from './Type';
+import {EPSILON, Type} from './Type';
 import {
   CompoundSignal,
   CompoundSignalContext,
@@ -136,10 +136,10 @@ export class Vector2 implements Type {
    * @param y - The y component of the vector.
    *
    * @remarks
-   * The returned angle will be between 0 and 360 degrees.
+   * The returned angle will be between -180 and 180 degrees.
    */
   public static degrees(x: number, y: number) {
-    return (360 + (Vector2.radians(x, y) * 180) / Math.PI) % 360;
+    return (Vector2.radians(x, y) * 180) / Math.PI;
   }
 
   public static magnitude(x: number, y: number) {
@@ -205,7 +205,7 @@ export class Vector2 implements Type {
    * Return the angle in degrees between the vector and the positive x-axis.
    *
    * @remarks
-   * The returned angle will be between 0 and 360 degrees.
+   * The returned angle will be between -180 and 180 degrees.
    */
   public get degrees() {
     return Vector2.degrees(this.x, this.y);
@@ -338,12 +338,12 @@ export class Vector2 implements Type {
    * exactly equal, use the {@link exactlyEquals} method, instead.
    *
    * @param other - The vector to compare.
-   * @param epsilon - The allowed error threshold when comparing the vectors.
+   * @param threshold - The allowed error threshold when comparing the vectors.
    */
-  public equals(other: Vector2, epsilon = 0.000001): boolean {
+  public equals(other: Vector2, threshold = EPSILON): boolean {
     return (
-      Math.abs(this.x - other.x) <= epsilon + Number.EPSILON &&
-      Math.abs(this.y - other.y) <= epsilon + Number.EPSILON
+      Math.abs(this.x - other.x) <= threshold + Number.EPSILON &&
+      Math.abs(this.y - other.y) <= threshold + Number.EPSILON
     );
   }
 }

@@ -47,9 +47,9 @@ describe('Vector2', () => {
     [[0, 1], 90],
     [[-1, 1], 135],
     [[-1, 0], 180],
-    [[-1, -1], 225],
-    [[0, -1], 270],
-    [[1, -1], 315],
+    [[-1, -1], -135],
+    [[0, -1], -90],
+    [[1, -1], -45],
   ])(
     'Computes angle of vector with positive x-axis in degrees: (%s, %s)',
     (points, expected) => {
