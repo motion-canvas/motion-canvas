@@ -23,7 +23,6 @@ import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Node} from './Node';
-import {BBox} from '@motion-canvas/core/lib/types';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -131,8 +130,6 @@ export class Latex extends SVGNode {
         type: Node,
         props: {},
         children,
-        transformation: new DOMMatrix(),
-        bbox: new BBox(),
       });
     }
     if (oldNodes.length > 0)
