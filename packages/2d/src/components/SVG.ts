@@ -16,6 +16,7 @@ import {
 import {Layout} from './Layout';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {View2D} from './View2D';
+import {all, delay} from '@motion-canvas/core/lib/flow';
 
 export interface SVGChildNode {
   id: string;
@@ -51,6 +52,13 @@ interface SVGDiff {
     from: SVGChildNode;
     to: SVGChildNode;
   }>;
+}
+
+interface TransformationInformation {
+  current: Node;
+  from: Node;
+  to: Node;
+  tweenPath: boolean;
 }
 
 export interface SVGProps extends ShapeProps {
@@ -411,18 +419,45 @@ export class SVG extends Shape {
           eased,
         ),
       );
+  }
 
-    const currentChildren = currentShape.children();
-    const fromChildren = fromShape.children();
-    const toChildren = toShape.children();
+  protected *extractTransformationInformation(
+    current: Node,
+    from: Node,
+    to: Node,
+  ): Generator<TransformationInformation> {
+    yield {
+      current,
+      from,
+      to,
+      tweenPath:
+        from instanceof Path && (from as Path).data() !== (to as Path).data(),
+    };
+    const currentChildren = current.children();
+    const fromChildren = from.children();
+    const toChildren = to.children();
     for (let i = 0; i < currentChildren.length; i++) {
-      this.transformNode(
+      yield* this.extractTransformationInformation(
         currentChildren[i],
         fromChildren[i],
         toChildren[i],
-        progress,
       );
     }
+  }
+
+  protected getTransformationList(transformed: SVGDiff['transformed']) {
+    const transformation: TransformationInformation[] = [];
+    for (const {from, to} of transformed) {
+      transformation.push(
+        ...this.extractTransformationInformation(
+          from.shape,
+          this.cloneNodeExact(from.shape),
+          to.shape,
+        ),
+      );
+    }
+
+    return transformation;
   }
 
   @threadable()
@@ -448,14 +483,7 @@ export class SVG extends Shape {
       this.wrapper.insert(node.from.shape);
     }
 
-    const transformed = diff.transformed.map(({from, ...rest}) => ({
-      from: {
-        id: from.id,
-        shape: this.cloneNodeExact(from.shape),
-      },
-      current: from,
-      ...rest,
-    }));
+    const transformed = this.getTransformationList(diff.transformed);
 
     const autoWidth = this.customWidth() == null;
     const autoHeight = this.customHeight() == null;
@@ -464,19 +492,26 @@ export class SVG extends Shape {
     const ending = 0.8;
     const overlap = 0.15;
 
-    yield* tween(
+    const pathTweenTime = 0.6 * time;
+    const pathTweenDelay = 0.2 * time;
+    const pathTweens = transformed
+      .filter(information => information.tweenPath)
+      .map(({current, to}) =>
+        (current as Path).data(
+          (to as Path).data,
+          pathTweenTime,
+          timingFunction,
+        ),
+      );
+
+    const baseTween = tween(
       time,
       value => {
         const progress = timingFunction(value);
         const remapped = clampRemap(beginning, ending, 0, 1, progress);
 
         for (const node of transformed) {
-          this.transformNode(
-            node.current.shape,
-            node.from.shape,
-            node.to.shape,
-            remapped,
-          );
+          this.transformNode(node.current, node.from, node.to, remapped);
         }
 
         const scale = this.wrapper.scale();
@@ -509,10 +544,11 @@ export class SVG extends Shape {
 
         for (const {shape} of diff.deleted) shape.dispose();
         for (const {from, current} of transformed) {
-          from.shape.dispose();
-          current.shape.dispose();
+          from.dispose();
+          current.dispose();
         }
       },
     );
+    yield* all(baseTween, delay(pathTweenDelay, all(...pathTweens)));
   }
 }
