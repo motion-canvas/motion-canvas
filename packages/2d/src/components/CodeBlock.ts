@@ -141,6 +141,15 @@ export class CodeBlock extends Shape {
     };
   }
 
+  protected hasCjk(char: string) {
+    let length = 0;
+    const result = char.match(
+      /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/,
+    );
+    if (result) length = result.length;
+    return length > 0;
+  }
+
   protected getTokensSize(tokens: Token[]) {
     const size = this.characterSize();
     let maxWidth = 0;
@@ -157,6 +166,9 @@ export class CodeBlock extends Shape {
           height += size.height;
         } else {
           width += size.width;
+          if (this.hasCjk(token.code[i])) {
+            width += size.width;
+          }
         }
       }
     }
@@ -330,6 +342,9 @@ export class CodeBlock extends Shape {
           globalAlpha * alpha * getSelectionAlpha(position.x, position.y);
         context.fillText(char, position.x * w, position.y * lh);
         position.x++;
+        if (this.hasCjk(char)) {
+          position.x++;
+        }
       }
     };
 
@@ -348,17 +363,49 @@ export class CodeBlock extends Shape {
       const beginning = 0.2;
       const ending = 0.8;
       const overlap = 0.15;
+
+      const cjkDeleteOffset = new Map();
+      const cjkCreateOffset = new Map();
+      for (const token of diffed) {
+        if (token.morph === 'delete') {
+          cjkDeleteOffset.set(token.from![1], 0);
+        }
+        if (token.morph === 'create') {
+          cjkCreateOffset.set(token.to![1], 0);
+        }
+      }
+
       for (const token of diffed) {
         context.save();
         context.fillStyle = token.color ?? '#c9d1d9';
 
+        let offsetChange = 0;
+        for (let i = 0; i < token.code.length; i++) {
+          const char = token.code.charAt(i);
+          if (this.hasCjk(char)) {
+            offsetChange++;
+          }
+        }
+
         if (token.morph === 'delete') {
+          if (offsetChange) {
+            cjkDeleteOffset.set(
+              token.from![1],
+              cjkDeleteOffset.get(token.from![1]) + offsetChange,
+            );
+          }
           drawToken(
             token.code,
             {x: token.from![0], y: token.from![1]},
             clampRemap(0, beginning + overlap, 1, 0, progress),
           );
         } else if (token.morph === 'create') {
+          if (offsetChange) {
+            cjkCreateOffset.set(
+              token.to![1],
+              cjkCreateOffset.get(token.to![1]) + offsetChange,
+            );
+          }
           drawToken(
             token.code,
             {x: token.to![0], y: token.to![1]},
@@ -366,7 +413,19 @@ export class CodeBlock extends Shape {
           );
         } else if (token.morph === 'retain') {
           const remapped = clampRemap(beginning, ending, 0, 1, progress);
-          const x = easeInOutSine(remapped, token.from![0], token.to![0]);
+          let xFromOffset = 0;
+          let xToOffset = 0;
+          if (cjkDeleteOffset.get(token.from![1])) {
+            xFromOffset = cjkDeleteOffset.get(token.from![1]);
+          }
+          if (cjkCreateOffset.get(token.to![1])) {
+            xToOffset = cjkCreateOffset.get(token.to![1]);
+          }
+          const x = easeInOutSine(
+            remapped,
+            token.from![0] + xFromOffset,
+            token.to![0] + xToOffset,
+          );
           const y = easeInOutSine(remapped, token.from![1], token.to![1]);
           const point: CodePoint = remapped > 0.5 ? token.to! : token.from!;
 
@@ -386,6 +445,9 @@ export class CodeBlock extends Shape {
 
             context.fillText(char, (x + offsetX) * w, (y + offsetY) * lh);
             offsetX++;
+            if (this.hasCjk(char)) {
+              offsetX++;
+            }
           }
         } else {
           useLogger().warn({
