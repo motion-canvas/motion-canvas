@@ -388,29 +388,37 @@ export class CodeBlock extends Shape {
         }
 
         if (token.morph === 'delete') {
+          let xFromOffset = 0;
+          if (cjkDeleteOffset.get(token.from![1])) {
+            xFromOffset = cjkDeleteOffset.get(token.from![1]);
+          }
+          drawToken(
+            token.code,
+            {x: token.from![0] + xFromOffset, y: token.from![1]},
+            clampRemap(0, beginning + overlap, 1, 0, progress),
+          );
           if (offsetChange) {
             cjkDeleteOffset.set(
               token.from![1],
               cjkDeleteOffset.get(token.from![1]) + offsetChange,
             );
           }
+        } else if (token.morph === 'create') {
+          let xToOffset = 0;
+          if (cjkCreateOffset.get(token.to![1])) {
+            xToOffset = cjkCreateOffset.get(token.to![1]);
+          }
           drawToken(
             token.code,
-            {x: token.from![0], y: token.from![1]},
-            clampRemap(0, beginning + overlap, 1, 0, progress),
+            {x: token.to![0] + xToOffset, y: token.to![1]},
+            clampRemap(ending - overlap, 1, 0, 1, progress),
           );
-        } else if (token.morph === 'create') {
           if (offsetChange) {
             cjkCreateOffset.set(
               token.to![1],
               cjkCreateOffset.get(token.to![1]) + offsetChange,
             );
           }
-          drawToken(
-            token.code,
-            {x: token.to![0], y: token.to![1]},
-            clampRemap(ending - overlap, 1, 0, 1, progress),
-          );
         } else if (token.morph === 'retain') {
           const remapped = clampRemap(beginning, ending, 0, 1, progress);
           let xFromOffset = 0;
