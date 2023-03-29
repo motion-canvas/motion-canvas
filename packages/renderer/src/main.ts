@@ -1,6 +1,12 @@
 import type {Project} from '@motion-canvas/core';
 import {Renderer} from '@motion-canvas/core';
 
+declare global {
+  interface Window {
+    onRenderComplete: () => void;
+  }
+}
+
 export const render = async (project: Project) => {
   try {
     const renderer = new Renderer(project);
@@ -9,7 +15,7 @@ export const render = async (project: Project) => {
       name: project.name,
     });
   } finally {
-    // @ts-ignore
     window.onRenderComplete();
+    console.log('Rendering complete.');
   }
 };

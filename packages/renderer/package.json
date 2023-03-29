@@ -1,5 +1,5 @@
 {
-  "name": "renderer",
+  "name": "@motion-canvas/renderer",
   "version": "3.3.4",
   "description": "A headless renderer for Motion Canvas",
   "author": "Tim Hawkins <timothyhaydenhawkins@gmail.com>",

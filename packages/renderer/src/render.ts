@@ -15,7 +15,7 @@ const Root = fileURLToPath(new URL('.', import.meta.url));
     return console.log(`Project couldn't be found.`);
 
   const [browser, server] = await Promise.all([
-    puppeteer.launch({headless: false}),
+    puppeteer.launch({headless: true}),
     createServer({
       root: Root,
       configFile: path.resolve(Root, '../vite.config.ts'),
