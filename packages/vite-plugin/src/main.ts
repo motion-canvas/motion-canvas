@@ -168,10 +168,12 @@ export default ({
       const {name, dir} = path.posix.parse(base);
 
       if (id.startsWith(resolvedRendererId)) {
-        if (projects.length === 1) {
+        const params = new URLSearchParams(query);
+        const name = params.get('project');
+        if (name && name in projectLookup) {
           return source(
             `import {render} from '${editor}';`,
-            `import project from '${projects[0].url}?project';`,
+            `import project from '${projectLookup[name].url}?project';`,
             `render(project);`,
           );
         }
@@ -373,12 +375,11 @@ export default ({
         if (name && name in projectLookup) {
           if (service === 'renderer') {
             res.setHeader('Content-Type', 'text/html');
-            res.end(createHtml(`/@id/__x00__virtual:renderer`));
+            res.end(createHtml(`/@id/__x00__virtual:renderer?project=${name}`));
             return;
           }
 
           res.setHeader('Content-Type', 'text/html');
-          console.log(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
           res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
           return;
         }
