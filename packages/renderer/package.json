@@ -2,7 +2,6 @@
   "name": "@motion-canvas/renderer",
   "version": "3.3.4",
   "description": "A headless renderer for Motion Canvas",
-  "author": "Tim Hawkins <timothyhaydenhawkins@gmail.com>",
   "homepage": "https://motioncanvas.io/",
   "license": "MIT",
   "main": "dist/main.js",
@@ -22,6 +21,11 @@
     "build": "ttsc",
     "watch": "ttsc -w",
     "render": "node ./dist/render.js"
+  },
+  "devDependencies": {
+    "@motion-canvas/core": "*",
+    "@motion-canvas/vite-plugin": "*",
+    "puppeteer": "^19.3.0"
   },
   "bugs": {
     "url": "https://github.com/motion-canvas/motion-canvas/issues"
