@@ -19,37 +19,37 @@ import {View2D} from './View2D';
 import {all, delay} from '@motion-canvas/core/lib/flow';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 
-export interface SVGChildNode {
+export interface SVGShape {
   id: string;
   shape: Node;
 }
 
-export interface RawSVGChild {
+export interface SVGShapeData {
   id: string;
   type: new (props: NodeProps) => Node;
   props: ShapeProps;
-  children?: RawSVGChild[];
+  children?: SVGShapeData[];
 }
 
-export interface ParsedSVG {
+export interface SVGDocument {
   size: Vector2;
-  nodes: SVGChildNode[];
+  nodes: SVGShape[];
 }
 
-export interface RawSVG {
+export interface SVGDocumentData {
   size: Vector2;
-  nodes: RawSVGChild[];
+  nodes: SVGShapeData[];
 }
 
 interface SVGDiff {
   fromSize: Vector2;
   toSize: Vector2;
-  inserted: Array<SVGChildNode>;
-  deleted: Array<SVGChildNode>;
+  inserted: Array<SVGShape>;
+  deleted: Array<SVGShape>;
   transformed: Array<{
     insert: boolean;
-    from: SVGChildNode;
-    to: SVGChildNode;
+    from: SVGShape;
+    to: SVGShape;
   }>;
 }
 
@@ -64,7 +64,7 @@ export class SVG extends Shape {
     return element;
   })
   protected static containerElement: HTMLDivElement;
-  private static svgNodesPool: Record<string, RawSVG> = {};
+  private static svgNodesPool: Record<string, SVGDocumentData> = {};
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
   public wrapper: Node;
@@ -72,13 +72,13 @@ export class SVG extends Shape {
   public constructor(props: SVGProps) {
     super(props);
     this.wrapper = new Node({});
-    this.wrapper.children(this.parsedNodes);
+    this.wrapper.children(this.documentNodes);
     this.add(this.wrapper);
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
-    const {x, y} = this.parsed().size.mul(this.wrapper.scale());
+    const {x, y} = this.document().size.mul(this.wrapper.scale());
     return {
       x: custom.x ?? x,
       y: custom.y ?? y,
@@ -86,42 +86,45 @@ export class SVG extends Shape {
   }
 
   @computed()
-  private parsed() {
+  private document() {
     return this.parseSVG(this.svg());
   }
 
   @computed()
-  private parsedNodes() {
-    return this.parsed().nodes.map(node => node.shape);
+  private documentNodes() {
+    return this.document().nodes.map(node => node.shape);
   }
 
-  protected buildParsedSVG(builder: RawSVG): ParsedSVG {
+  protected buildDocument(data: SVGDocumentData): SVGDocument {
     return {
-      size: builder.size,
-      nodes: builder.nodes.map(ch => this.buildRawNode(ch)),
+      size: data.size,
+      nodes: data.nodes.map(ch => this.buildShape(ch)),
     };
   }
 
-  protected buildRawNode({
-    id,
-    type,
-    props,
-    children,
-  }: RawSVGChild): SVGChildNode {
+  protected buildShape({id, type, props, children}: SVGShapeData): SVGShape {
     return {
       id,
       shape: new type({
-        children: children?.map(ch => this.buildRawNode(ch).shape),
+        children: children?.map(ch => this.buildShape(ch).shape),
         ...this.processElementStyle(props),
       }),
     };
   }
 
-  protected parseSVG(svg: string): ParsedSVG {
-    return this.buildParsedSVG(SVG.parseSVGasRaw(svg));
+  private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
+    return {
+      fill: fill === 'currentColor' ? this.fill : fill,
+      stroke: stroke === 'currentColor' ? this.stroke : stroke,
+      ...rest,
+    };
   }
 
-  protected static parseSVGasRaw(svg: string) {
+  protected parseSVG(svg: string): SVGDocument {
+    return this.buildDocument(SVG.parseSVGData(svg));
+  }
+
+  protected static parseSVGData(svg: string) {
     const cached = SVG.svgNodesPool[svg];
     if (cached && (cached.size.x > 0 || cached.size.y > 0)) return cached;
 
@@ -144,7 +147,7 @@ export class SVG extends Shape {
     const nodes = Array.from(
       SVG.extractGroupNodes(svgRoot, svgRoot, rootTransform, {}),
     );
-    const builder: RawSVG = {
+    const builder: SVGDocumentData = {
       size,
       nodes,
     };
@@ -179,14 +182,6 @@ export class SVG extends Shape {
     };
   }
 
-  private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
-    return {
-      fill: fill === 'currentColor' ? this.fill : fill,
-      stroke: stroke === 'currentColor' ? this.stroke : stroke,
-      ...rest,
-    };
-  }
-
   protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
     const position = {
       x: transform.m41,
@@ -215,7 +210,7 @@ export class SVG extends Shape {
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<RawSVGChild> {
+  ): Generator<SVGShapeData> {
     for (const child of element.children) {
       if (!(child instanceof SVGGraphicsElement)) continue;
 
@@ -233,7 +228,7 @@ export class SVG extends Shape {
     svgRoot: Element,
     parentTransform: DOMMatrix,
     inheritedStyle: ShapeProps,
-  ): Generator<RawSVGChild> {
+  ): Generator<SVGShapeData> {
     const transformMatrix = SVG.getElementTransformation(
       child,
       parentTransform,
@@ -291,8 +286,8 @@ export class SVG extends Shape {
     }
   }
 
-  private getShapeMap(svg: ParsedSVG) {
-    const map: Record<string, SVGChildNode[]> = {};
+  private getShapeMap(svg: SVGDocument) {
+    const map: Record<string, SVGShape[]> = {};
     for (const node of svg.nodes) {
       if (!map[node.id]) map[node.id] = [];
 
@@ -301,7 +296,7 @@ export class SVG extends Shape {
     return map;
   }
 
-  private diffSVG(from: ParsedSVG, to: ParsedSVG): SVGDiff {
+  private diffSVG(from: SVGDocument, to: SVGDocument): SVGDiff {
     const diff: SVGDiff = {
       fromSize: from.size,
       toSize: to.size,
@@ -407,7 +402,7 @@ export class SVG extends Shape {
   ) {
     const newValue = typeof value == 'string' ? value : value();
     const newSVG = this.parseSVG(newValue);
-    const diff = this.diffSVG(this.parsed(), newSVG);
+    const diff = this.diffSVG(this.document(), newSVG);
 
     for (const node of diff.inserted) this.wrapper.insert(node.shape);
 
@@ -469,7 +464,7 @@ export class SVG extends Shape {
         for (const {shape} of diff.inserted) shape.opacity(insertedOpacity);
       },
       () => {
-        this.wrapper.children(this.parsedNodes);
+        this.wrapper.children(this.documentNodes);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
 

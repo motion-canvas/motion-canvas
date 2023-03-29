@@ -11,7 +11,13 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
-import {SVGProps, SVG as SVGNode, ParsedSVG, RawSVGChild, RawSVG} from './SVG';
+import {
+  SVGProps,
+  SVG as SVGNode,
+  SVGDocument,
+  SVGShapeData,
+  SVGDocumentData,
+} from './SVG';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
@@ -40,7 +46,7 @@ export class Latex extends SVGNode {
   })
   private static containerFontSize: number;
   private static svgContentsPool: Record<string, string> = {};
-  private static texNodesPool: Record<string, RawSVG> = {};
+  private static texNodesPool: Record<string, SVGDocumentData> = {};
   private svgSubTexMap: Record<string, string[]> = {};
 
   @initial({})
@@ -85,24 +91,24 @@ export class Latex extends SVGNode {
     return subtexs.join('');
   }
 
-  private getNodeCharacterId({id}: RawSVGChild) {
+  private getNodeCharacterId({id}: SVGShapeData) {
     if (!id.includes('-')) return id;
     return id.substring(id.lastIndexOf('-') + 1);
   }
 
-  protected override parseSVG(svg: string): ParsedSVG {
+  protected override parseSVG(svg: string): SVGDocument {
     const subtexs = this.svgSubTexMap[svg]!;
     const key = `[${subtexs.join(',')}]::${JSON.stringify(this.options())}`;
     const cached = Latex.texNodesPool[key];
     if (cached && (cached.size.x > 0 || cached.size.y > 0))
-      return this.buildParsedSVG(Latex.texNodesPool[key]);
-    const oldSVG = SVGNode.parseSVGasRaw(svg);
+      return this.buildDocument(Latex.texNodesPool[key]);
+    const oldSVG = SVGNode.parseSVGData(svg);
     const oldNodes = [...oldSVG.nodes];
 
-    const newNodes: RawSVGChild[] = [];
+    const newNodes: SVGShapeData[] = [];
     for (const sub of subtexs) {
       const subsvg = this.subTexToSVG(sub);
-      const subnodes = SVGNode.parseSVGasRaw(subsvg).nodes;
+      const subnodes = SVGNode.parseSVGData(subsvg).nodes;
 
       const firstId = this.getNodeCharacterId(subnodes[0]);
       const spliceIndex = oldNodes.findIndex(
@@ -128,12 +134,12 @@ export class Latex extends SVGNode {
     if (oldNodes.length > 0)
       useLogger().error('matching between Latex SVG and subtex failed');
 
-    const newSVG: RawSVG = {
+    const newSVG: SVGDocumentData = {
       size: oldSVG.size,
       nodes: newNodes,
     };
     Latex.texNodesPool[key] = newSVG;
-    return this.buildParsedSVG(newSVG);
+    return this.buildDocument(newSVG);
   }
 
   private texToSvg(subtexs: string[]) {
