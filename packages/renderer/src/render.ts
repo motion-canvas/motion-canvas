@@ -30,5 +30,6 @@ const Root = fileURLToPath(new URL('.', import.meta.url));
 
   await page.exposeFunction('onRenderComplete', async () => {
     await Promise.all([browser.close(), server.close()]);
+    console.log('Rendering complete.');
   });
 })();

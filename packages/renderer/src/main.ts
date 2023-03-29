@@ -16,6 +16,5 @@ export const render = async (project: Project) => {
     });
   } finally {
     window.onRenderComplete();
-    console.log('Rendering complete.');
   }
 };
