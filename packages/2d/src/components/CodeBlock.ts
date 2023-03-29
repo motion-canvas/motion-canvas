@@ -363,77 +363,25 @@ export class CodeBlock extends Shape {
       const beginning = 0.2;
       const ending = 0.8;
       const overlap = 0.15;
-
-      const cjkDeleteOffset = new Map();
-      const cjkCreateOffset = new Map();
-      for (const token of diffed) {
-        if (token.morph === 'delete') {
-          cjkDeleteOffset.set(token.from![1], 0);
-        }
-        if (token.morph === 'create') {
-          cjkCreateOffset.set(token.to![1], 0);
-        }
-      }
-
       for (const token of diffed) {
         context.save();
         context.fillStyle = token.color ?? '#c9d1d9';
 
-        let offsetChange = 0;
-        for (let i = 0; i < token.code.length; i++) {
-          const char = token.code.charAt(i);
-          if (this.hasCjk(char)) {
-            offsetChange++;
-          }
-        }
-
         if (token.morph === 'delete') {
-          let xFromOffset = 0;
-          if (cjkDeleteOffset.get(token.from![1])) {
-            xFromOffset = cjkDeleteOffset.get(token.from![1]);
-          }
           drawToken(
             token.code,
-            {x: token.from![0] + xFromOffset, y: token.from![1]},
+            {x: token.from![0], y: token.from![1]},
             clampRemap(0, beginning + overlap, 1, 0, progress),
           );
-          if (offsetChange) {
-            cjkDeleteOffset.set(
-              token.from![1],
-              cjkDeleteOffset.get(token.from![1]) + offsetChange,
-            );
-          }
         } else if (token.morph === 'create') {
-          let xToOffset = 0;
-          if (cjkCreateOffset.get(token.to![1])) {
-            xToOffset = cjkCreateOffset.get(token.to![1]);
-          }
           drawToken(
             token.code,
-            {x: token.to![0] + xToOffset, y: token.to![1]},
+            {x: token.to![0], y: token.to![1]},
             clampRemap(ending - overlap, 1, 0, 1, progress),
           );
-          if (offsetChange) {
-            cjkCreateOffset.set(
-              token.to![1],
-              cjkCreateOffset.get(token.to![1]) + offsetChange,
-            );
-          }
         } else if (token.morph === 'retain') {
           const remapped = clampRemap(beginning, ending, 0, 1, progress);
-          let xFromOffset = 0;
-          let xToOffset = 0;
-          if (cjkDeleteOffset.get(token.from![1])) {
-            xFromOffset = cjkDeleteOffset.get(token.from![1]);
-          }
-          if (cjkCreateOffset.get(token.to![1])) {
-            xToOffset = cjkCreateOffset.get(token.to![1]);
-          }
-          const x = easeInOutSine(
-            remapped,
-            token.from![0] + xFromOffset,
-            token.to![0] + xToOffset,
-          );
+          const x = easeInOutSine(remapped, token.from![0], token.to![0]);
           const y = easeInOutSine(remapped, token.from![1], token.to![1]);
           const point: CodePoint = remapped > 0.5 ? token.to! : token.from!;
 
