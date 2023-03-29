@@ -23,7 +23,6 @@
     "@motion-canvas/2d": "^3.3.4",
     "@motion-canvas/core": "^3.3.4",
     "@motion-canvas/ui": "^3.3.4",
-    "@motion-canvas/renderer": "^3.3.4",
     "@motion-canvas/vite-plugin": "^3.3.0"
   },
   "dependencies": {

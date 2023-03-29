@@ -71,14 +71,6 @@ const MANIFEST = JSON.parse(
         },
       ],
     },
-    {
-      type: 'toggle',
-      name: 'renderer',
-      message: 'Install headless renderer?',
-      initial: false,
-      active: 'yes',
-      inactive: 'no',
-    },
   ]);
 
   if (!response.language) {
@@ -97,9 +89,6 @@ const MANIFEST = JSON.parse(
     fs.readFileSync(path.join(templateDir, `package.json`), 'utf-8'),
   );
   manifest.name = response.name;
-
-  if (!response.renderer)
-    delete manifest.devDependencies['@motion-canvas/renderer'];
   if (manifest.dependencies) {
     cloneVersions(manifest.dependencies);
   }
