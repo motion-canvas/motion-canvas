@@ -260,11 +260,7 @@ export class SVG extends Shape {
         useLogger().warn('blank path data at ' + child.id);
         return;
       }
-      const path = new Path({
-        data,
-      });
-      const bbox = path.getCurrentPathBBox();
-      const center = bbox.center;
+      const center = Path.getPathBBox(data).center;
       const transformation = transformMatrix.translate(center.x, center.y);
       yield {
         id: id || 'path',
