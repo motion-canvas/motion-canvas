@@ -1,7 +1,5 @@
 import {Vector2} from './Vector';
 
-export const EPSILON = 0.000001;
-
 export function transformAngle(angle: number, matrix: DOMMatrix) {
   const radians = (angle / 180) * Math.PI;
   const vector = Vector2.fromRadians(radians).transform(matrix);

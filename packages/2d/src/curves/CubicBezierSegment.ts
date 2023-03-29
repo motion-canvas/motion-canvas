@@ -2,15 +2,14 @@ import {Vector2} from '@motion-canvas/core/lib/types';
 import {bezierCurveTo} from '../utils';
 import {PolynomialSegment} from './PolynomialSegment';
 import {Polynomial2D} from './Polynomial2D';
+import {lazy} from '@motion-canvas/core/lib/decorators';
 
 /**
  * A spline segment representing a cubic Bézier curve.
  */
 export class CubicBezierSegment extends PolynomialSegment {
-  private static el = document.createElementNS(
-    'http://www.w3.org/2000/svg',
-    'path',
-  );
+  @lazy(() => document.createElementNS('http://www.w3.org/2000/svg', 'path'))
+  private static el: SVGPathElement;
 
   public get points(): Vector2[] {
     return [this.p0, this.p1, this.p2, this.p3];
