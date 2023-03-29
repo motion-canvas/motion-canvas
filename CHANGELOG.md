@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
+
+### Bug Fixes
+
+- **2d:** clone size correctly
+  ([#562](https://github.com/motion-canvas/motion-canvas/issues/562))
+  ([cdd3df1](https://github.com/motion-canvas/motion-canvas/commit/cdd3df1bff25b04b905e289264831d8d328caaab)),
+  closes [#559](https://github.com/motion-canvas/motion-canvas/issues/559)
+- **2d:** fix CodeBlock types
+  ([#563](https://github.com/motion-canvas/motion-canvas/issues/563))
+  ([25160fa](https://github.com/motion-canvas/motion-canvas/commit/25160fa4d92af88429110356e42f6e3b4f88a90f)),
+  closes [#560](https://github.com/motion-canvas/motion-canvas/issues/560)
+- **docs:** support multiple fiddles
+  ([#572](https://github.com/motion-canvas/motion-canvas/issues/572))
+  ([899f133](https://github.com/motion-canvas/motion-canvas/commit/899f133dd6632e0ffa559bf3f258f94cf75891a7))
+- **docs:** support multiple fiddles again
+  ([#574](https://github.com/motion-canvas/motion-canvas/issues/574))
+  ([d1867e9](https://github.com/motion-canvas/motion-canvas/commit/d1867e90998f5e36f819779bb5473a43ca4b3d7e))
+- **ui:** fix zoom to fit
+  ([#561](https://github.com/motion-canvas/motion-canvas/issues/561))
+  ([1c947b4](https://github.com/motion-canvas/motion-canvas/commit/1c947b417e218809f33928d6cbb89d463bdc2e66))
+
+### Features
+
+- **2d:** add spline node
+  ([#514](https://github.com/motion-canvas/motion-canvas/issues/514))
+  ([3ce2111](https://github.com/motion-canvas/motion-canvas/commit/3ce2111309e698450dc4c6e2ad47024995863e73))
+- auto meta fields
+  ([#565](https://github.com/motion-canvas/motion-canvas/issues/565))
+  ([645af6d](https://github.com/motion-canvas/motion-canvas/commit/645af6d2b7e8d9332b6f08419c318ee9434d7f3f))
+- **core:** expand Vector2 type
+  ([#579](https://github.com/motion-canvas/motion-canvas/issues/579))
+  ([010bba5](https://github.com/motion-canvas/motion-canvas/commit/010bba593e1c3ce368ab409dce09dbde8f999958))
+- get name from meta file
+  ([#552](https://github.com/motion-canvas/motion-canvas/issues/552))
+  ([ae2ed8a](https://github.com/motion-canvas/motion-canvas/commit/ae2ed8a5998768f160ec340d8b63d600d27bc15c))
+- plugin architecture
+  ([#564](https://github.com/motion-canvas/motion-canvas/issues/564))
+  ([1c375b8](https://github.com/motion-canvas/motion-canvas/commit/1c375b81e0af8a76467d42dd46a7031adb9d71d3))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.4](https://github.com/motion-canvas/motion-canvas/compare/v3.3.3...v3.3.4) (2023-03-19)
 
 ### Bug Fixes

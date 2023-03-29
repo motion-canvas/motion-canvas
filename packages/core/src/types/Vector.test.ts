@@ -40,4 +40,81 @@ describe('Vector2', () => {
     expect(vector()).toMatchObject({x: 3, y: 2});
     expect(vector.x()).toBe(3);
   });
+
+  test.each([
+    [[0, 0], 0],
+    [[1, 1], 45],
+    [[0, 1], 90],
+    [[-1, 1], 135],
+    [[-1, 0], 180],
+    [[-1, -1], -135],
+    [[0, -1], -90],
+    [[1, -1], -45],
+  ])(
+    'Computes angle of vector with positive x-axis in degrees: (%s, %s)',
+    (points, expected) => {
+      const vector = new Vector2(points[0], points[1]);
+
+      expect(vector.degrees).toBe(expected);
+      expect(Vector2.degrees(points[0], points[1])).toBe(expected);
+    },
+  );
+
+  describe('equality', () => {
+    test('equal if all components are exactly equal', () => {
+      const a = new Vector2(2.5, 2.5);
+      const b = new Vector2(2.5, 2.5);
+
+      expect(a.equals(b)).toBe(true);
+      expect(b.equals(a)).toBe(true);
+    });
+
+    test('equal if all components are within epsilon of each other', () => {
+      const a = new Vector2(2.5, 2.5);
+      const b = new Vector2(2.499, 2.499);
+
+      expect(a.equals(b, 0.001)).toBe(true);
+      expect(b.equals(a, 0.001)).toBe(true);
+    });
+
+    test('not equal if not all components are within epsilon of each other', () => {
+      const a = new Vector2(2.5, 2.5);
+      const b = new Vector2(2.498, 2.498);
+
+      expect(a.equals(b, 0.001)).toBe(false);
+      expect(b.equals(a, 0.001)).toBe(false);
+    });
+
+    test('exactly equal if all components are exactly equal', () => {
+      const a = new Vector2(2.5, 2.5);
+      const b = new Vector2(2.5, 2.5);
+
+      expect(a.exactlyEquals(b)).toBe(true);
+      expect(b.exactlyEquals(a)).toBe(true);
+    });
+
+    test('not exactly equal if not all components are exactly equal', () => {
+      const a = new Vector2(2.5, 2.5);
+      const b = new Vector2(2.49, 2.49);
+
+      expect(a.exactlyEquals(b)).toBe(false);
+      expect(b.exactlyEquals(a)).toBe(false);
+    });
+  });
+
+  test.each([
+    [[0, 0], 0],
+    [[1, 0], 1],
+    [[0, 1], 1],
+    [[2, 1], 5],
+    [[-1, 3], 10],
+  ])(
+    'Computes the squared magnitude of the vector: (%s, %s)',
+    (points, expected) => {
+      const vector = new Vector2(points[0], points[1]);
+
+      expect(vector.squaredMagnitude).toBe(expected);
+      expect(Vector2.squaredMagnitude(points[0], points[1])).toBe(expected);
+    },
+  );
 });

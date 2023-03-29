@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
+
+### Bug Fixes
+
+- **2d:** clone size correctly
+  ([#562](https://github.com/motion-canvas/motion-canvas/issues/562))
+  ([cdd3df1](https://github.com/motion-canvas/motion-canvas/commit/cdd3df1bff25b04b905e289264831d8d328caaab)),
+  closes [#559](https://github.com/motion-canvas/motion-canvas/issues/559)
+- **2d:** fix CodeBlock types
+  ([#563](https://github.com/motion-canvas/motion-canvas/issues/563))
+  ([25160fa](https://github.com/motion-canvas/motion-canvas/commit/25160fa4d92af88429110356e42f6e3b4f88a90f)),
+  closes [#560](https://github.com/motion-canvas/motion-canvas/issues/560)
+
+### Features
+
+- **2d:** add spline node
+  ([#514](https://github.com/motion-canvas/motion-canvas/issues/514))
+  ([3ce2111](https://github.com/motion-canvas/motion-canvas/commit/3ce2111309e698450dc4c6e2ad47024995863e73))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.4](https://github.com/motion-canvas/motion-canvas/compare/v3.3.3...v3.3.4) (2023-03-19)
 
 ### Bug Fixes

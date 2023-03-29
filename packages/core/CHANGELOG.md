@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
+
+### Features
+
+- auto meta fields
+  ([#565](https://github.com/motion-canvas/motion-canvas/issues/565))
+  ([645af6d](https://github.com/motion-canvas/motion-canvas/commit/645af6d2b7e8d9332b6f08419c318ee9434d7f3f))
+- **core:** expand Vector2 type
+  ([#579](https://github.com/motion-canvas/motion-canvas/issues/579))
+  ([010bba5](https://github.com/motion-canvas/motion-canvas/commit/010bba593e1c3ce368ab409dce09dbde8f999958))
+- plugin architecture
+  ([#564](https://github.com/motion-canvas/motion-canvas/issues/564))
+  ([1c375b8](https://github.com/motion-canvas/motion-canvas/commit/1c375b81e0af8a76467d42dd46a7031adb9d71d3))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.4](https://github.com/motion-canvas/motion-canvas/compare/v3.3.3...v3.3.4) (2023-03-19)
 
 ### Bug Fixes

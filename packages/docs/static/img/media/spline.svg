@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 420 175">
+  <style>
+    @media (max-width: 420px) {
+      #curve {
+        stroke-width: 4;
+      }
+      #controls {
+        stroke-width: 2;
+      }
+      text {
+        font-size: 16px;
+        transform: translateY(1px);
+      }
+      rect {
+        width: 100px;
+      }
+    }
+  </style>
+
+  <path id="curve" stroke="#CCCCD3" stroke-width="3" d="M95.5 156c19-59.5 66-97.962 146.5-71 104.5 35 151 3.5 164.5-65.5"/>
+  <path id="controls" stroke="#CCCCD3" d="M95.5 156 114 97.5M162 58.5l183.5 61M393 88.5 406.5 20"/>
+  <circle cx="95" cy="156" r="5" fill="var(--ifm-color-primary)"/>
+  <circle cx="114" cy="97" r="3.5" fill="var(--ifm-background-color)" stroke="var(--ifm-color-primary)" stroke-width="1.5"/>
+  <circle cx="162" cy="59" r="3.5" fill="var(--ifm-background-color)" stroke="var(--ifm-color-primary)" stroke-width="1.5"/>
+  <circle cx="345" cy="119" r="3.5" fill="var(--ifm-background-color)" stroke="var(--ifm-color-primary)" stroke-width="1.5"/>
+  <circle cx="393" cy="89" r="3.5" fill="var(--ifm-background-color)" stroke="var(--ifm-color-primary)" stroke-width="1.5"/>
+  <circle cx="242" cy="85" r="5" fill="var(--ifm-color-primary)"/>
+  <circle cx="406" cy="19" r="5" fill="var(--ifm-color-primary)"/>
+
+  <rect width="93" height="63" x="5" y="7" fill="var(--hl-background)" rx="7"/>
+  <circle cx="23" cy="51" r="4.5" fill="var(--ifm-background-color)" stroke="var(--ifm-color-primary)" stroke-width="1.5"/>
+  <circle cx="23" cy="26" r="5" fill="var(--ifm-color-primary)"/>
+  <text xml:space="preserve" fill="var(--ifm-font-color-base)" font-family="var(--ifm-font-family-base)" font-size="13" font-weight="500" letter-spacing="0em" style="white-space:pre"><tspan x="35" y="30.5">Knot</tspan></text>
+  <text xml:space="preserve" fill="var(--ifm-font-color-base)" font-family="var(--ifm-font-family-base)" font-size="13" font-weight="500" letter-spacing="0em" style="white-space:pre"><tspan x="35" y="54.864">Handle</tspan></text>
+</svg>
