@@ -6,7 +6,7 @@ import ts from 'typescript';
 import {projectTemplate} from '../templates';
 import {createDir} from '../../utils/createDir';
 import {createFile} from '../../utils/createFile';
-import {getConfigFile, getLanguage} from '../../projectInfo';
+import {getProjectInfo} from '../../projectInfo';
 
 export async function addProject() {
   const response = await prompts({
@@ -21,7 +21,9 @@ export async function addProject() {
 }
 
 function isValidProjectName(projectName: string): boolean {
-  return fs.existsSync(path.resolve('src', `${projectName}.${getLanguage()}`));
+  return fs.existsSync(
+    path.resolve('src', `${projectName}.${getProjectInfo().language}`),
+  );
 }
 
 function isProjectArray(node: ts.Node): node is ts.ArrayLiteralExpression {
@@ -39,7 +41,7 @@ function addProjectToConfig(projectName: string) {
     const visitor: ts.Visitor = node => {
       if (isProjectArray(node)) {
         const newElement = ts.factory.createStringLiteral(
-          `./src/${projectName}.${getLanguage()}`,
+          `./src/${projectName}.${getProjectInfo().language}`,
         );
         return ts.factory.updateArrayLiteralExpression(node, [
           ...node.elements,
@@ -59,7 +61,7 @@ function addProjectToConfig(projectName: string) {
   try {
     const src = ts.createSourceFile(
       '',
-      fs.readFileSync(getConfigFile(), 'utf8'),
+      fs.readFileSync(getProjectInfo().configFile, 'utf8'),
       ts.ScriptTarget.Latest,
       true,
     );
@@ -68,7 +70,7 @@ function addProjectToConfig(projectName: string) {
 
     const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed});
     const result = printer.printNode(ts.EmitHint.Unspecified, newSrc, newSrc);
-    fs.writeFile(getConfigFile(), result, e => {
+    fs.writeFile(getProjectInfo().configFile, result, e => {
       if (e) throw e;
     });
   } catch (e) {
@@ -79,12 +81,12 @@ function addProjectToConfig(projectName: string) {
 async function createProject(projectName: string) {
   try {
     await createFile(
-      path.resolve('src', `${projectName}.${getLanguage()}`),
+      path.resolve('src', `${projectName}.${getProjectInfo().language}`),
       projectTemplate(),
     );
     await createDir(path.resolve('src', 'scenes', projectName));
     addProjectToConfig(projectName);
   } catch (e) {
-    throw `Unable to create project\n${e}`;
+    throw new Error(`Unable to create project\n${e}`);
   }
 }

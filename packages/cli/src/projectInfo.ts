@@ -1,26 +1,21 @@
-let ConfigFile: string;
-let Language: string;
+export type Language = 'js' | 'ts';
 
-export function setConfigFile(newConfigFile: string) {
-  ConfigFile = newConfigFile;
+type ProjectInfo = {
+  configFile: string;
+  language: Language;
+};
+
+let ProjectInfo: ProjectInfo | null = null;
+
+export function setProjectInfo(newProjectInfo: ProjectInfo) {
+  ProjectInfo = newProjectInfo;
 }
 
-export function setLanguage(newLanguage: string) {
-  Language = newLanguage;
-}
-
-export function getConfigFile(): string {
-  if (ConfigFile == undefined)
+export function getProjectInfo(): ProjectInfo {
+  if (ProjectInfo == null) {
     throw new Error(
-      'configFile is undefined, try setting it first with setConfigFile()',
+      'ProjectInfo is undefined, try setting it first with setProjectInfo()',
     );
-  return ConfigFile;
-}
-
-export function getLanguage(): string {
-  if (ConfigFile == undefined)
-    throw new Error(
-      'language is undefined, try setting it first with setLanguage()',
-    );
-  return Language;
+  }
+  return ProjectInfo;
 }

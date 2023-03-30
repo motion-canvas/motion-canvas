@@ -6,7 +6,7 @@ import path from 'path';
 import kleur from 'kleur';
 
 import {add} from './add/index';
-import {getConfigFile, setConfigFile, setLanguage} from './projectInfo';
+import {setProjectInfo, Language} from './projectInfo';
 
 function isMotionCanvasProject(): boolean {
   if (!fs.existsSync(path.resolve('package.json')))
@@ -16,7 +16,7 @@ function isMotionCanvasProject(): boolean {
       .dependencies,
   );
   if (dependencies == undefined)
-    throw new Error(kleur.red('Unable to locate dependencies in package.json'));
+    throw new Error('Unable to locate dependencies in package.json');
   return dependencies.includes('@motion-canvas/core');
 }
 
@@ -32,8 +32,22 @@ function findConfigFile(): string {
 (async () => {
   try {
     isMotionCanvasProject();
-    setConfigFile(findConfigFile());
-    setLanguage(getConfigFile().slice(-2));
+    const configFile = findConfigFile();
+    let language: Language;
+    switch (configFile.slice(-2)) {
+      case 'js':
+        language = 'js';
+        break;
+      case 'ts':
+        language = 'ts';
+        break;
+      default:
+        throw new Error('Unsupported language');
+    }
+    setProjectInfo({
+      configFile: configFile,
+      language: language,
+    });
   } catch (e) {
     console.error(kleur.red(`Checks failed\n${e}`));
     return;

@@ -1,16 +1,15 @@
 import prompts from 'prompts';
 import path from 'path';
-import kleur from 'kleur';
 import fs from 'fs';
 import ts from 'typescript';
 
 import {sceneTemplate} from '../templates';
 import {createFile} from '../../utils/createFile';
-import {getConfigFile, getLanguage} from '../../projectInfo';
+import {getProjectInfo} from '../../projectInfo';
 
 export async function addScene() {
   const projectFiles = getProjectFiles();
-  if (projectFiles.length == 0) throw new Error(kleur.red('No projects found'));
+  if (projectFiles.length == 0) throw new Error('No projects found');
   const projectName = await prompts({
     type: 'select',
     name: 'projectName',
@@ -63,7 +62,7 @@ function getProjectFiles(): string[] {
 
   const src = ts.createSourceFile(
     '',
-    fs.readFileSync(getConfigFile(), 'utf8'),
+    fs.readFileSync(getProjectInfo().configFile, 'utf8'),
     ts.ScriptTarget.Latest,
     true,
   );
@@ -84,7 +83,7 @@ function isValidSceneName(
         'src',
         'scenes',
         `${projectName}`,
-        `${sceneName}.${getLanguage()}x`,
+        `${sceneName}.${getProjectInfo().language}x`,
       ),
     )
   ) {
@@ -151,7 +150,7 @@ function addSceneToProject(projectName: string, sceneName: string) {
     const src = ts.createSourceFile(
       '',
       fs.readFileSync(
-        path.resolve('src', `${projectName}.${getLanguage()}`),
+        path.resolve('src', `${projectName}.${getProjectInfo().language}`),
         'utf8',
       ),
       ts.ScriptTarget.Latest,
@@ -164,7 +163,7 @@ function addSceneToProject(projectName: string, sceneName: string) {
     const printer = ts.createPrinter({newLine: ts.NewLineKind.LineFeed});
     const result = printer.printNode(ts.EmitHint.Unspecified, newSrc, newSrc);
     fs.writeFile(
-      path.resolve('src', `${projectName}.${getLanguage()}`),
+      path.resolve('src', `${projectName}.${getProjectInfo().language}`),
       result,
       e => {
         if (e) throw e;
@@ -182,12 +181,12 @@ async function createScene(projectName: string, sceneName: string) {
         'src',
         'scenes',
         `${projectName}`,
-        `${sceneName}.${getLanguage()}x`,
+        `${sceneName}.${getProjectInfo().language}x`,
       ),
       sceneTemplate(),
     );
     addSceneToProject(projectName, sceneName);
   } catch (e) {
-    throw `Unable to create scene\n${e}`;
+    throw new Error(`Unable to create scene\n${e}`);
   }
 }
