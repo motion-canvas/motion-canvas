@@ -82,12 +82,13 @@ export class Video extends Rect {
   protected video(): HTMLVideoElement {
     const src = this.src();
     const key = `${this.key}/${src}`;
-    if (Video.pool[key]) {
-      return Video.pool[key];
+    let video = Video.pool[key];
+    if (!video) {
+      video = document.createElement('video');
+      video.src = src;
+      Video.pool[key] = video;
     }
 
-    const video = document.createElement('video');
-    video.src = src;
     if (video.readyState < 2) {
       DependencyContext.collectPromise(
         new Promise<void>(resolve => {
@@ -99,7 +100,6 @@ export class Video extends Rect {
         }),
       );
     }
-    Video.pool[key] = video;
 
     return video;
   }

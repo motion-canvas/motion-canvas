@@ -51,6 +51,14 @@ export class Latex extends Img {
     const src = `${this.tex()}::${JSON.stringify(this.options())}`;
     if (Latex.svgContentsPool[src]) {
       this.imageElement.src = Latex.svgContentsPool[src];
+      if (!this.imageElement.complete) {
+        DependencyContext.collectPromise(
+          new Promise((resolve, reject) => {
+            this.imageElement.addEventListener('load', resolve);
+            this.imageElement.addEventListener('error', reject);
+          }),
+        );
+      }
       return this.imageElement;
     }
 
