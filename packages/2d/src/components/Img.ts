@@ -56,13 +56,14 @@ export class Img extends Rect {
   @computed()
   protected image(): HTMLImageElement {
     const src = viaProxy(this.src());
-    if (Img.pool[src]) {
-      return Img.pool[src];
+    let image = Img.pool[src];
+    if (!image) {
+      image = document.createElement('img');
+      image.crossOrigin = 'anonymous';
+      image.src = src;
+      Img.pool[src] = image;
     }
 
-    const image = document.createElement('img');
-    image.crossOrigin = 'anonymous';
-    image.src = src;
     if (!image.complete) {
       DependencyContext.collectPromise(
         new Promise((resolve, reject) => {
@@ -71,7 +72,6 @@ export class Img extends Rect {
         }),
       );
     }
-    Img.pool[src] = image;
 
     return image;
   }
