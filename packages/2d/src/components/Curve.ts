@@ -204,10 +204,10 @@ export abstract class Curve extends Shape {
     context.save();
     context.beginPath();
     if (this.endArrow()) {
-      this.drawArrow(context, endPoint, endTangent, arrowSize);
+      this.drawArrow(context, endPoint, endTangent, arrowSize, false);
     }
     if (this.startArrow()) {
-      this.drawArrow(context, startPoint, startTangent, arrowSize);
+      this.drawArrow(context, startPoint, startTangent, arrowSize, true);
     }
     context.fillStyle = resolveCanvasStyle(this.stroke(), context);
     context.closePath();
@@ -215,12 +215,14 @@ export abstract class Curve extends Shape {
     context.restore();
   }
 
-  private drawArrow(
+  protected drawArrow(
     context: CanvasRenderingContext2D | Path2D,
     center: Vector2,
     tangent: Vector2,
     arrowSize: number,
+    start: boolean,
   ) {
+    tangent = this.getArrowTangent(tangent, start);
     const normal = tangent.perpendicular;
     const origin = center.add(normal.scale(-arrowSize / 2));
 
@@ -230,4 +232,9 @@ export abstract class Curve extends Shape {
     lineTo(context, origin);
     context.closePath();
   }
+
+  protected abstract getArrowTangent(
+    pointTangent: Vector2,
+    start: boolean,
+  ): Vector2;
 }

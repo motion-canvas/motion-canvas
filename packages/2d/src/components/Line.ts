@@ -90,6 +90,10 @@ export class Line extends Curve {
     return coefficient;
   }
 
+  protected override getArrowTangent(pointTangent: Vector2): Vector2 {
+    return pointTangent;
+  }
+
   public override drawOverlay(
     context: CanvasRenderingContext2D,
     matrix: DOMMatrix,

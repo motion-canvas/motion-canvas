@@ -308,6 +308,15 @@ export class Spline extends Curve {
     context.stroke();
   }
 
+  protected override getArrowTangent(
+    pointTangent: Vector2,
+    start: boolean,
+  ): Vector2 {
+    return start
+      ? pointTangent.perpendicular.flipped
+      : pointTangent.perpendicular;
+  }
+
   private isKnot(node: Node): node is Knot {
     return node instanceof Knot;
   }
