@@ -17,21 +17,95 @@ import {
 import {viaProxy} from '@motion-canvas/core/lib/utils';
 
 export interface ImgProps extends RectProps {
+  /**
+   * {@inheritDoc Img.src}
+   */
   src?: SignalValue<string>;
+  /**
+   * {@inheritDoc Img.alpha}
+   */
   alpha?: SignalValue<number>;
+  /**
+   * {@inheritDoc Img.smoothing}
+   */
   smoothing?: SignalValue<boolean>;
 }
 
+/**
+ * A node for displaying images.
+ *
+ * @remarks
+ * ```tsx editor
+ * import {Img} from '@motion-canvas/2d/lib/components';
+ * import {all, waitFor} from '@motion-canvas/core/lib/flow';
+ * import {createRef} from '@motion-canvas/core/lib/utils';
+ * import {makeScene2D} from '@motion-canvas/2d';
+ *
+ * export default makeScene2D(function* (view) {
+ *   const ref = createRef<Img>();
+ *   view.add(
+ *     <Img
+ *       ref={ref}
+ *       src="https://images.unsplash.com/photo-1679218407381-a6f1660d60e9"
+ *       width={300}
+ *       radius={20}
+ *       clip
+ *     />,
+ *   );
+ *
+ *   // set the background using the color sampled from the image:
+ *   ref().fill(ref().getColorAtPoint(0));
+ *
+ *   yield* all(
+ *     ref().size([100, 100], 1).to([300, null], 1),
+ *     ref().radius(50, 1).to(20, 1),
+ *     ref().alpha(0, 1).to(1, 1),
+ *   );
+ *   yield* waitFor(0.5);
+ * });
+ * ```
+ */
 export class Img extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 
+  /**
+   * The source of this image.
+   *
+   * @example
+   * Using a local image:
+   * ```tsx
+   * import image from './example.png';
+   * // ...
+   * view.add(<Img src={image} />)
+   * ```
+   * Loading an image from the internet:
+   * ```tsx
+   * view.add(<Img src="https://example.com/image.png" />)
+   * ```
+   */
   @signal()
   public declare readonly src: SimpleSignal<string, this>;
 
+  /**
+   * The alpha value of this image.
+   *
+   * @remarks
+   * Unlike opacity, the alpha value affects only the image itself, leaving the
+   * fill, stroke, and children intact.
+   */
   @initial(1)
   @signal()
   public declare readonly alpha: SimpleSignal<number, this>;
 
+  /**
+   * Whether the image should be smoothed.
+   *
+   * @remarks
+   * When disabled, the image will be scaled using the nearest neighbor
+   * interpolation with no smoothing. The resulting image will appear pixelated.
+   *
+   * @defaultValue true
+   */
   @initial(true)
   @signal()
   public declare readonly smoothing: SimpleSignal<boolean, this>;
@@ -133,15 +207,27 @@ export class Img extends Rect {
    * @param position - The position in local space at which to sample the color.
    */
   public getColorAtPoint(position: PossibleVector2): Color {
-    const image = this.image();
     const size = this.computedSize();
-    const naturalSize = new Vector2(image.naturalWidth, image.naturalHeight);
+    const naturalSize = this.naturalSize();
 
     const pixelPosition = new Vector2(position)
       .add(this.computedSize().scale(0.5))
       .mul(naturalSize.div(size).safe);
 
     return this.getPixelColor(pixelPosition);
+  }
+
+  /**
+   * The natural size of this image.
+   *
+   * @remarks
+   * The natural size is the size of the source image unaffected by the size
+   * and scale properties.
+   */
+  @computed()
+  public naturalSize() {
+    const image = this.image();
+    return new Vector2(image.naturalWidth, image.naturalHeight);
   }
 
   /**

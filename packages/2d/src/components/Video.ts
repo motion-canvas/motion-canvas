@@ -13,9 +13,25 @@ import {
 } from '@motion-canvas/core/lib/signals';
 
 export interface VideoProps extends RectProps {
+  /**
+   * {@inheritDoc Video.src}
+   */
   src?: SignalValue<string>;
+  /**
+   * {@inheritDoc Video.alpha}
+   */
   alpha?: SignalValue<number>;
+  /**
+   * {@inheritDoc Video.smoothing}
+   */
   smoothing?: SignalValue<boolean>;
+  /**
+   * {@inheritDoc Video.loop}
+   */
+  loop?: SignalValue<boolean>;
+  /**
+   * The starting time for this video in seconds.
+   */
   time?: SignalValue<number>;
   play?: boolean;
 }
@@ -23,16 +39,54 @@ export interface VideoProps extends RectProps {
 export class Video extends Rect {
   private static readonly pool: Record<string, HTMLVideoElement> = {};
 
+  /**
+   * The source of this video.
+   *
+   * @example
+   * Using a local video:
+   * ```tsx
+   * import video from './example.mp4';
+   * // ...
+   * view.add(<Video src={video} />)
+   * ```
+   * Loading an image from the internet:
+   * ```tsx
+   * view.add(<Video src="https://example.com/video.mp4" />)
+   * ```
+   */
   @signal()
   public declare readonly src: SimpleSignal<string, this>;
 
+  /**
+   * The alpha value of this video.
+   *
+   * @remarks
+   * Unlike opacity, the alpha value affects only the video itself, leaving the
+   * fill, stroke, and children intact.
+   */
   @initial(1)
   @signal()
   public declare readonly alpha: SimpleSignal<number, this>;
 
+  /**
+   * Whether the video should be smoothed.
+   *
+   * @remarks
+   * When disabled, the video will be scaled using the nearest neighbor
+   * interpolation with no smoothing. The resulting video will appear pixelated.
+   *
+   * @defaultValue true
+   */
   @initial(true)
   @signal()
   public declare readonly smoothing: SimpleSignal<boolean, this>;
+
+  /**
+   * Whether this video should loop upon reaching the end.
+   */
+  @initial(false)
+  @signal()
+  public declare readonly loop: SimpleSignal<boolean, this>;
 
   @initial(0)
   @signal()
@@ -44,8 +98,11 @@ export class Video extends Rect {
 
   private lastTime = -1;
 
-  public constructor(props: VideoProps) {
+  public constructor({play, ...props}: VideoProps) {
     super(props);
+    if (play) {
+      this.play();
+    }
   }
 
   public isPlaying(): boolean {
@@ -53,7 +110,7 @@ export class Video extends Rect {
   }
 
   public getCurrentTime(): number {
-    return this.time();
+    return this.clampTime(this.time());
   }
 
   public getDuration(): number {
@@ -229,7 +286,11 @@ export class Video extends Rect {
   }
 
   public clampTime(time: number): number {
-    return clamp(0, this.video().duration, time);
+    const duration = this.video().duration;
+    if (this.loop()) {
+      time %= duration;
+    }
+    return clamp(0, duration, time);
   }
 
   protected override collectAsyncResources() {
