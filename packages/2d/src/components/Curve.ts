@@ -216,26 +216,22 @@ export abstract class Curve extends Shape {
     context.save();
     context.beginPath();
     if (this.endArrow() instanceof Node) {
-      const endArrow = this.endArrow() as Node;
-      context.save();
-      context.translate(endPoint.x, endPoint.y);
-      context.rotate(endTangent.radians);
-
-      endArrow.render(context);
-
-      context.restore();
+      this.drawArrowNode(
+        context,
+        this.endArrow() as Node,
+        endPoint,
+        endTangent.radians,
+      );
     } else if (this.endArrow()) {
       this.drawArrow(context, endPoint, endTangent, arrowSize);
     }
     if (this.startArrow() instanceof Node) {
-      const startArrow = this.startArrow() as Node;
-      context.save();
-      context.translate(startPoint.x, startPoint.y);
-      context.rotate(startTangent.radians);
-
-      startArrow.render(context);
-
-      context.restore();
+      this.drawArrowNode(
+        context,
+        this.startArrow() as Node,
+        startPoint,
+        startTangent.radians,
+      );
     } else if (this.startArrow()) {
       this.drawArrow(context, startPoint, startTangent, arrowSize);
     }
@@ -259,5 +255,20 @@ export abstract class Curve extends Shape {
     lineTo(context, origin.add(tangent.sub(normal).scale(arrowSize)));
     lineTo(context, origin);
     context.closePath();
+  }
+
+  private drawArrowNode(
+    context: CanvasRenderingContext2D,
+    arrow: Node,
+    arrowPoint: Vector2,
+    arrowAngle: number,
+  ) {
+    context.save();
+    context.translate(arrowPoint.x, arrowPoint.y);
+    context.rotate(arrowAngle);
+
+    arrow.render(context);
+
+    context.restore();
   }
 }
