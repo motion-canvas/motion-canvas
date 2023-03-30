@@ -167,6 +167,14 @@ export class Latex extends SVGNode {
       tex = tex.replace(/\\left/g, '\\big').replace(/\\right/g, '\\big');
     }
 
+    const bracesLeft = tex.match(/((?<!\\)|(?<=\\\\)){/g)?.length ?? 0;
+    const bracesRight = tex.match(/((?<!\\)|(?<=\\\\))}/g)?.length ?? 0;
+
+    if (bracesLeft < bracesRight)
+      tex = '{'.repeat(bracesRight - bracesLeft) + tex;
+    else if (bracesRight < bracesLeft)
+      tex += '}'.repeat(bracesLeft - bracesRight);
+
     const hasArrayBegin = tex.includes('\\begin{array}');
     const hasArrayEnd = tex.includes('\\end{array}');
     if (hasArrayBegin !== hasArrayEnd) tex = '';
