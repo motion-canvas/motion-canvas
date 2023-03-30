@@ -158,8 +158,10 @@ export class Video extends Rect {
 
     const alpha = this.alpha();
     if (alpha > 0) {
+      const playbackState = this.view().playbackState();
       const video =
-        this.view().playbackState() === PlaybackState.Playing
+        playbackState === PlaybackState.Playing ||
+        playbackState === PlaybackState.Presenting
           ? this.fastSeekedVideo()
           : this.seekedVideo();
 
