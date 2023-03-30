@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {basicSetup} from 'codemirror';
 import {EditorView, keymap} from '@codemirror/view';
 import {Text, EditorState} from '@codemirror/state';
@@ -27,6 +27,8 @@ import {
   transform,
   TransformError,
 } from '@site/src/components/Fiddle/transformer';
+import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
+import Dropdown from '@site/src/components/Dropdown';
 
 export interface FiddleProps {
   children: string;
@@ -59,7 +61,6 @@ export default function Fiddle({children}: FiddleProps) {
 
   const [doc, setDoc] = useState<Text | null>(null);
   const [lastDoc, setLastDoc] = useState<Text | null>(null);
-  const [initialState, setInitialState] = useState<EditorState>(null);
 
   const update = (newDoc: Text, animate = true) => {
     borrowPlayer(setPlayer, previewRef.current);
@@ -73,40 +74,51 @@ export default function Fiddle({children}: FiddleProps) {
     }
   };
 
+  const [snippetId, setSnippetId] = useState(0);
+  const snippets = useMemo(
+    () =>
+      parseFiddle(children).map(snippet => ({
+        name: snippet.name,
+        state: EditorState.create({
+          doc: Text.of(snippet.lines),
+          extensions: [
+            basicSetup,
+            keymap.of([
+              indentWithTab,
+              {
+                key: 'Mod-s',
+                preventDefault: true,
+                run: view => {
+                  update(view.state.doc);
+                  return true;
+                },
+              },
+            ]),
+            EditorView.updateListener.of(update => {
+              setDoc(update.state.doc);
+              setError(null);
+            }),
+            autocomplete(),
+            javascript({
+              jsx: true,
+              typescript: true,
+            }),
+            syntaxHighlighting(SyntaxHighlightStyle),
+            EditorTheme,
+          ],
+        }),
+      })),
+    [children],
+  );
+
   useEffect(() => {
     editorView.current = new EditorView({
-      extensions: [
-        basicSetup,
-        keymap.of([
-          indentWithTab,
-          {
-            key: 'Mod-s',
-            preventDefault: true,
-            run: view => {
-              update(view.state.doc);
-              return true;
-            },
-          },
-        ]),
-        EditorView.updateListener.of(update => {
-          setDoc(update.state.doc);
-          setError(null);
-        }),
-        autocomplete(),
-        javascript({
-          jsx: true,
-          typescript: true,
-        }),
-        syntaxHighlighting(SyntaxHighlightStyle),
-        EditorTheme,
-      ],
       parent: editorRef.current,
-      doc: children,
+      state: snippets[snippetId].state,
     });
-    setInitialState(editorView.current.state);
     const borrowed = tryBorrowPlayer(setPlayer, previewRef.current);
     if (borrowed) {
-      update(editorView.current.state.doc, false);
+      update(snippets[snippetId].state.doc, false);
     }
 
     return () => {
@@ -114,6 +126,11 @@ export default function Fiddle({children}: FiddleProps) {
       editorView.current.destroy();
     };
   }, []);
+
+  const hasChangedSinceLastUpdate = lastDoc && doc && !doc.eq(lastDoc);
+  const hasChanged =
+    (doc && !doc.eq(snippets[snippetId].state.doc)) ||
+    hasChangedSinceLastUpdate;
 
   return (
     <div className={styles.root}>
@@ -126,7 +143,7 @@ export default function Fiddle({children}: FiddleProps) {
       />
       <div className={styles.controls}>
         <div className={styles.section}>
-          {lastDoc && !doc?.eq(lastDoc) && (
+          {hasChangedSinceLastUpdate && (
             <button
               onClick={() => update(editorView.current.state.doc)}
               className={styles.button}
@@ -169,25 +186,41 @@ export default function Fiddle({children}: FiddleProps) {
           </button>
         </div>
         <div className={styles.section}>
-          {((initialState && !doc?.eq(initialState.doc)) ||
-            (lastDoc && !doc?.eq(lastDoc))) && (
+          {snippets.length === 0 && hasChanged && (
             <button
               className={styles.button}
               onClick={() => {
-                editorView.current.setState(initialState);
-                update(initialState.doc);
-                setDoc(initialState.doc);
+                editorView.current.setState(snippets[snippetId].state);
+                update(snippets[snippetId].state.doc);
+                setDoc(snippets[snippetId].state.doc);
               }}
             >
               <small>Reset example</small>
             </button>
+          )}
+          {snippets.length > 1 && (
+            <Dropdown
+              className={styles.picker}
+              value={hasChanged ? -1 : snippetId}
+              onChange={id => {
+                setSnippetId(id);
+                editorView.current.setState(snippets[id].state);
+                update(snippets[id].state.doc);
+              }}
+              options={snippets
+                .map((snippet, index) => ({
+                  value: index,
+                  name: snippet.name,
+                }))
+                .concat(hasChanged ? {value: -1, name: 'Custom'} : [])}
+            />
           )}
         </div>
       </div>
       {error && <pre className={styles.error}>{error.message}</pre>}
       <div className={styles.editor} ref={editorRef}>
         <CodeBlock className={styles.source} language="tsx">
-          {children + '\n'}
+          {snippets[0].state.doc.toString() + '\n'}
         </CodeBlock>
       </div>
     </div>
