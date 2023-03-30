@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 slug: /spline
 ---
 
@@ -33,6 +33,13 @@ export default makeScene2D(function* (view) {
 
 The [`Spline`][spline] component allows us to draw and animate smooth curves
 through a series of control points.
+
+:::tip
+
+If all you want to do is draw a simple Bézier curve, check out the [Bézier curve
+components][bezier-curves], instead.
+
+:::
 
 ## Defining control points
 
@@ -452,6 +459,7 @@ The `getPointAtPercentage` method returns a [`CurvePoint`][curve-point] object
 which contains the position of the point that sits at the given percentage along
 the spline's arclength as well as the point's tangent vector.
 
+[bezier-curves]: /docs/bezier-curves
 [spline]: /api/2d/components/Spline
 [knot]: /api/2d/components/Knot
 [line]: /api/2d/components/Line

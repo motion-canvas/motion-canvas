@@ -1,0 +1,295 @@
+---
+sidebar_position: 3
+slug: /bezier-curves
+---
+
+# Bézier Curves
+
+```tsx editor
+// snippet Cubic Bézier
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {CubicBezier} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const bezier = createRef<Spline>();
+
+  view.add(
+    <CubicBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-200, -70]}
+      p1={[120, -120]}
+      p2={[-120, 120]}
+      p3={[200, 70]}
+      end={0}
+    />,
+  );
+
+  yield* bezier().end(1, 1);
+  yield* bezier().start(1, 1).to(0, 1);
+});
+
+// snippet Quadratic Bézier
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {QuadBezier} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const bezier = createRef<Spline>();
+
+  view.add(
+    <QuadBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-150, 50]}
+      p1={[0, -120]}
+      p2={[150, 50]}
+      end={0}
+    />,
+  );
+
+  yield* bezier().end(1, 1);
+  yield* bezier().start(1, 1).to(0, 1);
+});
+```
+
+Bézier curves are ubiquitous in computer graphics. Motion Canvas comes with
+components to draw both quadratic as well as cubic Bézier curves.
+
+:::tip
+
+If you're trying to draw more complicated shapes than single Bézier curves allow
+for, check out the [`Spline`][spline] component, instead.
+
+:::
+
+## Using the components
+
+To draw Bézier curves, we can use the [`QuadBezier`][quad-bezier] component for
+quadratic Bézier curves and [`CubicBezier`][cubic-bezier] component for cubic
+Bézier curves, respectively.
+
+:::info
+
+Most of the examples on this page can be switched between cubic and quadratic
+Bézier curves by using the dropdown at the right side of the animation player.
+
+:::
+
+### Defining control points
+
+Bézier curves are defined by a start and end point, as well as several control
+points. The exact number of control points is different for different kinds of
+Bézier curves. A quadratic Bézier curve only has a single control point whereas
+a cubic Bézier curve has two.
+
+To define a Bézier curve, we need to define its start and point, as well as its
+control points.
+
+```tsx editor
+// snippet Cubic Bézier
+export default makeScene2D(function* (view) {
+  const bezier = createRef<CubicBezier>();
+
+  view.add(
+    <CubicBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-200, -70]}
+      p1={[120, -120]}
+      p2={[-120, 120]}
+      p3={[200, 70]}
+    />,
+  );
+
+  yield* waitFor(1);
+});
+
+// snippet Quadratic Bézier
+export default makeScene2D(function* (view) {
+  const bezier = createRef<QuadBezier>();
+
+  view.add(
+    <QuadBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-150, 50]}
+      p1={[0, -120]}
+      p2={[150, 50]}
+    />,
+  );
+
+  yield* waitFor(1);
+});
+```
+
+All points of a Bézier curve are compound signals. This means that it's possible
+to animate their `x` and `y` components separately.
+
+```tsx {6,13}
+view.add(
+  <CubicBezier
+    ref={bezier}
+    lineWidth={6}
+    stroke={'lightseagreen'}
+    p0={[-200, -70]}
+    p1={[120, -120]}
+    p2={[-120, 120]}
+    p3={[200, 70]}
+  />,
+);
+
+yield * bezier().p0.x(200, 1);
+```
+
+### Drawing arrows
+
+Similar to the [`Line`][line] and [`Spline`][spline] components, we can also add
+arrowheads to a Bézier curve. To do so, we can use the
+[`startArrow`][start-arrow] and [`endArrow`][end-arrow] properties. We can
+control the size of the arrowheads with the [`arrowSize`][arrow-size] signal.
+
+```tsx editor
+// snippet Cubic Bézier
+export default makeScene2D(function* (view) {
+  const bezier = createRef<CubicBezier>();
+
+  view.add(
+    <CubicBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-200, -70]}
+      p1={[120, -120]}
+      p2={[-120, 120]}
+      p3={[200, 70]}
+      arrowSize={16}
+      startArrow
+      endArrow
+    />,
+  );
+
+  yield* bezier().arrowSize(20, 1).to(10, 1).to(16, 1);
+});
+
+// snippet Quadratic Bézier
+export default makeScene2D(function* (view) {
+  const bezier = createRef<QuadBezier>();
+
+  view.add(
+    <QuadBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-150, 50]}
+      p1={[0, -120]}
+      p2={[150, 50]}
+      arrowSize={16}
+      startArrow
+      endArrow
+    />,
+  );
+
+  yield* bezier().arrowSize(20, 1).to(10, 1).to(16, 1);
+});
+```
+
+:::tip Animating adding arrows
+
+Since `startArrow` and `endArrow` are booleans, they don't lend themselves well
+to being animated. To animate adding arrows to a Bézier curve, we should animate
+`arrowSize`, instead.
+
+```tsx {7,13}
+view.add(
+  <QuadBezier
+    ref={bezier}
+    p0={[-150, 50]}
+    p1={[0, -120]}
+    p2={[150, 50]}
+    arrowSize={0}
+    startArrow
+    endArrow
+  />,
+);
+
+yield * bezier().arrowSize(16, 1);
+```
+
+:::
+
+## Examples
+
+The following section shows examples of common animations for Bézier curves.
+
+```tsx editor
+// snippet Drawing Bézier curves
+export default makeScene2D(function* (view) {
+  const bezier = createRef<CubicBezier>();
+
+  view.add(
+    <CubicBezier
+      ref={bezier}
+      lineWidth={6}
+      stroke={'lightseagreen'}
+      p0={[-200, -70]}
+      p1={[120, -120]}
+      p2={[-120, 120]}
+      p3={[200, 70]}
+      end={0}
+    />,
+  );
+
+  yield* bezier().end(1, 2).to(0, 2);
+});
+
+// snippet Moving nodes along a curve
+export default makeScene2D(function* (view) {
+  const bezier = createRef<CubicBezier>();
+
+  const progress = createSignal(0);
+  const curvePoint = createComputed(() =>
+    bezier().getPointAtPercentage(progress()),
+  );
+
+  view.add(
+    <>
+      <CubicBezier
+        ref={bezier}
+        lineWidth={6}
+        stroke={'lightgray'}
+        p0={[-300, -70]}
+        p1={[120, -120]}
+        p2={[-120, 120]}
+        p3={[300, 70]}
+      />
+      <Rect
+        size={25}
+        fill={'lightseagreen'}
+        position={() => curvePoint().position}
+        rotation={() => curvePoint().tangent.degrees}
+      />
+    </>,
+  );
+
+  yield* progress(1, 2);
+  yield* waitFor(0.5);
+  yield* progress(0, 2);
+  yield* waitFor(0.5);
+});
+```
+
+[spline]: /docs/spline
+[line]: /api/2d/components/Line
+[quad-bezier]: /api/2d/components/QuadBezier
+[cubic-bezier]: /api/2d/components/CubicBezier
+[start-arrow]: /api/2d/components/CurveProps#startArrow
+[end-arrow]: /api/2d/components/CurveProps#endArrow
+[arrow-size]: /api/2d/components/CurveProps#arrowSize
