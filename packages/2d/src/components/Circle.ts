@@ -24,41 +24,62 @@ export interface CircleProps extends ShapeProps {
  * This node can be used to render shapes such as: circle, ellipse, arc, and
  * sector (pie chart).
  *
- * @example
- * A simple circle:
- * ```tsx
- * <Circle
- *   size={300}
- *   fill={'lightseagreen'}
- * />
- * ```
- * An ellipse:
- * ```tsx
- * <Circle
- *   width={300}
- *   height={100}
- *   fill={'lightseagreen'}
- * />
- * ```
- * A sector (pie chart):
- * ```tsx
- * <Circle
- *   size={300}
- *   fill={'lightseagreen'}
- *   startAngle={30}
- *   endAngle={270}
- *   closed={true}
- * />
- * ```
- * An arc:
- * ```tsx
- * <Circle
- *   size={300}
- *   stroke={'lightseagreen'}
- *   lineWidth={8}
- *   startAngle={-90}
- *   endAngle={90}
- * />
+ * @preview
+ * ```tsx editor
+ * // snippet Simple circle
+ * export default makeScene2D(function* (view) {
+ *   view.add(
+ *     <Circle
+ *       size={160}
+ *       fill={'lightseagreen'}
+ *     />
+ *    );
+ * });
+ *
+ * // snippet Ellipse
+ * export default makeScene2D(function* (view) {
+ *   view.add(
+ *     <Circle
+ *       width={160}
+ *       height={80}
+ *       fill={'lightseagreen'}
+ *     />
+ *   );
+ * });
+ *
+ * // snippet Sector (pie chart):
+ * export default makeScene2D(function* (view) {
+ *   const ref = createRef<Circle>();
+ *   view.add(
+ *     <Circle
+ *       ref={ref}
+ *       size={160}
+ *       fill={'lightseagreen'}
+ *       startAngle={30}
+ *       endAngle={270}
+ *       closed={true}
+ *     />
+ *   );
+ *
+ *   yield* ref().startAngle(270, 2).to(30, 2);
+ * });
+ *
+ * // snippet Arc:
+ * export default makeScene2D(function* (view) {
+ *   const ref = createRef<Circle>();
+ *   view.add(
+ *     <Circle
+ *       ref={ref}
+ *       size={160}
+ *       stroke={'lightseagreen'}
+ *       lineWidth={8}
+ *       startAngle={-90}
+ *       endAngle={90}
+ *     />
+ *   );
+ *
+ *   yield* ref().startAngle(-270, 2).to(-90, 2);
+ * });
  * ```
  */
 export class Circle extends Shape {

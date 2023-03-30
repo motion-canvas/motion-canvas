@@ -34,7 +34,7 @@ export interface ImgProps extends RectProps {
 /**
  * A node for displaying images.
  *
- * @remarks
+ * @preview
  * ```tsx editor
  * import {Img} from '@motion-canvas/2d/lib/components';
  * import {all, waitFor} from '@motion-canvas/core/lib/flow';

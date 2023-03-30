@@ -137,10 +137,12 @@ export default function Fiddle({children}: FiddleProps) {
       <div className={styles.preview} ref={previewRef}>
         {!player && <div>Press play to preview the animation</div>}
       </div>
-      <div
-        className={styles.progress}
-        style={{width: player ? `${(frame / duration) * 100}%` : 0}}
-      />
+      {duration > 0 && (
+        <div
+          className={styles.progress}
+          style={{width: player ? `${(frame / duration) * 100}%` : 0}}
+        />
+      )}
       <div className={styles.controls}>
         <div className={styles.section}>
           {hasChangedSinceLastUpdate && (

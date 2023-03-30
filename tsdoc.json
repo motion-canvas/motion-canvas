@@ -10,18 +10,19 @@
       "syntaxKind": "modifier"
     },
     {
-      "tagName": "@default",
+      "tagName": "@category",
       "syntaxKind": "modifier"
     },
     {
-      "tagName": "@category",
-      "syntaxKind": "modifier"
+      "tagName": "@preview",
+      "syntaxKind": "block"
     }
   ],
   "supportForTags": {
     "@packageDocumentation": true,
     "@module": true,
     "@category": true,
+    "@preview": true,
     "@param": true,
     "@deprecated": true,
     "@returns": true,
