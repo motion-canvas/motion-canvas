@@ -118,20 +118,20 @@ export abstract class Curve extends Shape {
       const clampedStart = clamp(0, 1, relativeStart);
       const clampedEnd = clamp(0, 1, relativeEnd);
 
-      const [
-        currentStartPoint,
-        currentStartTangent,
-        currentEndPoint,
-        currentEndTangent,
-      ] = segment.draw(path, clampedStart, clampedEnd, startPoint === null);
+      const [startCurvePoint, endCurvePoint] = segment.draw(
+        path,
+        clampedStart,
+        clampedEnd,
+        startPoint === null,
+      );
 
       if (startPoint === null) {
-        startPoint = currentStartPoint;
-        startTangent = currentStartTangent;
+        startPoint = startCurvePoint.position;
+        startTangent = startCurvePoint.normal.flipped.perpendicular;
       }
 
-      endPoint = currentEndPoint;
-      endTangent = currentEndTangent;
+      endPoint = endCurvePoint.position;
+      endTangent = endCurvePoint.normal.flipped.perpendicular;
       if (length > end) {
         break;
       }
@@ -143,9 +143,9 @@ export abstract class Curve extends Shape {
 
     return {
       startPoint: startPoint ?? Vector2.zero,
-      startTangent: startTangent ?? Vector2.up,
+      startTangent: startTangent ?? Vector2.right,
       endPoint: endPoint ?? Vector2.zero,
-      endTangent: endTangent ?? Vector2.up,
+      endTangent: endTangent ?? Vector2.right,
       arrowSize,
       path,
       startOffset: start,
@@ -204,7 +204,7 @@ export abstract class Curve extends Shape {
     context.save();
     context.beginPath();
     if (this.endArrow()) {
-      this.drawArrow(context, endPoint, endTangent, arrowSize);
+      this.drawArrow(context, endPoint, endTangent.flipped, arrowSize);
     }
     if (this.startArrow()) {
       this.drawArrow(context, startPoint, startTangent, arrowSize);
@@ -222,11 +222,11 @@ export abstract class Curve extends Shape {
     arrowSize: number,
   ) {
     const normal = tangent.perpendicular;
-    const origin = center.add(normal.scale(-arrowSize / 2));
+    const origin = center.add(tangent.scale(-arrowSize / 2));
 
     moveTo(context, origin);
-    lineTo(context, origin.add(normal.add(tangent).scale(arrowSize)));
-    lineTo(context, origin.add(normal.sub(tangent).scale(arrowSize)));
+    lineTo(context, origin.add(tangent.add(normal).scale(arrowSize)));
+    lineTo(context, origin.add(tangent.sub(normal).scale(arrowSize)));
     lineTo(context, origin);
     context.closePath();
   }
