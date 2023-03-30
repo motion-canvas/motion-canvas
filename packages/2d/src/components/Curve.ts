@@ -18,10 +18,10 @@ export interface CurveProps extends ShapeProps {
   closed?: SignalValue<boolean>;
   start?: SignalValue<number>;
   startOffset?: SignalValue<number>;
-  startArrow?: SignalValue<boolean>;
+  startArrow?: SignalValue<Node | boolean>;
   end?: SignalValue<number>;
   endOffset?: SignalValue<number>;
-  endArrow?: SignalValue<boolean>;
+  endArrow?: SignalValue<Node | boolean>;
   arrowSize?: SignalValue<number>;
 }
 
@@ -37,10 +37,16 @@ export abstract class Curve extends Shape {
   @initial(0)
   @signal()
   public declare readonly startOffset: SimpleSignal<number, this>;
-
+  /**
+   * Specifies if or what arrow should be drawn at the start of the line.
+   *
+   * @remarks
+   * If `true`, a default arrow will be drawn. This can be used with the {@link arrowSize} signal to change the size of the arrow.
+   * If set to a {@link Node}, the node will be used as the arrow. This can be used to edraw a custom arrow. If a custom arrow is used, the {@link arrowSize} signal will be ignored.
+   **/
   @initial(false)
   @signal()
-  public declare readonly startArrow: SimpleSignal<boolean, this>;
+  public declare readonly startArrow: SimpleSignal<Node | boolean, this>;
 
   @initial(1)
   @signal()
@@ -49,10 +55,16 @@ export abstract class Curve extends Shape {
   @initial(0)
   @signal()
   public declare readonly endOffset: SimpleSignal<number, this>;
-
+  /**
+   * Specifies if or what arrow should be drawn at the start of the line.
+   *
+   * @remarks
+   * If `true`, a default arrow will be drawn. This can be used with the {@link arrowSize} signal to change the size of the arrow.
+   * If set to a {@link Node}, the node will be used as the arrow. This can be used to edraw a custom arrow. If a custom arrow is used, the {@link arrowSize} signal will be ignored.
+   **/
   @initial(false)
   @signal()
-  public declare readonly endArrow: SimpleSignal<boolean, this>;
+  public declare readonly endArrow: SimpleSignal<Node | boolean, this>;
 
   @initial(24)
   @signal()
@@ -203,10 +215,28 @@ export abstract class Curve extends Shape {
 
     context.save();
     context.beginPath();
-    if (this.endArrow()) {
-      this.drawArrow(context, endPoint, endTangent.flipped, arrowSize);
+    if (this.endArrow() instanceof Node) {
+      const endArrow = this.endArrow() as Node;
+      context.save();
+      context.translate(endPoint.x, endPoint.y);
+      context.rotate(endTangent.radians);
+
+      endArrow.render(context);
+
+      context.restore();
+    } else if (this.endArrow()) {
+      this.drawArrow(context, endPoint, endTangent, arrowSize);
     }
-    if (this.startArrow()) {
+    if (this.startArrow() instanceof Node) {
+      const startArrow = this.startArrow() as Node;
+      context.save();
+      context.translate(startPoint.x, startPoint.y);
+      context.rotate(startTangent.radians);
+
+      startArrow.render(context);
+
+      context.restore();
+    } else if (this.startArrow()) {
       this.drawArrow(context, startPoint, startTangent, arrowSize);
     }
     context.fillStyle = resolveCanvasStyle(this.stroke(), context);
