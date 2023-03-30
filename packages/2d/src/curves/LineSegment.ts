@@ -24,18 +24,34 @@ export class LineSegment extends Segment {
     start = 0,
     end = 1,
     move = false,
-  ): [Vector2, Vector2, Vector2, Vector2] {
+  ): [CurvePoint, CurvePoint] {
     const from = this.from.add(this.vector.scale(start));
     const to = this.from.add(this.vector.scale(end));
     if (move) {
       moveTo(context, from);
     }
     lineTo(context, to);
-    return [from, this.tangent.flipped, to, this.tangent];
+
+    return [
+      {
+        position: from,
+        tangent: this.tangent.flipped,
+        normal: this.tangent,
+      },
+      {
+        position: to,
+        tangent: this.tangent,
+        normal: this.tangent,
+      },
+    ];
   }
 
   public getPoint(distance: number): CurvePoint {
     const point = this.from.add(this.vector.scale(distance));
-    return {position: point, tangent: this.tangent.flipped};
+    return {
+      position: point,
+      tangent: this.tangent.flipped,
+      normal: this.tangent,
+    };
   }
 }

@@ -18,5 +18,5 @@ export function getPointAtDistance(
     }
   }
 
-  return {position: Vector2.zero, tangent: Vector2.up};
+  return {position: Vector2.zero, tangent: Vector2.up, normal: Vector2.up};
 }

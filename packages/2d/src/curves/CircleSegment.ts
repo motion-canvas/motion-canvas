@@ -27,7 +27,7 @@ export class CircleSegment extends Segment {
     context: CanvasRenderingContext2D | Path2D,
     from: number,
     to: number,
-  ): [Vector2, Vector2, Vector2, Vector2] {
+  ): [CurvePoint, CurvePoint] {
     const counterFactor = this.counter ? -1 : 1;
     const startAngle = this.from.radians + from * this.angle * counterFactor;
     const endAngle = this.to.radians - (1 - to) * this.angle * counterFactor;
@@ -47,10 +47,16 @@ export class CircleSegment extends Segment {
     const endTangent = Vector2.fromRadians(endAngle);
 
     return [
-      this.center.add(startTangent.scale(this.radius)),
-      this.counter ? startTangent : startTangent.flipped,
-      this.center.add(endTangent.scale(this.radius)),
-      this.counter ? endTangent.flipped : endTangent,
+      {
+        position: this.center.add(startTangent.scale(this.radius)),
+        tangent: this.counter ? startTangent : startTangent.flipped,
+        normal: this.counter ? startTangent : startTangent.flipped,
+      },
+      {
+        position: this.center.add(endTangent.scale(this.radius)),
+        tangent: this.counter ? endTangent.flipped : endTangent,
+        normal: this.counter ? endTangent.flipped : endTangent,
+      },
     ];
   }
 
@@ -63,6 +69,7 @@ export class CircleSegment extends Segment {
     return {
       position: this.center.add(tangent.scale(this.radius)),
       tangent: this.counter ? tangent : tangent.flipped,
+      normal: this.counter ? tangent : tangent.flipped,
     };
   }
 }
