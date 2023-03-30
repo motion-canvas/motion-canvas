@@ -21,18 +21,20 @@
 }
 
 .section {
-  width: 33.333%;
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 8px;
   padding: 8px;
 }
 
 .section:first-child {
+  flex-basis: 100%;
   justify-content: start;
 }
 
 .section:last-child {
+  flex-basis: 100%;
   justify-content: end;
 }
 
