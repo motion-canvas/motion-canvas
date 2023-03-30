@@ -7,7 +7,7 @@ import {
 } from '@motion-canvas/2d/lib/components';
 import {initial, signal} from '@motion-canvas/2d/lib/decorators';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {createRef, range} from '@motion-canvas/core/lib/utils';
+import {range} from '@motion-canvas/core/lib/utils';
 
 /**
  * The Motion Canvas Icon as a component.
@@ -39,89 +39,81 @@ export class AnimatedMotionCanvasIcon extends Node {
     const YELLOW = '#FFC66D';
     const RED = '#FF6470';
     const GREEN = '#99C47A';
-    const star = createRef<Node>();
-    const trail1 = createRef<Layout>();
-    const trail2 = createRef<Layout>();
-    const trail3 = createRef<Layout>();
-    const dot = createRef<Rect>();
 
     this.add(
       <>
         <Layout layout={false}>
           <Node rotation={-45} position={44} scale={0.8}>
-            <Node cache y={-270}>
-              <Trail
-                y={() => (-150 * 4 * this.timePassed()) % 150}
-                ref={trail1}
-              >
-                {range(3).map(() => (
-                  <Rect width={40} radius={20} height={120} fill={YELLOW} />
-                ))}
-              </Trail>
-              <Rect
-                width={40}
-                radius={20}
-                height={270}
-                fill={'white'}
-                offsetY={-1}
-                compositeOperation={'destination-in'}
-              />
-            </Node>
-            <Node cache x={-70} y={-200}>
-              <Trail
-                y={() => (-150 * 2 * this.timePassed()) % 150}
-                ref={trail2}
-              >
-                {range(3).map(() => (
-                  <Rect width={40} height={120} radius={20} fill={RED} />
-                ))}
-              </Trail>
-              <Rect
-                width={40}
-                radius={20}
-                height={180}
-                fill={'white'}
-                offsetY={-1}
-                compositeOperation={'destination-in'}
-              />
-            </Node>
-            <Node cache x={70} y={-300}>
-              <Trail
-                y={() => (-130 * 2 * this.timePassed()) % 130}
-                ref={trail3}
-              >
-                {range(4).map(i => (
+            <Node cache>
+              <Node cache rotation={() => this.timePassed() * 360}>
+                {range(5).map(i => (
                   <Rect
-                    ref={i === 1 ? dot : undefined}
-                    width={40}
-                    radius={20}
-                    height={100}
-                    fill={GREEN}
+                    width={100}
+                    radius={50}
+                    height={150}
+                    fill={'#36393F'}
                     offsetY={1}
+                    rotation={(360 / 5) * i}
                   />
                 ))}
-              </Trail>
-              <Rect
-                width={40}
-                radius={20}
-                height={220}
-                fill={'white'}
-                offsetY={-1}
-                y={60}
-                compositeOperation={'destination-in'}
-              />
+              </Node>
+              <Node compositeOperation={'source-out'}>
+                {/* Trails */}
+                <Node cache y={-270}>
+                  <Trail y={() => (-150 * 4 * this.timePassed()) % 150}>
+                    {range(3).map(() => (
+                      <Rect width={40} radius={20} height={120} fill={YELLOW} />
+                    ))}
+                  </Trail>
+                  <Rect
+                    width={40}
+                    radius={20}
+                    height={270}
+                    fill={'white'}
+                    offsetY={-1}
+                    compositeOperation={'destination-in'}
+                  />
+                </Node>
+                <Node cache x={-70} y={-200}>
+                  <Trail y={() => (-150 * 2 * this.timePassed()) % 150}>
+                    {range(3).map(() => (
+                      <Rect width={40} height={120} radius={20} fill={RED} />
+                    ))}
+                  </Trail>
+                  <Rect
+                    width={40}
+                    radius={20}
+                    height={180}
+                    fill={'white'}
+                    offsetY={-1}
+                    compositeOperation={'destination-in'}
+                  />
+                </Node>
+                <Node cache x={70} y={-300}>
+                  <Trail y={() => (-130 * 2 * this.timePassed()) % 130}>
+                    {range(4).map(() => (
+                      <Rect
+                        width={40}
+                        radius={20}
+                        height={100}
+                        fill={GREEN}
+                        offsetY={1}
+                      />
+                    ))}
+                  </Trail>
+                  <Rect
+                    width={40}
+                    radius={20}
+                    height={220}
+                    fill={'white'}
+                    offsetY={-1}
+                    y={60}
+                    compositeOperation={'destination-in'}
+                  />
+                </Node>
+              </Node>
             </Node>
-            <Node rotation={() => this.timePassed() * 360} ref={star}>
-              {range(5).map(i => (
-                <Rect
-                  width={100}
-                  radius={50}
-                  height={150}
-                  fill={'#36393F'}
-                  offsetY={1}
-                  rotation={(360 / 5) * i}
-                />
-              ))}
+            <Node rotation={() => this.timePassed() * 360}>
               {range(5).map(i => (
                 <Rect
                   width={40}
