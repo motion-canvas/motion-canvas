@@ -43,19 +43,19 @@ export class CircleSegment extends Segment {
       );
     }
 
-    const startTangent = Vector2.fromRadians(startAngle);
-    const endTangent = Vector2.fromRadians(endAngle);
+    const startNormal = Vector2.fromRadians(startAngle);
+    const endNormal = Vector2.fromRadians(endAngle);
 
     return [
       {
-        position: this.center.add(startTangent.scale(this.radius)),
-        tangent: this.counter ? startTangent : startTangent.flipped,
-        normal: this.counter ? startTangent : startTangent.flipped,
+        position: this.center.add(startNormal.scale(this.radius)),
+        tangent: this.counter ? startNormal : startNormal.flipped,
+        normal: this.counter ? startNormal : startNormal.flipped,
       },
       {
-        position: this.center.add(endTangent.scale(this.radius)),
-        tangent: this.counter ? endTangent.flipped : endTangent,
-        normal: this.counter ? endTangent.flipped : endTangent,
+        position: this.center.add(endNormal.scale(this.radius)),
+        tangent: this.counter ? endNormal.flipped : endNormal,
+        normal: this.counter ? endNormal.flipped : endNormal,
       },
     ];
   }
@@ -64,12 +64,12 @@ export class CircleSegment extends Segment {
     const counterFactor = this.counter ? -1 : 1;
     const angle = this.from.radians + distance * this.angle * counterFactor;
 
-    const tangent = Vector2.fromRadians(angle);
+    const normal = Vector2.fromRadians(angle);
 
     return {
-      position: this.center.add(tangent.scale(this.radius)),
-      tangent: this.counter ? tangent : tangent.flipped,
-      normal: this.counter ? tangent : tangent.flipped,
+      position: this.center.add(normal.scale(this.radius)),
+      tangent: this.counter ? normal : normal.flipped,
+      normal: this.counter ? normal : normal.flipped,
     };
   }
 }
