@@ -5,32 +5,28 @@ import {linear} from '@motion-canvas/core/lib/tweening';
 import {Gradient} from '@motion-canvas/2d/lib/partials';
 import {Img, Layout, Rect, Txt} from '@motion-canvas/2d/lib/components';
 
-import valueImage from '../../assets/federico-bottos-Z3NceSeZqgI-unsplash.jpg';
 import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+
+const ImageUrl =
+  'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=50';
 
 export default makeScene2D(function* (scene) {
   const t = createSignal(0);
   const valueLayerYOffset = createSignal(100);
-  yield scene.add(
-    <Rect
-      width={1920}
-      height={1080}
-      fill={
-        new Gradient({
-          from: [-1920 / 2, 0],
-          to: [1920 / 2, 0],
-          stops: [
-            {offset: 0, color: '#a66'},
-            {offset: 1, color: '#66a'},
-          ],
-        })
-      }
-    />,
+  scene.fill(
+    new Gradient({
+      from: [-1920 / 2, 0],
+      to: [1920 / 2, 0],
+      stops: [
+        {offset: 0, color: '#a66'},
+        {offset: 1, color: '#66a'},
+      ],
+    }),
   );
 
   yield scene.add(
     <Layout y={-100} x={-500}>
-      <Img y={valueLayerYOffset} scale={0.7} src={valueImage} />
+      <Img y={valueLayerYOffset} scale={0.7} src={ImageUrl} />
       <AnimatedMotionCanvasIcon y={-10} timePassed={t} />
     </Layout>,
   );
@@ -42,7 +38,7 @@ export default makeScene2D(function* (scene) {
         compositeOperation={'source-in'}
         y={valueLayerYOffset}
         scale={0.7}
-        src={valueImage}
+        src={ImageUrl}
       />
     </Layout>,
   );
@@ -54,7 +50,7 @@ export default makeScene2D(function* (scene) {
         compositeOperation={'source-out'}
         y={valueLayerYOffset}
         scale={0.7}
-        src={valueImage}
+        src={ImageUrl}
       />
     </Layout>,
   );

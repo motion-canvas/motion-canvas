@@ -20,6 +20,14 @@
     "fps": 30,
     "resolutionScale": 1,
     "colorSpace": "srgb",
+    "exporter": {
+      "name": "image sequence",
+      "options": {
+        "fileType": "image/png",
+        "quality": 100,
+        "groupByScene": false
+      }
+    },
     "fileType": "image/png",
     "quality": 1
   }

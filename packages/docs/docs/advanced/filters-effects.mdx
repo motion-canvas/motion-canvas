@@ -5,7 +5,7 @@ slug: /canvas-operations
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 
-# Canvas Operations
+# Filter and Effects
 
 Because Motion Canvas is build ontop of the Browser's 2D Rendering Context, we
 can make use several canvas operations that are provided by the Browser.
@@ -35,18 +35,16 @@ while remaining green on the left.
 
 ## Masking and Composite Operations
 
-Composite Operations define how two layers are stacked ontop of each other. This
-way it is possible to define Masks. MDN has a
+Composite Operations define how two or more layers are stacked ontop of each
+other. This way it is possible to define Masks. MDN has a
 [great visualisation of all Composite Operations](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations).
 
-If you are familiar with Adobe After Effects, you might know about
-[Track Mattes](https://helpx.adobe.com/after-effects/using/track-mattes-and-traveling-mattes.html).
-Track Mattes allow you to define a Background "Color" Layer, and a Foreground
-"Stencil" Layer. The Alpha Matte Layer for example will multiply the
-background's color by the stencil's alpha value.
+You can create a Mask using two layers, a "Mask" / "Stencil" Layer, and a
+"Value" Layer. The Mask Layer will define if the Value Layer will be visible or
+not. The Value Layer will be what's actually visible in the end.
 
-The same effect can be achieved in Motion Canvas with the help of Composite
-Operations using `source-in` and `source-out`.
+To create a mask in Motion Canvas with the help of Composite Operations one can
+make use of the `source-in` and `source-out` Composite Operations.
 
 Create a new cached [`Node`](/api/2d/components/Node) that contains 2 children,
 the "stencil", and the "value" layers.
@@ -78,8 +76,8 @@ Icon acts as the stencil, the image in the back as the value.
 
 Both Filters and Composite Operations require a cached
 [`Node`](/api/2d/components/Node). Filters can set it automatically, while
-Composite Operations require you to set it explicitly on the parent
-[`Node`](/api/2d/components/Node).
+Composite Operations require you to set it explicitly on an ancestor
+[`Node`](/api/2d/components/Node) (usually the parent Node).
 
 A cached [`Node`](/api/2d/components/Node) and its children are rendered on an
 offscreen canvas first, before getting added to the main scene.  
@@ -88,14 +86,12 @@ creating a new canvas and moving the elements that should get affected by the
 filters over, applying filters to the entire "new" canvas, and then moving back
 the result, you effectively only apply the filters to the moved elements.
 
-<!-- Prettier merges header with text -->
-<!-- prettier-ignore -->
-:::caution Performance Implications 
-If you care about playback performance, for
-example because you want to embed the Scene on a website, try to minimize the
-use of cached Nodes as each cached [`Node`](/api/2d/components/Node) means a separate offscreen canvas.
+:::caution Performance Implications
 
-<!-- prettier-ignore -->
+If you care about playback performance, for example because you want to embed
+the Scene on a website, try to minimize the use of cached Nodes as each cached
+[`Node`](/api/2d/components/Node) means a separate offscreen canvas.
+
 :::
 
 To turn a [`Node`](/api/2d/components/Node) into a cached Node, simply pass the
