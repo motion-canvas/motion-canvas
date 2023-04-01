@@ -1,4 +1,3 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
 import {CurvePoint} from './CurvePoint';
 
 export abstract class Segment {
@@ -7,7 +6,7 @@ export abstract class Segment {
     start: number,
     end: number,
     move: boolean,
-  ): [Vector2, Vector2, Vector2, Vector2];
+  ): [CurvePoint, CurvePoint];
 
   public abstract getPoint(distance: number): CurvePoint;
 

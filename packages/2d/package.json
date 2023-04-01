@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/2d",
-  "version": "3.3.4",
+  "version": "3.4.0",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
@@ -30,7 +30,7 @@
     "vitest": "^0.29.2"
   },
   "dependencies": {
-    "@motion-canvas/core": "^3.3.4",
+    "@motion-canvas/core": "^3.4.0",
     "code-fns": "^0.10.1",
     "mathjax-full": "^3.2.2",
     "wcwidth": "^1.0.1"

@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
+
+### Bug Fixes
+
+- **ui:** fix zoom to fit
+  ([#561](https://github.com/motion-canvas/motion-canvas/issues/561))
+  ([1c947b4](https://github.com/motion-canvas/motion-canvas/commit/1c947b417e218809f33928d6cbb89d463bdc2e66))
+
+### Features
+
+- auto meta fields
+  ([#565](https://github.com/motion-canvas/motion-canvas/issues/565))
+  ([645af6d](https://github.com/motion-canvas/motion-canvas/commit/645af6d2b7e8d9332b6f08419c318ee9434d7f3f))
+- get name from meta file
+  ([#552](https://github.com/motion-canvas/motion-canvas/issues/552))
+  ([ae2ed8a](https://github.com/motion-canvas/motion-canvas/commit/ae2ed8a5998768f160ec340d8b63d600d27bc15c))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.3.4](https://github.com/motion-canvas/motion-canvas/compare/v3.3.3...v3.3.4) (2023-03-19)
 
 **Note:** Version bump only for package @motion-canvas/ui
