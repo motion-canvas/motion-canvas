@@ -30,6 +30,7 @@ import {
 } from '@motion-canvas/core/lib/signals';
 import {join, ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {waitFor} from '@motion-canvas/core/lib/flow';
+import wcwidth from 'wcwidth';
 
 type CodePoint = [number, number];
 type CodeRange = [CodePoint, CodePoint];
@@ -141,15 +142,6 @@ export class CodeBlock extends Shape {
     };
   }
 
-  protected hasCjk(char: string) {
-    let length = 0;
-    const result = char.match(
-      /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/,
-    );
-    if (result) length = result.length;
-    return length > 0;
-  }
-
   protected getTokensSize(tokens: Token[]) {
     const size = this.characterSize();
     let maxWidth = 0;
@@ -165,10 +157,7 @@ export class CodeBlock extends Shape {
           width = 0;
           height += size.height;
         } else {
-          width += size.width;
-          if (this.hasCjk(token.code[i])) {
-            width += size.width;
-          }
+          width += size.width * wcwidth(token.code[i]);
         }
       }
     }
@@ -341,10 +330,7 @@ export class CodeBlock extends Shape {
         context.globalAlpha =
           globalAlpha * alpha * getSelectionAlpha(position.x, position.y);
         context.fillText(char, position.x * w, position.y * lh);
-        position.x++;
-        if (this.hasCjk(char)) {
-          position.x++;
-        }
+        position.x += wcwidth(char);
       }
     };
 
@@ -400,10 +386,7 @@ export class CodeBlock extends Shape {
               getSelectionAlpha(point[0] + offsetX, point[1] + offsetY);
 
             context.fillText(char, (x + offsetX) * w, (y + offsetY) * lh);
-            offsetX++;
-            if (this.hasCjk(char)) {
-              offsetX++;
-            }
+            offsetX += wcwidth(char);
           }
         } else {
           useLogger().warn({

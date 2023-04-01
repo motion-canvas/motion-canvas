@@ -25,12 +25,14 @@
   ],
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
+    "@types/wcwidth": "^1.0.0",
     "jsdom": "^21.1.0",
     "vitest": "^0.29.2"
   },
   "dependencies": {
     "@motion-canvas/core": "^3.3.4",
-    "code-fns": "^0.8.2",
-    "mathjax-full": "^3.2.2"
+    "code-fns": "^0.10.1",
+    "mathjax-full": "^3.2.2",
+    "wcwidth": "^1.0.1"
   }
 }

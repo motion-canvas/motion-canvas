@@ -8,6 +8,7 @@
     "target": "es2020",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "declaration": true,
     "declarationMap": true,
     "inlineSourceMap": true,
