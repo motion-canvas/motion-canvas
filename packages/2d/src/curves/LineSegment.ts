@@ -6,7 +6,7 @@ import {CurvePoint} from './CurvePoint';
 export class LineSegment extends Segment {
   private readonly length: number;
   private readonly vector: Vector2;
-  private readonly tangent: Vector2;
+  private readonly normal: Vector2;
 
   public constructor(
     public readonly from: Vector2,
@@ -15,7 +15,7 @@ export class LineSegment extends Segment {
     super();
     this.vector = to.sub(from);
     this.length = this.vector.magnitude;
-    this.tangent = this.vector.perpendicular.normalized.safe;
+    this.normal = this.vector.perpendicular.normalized.safe;
   }
 
   public get arcLength(): number {
@@ -27,18 +27,34 @@ export class LineSegment extends Segment {
     start = 0,
     end = 1,
     move = false,
-  ): [Vector2, Vector2, Vector2, Vector2] {
+  ): [CurvePoint, CurvePoint] {
     const from = this.from.add(this.vector.scale(start));
     const to = this.from.add(this.vector.scale(end));
     if (move) {
       moveTo(context, from);
     }
     lineTo(context, to);
-    return [from, this.tangent.flipped, to, this.tangent];
+
+    return [
+      {
+        position: from,
+        tangent: this.normal.flipped,
+        normal: this.normal,
+      },
+      {
+        position: to,
+        tangent: this.normal,
+        normal: this.normal,
+      },
+    ];
   }
 
   public getPoint(distance: number): CurvePoint {
     const point = this.from.add(this.vector.scale(distance));
-    return {position: point, tangent: this.tangent.flipped};
+    return {
+      position: point,
+      tangent: this.normal.flipped,
+      normal: this.normal,
+    };
   }
 }

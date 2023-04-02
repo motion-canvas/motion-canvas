@@ -32,9 +32,12 @@ export abstract class PolynomialSegment extends Segment {
    * @param t - The t value at which to evaluate the curve.
    */
   public eval(t: number): CurvePoint {
+    const tangent = this.tangent(t);
+
     return {
       position: this.curve.eval(t),
-      tangent: this.tangent(t),
+      tangent,
+      normal: tangent.perpendicular,
     };
   }
 
@@ -50,7 +53,11 @@ export abstract class PolynomialSegment extends Segment {
     const closestPoint = this.pointSampler.pointAtDistance(
       this.arcLength * distance,
     );
-    return {position: closestPoint.position, tangent: closestPoint.tangent};
+    return {
+      position: closestPoint.position,
+      tangent: closestPoint.tangent,
+      normal: closestPoint.tangent.perpendicular,
+    };
   }
 
   public transformPoints(matrix: DOMMatrix): Vector2[] {
@@ -72,7 +79,7 @@ export abstract class PolynomialSegment extends Segment {
     start = 0,
     end = 1,
     move = true,
-  ): [Vector2, Vector2, Vector2, Vector2] {
+  ): [CurvePoint, CurvePoint] {
     let curve: PolynomialSegment | null = null;
     let startT = start;
     let endT = end;
@@ -96,11 +103,20 @@ export abstract class PolynomialSegment extends Segment {
     }
     (curve ?? this).doDraw(context);
 
+    const startTangent = this.tangent(startT);
+    const endTangent = this.tangent(endT);
+
     return [
-      points[0],
-      this.tangent(startT),
-      points.at(-1)!,
-      this.tangent(endT),
+      {
+        position: points[0],
+        tangent: startTangent,
+        normal: startTangent.perpendicular,
+      },
+      {
+        position: points.at(-1)!,
+        tangent: endTangent,
+        normal: endTangent.perpendicular,
+      },
     ];
   }
 
