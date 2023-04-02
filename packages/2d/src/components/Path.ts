@@ -6,7 +6,6 @@ import {
 import {BBox, Vector2} from '@motion-canvas/core/lib/types';
 import {View2D} from './View2D';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
-import {Line, LineProps} from './Line';
 import {CurveProfile, LineSegment} from '../curves';
 import {getPathProfile} from '../curves/getPathProfile';
 import {computed, signal} from '../decorators';
@@ -16,13 +15,14 @@ import {interpolateCurveProfile} from '../curves/interpolateCurveProfile';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ArcSegment} from '../curves/ArcSegment';
 import {drawLine, lineTo} from '../utils';
+import {Curve, CurveProps} from './Curve';
 
-export interface PathProps extends LineProps {
+export interface PathProps extends CurveProps {
   data?: SignalValue<string>;
   tweenAlignPath?: SignalValue<boolean>;
 }
 
-export class Path extends Line {
+export class Path extends Curve {
   @lazy(() => {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -40,6 +40,13 @@ export class Path extends Line {
   public constructor(props: PathProps) {
     super(props);
     this.canHaveSubpath = true;
+
+    if (!props.data) {
+      useLogger().warn({
+        message: `Path data not specified for Path. Path need path data.`,
+        inspect: this.key,
+      });
+    }
   }
 
   @computed()
@@ -59,13 +66,19 @@ export class Path extends Line {
     return BBox.fromPoints(...points);
   }
 
-  protected override validateProps(props: PathProps): void {
-    if (!props.data) {
-      useLogger().warn({
-        message: `Path data not specified for Path. Path need path data.`,
-        inspect: this.key,
-      });
+  protected override lineWidthCoefficient(): number {
+    const join = this.lineJoin();
+
+    let coefficient = super.lineWidthCoefficient();
+
+    if (join === 'miter') {
+      const {minSin} = this.profile();
+      if (minSin > 0) {
+        coefficient = Math.max(coefficient, 0.5 / minSin);
+      }
     }
+
+    return coefficient;
   }
 
   public static getPathBBox(data: string) {
@@ -126,13 +139,8 @@ export class Path extends Line {
         path = new Path2D();
         endPoint = null;
       }
-      const [, , currentEndPoint, ,] = segment.draw(
-        path,
-        0,
-        1,
-        endPoint == null,
-      );
-      endPoint = currentEndPoint;
+      const [, end] = segment.draw(path, 0, 1, endPoint == null);
+      endPoint = end.position;
     }
     context.stroke(path);
     context.restore();

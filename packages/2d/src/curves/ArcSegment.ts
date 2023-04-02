@@ -185,7 +185,7 @@ export class ArcSegment extends Segment {
     start: number,
     end: number,
     move: boolean,
-  ): [Vector2, Vector2, Vector2, Vector2] {
+  ): [CurvePoint, CurvePoint] {
     const startAngle = this.startAngle + this.deltaAngle * start;
     const endAngle = this.startAngle + this.deltaAngle * end;
     const startPos = this.getPoint(start);
@@ -204,19 +204,16 @@ export class ArcSegment extends Segment {
       this.sweepFlag === 0,
     );
 
-    return [
-      startPos.position,
-      startPos.tangent,
-      endPos.position,
-      endPos.tangent,
-    ];
+    return [startPos, endPos];
   }
 
   public getPoint(distance: number): CurvePoint {
     const angle = this.startAngle + distance * this.deltaAngle;
+    const tangent = this.getAngleDerivative(angle).normalized;
     return {
       position: this.getAnglePosition(angle),
-      tangent: this.getAngleDerivative(angle).normalized,
+      tangent,
+      normal: tangent.perpendicular,
     };
   }
   public get arcLength(): number {
