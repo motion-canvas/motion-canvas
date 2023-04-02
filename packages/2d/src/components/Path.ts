@@ -3,19 +3,26 @@ import {
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
-import {BBox, SerializedVector2} from '@motion-canvas/core/lib/types';
-import {DesiredLength} from '../partials';
-import {computed, signal} from '../decorators';
-import {Shape, ShapeProps} from './Shape';
+import {BBox, Vector2} from '@motion-canvas/core/lib/types';
 import {View2D} from './View2D';
 import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
-import {map, TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
+import {Line, LineProps} from './Line';
+import {CurveProfile, LineSegment} from '../curves';
+import {getPathProfile} from '../curves/getPathProfile';
+import {computed, signal} from '../decorators';
+import {PolynomialSegment} from '../curves/PolynomialSegment';
+import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
+import {interpolateCurveProfile} from '../curves/interpolateCurveProfile';
+import {useLogger} from '@motion-canvas/core/lib/utils';
+import {ArcSegment} from '../curves/ArcSegment';
+import {drawLine, lineTo} from '../utils';
 
-export interface PathProps extends ShapeProps {
+export interface PathProps extends LineProps {
   data?: SignalValue<string>;
+  tweenAlignPath?: SignalValue<boolean>;
 }
 
-export class Path extends Shape {
+export class Path extends Line {
   @lazy(() => {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -24,53 +31,46 @@ export class Path extends Shape {
     return path;
   })
   protected static pathElement: SVGPathElement;
+  private currentProfile = createSignal<CurveProfile | null>(null);
   @signal()
   public declare readonly data: SimpleSignal<string, this>;
-  private tweenProgress = createSignal<number | null>(null);
-  private targetData: string | null = null;
-  private targetBBox: BBox | null = null;
+  @signal()
+  public declare readonly tweenAlignPath: SimpleSignal<boolean, this>;
 
   public constructor(props: PathProps) {
     super(props);
+    this.canHaveSubpath = true;
+  }
+
+  @computed()
+  public override profile(): CurveProfile {
+    const currentProfile = this.currentProfile();
+    if (currentProfile) return currentProfile;
+    return getPathProfile(this.data());
+  }
+
+  protected override childrenBBox() {
+    const points = this.profile().segments.flatMap(segment => {
+      if (segment instanceof LineSegment) return [segment.from, segment.to];
+      else if (segment instanceof PolynomialSegment) return segment.points;
+      else if (segment instanceof ArcSegment) return segment.extremPoint;
+      return [];
+    });
+    return BBox.fromPoints(...points);
+  }
+
+  protected override validateProps(props: PathProps): void {
+    if (!props.data) {
+      useLogger().warn({
+        message: `Path data not specified for Path. Path need path data.`,
+        inspect: this.key,
+      });
+    }
   }
 
   public static getPathBBox(data: string) {
     Path.pathElement.setAttribute('d', data);
     return new BBox(Path.pathElement.getBBox());
-  }
-
-  @computed()
-  public getCurrentPathBBox() {
-    return Path.getPathBBox(this.data());
-  }
-
-  protected override desiredSize(): SerializedVector2<DesiredLength> {
-    const {x, y} = super.desiredSize();
-    const bbox = this.getCurrentPathBBox().size;
-    return {
-      x: x ?? bbox.x,
-      y: y ?? bbox.y,
-    };
-  }
-
-  protected override getPath(): Path2D {
-    const progress = this.tweenProgress() ?? 0;
-    const pathBBox = this.getCurrentPathBBox().center;
-    const path = new Path2D();
-    path.addPath(
-      new Path2D(this.data()),
-      new DOMMatrix()
-        .scaleSelf(1 - progress)
-        .translateSelf(-pathBBox.x, -pathBBox.y),
-    );
-    if (this.targetData) {
-      const center = this.targetBBox!.center;
-      path.addPath(
-        new Path2D(this.targetData),
-        new DOMMatrix().scaleSelf(progress).translateSelf(-center.x, -center.y),
-      );
-    }
-    return path;
   }
 
   @threadable()
@@ -79,37 +79,76 @@ export class Path extends Shape {
     time: number,
     timingFunction: TimingFunction,
   ) {
-    this.targetData = newPath;
-    this.targetBBox = Path.getPathBBox(newPath);
+    const fromProfile = this.profile();
+    const toProfile = getPathProfile(newPath);
 
-    const autoWidth = this.customWidth() === null;
-    const autoHeight = this.customHeight() === null;
-    const oldBBox = this.getCurrentPathBBox();
+    const interpolator = interpolateCurveProfile(
+      fromProfile,
+      toProfile,
+      this.tweenAlignPath(),
+    );
 
-    this.tweenProgress(0);
+    this.currentProfile(fromProfile);
     yield* tween(
       time,
       value => {
         const progress = timingFunction(value);
-        this.tweenProgress(progress);
-        if (autoWidth)
-          this.customWidth(
-            map(oldBBox.width, this.targetBBox!.width, progress),
-          );
-        if (autoHeight)
-          this.customHeight(
-            map(oldBBox.height, this.targetBBox!.height, progress),
-          );
+        this.currentProfile(interpolator(progress));
       },
       () => {
-        this.tweenProgress(null);
-        this.targetData = null;
-        this.targetBBox = null;
-
-        if (autoWidth) this.customWidth(null);
-        if (autoHeight) this.customHeight(null);
+        this.currentProfile(null);
         this.data(newPath);
       },
     );
+  }
+
+  public override drawOverlay(
+    context: CanvasRenderingContext2D,
+    matrix: DOMMatrix,
+  ): void {
+    const box = this.childrenBBox().transformCorners(matrix);
+    const size = this.computedSize();
+    const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
+    const segments = this.profile().segments;
+
+    context.lineWidth = 1;
+    context.strokeStyle = 'white';
+    context.fillStyle = 'white';
+
+    context.save();
+    context.setTransform(matrix);
+    let endPoint: Vector2 | null = null;
+    let path = new Path2D();
+
+    for (const segment of segments) {
+      if (endPoint && !segment.getPoint(0).position.equals(endPoint)) {
+        context.stroke(path);
+        path = new Path2D();
+        endPoint = null;
+      }
+      const [, , currentEndPoint, ,] = segment.draw(
+        path,
+        0,
+        1,
+        endPoint == null,
+      );
+      endPoint = currentEndPoint;
+    }
+    context.stroke(path);
+    context.restore();
+
+    const radius = 8;
+    context.beginPath();
+    lineTo(context, offset.addY(-radius));
+    lineTo(context, offset.addY(radius));
+    lineTo(context, offset);
+    lineTo(context, offset.addX(-radius));
+    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    context.stroke();
+
+    context.beginPath();
+    drawLine(context, box);
+    context.closePath();
+    context.stroke();
   }
 }

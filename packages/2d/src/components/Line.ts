@@ -84,6 +84,8 @@ export class Line extends Shape {
     this
   >;
 
+  protected canHaveSubpath = false;
+
   protected override desiredSize(): SerializedVector2<DesiredLength> {
     return this.childrenBBox().size;
   }
@@ -137,6 +139,7 @@ export class Line extends Shape {
   @computed()
   protected curveDrawingInfo(): CurveDrawingInfo {
     const path = new Path2D();
+    let subpath = new Path2D();
     const profile = this.profile();
 
     let start = this.percentageToDistance(this.start());
@@ -174,12 +177,22 @@ export class Line extends Shape {
       const clampedStart = clamp(0, 1, relativeStart);
       const clampedEnd = clamp(0, 1, relativeEnd);
 
+      if (
+        this.canHaveSubpath &&
+        endPoint &&
+        !segment.getPoint(0).position.equals(endPoint)
+      ) {
+        path.addPath(subpath);
+        subpath = new Path2D();
+        startPoint = null;
+      }
+
       const [
         currentStartPoint,
         currentStartTangent,
         currentEndPoint,
         currentEndTangent,
-      ] = segment.draw(path, clampedStart, clampedEnd, startPoint === null);
+      ] = segment.draw(subpath, clampedStart, clampedEnd, startPoint === null);
 
       if (startPoint === null) {
         startPoint = currentStartPoint;
@@ -194,8 +207,9 @@ export class Line extends Shape {
     }
 
     if (this.end() === 1 && this.closed()) {
-      path.closePath();
+      subpath.closePath();
     }
+    path.addPath(subpath);
 
     return {
       startPoint: startPoint ?? Vector2.zero,

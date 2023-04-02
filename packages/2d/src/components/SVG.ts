@@ -255,13 +255,13 @@ export class SVG extends Shape {
         useLogger().warn('blank path data at ' + child.id);
         return;
       }
-      const center = Path.getPathBBox(data).center;
-      const transformation = transformMatrix.translate(center.x, center.y);
+      const transformation = transformMatrix;
       yield {
         id: id || 'path',
-        type: Path,
+        type: Path as new (props: NodeProps) => Node,
         props: {
           data,
+          tweenAlignPath: true,
           ...SVG.getMatrixTransformation(transformation),
           ...style,
         } as PathProps,
