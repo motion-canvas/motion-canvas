@@ -4,8 +4,7 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {BBox, Vector2} from '@motion-canvas/core/lib/types';
-import {View2D} from './View2D';
-import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
+import {threadable} from '@motion-canvas/core/lib/decorators';
 import {CurveProfile, LineSegment} from '../curves';
 import {getPathProfile} from '../curves/getPathProfile';
 import {computed, signal} from '../decorators';
@@ -23,14 +22,6 @@ export interface PathProps extends CurveProps {
 }
 
 export class Path extends Curve {
-  @lazy(() => {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    svg.appendChild(path);
-    View2D.shadowRoot.appendChild(svg);
-    return path;
-  })
-  protected static pathElement: SVGPathElement;
   private currentProfile = createSignal<CurveProfile | null>(null);
   @signal()
   public declare readonly data: SimpleSignal<string, this>;
@@ -79,11 +70,6 @@ export class Path extends Curve {
     }
 
     return coefficient;
-  }
-
-  public static getPathBBox(data: string) {
-    Path.pathElement.setAttribute('d', data);
-    return new BBox(Path.pathElement.getBBox());
   }
 
   @threadable()
