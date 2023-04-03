@@ -24,7 +24,7 @@ export interface QuadBezierProps extends CurveProps {
 /**
  * A node for drawing a quadratic Bézier curve.
  *
- * @example
+ * @preview
  * ```tsx editor
  * export default makeScene2D(function* (view) {
  *   const bezier = createRef<QuadBezier>();
@@ -74,7 +74,6 @@ export class QuadBezier extends Bezier {
     return new QuadBezierSegment(this.p0(), this.p1(), this.p2());
   }
 
-  @computed()
   protected overlayInfo(matrix: DOMMatrix): BezierOverlayInfo {
     const [p0, p1, p2] = this.segment().transformPoints(matrix);
 

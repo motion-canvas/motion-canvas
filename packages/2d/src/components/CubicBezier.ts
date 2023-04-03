@@ -28,7 +28,7 @@ export interface CubicBezierProps extends CurveProps {
 /**
  * A node for drawing a cubic Bézier curve.
  *
- * @example
+ * @preview
  * Defining a cubic Bézier curve using `points` property.
  *
  * ```tsx editor
@@ -84,7 +84,6 @@ export class CubicBezier extends Bezier {
     return new CubicBezierSegment(this.p0(), this.p1(), this.p2(), this.p3());
   }
 
-  @computed()
   protected overlayInfo(matrix: DOMMatrix): BezierOverlayInfo {
     const [p0, p1, p2, p3] = this.segment().transformPoints(matrix);
 

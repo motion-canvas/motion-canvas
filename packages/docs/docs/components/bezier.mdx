@@ -59,7 +59,7 @@ export default makeScene2D(function* (view) {
 ```
 
 Bézier curves are ubiquitous in computer graphics. Motion Canvas comes with
-components to draw both quadratic as well as cubic Bézier curves.
+components to draw both quadratic and cubic Bézier curves.
 
 :::tip
 
@@ -70,26 +70,16 @@ for, check out the [`Spline`][spline] component, instead.
 
 ## Using the components
 
-To draw Bézier curves, we can use the [`QuadBezier`][quad-bezier] component for
-quadratic Bézier curves and [`CubicBezier`][cubic-bezier] component for cubic
-Bézier curves, respectively.
-
-:::info
-
-Most of the examples on this page can be switched between cubic and quadratic
-Bézier curves by using the dropdown at the right side of the animation player.
-
-:::
+Each example below applies to both the [`QuadBezier`][quad-bezier] and
+[`CubicBezier`][cubic-bezier] nodes. You can switch between the two types of
+curves using the dropdown on the right side of the animation player.
 
 ### Defining control points
 
 Bézier curves are defined by a start and end point, as well as several control
 points. The exact number of control points is different for different kinds of
-Bézier curves. A quadratic Bézier curve only has a single control point whereas
+Bézier curves. A quadratic Bézier curve has only a single control point whereas
 a cubic Bézier curve has two.
-
-To define a Bézier curve, we need to define its start and point, as well as its
-control points.
 
 ```tsx editor
 // snippet Cubic Bézier
