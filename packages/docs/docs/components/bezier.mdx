@@ -10,10 +10,9 @@ slug: /bezier-curves
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {CubicBezier} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
-  const bezier = createRef<Spline>();
+  const bezier = createRef<CubicBezier>();
 
   view.add(
     <CubicBezier
@@ -36,10 +35,9 @@ export default makeScene2D(function* (view) {
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {QuadBezier} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
-  const bezier = createRef<Spline>();
+  const bezier = createRef<QuadBezier>();
 
   view.add(
     <QuadBezier
@@ -280,6 +278,6 @@ export default makeScene2D(function* (view) {
 [line]: /api/2d/components/Line
 [quad-bezier]: /api/2d/components/QuadBezier
 [cubic-bezier]: /api/2d/components/CubicBezier
-[start-arrow]: /api/2d/components/CurveProps#startArrow
-[end-arrow]: /api/2d/components/CurveProps#endArrow
-[arrow-size]: /api/2d/components/CurveProps#arrowSize
+[start-arrow]: /api/2d/components/QuadBezierProps#startArrow
+[end-arrow]: /api/2d/components/QuadBezierProps#endArrow
+[arrow-size]: /api/2d/components/QuadBezierProps#arrowSize

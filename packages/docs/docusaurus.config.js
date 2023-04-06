@@ -21,7 +21,7 @@ const config = {
   customFields: {
     discordApi:
       'https://discord.com/api/guilds/1071029581009657896/widget.json',
-    discordUrl: 'https://discord.gg/XnnWTrHYAW',
+    discordUrl: 'https://chat.motioncanvas.io',
     githubApi: 'https://api.github.com/repos/motion-canvas/motion-canvas',
     githubUrl: 'https://github.com/motion-canvas/motion-canvas',
   },
@@ -79,7 +79,7 @@ const config = {
               },
               {
                 label: 'Discord',
-                href: 'https://discord.gg/XnnWTrHYAW',
+                href: 'https://chat.motioncanvas.io',
               },
             ],
           },
