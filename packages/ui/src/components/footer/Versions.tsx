@@ -7,8 +7,12 @@ import {compareVersions} from '../../utils';
 
 export function Versions() {
   const {project} = useApplication();
-  const [newVersion, setNewVersion] = useState(project.versions.core);
-  const isOld = compareVersions(project.versions.core, newVersion) < 0;
+  const versions = {
+    core: '0.0.0',
+    ...(project.versions ?? {}),
+  };
+  const [newVersion, setNewVersion] = useState(versions.core);
+  const isOld = compareVersions(versions.core, newVersion) < 0;
 
   useEffect(() => {
     const abort = new AbortController();
@@ -24,7 +28,7 @@ export function Versions() {
     <div className={styles.root}>
       {isOld && (
         <a
-          href={`https://motioncanvas.io/blog/version-${newVersion}`}
+          href="https://github.com/motion-canvas/motion-canvas/releases"
           target="_blank"
           title="See what's new"
           className={clsx(styles.link, styles.main)}
@@ -36,15 +40,15 @@ export function Versions() {
         title="Copy version information"
         className={styles.link}
         onClick={() => {
-          const versions = Object.entries(project.versions)
+          const text = Object.entries(versions)
             .filter(([, version]) => !!version)
             .map(([name, version]) => `- ${name}: ${version}`)
             .join('\n');
 
-          navigator.clipboard.writeText(versions);
+          navigator.clipboard.writeText(text);
         }}
       >
-        {project.versions.core}
+        {versions.core}
       </div>
     </div>
   );
