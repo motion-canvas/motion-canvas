@@ -29,8 +29,10 @@ import {
 } from '@site/src/components/Fiddle/transformer';
 import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import Dropdown from '@site/src/components/Dropdown';
+import clsx from 'clsx';
 
 export interface FiddleProps {
+  className?: string;
   children: string;
 }
 
@@ -48,7 +50,7 @@ function highlight(sizePixels = 4) {
   ];
 }
 
-export default function Fiddle({children}: FiddleProps) {
+export default function Fiddle({children, className}: FiddleProps) {
   const [player, setPlayer] = useState<Player>(null);
   const editorView = useRef<EditorView>(null);
   const editorRef = useRef<HTMLDivElement>();
@@ -133,7 +135,7 @@ export default function Fiddle({children}: FiddleProps) {
     hasChangedSinceLastUpdate;
 
   return (
-    <div className={styles.root}>
+    <div className={clsx(styles.root, className)}>
       <div className={styles.preview} ref={previewRef}>
         {!player && <div>Press play to preview the animation</div>}
       </div>
