@@ -107,6 +107,65 @@ useful properties are listed below:
 <ApiSnippet url={'/api/2d/components/Layout#justifyContent'} />
 <hr />
 
+### Disabling `layout` on a child node
+
+Sometimes it can be useful to remove the node from the node tree. This way the
+node can be styled independently of its ancestor layout, as well as moved freely
+on the canvas.
+
+Removal of node from the node tree is done by setting a value of `layout`
+property to `false`. The node can be brought back to its original position
+inside the node tree by setting the value of `layout` property to `true`.
+
+After disabling `layout` on a node, the following things change:
+
+1. the node is moved to the place of origin, e.g. center of the scene,
+2. the node can now be position on canvas freely,
+3. the node no longer inherits properties from its parent, such as text styling,
+4. the node's former parent layout will no longer considers the node's width or
+   height when calculating its own bounding box. Disabling a layout on a node
+   can be roughly thought of as an equivalent to setting a `position` CSS
+   property of an HTML node to `absolute` value.
+
+:::info
+
+The node retains its rendering order (`z-index`, in terms of CSS), e.g. it will
+potentially overlap any other nodes that were rendered previously, as well as
+get potentially covered by nodes that appear later.
+
+:::
+
+Consider the following example:
+
+1. a top-level `<Rect>` node has a `layout` property set, meaning that all its
+   children nodes follow `<Rect>`'s styling and direction,
+2. the yellow `<Circle>` is a child of `<Rect>`,
+3. commenting out line `yellowCircle().layout = false;` will make two green
+   circles get close to each other, as if the yellow circle is not there; the
+   yellow circle now stands alone now, can be moved freely and has it's own text
+   styling.
+
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle, Rect} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const yellowCircle = createRef<Circle>();
+
+  view.add(
+    <Rect layout alignItems="center" direction="row">
+      <Circle width={100} height={100} fill="forestgreen" />
+      <Circle width={150} height={150} fill="yellow" ref={yellowCircle} />
+      <Circle width={100} height={100} fill="green" />
+      <Circle width={100} height={100} fill="darkgreen" />
+    </Rect>,
+  );
+
+  yellowCircle().layout = false;
+});
+```
+
 ## Groups
 
 Nodes that don't extend the `Layout` class, such as the `Node` itself, are
