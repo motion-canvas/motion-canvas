@@ -91,10 +91,10 @@ export abstract class PolynomialSegment extends Segment {
 
       startT = this.pointSampler.distanceToT(startDistance);
       endT = this.pointSampler.distanceToT(endDistance);
-      endT = (endT - startT) / (1 - startT);
+      const relativeEndT = (endT - startT) / (1 - startT);
 
       const [, startSegment] = this.split(startT);
-      [curve] = startSegment.split(endT);
+      [curve] = startSegment.split(relativeEndT);
       points = curve.points;
     }
 

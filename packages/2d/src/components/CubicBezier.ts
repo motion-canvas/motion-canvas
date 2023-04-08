@@ -8,21 +8,21 @@ import {bezierCurveTo, lineTo, moveTo} from '../utils';
 import {Bezier, BezierOverlayInfo} from './Bezier';
 
 export interface CubicBezierProps extends CurveProps {
-  p0: SignalValue<PossibleVector2>;
-  p0X: SignalValue<number>;
-  p0Y: SignalValue<number>;
+  p0?: SignalValue<PossibleVector2>;
+  p0X?: SignalValue<number>;
+  p0Y?: SignalValue<number>;
 
-  p1: SignalValue<PossibleVector2>;
-  p1X: SignalValue<number>;
-  p1Y: SignalValue<number>;
+  p1?: SignalValue<PossibleVector2>;
+  p1X?: SignalValue<number>;
+  p1Y?: SignalValue<number>;
 
-  p2: SignalValue<PossibleVector2>;
-  p2X: SignalValue<number>;
-  p2Y: SignalValue<number>;
+  p2?: SignalValue<PossibleVector2>;
+  p2X?: SignalValue<number>;
+  p2Y?: SignalValue<number>;
 
-  p3: SignalValue<PossibleVector2>;
-  p3X: SignalValue<number>;
-  p3Y: SignalValue<number>;
+  p3?: SignalValue<PossibleVector2>;
+  p3X?: SignalValue<number>;
+  p3Y?: SignalValue<number>;
 }
 
 /**
