@@ -8,17 +8,17 @@ import {Bezier, BezierOverlayInfo} from './Bezier';
 import {CurveProps} from './Curve';
 
 export interface QuadBezierProps extends CurveProps {
-  p0: SignalValue<PossibleVector2>;
-  p0X: SignalValue<number>;
-  p0Y: SignalValue<number>;
+  p0?: SignalValue<PossibleVector2>;
+  p0X?: SignalValue<number>;
+  p0Y?: SignalValue<number>;
 
-  p1: SignalValue<PossibleVector2>;
-  p1X: SignalValue<number>;
-  p1Y: SignalValue<number>;
+  p1?: SignalValue<PossibleVector2>;
+  p1X?: SignalValue<number>;
+  p1Y?: SignalValue<number>;
 
-  p2: SignalValue<PossibleVector2>;
-  p2X: SignalValue<number>;
-  p2Y: SignalValue<number>;
+  p2?: SignalValue<PossibleVector2>;
+  p2X?: SignalValue<number>;
+  p2Y?: SignalValue<number>;
 }
 
 /**
