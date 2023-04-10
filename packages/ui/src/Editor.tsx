@@ -22,7 +22,7 @@ export function Editor() {
         start={
           <ResizeableLayout
             resizeable={sidebarOpen}
-            id={'sidebar-vieport'}
+            id={'sidebar-viewport'}
             start={<Sidebar setOpen={setSidebarOpen} />}
             end={<Viewport />}
           />
