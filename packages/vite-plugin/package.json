@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "follow-redirects": "^1.15.2",
+    "glob": "^10.0.0",
     "mime-types": "^2.1.35"
   }
 }

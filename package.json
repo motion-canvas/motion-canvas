@@ -52,7 +52,6 @@
     "*.{js,jsx,ts,tsx,md,scss}": "prettier --write"
   },
   "dependencies": {
-    "@motion-canvas/core": "^3.0.0",
-    "glob": "^9.3.2"
+    "@motion-canvas/core": "^3.0.0"
   }
 }
