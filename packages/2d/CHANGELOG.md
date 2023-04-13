@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.1](https://github.com/motion-canvas/motion-canvas/compare/v3.5.0...v3.5.1) (2023-04-08)
+
+### Bug Fixes
+
+- **2d:** fix curve arrow alignment when animating start signal
+  ([#615](https://github.com/motion-canvas/motion-canvas/issues/615))
+  ([2fefc40](https://github.com/motion-canvas/motion-canvas/commit/2fefc4026050159ba204c7629832ad83e8bfa51b))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/motion-canvas/motion-canvas/compare/v3.4.0...v3.5.0) (2023-04-06)
+
+### Bug Fixes
+
+- **2d:** calculate arrow orientations for curves correctly
+  ([#597](https://github.com/motion-canvas/motion-canvas/issues/597))
+  ([1626811](https://github.com/motion-canvas/motion-canvas/commit/1626811ec4cd1bd2a3d43e393ced40a7da462c3a))
+- **2d:** smoothly play videos when presenting
+  ([#600](https://github.com/motion-canvas/motion-canvas/issues/600))
+  ([294fe6a](https://github.com/motion-canvas/motion-canvas/commit/294fe6ac056ab074c77214fcf9035f53fac9258c)),
+  closes [#578](https://github.com/motion-canvas/motion-canvas/issues/578)
+- **2d:** wait for reused async resources
+  ([#599](https://github.com/motion-canvas/motion-canvas/issues/599))
+  ([280e065](https://github.com/motion-canvas/motion-canvas/commit/280e065fe69e9a744b7b12eb4609e7d87f76bb63)),
+  closes [#593](https://github.com/motion-canvas/motion-canvas/issues/593)
+
+### Features
+
+- **2d:** add Bézier nodes
+  ([#603](https://github.com/motion-canvas/motion-canvas/issues/603))
+  ([9841cfd](https://github.com/motion-canvas/motion-canvas/commit/9841cfdc3947ca4e6d6e42ed21eae88e855f855d))
+- **2d:** improve Video node
+  ([#601](https://github.com/motion-canvas/motion-canvas/issues/601))
+  ([3801d83](https://github.com/motion-canvas/motion-canvas/commit/3801d83415bbdeeee5d6d53d0c18e5d9e78fba56))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
 
 ### Bug Fixes

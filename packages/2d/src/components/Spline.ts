@@ -1,14 +1,24 @@
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {
+  isReactive,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core/lib/signals';
+import {
+  BBox,
+  PossibleVector2,
+  SerializedVector2,
+  Vector2,
+} from '@motion-canvas/core/lib/types';
 import {useLogger} from '@motion-canvas/core/lib/utils';
-import {Line, LineProps} from './Line';
-import {Node} from './Node';
 import {
   CubicBezierSegment,
   CurveProfile,
   getBezierSplineProfile,
   KnotInfo,
 } from '../curves';
+import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {computed, initial, signal} from '../decorators';
+import {DesiredLength} from '../partials';
 import {
   arc,
   bezierCurveTo,
@@ -17,17 +27,21 @@ import {
   moveTo,
   quadraticCurveTo,
 } from '../utils';
+import {Curve, CurveProps} from './Curve';
 import {Knot} from './Knot';
-import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
-import {DesiredLength} from '../partials';
+import {Node} from './Node';
 import splineWithInsufficientKnots from './__logs__/spline-with-insufficient-knots.md';
-import {PolynomialSegment} from '../curves/PolynomialSegment';
 
-export interface SplineProps extends LineProps {
+export interface SplineProps extends CurveProps {
   /**
    * {@inheritDoc Spline.smoothness}
    */
   smoothness?: SignalValue<number>;
+
+  /**
+   * {@inheritDoc Spline.points}
+   */
+  points?: SignalValue<SignalValue<PossibleVector2[]>>;
 }
 
 /**
@@ -73,7 +87,7 @@ export interface SplineProps extends LineProps {
  * </Spline>
  * ```
  */
-export class Spline extends Line {
+export class Spline extends Curve {
   /**
    * Determine the smoothness of the spline when using auto-calculated handles.
    *
@@ -86,42 +100,16 @@ export class Spline extends Line {
   @signal()
   public declare readonly smoothness: SimpleSignal<number>;
 
+  @initial(null)
+  @signal()
+  public declare readonly points: SimpleSignal<
+    SignalValue<PossibleVector2>[] | null,
+    this
+  >;
+
   public constructor(props: SplineProps) {
     super(props);
-  }
 
-  public override profile(): CurveProfile {
-    return getBezierSplineProfile(
-      this.knots(),
-      this.closed(),
-      this.smoothness(),
-    );
-  }
-
-  @computed()
-  public knots(): KnotInfo[] {
-    if (this.points()) {
-      return this.parsedPoints().map(point => ({
-        position: point,
-        startHandle: point,
-        endHandle: point,
-        auto: {start: 1, end: 1},
-      }));
-    }
-
-    return this.children()
-      .filter(this.isKnot)
-      .map(knot => knot.points());
-  }
-
-  protected override childrenBBox() {
-    const points = (this.profile().segments as PolynomialSegment[]).flatMap(
-      segment => segment.points,
-    );
-    return BBox.fromPoints(...points);
-  }
-
-  protected override validateProps(props: SplineProps) {
     if (
       (props.children === undefined || props.children.length < 2) &&
       (props.points === undefined || props.points.length < 2) &&
@@ -134,6 +122,62 @@ export class Spline extends Line {
         inspect: this.key,
       });
     }
+  }
+
+  @computed()
+  public override profile(): CurveProfile {
+    return getBezierSplineProfile(
+      this.knots(),
+      this.closed(),
+      this.smoothness(),
+    );
+  }
+
+  @computed()
+  public knots(): KnotInfo[] {
+    const points = this.points();
+
+    if (points) {
+      return points.map(signal => {
+        const point = new Vector2(isReactive(signal) ? signal() : signal);
+
+        return {
+          position: point,
+          startHandle: point,
+          endHandle: point,
+          auto: {start: 1, end: 1},
+        };
+      });
+    }
+
+    return this.children()
+      .filter(this.isKnot)
+      .map(knot => knot.points());
+  }
+
+  @computed()
+  protected childrenBBox() {
+    const points = (this.profile().segments as PolynomialSegment[]).flatMap(
+      segment => segment.points,
+    );
+    return BBox.fromPoints(...points);
+  }
+
+  protected override lineWidthCoefficient(): number {
+    const join = this.lineJoin();
+
+    let coefficient = super.lineWidthCoefficient();
+
+    if (join !== 'miter') {
+      return coefficient;
+    }
+
+    const {minSin} = this.profile();
+    if (minSin > 0) {
+      coefficient = Math.max(coefficient, 0.5 / minSin);
+    }
+
+    return coefficient;
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {

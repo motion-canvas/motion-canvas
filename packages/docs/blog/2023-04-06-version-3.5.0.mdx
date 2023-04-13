@@ -1,0 +1,71 @@
+---
+slug: version-3.5.0
+title: Motion Canvas v3.5.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PullRequest from '@site/src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import Fiddle from '@site/src/components/Fiddle';
+import source from '!!raw-loader!@site/blog/2023-04-06-examples.tsx';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'ksassnowski'}>
+    New{' '}
+    <Link to="/docs/bezier-curves">
+      <code>Bézier</code>
+    </Link>{' '}
+    nodes let you easily create splines consisting of only one segment:{' '}
+    <PullRequest id={603} />
+    <Fiddle className="margin-top--sm margin-bottom--sm">{source}</Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New{' '}
+    <Link to="/api/2d/components/Video">
+      <code>Video</code>
+    </Link>{' '}
+    properties: <PullRequest id={601} />
+    <ul className="margin-top--sm margin-bottom--sm">
+      <li>
+        <Link to="/api/2d/components/VideoProps#play">
+          <code>play</code>
+        </Link>{' '}
+        automatically plays the video
+      </li>
+      <li>
+        <Link to="/api/2d/components/Video#loop">
+          <code>loop</code>
+        </Link>{' '}
+        restarts the video upon reaching the end
+      </li>
+    </ul>
+  </Issue>
+  <Issue user={'aarthificial'} id={598}>
+    Fiddles now support multiple examples. You can switch between them using the
+    dropdown on the right side.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={608}>
+    <code>UPDATE AVAILABLE</code> now links to the GitHub release page.
+  </Issue>
+  <Issue user={'aarthificial'} pr={600}>
+    Videos play smoothly when in presentation mode.
+  </Issue>
+  <Issue user={'aarthificial'} pr={599}>
+    Reused async resources are now correctly awaited.
+  </Issue>
+  <Issue user={'ksassnowski'} pr={597}>
+    Arrow orientations for splines are correctly calculated.
+  </Issue>
+  <Issue user={'aarthificial'} pr={589}>
+    The showcase editor has been fixed.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

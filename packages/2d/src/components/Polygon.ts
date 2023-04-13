@@ -27,23 +27,34 @@ export interface PolygonProps extends ShapeProps {
  * will be particularly noticable if the number of sides is low, e.g. for a
  * triangle.
  *
- * @example
- * A hexagon:
- * ```tsx
- * <Polygon
- *   sides={6}
- *   size={300}
- *   fill={'lightseagreen'}
- * />
- * ```
- * A pentagon outline:
- * ```tsx
- * <Polygon
- *   sides={5}
- *   size={300}
- *   stroke={'lightblue'}
- *   lineWidth={8}
- * />
+ * @preview
+ * ```tsx editor
+ * // snippet Polygon
+ * export default makeScene2D(function* (view) {
+ *   const ref = createRef<Polygon>();
+ *   view.add(
+ *     <Polygon
+ *       ref={ref}
+ *       sides={6}
+ *       size={160}
+ *       fill={'lightseagreen'}
+ *     />
+ *   );
+ *
+ *   yield* ref().sides(3, 2).to(6, 2);
+ * });
+ *
+ * // snippet Pentagon outline
+ * export default makeScene2D(function* (view) {
+ *   view.add(
+ *     <Polygon
+ *       sides={5}
+ *       size={160}
+ *       stroke={'lightblue'}
+ *       lineWidth={8}
+ *     />
+ *   );
+ * });
  * ```
  */
 export class Polygon extends Shape {

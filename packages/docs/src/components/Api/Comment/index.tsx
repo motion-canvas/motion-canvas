@@ -27,6 +27,10 @@ export default function Comment({
 
 function FullComment({comment}: {comment: JSONOutput.Comment}) {
   const [collapsed, setCollapsed] = useState(true);
+  const preview = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@preview'),
+    [comment],
+  );
   const examples = useMemo(
     () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
     [comment],
@@ -46,6 +50,7 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
 
   return (
     <>
+      <Summary id={preview?.contentId} />
       {examples.length > 0 && (
         <>
           <h4>

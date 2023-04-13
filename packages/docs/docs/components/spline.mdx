@@ -1,10 +1,7 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 slug: /spline
 ---
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 # Spline
 
@@ -36,6 +33,13 @@ export default makeScene2D(function* (view) {
 
 The [`Spline`][spline] component allows us to draw and animate smooth curves
 through a series of control points.
+
+:::tip
+
+If all you want to do is draw a simple Bézier curve, check out the [Bézier curve
+components][bezier-curves], instead.
+
+:::
 
 ## Defining control points
 
@@ -355,10 +359,8 @@ transformations.
 
 :::
 
-<Tabs>
-  <TabItem value='position' label='Position' default>
-
 ```tsx editor
+// snippet Position
 export default makeScene2D(function* (view) {
   const knotPositions: PossibleVector2[] = [
     [-200, 0],
@@ -383,13 +385,8 @@ export default makeScene2D(function* (view) {
     knots[3].position.y(80, 1).to(-80, 1),
   );
 });
-```
 
-  </TabItem>
-
-  <TabItem value="rotation" label="Rotation">
-
-```tsx editor
+// snippet Rotation
 export default makeScene2D(function* (view) {
   const knot = createRef<Knot>();
 
@@ -403,13 +400,8 @@ export default makeScene2D(function* (view) {
 
   yield* knot().rotation(360, 3, linear).to(0, 3);
 });
-```
 
-  </TabItem>
-
-  <TabItem value="scale" label="Scale">
-
-```tsx editor
+// snippet Scale
 export default makeScene2D(function* (view) {
   const knot = createRef<Knot>();
 
@@ -424,10 +416,6 @@ export default makeScene2D(function* (view) {
   yield* knot().scale(3, 2).to(0.2, 2).to(1, 1);
 });
 ```
-
-  </TabItem>
-
-</Tabs>
 
 ### Animating objects along a spline
 
@@ -471,6 +459,7 @@ The `getPointAtPercentage` method returns a [`CurvePoint`][curve-point] object
 which contains the position of the point that sits at the given percentage along
 the spline's arclength as well as the point's tangent vector.
 
+[bezier-curves]: /docs/bezier-curves
 [spline]: /api/2d/components/Spline
 [knot]: /api/2d/components/Knot
 [line]: /api/2d/components/Line

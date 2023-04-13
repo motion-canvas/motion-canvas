@@ -1,4 +1,5 @@
 export * from './Circle';
+export * from './CubicBezier';
 export * from './Icon';
 export * from './Img';
 export * from './Grid';
@@ -9,6 +10,7 @@ export * from './Line';
 export * from './Node';
 export * from './Rect';
 export * from './Polygon';
+export * from './QuadBezier';
 export * from './Shape';
 export * from './Spline';
 export * from './Txt';
