@@ -117,6 +117,11 @@ export class Vector2 implements Type {
     return new Vector2(Math.cos(radians), Math.sin(radians));
   }
 
+  public static fromDegrees(degrees: number) {
+    const radians = (degrees * Math.PI) / 180;
+    return Vector2.fromRadians(radians);
+  }
+
   /**
    * Return the angle in radians between the vector described by x and y and the
    * positive x-axis.
