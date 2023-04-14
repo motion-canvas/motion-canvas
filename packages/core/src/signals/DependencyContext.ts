@@ -35,12 +35,14 @@ export class DependencyContext<TOwner = void>
     if (context) {
       handle.owner = context.owner;
     }
-    promise.then(value => {
-      handle.value = value;
-      context?.markDirty();
-    }).finally(() => {
-      this.promises = this.promises.filter(v => v !== handle)
-    })
+    promise
+      .then(value => {
+        handle.value = value;
+        context?.markDirty();
+      })
+      .finally(() => {
+        this.promises = this.promises.filter(v => v !== handle);
+      });
 
     this.promises.push(handle);
     return handle;
