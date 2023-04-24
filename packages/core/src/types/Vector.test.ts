@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'vitest';
-import {Vector2} from '../types';
+import {PossibleVector2, Vector2} from '../types';
 import {createSignal} from '../signals';
 
 describe('Vector2', () => {
@@ -117,4 +117,20 @@ describe('Vector2', () => {
       expect(Vector2.squaredMagnitude(points[0], points[1])).toBe(expected);
     },
   );
+
+  test.each([
+    [0, [1, 0]],
+    [30, [Math.sqrt(3) / 2, 0.5]],
+    [60, [0.5, Math.sqrt(3) / 2]],
+    [90, [0, 1]],
+    [180, [-1, 0]],
+    [270, [0, -1]],
+    [360, [1, 0]],
+    [-90, [0, -1]],
+    [-180, [-1, 0]],
+    [-270, [0, 1]],
+  ])('Creates a Vector from an angle in degrees: (%s°)', (angle, expected) => {
+    const vector = Vector2.fromDegrees(angle);
+    expect(vector.equals(new Vector2(expected as PossibleVector2))).toBe(true);
+  });
 });
