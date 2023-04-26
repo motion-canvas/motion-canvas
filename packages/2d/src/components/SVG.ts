@@ -269,16 +269,20 @@ export class SVG extends Shape {
     } else if (child.tagName == 'rect') {
       const width = parseFloat(child.getAttribute('width') ?? '0');
       const height = parseFloat(child.getAttribute('height') ?? '0');
+      const rx = parseFloat(child.getAttribute('rx') ?? '0');
+      const ry = parseFloat(child.getAttribute('ry') ?? '0');
 
       const bbox = new BBox(0, 0, width, height);
       const center = bbox.center;
       const transformation = transformMatrix.translate(center.x, center.y);
+
       yield {
         id: id || 'rect',
         type: Rect,
         props: {
           width,
           height,
+          radius: [rx, ry],
           ...SVG.getMatrixTransformation(transformation),
           ...style,
         } as RectProps,
