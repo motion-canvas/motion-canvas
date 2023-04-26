@@ -112,10 +112,25 @@ export class SVG extends Shape {
     };
   }
 
+  private static processSVGColor(
+    color: SignalValue<PossibleCanvasStyle> | undefined,
+  ): SignalValue<PossibleCanvasStyle> | undefined {
+    if (color === 'transparent' || color === 'none')
+      return {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
+      };
+
+    return color;
+  }
+
   private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
     return {
-      fill: fill === 'currentColor' ? this.fill : fill,
-      stroke: stroke === 'currentColor' ? this.stroke : stroke,
+      fill: fill === 'currentColor' ? this.fill : SVG.processSVGColor(fill),
+      stroke:
+        stroke === 'currentColor' ? this.stroke : SVG.processSVGColor(stroke),
       ...rest,
     };
   }
