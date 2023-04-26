@@ -160,11 +160,12 @@ export class SVG extends Shape {
     parentTransform: DOMMatrix,
   ) {
     const transform = element.transform.baseVal.consolidate();
-    const x = element.getAttribute('x');
-    const y = element.getAttribute('y');
     const transformMatrix = (
       transform ? parentTransform.multiply(transform.matrix) : parentTransform
-    ).translate(parseFloat(x ?? '0'), parseFloat(y ?? '0'));
+    ).translate(
+      SVG.parseNumberAttribute(element, 'x'),
+      SVG.parseNumberAttribute(element, 'y'),
+    );
     return transformMatrix;
   }
 
@@ -223,6 +224,13 @@ export class SVG extends Shape {
     }
   }
 
+  private static parseNumberAttribute(
+    element: SVGElement,
+    name: string,
+  ): number {
+    return parseFloat(element.getAttribute(name) ?? '0');
+  }
+
   private static *extractElementNodes(
     child: SVGGraphicsElement,
     svgRoot: Element,
@@ -267,10 +275,10 @@ export class SVG extends Shape {
         } as PathProps,
       };
     } else if (child.tagName == 'rect') {
-      const width = parseFloat(child.getAttribute('width') ?? '0');
-      const height = parseFloat(child.getAttribute('height') ?? '0');
-      const rx = parseFloat(child.getAttribute('rx') ?? '0');
-      const ry = parseFloat(child.getAttribute('ry') ?? '0');
+      const width = SVG.parseNumberAttribute(child, 'width');
+      const height = SVG.parseNumberAttribute(child, 'height');
+      const rx = SVG.parseNumberAttribute(child, 'rx');
+      const ry = SVG.parseNumberAttribute(child, 'ry');
 
       const bbox = new BBox(0, 0, width, height);
       const center = bbox.center;
