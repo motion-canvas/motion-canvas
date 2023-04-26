@@ -49,15 +49,21 @@ export interface SVGDocumentData {
   nodes: SVGShapeData[];
 }
 
+interface SVGDiffShape {
+  index: number;
+  node: SVGShape;
+}
+
 interface SVGDiff {
   fromSize: Vector2;
   toSize: Vector2;
-  inserted: Array<SVGShape>;
-  deleted: Array<SVGShape>;
+  inserted: Array<SVGDiffShape>;
+  deleted: Array<SVGDiffShape>;
   transformed: Array<{
     insert: boolean;
-    from: SVGShape;
-    to: SVGShape;
+    deleted: boolean;
+    from: SVGDiffShape;
+    to: SVGDiffShape;
   }>;
 }
 
@@ -417,11 +423,11 @@ export class SVG extends Shape {
   }
 
   private getShapeMap(svg: SVGDocument) {
-    const map: Record<string, SVGShape[]> = {};
-    for (const node of svg.nodes) {
+    const map: Record<string, SVGDiffShape[]> = {};
+    for (const [index, node] of svg.nodes.entries()) {
       if (!map[node.id]) map[node.id] = [];
 
-      map[node.id].push(node);
+      map[node.id].push({index, node});
     }
     return map;
   }
@@ -450,6 +456,7 @@ export class SVG extends Shape {
 
         for (let i = 0; i < Math.max(fromItem.length, toItem.length); i++) {
           const insert = i >= fromItem.length;
+          const deleted = i >= toItem.length;
 
           const fromNode =
             i < fromItem.length ? fromItem[i] : fromItem[fromItem.length - 1];
@@ -458,6 +465,7 @@ export class SVG extends Shape {
 
           diff.transformed.push({
             insert,
+            deleted,
             from: fromNode,
             to: toNode,
           });
@@ -524,6 +532,66 @@ export class SVG extends Shape {
     }
   }
 
+  private useTweenInitialNodes(diff: SVGDiff) {
+    const insertedList: SVGDiff['transformed'] = [];
+    for (const item of diff.transformed) {
+      if (!item.insert) continue;
+
+      const from = item.from;
+      item.from = {
+        index: from.index,
+        node: {
+          id: from.node.id,
+          shape: this.cloneNodeExact(from.node.shape),
+        },
+      };
+      insertedList.push(item);
+    }
+
+    const newChildren = this.wrapper.children().slice(0);
+    let insertShift = 0;
+
+    for (const {from} of insertedList.sort(
+      (a, b) => a.from.index - b.from.index,
+    )) {
+      newChildren.splice(from.index + insertShift, 0, from.node.shape);
+      from.node.shape.parent(this.wrapper);
+      insertShift++;
+    }
+
+    this.wrapper.children(newChildren);
+  }
+
+  private useTweenFinalNodes(diff: SVGDiff, newSVG: SVGDocument) {
+    const newChildren: Node[] = new Array(newSVG.nodes.length);
+    const deletedList: SVGDiff['transformed'] = [];
+
+    for (const item of diff.transformed) {
+      const {from, to, deleted} = item;
+      if (deleted) {
+        deletedList.push(item);
+        continue;
+      }
+      newChildren[to.index] = from.node.shape;
+      from.node.shape.parent(this.wrapper);
+    }
+    for (const {node, index} of diff.inserted) {
+      newChildren[index] = node.shape;
+      node.shape.parent(this.wrapper);
+    }
+
+    let insertShift = 0;
+    for (const {from, to} of deletedList.sort(
+      (a, b) => a.to.index - b.to.index,
+    )) {
+      newChildren.splice(to.index + insertShift, 0, from.node.shape);
+      from.node.shape.parent(this.wrapper);
+      insertShift++;
+    }
+
+    this.wrapper.children(newChildren);
+  }
+
   @threadable()
   protected *tweenSvg(
     value: SignalValue<string>,
@@ -534,8 +602,6 @@ export class SVG extends Shape {
     const newSVG = this.parseSVG(newValue);
     const diff = this.diffSVG(this.document(), newSVG);
 
-    for (const node of diff.inserted) this.wrapper.insert(node.shape);
-
     const beginning = 0.2;
     const ending = 0.8;
     const overlap = 0.15;
@@ -544,23 +610,26 @@ export class SVG extends Shape {
     const transformatorTime = (ending - beginning) * time;
     const transformatorDelay = beginning * time;
 
-    for (const node of diff.transformed) {
-      if (node.insert) {
-        node.from = {
-          id: node.from.id,
-          shape: this.cloneNodeExact(node.from.shape),
-        };
-        this.wrapper.insert(node.from.shape);
-      }
+    this.useTweenInitialNodes(diff);
+
+    for (const transformed of diff.transformed) {
       transformator.push(
         ...this.generateTransformator(
-          node.from.shape,
-          node.to.shape,
+          transformed.from.node.shape,
+          transformed.to.node.shape,
           transformatorTime,
           timingFunction,
         ),
       );
     }
+
+    let reordered = false;
+    const reorder = () => {
+      if (reordered) return;
+      this.useTweenFinalNodes(diff, newSVG);
+      reordered = true;
+    };
+
     const autoWidth = this.customWidth() == null;
     const autoHeight = this.customHeight() == null;
 
@@ -569,6 +638,8 @@ export class SVG extends Shape {
       value => {
         const progress = timingFunction(value);
         const remapped = clampRemap(beginning, ending, 0, 1, progress);
+
+        if (remapped >= 0.5) reorder();
 
         const scale = this.wrapper.scale();
         if (autoWidth)
@@ -588,20 +659,20 @@ export class SVG extends Shape {
           0,
           progress,
         );
-        for (const {shape} of diff.deleted) shape.opacity(deletedOpacity);
+        for (const {node} of diff.deleted) node.shape.opacity(deletedOpacity);
 
         const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
-        for (const {shape} of diff.inserted) shape.opacity(insertedOpacity);
+        for (const {node} of diff.inserted) node.shape.opacity(insertedOpacity);
       },
       () => {
         this.wrapper.children(this.documentNodes);
         if (autoWidth) this.customWidth(null);
         if (autoHeight) this.customHeight(null);
 
-        for (const {shape} of diff.deleted) shape.dispose();
+        for (const {node} of diff.deleted) node.shape.dispose();
         for (const {from, to} of diff.transformed) {
-          from.shape.dispose();
-          to.shape.dispose();
+          from.node.shape.dispose();
+          to.node.shape.dispose();
         }
       },
     );
