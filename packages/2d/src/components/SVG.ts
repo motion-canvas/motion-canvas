@@ -131,12 +131,34 @@ export class SVG extends Shape {
     SVG.containerElement.innerHTML = svg;
 
     const svgRoot = SVG.containerElement.querySelector('svg')!;
-    const {x, y, width, height} = svgRoot.viewBox.baseVal;
-    const viewBox = new BBox(x, y, width, height);
-    const size = new Vector2(
-      svgRoot.width.baseVal.value,
-      svgRoot.height.baseVal.value,
-    );
+    let viewBox: BBox = new BBox();
+    let size: Vector2 = new Vector2();
+
+    const hasViewBox = svgRoot.hasAttribute('viewBox');
+    const hasSize =
+      svgRoot.hasAttribute('width') || svgRoot.hasAttribute('height');
+
+    if (hasViewBox) {
+      const {x, y, width, height} = svgRoot.viewBox.baseVal;
+      viewBox = new BBox(x, y, width, height);
+
+      if (!hasSize) size = viewBox.size;
+    }
+
+    if (hasSize) {
+      size = new Vector2(
+        svgRoot.width.baseVal.value,
+        svgRoot.height.baseVal.value,
+      );
+
+      if (!hasViewBox) viewBox = new BBox(0, 0, size.width, size.height);
+    }
+
+    if (!hasViewBox && !hasSize) {
+      viewBox = new BBox(svgRoot.getBBox());
+      size = viewBox.size;
+    }
+
     const scale = size.div(viewBox.size);
     const center = viewBox.center;
 
