@@ -1,9 +1,14 @@
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
+import {
+  BBox,
+  PossibleSpacing,
+  SerializedVector2,
+  Vector2,
+} from '@motion-canvas/core/lib/types';
 import {computed, signal} from '../decorators';
 import {Shape, ShapeProps} from './Shape';
 import {Node, NodeProps} from './Node';
-import {DesiredLength} from '../partials';
+import {DesiredLength, PossibleCanvasStyle} from '../partials';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {Path, PathProps} from './Path';
 import {Rect, RectProps} from './Rect';
@@ -18,6 +23,9 @@ import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
 import {View2D} from './View2D';
 import {all, delay} from '@motion-canvas/core/lib/flow';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {Circle, CircleProps} from './Circle';
+import {Line, LineProps} from './Line';
+import {Img, ImgProps} from './Img';
 
 export interface SVGShape {
   id: string;
@@ -331,6 +339,79 @@ export class SVG extends Shape {
           ...SVG.getMatrixTransformation(transformation),
           ...style,
         } as RectProps,
+      };
+    } else if (['circle', 'ellipse'].includes(child.tagName)) {
+      const cx = SVG.parseNumberAttribute(child, 'cx');
+      const cy = SVG.parseNumberAttribute(child, 'cy');
+      const size: PossibleSpacing =
+        child.tagName === 'circle'
+          ? SVG.parseNumberAttribute(child, 'r') * 2
+          : [
+              SVG.parseNumberAttribute(child, 'rx') * 2,
+              SVG.parseNumberAttribute(child, 'ry') * 2,
+            ];
+
+      const transformation = transformMatrix.translate(cx, cy);
+
+      yield {
+        id: id || child.tagName,
+        type: Circle,
+        props: {
+          size,
+          ...style,
+          ...SVG.getMatrixTransformation(transformation),
+        } as CircleProps,
+      };
+    } else if (['line', 'polyline', 'polygon'].includes(child.tagName)) {
+      const numbers =
+        child.tagName === 'line'
+          ? ['x1', 'y1', 'x2', 'y2'].map(attr =>
+              SVG.parseNumberAttribute(child, attr),
+            )
+          : child
+              .getAttribute('points')!
+              .match(/-?[\d.e+-]+/g)!
+              .map(value => parseFloat(value));
+      const points = numbers.reduce<number[][]>((accum, current) => {
+        let last = accum.at(-1);
+        if (!last || last.length == 2) {
+          last = [];
+          accum.push(last);
+        }
+        last.push(current);
+        return accum;
+      }, []);
+
+      if (child.tagName === 'polygon') points.push(points[0]);
+
+      yield {
+        id: id || child.tagName,
+        type: Line as unknown as new (props: NodeProps) => Node,
+        props: {
+          points,
+          ...style,
+          ...SVG.getMatrixTransformation(transformMatrix),
+        } as LineProps,
+      };
+    } else if (child.tagName === 'image') {
+      const x = SVG.parseNumberAttribute(child, 'x');
+      const y = SVG.parseNumberAttribute(child, 'y');
+      const width = SVG.parseNumberAttribute(child, 'width');
+      const height = SVG.parseNumberAttribute(child, 'height');
+      const href = child.getAttribute('href') ?? '';
+
+      const bbox = new BBox(x, y, width, height);
+      const center = bbox.center;
+      const transformation = transformMatrix.translate(center.x, center.y);
+
+      yield {
+        id: id || child.tagName,
+        type: Img,
+        props: {
+          src: href,
+          ...style,
+          ...SVG.getMatrixTransformation(transformation),
+        } as ImgProps,
       };
     }
   }
