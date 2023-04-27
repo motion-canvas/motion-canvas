@@ -9,6 +9,7 @@ import {
   InspectionProvider,
   LoggerProvider,
   ApplicationProvider,
+  useApplication,
 } from './contexts';
 import {getItem, setItem} from './utils';
 import {ShortcutsProvider} from './contexts/shortcuts';
@@ -31,10 +32,25 @@ export function editor(project: Project) {
     }
   });
 
+
   const renderer = new Renderer(project);
   const presenter = new Presenter(project);
 
   const meta = project.meta;
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  const startInPresenter = urlParams.has('present')
+  
+  if (startInPresenter) {
+    presenter.present({
+      ...meta.getFullRenderingSettings(),
+      name: project.name,
+      slide: null,
+    });
+  }
+
   const playerKey = `${project.name}/player`;
   const frameKey = `${project.name}/frame`;
   const player = new Player(
