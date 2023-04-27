@@ -25,6 +25,8 @@ import {
   DetailedError,
   ReferenceReceiver,
   useLogger,
+  createRef,
+  Reference,
 } from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
@@ -1280,6 +1282,18 @@ export class Node implements Promisable<Node> {
       promises = DependencyContext.consumePromises();
     } while (promises.length > 0);
     return this;
+  }
+
+  /**
+   * Create and return a reference for this node.
+   *
+   * @remarks
+   * This method creates a new Reference object for this node.
+   */
+  public ref(): Reference<this> {
+    const ref = createRef<typeof this>();
+    ref(this);
+    return ref;
   }
 
   /**
