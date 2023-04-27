@@ -555,7 +555,6 @@ export class Node implements Promisable<Node> {
     return this.insert(node, Infinity);
   }
 
-
   /**
    * Add this node as a child of another node.
    *
