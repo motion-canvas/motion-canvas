@@ -555,6 +555,34 @@ export class Node implements Promisable<Node> {
     return this.insert(node, Infinity);
   }
 
+
+  /**
+   * Add this node as a child of another node.
+   *
+   * @remarks
+   * This node will be appended at the end of the children list of the another node.
+   *
+   * @example
+   * ```tsx
+   * const rect = <Rect />;
+   * const node = <Layout />;
+   * rect.addTo(node);
+   * ```
+   * Result:
+   * ```mermaid
+   * graph TD;
+   *   layout([Layout])
+   *   rect([Rect])
+   *     layout-->rect;
+   * ```
+   *
+   * @param node - A node or an array of nodes to append.
+   */
+  public addTo(node: Node): this {
+    node.add(this);
+    return this;
+  }
+
   /**
    * Insert the given node(s) at the specified index in the children list.
    *
