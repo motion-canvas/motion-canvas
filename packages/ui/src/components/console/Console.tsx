@@ -1,6 +1,6 @@
 import styles from './Console.module.scss';
 
-import {LogLevel} from '@motion-canvas/core/lib';
+import {LogLevel} from '@motion-canvas/core';
 import {capitalize} from '@motion-canvas/core/lib/utils';
 import {Pane} from '../tabs';
 import {useLogs} from '../../contexts';

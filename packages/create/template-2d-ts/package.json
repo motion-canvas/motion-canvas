@@ -14,6 +14,6 @@
     "@motion-canvas/ui": "*",
     "@motion-canvas/vite-plugin": "*",
     "typescript": "^4.9.5",
-    "vite": "^3.0.5"
+    "vite": "^4.1.4"
   }
 }

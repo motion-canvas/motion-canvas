@@ -142,15 +142,15 @@ yield * signal(DEFAULT, 2);
 
 Resetting to the default value is especially useful with node properties. In the
 example below, we set the [`lineHeight`](/api/2d/components/Layout#lineHeight)
-of the [`Text`](/api/2d/components/Text) node to `150%`. This will override its
+of the [`Txt`](/api/2d/components/Txt) node to `150%`. This will override its
 default value, which would be simply inherited from its parent:
 
 ```tsx
-const text = createRef<Text>();
+const text = createRef<Txt>();
 view.add(
-  <Text lineHeight={'150%'} ref={text}>
+  <Txt lineHeight={'150%'} ref={text}>
     Hello world!
-  </Text>,
+  </Txt>,
 );
 ```
 

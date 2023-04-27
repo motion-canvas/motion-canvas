@@ -1,4 +1,4 @@
-import type {Project} from '@motion-canvas/core/lib';
+import type {Project} from '@motion-canvas/core';
 
 export function editor(project: Project): void;
 

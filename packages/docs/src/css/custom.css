@@ -44,7 +44,6 @@
   --ifm-toc-border-color: var(--ifm-color-emphasis-300);
   --ifm-color-emphasis-300: rgba(60, 60, 60, 0.12);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --code-background-color: var(--ifm-background-surface-color);
   --ifm-code-hover-background: #f0f0f0;
   --ifm-hr-background-color: var(--ifm-color-emphasis-300);
 
@@ -56,6 +55,25 @@
   --ifm-pre-line-height: 1.6;
 
   --ifm-h3-font-size: 1.5rem;
+
+  --ifm-code-selection-color: #dde8e1;
+  --ifm-code-active-color: rgba(0, 0, 0, 0.04);
+  --hl-color: rgb(57, 58, 52);
+  --hl-background: var(--ifm-background-surface-color);
+  --hl-comment: #999988;
+  --hl-comment-style: italic;
+  --hl-keyword: #00009f;
+  --hl-number: #36acaa;
+  --hl-namespace: #f0f;
+  --hl-string: #e3116c;
+  --hl-punctuation: #393a34;
+  --hl-constant: #36acaa;
+  --hl-variable: var(--hl-color);
+  --hl-selector: #00a4db;
+  --hl-tag: #00009f;
+  --hl-function: #d73a49;
+  --hl-class: #00009f;
+  --hl-char: rgb(209, 105, 105);
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -89,10 +107,28 @@ html[data-theme='dark'] {
 
   --ifm-color-emphasis-300: rgba(84, 84, 84, 0.48);
   --ifm-toc-border-color: var(--ifm-color-emphasis-300);
+
+  --ifm-code-selection-color: #2b332f;
+  --ifm-code-active-color: rgba(255, 255, 255, 0.04);
+  --hl-color: #f8f8f8;
+  --hl-comment: rgb(106, 153, 85);
+  --hl-comment-style: italic;
+  --hl-keyword: rgb(86, 156, 214);
+  --hl-number: rgb(181, 206, 168);
+  --hl-namespace: #f0f;
+  --hl-string: rgb(206, 145, 120);
+  --hl-punctuation: rgb(212, 212, 212);
+  --hl-constant: rgb(100, 102, 149);
+  --hl-variable: rgb(156, 220, 254);
+  --hl-selector: rgb(215, 186, 125);
+  --hl-tag: rgb(78, 201, 176);
+  --hl-function: rgb(220, 220, 170);
+  --hl-class: rgb(78, 201, 176);
+  --hl-char: rgb(209, 105, 105);
 }
 
 .alert {
-  --code-background-color: var(--ifm-background-color);
+  --hl-background: var(--ifm-background-color);
   background-color: var(--ifm-background-surface-color);
 }
 
@@ -195,4 +231,17 @@ a.button:hover {
 
 .DocSearch-Logo svg {
   filter: saturate(0) brightness(2);
+}
+
+kbd {
+  background-color: var(--ifm-background-color);
+  border: 1px solid var(--ifm-color-emphasis-500);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: none;
+  color: var(--ifm-color-emphasis-800);
+  font: 80% var(--ifm-font-family-monospace);
+}
+
+[data-theme='dark'] kbd {
+  border: 1px solid var(--ifm-color-emphasis-300);
 }

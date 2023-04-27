@@ -8,7 +8,7 @@ const config = {
   baseUrl: '/',
   onBrokenLinks: 'log',
   onBrokenMarkdownLinks: 'warn',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
   organizationName: 'motion-canvas',
   projectName: 'motion-canvas.github.io',
   i18n: {
@@ -21,7 +21,7 @@ const config = {
   customFields: {
     discordApi:
       'https://discord.com/api/guilds/1071029581009657896/widget.json',
-    discordUrl: 'https://discord.gg/XnnWTrHYAW',
+    discordUrl: 'https://chat.motioncanvas.io',
     githubApi: 'https://api.github.com/repos/motion-canvas/motion-canvas',
     githubUrl: 'https://github.com/motion-canvas/motion-canvas',
   },
@@ -79,7 +79,7 @@ const config = {
               },
               {
                 label: 'Discord',
-                href: 'https://discord.gg/XnnWTrHYAW',
+                href: 'https://chat.motioncanvas.io',
               },
             ],
           },
@@ -105,8 +105,8 @@ const config = {
         indexName: 'motion-canvasio',
       },
       prism: {
-        theme: require('./config/lightCodeTheme'),
-        darkTheme: require('./config/darkCodeTheme'),
+        theme: require('./config/codeTheme'),
+        darkTheme: require('./config/codeTheme'),
       },
     }),
   themes: [
@@ -149,16 +149,24 @@ const config = {
       {
         examples: [
           {
-            name: 'random',
+            name: 'Random',
+            fileName: 'random',
             url: 'Random values generator',
           },
           {
-            name: 'quickstart',
+            name: 'Quickstart',
+            fileName: 'quickstart',
             url: 'Quickstart example',
           },
           {
-            name: 'logging',
+            name: 'Logging',
+            fileName: 'logging',
             url: 'Logging example',
+          },
+          {
+            name: 'Presentation',
+            fileName: 'presentation',
+            url: 'Presentation example',
           },
         ],
       },

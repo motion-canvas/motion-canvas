@@ -1,4 +1,4 @@
-import {Rect, Vector2} from '../types';
+import {BBox, Vector2} from '../types';
 import {useScene} from '../utils';
 import {useTransition} from './useTransition';
 import {clampRemap, easeInOutCubic, linear} from '../tweening';
@@ -13,7 +13,7 @@ import {ThreadGenerator} from '../threading';
  * @param duration - The duration of the transition.
  */
 export function* zoomOutTransition(
-  area: Rect,
+  area: BBox,
   duration = 0.6,
 ): ThreadGenerator {
   const scale = useScene().getSize().div(area.size);

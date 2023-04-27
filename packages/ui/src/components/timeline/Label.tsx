@@ -1,9 +1,10 @@
 import styles from './Timeline.module.scss';
 
-import type {Scene, TimeEvent} from '@motion-canvas/core/lib/scenes';
+import type {Scene} from '@motion-canvas/core/lib/scenes';
+import type {TimeEvent} from '@motion-canvas/core/lib/scenes/timeEvents';
 import {useDrag} from '../../hooks';
 import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
-import {usePlayer, useProject, useTimelineContext} from '../../contexts';
+import {useApplication, useTimelineContext} from '../../contexts';
 import {findAndOpenFirstUserFile} from '../../utils';
 
 interface LabelProps {
@@ -13,15 +14,16 @@ interface LabelProps {
 
 export function Label({event, scene}: LabelProps) {
   const {framesToPercents, pixelsToFrames} = useTimelineContext();
-  const player = usePlayer();
-  const project = useProject();
+  const {player} = useApplication();
   const [eventTime, setEventTime] = useState(event.offset);
   const [handleDrag] = useDrag(
     useCallback(
       dx => {
-        setEventTime(eventTime + project.framesToSeconds(pixelsToFrames(dx)));
+        setEventTime(
+          eventTime + player.status.framesToSeconds(pixelsToFrames(dx)),
+        );
       },
-      [eventTime, project, pixelsToFrames],
+      [eventTime, player, pixelsToFrames],
     ),
     useCallback(
       e => {
@@ -51,9 +53,7 @@ export function Label({event, scene}: LabelProps) {
             e.preventDefault();
             player.requestSeek(
               scene.firstFrame +
-                player.project.secondsToFrames(
-                  event.initialTime + event.offset,
-                ),
+                player.status.secondsToFrames(event.initialTime + event.offset),
             );
           } else {
             handleDrag(e);
@@ -64,7 +64,7 @@ export function Label({event, scene}: LabelProps) {
         style={{
           left: `${framesToPercents(
             scene.firstFrame +
-              scene.project.secondsToFrames(
+              scene.playback.secondsToFrames(
                 event.initialTime + Math.max(0, eventTime),
               ),
           )}%`,
@@ -74,7 +74,7 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClipTarget}
         style={{
           left: `${framesToPercents(
-            scene.firstFrame + scene.project.secondsToFrames(event.targetTime),
+            scene.firstFrame + scene.playback.secondsToFrames(event.targetTime),
           )}%`,
         }}
       />
@@ -82,11 +82,12 @@ export function Label({event, scene}: LabelProps) {
         className={styles.labelClipStart}
         style={{
           left: `${framesToPercents(
-            scene.firstFrame + scene.project.secondsToFrames(event.initialTime),
+            scene.firstFrame +
+              scene.playback.secondsToFrames(event.initialTime),
           )}%`,
           width: `${Math.max(
             0,
-            framesToPercents(scene.project.secondsToFrames(eventTime)),
+            framesToPercents(scene.playback.secondsToFrames(eventTime)),
           )}%`,
         }}
       />

@@ -1,30 +1,28 @@
 import styles from './Timeline.module.scss';
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {
   useDocumentEvent,
-  usePlayerState,
+  useDuration,
+  usePreviewSettings,
   useSize,
   useStateChange,
+  useStorage,
 } from '../../hooks';
 import {Playhead} from './Playhead';
 import {Timestamps} from './Timestamps';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
 import {RangeSelector} from './RangeSelector';
-import {clamp} from '@motion-canvas/core/lib/tweening';
+import {clamp} from '../../utils';
 import {AudioTrack} from './AudioTrack';
 import {
-  usePlayer,
+  useApplication,
   TimelineContextProvider,
   TimelineState,
 } from '../../contexts';
+import clsx from 'clsx';
+import {useShortcut} from '../../hooks/useShortcut';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -32,13 +30,20 @@ const TIMESTAMP_SPACING = 32;
 const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
-  const player = usePlayer();
+  const [hoverRef] = useShortcut<HTMLDivElement>('timeline');
+  const {player} = useApplication();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
-  const {duration, fps} = usePlayerState();
+  const duration = useDuration();
+  const {fps} = usePreviewSettings();
   const rect = useSize(containerRef);
-  const [offset, setOffset] = useState(0);
-  const [scale, setScale] = useState(1);
+  const [offset, setOffset] = useStorage('timeline-offset', 0);
+  const [scale, setScale] = useStorage('timeline-scale', 1);
+  const isReady = duration > 0;
+
+  useLayoutEffect(() => {
+    containerRef.current.scrollLeft = offset;
+  }, [rect.width > 0 && isReady]);
 
   const sizes = useMemo(
     () => ({
@@ -50,7 +55,7 @@ export function Timeline() {
     [rect.width, scale],
   );
 
-  const ZOOM_MAX = (MAX_FRAME_SIZE / sizes.viewLength) * duration;
+  const zoomMax = (MAX_FRAME_SIZE / sizes.viewLength) * duration;
 
   const conversion = useMemo(
     () => ({
@@ -103,8 +108,8 @@ export function Timeline() {
       if (prevWidth !== 0 && rect.width !== 0) {
         newScale *= prevWidth / rect.width;
       }
-      if (!isNaN(newScale)) {
-        setScale(clamp(ZOOM_MIN, ZOOM_MAX, newScale));
+      if (!isNaN(newScale) && duration > 0) {
+        setScale(clamp(ZOOM_MIN, zoomMax, newScale));
       }
     },
     [duration / fps, rect.width],
@@ -114,6 +119,9 @@ export function Timeline() {
     'keydown',
     useCallback(
       event => {
+        if (document.activeElement.tagName === 'INPUT') {
+          return;
+        }
         if (event.key !== 'f') return;
         const frame = player.onFrameChanged.current;
         const maxOffset = sizes.fullLength - sizes.viewLength;
@@ -132,7 +140,7 @@ export function Timeline() {
 
   return (
     <TimelineContextProvider state={state}>
-      <div className={styles.root}>
+      <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
         <div
           className={styles.timelineWrapper}
           ref={containerRef}
@@ -150,8 +158,8 @@ export function Timeline() {
               newScale = ZOOM_MIN;
               ratio = newScale / scale;
             }
-            if (newScale > ZOOM_MAX) {
-              newScale = ZOOM_MAX;
+            if (newScale > zoomMax) {
+              newScale = zoomMax;
               ratio = newScale / scale;
             }
             if (newScale === scale) {

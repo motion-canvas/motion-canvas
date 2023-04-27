@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {describe, test, beforeEach, expect} from 'vitest';
-import {Project} from '../Project';
-import {setProject, useProject, useTime} from '../utils';
+import {describe, test, expect, beforeAll, afterAll} from 'vitest';
+import {endPlayback, startPlayback, useTime} from '../utils';
 import {threads} from '../threading';
 import {tween} from './tween';
+import {PlaybackManager, PlaybackStatus} from '../app';
 
 describe('tween()', () => {
-  beforeEach(() => {
-    setProject(new Project({name: 'tests', scenes: []}));
-  });
+  const playback = new PlaybackManager();
+  const status = new PlaybackStatus(playback);
+  beforeAll(() => startPlayback(status));
+  afterAll(() => endPlayback(status));
 
   test('Framerate-independent tween duration', () => {
-    const project = useProject();
-
-    let time60;
+    let time60 = NaN;
     const task60 = threads(function* () {
       yield* tween(3.1415, () => {
         // do nothing
@@ -22,7 +21,7 @@ describe('tween()', () => {
       time60 = useTime();
     });
 
-    let time24;
+    let time24 = NaN;
     const task24 = threads(function* () {
       yield* tween(3.1415, () => {
         // do nothing
@@ -30,16 +29,16 @@ describe('tween()', () => {
       time24 = useTime();
     });
 
-    project.framerate = 60;
-    project.frame = 0;
+    playback.fps = 60;
+    playback.frame = 0;
     for (const _ of task60) {
-      project.frame++;
+      playback.frame++;
     }
 
-    project.framerate = 24;
-    project.frame = 0;
+    playback.fps = 24;
+    playback.frame = 0;
     for (const _ of task24) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time60).toBeCloseTo(3.1415);
@@ -47,9 +46,7 @@ describe('tween()', () => {
   });
 
   test('Accumulated time offset', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       yield* tween(0.45, () => {
         // do nothing
@@ -57,13 +54,13 @@ describe('tween()', () => {
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
-    expect(project.frame).toBe(5);
+    expect(playback.frame).toBe(5);
     expect(time).toBeCloseTo(0.45);
   });
 });

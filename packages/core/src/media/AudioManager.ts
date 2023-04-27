@@ -1,6 +1,7 @@
 import {AudioData} from './AudioData';
 import {ValueDispatcher} from '../events';
 import {useLogger} from '../utils';
+import {Logger} from '../app';
 
 export class AudioManager {
   public get onDataChanged() {
@@ -8,18 +9,14 @@ export class AudioManager {
   }
   private readonly data = new ValueDispatcher<AudioData | null>(null);
 
-  public get onOffsetChanged() {
-    return this.offset.subscribable;
-  }
-  private readonly offset = new ValueDispatcher(0);
-
-  private static readonly context = new AudioContext();
+  private readonly context = new AudioContext();
   private readonly audioElement: HTMLAudioElement = new Audio();
   private source: string | null = null;
   private error = false;
   private abortController: AbortController | null = null;
+  private offset = 0;
 
-  public constructor() {
+  public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
         if (this.source && urls.includes(this.source)) {
@@ -38,7 +35,7 @@ export class AudioManager {
   }
 
   public setOffset(value: number) {
-    this.offset.current = value;
+    this.offset = value;
   }
 
   public setMuted(isMuted: boolean) {
@@ -52,21 +49,21 @@ export class AudioManager {
     this.abortController = new AbortController();
     this.loadData(this.abortController.signal).catch(e => {
       if (e.name !== 'AbortError') {
-        useLogger().error(e);
+        this.logger.error(e);
       }
     });
   }
 
   public isInRange(time: number) {
-    return time >= this.offset.current && time < this.audioElement.duration;
+    return time >= this.offset && time < this.audioElement.duration;
   }
 
   public toRelativeTime(time: number) {
-    return Math.max(0, time - this.offset.current);
+    return Math.max(0, time - this.offset);
   }
 
   public toAbsoluteTime(time: number) {
-    return time + this.offset.current;
+    return time + this.offset;
   }
 
   public isReady() {
@@ -167,7 +164,7 @@ export class AudioManager {
 
   private decodeAudioData(buffer: ArrayBuffer): Promise<AudioBuffer> {
     return new Promise<AudioBuffer>((resolve, reject) =>
-      AudioManager.context.decodeAudioData(buffer, resolve, reject),
+      this.context.decodeAudioData(buffer, resolve, reject),
     );
   }
 }

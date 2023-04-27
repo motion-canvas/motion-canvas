@@ -1,12 +1,12 @@
 import {describe, test, beforeEach, expect, vi} from 'vitest';
-import {setProject, useLogger, debug} from '../utils';
-import {Project} from '../Project';
-import {LogLevel} from '../Logger';
-import {Rect, Vector2} from '../types';
+import {useLogger, debug, startScene} from '../utils';
+import {BBox, Vector2} from '../types';
+import {Logger, LogLevel} from '../app';
+import {Scene} from '../scenes';
 
 describe('debug()', () => {
   beforeEach(() => {
-    setProject(new Project({name: 'test', scenes: []}));
+    startScene({logger: new Logger()} as Scene);
   });
 
   test.each([
@@ -17,11 +17,11 @@ describe('debug()', () => {
     ['NaN', NaN, {message: 'NaN'}],
     ['Vector2', Vector2.one, {message: '{"x":1,"y":1}', object: Vector2.one}],
     [
-      'Rect',
-      new Rect([10, 20, 30, 40]),
+      'BBox',
+      new BBox([10, 20, 30, 40]),
       {
         message: '{"x":10,"y":20,"width":30,"height":40}',
-        object: new Rect([10, 20, 30, 40]),
+        object: new BBox([10, 20, 30, 40]),
       },
     ],
     [
@@ -38,7 +38,7 @@ describe('debug()', () => {
     ['Empty Objects', {}, {message: '{}', object: {}}],
   ])('log: %s', (_, payload, expected) => {
     const spy = vi.fn();
-    useLogger().onLogged.subscribe(spy);
+    (useLogger() as Logger).onLogged.subscribe(spy);
 
     debug(payload);
 

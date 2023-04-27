@@ -1,16 +1,17 @@
 import './index.scss';
 
-import type {Project} from '@motion-canvas/core/lib';
-import {Player} from '@motion-canvas/core/lib/player';
+import type {Project} from '@motion-canvas/core';
+import {Player, Presenter, Renderer} from '@motion-canvas/core';
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {Index, ProjectData} from './Index';
 import {
   InspectionProvider,
   LoggerProvider,
-  PlayerProvider,
-  ProjectProvider,
+  ApplicationProvider,
 } from './contexts';
+import {getItem, setItem} from './utils';
+import {ShortcutsProvider} from './contexts/shortcuts';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -18,8 +19,7 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export function editor(factory: () => Project) {
-  const project = factory();
+export function editor(project: Project) {
   Error.stackTraceLimit = Infinity;
 
   project.logger.onLogged.subscribe(log => {
@@ -31,35 +31,51 @@ export function editor(factory: () => Project) {
     }
   });
 
-  const player = new Player(project);
+  const renderer = new Renderer(project);
+  const presenter = new Presenter(project);
+
+  const meta = project.meta;
   const playerKey = `${project.name}/player`;
   const frameKey = `${project.name}/frame`;
-  const state = localStorage.getItem(playerKey);
-  const frame = localStorage.getItem(frameKey);
-  if (state) {
-    player.loadState(JSON.parse(state));
-  }
-  if (frame) {
-    player.requestSeek(parseInt(frame));
-  }
+  const player = new Player(
+    project,
+    meta.getFullPreviewSettings(),
+    getItem(playerKey, {}),
+    getItem(frameKey, -1),
+  );
+
   player.onStateChanged.subscribe(state => {
-    localStorage.setItem(playerKey, JSON.stringify(state));
+    setItem(playerKey, state);
   });
   player.onFrameChanged.subscribe(frame => {
-    localStorage.setItem(frameKey, frame.toString());
+    setItem(frameKey, frame);
   });
+
+  const updatePlayer = () => {
+    player.configure(meta.getFullPreviewSettings());
+  };
+  meta.shared.onChanged.subscribe(updatePlayer);
+  meta.preview.onChanged.subscribe(updatePlayer);
 
   document.title = `${project.name} | Motion Canvas`;
   renderRoot(
-    <PlayerProvider player={player}>
-      <ProjectProvider project={project}>
+    <ApplicationProvider
+      application={{
+        player,
+        renderer,
+        presenter,
+        project,
+        meta,
+      }}
+    >
+      <ShortcutsProvider>
         <LoggerProvider>
           <InspectionProvider>
             <Editor />
           </InspectionProvider>
         </LoggerProvider>
-      </ProjectProvider>
-    </PlayerProvider>,
+      </ShortcutsProvider>
+    </ApplicationProvider>,
   );
 }
 

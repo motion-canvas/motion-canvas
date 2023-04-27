@@ -1,7 +1,9 @@
-import type {Project} from '@motion-canvas/core';
+import {Stage, Player} from '@motion-canvas/core';
+import type {PlayerSettings, Project, StageSettings} from '@motion-canvas/core';
 
 import styles from './styles.scss?inline';
 import html from './template.html?raw';
+import {Vector2} from '@motion-canvas/core/lib/types';
 
 const TEMPLATE = `<style>${styles}</style>${html}`;
 const ID = 'motion-canvas-player';
@@ -29,17 +31,17 @@ class MotionCanvasPlayer extends HTMLElement {
 
   private get quality() {
     const attr = this.getAttribute('quality');
-    return attr ? parseFloat(attr) : 1;
+    return attr ? parseFloat(attr) : this.defaultSettings.resolutionScale;
   }
 
   private get width() {
     const attr = this.getAttribute('width');
-    return attr ? parseFloat(attr) : this.defaultWidth;
+    return attr ? parseFloat(attr) : this.defaultSettings.size.width;
   }
 
   private get height() {
     const attr = this.getAttribute('height');
-    return attr ? parseFloat(attr) : this.defaultHeight;
+    return attr ? parseFloat(attr) : this.defaultSettings.size.height;
   }
 
   private get variables() {
@@ -58,24 +60,26 @@ class MotionCanvasPlayer extends HTMLElement {
   private readonly button: HTMLDivElement;
 
   private state = State.Initial;
-  private defaultWidth = 1920;
-  private defaultHeight = 1080;
   private project: Project | null = null;
+  private player: Player | null = null;
+  private defaultSettings: PlayerSettings & StageSettings;
   private abortController: AbortController | null = null;
-  private runId: number | null = null;
   private mouseMoveId: number | null = null;
-  private renderTime = 0;
   private finished = false;
   private playing = false;
   private connected = false;
+  private stage = new Stage();
 
   public constructor() {
     super();
     this.root = this.attachShadow({mode: 'open'});
     this.root.innerHTML = TEMPLATE;
-    this.canvas = this.root.querySelector('.canvas');
+
     this.overlay = this.root.querySelector('.overlay');
     this.button = this.root.querySelector('.button');
+    this.canvas = this.stage.finalBuffer;
+    this.canvas.classList.add('canvas');
+    this.root.prepend(this.canvas);
 
     this.overlay.addEventListener('click', this.handleClick);
     this.overlay.addEventListener('mousemove', this.handleMouseMove);
@@ -138,9 +142,10 @@ class MotionCanvasPlayer extends HTMLElement {
 
   private setPlaying(value: boolean) {
     if (this.state === State.Ready && (value || (this.auto && !this.hover))) {
+      this.player?.togglePlayback(true);
       this.playing = true;
-      this.request();
     } else {
+      this.player?.togglePlayback(false);
       this.playing = false;
     }
     this.updateClass();
@@ -162,10 +167,6 @@ class MotionCanvasPlayer extends HTMLElement {
     }
   }
 
-  private shouldPlay() {
-    return this.state === State.Ready && this.playing && this.connected;
-  }
-
   private async updateSource(source: string) {
     this.setState(State.Initial);
 
@@ -180,65 +181,34 @@ class MotionCanvasPlayer extends HTMLElement {
       const delay = new Promise(resolve => setTimeout(resolve, 200));
       await Promise.any([delay, promise]);
       this.setState(State.Loading);
-      project = (await promise).default();
-      project.setVariables(this.variables);
+      project = (await promise).default;
     } catch (e) {
+      console.error(e);
       this.setState(State.Error);
       return;
     }
 
-    if (this.abortController.signal.aborted) return;
-    project.framerate = 60;
-    await project.recalculate();
+    this.defaultSettings = project.meta.getFullRenderingSettings();
+    const player = new Player(project);
+    player.setVariables(this.variables);
 
-    if (this.abortController.signal.aborted) return;
-    await project.seek(0);
-
-    if (this.abortController.signal.aborted) return;
-    const size = project.getSize();
-    this.defaultWidth = size.width;
-    this.defaultHeight = size.height;
     this.finished = false;
+    this.player?.onRender.unsubscribe(this.render);
+    this.player?.togglePlayback(false);
+    this.player?.deactivate();
     this.project = project;
-    this.project.resolutionScale = this.quality;
-    this.project.setSize([this.width, this.height]);
-    this.project.logger.onLogged.subscribe(console.log);
-    this.project.setCanvas(this.canvas);
+    this.player = player;
+    this.updateSettings();
+    this.player.onRender.subscribe(this.render);
+    this.player.togglePlayback(this.playing);
+    if (import.meta.env.DEV) {
+      this.player.logger.onLogged.subscribe(console.log);
+    }
 
     this.setState(State.Ready);
   }
 
-  private async run() {
-    if (this.finished) {
-      await this.project.seek(0);
-    }
-
-    if (!this.shouldPlay()) return;
-    this.finished = await this.project.next();
-
-    if (!this.shouldPlay()) return;
-    await this.project.render();
-  }
-
-  private request() {
-    this.runId ??= requestAnimationFrame(async time => {
-      this.runId = null;
-      if (!this.shouldPlay()) return;
-      if (time - this.renderTime >= 1000 / (this.project.framerate + 5)) {
-        this.renderTime = time;
-        try {
-          await this.run();
-        } catch (e) {
-          this.setState(State.Error);
-          return;
-        }
-      }
-
-      this.request();
-    });
-  }
-
-  private attributeChangedCallback(name: string, oldValue: any, newValue: any) {
+  private attributeChangedCallback(name: string, _: any, newValue: any) {
     switch (name) {
       case 'auto':
         this.setPlaying(this.playing);
@@ -247,30 +217,44 @@ class MotionCanvasPlayer extends HTMLElement {
         this.updateSource(newValue);
         break;
       case 'quality':
-        if (this.project) {
-          this.project.resolutionScale = this.quality;
-        }
-        break;
       case 'width':
       case 'height':
-        if (this.project) {
-          this.project.setSize([this.width, this.height]);
-        }
+        this.updateSettings();
         break;
       case 'variables':
-        if (this.project) {
-          this.project.setVariables(this.variables);
-        }
+        this.player?.setVariables(this.variables);
     }
   }
 
   private disconnectedCallback() {
     this.connected = false;
+    this.player?.deactivate();
+    this.player?.onRender.unsubscribe(this.render);
   }
 
   private connectedCallback() {
     this.connected = true;
-    this.request();
+    this.player?.activate();
+    this.player?.onRender.subscribe(this.render);
+  }
+
+  private render = async () => {
+    if (this.player) {
+      await this.stage.render(
+        this.player.playback.currentScene,
+        this.player.playback.previousScene,
+      );
+    }
+  };
+
+  private updateSettings() {
+    const settings = {
+      ...this.defaultSettings,
+      size: new Vector2(this.width, this.height),
+      resolutionScale: this.quality,
+    };
+    this.stage.configure(settings);
+    this.player.configure(settings);
   }
 }
 

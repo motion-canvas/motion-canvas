@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "2.6.0",
+  "version": "3.4.0",
   "description": "A Vite plugin for Motion Canvas projects",
   "main": "lib/main.js",
   "author": "motion-canvas",
@@ -19,7 +19,7 @@
     "lib"
   ],
   "peerDependencies": {
-    "vite": "3.x"
+    "vite": "4.x"
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",

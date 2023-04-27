@@ -5,7 +5,7 @@
  * the Proxy instead.
  */
 
-import {useLogger} from './useProject';
+import {useLogger} from './useScene';
 
 /**
  * Route the given url through a local proxy.
@@ -98,7 +98,7 @@ export function isProxyEnabled() {
  * try to parse the Env var on every call,
  * spamming the console in the process
  */
-let getAllowListCache: string[] | undefined = undefined;
+let AllowListCache: string[] | undefined = undefined;
 /**
  * Return the list of allowed hosts
  * from the Plugin Config
@@ -106,8 +106,8 @@ let getAllowListCache: string[] | undefined = undefined;
 function getAllowList() {
   // Condition should get optimized away for Prod
   if (import.meta.env.VITEST !== 'true') {
-    if (getAllowListCache) {
-      return [...getAllowListCache];
+    if (AllowListCache) {
+      return [...AllowListCache];
     }
   }
 
@@ -144,6 +144,6 @@ function getAllowList() {
     }
     return validatedEntries;
   })();
-  getAllowListCache = result;
-  return [...getAllowListCache];
+  AllowListCache = result;
+  return [...AllowListCache];
 }

@@ -1,13 +1,13 @@
 import type {Thread} from '../threading';
-import {DetailedError} from '../utils';
+import {DetailedError} from './DetailedError';
 
-const threadStack: Thread[] = [];
+const ThreadStack: Thread[] = [];
 
 /**
  * Get a reference to the current thread.
  */
 export function useThread(): Thread {
-  const thread = threadStack.at(-1);
+  const thread = ThreadStack.at(-1);
   if (!thread) {
     throw new DetailedError(
       'The thread is not available in the current context.',
@@ -20,11 +20,11 @@ export function useThread(): Thread {
 }
 
 export function startThread(thread: Thread) {
-  threadStack.push(thread);
+  ThreadStack.push(thread);
 }
 
 export function endThread(thread: Thread) {
-  if (threadStack.pop() !== thread) {
+  if (ThreadStack.pop() !== thread) {
     throw new Error('startThread/endThread was called out of order.');
   }
 }

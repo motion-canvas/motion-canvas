@@ -7,12 +7,12 @@ export interface IssueGroupProps {
   children: ReactNode | ReactNode[];
 }
 
-const titles = {
+const Titles = {
   feat: 'New features 🎉',
   fix: 'Fixed bugs 🐛',
 };
 
-const ids = {
+const IDs = {
   feat: 'new-features',
   fix: 'fixed-bugs',
 };
@@ -20,8 +20,8 @@ const ids = {
 export default function IssueGroup({type, children}: IssueGroupProps) {
   return (
     <>
-      <Heading id={ids[type]} as="h3">
-        {titles[type]}
+      <Heading id={IDs[type]} as="h3">
+        {Titles[type]}
       </Heading>
       <ul className={styles.group}>{children}</ul>
     </>

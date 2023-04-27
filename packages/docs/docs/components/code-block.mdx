@@ -22,7 +22,7 @@ important snippets.
 To display code, set the `code` and `language` property.
 
 ```ts
-import {CodeBlock} from '@motion-canvas/2d/lib/components';
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(
   <CodeBlock language="c#" code={`Console.WriteLine("Hello World!")`} />,
@@ -48,7 +48,7 @@ For convenience, the indentation of code will be automatically adjust whenever
 the code starts with a new line.
 
 ```tsx
-import {CodeBlock} from '@motion-canvas/2d/lib/components';
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(
   // note that the ` bracket is followed by a new line
@@ -71,7 +71,7 @@ console.log('Hello World!');
 The indentation is then set by the least indented code.
 
 ```tsx
-import {CodeBlock} from '@motion-canvas/2d/lib/components';
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(
   // note that the ` bracket is followed by a new line
@@ -131,7 +131,7 @@ line, starting at the fifth character, and selecting a total of six characters.
 Finally, you can use the `lines` function to select whole lines of code.
 
 ```tsx
-import {CodeBlock, lines} from '@motion-canvas/2d/lib/components';
+import {CodeBlock, lines} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 const codeRef = createRef();
 yield view.add(
@@ -150,7 +150,20 @@ yield * codeRef().selection(lines(1));
 yield * codeRef().selection(lines(1, 2));
 ```
 
-To remove a selection, you must set the selected range from `[0, 0]` to
+To remove a selection, the value of `.selection()` signal can be set to its
+[`DEFAULT`](signal-default), i.e. "all selected". For example:
+
+```ts
+import {DEFAULT} from '@motion-canvas/core/lib/signals';
+
+// highlight lines 1 and 2
+yield * codeRef().selection(lines(1, 2));
+
+// highlight all lines
+yield * codeRef().selection(DEFAULT);
+```
+
+Alternatively, the selected range can be set from `[0, 0]` to
 `[Infinity, Infinity]` to select all text. This is most easily performed by
 setting the selection to `lines(0, Infinity)`.
 
@@ -165,7 +178,7 @@ for future edits. Then call `edit` with an embedded `insert` call to add the new
 code.
 
 ```tsx
-import {CodeBlock, insert} from '@motion-canvas/2d/lib/components';
+import {CodeBlock, insert} from '@motion-canvas/2d/lib/components/CodeBlock';
 import {createRef} from '@motion-canvas/core/lib/utils';
 
 const codeRef = createRef<CodeBlock>();
@@ -186,7 +199,7 @@ Removing code is similar, only with the provided code being removed during the
 animation.
 
 ```tsx
-import {CodeBlock, remove} from '@motion-canvas/2d/lib/components';
+import {CodeBlock, remove} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(<CodeBlock ref={codeRef} code={`var myBool = true;`} />);
 
@@ -262,3 +275,4 @@ const myBool = true;
 ```
 
 [languages]: https://github.com/wooorm/starry-night#languages
+[signal-default]: /docs/signals#default-values

@@ -1,21 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {describe, test, beforeEach, expect} from 'vitest';
-import {Project} from '../Project';
-import {setProject, useProject, useTime} from '../utils';
+import {describe, test, expect, beforeAll, afterAll} from 'vitest';
+import {endPlayback, startPlayback, useTime} from '../utils';
 import {waitFor} from '../flow';
 import {threads} from './threads';
 import {join} from './join';
+import {PlaybackManager, PlaybackStatus} from '../app';
 
 describe('join()', () => {
-  beforeEach(() => {
-    setProject(new Project({name: 'tests', scenes: []}));
-  });
+  const playback = new PlaybackManager();
+  const status = new PlaybackStatus(playback);
+  beforeAll(() => startPlayback(status));
+  afterAll(() => endPlayback(status));
 
   test('Elapsed time when joining all threads', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       const taskA = yield waitFor(0.15);
       const taskB = yield waitFor(0.17);
@@ -23,19 +22,17 @@ describe('join()', () => {
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time).toBeCloseTo(0.17);
   });
 
   test('Elapsed time when joining any thread', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       const taskA = yield waitFor(0.15);
       const taskB = yield waitFor(0.17);
@@ -43,19 +40,17 @@ describe('join()', () => {
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time).toBeCloseTo(0.15);
   });
 
   test('Elapsed time when joining an already canceled thread', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       const waitTask = yield waitFor(0.15);
       yield* waitFor(0.2);
@@ -63,29 +58,27 @@ describe('join()', () => {
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time).toBeCloseTo(0.2);
   });
 
   test('Elapsed time when joining a thread right after cancellation', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       const waitTask = yield waitFor(0.05);
       yield* join(waitTask);
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time).toBeCloseTo(0.05);

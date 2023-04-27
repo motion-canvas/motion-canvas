@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {describe, test, beforeEach, expect} from 'vitest';
-import {Project} from '../Project';
-import {setProject, useProject, useTime} from '../utils';
+import {describe, test, expect, beforeAll, afterAll} from 'vitest';
+import {endPlayback, startPlayback, useTime} from '../utils';
 import {threads} from '../threading';
-import {spring, Spring} from './spring';
+import {spring} from './spring';
+import {PlaybackManager, PlaybackStatus} from '../app';
 
 describe('spring()', () => {
-  beforeEach(() => {
-    setProject(new Project({name: 'tests', scenes: []}));
-  });
+  const playback = new PlaybackManager();
+  const status = new PlaybackStatus(playback);
+  beforeAll(() => startPlayback(status));
+  afterAll(() => endPlayback(status));
 
   test('Framerate-independent spring duration', () => {
-    const project = useProject();
-
     let timeA;
     // should be around 1.13333333 seconds
     const taskA = threads(function* () {
@@ -25,7 +24,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
@@ -42,7 +41,7 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
@@ -59,29 +58,29 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
       timeC = useTime();
     });
 
-    project.framerate = 60;
-    project.frame = 0;
+    playback.fps = 60;
+    playback.frame = 0;
     for (const _ of taskA) {
-      project.frame++;
+      playback.frame++;
     }
 
-    project.framerate = 24;
-    project.frame = 0;
+    playback.fps = 24;
+    playback.frame = 0;
     for (const _ of taskB) {
-      project.frame++;
+      playback.frame++;
     }
 
-    project.framerate = 120;
-    project.frame = 0;
+    playback.fps = 120;
+    playback.frame = 0;
     for (const _ of taskC) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(timeA).toBeCloseTo(1.5, 0);
@@ -90,8 +89,6 @@ describe('spring()', () => {
   });
 
   test('Accumulated time offset', () => {
-    const project = useProject();
-
     let time;
     const task = threads(function* () {
       yield* spring(
@@ -102,20 +99,20 @@ describe('spring()', () => {
         },
         0,
         300,
-        x => {
+        _ => {
           // do nothing
         },
       );
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
-    expect(project.frame).toBe(18);
+    expect(playback.frame).toBe(18);
     expect(time).toBeCloseTo(1.5, 0);
   });
 });

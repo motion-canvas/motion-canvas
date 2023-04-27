@@ -1,0 +1,74 @@
+---
+slug: version-3.0.0
+title: Motion Canvas v3.0.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+
+:::info
+
+Check out the [Migration Guide](/docs/migrating-to-3.0.0) for instructions on
+how to update your project.
+
+:::
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} pr={402}>
+    New playback architecture:
+    <ul className="margin-top--sm margin-bottom--sm">
+      <li>Project settings are now stored in meta files.</li>
+      <li>Preview and rendering settings are configured separately.</li>
+      <li>The animation range is stored using seconds instead of frames.</li>
+      <li>
+        You can adjust the audio offset by holding <code>SHIFT</code> and
+        dragging the waveform left and right
+      </li>
+      <li>
+        The rendering is not locked to the framerate, making the process a bit
+        faster.
+      </li>
+    </ul>
+    This change also opens the door to a lot of new features, including the{' '}
+    <Link to="https://github.com/motion-canvas/motion-canvas/issues/213">
+      Presentation Mode
+    </Link>
+    , <Link to="https://github.com/motion-canvas/motion-canvas/issues/170">
+      Editable Signals
+    </Link> and <Link to="https://github.com/motion-canvas/motion-canvas/issues/364">
+      Custom Exporters
+    </Link>.
+  </Issue>
+  <Issue user={'ccaven'} pr={421}>
+    Rendering settings include a quarter resolution (x0.25).
+  </Issue>
+  <Issue user={'mohsinhijazee'} pr={404}>
+    New{' '}
+    <Link to="/api/2d/components/Layout#textDirection">
+      <code>textDirection</code>
+    </Link>{' '}
+    property for RTL/LTR text.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={437}>
+    Fix <code>Vector2.exactlyEquals</code>.
+  </Issue>
+  <Issue user={'aarthificial'} pr={436}>
+    Render only within the range.
+  </Issue>
+  <Issue user={'aarthificial'} pr={433}>
+    Fix initial value of <code>endOffset</code>.
+  </Issue>
+  <Issue user={'aarthificial'} pr={432}>
+    Correctly reset zoom.
+  </Issue>
+  <Issue user={'aarthificial'} pr={427}>
+    Fix performance issue with audio track.
+  </Issue>
+  <Issue user={'aarthificial'} pr={424}>
+    Clear semi-transparent backgrounds.
+  </Issue>
+</IssueGroup>

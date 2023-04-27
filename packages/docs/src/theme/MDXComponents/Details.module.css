@@ -1,0 +1,10 @@
+.root {
+  padding: var(--ifm-global-spacing);
+  background-color: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: var(--ifm-global-shadow-lw);
+  margin-bottom: 0.5rem;
+  --hl-background: var(--ifm-background-color);
+  --ifm-code-background: var(--ifm-background-color);
+  --docusaurus-details-decoration-color: var(--ifm-color-emphasis-300);
+}

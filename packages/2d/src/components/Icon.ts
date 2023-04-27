@@ -1,10 +1,10 @@
-import {Image, ImageProps} from '../components/Image';
+import {Img, ImgProps} from './Img';
 import {colorSignal, computed, initial, signal} from '../decorators';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ColorSignal, PossibleColor} from '@motion-canvas/core/lib/types';
 
-export interface IconProps extends ImageProps {
+export interface IconProps extends ImgProps {
   /**
    * {@inheritDoc Icon.icon}
    */
@@ -20,7 +20,7 @@ export interface IconProps extends ImageProps {
  * An Icon Component that provides an easy access to over 150k icons.
  * See https://icones.js.org/collection/all for all available Icons.
  */
-export class Icon extends Image {
+export class Icon extends Img {
   /**
    * The identifier of the icon.
    *
@@ -44,7 +44,7 @@ export class Icon extends Image {
    *   Value can be either RGB or RGBA: `#bada55`, `#bada55aa` (latter is partially transparent)
    *   The shorthand version (e.g. `#abc` for `#aabbcc` is also possible.)
    *
-   * @default 'white'
+   * @defaultValue 'white'
    */
   @initial('white')
   @colorSignal()
@@ -79,7 +79,7 @@ export class Icon extends Image {
    */
   protected setSrc() {
     useLogger().warn(
-      "The Icon Component does not accept setting the `src`. If you need access to `src`, use '<Image/>` instead.",
+      "The Icon Component does not accept setting the `src`. If you need access to `src`, use '<Img/>` instead.",
     );
   }
 }

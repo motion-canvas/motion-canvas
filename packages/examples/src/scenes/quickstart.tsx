@@ -11,8 +11,8 @@ export default makeScene2D(function* (view) {
       //highlight-start
       ref={myCircle}
       x={-300}
-      width={240}
-      height={240}
+      width={140}
+      height={140}
       fill="#e13238"
     />,
   );

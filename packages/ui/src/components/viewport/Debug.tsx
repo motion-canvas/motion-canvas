@@ -2,8 +2,9 @@ import styles from './Viewport.module.scss';
 
 import {
   useCurrentScene,
-  usePlayerState,
   usePlayerTime,
+  usePreviewSettings,
+  useSharedSettings,
   useSubscribable,
 } from '../../hooks';
 import {
@@ -15,19 +16,19 @@ import {
 } from 'preact/hooks';
 import {ViewportContext} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
-import {useInspection, usePlayer} from '../../contexts';
+import {useInspection, useApplication} from '../../contexts';
 
 export function Debug() {
   const time = usePlayerTime();
   const scene = useCurrentScene();
-  const player = usePlayer();
-  const {scale} = usePlayerState();
+  const {player} = useApplication();
+  const {resolutionScale} = usePreviewSettings();
+  const {size} = useSharedSettings();
   const canvasRef = useRef<HTMLCanvasElement>();
   const contextRef = useRef<CanvasRenderingContext2D>();
   const state = useContext(ViewportContext);
   const {inspectedElement, setInspectedElement} = useInspection();
   const [renderCount, setRenderCount] = useState(0);
-  const size = player.project.getSize();
 
   const matrix = useMemo(() => {
     const matrix = new DOMMatrix();
@@ -37,15 +38,17 @@ export function Debug() {
 
     const offset = size.scale(-0.5);
     matrix.translateSelf(state.x + state.width / 2, state.y + state.height / 2);
-    matrix.scaleSelf(state.zoom * scale, state.zoom * scale);
+    matrix.scaleSelf(state.zoom, state.zoom);
     matrix.translateSelf(offset.width, offset.height);
 
     return matrix;
-  }, [size, state, scale]);
+  }, [size, state, resolutionScale]);
 
-  useSubscribable(player.onReloaded, () => setRenderCount(renderCount + 1), [
-    renderCount,
-  ]);
+  useSubscribable(
+    player.onRecalculated,
+    () => setRenderCount(renderCount + 1),
+    [renderCount],
+  );
 
   useLayoutEffect(() => {
     contextRef.current ??= canvasRef.current.getContext('2d');

@@ -30,7 +30,7 @@ decorate(loop, threadable());
  * yield* loop(
  *   colors.length,
  *   i => rect.fill(colors[i], 2),
- * });
+ * );
  * ```
  *
  * @param iterations - The number of iterations.

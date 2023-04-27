@@ -1,19 +1,21 @@
 import {useMemo} from 'preact/hooks';
-import {usePlayerState} from './usePlayerState';
 import {useCurrentFrame} from './useCurrentFrame';
+import {usePreviewSettings} from './useSettings';
+import {useDuration} from './useDuration';
 
 export function usePlayerTime() {
-  const state = usePlayerState();
+  const {fps} = usePreviewSettings();
   const frame = useCurrentFrame();
+  const duration = useDuration();
 
   return useMemo(
     () => ({
       frame,
-      time: frame / state.fps,
-      duration: state.duration,
-      durationTime: state.duration / state.fps,
-      completion: frame / state.duration,
+      time: frame / fps,
+      duration: duration,
+      durationTime: duration / fps,
+      completion: frame / duration,
     }),
-    [state, frame],
+    [frame, duration, fps],
   );
 }

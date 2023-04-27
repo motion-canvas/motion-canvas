@@ -1,0 +1,21 @@
+---
+sidebar_position: -1
+slug: /updating
+---
+
+# Update Guide
+
+The latest patch notes can be found
+[here](https://github.com/motion-canvas/motion-canvas/releases).
+
+To update all the `@motion-canvas` packages to the latest version use the
+following:
+
+```bash
+npm update --save @motion-canvas/2d @motion-canvas/core @motion-canvas/ui @motion-canvas/vite-plugin
+```
+
+## Troubleshooting
+
+If you get any errors, try removing `package-lock.json` and the `node_modules`
+folder, then run `npm install` again.

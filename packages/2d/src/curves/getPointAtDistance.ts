@@ -14,10 +14,9 @@ export function getPointAtDistance(
     length += segment.arcLength;
     if (length >= clamped) {
       const relative = (clamped - previousLength) / segment.arcLength;
-      const [position, tangent] = segment.getPoint(clamp(0, 1, relative));
-      return {position, tangent};
+      return segment.getPoint(clamp(0, 1, relative));
     }
   }
 
-  return {position: Vector2.zero, tangent: Vector2.up};
+  return {position: Vector2.zero, tangent: Vector2.up, normal: Vector2.up};
 }

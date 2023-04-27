@@ -1,5 +1,5 @@
 import {CanvasStyle, Gradient, Pattern, PossibleCanvasStyle} from '../partials';
-import {Color, Rect, Spacing, Vector2} from '@motion-canvas/core/lib/types';
+import {Color, BBox, Spacing, Vector2} from '@motion-canvas/core/lib/types';
 
 export function canvasStyleParser(style: PossibleCanvasStyle) {
   if (style === null) {
@@ -37,7 +37,7 @@ export function resolveCanvasStyle(
 
 export function drawRoundRect(
   context: CanvasRenderingContext2D | Path2D,
-  rect: Rect,
+  rect: BBox,
   radius: Spacing,
   smoothCorners: boolean,
   cornerSharpness: number,
@@ -133,7 +133,7 @@ function adjustRectRadius(
   radius: number,
   horizontal: number,
   vertical: number,
-  rect: Rect,
+  rect: BBox,
 ): number {
   const width =
     radius + horizontal > rect.width
@@ -149,35 +149,54 @@ function adjustRectRadius(
 
 export function drawRect(
   context: CanvasRenderingContext2D | Path2D,
-  rect: Rect,
+  rect: BBox,
 ) {
   context.rect(rect.x, rect.y, rect.width, rect.height);
 }
 
-export function fillRect(context: CanvasRenderingContext2D, rect: Rect) {
+export function fillRect(context: CanvasRenderingContext2D, rect: BBox) {
   context.fillRect(rect.x, rect.y, rect.width, rect.height);
 }
 
-export function strokeRect(context: CanvasRenderingContext2D, rect: Rect) {
+export function strokeRect(context: CanvasRenderingContext2D, rect: BBox) {
   context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+}
+
+export function drawPolygon(
+  path: CanvasRenderingContext2D | Path2D,
+  rect: BBox,
+  sides: number,
+) {
+  const size = rect.size.scale(0.5);
+  for (let i = 0; i <= sides; i++) {
+    const theta = (i * 2 * Math.PI) / sides;
+    const direction = Vector2.fromRadians(theta).perpendicular;
+    const vertex = direction.mul(size);
+    if (i == 0) {
+      moveTo(path, vertex);
+    } else {
+      lineTo(path, vertex);
+    }
+  }
+  path.closePath();
 }
 
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  destination: Rect,
+  destination: BBox,
 ): void;
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  source: Rect,
-  destination: Rect,
+  source: BBox,
+  destination: BBox,
 ): void;
 export function drawImage(
   context: CanvasRenderingContext2D,
   image: CanvasImageSource,
-  first: Rect,
-  second?: Rect,
+  first: BBox,
+  second?: BBox,
 ): void {
   if (second) {
     context.drawImage(
@@ -246,4 +265,28 @@ export function arc(
     endAngle,
     counterclockwise,
   );
+}
+
+export function bezierCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint1: Vector2,
+  controlPoint2: Vector2,
+  to: Vector2,
+) {
+  context.bezierCurveTo(
+    controlPoint1.x,
+    controlPoint1.y,
+    controlPoint2.x,
+    controlPoint2.y,
+    to.x,
+    to.y,
+  );
+}
+
+export function quadraticCurveTo(
+  context: CanvasRenderingContext2D | Path2D,
+  controlPoint: Vector2,
+  to: Vector2,
+) {
+  context.quadraticCurveTo(controlPoint.x, controlPoint.y, to.x, to.y);
 }

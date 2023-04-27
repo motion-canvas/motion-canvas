@@ -27,8 +27,16 @@ export default function Comment({
 
 function FullComment({comment}: {comment: JSONOutput.Comment}) {
   const [collapsed, setCollapsed] = useState(true);
+  const preview = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@preview'),
+    [comment],
+  );
   const examples = useMemo(
     () => comment?.blockTags?.filter(({tag}) => tag === '@example') ?? [],
+    [comment],
+  );
+  const defaultValue = useMemo(
+    () => comment?.blockTags?.find(({tag}) => tag === '@defaultValue'),
     [comment],
   );
   const deprecated = useMemo(
@@ -42,6 +50,7 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
 
   return (
     <>
+      <Summary id={preview?.contentId} />
       {examples.length > 0 && (
         <>
           <h4>
@@ -65,6 +74,12 @@ function FullComment({comment}: {comment: JSONOutput.Comment}) {
             <div className={styles.clearFix}></div>
           </Collapsible>
           <div className={clsx(styles.clearFix, styles.inverse)}></div>
+        </>
+      )}
+      {defaultValue && (
+        <>
+          Default Value:{' '}
+          <code>{defaultValue.content.map(part => part.text).join('')}</code>
         </>
       )}
       {deprecated && (

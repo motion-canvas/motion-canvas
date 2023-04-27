@@ -13,7 +13,7 @@ import {
   originToOffset,
   PossibleSpacing,
   PossibleVector2,
-  Rect,
+  BBox,
   SerializedVector2,
   SpacingSignal,
   Vector2,
@@ -32,7 +32,6 @@ import {
   FlexWrap,
   LayoutMode,
   DesiredLength,
-  LetterSpacing,
   TextWrap,
   Length,
   LengthLimit,
@@ -94,6 +93,8 @@ export interface LayoutProps extends NodeProps {
   lineHeight?: SignalValue<Length>;
   letterSpacing?: SignalValue<number>;
   textWrap?: SignalValue<TextWrap>;
+  textDirection?: SignalValue<CanvasDirection>;
+  textAlign?: SignalValue<CanvasTextAlign>;
 
   size?: SignalValue<PossibleVector2<Length>>;
   offsetX?: SignalValue<number>;
@@ -145,16 +146,16 @@ export class Layout extends Node {
   @signal()
   public declare readonly wrap: SimpleSignal<FlexWrap, this>;
 
-  @initial('normal')
+  @initial('start')
   @signal()
   public declare readonly justifyContent: SimpleSignal<FlexContent, this>;
   @initial('normal')
   @signal()
   public declare readonly alignContent: SimpleSignal<FlexContent, this>;
-  @initial('normal')
+  @initial('stretch')
   @signal()
   public declare readonly alignItems: SimpleSignal<FlexItems, this>;
-  @initial('normal')
+  @initial('auto')
   @signal()
   public declare readonly alignSelf: SimpleSignal<FlexItems, this>;
   @initial(0)
@@ -182,20 +183,19 @@ export class Layout extends Node {
   @defaultStyle('line-height', parseFloat)
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
-  @defaultStyle('letter-spacing', i => {
-    if (i === 'normal') {
-      return 'normal';
-    }
-    return parseFloat(i);
-  })
+  @defaultStyle('letter-spacing', i => (i === 'normal' ? 0 : parseFloat(i)))
   @signal()
-  public declare readonly letterSpacing: SimpleSignal<LetterSpacing, this>;
+  public declare readonly letterSpacing: SimpleSignal<number, this>;
 
-  @defaultStyle('white-space', i => {
-    return i === 'pre' ? 'pre' : i === 'normal';
-  })
+  @defaultStyle('white-space', i => (i === 'pre' ? 'pre' : i === 'normal'))
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
+  @initial('inherit')
+  @signal()
+  public declare readonly textDirection: SimpleSignal<CanvasDirection, this>;
+  @defaultStyle('text-align')
+  @signal()
+  public declare readonly textAlign: SimpleSignal<CanvasTextAlign, this>;
 
   @cloneable(false)
   @inspectable(false)
@@ -226,97 +226,6 @@ export class Layout extends Node {
   }
   protected setY(value: SignalValue<number>) {
     this.customY(value);
-  }
-
-  @inspectable(false)
-  @initial(null)
-  @signal()
-  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
-
-  protected getWidth(): number {
-    return this.computedSize().width;
-  }
-  protected setWidth(value: SignalValue<Length>) {
-    this.customWidth(value);
-  }
-
-  @threadable()
-  protected *tweenWidth(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const width = this.desiredSize().x;
-    const lock = typeof width !== 'number' || typeof value !== 'number';
-    let from: number;
-    if (lock) {
-      from = this.size.x();
-    } else {
-      from = width;
-    }
-
-    let to: number;
-    if (lock) {
-      this.size.x(value);
-      to = this.size.x();
-    } else {
-      to = value;
-    }
-
-    this.size.x(from);
-    lock && this.lockSize();
-    yield* tween(time, value =>
-      this.size.x(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.size.x(value);
-    lock && this.releaseSize();
-  }
-
-  @inspectable(false)
-  @initial(null)
-  @signal()
-  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
-
-  protected getHeight(): number {
-    return this.computedSize().height;
-  }
-  protected setHeight(value: SignalValue<Length>) {
-    this.customHeight(value);
-  }
-
-  @threadable()
-  protected *tweenHeight(
-    value: SignalValue<Length>,
-    time: number,
-    timingFunction: TimingFunction,
-    interpolationFunction: InterpolationFunction<Length>,
-  ): ThreadGenerator {
-    const height = this.desiredSize().y;
-    const lock = typeof height !== 'number' || typeof value !== 'number';
-
-    let from: number;
-    if (lock) {
-      from = this.size.y();
-    } else {
-      from = height;
-    }
-
-    let to: number;
-    if (lock) {
-      this.size.y(value);
-      to = this.size.y();
-    } else {
-      to = value;
-    }
-
-    this.size.y(from);
-    lock && this.lockSize();
-    yield* tween(time, value =>
-      this.size.y(interpolationFunction(from, to, timingFunction(value))),
-    );
-    this.size.y(value);
-    lock && this.releaseSize();
   }
 
   /**
@@ -377,6 +286,95 @@ export class Layout extends Node {
   }
   public get height(): Signal<Length, number, this> {
     return this.size.y;
+  }
+
+  @inspectable(false)
+  @signal()
+  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
+
+  protected getWidth(): number {
+    return this.computedSize().width;
+  }
+  protected setWidth(value: SignalValue<Length>) {
+    this.customWidth(value);
+  }
+
+  @threadable()
+  protected *tweenWidth(
+    value: SignalValue<Length>,
+    time: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<Length>,
+  ): ThreadGenerator {
+    const width = this.desiredSize().x;
+    const lock = typeof width !== 'number' || typeof value !== 'number';
+    let from: number;
+    if (lock) {
+      from = this.size.x();
+    } else {
+      from = width;
+    }
+
+    let to: number;
+    if (lock) {
+      this.size.x(value);
+      to = this.size.x();
+    } else {
+      to = value;
+    }
+
+    this.size.x(from);
+    lock && this.lockSize();
+    yield* tween(time, value =>
+      this.size.x(interpolationFunction(from, to, timingFunction(value))),
+    );
+    this.size.x(value);
+    lock && this.releaseSize();
+  }
+
+  @inspectable(false)
+  @signal()
+  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
+
+  protected getHeight(): number {
+    return this.computedSize().height;
+  }
+  protected setHeight(value: SignalValue<Length>) {
+    this.customHeight(value);
+  }
+
+  @threadable()
+  protected *tweenHeight(
+    value: SignalValue<Length>,
+    time: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<Length>,
+  ): ThreadGenerator {
+    const height = this.desiredSize().y;
+    const lock = typeof height !== 'number' || typeof value !== 'number';
+
+    let from: number;
+    if (lock) {
+      from = this.size.y();
+    } else {
+      from = height;
+    }
+
+    let to: number;
+    if (lock) {
+      this.size.y(value);
+      to = this.size.y();
+    } else {
+      to = value;
+    }
+
+    this.size.y(from);
+    lock && this.lockSize();
+    yield* tween(time, value =>
+      this.size.y(interpolationFunction(from, to, timingFunction(value))),
+    );
+    this.size.y(value);
+    lock && this.releaseSize();
   }
 
   /**
@@ -526,25 +524,25 @@ export class Layout extends Node {
     return matrix;
   }
 
-  protected getComputedLayout(): Rect {
-    return new Rect(this.element.getBoundingClientRect());
+  protected getComputedLayout(): BBox {
+    return new BBox(this.element.getBoundingClientRect());
   }
 
   @computed()
   public computedPosition(): Vector2 {
     this.requestLayoutUpdate();
-    const rect = this.getComputedLayout();
+    const box = this.getComputedLayout();
 
     const position = new Vector2(
-      rect.x + (rect.width / 2) * this.offset.x(),
-      rect.y + (rect.height / 2) * this.offset.y(),
+      box.x + (box.width / 2) * this.offset.x(),
+      box.y + (box.height / 2) * this.offset.y(),
     );
 
     const parent = this.parentTransform();
     if (parent) {
       const parentRect = parent.getComputedLayout();
-      position.x -= parentRect.x + (parentRect.width - rect.width) / 2;
-      position.y -= parentRect.y + (parentRect.height - rect.height) / 2;
+      position.x -= parentRect.x + (parentRect.width - box.width) / 2;
+      position.y -= parentRect.y + (parentRect.height - box.height) / 2;
     }
 
     return position;
@@ -574,7 +572,7 @@ export class Layout extends Node {
   protected appendedToView() {
     const root = this.isLayoutRoot();
     if (root) {
-      this.view()?.element.append(this.element);
+      this.view().element.append(this.element);
     }
 
     return root;
@@ -623,8 +621,8 @@ export class Layout extends Node {
     this.applyFont();
   }
 
-  protected override getCacheRect(): Rect {
-    return Rect.fromSizeCentered(this.computedSize());
+  protected override getCacheBBox(): BBox {
+    return BBox.fromSizeCentered(this.computedSize());
   }
 
   protected override draw(context: CanvasRenderingContext2D) {
@@ -649,12 +647,12 @@ export class Layout extends Node {
   ) {
     const size = this.computedSize();
     const offset = size.mul(this.offset()).scale(0.5).transformAsPoint(matrix);
-    const rect = Rect.fromSizeCentered(size);
-    const layout = rect.transformCorners(matrix);
-    const padding = rect
+    const box = BBox.fromSizeCentered(size);
+    const layout = box.transformCorners(matrix);
+    const padding = box
       .addSpacing(this.padding().scale(-1))
       .transformCorners(matrix);
-    const margin = rect.addSpacing(this.margin()).transformCorners(matrix);
+    const margin = box.addSpacing(this.margin()).transformCorners(matrix);
 
     context.beginPath();
     drawLine(context, margin);
@@ -795,9 +793,11 @@ export class Layout extends Node {
       : this.fontWeight().toString();
     this.element.style.letterSpacing = this.letterSpacing.isInitial()
       ? ''
-      : this.letterSpacing() === 'normal'
-      ? 'normal'
       : `${this.letterSpacing()}px`;
+
+    this.element.style.textAlign = this.textAlign.isInitial()
+      ? ''
+      : this.textAlign();
 
     if (this.textWrap.isInitial()) {
       this.element.style.whiteSpace = '';
@@ -813,16 +813,18 @@ export class Layout extends Node {
 
   public override dispose() {
     super.dispose();
-    this.sizeLockCounter.context.dispose();
-    this.element.remove();
-    this.element.innerHTML = '';
+    this.sizeLockCounter?.context.dispose();
+    if (this.element) {
+      this.element.remove();
+      this.element.innerHTML = '';
+    }
     this.element = null as unknown as HTMLElement;
     this.styles = null as unknown as CSSStyleDeclaration;
   }
 
   public override hit(position: Vector2): Node | null {
     const local = position.transformAsPoint(this.localToParent().inverse());
-    if (this.cacheRect().includes(local)) {
+    if (this.cacheBBox().includes(local)) {
       return super.hit(position) ?? this;
     }
 

@@ -1,12 +1,12 @@
 import {useSubscribableValue} from './useSubscribable';
-import {usePlayer} from '../contexts';
+import {useApplication} from '../contexts';
 
 export function useScenes() {
-  const player = usePlayer();
-  return useSubscribableValue(player.project.onScenesChanged);
+  const {player} = useApplication();
+  return useSubscribableValue(player.playback.onScenesRecalculated);
 }
 
 export function useCurrentScene() {
-  const player = usePlayer();
-  return useSubscribableValue(player.project.onCurrentSceneChanged);
+  const {player} = useApplication();
+  return useSubscribableValue(player.playback.onSceneChanged);
 }

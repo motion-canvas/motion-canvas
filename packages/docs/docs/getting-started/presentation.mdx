@@ -1,0 +1,60 @@
+---
+sidebar_position: 15
+slug: /presentation
+---
+
+import {VideoSettings} from '@site/src/Icon/VideoSettings';
+
+# Presentation
+
+Aside from exporting your animations, you can use Motion Canvas to present them
+in real time. Simply define some slides in your animation and then navigate
+between them using the Presentation Mode.
+
+## `beginSlide` function
+
+The [`beginSlide`](/api/core/utils#beginSlide) function is used to mark the
+beginning of a new slide. When this function is yielded, the playback will pause
+and wait for you to press `SPACE`:
+
+```ts
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Txt} from '@motion-canvas/2d/lib/components';
+import {beginSlide, createRef} from '@motion-canvas/core/lib/utils';
+import {waitFor} from '@motion-canvas/core/lib/flow';
+
+export default makeScene2D(function* (view) {
+  const title = createRef<Txt>();
+  view.add(<Txt ref={title} />);
+
+  title().text('FIRST SLIDE');
+  yield* beginSlide('first slide');
+  yield* waitFor(1); // try doing some actual animations here
+
+  title().text('SECOND SLIDE');
+  yield* beginSlide('second slide');
+  yield* waitFor(1);
+
+  title().text('LAST SLIDE');
+  yield* beginSlide('last slide');
+  yield* waitFor(1);
+});
+```
+
+## Presentation Mode
+
+To present your animation, navigate to the Video Settings <VideoSettings
+  className="icon-inline"
+  alt="Video Settings"
+  title="Video Settings"
+/> tab. Click on the dropdown next to the `RENDER` button and choose `PRESENT`.
+From now on, pressing the button will enter the Presentation Mode (You can
+switch back to rendering at any time using the same dropdown). Try entering the
+Presentation Mode in <a href="/editor/presentation/" target="_blank">our online
+editor</a>.
+
+In this mode, you can quickly switch between all your slides using the panel on
+the left. You can also use the playback controls at the bottom to navigate from
+one slide to another. Hover over the buttons to see what they do and what
+keyboard shortcuts are assigned to them. When switching to full screen, the
+controls disappear, but you can still use your keyboard to navigate.

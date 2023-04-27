@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {describe, test, beforeEach, expect} from 'vitest';
-import {Project} from '../Project';
-import {setProject, useProject, useTime} from '../utils';
+import {describe, test, expect, beforeAll, afterAll} from 'vitest';
+import {endPlayback, startPlayback, useTime} from '../utils';
 import {threads} from '../threading';
 import {waitFor} from './scheduling';
+import {PlaybackManager, PlaybackStatus} from '../app';
+import {all} from './all';
 
 describe('waitFor()', () => {
-  beforeEach(() => {
-    setProject(new Project({name: 'tests', scenes: []}));
-  });
+  const playback = new PlaybackManager();
+  const status = new PlaybackStatus(playback);
+  beforeAll(() => startPlayback(status));
+  afterAll(() => endPlayback(status));
 
   test('Framerate-independent wait duration', () => {
-    const project = useProject();
-
     let time60;
     const task60 = threads(function* () {
       yield* waitFor(3.1415);
@@ -26,16 +26,16 @@ describe('waitFor()', () => {
       time24 = useTime();
     });
 
-    project.framerate = 60;
-    project.frame = 0;
+    playback.fps = 60;
+    playback.frame = 0;
     for (const _ of task60) {
-      project.frame++;
+      playback.frame++;
     }
 
-    project.framerate = 24;
-    project.frame = 0;
+    playback.fps = 24;
+    playback.frame = 0;
     for (const _ of task24) {
-      project.frame++;
+      playback.frame++;
     }
 
     expect(time60).toBeCloseTo(3.1415);
@@ -43,9 +43,7 @@ describe('waitFor()', () => {
   });
 
   test('Accumulated time offset', () => {
-    const project = useProject();
-
-    let time: number;
+    let time = NaN;
     const task = threads(function* () {
       yield* waitFor(0.15);
       yield* waitFor(0.15);
@@ -53,13 +51,31 @@ describe('waitFor()', () => {
       time = useTime();
     });
 
-    project.framerate = 10;
-    project.frame = 0;
+    playback.fps = 10;
+    playback.frame = 0;
     for (const _ of task) {
-      project.frame++;
+      playback.frame++;
     }
 
-    expect(project.frame).toBe(4);
+    expect(playback.frame).toBe(4);
+    expect(time).toBeCloseTo(0.45);
+  });
+
+  test('Accumulated time offset from concurrent threads', () => {
+    let time = NaN;
+    const task = threads(function* () {
+      yield* waitFor(0.15);
+      yield* all(waitFor(0.3), waitFor(0.15));
+      time = useTime();
+    });
+
+    playback.fps = 10;
+    playback.frame = 0;
+    for (const _ of task) {
+      playback.frame++;
+    }
+
+    expect(playback.frame).toBe(4);
     expect(time).toBeCloseTo(0.45);
   });
 });

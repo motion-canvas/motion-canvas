@@ -2,9 +2,10 @@ import styles from './Timeline.module.scss';
 
 import type {Scene} from '@motion-canvas/core/lib/scenes';
 import {useScenes, useSubscribableValue} from '../../hooks';
-import {usePlayer, useTimelineContext} from '../../contexts';
+import {useApplication, useTimelineContext} from '../../contexts';
 import {useMemo} from 'preact/hooks';
 import {findAndOpenFirstUserFile} from '../../utils';
+import {SlideTrack} from './SlideTrack';
 
 export function SceneTrack() {
   const scenes = useScenes();
@@ -23,7 +24,7 @@ interface SceneClipProps {
 }
 
 function SceneClip({scene}: SceneClipProps) {
-  const player = usePlayer();
+  const {player, meta} = useApplication();
   const {framesToPercents, framesToPixels, offset} = useTimelineContext();
   const cachedData = useSubscribableValue(scene.onCacheChanged);
 
@@ -36,8 +37,7 @@ function SceneClip({scene}: SceneClipProps) {
 
   return (
     <div
-      className={styles.sceneClip}
-      data-name={scene.name}
+      className={styles.clip}
       style={{
         width: `${framesToPercents(cachedData.duration)}%`,
       }}
@@ -49,23 +49,26 @@ function SceneClip({scene}: SceneClipProps) {
       onMouseUp={event => {
         if (event.button === 1) {
           event.stopPropagation();
-          player.setRange(cachedData.firstFrame, cachedData.lastFrame - 1);
+          meta.shared.range.set([
+            player.status.framesToSeconds(cachedData.firstFrame),
+            player.status.framesToSeconds(cachedData.lastFrame),
+          ]);
         }
       }}
     >
-      <div className={styles.scene}>
-        {cachedData.transitionDuration > 0 && (
-          <div
-            style={{
-              width: `${
-                (cachedData.transitionDuration / cachedData.duration) * 100
-              }%`,
-            }}
-            className={styles.transition}
-          />
-        )}
-        <button
-          className={styles.sceneName}
+      {cachedData.transitionDuration > 0 && (
+        <div
+          style={{
+            width: `${
+              (cachedData.transitionDuration / cachedData.duration) * 100
+            }%`,
+          }}
+          className={styles.transition}
+        />
+      )}
+      <div className={styles.container}>
+        <div
+          className={styles.name}
           style={nameStyle}
           title="Go to source"
           onMouseUp={async event => {
@@ -76,8 +79,12 @@ function SceneClip({scene}: SceneClipProps) {
           }}
         >
           {scene.name}
-        </button>
+        </div>
       </div>
+      <SlideTrack
+        scene={scene}
+        duration={scene.playback.framesToSeconds(cachedData.duration)}
+      />
     </div>
   );
 }

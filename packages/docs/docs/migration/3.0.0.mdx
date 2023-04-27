@@ -1,0 +1,97 @@
+---
+title: Version 3
+slug: /migrating-to-3.0.0
+---
+
+# Migrating to v3
+
+## Installation
+
+Update all `@motion-canvas` packages to version `3.x.x` by running:
+
+```bash
+npm install --save @motion-canvas/2d@3 @motion-canvas/core@3 @motion-canvas/ui@3 @motion-canvas/vite-plugin@3
+```
+
+## Name changes
+
+This version introduces multiple name changes that are meant to make the code
+more readable and less prone to collisions with already existing types. Make
+sure to replace the following names in your codebase:
+
+| Old name                        | New name                                                                        |
+| ------------------------------- | ------------------------------------------------------------------------------- |
+| `Image`                         | [`Img`](/api/2d/components/Img)                                                 |
+| `Text`                          | [`Txt`](/api/2d/components/Txt)                                                 |
+| `Rect` (the type, not the node) | [`BBox`](/api/core/types/BBox)                                                  |
+| `Node.getCacheRect`             | [`Node.getCacheBBox`](/api/2d/components/Node#getCacheBBox)                     |
+| `Node.cacheRect`                | [`Node.cacheBBox`](/api/2d/components/Node#cacheBBox)                           |
+| `Node.fullCacheRect`            | [`Node.fullCacheBBox`](/api/2d/components/Node#fullCacheBBox)                   |
+| `CodeBlock.selectionOpacity`    | [`CodeBlock.unselectedOpacity`](/api/2d/components/CodeBlock#unselectedOpacity) |
+
+## Project configuration
+
+Most project settings are now configured via the editor and stored in the meta
+file. After running your project for the first time, the meta file will be
+automatically updated to contain these new settings.
+
+You can transfer your configuration from the project file:
+
+```ts title="src/project.ts"
+import {makeProject} from '@motion-canvas/core';
+
+import example from './scenes/example?scene';
+
+export default makeProject({
+  scenes: [example],
+  // highlight-start
+  background: '#141414',
+  audioOffset: 2,
+  // highlight-end
+});
+```
+
+Over to the meta file:
+
+```json title="src/project.meta"
+{
+  "version": 1,
+  "shared": {
+    // highlight-next-line
+    "background": "rgb(20,20,20)",
+    "range": [0, null],
+    "size": {
+      "x": 1920,
+      "y": 1080
+    },
+    // highlight-next-line
+    "audioOffset": 2
+  },
+  "preview": {
+    "fps": 30,
+    "resolutionScale": 1
+  },
+  "rendering": {
+    "fps": 30,
+    "resolutionScale": 1,
+    "colorSpace": "srgb",
+    "fileType": "image/png",
+    "quality": 1
+  }
+}
+```
+
+## `CodeBlock` revert
+
+Due to technical issues,
+[PR #401](https://github.com/motion-canvas/motion-canvas/pull/401) has been
+reverted.
+
+- The [`CodeBlock`](/docs/code-block) should be imported using the full path
+  again:
+  ```ts
+  import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+  ```
+- The `stockTheme` property is not supported for the time being.
+
+Please stay tuned as we try to find a better solution.

@@ -3,12 +3,13 @@ import path from 'path';
 import fs from 'fs';
 import {Readable} from 'stream';
 import mime from 'mime-types';
-import projectInstance from './__logs__/project-instance.md';
 import {
   motionCanvasCorsProxy,
   MotionCanvasCorsProxyOptions,
   setupEnvVarsForProxy,
 } from './proxy-middleware';
+import {getVersions} from './versions';
+import {PluginOptions, isPlugin, PLUGIN_OPTIONS} from './plugins';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -28,13 +29,13 @@ export interface MotionCanvasPluginConfig {
    * })
    * ```
    *
-   * @default './src/project.ts'
+   * @defaultValue './src/project.ts'
    */
   project?: string | string[];
   /**
    * A directory path to which the animation will be rendered.
    *
-   * @default './output'
+   * @defaultValue './output'
    */
   output?: string;
   /**
@@ -50,7 +51,7 @@ export interface MotionCanvasPluginConfig {
    * there. This leaves the original files open for modification with hot module
    * replacement still working.
    *
-   * @default /\.(wav|ogg)$/
+   * @defaultValue /\.(wav|ogg)$/
    */
   bufferedAssets?: RegExp | false;
   /**
@@ -69,7 +70,7 @@ export interface MotionCanvasPluginConfig {
    * - `index` - Receives a list of all projects as its first argument and
    *             creates the initial page for selecting a project.
    *
-   * @default '\@motion-canvas/ui'
+   * @defaultValue '\@motion-canvas/ui'
    */
   editor?: string;
   /**
@@ -96,6 +97,9 @@ export default ({
   editor = '@motion-canvas/ui',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
+  const plugins: PluginOptions[] = [
+    {entryPoint: '@motion-canvas/core/lib/plugin/DefaultPlugin'},
+  ];
   const editorPath = path.dirname(require.resolve(editor));
   const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
   const htmlParts = editorFile
@@ -103,6 +107,7 @@ export default ({
     .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
     .split('{{source}}');
   const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
+  const versions = JSON.stringify(getVersions());
 
   const resolvedEditorId = '\0virtual:editor';
 
@@ -111,8 +116,10 @@ export default ({
   const projects: ProjectData[] = [];
   const projectLookup: Record<string, ProjectData> = {};
   for (const url of typeof project === 'string' ? [project] : project) {
-    const {name} = path.parse(url);
-    const data = {name, url};
+    const {name, dir} = path.posix.parse(url);
+    const metaFile = `${name}.meta`;
+    const metaData = getMeta(path.join(dir, metaFile));
+    const data = {name: metaData?.name ?? name, fileName: name, url};
     projects.push(data);
     projectLookup[name] = data;
   }
@@ -121,6 +128,12 @@ export default ({
 
   function source(...lines: string[]) {
     return lines.join('\n');
+  }
+
+  function getMeta(metaPath: string) {
+    if (fs.existsSync(metaPath)) {
+      return JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+    }
   }
 
   async function createMeta(metaPath: string) {
@@ -139,6 +152,11 @@ export default ({
   return {
     name: 'motion-canvas',
     async configResolved(resolvedConfig) {
+      plugins.push(
+        ...resolvedConfig.plugins
+          .filter(isPlugin)
+          .map(plugin => plugin[PLUGIN_OPTIONS]),
+      );
       viteConfig = resolvedConfig;
     },
     async load(id) {
@@ -181,10 +199,10 @@ export default ({
 
           return source(
             `import {ValueDispatcher} from '@motion-canvas/core/lib/events';`,
-            `import meta from './${metaFile}';`,
+            `import metaFile from './${metaFile}';`,
             `import description from './${sceneFile}';`,
             `description.name = '${name}';`,
-            `description.meta = meta;`,
+            `metaFile.attach(description.meta);`,
             `if (import.meta.hot) {`,
             `  description.onReplaced = import.meta.hot.data.onReplaced;`,
             `}`,
@@ -205,24 +223,32 @@ export default ({
           const metaFile = `${name}.meta`;
           await createMeta(path.join(dir, metaFile));
 
+          const imports: string[] = [];
+          const pluginNames: string[] = ['...config.plugins'];
+          let index = 0;
+          for (const plugin of plugins) {
+            if (plugin.entryPoint) {
+              const pluginName = `plugin${index}`;
+              imports.push(`import ${pluginName} from '${plugin.entryPoint}'`);
+              pluginNames.push(pluginName);
+              index++;
+            }
+          }
+
           return source(
-            `import {Project} from '@motion-canvas/core';`,
-            `import meta from './${metaFile}';`,
+            ...imports,
+            `import {ProjectMetadata} from '@motion-canvas/core/lib/app';`,
+            `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
-            `const factory = () => {`,
-            `  if (config instanceof Project) {`,
-            `    config.meta = meta;`,
-            `    config.name = '${name}';`,
-            `    config.logger.warn({`,
-            `      message: 'A project instance was exported instead of a project factory.',`,
-            `      remarks: \`${projectInstance}\`,`,
-            `      stack: config.creationStack,`,
-            `    });`,
-            `    return config;`,
-            `  }`,
-            `  return new Project('${name}', meta, config);`,
-            `}`,
-            `export default factory;`,
+            `const project = {`,
+            `  name: '${name}',`,
+            `  versions: ${versions},`,
+            `  ...config,`,
+            `  plugins: [${pluginNames.join(', ')}],`,
+            `};`,
+            `project.meta = new ProjectMetadata(project);`,
+            `metaFile.attach(project.meta)`,
+            `export default project;`,
           );
         }
       }
@@ -267,12 +293,12 @@ export default ({
       if (ext === '.meta') {
         const sourceFile = viteConfig.command === 'build' ? false : `'${id}'`;
         return source(
-          `import {Meta} from '@motion-canvas/core/lib';`,
+          `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
           `let meta;`,
           `if (import.meta.hot) {`,
           `  meta = import.meta.hot.data.meta;`,
           `}`,
-          `meta ??= new Meta('${name}', ${sourceFile}, ${code});`,
+          `meta ??= new MetaFile('${name}', ${sourceFile});`,
           `if (import.meta.hot) {`,
           `  import.meta.hot.accept();`,
           `  import.meta.hot.data.meta = meta;`,
@@ -353,27 +379,34 @@ export default ({
       });
       server.ws.on(
         'motion-canvas:export',
-        async ({frame, mimeType, data, project, isStill}, client) => {
+        async (
+          {data, frame, sceneFrame, subDirectories, mimeType, groupByScene},
+          client,
+        ) => {
+          const name = (groupByScene ? sceneFrame : frame)
+            .toString()
+            .padStart(6, '0');
           const extension = mime.extension(mimeType);
-          const name = frame.toString().padStart(6, '0') + '.' + extension;
-          const file = isStill
-            ? path.join(outputPath, 'still', project, name)
-            : path.join(outputPath, project, name);
+          const outputFilePath = path.join(
+            outputPath,
+            ...subDirectories,
+            `${name}.${extension}`,
+          );
+          const outputDirectory = path.dirname(outputFilePath);
 
-          const directory = path.dirname(file);
-          if (!fs.existsSync(directory)) {
-            fs.mkdirSync(directory, {recursive: true});
+          if (!fs.existsSync(outputDirectory)) {
+            fs.mkdirSync(outputDirectory, {recursive: true});
           }
 
           const base64Data = data.slice(data.indexOf(',') + 1);
-          await fs.promises.writeFile(file, base64Data, {
+          await fs.promises.writeFile(outputFilePath, base64Data, {
             encoding: 'base64',
           });
           client.send('motion-canvas:export-ack', {frame});
         },
       );
     },
-    config() {
+    config(config) {
       return {
         build: {
           assetsDir: './',
@@ -385,7 +418,7 @@ export default ({
           },
         },
         server: {
-          port: 9000,
+          port: config?.server?.port ?? 9000,
         },
         esbuild: {
           jsx: 'automatic',

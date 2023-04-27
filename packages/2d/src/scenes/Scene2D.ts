@@ -1,12 +1,13 @@
 import {
+  FullSceneDescription,
   GeneratorScene,
   Inspectable,
   InspectedAttributes,
   InspectedElement,
   Scene,
   SceneRenderEvent,
+  ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {endScene, startScene} from '@motion-canvas/core/lib/utils';
 import {Vector2} from '@motion-canvas/core/lib/types';
 import {Node, View2D} from '../components';
 
@@ -15,8 +16,20 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
 
+  public constructor(
+    description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
+  ) {
+    super(description);
+    this.recreateView();
+  }
+
   public getView(): View2D {
     return this.view!;
+  }
+
+  public override next(): Promise<void> {
+    this.getView()?.playbackState(this.playback.state);
+    return super.next();
   }
 
   public draw(context: CanvasRenderingContext2D) {
@@ -24,6 +37,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
+    this.getView().playbackState(this.playback.state);
     this.getView().render(context);
     this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
     context.restore();
@@ -33,27 +47,25 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
 
   public override reset(previousScene?: Scene): Promise<void> {
     for (const key in this.registeredNodes) {
-      this.registeredNodes[key].dispose();
+      try {
+        this.registeredNodes[key].dispose();
+      } catch (e: any) {
+        this.logger.error(e);
+      }
     }
     this.registeredNodes = {};
     this.nodeCounters = {};
-
-    startScene(this);
-    const size = this.getSize();
-    this.view = new View2D({
-      position: size.scale(0.5),
-      size,
-    });
-    endScene(this);
+    this.recreateView();
 
     return super.reset(previousScene);
   }
 
   public inspectPosition(x: number, y: number): InspectedElement | null {
-    startScene(this);
-    const node = this.getView().hit(new Vector2(x, y))?.key ?? null;
-    endScene(this);
-    return node;
+    return this.execute(
+      () =>
+        this.getView().hit(new Vector2(x, y).scale(this.resolutionScale))
+          ?.key ?? null,
+    );
   }
 
   public validateInspection(
@@ -87,7 +99,14 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   ): void {
     const node = this.getNode(element);
     if (node) {
-      node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+      this.execute(() => {
+        node.drawOverlay(
+          context,
+          matrix
+            .scale(1 / this.resolutionScale, 1 / this.resolutionScale)
+            .multiplySelf(node.localToWorld()),
+        );
+      });
     }
   }
 
@@ -104,5 +123,16 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   public getNode(key: any): Node | null {
     if (typeof key !== 'string') return null;
     return this.registeredNodes[key] ?? null;
+  }
+
+  protected recreateView() {
+    this.execute(() => {
+      const size = this.getSize();
+      this.view = new View2D({
+        position: size.scale(this.resolutionScale / 2),
+        scale: this.resolutionScale,
+        size,
+      });
+    });
   }
 }

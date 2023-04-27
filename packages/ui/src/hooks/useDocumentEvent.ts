@@ -1,8 +1,8 @@
 import {useEffect} from 'preact/hooks';
 
-export function useDocumentEvent<K extends keyof DocumentEventMap>(
-  type: K,
-  listener: (this: Document, ev: DocumentEventMap[K]) => void,
+export function useDocumentEvent<T extends keyof DocumentEventMap>(
+  type: T,
+  listener: (this: Document, ev: DocumentEventMap[T]) => void,
   enabled = true,
   capture = false,
 ) {

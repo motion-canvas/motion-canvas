@@ -1,14 +1,15 @@
 import {Badge, Tabs, TabType} from '../tabs';
 import {Properties} from './Properties';
-import {Rendering} from './Rendering';
+import {VideoSettings} from './VideoSettings';
 import {Threads} from './Threads';
 import {Console} from '../console';
 import {useInspection, useLogger} from '../../contexts';
 import {useEffect, useRef, useState} from 'preact/hooks';
 import {shake} from '../animations';
 import {useStorage} from '../../hooks';
-import {MotionCanvas, Bug, Tune, VideoSettings, Schedule} from '../icons';
+import {MotionCanvas, Bug, Videocam, AccountTree} from '../icons';
 import {Docs} from '../icons/Docs';
+import {ViewTimeline} from '../icons/ViewTimeline';
 
 interface SidebarProps {
   setOpen?: (value: boolean) => void;
@@ -33,7 +34,7 @@ export function Sidebar({setOpen}: SidebarProps) {
 
   useEffect(() => {
     if (inspectedElement && tab !== -1) {
-      setTab(3);
+      setTab(4);
     }
   }, [!inspectedElement]);
 
@@ -64,24 +65,24 @@ export function Sidebar({setOpen}: SidebarProps) {
           type: TabType.Space,
         }}
         {{
-          title: 'Inspector',
-          id: 'inspector-tab',
-          type: TabType.Pane,
-          icon: <Tune />,
-          pane: <Properties />,
-        }}
-        {{
           title: 'Video Settings',
           id: 'rendering-tab',
           type: TabType.Pane,
-          icon: <VideoSettings />,
-          pane: <Rendering />,
+          icon: <Videocam />,
+          pane: <VideoSettings />,
+        }}
+        {{
+          title: 'Inspector',
+          id: 'inspector-tab',
+          type: TabType.Pane,
+          icon: <AccountTree />,
+          pane: <Properties />,
         }}
         {{
           title: 'Thread Debugger',
           id: 'threads-tab',
           type: TabType.Pane,
-          icon: <Schedule />,
+          icon: <ViewTimeline />,
           pane: <Threads />,
         }}
         {{

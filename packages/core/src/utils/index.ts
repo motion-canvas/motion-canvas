@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 
+export * from './beginSlide';
 export * from './capitalize';
 export * from './debug';
 export * from './deprecate';
@@ -11,7 +12,8 @@ export * from './DetailedError';
 export * from './errorToLog';
 export * from './getContext';
 export * from './range';
-export * from './useProject';
+export * from './Semaphore';
+export * from './usePlayback';
 export * from './useRandom';
 export * from './createRef';
 export * from './useScene';

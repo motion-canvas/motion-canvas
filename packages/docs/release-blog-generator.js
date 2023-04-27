@@ -23,7 +23,11 @@ async function gitLog(from, to) {
 
 async function gitTags() {
   const tags = await runBash('git tag');
-  return tags.trim().split('\n').reverse();
+  return tags
+    .trim()
+    .split('\n')
+    .reverse()
+    .filter(tag => !tag.includes('-alpha'));
 }
 
 function getDate() {
@@ -84,7 +88,12 @@ authors: aarthificial
 import IssueGroup from '@site/src/components/Release/IssueGroup';
 import Issue from '@site/src/components/Release/Issue';
 
-${Object.entries(types).map(IssueGroup).join('\n')}`,
+${Object.entries(types).map(IssueGroup).join('\n')}
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>`,
     'utf8',
   );
 })();

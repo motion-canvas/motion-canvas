@@ -1,0 +1,66 @@
+---
+slug: version-3.2.0
+title: Motion Canvas v3.2.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+import CodeBlock from '@theme/CodeBlock';
+import PullRequest from '@site/src/components/Release/PullRequest';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'oacs'} pr={444}>
+    New status bar lists the shortcuts available in the currently hovered panel.
+  </Issue>
+  <Issue user={'aarthificial'} pr={501}>
+    The current version is now displayed on the status bar. Clicking it will
+    copy the versions of all packages currently in use.
+  </Issue>
+  <Issue user={'aarthificial'} pr={498}>
+    Cache is now stored using world space coordinates. Scaling up{' '}
+    <Link to="/api/2d/components/Node#cache">
+      <code>cache</code>
+    </Link>
+    d nodes no longer results in quality loss.
+  </Issue>
+  <Issue user={'magx2'}>
+    All methods of{' '}
+    <Link to="/api/core/types/Vector2">
+      <code>Vector2</code>
+    </Link>{' '}
+    now accept
+    <Link to="/api/core/types#PossibleVector2">
+      <code>PossibleVector2</code>
+    </Link> as arguments, making it possible to write code like this: <PullRequest
+      id={478}
+    />
+    <CodeBlock language={'tsx'} className="margin-top--sm margin-bottom--sm">
+      {`vector.add([100, 200]).mul(2);`}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'andrie'} pr={463}>
+    New{' '}
+    <Link to="/api/2d/components/Polygon">
+      <code>Polygon</code>
+    </Link>{' '}
+    node lets you quickly create regular polygons:
+    <CodeBlock language={'tsx'} className="margin-top--sm margin-bottom--sm">
+      {`<Polygon
+  sides={6}
+  size={300}
+  fill={'lightseagreen'}
+/>`}
+    </CodeBlock>
+    The code above will generate a hexagon.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={503}>
+    Fix line arc length.
+  </Issue>
+  <Issue user={'AshishBarvaliya'} pr={502}>
+    Fix invalid source code link.
+  </Issue>
+</IssueGroup>

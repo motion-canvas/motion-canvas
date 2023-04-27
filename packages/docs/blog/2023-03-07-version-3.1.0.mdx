@@ -1,0 +1,47 @@
+---
+slug: version-3.1.0
+title: Motion Canvas v3.1.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} pr={486}>
+    New <Link to="/docs/presentation">Presentation Mode</Link> lets you present
+    your animations live.
+  </Issue>
+  <Issue user={'aarthificial'} pr={451}>
+    New{' '}
+    <Link to="/api/2d/components/Layout#textAlign">
+      <code>textAlign</code>
+    </Link>{' '}
+    property.
+  </Issue>
+  <Issue user={'ksassnowski'} pr={485}>
+    New{' '}
+    <Link to="/api/core/types/BBox#intersects">
+      <code>intersects</code>
+    </Link>{' '}
+    method for the <code>BBox</code> type.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={471}>
+    Fix playback state.
+  </Issue>
+  <Issue user={'aarthificial'} pr={467}>
+    Fix cache bbox for lines.
+  </Issue>
+  <Issue user={'aarthificial'} pr={461}>
+    Fix relative time.
+  </Issue>
+  <Issue user={'aarthificial'} pr={450}>
+    Support multiple async players.
+  </Issue>
+  <Issue user={'aarthificial'} pr={448}>
+    Fix <code>letterSpacing</code>.
+  </Issue>
+</IssueGroup>

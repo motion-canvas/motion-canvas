@@ -1,6 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {isProxyEnabled, viaProxy} from './proxyUtils';
-const windowMock = {
+const WindowMock = {
   location: {
     toString: () => 'https://mockhostname:1234',
   },
@@ -41,7 +41,7 @@ describe('proxyUtils', () => {
         beforeEach(() => {
           import.meta.env.VITE_MC_PROXY_ENABLED = 'true';
           import.meta.env.VITE_MC_PROXY_ALLOW_LIST = undefined;
-          vi.stubGlobal('window', windowMock);
+          vi.stubGlobal('window', WindowMock);
         });
         const input = 'https://via.placeholder.com/300.png/09f/fff';
         const proxiedInput = proxy(input);
@@ -69,7 +69,7 @@ describe('proxyUtils', () => {
         });
         it('should not proxy if the host is the same as the server', () => {
           import.meta.env['VITE_MC_PROXY_ALLOW_LIST'] = JSON.stringify([]);
-          const input = windowMock.location.toString() + '/some/example.png';
+          const input = WindowMock.location.toString() + '/some/example.png';
           expect(viaProxy(input)).toStrictEqual(input);
         });
       }),
@@ -77,7 +77,7 @@ describe('proxyUtils', () => {
         beforeEach(() => {
           import.meta.env.VITE_MC_PROXY_ENABLED = 'true';
           import.meta.env.VITE_MC_PROXY_ALLOW_LIST = JSON.stringify([]);
-          vi.stubGlobal('window', windowMock);
+          vi.stubGlobal('window', WindowMock);
         });
 
         it('should proxy if the request protocol is http and https', () => {

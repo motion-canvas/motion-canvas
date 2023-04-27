@@ -1,6 +1,6 @@
 import {PossibleCanvasStyle} from '../partials';
 import {computed, initial, signal} from '../decorators';
-import {Rect} from '@motion-canvas/core/lib/types';
+import {BBox} from '@motion-canvas/core/lib/types';
 import {Layout, LayoutProps} from './Layout';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {easeOutExpo, linear, map} from '@motion-canvas/core/lib/tweening';
@@ -65,6 +65,11 @@ export abstract class Shape extends Layout {
     super(props);
   }
 
+  protected applyText(context: CanvasRenderingContext2D) {
+    context.direction = this.textDirection();
+    this.element.dir = this.textDirection();
+  }
+
   protected applyStyle(context: CanvasRenderingContext2D) {
     context.fillStyle = resolveCanvasStyle(this.fill(), context);
     context.strokeStyle = resolveCanvasStyle(this.stroke(), context);
@@ -105,8 +110,8 @@ export abstract class Shape extends Layout {
     context.restore();
   }
 
-  protected override getCacheRect(): Rect {
-    return super.getCacheRect().expand(this.lineWidth() / 2);
+  protected override getCacheBBox(): BBox {
+    return super.getCacheBBox().expand(this.lineWidth() / 2);
   }
 
   @computed()

@@ -12,6 +12,7 @@ export function getPolylineProfile(
   const profile: CurveProfile = {
     arcLength: 0,
     segments: [],
+    minSin: 1,
   };
 
   if (points.length === 0) {
@@ -32,8 +33,8 @@ export function getPolylineProfile(
 
     const centerToStart = start.sub(center);
     const centerToEnd = end.sub(center);
-    const startVector = centerToStart.normalized;
-    const endVector = centerToEnd.normalized;
+    const startVector = centerToStart.normalized.safe;
+    const endVector = centerToEnd.normalized.safe;
     const angleBetween = Math.acos(clamp(-1, 1, startVector.dot(endVector)));
     const angleTan = Math.tan(angleBetween / 2);
     const angleSin = Math.sin(angleBetween / 2);
@@ -49,7 +50,7 @@ export function getPolylineProfile(
     const circleDistance = startVector
       .add(endVector)
       .scale(1 / 2)
-      .normalized.scale(circleOffsetDistance)
+      .normalized.safe.scale(circleOffsetDistance)
       .add(center);
 
     const counter = startVector.perpendicular.dot(endVector) < 0;
@@ -70,6 +71,8 @@ export function getPolylineProfile(
 
     profile.arcLength += line.arcLength;
     profile.arcLength += circle.arcLength;
+
+    profile.minSin = Math.min(profile.minSin, Math.abs(angleSin));
 
     last = center.add(endVector.scale(pointOffsetDistance));
   }

@@ -1,14 +1,16 @@
 import {Rect, RectProps} from './Rect';
+import {initial, signal} from '../decorators';
+import {PlaybackState} from '@motion-canvas/core';
+import {SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {lazy} from '@motion-canvas/core/lib/decorators';
 
 export class View2D extends Rect {
-  public static frameID = 'motion-canvas-2d-frame';
-  public static shadowRoot: ShadowRoot;
-
-  static {
-    let frame = document.querySelector<HTMLDivElement>(`#${View2D.frameID}`);
+  @lazy(() => {
+    const frameID = 'motion-canvas-2d-frame';
+    let frame = document.querySelector<HTMLDivElement>(`#${frameID}`);
     if (!frame) {
       frame = document.createElement('div');
-      frame.id = View2D.frameID;
+      frame.id = frameID;
       frame.style.position = 'absolute';
       frame.style.pointerEvents = 'none';
       frame.style.top = '0';
@@ -17,8 +19,13 @@ export class View2D extends Rect {
       frame.style.overflow = 'hidden';
       document.body.prepend(frame);
     }
-    View2D.shadowRoot = frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
-  }
+    return frame.shadowRoot ?? frame.attachShadow({mode: 'open'});
+  })
+  public static shadowRoot: ShadowRoot;
+
+  @initial(PlaybackState.Paused)
+  @signal()
+  public declare readonly playbackState: SimpleSignal<PlaybackState, this>;
 
   public constructor(props: RectProps) {
     super({
@@ -55,7 +62,7 @@ export class View2D extends Rect {
     this.updateLayout();
   }
 
-  public override view(): View2D | null {
+  public override view(): View2D {
     return this;
   }
 }

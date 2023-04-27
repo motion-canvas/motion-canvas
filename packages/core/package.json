@@ -1,8 +1,8 @@
 {
   "name": "@motion-canvas/core",
-  "version": "2.6.0",
+  "version": "3.4.0",
   "description": "Web-based tool for creating animations programmatically",
-  "main": "lib/index.js",
+  "main": "lib/app/index.js",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
@@ -12,6 +12,9 @@
     "watch": "ttsc -p tsconfig.build.json -w",
     "test": "vitest"
   },
+  "sideEffects": [
+    "./lib/types/Color.js"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/motion-canvas/motion-canvas.git"
@@ -22,7 +25,7 @@
     "project.d.ts"
   ],
   "peerDependencies": {
-    "vite": "^3.0.5"
+    "vite": "^4.1.4"
   },
   "dependencies": {
     "@types/chroma-js": "^2.1.4",
@@ -31,6 +34,6 @@
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
     "jsdom": "^21.1.0",
-    "vitest": "^0.25.4"
+    "vitest": "^0.29.2"
   }
 }

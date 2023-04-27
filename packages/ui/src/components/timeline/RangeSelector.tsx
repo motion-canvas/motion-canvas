@@ -1,21 +1,30 @@
 import styles from './Timeline.module.scss';
 
-import {useDrag, usePlayerState} from '../../hooks';
+import {
+  useDrag,
+  useDuration,
+  usePreviewSettings,
+  useSharedSettings,
+} from '../../hooks';
 import {useCallback, useEffect, useState} from 'preact/hooks';
-import {usePlayer, useTimelineContext} from '../../contexts';
+import {useApplication, useTimelineContext} from '../../contexts';
 import {DragIndicator} from '../icons';
 
 export function RangeSelector() {
   const {pixelsToFrames, framesToPercents} = useTimelineContext();
 
-  const player = usePlayer();
-  const state = usePlayerState();
-  const [start, setStart] = useState(state.startFrame);
-  const [end, setEnd] = useState(state.endFrame);
+  const {player, meta} = useApplication();
+  const {range} = useSharedSettings();
+  const {fps} = usePreviewSettings();
+  const duration = useDuration();
+  const startFrame = player.status.secondsToFrames(range[0]);
+  const endFrame = Math.min(player.status.secondsToFrames(range[1]), duration);
+  const [start, setStart] = useState(startFrame);
+  const [end, setEnd] = useState(endFrame);
 
   const onDrop = useCallback(() => {
-    player.setRange(Math.floor(start), Math.floor(end));
-  }, [start, end, state.duration]);
+    meta.shared.range.update(start, end, duration, fps);
+  }, [start, end, duration, fps]);
 
   const [handleDragStart] = useDrag(
     useCallback(
@@ -30,9 +39,9 @@ export function RangeSelector() {
   const [handleDragEnd] = useDrag(
     useCallback(
       dx => {
-        setEnd(Math.min(state.duration, end) + pixelsToFrames(dx));
+        setEnd(end + pixelsToFrames(dx));
       },
-      [end, pixelsToFrames, state.duration],
+      [end, pixelsToFrames, duration],
     ),
     onDrop,
   );
@@ -41,17 +50,17 @@ export function RangeSelector() {
     useCallback(
       dx => {
         setStart(start + pixelsToFrames(dx));
-        setEnd(Math.min(state.duration, end) + pixelsToFrames(dx));
+        setEnd(end + pixelsToFrames(dx));
       },
-      [start, end, state.duration, pixelsToFrames],
+      [start, end, duration, pixelsToFrames],
     ),
     onDrop,
   );
 
   useEffect(() => {
-    setStart(state.startFrame);
-    setEnd(state.endFrame);
-  }, [state.startFrame, state.endFrame]);
+    setStart(startFrame);
+    setEnd(endFrame);
+  }, [startFrame, endFrame, range[0], range[1]]);
 
   let normalizedStart = start;
   let normalizedEnd = end;
@@ -65,15 +74,13 @@ export function RangeSelector() {
       style={{
         flexDirection: start > end ? 'row-reverse' : 'row',
         left: `${framesToPercents(Math.max(0, normalizedStart))}%`,
-        right: `${
-          100 - framesToPercents(Math.min(state.duration, normalizedEnd + 1))
-        }%`,
+        right: `${100 - framesToPercents(Math.min(duration, normalizedEnd))}%`,
       }}
       className={styles.range}
       onMouseDown={event => {
         if (event.button === 1) {
           event.preventDefault();
-          player.setRange(0, Infinity);
+          meta.shared.range.update(0, Infinity, duration, fps);
         } else {
           handleDrag(event);
         }

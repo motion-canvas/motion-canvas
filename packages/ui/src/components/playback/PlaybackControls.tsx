@@ -1,11 +1,10 @@
 import styles from './Playback.module.scss';
 
-import {IconButton, IconCheckbox} from '../controls';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
-import {Select, Input} from '../controls';
+import {IconButton, IconCheckbox, Input, Select} from '../controls';
+import {useDocumentEvent, usePlayerState, useRendererState} from '../../hooks';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
-import {usePlayer} from '../../contexts';
+import {useApplication} from '../../contexts';
 import clsx from 'clsx';
 import React from 'react';
 import {
@@ -18,10 +17,12 @@ import {
   VolumeOff,
   VolumeOn,
 } from '../icons';
+import {RendererState} from '@motion-canvas/core';
 
 export function PlaybackControls() {
-  const player = usePlayer();
+  const {player, renderer, meta, project} = useApplication();
   const state = usePlayerState();
+  const rendererState = useRendererState();
 
   useDocumentEvent(
     'keydown',
@@ -47,7 +48,7 @@ export function PlaybackControls() {
           case 'ArrowRight':
             event.preventDefault();
             if (event.shiftKey) {
-              player.requestSeek(state.endFrame);
+              player.requestSeek(Infinity);
               return;
             }
 
@@ -61,12 +62,17 @@ export function PlaybackControls() {
             break;
         }
       },
-      [state],
+      [player],
     ),
   );
 
   return (
-    <div className={clsx(styles.controls, state.render && styles.disabled)}>
+    <div
+      className={clsx(
+        styles.controls,
+        rendererState === RendererState.Working && styles.disabled,
+      )}
+    >
       <Select
         title="Playback speed"
         options={[
@@ -80,34 +86,37 @@ export function PlaybackControls() {
         onChange={speed => player.setSpeed(speed)}
       />
       <IconCheckbox
-        titleOn="Mute audio"
-        titleOff="Unmute audio"
+        titleOn="Mute audio [M]"
+        titleOff="Unmute audio [M]"
         checked={!state.muted}
         onChange={value => player.toggleAudio(value)}
       >
         {state.muted ? <VolumeOff /> : <VolumeOn />}
       </IconCheckbox>
       <IconButton
-        title="Previous frame"
+        title="Previous frame [Left arrow]"
         onClick={() => player.requestPreviousFrame()}
       >
         <SkipPrevious />
       </IconButton>
       <IconCheckbox
         main
-        titleOn="Pause"
-        titleOff="Play"
+        titleOn="Pause [Space]"
+        titleOff="Play [Space]"
         checked={!state.paused}
         onChange={value => player.togglePlayback(value)}
       >
         {state.paused ? <PlayArrow /> : <Pause />}
       </IconCheckbox>
-      <IconButton title="Next frame" onClick={() => player.requestNextFrame()}>
+      <IconButton
+        title="Next frame [Right arrow]"
+        onClick={() => player.requestNextFrame()}
+      >
         <SkipNext />
       </IconButton>
       <IconCheckbox
-        titleOn="Loop video (Enabled)"
-        titleOff="Loop video (Disabled)"
+        titleOn="Disable looping [L]"
+        titleOff="Enable looping [L]"
         checked={state.loop}
         onChange={() => player.toggleLoop()}
       >
@@ -118,13 +127,27 @@ export function PlaybackControls() {
           <Input
             title="Current framerate"
             readOnly
-            value={paused ? 'PAUSED' : `${framerate} FPS`}
+            value={
+              rendererState === RendererState.Working
+                ? 'RENDERING'
+                : paused
+                ? 'PAUSED'
+                : `${framerate} FPS`
+            }
           />
         )}
       />
       <IconButton
         title="Save snapshot"
-        onClick={() => player.exportCurrentFrame()}
+        onClick={() =>
+          renderer.renderFrame(
+            {
+              ...meta.getFullRenderingSettings(),
+              name: project.name,
+            },
+            player.playback.frame,
+          )
+        }
       >
         <PhotoCamera />
       </IconButton>
