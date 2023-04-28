@@ -5,7 +5,7 @@ import {
   Vector2Signal,
 } from '@motion-canvas/core/lib/types';
 import {CurveProfile, LineSegment} from '../curves';
-import {computed, vector2Signal} from '../decorators';
+import {vector2Signal} from '../decorators';
 import {arc, drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
 
@@ -70,12 +70,10 @@ export class Ray extends Curve {
     super(props);
   }
 
-  @computed()
   protected override childrenBBox() {
     return BBox.fromPoints(this.from(), this.to());
   }
 
-  @computed()
   public override profile(): CurveProfile {
     const segment = new LineSegment(this.from(), this.to());
 
