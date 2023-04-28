@@ -8,6 +8,7 @@ export * from './Latex';
 export * from './Layout';
 export * from './Line';
 export * from './Node';
+export * from './Ray';
 export * from './Rect';
 export * from './Polygon';
 export * from './QuadBezier';

@@ -7,7 +7,7 @@ import {BBox, PossibleVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {CurveProfile, getPolylineProfile} from '../curves';
 import {computed, initial, signal} from '../decorators';
-import {arc, drawLine, lineTo, moveTo} from '../utils';
+import {arc, drawLine, drawPivot, lineTo, moveTo} from '../utils';
 import {Curve, CurveProps} from './Curve';
 import {Layout} from './Layout';
 import lineWithoutPoints from './__logs__/line-without-points.md';
@@ -121,13 +121,8 @@ export class Line extends Curve {
     context.strokeStyle = 'white';
     context.stroke(path);
 
-    const radius = 8;
     context.beginPath();
-    lineTo(context, offset.addY(-radius));
-    lineTo(context, offset.addY(radius));
-    lineTo(context, offset);
-    lineTo(context, offset.addX(-radius));
-    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    drawPivot(context, offset);
     context.stroke();
 
     context.beginPath();
