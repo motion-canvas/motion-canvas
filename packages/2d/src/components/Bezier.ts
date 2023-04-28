@@ -3,7 +3,7 @@ import {Curve} from './Curve';
 import {CurveProfile} from '../curves';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {DesiredLength} from '../partials';
-import {arc, drawLine, lineTo, moveTo} from '../utils';
+import {arc, drawLine, drawPivot, moveTo} from '../utils';
 import {computed} from '../decorators';
 
 export interface BezierOverlayInfo {
@@ -90,13 +90,8 @@ export abstract class Bezier extends Curve {
 
     // Draw the offset marker
     context.lineWidth = 1;
-    const radius = 8;
     context.beginPath();
-    lineTo(context, offset.addY(-radius));
-    lineTo(context, offset.addY(radius));
-    lineTo(context, offset);
-    lineTo(context, offset.addX(-radius));
-    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    drawPivot(context, offset);
     context.stroke();
 
     // Draw the bounding box

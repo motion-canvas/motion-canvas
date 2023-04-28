@@ -39,7 +39,7 @@ import {
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
-import {drawLine, lineTo} from '../utils';
+import {drawLine, drawPivot} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   createSignal,
@@ -675,13 +675,8 @@ export class Layout extends Node {
     context.strokeStyle = 'white';
     context.stroke();
 
-    const radius = 8;
     context.beginPath();
-    lineTo(context, offset.addY(-radius));
-    lineTo(context, offset.addY(radius));
-    lineTo(context, offset);
-    lineTo(context, offset.addX(-radius));
-    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    drawPivot(context, offset);
     context.stroke();
   }
 

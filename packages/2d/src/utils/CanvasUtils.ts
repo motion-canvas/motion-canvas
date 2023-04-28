@@ -249,6 +249,18 @@ export function drawLine(
   }
 }
 
+export function drawPivot(
+  context: CanvasRenderingContext2D | Path2D,
+  offset: Vector2,
+  radius = 8,
+) {
+  lineTo(context, offset.addY(-radius));
+  lineTo(context, offset.addY(radius));
+  lineTo(context, offset);
+  lineTo(context, offset.addX(-radius));
+  arc(context, offset, radius);
+}
+
 export function arc(
   context: CanvasRenderingContext2D | Path2D,
   center: Vector2,
