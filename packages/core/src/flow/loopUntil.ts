@@ -16,7 +16,8 @@ decorate(loopUntil, threadable());
  * ```
  *
  * @param event - The event.
- * @param tasks - A list of tasks to run.
+ * @param factory - A function creating the generator to run. Because generators
+ *                can't be reset, a new generator is created on each iteration.
  */
 export function* loopUntil(
   event: string,
