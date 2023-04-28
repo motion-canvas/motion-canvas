@@ -1,5 +1,6 @@
 import {Type, EPSILON} from './Type';
 import {PossibleVector2, Vector2} from './Vector';
+import {DEG2RAD} from '../utils';
 
 export type PossibleMatrix2D =
   | Matrix2D
@@ -101,10 +102,10 @@ export class Matrix2D implements Type {
   }
 
   public get rotation(): number {
-    return (Math.atan2(this.values[1], this.values[0]) * 180) / Math.PI;
+    return Vector2.degrees(this.values[0], this.values[1]);
   }
 
-  public set translation(translation: PossibleVector2<number>) {
+  public set translation(translation: PossibleVector2) {
     const vec = new Vector2(translation);
     this.values[4] = vec.x;
     this.values[5] = vec.y;
@@ -421,12 +422,12 @@ export class Matrix2D implements Type {
    * //   )
    * ```
    *
-   * @param angle - The angle by which to rotate the matrix
-   * @param radians - Whether the angle is provided in radians
+   * @param angle - The angle by which to rotate the matrix.
+   * @param degrees - Whether the angle is provided in degrees.
    */
   public rotate(angle: number, degrees = true): Matrix2D {
     if (degrees) {
-      angle = (angle * Math.PI) / 180;
+      angle *= DEG2RAD;
     }
 
     const a0 = this.values[0],
