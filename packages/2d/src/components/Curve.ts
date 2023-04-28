@@ -181,7 +181,7 @@ export abstract class Curve extends Shape {
   }
 
   /**
-   * Covert a distance along the curve to a percentage.
+   * Convert a distance along the curve to a percentage.
    *
    * @remarks
    * The distance should be given in relation to the full curve, not
