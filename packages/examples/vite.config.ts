@@ -6,7 +6,6 @@ export default defineConfig({
     motionCanvas({
       project: [
         './src/quickstart.ts',
-        './src/tex.ts',
         './src/code-block.ts',
         './src/random.ts',
         './src/layout.ts',
