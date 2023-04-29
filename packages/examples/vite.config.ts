@@ -17,7 +17,6 @@ export default defineConfig({
         './src/components.ts',
         './src/logging.ts',
         './src/transitions.ts',
-        './src/tweening-spring.ts',
         './src/tweening-save-restore.ts',
         './src/presentation.ts',
       ],

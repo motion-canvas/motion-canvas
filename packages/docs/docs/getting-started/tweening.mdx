@@ -6,7 +6,6 @@ slug: /tweening
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
 import saveRestoreSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-save-restore';
-import springSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-spring';
 
 # Tweening
 
@@ -450,9 +449,37 @@ animations.
 In the example below, we use springs to animate a position of a circle, but this
 method can be used for more things than just position.
 
-<CodeBlock language="tsx">{springSource}</CodeBlock>
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {
+  PlopSpring,
+  SmoothSpring,
+  spring,
+} from '@motion-canvas/core/lib/tweening';
 
-<AnimationPlayer small name="tweening-spring" />
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      // highlight-start
+      ref={circle}
+      x={-400}
+      size={240}
+      fill={'#e13238'}
+    />,
+  );
+
+  yield* spring(PlopSpring, -400, 400, 1, value => {
+    circle().position.x(value);
+  });
+  yield* spring(SmoothSpring, 400, -400, value => {
+    circle().position.x(value);
+  });
+});
+```
 
 ### Spring description
 
