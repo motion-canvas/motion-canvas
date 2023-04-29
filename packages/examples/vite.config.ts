@@ -7,7 +7,6 @@ export default defineConfig({
       project: [
         './src/quickstart.ts',
         './src/tex.ts',
-        './src/tweening-cubic.ts',
         './src/tweening-color.ts',
         './src/tweening-vector.ts',
         './src/tweening-visualiser.ts',
