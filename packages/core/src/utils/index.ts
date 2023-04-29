@@ -11,6 +11,7 @@ export * from './deprecate';
 export * from './DetailedError';
 export * from './errorToLog';
 export * from './getContext';
+export * from './math';
 export * from './range';
 export * from './Semaphore';
 export * from './usePlayback';

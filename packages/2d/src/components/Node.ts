@@ -171,7 +171,7 @@ export class Node implements Promisable<Node> {
 
   protected getAbsoluteRotation() {
     const matrix = this.localToWorld();
-    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
+    return Vector2.degrees(matrix.m11, matrix.m12);
   }
 
   protected setAbsoluteRotation(value: SignalValue<number>) {

@@ -8,6 +8,7 @@ import {
   Signal,
   SignalValue,
 } from '../signals';
+import {DEG2RAD, RAD2DEG} from '../utils';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -118,8 +119,7 @@ export class Vector2 implements Type {
   }
 
   public static fromDegrees(degrees: number) {
-    const radians = (degrees * Math.PI) / 180;
-    return Vector2.fromRadians(radians);
+    return Vector2.fromRadians(degrees * DEG2RAD);
   }
 
   /**
@@ -144,7 +144,7 @@ export class Vector2 implements Type {
    * The returned angle will be between -180 and 180 degrees.
    */
   public static degrees(x: number, y: number) {
-    return (Vector2.radians(x, y) * 180) / Math.PI;
+    return Vector2.radians(x, y) * RAD2DEG;
   }
 
   public static magnitude(x: number, y: number) {

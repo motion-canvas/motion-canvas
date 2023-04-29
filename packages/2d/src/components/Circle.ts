@@ -1,6 +1,7 @@
 import {Shape, ShapeProps} from './Shape';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {initial, signal} from '../decorators';
+import {DEG2RAD} from '@motion-canvas/core/lib/utils';
 
 export interface CircleProps extends ShapeProps {
   /**
@@ -157,8 +158,8 @@ export class Circle extends Shape {
 
   protected createPath(expand = 0) {
     const path = new Path2D();
-    const start = (this.startAngle() / 180) * Math.PI;
-    const end = (this.endAngle() / 180) * Math.PI;
+    const start = this.startAngle() * DEG2RAD;
+    const end = this.endAngle() * DEG2RAD;
     const size = this.size().scale(0.5);
     const closed = this.closed();
     if (closed) {
