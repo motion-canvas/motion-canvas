@@ -1,7 +1,7 @@
 <br/>
 <p align="center">
   <a href="https://motion-canvas.github.io">
-    <img width="180" src="https://motion-canvas.github.io/img/logo_dark.svg" alt="Vite logo">
+    <img width="180" src="https://motion-canvas.github.io/img/logo_dark.svg" alt="Motion Canvas logo">
   </a>
 </p>
 <p align="center">
