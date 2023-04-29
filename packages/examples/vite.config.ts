@@ -7,7 +7,6 @@ export default defineConfig({
       project: [
         './src/quickstart.ts',
         './src/tex.ts',
-        './src/tweening-vector.ts',
         './src/code-block.ts',
         './src/random.ts',
         './src/layout.ts',
