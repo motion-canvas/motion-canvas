@@ -5,7 +5,6 @@ slug: /tweening
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
-import linearSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-linear';
 import saveRestoreSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-save-restore';
 import springSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-spring';
 
@@ -19,7 +18,32 @@ special type of generators that animate between two values over given time.
 The simplest way to create a tween is via the
 [`tween`](/api/core/tweening#tween) function:
 
-<CodeBlock language="tsx">{linearSource}</CodeBlock>
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {tween, map} from '@motion-canvas/core/lib/tweening';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      x={-300}
+      width={240}
+      height={240}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().position.x(map(-300, 300, value));
+  });
+  //highlight-end
+});
+```
 
 In the example above, we animate the x coordinate of our circle from `-300` to
 `300` over a span of `2` second.
@@ -30,9 +54,7 @@ that will be called each frame the tween takes place. The `value` parameter it
 receives is a number ranging from `0` to `1`, informing us about the progress of
 the tween. We can use it to calculate the values that our tween animates. In the
 case of our circle, we use the `map` function to map the `value` range from
-`[0, 1]` to `[-300, 300]` and set it as the `x` coordinate:
-
-<AnimationPlayer small name="tweening-linear" />
+`[0, 1]` to `[-300, 300]` and set it as the `x` coordinate.
 
 ### Timing functions
 
