@@ -10,7 +10,6 @@ export default defineConfig({
         './src/code-block.ts',
         './src/random.ts',
         './src/layout.ts',
-        './src/layout-group.ts',
         './src/positioning.ts',
         './src/media-video.ts',
         './src/components.ts',
