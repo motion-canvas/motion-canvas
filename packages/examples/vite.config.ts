@@ -9,7 +9,6 @@ export default defineConfig({
         './src/tex.ts',
         './src/tweening-color.ts',
         './src/tweening-vector.ts',
-        './src/tweening-visualiser.ts',
         './src/code-block.ts',
         './src/random.ts',
         './src/layout.ts',
