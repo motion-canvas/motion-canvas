@@ -125,19 +125,20 @@ export class Renderer {
    * This method always uses the default {@link ImageExporter}.
    *
    * @param settings - The rendering settings.
-   * @param frame - The frame to export.
+   * @param time - The timestamp to export.
    */
-  public async renderFrame(settings: RendererSettings, frame: number) {
+  public async renderFrame(settings: RendererSettings, time: number) {
     await this.lock.acquire();
 
     try {
+      const frame = this.status.secondsToFrames(time);
       this.stage.configure(settings);
       this.playback.fps = settings.fps;
       this.playback.state = PlaybackState.Rendering;
 
       await this.reloadScenes(settings);
       await this.playback.reset();
-      await this.playback.seek(this.status.secondsToFrames(settings.range[0]));
+      await this.playback.seek(frame);
       await this.stage.render(
         this.playback.currentScene!,
         this.playback.previousScene,
