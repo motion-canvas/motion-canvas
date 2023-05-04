@@ -1,7 +1,9 @@
 import {
+  addInitializer,
   cloneable,
   computed,
   defaultStyle,
+  getPropertyMeta,
   initial,
   inspectable,
   signal,
@@ -18,6 +20,7 @@ import {
   SpacingSignal,
   Vector2,
   Vector2Signal,
+  SimpleVector2Signal,
 } from '@motion-canvas/core/lib/types';
 import {
   InterpolationFunction,
@@ -42,7 +45,7 @@ import {Node, NodeProps} from './Node';
 import {drawLine, drawPivot} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
-  createSignal,
+  isReactive,
   Signal,
   SignalValue,
   SimpleSignal,
@@ -100,6 +103,78 @@ export interface LayoutProps extends NodeProps {
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
   offset?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the top edge of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the top edge
+   * ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  top?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the bottom edge of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the bottom edge
+   * ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  bottom?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the left edge of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the left edge
+   * ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  left?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the right edge of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the right edge
+   * ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  right?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the top left corner of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the top left
+   * corner ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  topLeft?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the top right corner of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the top right
+   * corner ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  topRight?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the bottom left corner of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the bottom left
+   * corner ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  bottomLeft?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the bottom
+   * right corner ends up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   */
+  bottomRight?: SignalValue<PossibleVector2>;
   clip?: SignalValue<boolean>;
 }
 
@@ -446,23 +521,116 @@ export class Layout extends Node {
   @vector2Signal('offset')
   public declare readonly offset: Vector2Signal<this>;
 
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the top edge ends up in the given place.
+   *
+   * When retrieved, it will return the position of the top edge in the parent
+   * space.
+   */
+  @originSignal(Origin.Top)
+  public declare readonly top: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the bottom edge ends up in the given place.
+   *
+   * When retrieved, it will return the position of the bottom edge in the
+   * parent space.
+   */
+  @originSignal(Origin.Bottom)
+  public declare readonly bottom: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the left edge ends up in the given place.
+   *
+   * When retrieved, it will return the position of the left edge in the parent
+   * space.
+   */
+  @originSignal(Origin.Left)
+  public declare readonly left: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the right edge ends up in the given place.
+   *
+   * When retrieved, it will return the position of the right edge in the parent
+   * space.
+   */
+  @originSignal(Origin.Right)
+  public declare readonly right: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the top left corner ends up in the given place.
+   *
+   * When retrieved, it will return the position of the top left corner in the
+   * parent space.
+   */
+  @originSignal(Origin.TopLeft)
+  public declare readonly topLeft: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the top right corner ends up in the given place.
+   *
+   * When retrieved, it will return the position of the top right corner in the
+   * parent space.
+   */
+  @originSignal(Origin.TopRight)
+  public declare readonly topRight: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the bottom left corner ends up in the given place.
+   *
+   * When retrieved, it will return the position of the bottom left corner in
+   * the parent space.
+   */
+  @originSignal(Origin.BottomLeft)
+  public declare readonly bottomLeft: SimpleVector2Signal<this>;
+  /**
+   * The position of the bottom right corner of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the bottom right corner ends up in the given place.
+   *
+   * When retrieved, it will return the position of the bottom right corner in
+   * the parent space.
+   */
+  @originSignal(Origin.BottomRight)
+  public declare readonly bottomRight: SimpleVector2Signal<this>;
+
   @initial(false)
   @signal()
   public declare readonly clip: SimpleSignal<boolean, this>;
 
-  public element: HTMLElement;
-  public styles: CSSStyleDeclaration;
+  public declare element: HTMLElement;
+  public declare styles: CSSStyleDeclaration;
 
-  protected readonly sizeLockCounter = createSignal(0);
+  @initial(0)
+  @signal()
+  protected declare readonly sizeLockCounter: SimpleSignal<number, this>;
 
-  public constructor({tagName = 'div', ...props}: LayoutProps) {
+  public constructor(props: LayoutProps) {
     super(props);
-
-    this.element = document.createElement(tagName);
-    this.element.style.display = 'flex';
-    this.element.style.boxSizing = 'border-box';
-
-    this.styles = getComputedStyle(this.element);
   }
 
   public lockSize() {
@@ -515,11 +683,16 @@ export class Layout extends Node {
 
   public override localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
-    const offset = this.size().mul(this.offset()).scale(-0.5);
+
     matrix.translateSelf(this.position.x(), this.position.y());
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scale.x(), this.scale.y());
-    matrix.translateSelf(offset.x, offset.y);
+
+    const offset = this.offset();
+    if (!offset.exactlyEquals(Vector2.zero)) {
+      const translate = this.size().mul(offset).scale(-0.5);
+      matrix.translateSelf(translate.x, translate.y);
+    }
 
     return matrix;
   }
@@ -826,3 +999,37 @@ export class Layout extends Node {
     return null;
   }
 }
+
+function originSignal(origin: Origin): PropertyDecorator {
+  return (target, key) => {
+    signal()(target, key);
+    cloneable(false)(target, key);
+    const meta = getPropertyMeta<any>(target, key);
+    meta!.getter = function (this: Layout) {
+      return this.getOriginDelta(origin).transformAsPoint(this.localToParent());
+    };
+    meta!.setter = function (
+      this: Layout,
+      value: SignalValue<PossibleVector2>,
+    ) {
+      this.position(
+        isReactive(value)
+          ? () =>
+              this.getOriginDelta(origin)
+                .transform(this.localToParent())
+                .flipped.add(value())
+          : this.getOriginDelta(origin)
+              .transform(this.localToParent())
+              .flipped.add(value),
+      );
+      return this;
+    };
+  };
+}
+
+addInitializer<Layout>(Layout.prototype, instance => {
+  instance.element = document.createElement('div');
+  instance.element.style.display = 'flex';
+  instance.element.style.boxSizing = 'border-box';
+  instance.styles = getComputedStyle(instance.element);
+});

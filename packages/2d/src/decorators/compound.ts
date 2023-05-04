@@ -48,7 +48,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
         meta.interpolationFunction ?? deepLerp,
         instance,
       );
-      patchSignal(signalContext, meta.parser, instance, <string>key);
+      patchSignal(signalContext, meta, instance, <string>key);
       const signal = signalContext.toSignal();
 
       for (const [key, property] of meta.compoundEntries) {

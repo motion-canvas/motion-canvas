@@ -139,11 +139,13 @@ export class Node implements Promisable<Node> {
     return new Vector2(matrix.m41, matrix.m42);
   }
 
-  protected setAbsolutePosition(value: SignalValue<Vector2>) {
+  protected setAbsolutePosition(value: SignalValue<PossibleVector2>) {
     if (isReactive(value)) {
-      this.position(() => value().transformAsPoint(this.worldToParent()));
+      this.position(() =>
+        new Vector2(value()).transformAsPoint(this.worldToParent()),
+      );
     } else {
-      this.position(value.transformAsPoint(this.worldToParent()));
+      this.position(new Vector2(value).transformAsPoint(this.worldToParent()));
     }
   }
 
@@ -243,11 +245,11 @@ export class Node implements Promisable<Node> {
     );
   }
 
-  protected setAbsoluteScale(value: SignalValue<Vector2>) {
+  protected setAbsoluteScale(value: SignalValue<PossibleVector2>) {
     if (isReactive(value)) {
-      this.scale(() => this.getRelativeScale(value()));
+      this.scale(() => this.getRelativeScale(new Vector2(value())));
     } else {
-      this.scale(this.getRelativeScale(value));
+      this.scale(this.getRelativeScale(new Vector2(value)));
     }
   }
 
