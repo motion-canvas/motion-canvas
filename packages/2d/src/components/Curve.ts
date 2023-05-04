@@ -177,7 +177,11 @@ export abstract class Curve extends Shape {
    * @param value - The percentage along the curve.
    */
   public percentageToDistance(value: number): number {
-    return this.startOffset() + this.offsetArcLength() * value;
+    return clamp(
+      0,
+      this.baseArcLength(),
+      this.startOffset() + this.offsetArcLength() * value,
+    );
   }
 
   /**
@@ -214,7 +218,8 @@ export abstract class Curve extends Shape {
   public offsetArcLength() {
     const startOffset = this.startOffset();
     const endOffset = this.endOffset();
-    return this.baseArcLength() - startOffset - endOffset;
+    const baseLength = this.baseArcLength();
+    return clamp(0, baseLength, baseLength - startOffset - endOffset);
   }
 
   /**
@@ -227,6 +232,17 @@ export abstract class Curve extends Shape {
   @computed()
   public arcLength() {
     return this.offsetArcLength() * Math.abs(this.start() - this.end());
+  }
+
+  /**
+   * The percentage of the curve that's currently visible.
+   *
+   * @remarks
+   * The returned value is the ratio between the visible length (as defined by
+   * {@link start} and {@link end}) and the offset length of the curve.
+   */
+  public completion(): number {
+    return Math.abs(this.start() - this.end());
   }
 
   @computed()
