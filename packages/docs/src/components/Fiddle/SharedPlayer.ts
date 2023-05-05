@@ -29,6 +29,7 @@ let PlayerInstance: Player = null;
 let StageInstance: Stage = null;
 let CurrentSetter: (value: Player) => void = null;
 let CurrentParent: HTMLElement = null;
+let CurrentRatio = 1;
 
 export function disposePlayer(setter: (value: Player) => void) {
   if (CurrentSetter !== setter || !ProjectInstance) return;
@@ -41,6 +42,7 @@ export function disposePlayer(setter: (value: Player) => void) {
 export function borrowPlayer(
   setter: (value: Player) => void,
   parent: HTMLDivElement,
+  ratio: number,
 ): Player {
   if (setter === CurrentSetter) return;
 
@@ -66,7 +68,7 @@ export function borrowPlayer(
       scenes: [Description],
     } as Project;
     ProjectInstance.meta = new ProjectMetadata(ProjectInstance);
-    ProjectInstance.meta.shared.size.set([960, 960 / 4]);
+    ProjectInstance.meta.shared.size.set(960);
 
     PlayerInstance = new Player(ProjectInstance, {
       size: ProjectInstance.meta.shared.size.get(),
@@ -96,6 +98,17 @@ export function borrowPlayer(
   CurrentSetter?.(null);
   CurrentSetter = setter;
   CurrentParent = parent;
+  if (CurrentRatio !== ratio) {
+    ProjectInstance.meta.shared.size.set([960, Math.floor(960 / ratio)]);
+    Description.onReplaced.current = {
+      ...Description.onReplaced.current,
+      size: ProjectInstance.meta.shared.size.get(),
+    };
+    StageInstance.configure({
+      size: ProjectInstance.meta.shared.size.get(),
+    });
+    CurrentRatio = ratio;
+  }
 
   PlayerInstance.activate();
   PlayerInstance.requestReset();
@@ -105,6 +118,7 @@ export function borrowPlayer(
 export function tryBorrowPlayer(
   setter: (value: Player) => void,
   parent: HTMLDivElement,
+  ratio: number,
 ): Player | null {
-  return CurrentSetter ? null : borrowPlayer(setter, parent);
+  return CurrentSetter ? null : borrowPlayer(setter, parent, ratio);
 }
