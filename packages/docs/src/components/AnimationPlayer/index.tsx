@@ -20,7 +20,6 @@ declare global {
 
 export interface AnimationPlayerProps {
   banner?: boolean;
-  small?: boolean;
   name: string;
   link?: string;
 }
@@ -28,17 +27,10 @@ export interface AnimationPlayerProps {
 export default function AnimationPlayer({
   name,
   banner,
-  small,
   link,
 }: AnimationPlayerProps) {
   return (
-    <div
-      className={clsx(
-        styles.container,
-        banner && styles.banner,
-        small && styles.small,
-      )}
-    >
+    <div className={clsx(styles.container, banner && styles.banner)}>
       <motion-canvas-player
         class={styles.player}
         src={`/examples/${name}.js`}
