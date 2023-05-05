@@ -145,7 +145,7 @@ export function PlaybackControls() {
               ...meta.getFullRenderingSettings(),
               name: project.name,
             },
-            player.playback.frame,
+            player.status.time,
           )
         }
       >
