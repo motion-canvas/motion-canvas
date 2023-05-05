@@ -69,6 +69,10 @@ export class View2D extends Rect {
     this.updateLayout();
   }
 
+  protected override requestFontUpdate() {
+    this.applyFont();
+  }
+
   public override view(): View2D {
     return this;
   }

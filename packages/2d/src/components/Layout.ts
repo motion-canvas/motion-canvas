@@ -790,6 +790,7 @@ export class Layout extends Node {
    */
   @computed()
   protected requestFontUpdate() {
+    this.appendedToView();
     this.parentTransform()?.requestFontUpdate();
     this.applyFont();
   }
