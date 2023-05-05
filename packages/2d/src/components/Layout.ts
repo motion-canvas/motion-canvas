@@ -697,6 +697,28 @@ export class Layout extends Node {
     return matrix;
   }
 
+  /**
+   * A simplified version of {@link localToParent} matrix used for transforming
+   * direction vectors.
+   *
+   * @internal
+   */
+  @computed()
+  protected scalingRotationMatrix(): DOMMatrix {
+    const matrix = new DOMMatrix();
+
+    matrix.rotateSelf(0, 0, this.rotation());
+    matrix.scaleSelf(this.scale.x(), this.scale.y());
+
+    const offset = this.offset();
+    if (!offset.exactlyEquals(Vector2.zero)) {
+      const translate = this.size().mul(offset).scale(-0.5);
+      matrix.translateSelf(translate.x, translate.y);
+    }
+
+    return matrix;
+  }
+
   protected getComputedLayout(): BBox {
     return new BBox(this.element.getBoundingClientRect());
   }
@@ -1017,10 +1039,10 @@ function originSignal(origin: Origin): PropertyDecorator {
         isReactive(value)
           ? () =>
               this.getOriginDelta(origin)
-                .transform(this.localToParent())
+                .transform(this.scalingRotationMatrix())
                 .flipped.add(value())
           : this.getOriginDelta(origin)
-              .transform(this.localToParent())
+              .transform(this.scalingRotationMatrix())
               .flipped.add(value),
       );
       return this;
