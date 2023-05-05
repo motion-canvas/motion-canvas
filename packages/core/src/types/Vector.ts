@@ -88,6 +88,11 @@ export class Vector2 implements Type {
     return Vector2.lerp(from, to, arcLerp(value, reverse, ratio));
   }
 
+  public static createArcLerp(reverse?: boolean, ratio?: number) {
+    return (from: Vector2, to: Vector2, value: number) =>
+      Vector2.arcLerp(from, to, value, reverse, ratio);
+  }
+
   public static fromOrigin(origin: Origin | Direction) {
     const position = new Vector2();
 
@@ -303,6 +308,11 @@ export class Vector2 implements Type {
   public dot(possibleVector: PossibleVector2): number {
     const vector = new Vector2(possibleVector);
     return this.x * vector.x + this.y * vector.y;
+  }
+
+  public mod(possibleVector: PossibleVector2): Vector2 {
+    const vector = new Vector2(possibleVector);
+    return new Vector2(this.x % vector.x, this.y % vector.y);
   }
 
   public addX(value: number) {
