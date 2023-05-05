@@ -68,6 +68,18 @@ export interface ImgProps extends RectProps {
 export class Img extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 
+  static {
+    if (import.meta.hot) {
+      import.meta.hot.on('motion-canvas:assets', ({urls}) => {
+        for (const url of urls) {
+          if (this.pool[url]) {
+            delete this.pool[url];
+          }
+        }
+      });
+    }
+  }
+
   /**
    * The source of this image.
    *
@@ -130,11 +142,12 @@ export class Img extends Rect {
   @computed()
   protected image(): HTMLImageElement {
     const src = viaProxy(this.src());
+    const hash = this.view().assetHash();
     let image = Img.pool[src];
     if (!image) {
       image = document.createElement('img');
       image.crossOrigin = 'anonymous';
-      image.src = src;
+      image.src = `${src}?${hash}`;
       Img.pool[src] = image;
     }
 

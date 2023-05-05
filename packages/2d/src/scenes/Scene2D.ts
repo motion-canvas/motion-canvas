@@ -15,12 +15,19 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
+  private assetHash = Date.now().toString();
 
   public constructor(
     description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
   ) {
     super(description);
     this.recreateView();
+    if (import.meta.hot) {
+      import.meta.hot.on('motion-canvas:assets', () => {
+        this.assetHash = Date.now().toString();
+        this.getView().assetHash(this.assetHash);
+      });
+    }
   }
 
   public getView(): View2D {
@@ -131,6 +138,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
       this.view = new View2D({
         position: size.scale(this.resolutionScale / 2),
         scale: this.resolutionScale,
+        assetHash: this.assetHash,
         size,
       });
     });
