@@ -1,7 +1,7 @@
 import {describe, test, expect, beforeAll, afterAll} from 'vitest';
 import {threads} from './threads';
 import {noop, run} from '../flow';
-import {endPlayback, startPlayback} from '../utils';
+import {endPlayback, startPlayback, useThread} from '../utils';
 import {PlaybackManager, PlaybackStatus} from '../app';
 
 describe('threads()', () => {
@@ -42,5 +42,31 @@ describe('threads()', () => {
     });
 
     expect([...task].length).toBe(2);
+  });
+
+  test('Pausing a thread', () => {
+    const order: number[] = [];
+    const task = threads(function* () {
+      order.push(0);
+      yield run(function* () {
+        order.push(1);
+        yield;
+        order.push(5);
+      });
+      const child = useThread().children[0];
+      child.pause(true);
+      order.push(2);
+      yield;
+      order.push(3);
+      yield;
+      child.pause(false);
+      order.push(4);
+      yield;
+      order.push(6);
+    });
+
+    [...task];
+
+    expect(order).toEqual([0, 1, 2, 3, 4, 5, 6]);
   });
 });
