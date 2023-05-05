@@ -4,6 +4,10 @@ import {PlaybackState} from '@motion-canvas/core';
 import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {lazy} from '@motion-canvas/core/lib/decorators';
 
+export interface View2DProps extends RectProps {
+  assetHash: string;
+}
+
 export class View2D extends Rect {
   @lazy(() => {
     const frameID = 'motion-canvas-2d-frame';
@@ -27,7 +31,10 @@ export class View2D extends Rect {
   @signal()
   public declare readonly playbackState: SimpleSignal<PlaybackState, this>;
 
-  public constructor(props: RectProps) {
+  @signal()
+  public declare readonly assetHash: SimpleSignal<string, this>;
+
+  public constructor(props: View2DProps) {
     super({
       composite: true,
       fontFamily: 'Roboto',
