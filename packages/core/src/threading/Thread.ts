@@ -47,8 +47,13 @@ export class Thread {
     return this.isCanceled || (this.parent?.canceled ?? false);
   }
 
+  public get paused(): boolean {
+    return this.isPaused || (this.parent?.paused ?? false);
+  }
+
   public parent: Thread | null = null;
   private isCanceled = false;
+  private isPaused = false;
   private fixedTime = 0;
 
   public constructor(
@@ -62,6 +67,13 @@ export class Thread {
    * Progress the wrapped generator once.
    */
   public next() {
+    if (this.paused) {
+      return {
+        value: null,
+        done: false,
+      };
+    }
+
     startThread(this);
     const result = this.runner.next(this.value);
     endThread(this);
@@ -75,8 +87,10 @@ export class Thread {
    * @param dt - The delta time of the next cycle.
    */
   public update(dt: number) {
-    this.time(this.time() + dt);
-    this.fixedTime += dt;
+    if (!this.paused) {
+      this.time(this.time() + dt);
+      this.fixedTime += dt;
+    }
     this.children = this.children.filter(child => !child.canceled);
   }
 
@@ -94,5 +108,9 @@ export class Thread {
   public cancel() {
     this.isCanceled = true;
     this.parent = null;
+  }
+
+  public pause(value: boolean) {
+    this.isPaused = value;
   }
 }
