@@ -1,12 +1,11 @@
-import {useDuration} from '../utils';
+import {usePlayback, useThread} from '../utils';
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
 import {LoopCallback} from './loop';
-import {loopFor} from './loopFor';
 
-decorate(loopUntil, threadable());
+decorate(loopFor, threadable());
 /**
- * Run a generator in a loop until the given time event.
+ * Run a generator in a loop for the given amount of time.
  *
  * @remarks
  * Generators are executed completely before the next iteration starts.
@@ -15,20 +14,34 @@ decorate(loopUntil, threadable());
  *
  * @example
  * ```ts
- * yield* loopUntil(
- *   'Stop Looping',
+ * yield* loopFor(
+ *   3,
  *   () => circle().position.x(-10, 0.1).to(10, 0.1)
  * );
  * ```
  *
- * @param event - The event.
+ * @param seconds - The duration in seconds.
  * @param factory - A function creating the generator to run. Because generators
  *                  can't be reset, a new generator is created on each
  *                  iteration.
  */
-export function* loopUntil(
-  event: string,
+export function* loopFor(
+  seconds: number,
   factory: LoopCallback,
 ): ThreadGenerator {
-  yield* loopFor(useDuration(event), factory);
+  const thread = useThread();
+  const step = usePlayback().framesToSeconds(1);
+  const targetTime = thread.time() + seconds;
+
+  let iteration = 0;
+  while (targetTime - step > thread.fixed) {
+    const generator = factory(iteration);
+    if (generator) {
+      yield* generator;
+    } else {
+      yield;
+    }
+    iteration += 1;
+  }
+  thread.time(targetTime);
 }
