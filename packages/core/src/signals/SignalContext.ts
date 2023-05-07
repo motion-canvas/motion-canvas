@@ -6,7 +6,7 @@ import {
 } from '../tweening';
 import {errorToLog, useLogger} from '../utils';
 import {ThreadGenerator} from '../threading';
-import {run} from '../flow';
+import {run, waitFor} from '../flow';
 import {DependencyContext} from './DependencyContext';
 import {
   SignalExtensions,
@@ -167,41 +167,75 @@ export class SignalContext<
       return this.set(value);
     }
 
-    return this.makeAnimate(timingFunction, interpolationFunction)(
-      value,
-      duration,
-    );
+    const queue = this.createQueue(timingFunction, interpolationFunction);
+    return queue.to(value, duration);
   }
 
-  protected makeAnimate(
+  protected createQueue(
     defaultTimingFunction: TimingFunction,
     defaultInterpolationFunction: InterpolationFunction<TValue>,
-    before?: ThreadGenerator,
   ) {
-    const animate = (
+    const initial = this.get();
+    const queue: ThreadGenerator[] = [];
+
+    const task = run(function* animate() {
+      while (queue.length > 0) {
+        yield* queue.shift()!;
+      }
+    }) as SignalGenerator<TSetterValue, TValue>;
+
+    task.to = (
       value: SignalValue<TSetterValue> | typeof DEFAULT,
       duration: number,
       timingFunction = defaultTimingFunction,
       interpolationFunction = defaultInterpolationFunction,
     ) => {
-      const tween = this.tween(
-        value,
-        duration,
-        timingFunction,
-        interpolationFunction,
-      ) as SignalGenerator<TSetterValue, TValue>;
-      let task = tween;
-      if (before) {
-        task = run(function* () {
-          yield* before;
-          yield* tween;
-        }) as SignalGenerator<TSetterValue, TValue>;
-      }
-      task.to = this.makeAnimate(timingFunction, interpolationFunction, task);
+      defaultTimingFunction = timingFunction;
+      defaultInterpolationFunction = interpolationFunction;
+      queue.push(
+        this.tween(value, duration, timingFunction, interpolationFunction),
+      );
       return task;
     };
 
-    return <SignalTween<TSetterValue, TValue>>animate;
+    task.back = (
+      time: number,
+      timingFunction = defaultTimingFunction,
+      interpolationFunction = defaultInterpolationFunction,
+    ) => {
+      defaultTimingFunction = timingFunction;
+      defaultInterpolationFunction = interpolationFunction;
+      queue.push(
+        this.tween(
+          initial,
+          time,
+          defaultTimingFunction,
+          defaultInterpolationFunction,
+        ),
+      );
+      return task;
+    };
+
+    task.wait = (duration: number) => {
+      queue.push(waitFor(duration));
+      return task;
+    };
+
+    task.run = (generator: ThreadGenerator) => {
+      queue.push(generator);
+      return task;
+    };
+
+    task.do = (callback: () => void) => {
+      queue.push(
+        run(function* () {
+          callback();
+        }),
+      );
+      return task;
+    };
+
+    return task;
   }
 
   protected *tween(
