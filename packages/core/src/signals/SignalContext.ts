@@ -9,13 +9,14 @@ import {ThreadGenerator} from '../threading';
 import {run} from '../flow';
 import {DependencyContext} from './DependencyContext';
 import {
+  SignalExtensions,
   SignalGenerator,
   SignalGetter,
   SignalSetter,
   SignalTween,
   SignalValue,
 } from './types';
-import {isReactive} from './isReactive';
+import {isReactive, unwrap} from './utils';
 import {DEFAULT} from './symbols';
 
 export type SimpleSignal<TValue, TReturn = void> = Signal<
@@ -55,14 +56,16 @@ export class SignalContext<
   TValue extends TSetterValue = TSetterValue,
   TOwner = void,
 > extends DependencyContext<TOwner> {
+  protected extensions: SignalExtensions<TSetterValue, TValue>;
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
-  protected parser: (value: TSetterValue) => TValue = value => <TValue>value;
 
   public constructor(
     private initial: SignalValue<TSetterValue> | undefined,
     private readonly interpolation: InterpolationFunction<TValue>,
     owner: TOwner = <TOwner>(<unknown>undefined),
+    protected parser: (value: TSetterValue) => TValue = value => <TValue>value,
+    extensions: Partial<SignalExtensions<TSetterValue, TValue>> = {},
   ) {
     super(owner);
 
@@ -84,6 +87,13 @@ export class SignalContext<
         this.last = this.parse(this.initial);
       }
     }
+
+    this.extensions = {
+      getter: this.getter.bind(this),
+      setter: this.setter.bind(this),
+      tweener: this.tweener.bind(this),
+      ...extensions,
+    };
   }
 
   public toSignal(): Signal<TSetterValue, TValue, TOwner> {
@@ -94,23 +104,12 @@ export class SignalContext<
     return this.parser(value);
   }
 
-  protected wrap(value: SignalValue<TSetterValue>): SignalValue<TValue> {
-    return isReactive(value) ? () => this.parse(value()) : this.parse(value);
-  }
-
-  public setInitial(value: SignalValue<TSetterValue>) {
-    this.initial = value;
-  }
-
-  public setParser(value: (value: TSetterValue) => TValue) {
-    this.parser = value;
-    if (this.current !== undefined && !isReactive(this.current)) {
-      this.last = this.parse(this.current);
-    }
-    this.markDirty();
-  }
-
   public set(value: SignalValue<TSetterValue> | typeof DEFAULT): TOwner {
+    this.extensions.setter(value);
+    return this.owner;
+  }
+
+  public setter(value: SignalValue<TSetterValue> | typeof DEFAULT): TOwner {
     if (value === DEFAULT) {
       value = this.initial!;
     }
@@ -131,6 +130,10 @@ export class SignalContext<
   }
 
   public get(): TValue {
+    return this.extensions.getter();
+  }
+
+  public getter(): TValue {
     if (this.event.isRaised() && isReactive(this.current)) {
       this.clearDependencies();
       this.startCollecting();
@@ -211,8 +214,8 @@ export class SignalContext<
       value = this.initial!;
     }
 
-    yield* this.doTween(
-      this.parse(isReactive(value) ? value() : value),
+    yield* this.extensions.tweener(
+      value,
       duration,
       timingFunction,
       interpolationFunction,
@@ -220,15 +223,21 @@ export class SignalContext<
     this.set(value);
   }
 
-  public *doTween(
-    value: TValue,
+  public *tweener(
+    value: SignalValue<TSetterValue>,
     duration: number,
     timingFunction: TimingFunction,
     interpolationFunction: InterpolationFunction<TValue>,
   ): ThreadGenerator {
     const from = this.get();
     yield* tween(duration, v => {
-      this.set(interpolationFunction(from, value, timingFunction(v)));
+      this.set(
+        interpolationFunction(
+          from,
+          this.parse(unwrap(value)),
+          timingFunction(v),
+        ),
+      );
     });
   }
 

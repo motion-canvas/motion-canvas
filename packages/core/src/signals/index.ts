@@ -9,7 +9,7 @@ export * from './ComputedContext';
 export * from './createComputed';
 export * from './createComputedAsync';
 export * from './createSignal';
-export * from './isReactive';
+export * from './utils';
 export * from './SignalContext';
 export * from './DependencyContext';
 export * from './types';

@@ -1,7 +1,7 @@
 import {
-  isReactive,
   SignalValue,
   SimpleSignal,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 import {BBox, PossibleVector2, Vector2} from '@motion-canvas/core/lib/types';
 import {useLogger} from '@motion-canvas/core/lib/utils';
@@ -45,9 +45,7 @@ export class Line extends Curve {
   protected childrenBBox() {
     const custom = this.points();
     const points = custom
-      ? custom.map(
-          signal => new Vector2(isReactive(signal) ? signal() : signal),
-        )
+      ? custom.map(signal => new Vector2(unwrap(signal)))
       : this.children()
           .filter(child => !(child instanceof Layout) || child.isLayoutRoot())
           .map(child => child.position());
@@ -59,9 +57,7 @@ export class Line extends Curve {
   public parsedPoints(): Vector2[] {
     const custom = this.points();
     return custom
-      ? custom.map(
-          signal => new Vector2(isReactive(signal) ? signal() : signal),
-        )
+      ? custom.map(signal => new Vector2(unwrap(signal)))
       : this.children().map(child => child.position());
   }
 

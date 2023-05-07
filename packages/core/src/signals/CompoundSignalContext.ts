@@ -1,13 +1,13 @@
 import {InterpolationFunction, map} from '../tweening';
 import {Signal, SignalContext} from './SignalContext';
-import {SignalValue} from './types';
-import {isReactive} from './isReactive';
+import {SignalExtensions, SignalValue} from './types';
+import {isReactive, modify} from './utils';
 
 export type CompoundSignal<
   TSetterValue,
   TValue extends TSetterValue,
-  TKeys extends keyof TValue,
-  TOwner,
+  TKeys extends keyof TValue = keyof TValue,
+  TOwner = void,
   TContext = CompoundSignalContext<TSetterValue, TValue, TKeys, TOwner>,
 > = Signal<TSetterValue, TValue, TOwner, TContext> & {
   [K in TKeys]: Signal<
@@ -22,29 +22,39 @@ export type CompoundSignal<
 export class CompoundSignalContext<
   TSetterValue,
   TValue extends TSetterValue,
-  TKeys extends keyof TValue,
+  TKeys extends keyof TValue = keyof TValue,
   TOwner = void,
 > extends SignalContext<TSetterValue, TValue, TOwner> {
   public readonly signals: [keyof TValue, Signal<any, any, TOwner>][] = [];
 
   public constructor(
-    private readonly entries: TKeys[],
+    private readonly entries: (
+      | TKeys
+      | [keyof TValue, Signal<any, any, TOwner>]
+    )[],
     parser: (value: TSetterValue) => TValue,
     initial: SignalValue<TSetterValue>,
     interpolation: InterpolationFunction<TValue>,
     owner: TOwner = <TOwner>(<unknown>undefined),
+    extensions: Partial<SignalExtensions<TSetterValue, TValue>> = {},
   ) {
-    super(undefined, interpolation, owner);
+    super(undefined, interpolation, owner, parser, extensions);
     this.parser = parser;
 
-    for (const key of entries) {
-      const signal = new SignalContext(
-        isReactive(initial)
-          ? () => parser(initial())[key]
-          : parser(initial)[key],
-        <any>map,
-        owner ?? this.invokable,
-      ).toSignal();
+    for (const entry of entries) {
+      let key: keyof TValue;
+      let signal: Signal<any, any, TOwner>;
+      if (Array.isArray(entry)) {
+        [key, signal] = entry;
+        (signal.context as any).owner ??= this;
+      } else {
+        key = entry;
+        signal = new SignalContext(
+          modify(initial, value => parser(value)[entry]),
+          <any>map,
+          owner ?? this.invokable,
+        ).toSignal();
+      }
       this.signals.push([key, signal]);
       Object.defineProperty(this.invokable, key, {value: signal});
     }
@@ -63,7 +73,7 @@ export class CompoundSignalContext<
     return this.parser(value);
   }
 
-  public override get(): TValue {
+  public override getter(): TValue {
     return this.parse(
       <TSetterValue>(
         Object.fromEntries(
@@ -73,7 +83,7 @@ export class CompoundSignalContext<
     );
   }
 
-  public override set(value: SignalValue<TValue>): TOwner {
+  public override setter(value: SignalValue<TValue>): TOwner {
     if (isReactive(value)) {
       for (const [key, property] of this.signals) {
         property(() => this.parser(value())[key]);

@@ -9,11 +9,11 @@ import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {all} from '@motion-canvas/core/lib/flow';
 import {addInitializer} from './initializers';
 import {
-  isReactive,
   Signal,
   SignalContext,
   SignalValue,
   SimpleSignal,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 
 export type FiltersSignal<TOwner> = Signal<
@@ -68,13 +68,13 @@ export class FiltersSignalContext<TOwner> extends SignalContext<
     }
   }
 
-  public override *doTween(
+  public override *tweener(
     value: SignalValue<Filter[]>,
     duration: number,
     timingFunction: TimingFunction,
   ): ThreadGenerator {
     const from = this.get();
-    const to = isReactive(value) ? value() : value;
+    const to = unwrap(value);
 
     if (areFiltersCompatible(from, to)) {
       yield* all(

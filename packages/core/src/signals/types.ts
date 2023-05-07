@@ -26,3 +26,14 @@ export interface SignalTween<TSetterValue, TValue extends TSetterValue> {
     interpolationFunction?: InterpolationFunction<TValue>,
   ): SignalGenerator<TSetterValue, TValue>;
 }
+
+export interface SignalExtensions<TSetterValue, TValue extends TSetterValue> {
+  getter: SignalGetter<TValue>;
+  setter: SignalSetter<TSetterValue>;
+  tweener(
+    value: SignalValue<TSetterValue>,
+    time: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<TValue>,
+  ): ThreadGenerator;
+}

@@ -1,7 +1,7 @@
 import {
-  isReactive,
   SignalValue,
   SimpleSignal,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 import {
   BBox,
@@ -140,7 +140,7 @@ export class Spline extends Curve {
 
     if (points) {
       return points.map(signal => {
-        const point = new Vector2(isReactive(signal) ? signal() : signal);
+        const point = new Vector2(unwrap(signal));
 
         return {
           position: point,

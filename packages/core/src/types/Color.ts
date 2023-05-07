@@ -83,9 +83,12 @@ Color.createSignal = (
   initial?: SignalValue<PossibleColor>,
   interpolation: InterpolationFunction<Color> = Color.lerp,
 ): ColorSignal<void> => {
-  const context = new SignalContext(initial, interpolation);
-  context.setParser(value => new Color(value));
-  return context.toSignal();
+  return new SignalContext(
+    initial,
+    interpolation,
+    undefined,
+    value => new Color(value),
+  ).toSignal();
 };
 
 Color.prototype.toSymbol = () => {
