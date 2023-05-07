@@ -89,7 +89,7 @@ include: [`top`](/api/2d/components/Layout#top),
 
 ```tsx editor
 import {makeScene2D} from '@motion-canvas/2d';
-import {Circle, Rect} from '@motion-canvas/2d/lib';
+import {Rect} from '@motion-canvas/2d/lib';
 import {createRef} from '@motion-canvas/core/lib/utils';
 
 export default makeScene2D(function* (view) {
@@ -107,18 +107,20 @@ export default makeScene2D(function* (view) {
       <Rect
         size={50}
         fill={'#e6a700'}
-        rotation={-10}
+        rotation={rect().rotation}
         // Try changing "right" to "top"
-        right={rect().left()}
+        right={rect().left}
       />
       <Rect
         size={100}
         fill={'#e13238'}
         rotation={10}
-        bottomLeft={rect().bottomRight()}
+        bottomLeft={rect().bottomRight}
       />
     </>,
   );
+
+  yield* rect().rotation(10, 1).to(-10, 1);
 });
 ```
 
