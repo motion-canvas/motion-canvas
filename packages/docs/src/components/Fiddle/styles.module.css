@@ -6,11 +6,13 @@
   margin-bottom: var(--ifm-leading);
 }
 
+.root:focus-within .layoutControl,
 .root:hover .layoutControl {
   opacity: 1;
 }
 
 .layoutControl {
+  z-index: 1;
   transition: opacity 200ms ease-in-out;
   opacity: 0;
   display: flex;

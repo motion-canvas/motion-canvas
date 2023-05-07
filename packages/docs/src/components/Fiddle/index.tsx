@@ -171,6 +171,32 @@ export default function Fiddle({
         [styles.previewOnly]: mode === 'preview',
       })}
     >
+      <div className={styles.layoutControl}>
+        <button
+          className={clsx(styles.icon, mode === 'code' && styles.active)}
+          onClick={() => {
+            setMode('code');
+            player?.togglePlayback(false);
+          }}
+          title="Source code"
+        >
+          <IconText />
+        </button>
+        <button
+          className={clsx(styles.icon, mode === 'editor' && styles.active)}
+          onClick={() => setMode('editor')}
+          title="Editor with preview"
+        >
+          <IconSplit />
+        </button>
+        <button
+          className={clsx(styles.icon, mode === 'preview' && styles.active)}
+          onClick={() => setMode('preview')}
+          title="Preview"
+        >
+          <IconImage />
+        </button>
+      </div>
       <div
         className={styles.preview}
         style={{aspectRatio: ratio}}
@@ -269,32 +295,6 @@ export default function Fiddle({
         <CodeBlock className={styles.source} language="tsx">
           {snippets[0].state.doc.toString() + (mode === 'code' ? '' : '\n')}
         </CodeBlock>
-      </div>
-      <div className={styles.layoutControl}>
-        <button
-          className={clsx(styles.icon, mode === 'code' && styles.active)}
-          onClick={() => {
-            setMode('code');
-            player?.togglePlayback(false);
-          }}
-          title="Source code"
-        >
-          <IconText />
-        </button>
-        <button
-          className={clsx(styles.icon, mode === 'editor' && styles.active)}
-          onClick={() => setMode('editor')}
-          title="Editor with preview"
-        >
-          <IconSplit />
-        </button>
-        <button
-          className={clsx(styles.icon, mode === 'preview' && styles.active)}
-          onClick={() => setMode('preview')}
-          title="Preview"
-        >
-          <IconImage />
-        </button>
       </div>
     </div>
   );
