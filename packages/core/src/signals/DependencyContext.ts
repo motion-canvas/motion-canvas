@@ -35,19 +35,21 @@ export class DependencyContext<TOwner = void>
     if (context) {
       handle.owner = context.owner;
     }
-    promise.then(value => {
-      handle.value = value;
-      context?.markDirty();
-    });
+    promise
+      .then(value => {
+        handle.value = value;
+        context?.markDirty();
+      })
+      .finally(() => {
+        this.promises = this.promises.filter(v => v !== handle);
+      });
 
     this.promises.push(handle);
     return handle;
   }
 
   public static consumePromises(): PromiseHandle<any>[] {
-    const result = this.promises;
-    this.promises = [];
-    return result;
+    return this.promises;
   }
 
   protected readonly invokable: any;
