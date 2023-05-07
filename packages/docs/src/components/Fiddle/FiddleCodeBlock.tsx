@@ -8,7 +8,7 @@ export default function FiddleCodeBlock(props: Props) {
     isValidElement(props.children) &&
     (props.children.props as {editor: boolean} | null)?.editor
   ) {
-    return <Fiddle {...props.children.props.children} />;
+    return <Fiddle {...props.children.props} />;
   }
 
   return (
