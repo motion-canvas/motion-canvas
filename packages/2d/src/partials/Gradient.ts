@@ -8,9 +8,9 @@ import {
   Vector2Signal,
 } from '@motion-canvas/core/lib/types';
 import {
-  isReactive,
   SignalValue,
   SimpleSignal,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
@@ -95,8 +95,8 @@ export class Gradient {
 
     for (const {offset, color} of this.stops()) {
       gradient.addColorStop(
-        isReactive(offset) ? offset() : offset,
-        new Color(isReactive(color) ? color() : color).serialize(),
+        unwrap(offset),
+        new Color(unwrap(color)).serialize(),
       );
     }
 

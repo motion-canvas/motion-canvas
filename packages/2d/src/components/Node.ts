@@ -46,6 +46,8 @@ import {
   SignalValue,
   SimpleSignal,
   isReactive,
+  modify,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 
 export type NodeState = NodeProps & Record<string, any>;
@@ -113,6 +115,13 @@ export class Node implements Promisable<Node> {
   @vector2Signal()
   public declare readonly position: Vector2Signal<this>;
 
+  public get x() {
+    return this.position.x as SimpleSignal<number, this>;
+  }
+  public get y() {
+    return this.position.y as SimpleSignal<number, this>;
+  }
+
   /**
    * A helper signal for operating on the position in world space.
    *
@@ -140,13 +149,11 @@ export class Node implements Promisable<Node> {
   }
 
   protected setAbsolutePosition(value: SignalValue<PossibleVector2>) {
-    if (isReactive(value)) {
-      this.position(() =>
-        new Vector2(value()).transformAsPoint(this.worldToParent()),
-      );
-    } else {
-      this.position(new Vector2(value).transformAsPoint(this.worldToParent()));
-    }
+    this.position(
+      modify(value, unwrapped =>
+        new Vector2(unwrapped).transformAsPoint(this.worldToParent()),
+      ),
+    );
   }
 
   /**
@@ -177,11 +184,11 @@ export class Node implements Promisable<Node> {
   }
 
   protected setAbsoluteRotation(value: SignalValue<number>) {
-    if (isReactive(value)) {
-      this.rotation(() => transformAngle(value(), this.worldToParent()));
-    } else {
-      this.rotation(transformAngle(value, this.worldToParent()));
-    }
+    this.rotation(
+      modify(value, unwrapped =>
+        transformAngle(unwrapped, this.worldToParent()),
+      ),
+    );
   }
 
   /**
@@ -246,11 +253,9 @@ export class Node implements Promisable<Node> {
   }
 
   protected setAbsoluteScale(value: SignalValue<PossibleVector2>) {
-    if (isReactive(value)) {
-      this.scale(() => this.getRelativeScale(new Vector2(value())));
-    } else {
-      this.scale(this.getRelativeScale(new Vector2(value)));
-    }
+    this.scale(
+      modify(value, unwrapped => this.getRelativeScale(new Vector2(unwrapped))),
+    );
   }
 
   private getRelativeScale(scale: Vector2): Vector2 {
@@ -285,7 +290,7 @@ export class Node implements Promisable<Node> {
     time: number,
     timingFunction: TimingFunction,
   ) {
-    const nextValue = isReactive(value) ? value() : value;
+    const nextValue = unwrap(value);
     if (nextValue === 'source-over') {
       yield* this.compositeOverride(1, time, timingFunction);
       this.compositeOverride(0);

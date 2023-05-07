@@ -5,7 +5,6 @@ import {
   defaultStyle,
   getPropertyMeta,
   initial,
-  inspectable,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -45,7 +44,7 @@ import {Node, NodeProps} from './Node';
 import {drawLine, drawPivot} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
-  isReactive,
+  modify,
   Signal,
   SignalValue,
   SimpleSignal,
@@ -272,35 +271,26 @@ export class Layout extends Node {
   @signal()
   public declare readonly textAlign: SimpleSignal<CanvasTextAlign, this>;
 
-  @cloneable(false)
-  @inspectable(false)
-  @signal()
-  protected declare readonly customX: SimpleSignal<number, this>;
   protected getX(): number {
     if (this.isLayoutRoot()) {
-      return this.customX();
+      return this.x.context.getter();
     }
 
     return this.computedPosition().x;
   }
   protected setX(value: SignalValue<number>) {
-    this.customX(value);
+    this.x.context.setter(value);
   }
-
-  @cloneable(false)
-  @inspectable(false)
-  @signal()
-  protected declare readonly customY: SimpleSignal<number, this>;
 
   protected getY(): number {
     if (this.isLayoutRoot()) {
-      return this.customY();
+      return this.y.context.getter();
     }
 
     return this.computedPosition().y;
   }
   protected setY(value: SignalValue<number>) {
-    this.customY(value);
+    this.y.context.setter(value);
   }
 
   /**
@@ -352,7 +342,6 @@ export class Layout extends Node {
    * node.size.x(() => '50%');
    * ```
    */
-  @cloneable(false)
   @initial({x: null, y: null})
   @vector2Signal({x: 'width', y: 'height'})
   public declare readonly size: Vector2LengthSignal<this>;
@@ -363,15 +352,11 @@ export class Layout extends Node {
     return this.size.y;
   }
 
-  @inspectable(false)
-  @signal()
-  protected declare readonly customWidth: SimpleSignal<DesiredLength, this>;
-
   protected getWidth(): number {
     return this.computedSize().width;
   }
   protected setWidth(value: SignalValue<Length>) {
-    this.customWidth(value);
+    this.width.context.setter(value);
   }
 
   @threadable()
@@ -407,15 +392,11 @@ export class Layout extends Node {
     lock && this.releaseSize();
   }
 
-  @inspectable(false)
-  @signal()
-  protected declare readonly customHeight: SimpleSignal<DesiredLength, this>;
-
   protected getHeight(): number {
     return this.computedSize().height;
   }
   protected setHeight(value: SignalValue<Length>) {
-    this.customHeight(value);
+    this.height.context.setter(value);
   }
 
   @threadable()
@@ -462,8 +443,8 @@ export class Layout extends Node {
   @computed()
   protected desiredSize(): SerializedVector2<DesiredLength> {
     return {
-      x: this.customWidth(),
-      y: this.customHeight(),
+      x: this.width.context.getter(),
+      y: this.height.context.getter(),
     };
   }
 
@@ -684,7 +665,7 @@ export class Layout extends Node {
   public override localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
 
-    matrix.translateSelf(this.position.x(), this.position.y());
+    matrix.translateSelf(this.x(), this.y());
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scale.x(), this.scale.y());
 
@@ -1036,14 +1017,11 @@ function originSignal(origin: Origin): PropertyDecorator {
       value: SignalValue<PossibleVector2>,
     ) {
       this.position(
-        isReactive(value)
-          ? () =>
-              this.getOriginDelta(origin)
-                .transform(this.scalingRotationMatrix())
-                .flipped.add(value())
-          : this.getOriginDelta(origin)
-              .transform(this.scalingRotationMatrix())
-              .flipped.add(value),
+        modify(value, unwrapped =>
+          this.getOriginDelta(origin)
+            .transform(this.scalingRotationMatrix())
+            .flipped.add(unwrapped),
+        ),
       );
       return this;
     };
