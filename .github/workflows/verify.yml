@@ -8,8 +8,8 @@ env:
   HUSKY: 0
 
 jobs:
-  commit:
-    name: Commit name
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,10 +19,37 @@ jobs:
         with:
           node-version: 18
           cache: npm
+      - uses: actions/cache@v3
+        id: cache-npm
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
       - run: npm ci
+        if: steps.cache-npm.outputs.cache-hit != 'true'
+  commit:
+    name: Commit name
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
   lint:
     name: Lint
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,10 +57,16 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - run: npm ci
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
       - run: npm run eslint
   prettier:
     name: Code style
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -41,22 +74,16 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - run: npm ci
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
       - run: npm run prettier
-  tests:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-      - run: npm ci
-      - run: npm run core:build
-      - run: npx lerna run test
   build:
     name: Build
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -64,10 +91,125 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - run: npm ci
-      - name: Build
-        run: npx lerna run build
-      - name: Examples
-        run: npm run examples:build
-      - name: E2E
-        run: npm run e2e:test
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
+      - run: npx lerna run build
+      - uses: actions/cache/save@v3
+        with:
+          key: ${{ github.run_id }}-build
+          path: |
+            packages/2d/lib
+            packages/core/lib
+            packages/ui/dist
+            packages/player/dist
+            packages/vite-plugin/lib
+  tests:
+    name: Unit tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ github.run_id }}-build
+          path: |
+            packages/2d/lib
+            packages/core/lib
+            packages/ui/dist
+            packages/player/dist
+            packages/vite-plugin/lib
+      - run: npx lerna run test
+  examples:
+    name: Examples
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ github.run_id }}-build
+          path: |
+            packages/2d/lib
+            packages/core/lib
+            packages/ui/dist
+            packages/player/dist
+            packages/vite-plugin/lib
+      - run: npm run examples:build
+  e2e:
+    name: End to end tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ github.run_id }}-build
+          path: |
+            packages/2d/lib
+            packages/core/lib
+            packages/ui/dist
+            packages/player/dist
+            packages/vite-plugin/lib
+      - run: npm run e2e:test
+  docs:
+    name: Documentation
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          path: |
+            **/node_modules
+            ~/.cache/puppeteer
+      - uses: actions/cache/restore@v3
+        with:
+          key: ${{ github.run_id }}-build
+          path: |
+            packages/2d/lib
+            packages/core/lib
+            packages/ui/dist
+            packages/player/dist
+            packages/vite-plugin/lib
+      - run: npm run docs:build
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
