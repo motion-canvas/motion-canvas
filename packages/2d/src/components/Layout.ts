@@ -503,7 +503,7 @@ export class Layout extends Node {
   public declare readonly offset: Vector2Signal<this>;
 
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the top edge of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -515,7 +515,7 @@ export class Layout extends Node {
   @originSignal(Origin.Top)
   public declare readonly top: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the bottom edge of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -527,7 +527,7 @@ export class Layout extends Node {
   @originSignal(Origin.Bottom)
   public declare readonly bottom: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the left edge of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -539,7 +539,7 @@ export class Layout extends Node {
   @originSignal(Origin.Left)
   public declare readonly left: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the right edge of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -551,7 +551,7 @@ export class Layout extends Node {
   @originSignal(Origin.Right)
   public declare readonly right: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the top left corner of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -563,7 +563,7 @@ export class Layout extends Node {
   @originSignal(Origin.TopLeft)
   public declare readonly topLeft: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the top right corner of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
@@ -575,7 +575,7 @@ export class Layout extends Node {
   @originSignal(Origin.TopRight)
   public declare readonly topRight: SimpleVector2Signal<this>;
   /**
-   * The position of the bottom right corner of this node.
+   * The position of the bottom left corner of this node.
    *
    * @remarks
    * When set, this shortcut property will modify the node's position so that
