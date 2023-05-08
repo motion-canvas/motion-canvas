@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.6.0](https://github.com/motion-canvas/motion-canvas/compare/v3.5.1...v3.6.0) (2023-05-08)
+
+### Bug Fixes
+
+- **ui:** fix snapshot
+  ([#643](https://github.com/motion-canvas/motion-canvas/issues/643))
+  ([590216a](https://github.com/motion-canvas/motion-canvas/commit/590216ac094d6b6ef3e9c773499bc52063f617b1))
+- **ui:** fix typo in viewport ID
+  ([#620](https://github.com/motion-canvas/motion-canvas/issues/620))
+  ([3a83f20](https://github.com/motion-canvas/motion-canvas/commit/3a83f20cb1b8ddc7b95a8e36bf6f3d0cd036693b))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.5.0](https://github.com/motion-canvas/motion-canvas/compare/v3.4.0...v3.5.0) (2023-04-06)
 
 ### Bug Fixes
