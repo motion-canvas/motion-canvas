@@ -1,0 +1,141 @@
+---
+slug: version-3.6.0
+title: Motion Canvas v3.6.0
+description: The Cardinal Update
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PullRequest from '@site/src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import Fiddle from '@site/src/components/Fiddle';
+import CodeBlock from '@theme/CodeBlock';
+import cardinal from '!!raw-loader!@site/blog/2023-05-08-cardinal.tsx';
+
+import IconText from '@site/src/Icon/Text';
+import IconSplit from '@site/src/Icon/Split';
+import IconImage from '@site/src/Icon/Image';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    <Link to="/docs/layouts#cardinal-directions">Cardinal points</Link> let you
+    position nodes relative to their corners and edges
+    <PullRequest id={636} />
+    <Fiddle mode={'preview'} className="margin-top--sm margin-bottom--sm">
+      {cardinal}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'} pr={628}>
+    New{' '}
+    <Link to="/api/2d/components/Ray">
+      <code>Ray</code>
+    </Link>{' '}
+    node lets you easily define simple lines between two points.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New methods for chaining animations together:
+    <PullRequest id={651} />
+    <CodeBlock language={'tsx'} className="margin-top--sm margin-bottom--sm">
+      {`yield* circle().scale(0.5, 0.2)
+  // tween to another value
+  .to(2, 0.2)
+  // wait for one second
+  .wait(1)
+  // tween back to the initial value
+  .back(0.2)
+  // execute a callback
+  .do(() => circle().fill('red'))
+  // run the given generator
+  .run(circle().position.y(100, 2));`}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'squigglesdev'}>
+    New{' '}
+    <Link to="/api/core/flow#loopFor">
+      <code>loopFor</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/core/flow#loopUntil">
+      <code>loopUntil</code>
+    </Link>{' '}
+    flow functions.
+    <PullRequest id={650} />
+    <PullRequest id={624} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={641}>
+    External changes to images are now automatically reflected in the preview.
+  </Issue>
+  <Issue user={'ksassnowski'} pr={622}>
+    New{' '}
+    <Link to="/api/core/types/Vector2#static-fromDegrees">
+      <code>fromDegrees</code>
+    </Link>
+    , <Link to="/api/core/types/Vector2#static-createArcLerp">
+      <code>createArcLerp</code>
+    </Link> and <Link to="/api/core/types/Vector2#mod">
+      <code>mod</code>
+    </Link> <code>Vector2</code> methods.
+    <PullRequest id={640} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={635}>
+    New{' '}
+    <Link to="/api/2d/components/Curve#completion">
+      <code>completion</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/2d/components/Curve#arcLength">
+      <code>arcLength</code>
+    </Link>
+    properties for curves.
+    <PullRequest id={627} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={630}>
+    New{' '}
+    <Link to="/api/core/utils#DEG2RAD">
+      <code>DEG2RAD</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/core/utils#RAD2DEG">
+      <code>RAD2DEG</code>
+    </Link>{' '}
+    constants for converting between degrees and radians.
+  </Issue>
+  <Issue user={'aarthificial'} pr={642}>
+    You can now toggle fiddles between the code{' '}
+    <sub>
+      <IconText />
+    </sub>
+    , editor <sub>
+      <IconSplit />
+    </sub> and preview <sub>
+      <IconImage />
+    </sub> mode (You can try it out in the example above).
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'someguythatcodes'} pr={617}>
+    Clear DependencyContext promises once resolved.
+  </Issue>
+  <Issue user={'aarthificial'} pr={647}>
+    Fix fiddle accessibility.
+  </Issue>
+  <Issue user={'aarthificial'} pr={645}>
+    Fix cyclic dependency in cardinal points.
+  </Issue>
+  <Issue user={'aarthificial'} pr={644}>
+    Correctly append Txt nodes to view.
+  </Issue>
+  <Issue user={'aarthificial'} pr={643}>
+    Fix taking snapshots.
+    <PullRequest id={638} />
+  </Issue>
+  <Issue user={'gmile'} pr={620}>
+    Fix a typo in a viewport ID.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>
