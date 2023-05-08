@@ -40,9 +40,8 @@ side.
 ## Payloads
 
 In some cases you might want to have a bit more detail in your log messages like
-a `stacktrace` or an `object`. That's where
-[`LogPayloads`](/api/core/index/LogPayload) come in. These can be used to
-provide more information to your log messages.
+a `stacktrace` or an `object`. You can use payloads to provide more information
+to your log messages.
 
 ```ts
 logger.debug({
@@ -71,7 +70,7 @@ don't have to `useLogger` manually and create a payload.
 ## Profiling
 
 Besides logging messages its also possible to profile certain sections of code
-with the [`Logger`](/api/core/index/Logger):
+with the `Logger`:
 
 ```ts
 logger.profile('id'); // <-- starts the profiling

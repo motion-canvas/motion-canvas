@@ -1,5 +1,6 @@
 export * from './Circle';
 export * from './CubicBezier';
+export * from './Curve';
 export * from './Icon';
 export * from './Img';
 export * from './Grid';
