@@ -1280,12 +1280,10 @@ export class Node implements Promisable<Node> {
    * before continuing the animation.
    */
   public async toPromise(): Promise<this> {
-    let promises = DependencyContext.consumePromises();
     do {
-      await Promise.all(promises.map(handle => handle.promise));
+      await DependencyContext.consumePromises();
       this.collectAsyncResources();
-      promises = DependencyContext.consumePromises();
-    } while (promises.length > 0);
+    } while (DependencyContext.hasPromises());
     return this;
   }
 

@@ -35,21 +35,24 @@ export class DependencyContext<TOwner = void>
     if (context) {
       handle.owner = context.owner;
     }
-    promise
-      .then(value => {
-        handle.value = value;
-        context?.markDirty();
-      })
-      .finally(() => {
-        this.promises = this.promises.filter(v => v !== handle);
-      });
+    promise.then(value => {
+      handle.value = value;
+      context?.markDirty();
+    });
 
     this.promises.push(handle);
     return handle;
   }
 
-  public static consumePromises(): PromiseHandle<any>[] {
-    return this.promises;
+  public static hasPromises() {
+    return this.promises.length > 0;
+  }
+
+  public static async consumePromises() {
+    const promises = [...this.promises];
+    await Promise.all(promises.map(handle => handle.promise));
+    this.promises = this.promises.filter(v => !promises.includes(v));
+    return promises;
   }
 
   protected readonly invokable: any;
@@ -114,12 +117,10 @@ export class DependencyContext<TOwner = void>
   }
 
   public async toPromise(): Promise<this> {
-    let promises = DependencyContext.consumePromises();
     do {
-      await Promise.all(promises.map(handle => handle.promise));
+      await DependencyContext.consumePromises();
       this.invokable();
-      promises = DependencyContext.consumePromises();
-    } while (promises.length > 0);
+    } while (DependencyContext.hasPromises());
     return this.invokable;
   }
 }
