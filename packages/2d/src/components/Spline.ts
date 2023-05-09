@@ -112,7 +112,9 @@ export class Spline extends Curve {
     super(props);
 
     if (
-      (props.children === undefined || props.children.length < 2) &&
+      (props.children === undefined ||
+        !Array.isArray(props.children) ||
+        props.children.length < 2) &&
       (props.points === undefined || props.points.length < 2) &&
       props.spawner === undefined
     ) {

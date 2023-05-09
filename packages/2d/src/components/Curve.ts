@@ -10,11 +10,9 @@ import {
 import {computed, initial, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {lineTo, moveTo, resolveCanvasStyle} from '../utils';
-import {Node} from './Node';
 import {Shape, ShapeProps} from './Shape';
 
 export interface CurveProps extends ShapeProps {
-  children?: Node[];
   /**
    * {@inheritDoc Curve.closed}
    */
