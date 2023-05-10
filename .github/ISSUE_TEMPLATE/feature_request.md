@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an idea for Motion Canvas
 title: ''
-labels: enhancement
+labels: b-enhancement
 assignees: aarthificial
 ---
 
