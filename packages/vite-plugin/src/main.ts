@@ -9,7 +9,7 @@ import {
   setupEnvVarsForProxy,
 } from './proxy-middleware';
 import {getVersions} from './versions';
-import {PluginOptions, isPlugin, PLUGIN_OPTIONS} from './plugins';
+import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -85,11 +85,6 @@ export interface MotionCanvasPluginConfig {
   proxy?: boolean | MotionCanvasCorsProxyOptions;
 }
 
-interface ProjectData {
-  name: string;
-  url: string;
-}
-
 export default ({
   project = './src/project.ts',
   output = './output',
@@ -156,6 +151,14 @@ export default ({
         ...resolvedConfig.plugins
           .filter(isPlugin)
           .map(plugin => plugin[PLUGIN_OPTIONS]),
+      );
+      await Promise.all(
+        plugins.map(plugin =>
+          plugin.config?.({
+            output: outputPath,
+            projects,
+          }),
+        ),
       );
       viteConfig = resolvedConfig;
     },
