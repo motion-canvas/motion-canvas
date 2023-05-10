@@ -44,68 +44,76 @@ declare module 'chroma-js' {
   }
 }
 
-Color.symbol = Color.prototype.symbol = Symbol.for(
-  '@motion-canvas/core/types/Color',
-);
+// iife prevents tree shaking from stripping our methods.
+type ExtendedColor = Color;
+const ExtendedColor: typeof Color = (() => {
+  Color.symbol = Color.prototype.symbol = Symbol.for(
+    '@motion-canvas/core/types/Color',
+  );
 
-Color.lerp = Color.prototype.lerp = (
-  from: Color | string | null,
-  to: Color | string | null,
-  value: number,
-  colorSpace: InterpolationMode = 'lch',
-) => {
-  if (typeof from === 'string') {
-    from = new Color(from);
-  }
-  if (typeof to === 'string') {
-    to = new Color(to);
-  }
+  Color.lerp = Color.prototype.lerp = (
+    from: Color | string | null,
+    to: Color | string | null,
+    value: number,
+    colorSpace: InterpolationMode = 'lch',
+  ) => {
+    if (typeof from === 'string') {
+      from = new Color(from);
+    }
+    if (typeof to === 'string') {
+      to = new Color(to);
+    }
 
-  const fromIsColor = from instanceof Color;
-  const toIsColor = to instanceof Color;
+    const fromIsColor = from instanceof Color;
+    const toIsColor = to instanceof Color;
 
-  if (!fromIsColor) {
-    from = toIsColor ? (to as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
-  }
-  if (!toIsColor) {
-    to = fromIsColor ? (from as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
-  }
+    if (!fromIsColor) {
+      from = toIsColor ? (to as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
+    }
+    if (!toIsColor) {
+      to = fromIsColor
+        ? (from as Color).alpha(0)
+        : new Color('rgba(0, 0, 0, 0)');
+    }
 
-  return mix(from as Color, to as Color, value, colorSpace);
-};
+    return mix(from as Color, to as Color, value, colorSpace);
+  };
 
-Color.createLerp = Color.prototype.createLerp =
-  (colorSpace: InterpolationMode) =>
-  (from: Color | string | null, to: Color | string | null, value: number) =>
-    Color.lerp(from, to, value, colorSpace);
+  Color.createLerp = Color.prototype.createLerp =
+    (colorSpace: InterpolationMode) =>
+    (from: Color | string | null, to: Color | string | null, value: number) =>
+      Color.lerp(from, to, value, colorSpace);
 
-Color.createSignal = (
-  initial?: SignalValue<PossibleColor>,
-  interpolation: InterpolationFunction<Color> = Color.lerp,
-): ColorSignal<void> => {
-  return new SignalContext(
-    initial,
-    interpolation,
-    undefined,
-    value => new Color(value),
-  ).toSignal();
-};
+  Color.createSignal = (
+    initial?: SignalValue<PossibleColor>,
+    interpolation: InterpolationFunction<Color> = Color.lerp,
+  ): ColorSignal<void> => {
+    return new SignalContext(
+      initial,
+      interpolation,
+      undefined,
+      value => new Color(value),
+    ).toSignal();
+  };
 
-Color.prototype.toSymbol = () => {
-  return Color.symbol;
-};
+  Color.prototype.toSymbol = () => {
+    return Color.symbol;
+  };
 
-Color.prototype.serialize = function (this: Color): SerializedColor {
-  return this.css();
-};
+  Color.prototype.serialize = function (this: Color): SerializedColor {
+    return this.css();
+  };
 
-Color.prototype.lerp = function (
-  this: Color,
-  to: Color,
-  value: number,
-  colorSpace?: ColorSpace,
-) {
-  return Color.lerp(this, to, value, colorSpace);
-};
+  Color.prototype.lerp = function (
+    this: Color,
+    to: Color,
+    value: number,
+    colorSpace?: ColorSpace,
+  ) {
+    return Color.lerp(this, to, value, colorSpace);
+  };
 
-export {Color};
+  return Color;
+})();
+
+export {ExtendedColor as Color};

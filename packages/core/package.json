@@ -12,9 +12,7 @@
     "watch": "ttsc -p tsconfig.build.json -w",
     "test": "vitest"
   },
-  "sideEffects": [
-    "./lib/types/Color.js"
-  ],
+  "sideEffects": false,
   "repository": {
     "type": "git",
     "url": "https://github.com/motion-canvas/motion-canvas.git"
