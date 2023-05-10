@@ -4,7 +4,6 @@ import type {Scene} from '../scenes';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import {ImageExporter} from './ImageExporter';
 import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
@@ -64,7 +63,7 @@ export class Renderer {
   private readonly lock = new Semaphore();
   private readonly playback: PlaybackManager;
   private readonly status: PlaybackStatus;
-  private readonly exporter: Exporter = new ImageExporter(this.project.logger);
+  private exporter: Exporter | null = null;
   private abortController: AbortController | null = null;
 
   public constructor(private project: Project) {
@@ -102,6 +101,14 @@ export class Renderer {
     } catch (e: any) {
       this.project.logger.error(e);
       result = RendererResult.Error;
+      if (this.exporter) {
+        try {
+          await this.exporter.stop?.(result);
+        } catch (_) {
+          // do nothing
+        }
+        this.exporter = null;
+      }
     }
 
     this.state.current = RendererState.Initial;
@@ -163,7 +170,23 @@ export class Renderer {
     settings: RendererSettings,
     signal: AbortSignal,
   ): Promise<RendererResult> {
-    settings = (await this.exporter.configure(settings)) ?? settings;
+    const exporterClass = this.project.meta.rendering.exporter.exporters.find(
+      exporter => exporter.id === settings.exporter.name,
+    );
+    if (!exporterClass) {
+      this.project.logger.error(
+        `Could not find the "${settings.exporter.name}" exporter.`,
+      );
+      return RendererResult.Error;
+    }
+
+    this.exporter = await exporterClass.create(this.project, settings);
+    if (this.exporter.configuration) {
+      settings = {
+        ...settings,
+        ...((await this.exporter.configuration()) ?? {}),
+      };
+    }
     this.stage.configure(settings);
     this.playback.fps = settings.fps;
     this.playback.state = PlaybackState.Rendering;
@@ -178,7 +201,7 @@ export class Renderer {
     await this.playback.seek(from);
     if (signal.aborted) return RendererResult.Aborted;
 
-    await this.exporter.start();
+    await this.exporter.start?.();
 
     let lastRefresh = performance.now();
     let result = RendererResult.Success;
@@ -209,7 +232,8 @@ export class Renderer {
       result = RendererResult.Error;
     }
 
-    await this.exporter.stop(result);
+    await this.exporter.stop?.(result);
+    this.exporter = null;
     return result;
   }
 
@@ -235,7 +259,7 @@ export class Renderer {
 
     const sceneFrame =
       this.playback.frame - this.playback.currentScene.firstFrame;
-    await this.exporter.handleFrame(
+    await this.exporter!.handleFrame(
       this.stage.finalBuffer,
       this.playback.frame,
       sceneFrame,

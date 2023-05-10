@@ -20,7 +20,13 @@
     "fps": 30,
     "resolutionScale": 1,
     "colorSpace": "srgb",
-    "fileType": "image/png",
-    "quality": 1
+    "exporter": {
+      "name": "@motion-canvas/core/image-sequence",
+      "options": {
+        "fileType": "image/png",
+        "quality": 100,
+        "groupByScene": false
+      }
+    }
   }
 }

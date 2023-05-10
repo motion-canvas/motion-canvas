@@ -1,12 +1,12 @@
 import {makePlugin} from './makePlugin';
-import {type Exporter, ImageExporter, type Project} from '../app';
+import {type ExporterClass, ImageExporter} from '../app';
 
 /**
  * The default plugin included in every Motion Canvas project.
  */
 export default makePlugin({
   name: 'mc-default-plugin',
-  exporters(project: Project): Exporter[] {
-    return [new ImageExporter(project.logger)];
+  exporters(): ExporterClass[] {
+    return [ImageExporter];
   },
 });
