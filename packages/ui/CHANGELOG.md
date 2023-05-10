@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+### Features
+
+- button for opening the output directory
+  ([#663](https://github.com/motion-canvas/motion-canvas/issues/663))
+  ([79f320c](https://github.com/motion-canvas/motion-canvas/commit/79f320c07c422ca927b34bf339094fe0e70ffd0d))
+- meta field descriptions
+  ([#664](https://github.com/motion-canvas/motion-canvas/issues/664))
+  ([80c9d07](https://github.com/motion-canvas/motion-canvas/commit/80c9d07f88f4a3df0f99e5741b31313f891a5d51))
+- **ui:** improve rendering button
+  ([#662](https://github.com/motion-canvas/motion-canvas/issues/662))
+  ([2b4ae70](https://github.com/motion-canvas/motion-canvas/commit/2b4ae70ea0b0305fbb2596e95bbc70440718bbe2))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
 
 **Note:** Version bump only for package @motion-canvas/ui

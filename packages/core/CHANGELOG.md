@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+### Bug Fixes
+
+- prevent Color tree shaking
+  ([#666](https://github.com/motion-canvas/motion-canvas/issues/666))
+  ([e5028e3](https://github.com/motion-canvas/motion-canvas/commit/e5028e3c176d5ba74dd3f28c2f25672390c76936)),
+  closes [#577](https://github.com/motion-canvas/motion-canvas/issues/577)
+
+### Features
+
+- finalize custom exporters
+  ([#660](https://github.com/motion-canvas/motion-canvas/issues/660))
+  ([6a50430](https://github.com/motion-canvas/motion-canvas/commit/6a50430cdf9928992ca078eba39c484a5253da2b))
+- meta field descriptions
+  ([#664](https://github.com/motion-canvas/motion-canvas/issues/664))
+  ([80c9d07](https://github.com/motion-canvas/motion-canvas/commit/80c9d07f88f4a3df0f99e5741b31313f891a5d51))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
 
 ### Bug Fixes
