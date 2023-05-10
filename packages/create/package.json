@@ -26,6 +26,7 @@
     "@motion-canvas/vite-plugin": "^3.7.0"
   },
   "dependencies": {
+    "minimist": "^1.2.8",
     "prompts": "^2.4.2"
   }
 }

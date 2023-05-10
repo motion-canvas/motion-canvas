@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 //@ts-check
 import prompts from 'prompts';
+import minimist from 'minimist';
 import fs from 'fs';
 import path from 'path';
 import {fileURLToPath} from 'node:url';
@@ -19,6 +20,7 @@ const MANIFEST = JSON.parse(
 );
 
 (async () => {
+  prompts.override(minimist(process.argv.slice(2)));
   const response = await prompts([
     {
       type: 'text',
