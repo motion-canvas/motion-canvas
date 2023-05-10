@@ -16,6 +16,7 @@ export class MetaField<
    */
   public readonly type: any = undefined;
   public spacing = false;
+  public description = '';
 
   /**
    * Triggered when the data of this field changes.
@@ -103,6 +104,16 @@ export class MetaField<
    */
   public space(value = true): this {
     this.spacing = value;
+    return this;
+  }
+
+  /**
+   * Set the description of this field.
+   *
+   * @param description - The description.
+   */
+  public describe(description: string): this {
+    this.description = description;
     return this;
   }
 }
