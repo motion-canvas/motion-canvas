@@ -92,6 +92,11 @@
       box-shadow: 0 0 0 2px white inset;
     }
   }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.54;
+  }
 }
 
 .inputSelect {
