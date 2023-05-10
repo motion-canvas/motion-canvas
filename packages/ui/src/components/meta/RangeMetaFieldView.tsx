@@ -1,4 +1,4 @@
-import {Group, Input, Label} from '../controls';
+import {Input} from '../controls';
 import type {RangeMetaField} from '@motion-canvas/core/lib/meta';
 import {useApplication} from '../../contexts';
 import {
@@ -6,6 +6,7 @@ import {
   usePreviewSettings,
   useSubscribableValue,
 } from '../../hooks';
+import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface RangeMetaFieldViewProps {
   field: RangeMetaField;
@@ -22,8 +23,7 @@ export function RangeMetaFieldView({field}: RangeMetaFieldViewProps) {
   const endFrame = player.status.secondsToFrames(range[1]);
 
   return (
-    <Group>
-      <Label>{field.name}</Label>
+    <MetaFieldGroup field={field}>
       <Input
         min={0}
         max={endFrame}
@@ -51,6 +51,6 @@ export function RangeMetaFieldView({field}: RangeMetaFieldViewProps) {
           field.update(startFrame, end, duration, fps);
         }}
       />
-    </Group>
+    </MetaFieldGroup>
   );
 }
