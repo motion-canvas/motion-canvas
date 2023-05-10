@@ -10,6 +10,7 @@ import {
 } from './proxy-middleware';
 import {getVersions} from './versions';
 import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
+import {openInExplorer} from './openInExplorer';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -358,6 +359,12 @@ export default ({
         if (name && name in projectLookup) {
           res.setHeader('Content-Type', 'text/html');
           res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
+          return;
+        }
+
+        if (name === '__open-output-path') {
+          openInExplorer(outputPath);
+          res.end();
           return;
         }
 

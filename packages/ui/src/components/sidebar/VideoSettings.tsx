@@ -5,9 +5,11 @@ import {useApplication} from '../../contexts';
 import {Expandable} from '../fields';
 import {RendererState} from '@motion-canvas/core';
 import {MetaFieldView} from '../meta';
+import {openOutputPath} from '../../utils';
 
 export function VideoSettings() {
   const {meta} = useApplication();
+  const [processId, setProcess] = useStorage('main-action', 0);
 
   return (
     <Pane title="Video Settings" id="settings-pane">
@@ -22,14 +24,29 @@ export function VideoSettings() {
       </Expandable>
       <Group>
         <Label />
-        <ProcessButton />
+        <ProcessButton processId={processId} setProcess={setProcess} />
       </Group>
+      {processId === 0 && (
+        <Group>
+          <Label />
+          <Button
+            title="Reveal the output directory in file explorer"
+            onClick={openOutputPath}
+          >
+            OUTPUT DIRECTORY
+          </Button>
+        </Group>
+      )}
     </Pane>
   );
 }
 
-function ProcessButton() {
-  const [processId, setProcess] = useStorage('main-action', 0);
+interface ProcessButtonProps {
+  processId: number;
+  setProcess: (id: number) => void;
+}
+
+function ProcessButton({processId, setProcess}: ProcessButtonProps) {
   const {renderer, presenter, meta, project} = useApplication();
   const rendererState = useRendererState();
 
