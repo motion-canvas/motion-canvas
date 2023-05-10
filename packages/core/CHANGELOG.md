@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.7.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0-alpha.0) (2023-05-10)
+
+### Features
+
+- finalize custom exporters
+  ([#660](https://github.com/motion-canvas/motion-canvas/issues/660))
+  ([6a50430](https://github.com/motion-canvas/motion-canvas/commit/6a50430cdf9928992ca078eba39c484a5253da2b))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
 
 ### Bug Fixes
