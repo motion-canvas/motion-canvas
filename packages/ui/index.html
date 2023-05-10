@@ -15,10 +15,14 @@
     <script type="module">
       import {index} from '/src/main.tsx';
       index([
-        {name: 'project.html', url: './src/project.ts'},
-        {name: 'exampleA', url: './src/exampleA.ts'},
-        {name: 'exampleB', url: './src/exampleB.ts'},
-        {name: 'exampleC', url: './src/exampleC.ts'},
+        {
+          name: 'project.html',
+          fileName: 'project.html',
+          url: './src/project.ts',
+        },
+        {name: 'exampleA', fileName: 'exampleA', url: './src/exampleA.ts'},
+        {name: 'exampleB', fileName: 'exampleB', url: './src/exampleB.ts'},
+        {name: 'exampleC', fileName: 'exampleC', url: './src/exampleC.ts'},
       ]);
     </script>
   </body>

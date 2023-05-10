@@ -1,9 +1,9 @@
-import {usePresenterState, useRendererState, useStorage} from '../../hooks';
-import {ButtonSelect, Group, Label} from '../controls';
+import {useRendererState, useStorage} from '../../hooks';
+import {Button, ButtonSelect, Group, Label} from '../controls';
 import {Pane} from '../tabs';
 import {useApplication} from '../../contexts';
 import {Expandable} from '../fields';
-import {PresenterState, RendererState} from '@motion-canvas/core';
+import {RendererState} from '@motion-canvas/core';
 import {MetaFieldView} from '../meta';
 
 export function VideoSettings() {
@@ -32,26 +32,20 @@ function ProcessButton() {
   const [processId, setProcess] = useStorage('main-action', 0);
   const {renderer, presenter, meta, project} = useApplication();
   const rendererState = useRendererState();
-  const presenterState = usePresenterState();
 
-  return (
+  return rendererState === RendererState.Initial ? (
     <ButtonSelect
       main
       id="render"
-      data-rendering={rendererState !== RendererState.Initial}
       value={processId}
       onChange={setProcess}
       onClick={() => {
         if (processId === 0) {
-          if (rendererState === RendererState.Initial) {
-            renderer.render({
-              ...meta.getFullRenderingSettings(),
-              name: project.name,
-            });
-          } else {
-            renderer.abort();
-          }
-        } else if (presenterState === PresenterState.Initial) {
+          renderer.render({
+            ...meta.getFullRenderingSettings(),
+            name: project.name,
+          });
+        } else {
           presenter.present({
             ...meta.getFullRenderingSettings(),
             name: project.name,
@@ -60,9 +54,24 @@ function ProcessButton() {
         }
       }}
       options={[
-        {value: 0, text: 'RENDER'},
+        {
+          value: 0,
+          text: 'RENDER',
+        },
         {value: 1, text: 'PRESENT'},
       ]}
     />
+  ) : (
+    <Button
+      main
+      id="render"
+      data-rendering={true}
+      disabled={rendererState === RendererState.Aborting}
+      onClick={() => {
+        renderer.abort();
+      }}
+    >
+      {rendererState === RendererState.Working ? 'ABORT' : 'ABORTING'}
+    </Button>
   );
 }
