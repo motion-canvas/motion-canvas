@@ -1,0 +1,33 @@
+---
+slug: /rendering/image-sequence
+---
+
+# Image sequence
+
+The built-in exporter for Motion Canvas. It stores the rendered frames as a
+sequence of images, which can then be imported into a video editor for further
+processing.
+
+## Configuration
+
+After selecting the Image sequence exporter in the Video Settings tab, the
+following configuration options will become available:
+
+### File Type
+
+The type of image file to which Motion Canvas will convert the frames. Current
+options are PNG, JPEG, and WebP. Note that Motion Canvas depends on the
+capabilities of your browser to generate image files, and so WebP may not work
+on Safari or older browsers.
+
+### Quality
+
+The quality target for compression from 0 to 100, where a lower setting will
+result in smaller file sizes but might degrade image quality. A setting of 100
+will result in lossless images, such that no detail is lost, but lower settings
+will often produce no discernible difference.
+
+### Group by scene
+
+When enabled, each scene will be rendered into a separate image sequence located
+in a subdirectory called the same as the scene.
