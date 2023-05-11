@@ -122,7 +122,7 @@ $colors: (
   padding: 8px;
   background-color: var(--surface-color);
   opacity: 0;
-  transition: opacity 0.1s;
+  transition: opacity var(--duration-fast);
 
   &:focus,
   .sourceCode:hover & {

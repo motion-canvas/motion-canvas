@@ -4,7 +4,7 @@
   height: 100%;
   padding-top: 1px;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--duration-normal);
   display: flex;
   align-items: stretch;
   position: relative;
@@ -320,7 +320,7 @@
   width: 100%;
   margin: 24px 0;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity var(--duration-normal);
 
   &.show {
     opacity: 1;

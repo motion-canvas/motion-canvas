@@ -251,7 +251,7 @@
   }
 
   svg {
-    transition: rotate 0.2s;
+    transition: rotate var(--duration-normal);
   }
 
   &.open svg {

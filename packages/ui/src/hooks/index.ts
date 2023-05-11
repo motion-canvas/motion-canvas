@@ -7,6 +7,7 @@ export * from './useKeyHold';
 export * from './usePlayerState';
 export * from './usePlayerTime';
 export * from './usePresenterState';
+export * from './useReducedMotion';
 export * from './useRendererState';
 export * from './useScenes';
 export * from './useSettings';

@@ -2,6 +2,7 @@ import {ComponentChildren} from 'preact';
 
 import {useStorage} from '../../hooks';
 import {Toggle} from '../controls';
+import {Collapse} from '../layout';
 
 import styles from './Expandable.module.scss';
 
@@ -40,7 +41,9 @@ export function ControlledExpandable({
         <Toggle open={open} />
         {title}
       </div>
-      {open && <div className={styles.content}>{children}</div>}
+      <Collapse open={open}>
+        <div className={styles.content}>{children}</div>
+      </Collapse>
     </div>
   );
 }

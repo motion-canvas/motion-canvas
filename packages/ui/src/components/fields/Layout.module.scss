@@ -36,19 +36,11 @@
 }
 
 .fields {
-  display: none;
-
   &.nested {
+    display: flex;
     flex-direction: column;
     gap: 4px;
     padding: 4px;
-  }
-
-  .open > & {
-    display: block;
-    &.nested {
-      display: flex;
-    }
   }
 
   & > .field {
@@ -79,7 +71,7 @@
     background-color: var(--field-color-hover);
     color: white;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity var(--duration-normal);
   }
 
   &.copied::before {
