@@ -777,8 +777,10 @@ export class Layout extends Node {
     while (queue.length) {
       const child = queue.shift();
       if (child instanceof Layout) {
-        result.push(child);
-        elements.push(child.element);
+        if (child.layoutEnabled()) {
+          result.push(child);
+          elements.push(child.element);
+        }
       } else if (child) {
         queue.unshift(...child.children());
       }
