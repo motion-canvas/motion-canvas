@@ -10,6 +10,7 @@ import {StackTrace} from './StackTrace';
 import {SourceCodeFrame} from './SourceCodeFrame';
 import clsx from 'clsx';
 import {Locate} from '../icons';
+import {Collapse} from '../layout';
 
 export interface LogProps {
   payload: LogPayload;
@@ -60,8 +61,8 @@ export function Log({payload}: LogProps) {
           </IconButton>
         )}
       </div>
-      {hasBody && open && (
-        <div>
+      {hasBody && (
+        <Collapse open={open}>
           {payload.remarks && (
             <div
               className={clsx(styles.section, styles.remarks)}
@@ -81,7 +82,7 @@ export function Log({payload}: LogProps) {
               <StackTrace entries={entries} />
             </div>
           )}
-        </div>
+        </Collapse>
       )}
     </div>
   );

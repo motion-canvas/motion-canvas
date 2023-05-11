@@ -4,6 +4,7 @@ import {ComponentChildren, JSX} from 'preact';
 import {useRef, useState} from 'preact/hooks';
 import {useFormattedNumber} from '../../hooks';
 import {Toggle} from '../controls';
+import {Collapse} from '../layout';
 import clsx from 'clsx';
 
 export interface FieldSetProps {
@@ -11,18 +12,21 @@ export interface FieldSetProps {
   header: ComponentChildren;
   nested?: boolean;
 }
+
 export function FieldSet({children, header, nested}: FieldSetProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <FieldSurface open={open}>
+    <FieldSurface open={true}>
       <div className={styles.header}>
         <Toggle open={open} onToggle={setOpen} />
         {header}
       </div>
-      <div className={clsx(styles.fields, nested && styles.nested)}>
-        {children}
-      </div>
+      <Collapse open={open}>
+        <div className={clsx(styles.fields, nested && styles.nested)}>
+          {children}
+        </div>
+      </Collapse>
     </FieldSurface>
   );
 }

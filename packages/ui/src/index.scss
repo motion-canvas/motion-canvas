@@ -12,9 +12,19 @@
   --input-background: var(--surface-color-light);
   --input-background-hover: var(--surface-color-hover);
 
+  --duration-normal: 0.2s;
+  --duration-fast: 0.1s;
+
   --red: #e13238;
   --yellow: #e6a700;
   --blue: #4cb3d4;
+}
+
+@media (prefers-reduced-motion) {
+  :root {
+    --duration-normal: 0;
+    --duration-fast: 0;
+  }
 }
 
 .wait * {

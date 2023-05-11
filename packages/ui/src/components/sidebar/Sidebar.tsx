@@ -6,7 +6,7 @@ import {Console} from '../console';
 import {useInspection, useLogger} from '../../contexts';
 import {useEffect, useRef, useState} from 'preact/hooks';
 import {shake} from '../animations';
-import {useStorage} from '../../hooks';
+import {useReducedMotion, useStorage} from '../../hooks';
 import {MotionCanvas, Bug, Videocam, AccountTree} from '../icons';
 import {Docs} from '../icons/Docs';
 import {ViewTimeline} from '../icons/ViewTimeline';
@@ -18,6 +18,7 @@ interface SidebarProps {
 export function Sidebar({setOpen}: SidebarProps) {
   const [tab, setTab] = useStorage('sidebar', -1);
   const {inspectedElement} = useInspection();
+  const reducedMotion = useReducedMotion();
   const logger = useLogger();
   const badge = useRef<HTMLDivElement>();
   const [errorCount, setErrorCount] = useState(logger.onErrorLogged.current);
@@ -25,11 +26,13 @@ export function Sidebar({setOpen}: SidebarProps) {
     () =>
       logger.onErrorLogged.subscribe(value => {
         setErrorCount(value);
-        setTimeout(() => {
-          badge.current?.animate(shake(2), {duration: 300});
-        }, 0);
+        if (!reducedMotion) {
+          setTimeout(() => {
+            badge.current?.animate(shake(2), {duration: 300});
+          }, 0);
+        }
       }),
-    [logger],
+    [logger, reducedMotion],
   );
 
   useEffect(() => {
