@@ -48,7 +48,7 @@ export function AudioTrack() {
       [editingOffset, pixelsToFrames],
     ),
     useCallback(() => {
-      meta.shared.audioOffset.set(audioOffset);
+      meta.shared.audioOffset.set(fullOffset);
     }, [fullOffset]),
   );
 
