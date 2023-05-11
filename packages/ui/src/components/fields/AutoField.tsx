@@ -6,10 +6,9 @@ import {UnknownField} from './UnknownField';
 import {NumberField} from './NumberField';
 import {ColorField} from './ColorField';
 import {SpacingField} from './SpacingField';
-import {Group, Label} from '../controls';
+import {ArrayField} from './ArrayField';
 
 export interface AutoFieldProps {
-  label: string;
   value: any;
 }
 
@@ -19,18 +18,15 @@ const TYPE_MAP: Record<symbol, FunctionComponent<{value: any}>> = {
   [Spacing.symbol]: SpacingField,
 };
 
-export function AutoField({label, value}: AutoFieldProps) {
+export function AutoField({value}: AutoFieldProps) {
   let Field = UnknownField;
   if (isType(value)) {
     Field = TYPE_MAP[value.toSymbol()] ?? UnknownField;
   } else if (typeof value === 'number') {
     Field = NumberField;
+  } else if (Array.isArray(value)) {
+    Field = ArrayField;
   }
 
-  return (
-    <Group>
-      <Label>{label}</Label>
-      <Field value={value} />
-    </Group>
-  );
+  return <Field value={value} />;
 }

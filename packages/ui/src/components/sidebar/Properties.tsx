@@ -39,7 +39,10 @@ export function Properties() {
       )}
       {attributes
         ? Object.entries(attributes).map(([key, value]) => (
-            <AutoField label={key} value={value} />
+            <Group>
+              <Label>{key}</Label>
+              <AutoField value={value} />
+            </Group>
           ))
         : inspectable
         ? 'Click on a node to view its properties.'
