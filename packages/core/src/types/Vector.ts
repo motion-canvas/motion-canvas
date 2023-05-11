@@ -327,6 +327,10 @@ export class Vector2 implements Type {
     return Vector2.symbol;
   }
 
+  public toString() {
+    return `Vector2(${this.x}, ${this.y})`;
+  }
+
   public serialize(): SerializedVector2 {
     return {x: this.x, y: this.y};
   }

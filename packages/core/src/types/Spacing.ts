@@ -126,6 +126,10 @@ export class Spacing implements Type {
     return Spacing.symbol;
   }
 
+  public toString() {
+    return `Spacing(${this.top}, ${this.right}, ${this.bottom}, ${this.left})`;
+  }
+
   public serialize(): SerializedSpacing {
     return {
       top: this.top,

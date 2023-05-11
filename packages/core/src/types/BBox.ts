@@ -337,6 +337,10 @@ export class BBox implements Type {
     return BBox.symbol;
   }
 
+  public toString(): string {
+    return `BBox(${this.x}, ${this.y}, ${this.width}, ${this.height})`;
+  }
+
   public serialize(): SerializedBBox {
     return {x: this.x, y: this.y, width: this.width, height: this.height};
   }
