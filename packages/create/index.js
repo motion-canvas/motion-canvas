@@ -19,8 +19,45 @@ const MANIFEST = JSON.parse(
   ),
 );
 
+const PLUGINS = {
+  core: {
+    package: '@motion-canvas/vite-plugin',
+    variable: 'motionCanvas',
+    options: response =>
+      response.language === 'js' ? `{project: './src/project.js'}` : '',
+  },
+  ffmpeg: {
+    package: '@motion-canvas/ffmpeg',
+    variable: 'ffmpeg',
+    version: '^1.1.0',
+  },
+};
+
 (async () => {
-  prompts.override(minimist(process.argv.slice(2)));
+  const options = minimist(process.argv.slice(2));
+  if (options.plugins !== undefined) {
+    if (typeof options.plugins === 'string') {
+      options.plugins = options.plugins.split(',');
+    }
+
+    if (!Array.isArray(options.plugins)) {
+      options.plugins = [options.plugins];
+    }
+
+    const plugins = ['core'];
+    for (const plugin of options.plugins) {
+      if (plugin === 'core') continue;
+      if (!(plugin in PLUGINS)) {
+        console.log(kleur.yellow(`! Unknown plugin "${plugin}".\n`));
+        continue;
+      }
+      plugins.push(plugin);
+    }
+
+    options.plugins = plugins;
+  }
+
+  prompts.override(options);
   const response = await prompts([
     {
       type: 'text',
@@ -73,9 +110,42 @@ const MANIFEST = JSON.parse(
         },
       ],
     },
+    {
+      type: 'multiselect',
+      name: 'plugins',
+      message: 'How would you like to render your animation?',
+      choices: [
+        {
+          title: 'Image sequence',
+          value: 'core',
+          disabled: true,
+          selected: true,
+        },
+        {
+          title: 'Video (FFmpeg)',
+          value: 'ffmpeg',
+          selected: true,
+        },
+      ],
+      warn: 'This option is always included.',
+      onRender() {
+        this.value[0].selected = true;
+      },
+      validate: value => {
+        if (!Array.isArray(value)) {
+          return '"plugins" option must be an array.';
+        }
+
+        if (!value.includes('core')) {
+          return 'Image sequence is required.';
+        }
+
+        return true;
+      },
+    },
   ]);
 
-  if (!response.language) {
+  if (!response.plugins) {
     console.log(kleur.red('× Scaffolding aborted by the user.\n'));
     return;
   }
@@ -86,14 +156,21 @@ const MANIFEST = JSON.parse(
     `template-2d-${response.language}`,
   );
   copyDirectory(templateDir, response.path);
+  createConfig(response);
 
   const manifest = JSON.parse(
     fs.readFileSync(path.join(templateDir, `package.json`), 'utf-8'),
   );
   manifest.name = response.name;
-  if (manifest.dependencies) {
-    cloneVersions(manifest.dependencies);
+  manifest.dependencies ??= {};
+  for (const plugin of response.plugins) {
+    const data = PLUGINS[plugin];
+    if (data.version) {
+      manifest.dependencies[data.package] = data.version;
+    }
   }
+  cloneVersions(manifest.dependencies);
+
   if (manifest.devDependencies) {
     cloneVersions(manifest.devDependencies);
   }
@@ -147,6 +224,33 @@ function copy(src, dest) {
   } else {
     fs.copyFileSync(src, dest);
   }
+}
+
+function createConfig(response) {
+  const imports = [];
+  const plugins = [];
+  for (const plugin of response.plugins) {
+    const data = PLUGINS[plugin];
+    imports.push(`import ${data.variable} from '${data.package}';\n`);
+    plugins.push(`${data.variable}(${data.options?.(response) ?? ''}),`);
+  }
+
+  const configFile = path.resolve(
+    response.path,
+    `vite.config.${response.language}`,
+  );
+
+  fs.writeFileSync(
+    configFile,
+    `import {defineConfig} from 'vite';
+${imports.join('')}
+export default defineConfig({
+  plugins: [
+    ${plugins.join('\n    ')}
+  ],
+});
+`,
+  );
 }
 
 function getPackageManager() {
