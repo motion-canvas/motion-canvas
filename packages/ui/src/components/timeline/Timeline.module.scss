@@ -106,7 +106,7 @@
     bottom: 0;
     display: block;
     content: '';
-    border-radius: 4px;
+    border-radius: var(--radius);
     background-color: var(--clip-color);
   }
 
@@ -259,7 +259,7 @@
   &::before {
     display: block;
     padding: 0 4px;
-    border-radius: 4px;
+    border-radius: var(--radius);
     background-color: var(--theme);
     font-size: 12px;
     line-height: 20px;
@@ -284,7 +284,7 @@
 }
 
 .range {
-  border-radius: 4px;
+  border-radius: var(--radius);
   cursor: move;
   position: absolute;
   height: 32px;

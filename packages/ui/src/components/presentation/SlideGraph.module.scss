@@ -5,7 +5,7 @@
   max-height: calc(100vh - 32px);
   width: min(360px, 30vw);
   background-color: var(--surface-color);
-  border-radius: 4px;
+  border-radius: var(--radius);
   padding: 16px;
   overflow-y: scroll;
 }
@@ -18,7 +18,7 @@
   padding: 4px 8px 4px 36px;
   width: 100%;
   user-select: none;
-  border-radius: 4px;
+  border-radius: var(--radius);
   cursor: pointer;
 
   &:hover {

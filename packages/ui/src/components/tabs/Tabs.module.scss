@@ -19,7 +19,7 @@
 .tab {
   padding: 8px;
   margin: 4px;
-  border-radius: 4px;
+  border-radius: var(--radius);
   cursor: pointer;
   position: relative;
   color: rgba(255, 255, 255, 0.54);
