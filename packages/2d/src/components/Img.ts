@@ -142,12 +142,17 @@ export class Img extends Rect {
   @computed()
   protected image(): HTMLImageElement {
     const src = viaProxy(this.src());
-    const hash = this.view().assetHash();
+    const url = new URL(src, window.location.origin);
+    if (url.origin === window.location.origin) {
+      const hash = this.view().assetHash();
+      url.searchParams.set('asset-hash', hash);
+    }
+
     let image = Img.pool[src];
     if (!image) {
       image = document.createElement('img');
       image.crossOrigin = 'anonymous';
-      image.src = `${src}?${hash}`;
+      image.src = url.toString();
       Img.pool[src] = image;
     }
 
