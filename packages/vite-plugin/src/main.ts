@@ -434,6 +434,9 @@ export default ({
           jsx: 'automatic',
           jsxImportSource: '@motion-canvas/2d/lib',
         },
+        optimizeDeps: {
+          entries: projects.map(project => project.url),
+        },
       };
     },
   };
