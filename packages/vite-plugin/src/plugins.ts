@@ -60,6 +60,36 @@ export interface PluginOptions {
    * @param config - The configuration passed to the plugin.
    */
   config?(config: PluginConfig): Promise<void>;
+
+  /**
+   * Get custom configuration that will be passed to the runtime plugin.
+   *
+   * @remarks
+   * The config will be passed as the first argument to the default export of
+   * the runtime plugin. When provided as a string, it will be injected to the
+   * code as is, letting you define non-serializable values such as functions.
+   *
+   * If the returned value is an object, it will be converted to a JavaScript
+   * object using JSON serialization.
+   *
+   * @example
+   * Returning an object:
+   * ```ts
+   * {
+   *   runtimeConfig: () => ({
+   *     myText: 'Hello!',
+   *     myNumber: 42,
+   *   })
+   * }
+   * ```
+   * Returning a string:
+   * ```ts
+   * {
+   *   runtimeConfig: () => `{myRegex: /\\.wav$/}`
+   * }
+   * ```
+   */
+  runtimeConfig?(): Promise<any>;
 }
 
 /**

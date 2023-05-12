@@ -9,8 +9,18 @@ export interface ProjectSettings {
   plugins?: Plugin[];
   logger?: Logger;
   audio?: string;
+  /**
+   * @deprecated Configure the offset in the Video Settings tab of th editor.
+   */
   audioOffset?: number;
   variables?: Record<string, unknown>;
+}
+
+export interface Versions {
+  core: string;
+  two: string | null;
+  ui: string | null;
+  vitePlugin: string | null;
 }
 
 export interface Project {
@@ -20,20 +30,10 @@ export interface Project {
   logger: Logger;
   meta: ProjectMetadata;
   audio?: string;
-  audioOffset?: number;
   variables?: Record<string, unknown>;
-  versions: {
-    core: string;
-    two: string | null;
-    ui: string | null;
-    vitePlugin: string | null;
-  };
+  versions: Versions;
 }
 
 export function makeProject(settings: ProjectSettings) {
-  return {
-    logger: new Logger(),
-    plugins: [],
-    ...settings,
-  };
+  return settings;
 }

@@ -43,6 +43,7 @@ export function editor(project: Project) {
     getItem(playerKey, {}),
     getItem(frameKey, -1),
   );
+  project.plugins.forEach(plugin => plugin.player?.(player));
 
   player.onStateChanged.subscribe(state => {
     setItem(playerKey, state);
