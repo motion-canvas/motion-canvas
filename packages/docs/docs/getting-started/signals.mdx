@@ -180,12 +180,12 @@ export default makeScene2D(function* (view) {
   const area = createSignal(() => Math.PI * radius() * radius());
   // highlight-end
 
-  const scale = 100;
+  const scale = 50;
   const textStyle = {
-    fontWeight: 700,
-    fontSize: 56,
+    fontWeight: 350,
+    fontSize: 26,
     offsetY: -1,
-    padding: 20,
+    padding: 10,
     cache: true,
   };
 
@@ -204,11 +204,12 @@ export default makeScene2D(function* (view) {
           // highlight-next-line
           () => Vector2.right.scale(radius() * scale),
         ]}
-        lineDash={[20, 20]}
+        lineDash={[10, 10]}
         startArrow
         endArrow
-        endOffset={8}
-        lineWidth={8}
+        endOffset={5}
+        lineWidth={4}
+        arrowSize={8}
         stroke={'#242424'}
       />
       <Txt
