@@ -4,6 +4,7 @@
  * @packageDocumentation
  */
 
+export * from './bootstrap';
 export * from './Exporter';
 export * from './ImageExporter';
 export * from './Logger';

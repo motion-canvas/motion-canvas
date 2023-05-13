@@ -228,31 +228,34 @@ export default ({
           await createMeta(path.join(dir, metaFile));
 
           const imports: string[] = [];
-          const pluginNames: string[] = ['...config.plugins'];
+          const pluginNames: string[] = [];
           let index = 0;
           for (const plugin of plugins) {
             if (plugin.entryPoint) {
               const pluginName = `plugin${index}`;
+              let options = (await plugin.runtimeConfig?.()) ?? '';
+              if (typeof options !== 'string') {
+                options = JSON.stringify(options);
+              }
+
               imports.push(`import ${pluginName} from '${plugin.entryPoint}'`);
-              pluginNames.push(pluginName);
+              pluginNames.push(`${pluginName}(${options})`);
               index++;
             }
           }
 
           return source(
             ...imports,
-            `import {ProjectMetadata} from '@motion-canvas/core/lib/app';`,
+            `import {bootstrap} from '@motion-canvas/core/lib/app';`,
             `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
-            `const project = {`,
-            `  name: '${name}',`,
-            `  versions: ${versions},`,
-            `  ...config,`,
-            `  plugins: [${pluginNames.join(', ')}],`,
-            `};`,
-            `project.meta = new ProjectMetadata(project);`,
-            `metaFile.attach(project.meta)`,
-            `export default project;`,
+            `export default bootstrap(`,
+            `  '${name}',`,
+            `  ${versions},`,
+            `  [${pluginNames.join(', ')}],`,
+            `  config,`,
+            `  metaFile`,
+            `);`,
           );
         }
       }
