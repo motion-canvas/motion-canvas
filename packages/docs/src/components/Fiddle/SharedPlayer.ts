@@ -64,7 +64,7 @@ export function borrowPlayer(
     ProjectInstance = {
       name: 'fiddle',
       logger: new Logger(),
-      plugins: [DefaultPlugin],
+      plugins: [DefaultPlugin()],
       scenes: [Description],
     } as Project;
     ProjectInstance.meta = new ProjectMetadata(ProjectInstance);
