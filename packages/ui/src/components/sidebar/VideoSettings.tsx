@@ -81,6 +81,7 @@ function ProcessButton({processId, setProcess}: ProcessButtonProps) {
   ) : (
     <Button
       main
+      loading
       id="render"
       data-rendering={true}
       disabled={rendererState === RendererState.Aborting}

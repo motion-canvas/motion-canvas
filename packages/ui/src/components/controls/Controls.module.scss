@@ -84,6 +84,7 @@
   }
 
   &.main {
+    --loading-stripe-color: var(--theme-light);
     background-color: var(--theme);
     color: rgba(0, 0, 0, 0.87);
     font-weight: bold;
