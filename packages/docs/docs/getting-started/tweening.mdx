@@ -16,7 +16,7 @@ special type of generators that animate between two values over given time.
 The simplest way to create a tween is via the
 [`tween`](/api/core/tweening#tween) function:
 
-```tsx editor
+```tsx editor ratio=4
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
@@ -29,15 +29,15 @@ export default makeScene2D(function* (view) {
     <Circle
       //highlight-start
       ref={circle}
-      x={-300}
-      width={240}
-      height={240}
+      x={-150}
+      width={120}
+      height={120}
       fill="#e13238"
     />,
   );
   //highlight-start
   yield* tween(2, value => {
-    circle().position.x(map(-300, 300, value));
+    circle().position.x(map(-150, 150, value));
   });
   //highlight-end
 });
@@ -74,7 +74,7 @@ fix our animation:
 ```ts
 yield *
   tween(2, value => {
-    circle().position.x(map(-300, 300, easeInOutCubic(value)));
+    circle().position.x(map(-150, 150, easeInOutCubic(value)));
   });
 ```
 
@@ -91,15 +91,15 @@ export default makeScene2D(function* (view) {
     <Circle
       //highlight-start
       ref={circle}
-      x={-300}
-      width={240}
-      height={240}
+      x={-150}
+      width={120}
+      height={120}
       fill="#e13238"
     />,
   );
   //highlight-start
   yield* tween(2, value => {
-    circle().position.x(map(-300, 300, easeInOutCubic(value)));
+    circle().position.x(map(-150, 150, easeInOutCubic(value)));
   });
   //highlight-end
 });
@@ -115,7 +115,7 @@ The effects of a particular easing function can be visualised by animating the
 `y` coordinate of an object as time changes with a constant rate, such as
 bouncing it in and out.
 
-```tsx editor
+```tsx editor mode=code ratio=16/9
 import {
   Circle,
   Grid,
@@ -139,28 +139,28 @@ export default makeScene2D(function* (view) {
   const TIME = 3.5;
 
   view.add(
-    <Node y={-30}>
+    <Node y={-15}>
       {/* Grid and animated point */}
-      <Grid size={700} stroke={'#444'} lineWidth={3} spacing={100}>
+      <Grid size={350} stroke={'#444'} lineWidth={1.5} spacing={50}>
         <Rect
           layout
-          size={100}
+          size={50}
           offset={[-1, 1]}
-          x={() => time() * 500 - 300}
-          y={() => value() * -500 + 300}
+          x={() => time() * 250 - 150}
+          y={() => value() * -250 + 150}
         >
-          <Circle size={60} fill={'#C22929'} margin={20}></Circle>
+          <Circle size={30} fill={'#C22929'} margin={10}></Circle>
         </Rect>
       </Grid>
 
       {/* Vertical */}
-      <Node position={[-400, -400]}>
+      <Node position={[-200, -200]}>
         {/* Axis */}
         <Line
           lineWidth={4}
           points={[
-            [0, 750],
-            [0, 35],
+            [0, 375],
+            [0, 18.5],
           ]}
           stroke={'#DDD'}
           lineCap={'round'}
@@ -169,25 +169,25 @@ export default makeScene2D(function* (view) {
         ></Line>
 
         {/* Tracker */}
-        <Layout y={() => value() * -500 + 650}>
+        <Layout y={() => value() * -250 + 325}>
           <Txt
             fill={'#DDD'}
             text={() => value().toFixed(2).toString()}
-            fontWeight={300}
-            fontSize={30}
+            fontWeight={150}
+            fontSize={15}
             x={-55}
-            y={3}
+            y={1.5}
           ></Txt>
-          <Circle size={30} fill={'#DDD'}></Circle>
+          <Circle size={15} fill={'#DDD'}></Circle>
         </Layout>
 
         {/* Label */}
         <Txt
-          y={400}
-          x={-160}
-          fontWeight={400}
-          fontSize={50}
-          padding={20}
+          y={200}
+          x={-80}
+          fontWeight={200}
+          fontSize={25}
+          padding={10}
           fontFamily={'Candara'}
           fill={'#DDD'}
           text={'VALUE'}
@@ -195,39 +195,39 @@ export default makeScene2D(function* (view) {
       </Node>
 
       {/* Horizontal */}
-      <Node position={[-400, -400]}>
+      <Node position={[-200, -200]}>
         {/* Axis */}
         <Line
           lineWidth={4}
           points={[
-            [50, 800],
-            [765, 800],
+            [25, 400],
+            [382.5, 400],
           ]}
           stroke={'#DDD'}
           lineCap={'round'}
           endArrow
-          arrowSize={15}
+          arrowSize={7.5}
         ></Line>
 
         {/* Tracker */}
-        <Layout y={800} x={() => time() * 500 + 150}>
-          <Circle size={30} fill={'#DDD'}></Circle>
+        <Layout y={400} x={() => time() * 250 + 75}>
+          <Circle size={15} fill={'#DDD'}></Circle>
           <Txt
             fill={'#DDD'}
             text={() => (time() * TIME).toFixed(2).toString()}
-            fontWeight={300}
-            fontSize={30}
-            y={50}
+            fontWeight={150}
+            fontSize={15}
+            y={25}
           ></Txt>
         </Layout>
 
         {/* Label */}
         <Txt
-          y={900}
-          x={400}
-          fontWeight={400}
-          fontSize={50}
-          padding={20}
+          y={450}
+          x={200}
+          fontWeight={200}
+          fontSize={25}
+          padding={10}
           fontFamily={'Candara'}
           fill={'#DDD'}
           text={'TIME'}
@@ -292,8 +292,8 @@ export default makeScene2D(function* (view) {
     <Circle
       //highlight-start
       ref={circle}
-      width={240}
-      height={240}
+      width={120}
+      height={120}
       fill="#e13238"
     />,
   );
@@ -328,15 +328,15 @@ yield *
     circle().position(
       // highlight-next-line
       Vector2.arcLerp(
-        new Vector2(-300, 200),
-        new Vector2(300, -200),
+        new Vector2(-150, 100),
+        new Vector2(150, -100),
         easeInOutCubic(value),
       ),
     );
   });
 ```
 
-```tsx editor
+```tsx editor ratio=2
 import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
@@ -350,10 +350,10 @@ export default makeScene2D(function* (view) {
     <Circle
       //highlight-start
       ref={circle}
-      x={-300}
-      y={200}
-      width={240}
-      height={240}
+      x={-150}
+      y={100}
+      width={120}
+      height={120}
       fill="#e13238"
     />,
   );
@@ -361,8 +361,8 @@ export default makeScene2D(function* (view) {
   yield* tween(2, value => {
     circle().position(
       Vector2.arcLerp(
-        new Vector2(-300, 200),
-        new Vector2(300, -200),
+        new Vector2(-120, 100),
+        new Vector2(120, -100),
         easeInOutCubic(value),
       ),
     );
@@ -448,7 +448,7 @@ animations.
 In the example below, we use springs to animate a position of a circle, but this
 method can be used for more things than just position.
 
-```tsx editor
+```tsx editor ratio=4
 import {makeScene2D} from '@motion-canvas/2d';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
@@ -465,16 +465,16 @@ export default makeScene2D(function* (view) {
     <Circle
       // highlight-start
       ref={circle}
-      x={-400}
-      size={240}
+      x={-200}
+      size={120}
       fill={'#e13238'}
     />,
   );
 
-  yield* spring(PlopSpring, -400, 400, 1, value => {
+  yield* spring(PlopSpring, -200, 200, 1, value => {
     circle().position.x(value);
   });
-  yield* spring(SmoothSpring, 400, -400, value => {
+  yield* spring(SmoothSpring, 200, -200, value => {
     circle().position.x(value);
   });
 });
@@ -556,7 +556,7 @@ state stack. If there is no saved state, this method does nothing.
 The example below shows a more complete example of how we can store and restore
 multiple states across an animation.
 
-```tsx editor
+```tsx editor ratio=2
 import {makeScene2D} from '@motion-canvas/2d';
 import {Circle} from '@motion-canvas/2d/lib/components';
 import {createRef} from '@motion-canvas/core/lib/utils';
@@ -569,8 +569,8 @@ export default makeScene2D(function* (view) {
     <Circle
       // highlight-start
       ref={circle}
-      size={150}
-      position={[-300, -300]}
+      size={75}
+      position={[-150, -150]}
       fill={'#e13238'}
     />,
   );
@@ -582,7 +582,7 @@ export default makeScene2D(function* (view) {
   yield* all(circle().position.y(0, 1), circle().scale(0.5, 1));
 
   circle().save();
-  yield* all(circle().position.x(300, 1), circle().scale(1, 1));
+  yield* all(circle().position.x(150, 1), circle().scale(1, 1));
 
   yield* circle().restore(1);
   yield* circle().restore(1);
