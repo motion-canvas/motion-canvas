@@ -2,6 +2,7 @@
 
 :root {
   --theme: #33a6ff;
+  --theme-light: #52bbff;
   --theme-overlay: rgba(51, 166, 255, 0.24);
   --background-color: #181818;
   --background-color-dark: #141414;
@@ -83,4 +84,31 @@ button {
   appearance: none;
   border: 0;
   padding: 0;
+}
+
+.loading {
+  --loading-stripe-color: var(--surface-color-hover);
+
+  background-image: linear-gradient(
+    45deg,
+    var(--loading-stripe-color) 25%,
+    #0000 25%,
+    #0000 50%,
+    var(--loading-stripe-color) 50%,
+    var(--loading-stripe-color) 75%,
+    #0000 75%,
+    #0000 100%
+  );
+
+  background-size: 22.63px 22.63px;
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 22.63px 0;
+  }
 }
