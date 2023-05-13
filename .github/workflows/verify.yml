@@ -160,7 +160,7 @@ jobs:
             packages/vite-plugin/lib
       - run: npm run examples:build
   e2e:
-    name: End to end tests
+    name: E2E
     needs: build
     runs-on: ubuntu-latest
     steps:

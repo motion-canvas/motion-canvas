@@ -72,18 +72,17 @@ Motion Canvas follows [semantic versioning][semver].
 After you made a pull request, a GitHub workflow will be dispatched to verify
 it. There are a few checks that can fail:
 
-- `Commit message` - The commit message doesn't follow the [Angular Commit
-  Message Conventions][commit-format]. You can ignore this check since
-  maintainers can modify your commit message before merging, but make sure to
-  follow the conventions in the future.
-- `Lint` - ESLint has failed. Run `npm run eslint` locally to list the problems.
-- `Tests` - Unit tests have failed. Run `npm run core:test` to check which tests
-  fail and why.
-- `Build` - The build process have failed. There are three possible points of
-  failure you need to check:
-  - `run: npx lerna run build` - Building all packages.
-  - `run: npm run examples:build` - Building the examples.
-  - `run: npm run e2e:test` - Running the end-to-end tests.
+| Check name        | Description                                                                                                                                                                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Prepare`         | Something bad happened when preparing your pull request for verification. This is most likely a problem with our pipeline so make sure to notify us about it.                                                                                |
+| `Commit message`  | The commit message doesn't follow the [Angular Commit Message Conventions][commit-format]. You can ignore this check since maintainers can modify your commit message before merging, but make sure to follow the conventions in the future. |
+| `Lint`            | ESLint has failed. Run `npm run eslint` locally to list the problems.                                                                                                                                                                        |
+| `Code&nbsp;style` | The code is not correctly formatted. Run `npm run prettier:fix` locally to fix the formatting issues.                                                                                                                                        |
+| `Build`           | The build process failed. Run `npx lerna run build` locally to see the errors.                                                                                                                                                               |
+| `Unit tests`      | Unit tests failed. Run `npx lerna run test` locally to see the which tests are failing and fix them.                                                                                                                                         |
+| `Examples`        | The examples failed to build. Run `npm run examples:build` locally to see the errors.                                                                                                                                                        |
+| `E2E`             | End-to-end tests failed to build. Run `npm run examples:build` locally to see the errors.                                                                                                                                                    |
+| `Documentation`   | The documentation website failed to build. Run `npm run docs:build` locally to see the errors.                                                                                                                                               |
 
 ### Addressing review feedback
 
@@ -93,6 +92,13 @@ it. There are a few checks that can fail:
    git commit --all --fixup HEAD
    git push
    ```
+
+## Getting the _Contributor_ Discord role
+
+After one of your pull requests has been merged, you can receive the
+_Contributor_ role on [our discord server][discord]. To do that, create a
+[secret gist][gist] on GitHub and DM one of the server moderators with the link.
+This will let us verify that you're the author of the pull request.
 
 ## Attribution
 
@@ -114,3 +120,4 @@ This Contribution Guide was partially inspired by [React][react] and
 [react]: https://reactjs.org/docs/how-to-contribute.html
 [label-accepted]:
   https://github.com/motion-canvas/motion-canvas/labels/c-accepted
+[gist]: https://gist.github.com/
