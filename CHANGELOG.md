@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
+
+### Bug Fixes
+
+- **2d:** correctly support external image urls
+  ([#678](https://github.com/motion-canvas/motion-canvas/issues/678))
+  ([a08556b](https://github.com/motion-canvas/motion-canvas/commit/a08556b6e2822a55db593f610ea4dd6cb8494adb)),
+  closes [#677](https://github.com/motion-canvas/motion-canvas/issues/677)
+- **2d:** fix audio offset editing
+  ([#674](https://github.com/motion-canvas/motion-canvas/issues/674))
+  ([58d6ef7](https://github.com/motion-canvas/motion-canvas/commit/58d6ef79fa06e377e0c1821efe73585586d124a6))
+- **2d:** ignore children with disabled layout
+  ([#669](https://github.com/motion-canvas/motion-canvas/issues/669))
+  ([b98c462](https://github.com/motion-canvas/motion-canvas/commit/b98c4625c3634495e86ca23d19355035e457db06)),
+  closes [#580](https://github.com/motion-canvas/motion-canvas/issues/580)
+- remove dependency pre-bundling warning
+  ([#676](https://github.com/motion-canvas/motion-canvas/issues/676))
+  ([38c81ff](https://github.com/motion-canvas/motion-canvas/commit/38c81ffa5ea0ef2d2beec9d015896f5873629d74))
+
+### Features
+
+- **2d:** expand animations and reduced motion
+  ([#671](https://github.com/motion-canvas/motion-canvas/issues/671))
+  ([b8e9d03](https://github.com/motion-canvas/motion-canvas/commit/b8e9d03488f8ca7085b3e7e1b095a52f39f2bc89))
+- **2d:** visual feedback about rendering process
+  ([#681](https://github.com/motion-canvas/motion-canvas/issues/681))
+  ([d0495f5](https://github.com/motion-canvas/motion-canvas/commit/d0495f5c6396c05454a5323e4486ab4829adbc9e))
+- add new hooks for plugins
+  ([#679](https://github.com/motion-canvas/motion-canvas/issues/679))
+  ([74e18bc](https://github.com/motion-canvas/motion-canvas/commit/74e18bce71abd7e26a6415240603241b48cb36c2))
+- **create:** add exporter selection
+  ([#673](https://github.com/motion-canvas/motion-canvas/issues/673))
+  ([82fd47d](https://github.com/motion-canvas/motion-canvas/commit/82fd47d93ffad6125a685880a132ce0d3a388693))
+- **create:** support command-line arguments
+  ([#668](https://github.com/motion-canvas/motion-canvas/issues/668))
+  ([fa62a98](https://github.com/motion-canvas/motion-canvas/commit/fa62a9868d5cd33f1cb6ac5f147cca81917457dc))
+- display array values in inspector
+  ([#670](https://github.com/motion-canvas/motion-canvas/issues/670))
+  ([e71d74c](https://github.com/motion-canvas/motion-canvas/commit/e71d74c9c04995393ad8ee942b8e6e5baa6f982f))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
 
 ### Bug Fixes
