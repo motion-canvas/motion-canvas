@@ -6,6 +6,7 @@ export * from './Close';
 export * from './DragIndicator';
 export * from './Fullscreen';
 export * from './Grid';
+export * from './Colorize';
 export * from './Locate';
 export * from './MotionCanvas';
 export * from './OpenInNew';

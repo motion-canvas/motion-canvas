@@ -7,12 +7,14 @@ export function Footer() {
   return (
     <div className={styles.root}>
       <div className={styles.shortcuts}>
-        {shortcuts[currentModule].map(({key, action}) => (
-          <div className={styles.shortcut}>
-            <span className={styles.key}>{key}</span>
-            <span className={styles.action}>{action}</span>
-          </div>
-        ))}
+        {shortcuts[currentModule]
+          .filter(({available}) => !available || available())
+          .map(({key, action}) => (
+            <div className={styles.shortcut}>
+              <span className={styles.key}>{key}</span>
+              <span className={styles.action}>{action}</span>
+            </div>
+          ))}
       </div>
       <Versions />
     </div>
