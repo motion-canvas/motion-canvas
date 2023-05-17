@@ -131,3 +131,87 @@ generator in the quickstart section, there's a few more:
 
 <ApiSnippet url={'/api/core/flow#loop'} />
 <hr />
+
+## Looping
+
+There are many ways to animate multiple objects. Here are some examples. Try
+using them in the below editor.
+
+```tsx editor ratio=2
+import {makeScene2D} from '@motion-canvas/2d';
+import {Rect} from '@motion-canvas/2d/lib/components';
+import {all, waitFor} from '@motion-canvas/core/lib/flow';
+import {makeRef, range} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const rects: Rect[] = [];
+
+  // Create some rects
+  view.add(
+    range(5).map(i => (
+      <Rect
+        ref={makeRef(rects, i)}
+        width={100}
+        height={100}
+        x={-250 + 125 * i}
+        fill="#88C0D0"
+        radius={10}
+      />
+    )),
+  );
+
+  yield* waitFor(1);
+
+  // Animate them
+  yield* all(
+    ...rects.map(rect => rect.position.y(100, 1).to(-100, 2).to(0, 1)),
+  );
+});
+```
+
+### Using `Array.map` and `all`
+
+This is one of the most elegant ways to do simple tweens, but requires nesting
+`all` to do multiple tweens on an object since the `map` callback must return a
+`ThreadGenerator`.
+
+```tsx
+yield *
+  all(
+    ...rects.map(rect =>
+      // No yield or anything; we return this generator and deal with it outside
+      rect.position.y(100, 1).to(-100, 2).to(0, 1),
+    ),
+  );
+```
+
+### Using a `for` loop and `all`
+
+This is similar to above, but uses a `for` loop and an array of generators.
+
+```tsx
+const generators = [];
+for (const ref of rects) {
+  // No yield here, just store the generators.
+  generators.push(rect.position.y(100, 1).to(-100, 2).to(0, 1));
+}
+
+// Run all of the generators.
+yield * all(...generators);
+```
+
+### Using a `for` loop
+
+This is a bit of a cumbersome option because you have to figure out how long it
+would take for the generator in the loop to complete, but is useful in some
+situations.
+
+```tsx
+for (const ref of rects) {
+  // Note the absence of a * after this yield
+  yield rect.position.y(100, 1).to(-100, 2).to(0, 1);
+}
+
+// Wait for the duration of the above generators
+yield * waitFor(4);
+```
