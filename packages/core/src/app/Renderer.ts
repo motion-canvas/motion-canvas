@@ -80,7 +80,6 @@ export class Renderer {
         resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
       });
-      scene.variables.updateSignals(this.project.variables ?? {});
       scenes.push(scene);
     }
     this.playback.setup(scenes);
@@ -248,6 +247,7 @@ export class Renderer {
         resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
+      scene.variables.updateSignals(this.project.variables ?? {});
     }
   }
 
