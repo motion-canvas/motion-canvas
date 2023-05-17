@@ -80,6 +80,7 @@ export class Renderer {
         resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
       });
+      scene.variables.updateSignals(this.project.variables ?? {});
       scenes.push(scene);
     }
     this.playback.setup(scenes);

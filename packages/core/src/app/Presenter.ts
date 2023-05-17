@@ -191,6 +191,7 @@ export class Presenter {
         resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
+      scene.variables.updateSignals(this.project.variables ?? {});
     }
   }
 
