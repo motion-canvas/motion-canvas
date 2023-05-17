@@ -22,6 +22,7 @@ import clsx from 'clsx';
 import {Button, Select} from '../controls';
 import {Recenter, Grid as GridIcon} from '../icons';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
+import {ColorPicker} from './ColorPicker';
 
 const ZOOM_SPEED = 0.1;
 
@@ -238,12 +239,13 @@ export function EditorPreview() {
             <Recenter />
           </Button>
           <ButtonCheckbox
-            title={'Toggle grid'}
+            title={"Toggle grid [']"}
             onChecked={setGrid}
             checked={grid}
           >
             <GridIcon />
           </ButtonCheckbox>
+          <ColorPicker />
         </div>
       </div>
     </ViewportContext.Provider>

@@ -4,6 +4,7 @@ import {useContext, useState} from 'preact/hooks';
 export type Shortcut = {
   key: string;
   action: string;
+  available?: () => boolean;
 };
 
 export type ShortcutModules = 'global' | 'timeline' | 'viewport' | 'none';
@@ -29,6 +30,11 @@ const InitialShortcuts: ShortcutsByModule = {
     {key: '=', action: 'Zoom in'},
     {key: '-', action: 'Zoom out'},
     {key: "'", action: 'Toggle grid'},
+    {
+      key: 'I',
+      action: 'Use color picker',
+      available: () => typeof EyeDropper === 'function',
+    },
   ],
   timeline: [{key: 'F', action: 'Focus playhead'}],
   none: [],
