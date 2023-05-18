@@ -4,9 +4,11 @@
   flex-shrink: 0;
   justify-content: space-between;
   width: 100%;
-  height: 24px;
+  height: 26px;
   padding: 4px;
   gap: 4px;
+  grid-area: footer;
+  border-top: 2px solid var(--border-color);
 }
 
 .shortcuts {

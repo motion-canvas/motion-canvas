@@ -1,108 +1,78 @@
+import {cloneElement, ComponentChildren, JSX, Ref, VNode} from 'preact';
 import styles from './Tabs.module.scss';
-
-import {ComponentChildren} from 'preact';
-import {useCallback, useLayoutEffect} from 'preact/hooks';
 import clsx from 'clsx';
 
-export enum TabType {
-  Link,
-  ExternalLink,
-  Pane,
-  Space,
+function isTab(node: VNode): node is VNode<TabProps> {
+  return node.type === Tab;
 }
 
-type Tab =
-  | {
-      type: TabType.Pane;
-      icon: ComponentChildren;
-      pane: ComponentChildren;
-      badge?: ComponentChildren;
-      title?: string;
-      id?: string;
-    }
-  | {
-      type: TabType.Link;
-      icon: ComponentChildren;
-      url?: string;
-      title?: string;
-      id?: string;
-    }
-  | {
-      type: TabType.ExternalLink;
-      icon: ComponentChildren;
-      url: string;
-      title?: string;
-      id?: string;
-    }
-  | {
-      type: TabType.Space;
-    };
-
-export interface TabsProps {
-  children: Tab[];
-  tab: number;
-  onToggle: (tab: number) => void;
+export function Tabs({
+  className,
+  ...props
+}: JSX.HTMLAttributes<HTMLDivElement>) {
+  return <div className={clsx(className, styles.tabs)} {...props} />;
 }
 
-export function Tabs({children, tab, onToggle}: TabsProps) {
-  const toggleTab = useCallback(
-    (value: number) => {
-      const newTab = value === tab ? -1 : getPane(children[value]) ? value : -1;
-      onToggle(newTab);
-    },
-    [tab, onToggle, children],
-  );
-  useLayoutEffect(() => {
-    if (tab > -1 && !getPane(children[tab])) {
-      onToggle(-1);
-    } else {
-      onToggle(tab);
-    }
-  }, [onToggle, tab]);
+export interface TabGroupProps {
+  children: VNode | VNode[];
+  tab: string | null;
+  setTab: (tab: string | null) => void;
+}
 
+export function TabGroup({children, tab, setTab}: TabGroupProps) {
+  const array = Array.isArray(children) ? children : [children];
   return (
-    <div className={styles.root}>
-      <div className={styles.panes}>{getPane(children[tab])}</div>
-      <div className={styles.tabs}>
-        {children.map((data, index) =>
-          data.type === TabType.Link ? (
-            <a
-              title={data.title}
-              href={data.url}
-              id={data.id}
-              className={clsx(styles.tab, !data.url && styles.disabled)}
-            >
-              {data.icon}
-            </a>
-          ) : data.type === TabType.ExternalLink ? (
-            <a
-              title={data.title}
-              href={data.url}
-              id={data.id}
-              className={clsx(styles.tab)}
-              target="_blank"
-            >
-              {data.icon}
-            </a>
-          ) : data.type === TabType.Pane ? (
-            <button
-              title={data.title}
-              id={data.id}
-              onClick={() => toggleTab(index)}
-              className={clsx(styles.tab, tab === index && styles.active)}
-            >
-              {data.icon}
-              {data.badge}
-            </button>
-          ) : (
-            <div className={styles.space} />
-          ),
-        )}
-      </div>
-    </div>
+    <>
+      {array.map(child => {
+        if (isTab(child)) {
+          const active = child.props.tab === tab;
+          return cloneElement(child, {
+            active,
+            onClick: () => setTab(active ? null : child.props.tab),
+          });
+        }
+        return child;
+      })}
+    </>
   );
 }
 
-function getPane(tab: Tab) {
-  return tab && tab.type === TabType.Pane ? tab.pane : false;
+export interface TabProps extends JSX.HTMLAttributes<HTMLButtonElement> {
+  children: ComponentChildren;
+  forwardRef?: Ref<HTMLButtonElement>;
+  active?: boolean;
+  tab: string;
+}
+
+export function Tab({className, forwardRef, active, ...props}: TabProps) {
+  return (
+    <button
+      ref={forwardRef}
+      className={clsx(styles.tab, active && styles.active, className)}
+      {...props}
+    />
+  );
+}
+
+export interface TabLinkProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
+  children: ComponentChildren;
+  disabled?: boolean;
+}
+
+export function TabLink({className, href, disabled, ...props}: TabLinkProps) {
+  return (
+    <a
+      className={clsx(
+        styles.tab,
+        (!href || disabled) && styles.disabled,
+        className,
+      )}
+      href={href}
+      {...props}
+    />
+  );
+}
+
+export function Space() {
+  return <div className={styles.space} />;
 }

@@ -24,6 +24,11 @@
   flex-grow: 0;
   flex-shrink: 0;
   overflow: hidden;
+
+  .root.hidden > & {
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
 }
 
 .right {
@@ -33,10 +38,11 @@
 }
 
 .separator {
+  touch-action: none;
   width: 16px;
   flex-shrink: 0;
   padding: 0 7px;
-  margin: 0 -8px;
+  margin: 0 -7px;
   z-index: 1600;
   cursor: ew-resize;
 
@@ -45,11 +51,22 @@
     width: 100%;
     height: 100%;
     display: block;
-    background-color: var(--background-color-dark);
+    background-color: var(--border-color);
   }
 
   &:hover::before {
     background-color: black;
+  }
+
+  &:active::before {
+    background-color: var(--theme) !important;
+  }
+
+  .root.hidden > & {
+    margin-right: -9px;
+    &::before {
+      background-color: transparent;
+    }
   }
 
   .root.vertical > & {
@@ -57,10 +74,10 @@
     width: auto;
     height: 16px;
     padding: 7px 0;
-    margin: -8px 0;
+    margin: -7px 0;
   }
 
-  .root:not(.resizeable) > & {
-    pointer-events: none;
+  .root.vertical.hidden > & {
+    margin-top: -9px;
   }
 }
