@@ -26,7 +26,6 @@
   overflow: hidden;
 
   .root.hidden > & {
-    flex-grow: 1;
     flex-shrink: 1;
   }
 }

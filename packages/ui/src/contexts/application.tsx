@@ -6,6 +6,7 @@ import type {
   Project,
   Presenter,
   ProjectMetadata,
+  SettingsMetadata,
 } from '@motion-canvas/core';
 
 interface Application {
@@ -14,6 +15,7 @@ interface Application {
   renderer: Renderer;
   presenter: Presenter;
   meta: ProjectMetadata;
+  settings: SettingsMetadata;
 }
 
 const ApplicationContext = createContext<Application | null>(null);

@@ -57,7 +57,7 @@ class ObjectMetaFieldInternal<
     }
   }
 
-  public override set(value: ValueOf<T>) {
+  public override set(value: Partial<ValueOf<T>>) {
     this.ignoreChange = true;
     for (const [key, fieldValue] of Object.entries(value)) {
       const field = this.fields.get(key);

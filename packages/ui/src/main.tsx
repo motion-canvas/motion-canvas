@@ -36,6 +36,33 @@ export function editor(project: Project) {
   const renderer = new Renderer(project);
   const presenter = new Presenter(project);
 
+  const settings = project.settings;
+  settings.appearance.color.onChanged.subscribe(() => {
+    const color = settings.appearance.color.get();
+    if (color) {
+      document.body.style.setProperty('--theme', color.css());
+      document.body.style.setProperty(
+        '--theme-light',
+        color.brighten(0.54).css(),
+      );
+      document.body.style.setProperty(
+        '--theme-overlay',
+        color.alpha(0.16).css(),
+      );
+    } else {
+      document.body.style.removeProperty('--theme');
+      document.body.style.removeProperty('--theme-light');
+      document.body.style.removeProperty('--theme-overlay');
+    }
+  });
+  settings.appearance.font.onChanged.subscribe(() => {
+    if (settings.appearance.font.get()) {
+      document.body.style.setProperty('--font-family', 'JetBrains Mono');
+    } else {
+      document.body.style.removeProperty('--font-family');
+    }
+  });
+
   const meta = project.meta;
   const playerKey = `${project.name}/player`;
   const frameKey = `${project.name}/frame`;
@@ -69,6 +96,7 @@ export function editor(project: Project) {
         presenter,
         project,
         meta,
+        settings,
       }}
     >
       <ShortcutsProvider>

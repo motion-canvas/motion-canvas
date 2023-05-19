@@ -178,7 +178,7 @@ export class SignalContext<
     const initial = this.get();
     const queue: ThreadGenerator[] = [];
 
-    const task = run(function* animate() {
+    const task = run('animation chain', function* animate() {
       while (queue.length > 0) {
         yield* queue.shift()!;
       }
