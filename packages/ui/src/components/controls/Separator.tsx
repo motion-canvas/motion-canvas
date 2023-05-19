@@ -1,15 +1,16 @@
 import type {JSX} from 'preact';
 
-import styles from './Controls.module.scss';
-import clsx from 'clsx';
+export interface SeparatorProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  size?: number;
+}
 
-export function Separator({
-  className,
-  ...props
-}: JSX.HTMLAttributes<HTMLDivElement>) {
+export function Separator({size = 2, ...props}: SeparatorProps) {
   return (
-    <div className={clsx(styles.separator, className)} {...props}>
-      {props.children}
-    </div>
+    <div
+      {...props}
+      style={{
+        height: size * 8,
+      }}
+    />
   );
 }

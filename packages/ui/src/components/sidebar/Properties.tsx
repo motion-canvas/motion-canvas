@@ -5,7 +5,7 @@ import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {Pane} from '../tabs';
 import {useInspection} from '../../contexts';
 import {AutoField} from '../fields';
-import {Button, Group, Label} from '../controls';
+import {Button, Group, Label, Separator} from '../controls';
 import {findAndOpenFirstUserFile} from '../../utils';
 
 export function Properties() {
@@ -29,6 +29,7 @@ export function Properties() {
 
   return (
     <Pane title="Properties" id="properties-pane">
+      <Separator size={1} />
       {stack && (
         <Group>
           <Label />
