@@ -11,6 +11,7 @@ import {SourceCodeFrame} from './SourceCodeFrame';
 import clsx from 'clsx';
 import {Locate} from '../icons';
 import {Collapse} from '../layout';
+import {EditorPanel, SidebarPanel} from '../../signals';
 
 export interface LogProps {
   payload: LogPayload;
@@ -55,7 +56,10 @@ export function Log({payload}: LogProps) {
         {payload.inspect && (
           <IconButton
             title="Select related node"
-            onClick={() => setInspectedElement(payload.inspect)}
+            onClick={() => {
+              setInspectedElement(payload.inspect);
+              SidebarPanel.set(EditorPanel.Inspector);
+            }}
           >
             <Locate />
           </IconButton>

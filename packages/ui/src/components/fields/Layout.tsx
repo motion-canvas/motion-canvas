@@ -17,7 +17,7 @@ export function FieldSet({children, header, nested}: FieldSetProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <FieldSurface open={true}>
+    <FieldSurface open={open}>
       <div className={styles.header}>
         <Toggle open={open} onToggle={setOpen} />
         {header}

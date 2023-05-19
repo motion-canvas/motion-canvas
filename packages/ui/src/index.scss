@@ -3,17 +3,20 @@
 :root {
   --theme: #33a6ff;
   --theme-light: #52bbff;
-  --theme-overlay: rgba(51, 166, 255, 0.24);
+  --theme-overlay: rgba(51, 166, 255, 0.16);
   --background-color: #181818;
   --background-color-dark: #141414;
   --surface-color: #242424;
   --surface-color-light: #444444;
   --surface-color-hover: #333333;
+  --border-color: var(--background-color-dark);
   --scrollbar-background: var(--surface-color);
   --input-background: var(--surface-color-light);
   --input-background-hover: var(--surface-color-hover);
   --radius: 4px;
 
+  --timing-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --timing-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --duration-normal: 0.2s;
   --duration-fast: 0.1s;
 

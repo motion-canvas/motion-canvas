@@ -1,5 +1,5 @@
 .root {
   height: 0;
   overflow: hidden;
-  transition: height var(--duration-normal) ease-in-out;
+  transition: height var(--duration-normal) var(--timing-ease-in-out);
 }

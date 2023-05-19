@@ -1,6 +1,11 @@
 .root {
-  display: flex;
-  flex-direction: column;
+  border: 2px solid var(--border-color);
+  display: grid;
   width: 100%;
   height: 100%;
+  grid-template-rows: 1fr min-content;
+  grid-template-columns: min-content 1fr;
+  grid-template-areas:
+    'navigation viewport'
+    'footer footer';
 }

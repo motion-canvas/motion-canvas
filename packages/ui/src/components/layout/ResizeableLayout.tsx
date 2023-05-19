@@ -1,63 +1,71 @@
 import styles from './ResizeableLayout.module.scss';
 
-import {ComponentChild, JSX} from 'preact';
-import {useCallback, useMemo, useRef} from 'preact/hooks';
-import {useDrag, useStorage} from '../../hooks';
+import {ComponentChild} from 'preact';
+import {useRef} from 'preact/hooks';
 import clsx from 'clsx';
+import {Signal} from '@preact/signals';
+import {useStorage} from '../../hooks';
 import {clamp} from '../../utils';
 
 interface ResizeableLayoutProps {
-  start: ComponentChild;
-  end: ComponentChild;
+  id: string;
   vertical?: boolean;
-  size?: number;
-  id?: string;
-  resizeable?: boolean;
+  hidden: Signal<boolean>;
+  offset?: number;
+  children: [ComponentChild, ComponentChild];
 }
 
 export function ResizeableLayout({
-  start,
-  end,
+  id,
+  children: [start, end],
   vertical = false,
-  size = 0.3,
-  id = null,
-  resizeable = true,
+  offset = 0,
+  hidden,
 }: ResizeableLayoutProps) {
-  const [currentSize, setSize] = useStorage(`${id}-layout-size`, size);
+  const inverse = offset < 0;
   const containerRef = useRef<HTMLDivElement>();
-
-  const [handleDrag] = useDrag(
-    useCallback(
-      (_dx, _dy, x, y) => {
-        const rect = containerRef.current.getBoundingClientRect();
-        const newSize = vertical
-          ? (y - rect.y) / rect.height
-          : (x - rect.x) / rect.width;
-        setSize(clamp(0, 1, newSize));
-      },
-      [vertical, setSize],
-    ),
-  );
-
-  const style = useMemo<JSX.CSSProperties>(() => {
-    if (!resizeable) return {};
-    return vertical
-      ? {height: `${currentSize * 100}%`}
-      : {width: `${currentSize * 100}%`};
-  }, [currentSize, vertical, resizeable]);
+  const [size, setSize] = useStorage(`${id}-layout-size`, inverse ? 1 : 0);
+  const dimension = vertical ? 'height' : 'width';
+  const axis = vertical ? 'y' : 'x';
 
   return (
     <div
       ref={containerRef}
       className={clsx(styles.root, {
         [styles.vertical]: vertical,
-        [styles.resizeable]: resizeable,
+        [styles.hidden]: hidden.value,
       })}
     >
-      <div className={styles.left} style={style}>
+      <div
+        className={styles.left}
+        style={{
+          [dimension]: hidden.value
+            ? undefined
+            : `calc(${offset}px + ${size * 100}%)`,
+        }}
+      >
         {start}
       </div>
-      <div onMouseDown={handleDrag} className={styles.separator} />
+      <div
+        className={styles.separator}
+        onPointerDown={event => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={event => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            const rect = containerRef.current.getBoundingClientRect();
+            const pixels = event[axis] - rect[axis];
+            hidden.value = inverse
+              ? rect[dimension] - pixels < -offset / 2
+              : pixels < offset / 2;
+            const percentage = clamp(0, 1, (pixels - offset) / rect[dimension]);
+            setSize(percentage);
+          }
+        }}
+        onPointerUp={event => {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+      />
       <div className={styles.right}>{end}</div>
     </div>
   );

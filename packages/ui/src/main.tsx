@@ -12,6 +12,7 @@ import {
 } from './contexts';
 import {getItem, setItem} from './utils';
 import {ShortcutsProvider} from './contexts/shortcuts';
+import {projectNameSignal} from './signals';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -21,6 +22,7 @@ function renderRoot(vnode: ComponentChild) {
 
 export function editor(project: Project) {
   Error.stackTraceLimit = Infinity;
+  projectNameSignal.value = project.name;
 
   project.logger.onLogged.subscribe(log => {
     const {level, message, stack, object, durationMs, ...rest} = log;

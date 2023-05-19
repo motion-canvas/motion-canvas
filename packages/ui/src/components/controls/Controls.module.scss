@@ -106,6 +106,7 @@
   flex-shrink: 1;
 
   .button {
+    padding-left: 32px;
     border-radius: var(--radius) 0 0 var(--radius);
   }
 
@@ -252,7 +253,7 @@
   }
 
   svg {
-    transition: rotate var(--duration-normal);
+    transition: rotate var(--duration-normal) var(--timing-ease-in-out);
   }
 
   &.open svg {
