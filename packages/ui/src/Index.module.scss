@@ -11,10 +11,7 @@
 .header {
   position: sticky;
   top: 0;
-  font-size: 16px;
-  line-height: 24px;
-  text-transform: uppercase;
-  font-weight: bold;
+  margin: 0;
   display: flex;
   gap: 16px;
   padding: 16px;
@@ -47,6 +44,6 @@
 }
 
 .subtitle {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   color: rgba(255, 255, 255, 0.32);
 }

@@ -51,7 +51,7 @@ export function Log({payload}: LogProps) {
         {hasBody && <Toggle open={open} onToggle={setOpen} />}
         <div className={styles.message}>{payload.message}</div>
         {duration !== null && (
-          <div className={styles.duration}>{duration} ms</div>
+          <code className={styles.duration}>{duration} ms</code>
         )}
         {payload.inspect && (
           <IconButton

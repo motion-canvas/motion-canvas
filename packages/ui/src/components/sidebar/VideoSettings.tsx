@@ -33,7 +33,7 @@ export function VideoSettings() {
             title="Reveal the output directory in file explorer"
             onClick={openOutputPath}
           >
-            OUTPUT DIRECTORY
+            Output Directory
           </Button>
         </Group>
       )}
@@ -73,9 +73,9 @@ function ProcessButton({processId, setProcess}: ProcessButtonProps) {
       options={[
         {
           value: 0,
-          text: 'RENDER',
+          text: 'Render',
         },
-        {value: 1, text: 'PRESENT'},
+        {value: 1, text: 'Present'},
       ]}
     />
   ) : (
@@ -89,7 +89,7 @@ function ProcessButton({processId, setProcess}: ProcessButtonProps) {
         renderer.abort();
       }}
     >
-      {rendererState === RendererState.Working ? 'ABORT' : 'ABORTING'}
+      {rendererState === RendererState.Working ? 'Abort' : 'Aborting'}
     </Button>
   );
 }

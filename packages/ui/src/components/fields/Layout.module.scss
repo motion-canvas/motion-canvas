@@ -6,7 +6,6 @@
   background: var(--field-color);
   color: rgba(255, 255, 255, 0.6);
   border-radius: var(--radius);
-  line-height: 24px;
   flex-shrink: 1;
   flex-grow: 1;
   flex-basis: 100%;
@@ -87,6 +86,7 @@
 }
 
 .value {
+  font-family: var(--font-family-mono);
   padding: 0 8px;
   flex-shrink: 0;
   overflow: hidden;

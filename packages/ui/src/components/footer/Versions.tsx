@@ -48,7 +48,7 @@ export function Versions() {
           navigator.clipboard.writeText(text);
         }}
       >
-        {versions.core}
+        <code>{versions.core}</code>
       </div>
     </div>
   );
