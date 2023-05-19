@@ -10,6 +10,7 @@ import {
   Docs,
   MotionCanvas,
   Movie,
+  Settings,
   Videocam,
   ViewTimeline,
 } from '../icons';
@@ -89,6 +90,9 @@ export function Navigation() {
               {errorCount > 999 ? `999+` : errorCount}
             </Badge>
           )}
+        </Tab>
+        <Tab title="Settings" id="settings-tab" tab={EditorPanel.Settings}>
+          <Settings />
         </Tab>
       </TabGroup>
       <Space />

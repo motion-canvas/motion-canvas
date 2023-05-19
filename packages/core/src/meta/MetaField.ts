@@ -42,10 +42,13 @@ export class MetaField<
 
   /**
    * @param name - The name of this field displayed in the editor.
-   * @param value - The initial value of this field.
+   * @param initial - The initial value of this field.
    */
-  public constructor(public readonly name: string, value: TValue) {
-    this.value = new ValueDispatcher(value);
+  public constructor(
+    public readonly name: string,
+    public readonly initial: TValue,
+  ) {
+    this.value = new ValueDispatcher(initial);
   }
 
   /**

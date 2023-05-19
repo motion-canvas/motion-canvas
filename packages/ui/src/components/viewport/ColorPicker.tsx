@@ -26,7 +26,7 @@ function ColorPickerImpl() {
     'keydown',
     useCallback(
       event => {
-        if (event.key === 'i') {
+        if (document.activeElement.tagName !== 'INPUT' && event.key === 'i') {
           pickColor();
         }
       },

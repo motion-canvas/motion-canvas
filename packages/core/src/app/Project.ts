@@ -2,6 +2,7 @@ import {FullSceneDescription} from '../scenes';
 import {Logger} from './Logger';
 import type {ProjectMetadata} from './ProjectMetadata';
 import type {Plugin} from '../plugin';
+import {SettingsMetadata} from './SettingsMetadata';
 
 export interface ProjectSettings {
   name?: string;
@@ -29,6 +30,7 @@ export interface Project {
   plugins: Plugin[];
   logger: Logger;
   meta: ProjectMetadata;
+  settings: SettingsMetadata;
   audio?: string;
   variables?: Record<string, unknown>;
   versions: Versions;
