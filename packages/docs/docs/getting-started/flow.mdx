@@ -20,9 +20,9 @@ function* example() {
 
 const generator = example();
 
-console.log(generator.next()); // 1;
-console.log(generator.next()); // 2;
-console.log(generator.next()); // 3;
+console.log(generator.next().value); // 1;
+console.log(generator.next().value); // 2;
+console.log(generator.next().value); // 3;
 ```
 
 When the `yield` keyword is encountered, the execution of the function pauses,
