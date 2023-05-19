@@ -20,6 +20,15 @@
   --duration-normal: 0.2s;
   --duration-fast: 0.1s;
 
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol';
+  --font-family: 'JetBrains Mono';
+  --font-family-mono: 'JetBrains Mono';
+  --font-size: 14px;
+  --font-size-small: 12px;
+  --font-size-big: 16px;
+
   --red: #e13238;
   --yellow: #e6a700;
   --blue: #4cb3d4;
@@ -38,8 +47,6 @@
 
 * {
   box-sizing: border-box;
-  font-family: 'JetBrains Mono', sans-serif;
-  font-size: 14px;
   accent-color: var(--theme);
 
   &::-webkit-scrollbar {
@@ -61,6 +68,9 @@
 
 html,
 body {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 24px;
   overflow: hidden;
   padding: 0;
   margin: 0;
@@ -74,6 +84,19 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+code,
+pre {
+  font-family: var(--font-family-mono);
 }
 
 svg {

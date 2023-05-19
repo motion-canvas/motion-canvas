@@ -9,6 +9,8 @@
   gap: 4px;
   grid-area: footer;
   border-top: 2px solid var(--border-color);
+  font-size: var(--font-size-small);
+  line-height: 16px;
 }
 
 .shortcuts {
@@ -31,11 +33,8 @@
     border-radius: var(--radius);
     margin-right: 4px;
     padding: 0 4px;
-    font-size: 12px;
   }
   .action {
-    font-size: 12px;
-    line-height: 16px;
     white-space: nowrap;
   }
 }

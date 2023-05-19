@@ -6,8 +6,6 @@
 }
 
 .link {
-  font-size: 12px;
-  line-height: 16px;
   cursor: pointer;
   text-decoration: none;
   white-space: nowrap;
@@ -19,8 +17,4 @@
   &.main {
     color: var(--theme);
   }
-}
-
-.input {
-  display: none;
 }

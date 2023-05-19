@@ -11,7 +11,7 @@ export function Footer() {
           .filter(({available}) => !available || available())
           .map(({key, action}) => (
             <div className={styles.shortcut}>
-              <span className={styles.key}>{key}</span>
+              <code className={styles.key}>{key}</code>
               <span className={styles.action}>{action}</span>
             </div>
           ))}

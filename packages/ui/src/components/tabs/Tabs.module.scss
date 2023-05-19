@@ -43,7 +43,8 @@
 }
 
 .badge {
-  font-size: 12px;
+  font-size: var(--font-size-small);
+  line-height: 16px;
   color: rgba(255, 255, 255, 0.7);
   position: absolute;
   font-weight: 900;
@@ -54,7 +55,6 @@
   height: 16px;
   background-color: var(--red);
   border-radius: 8px;
-  line-height: 16px;
   text-align: center;
   z-index: 1;
 }

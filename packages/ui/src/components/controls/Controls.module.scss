@@ -61,7 +61,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 24px;
 }
 
 .select,
@@ -72,9 +71,7 @@
   border: 0;
   border-radius: var(--radius);
   padding: 0 8px;
-  font-size: 14px;
   height: 24px;
-  line-height: 24px;
   flex-shrink: 1;
   flex-grow: 1;
   min-width: 0;
@@ -100,6 +97,11 @@
   }
 }
 
+.select,
+.input {
+  font-family: var(--font-family-mono);
+}
+
 .inputSelect {
   display: flex;
   flex-grow: 1;
@@ -117,7 +119,7 @@
   }
 
   .select {
-    font-size: 0;
+    width: 0;
     flex-grow: 0;
     flex-basis: 0;
     padding: 0 12px;
@@ -219,6 +221,7 @@
   justify-content: center;
   overflow: hidden;
   white-space: nowrap;
+  text-transform: uppercase;
   gap: 8px;
 
   &:disabled {
@@ -265,7 +268,6 @@
   color: rgba(255, 255, 255, 0.7);
   background-color: var(--surface-color-light);
   user-select: none;
-  line-height: 24px;
   border-radius: 12px;
   padding: 0 12px;
   cursor: pointer;

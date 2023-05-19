@@ -33,7 +33,6 @@ $colors: (
   border-left: 4px solid transparent;
   background-color: var(--background-color-dark);
   border-radius: var(--radius);
-  line-height: 24px;
   padding: 8px;
   overflow: hidden;
   display: none;
@@ -68,6 +67,8 @@ $colors: (
 }
 
 .stack {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-small);
   overflow-x: auto;
   margin-top: 8px;
 
@@ -131,7 +132,6 @@ $colors: (
 }
 
 .entry {
-  font-size: 12px;
   line-height: 20px;
   white-space: nowrap;
 
@@ -141,7 +141,6 @@ $colors: (
 }
 
 .link {
-  font-size: 12px;
   cursor: pointer;
   color: inherit;
 
