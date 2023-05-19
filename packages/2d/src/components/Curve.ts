@@ -153,6 +153,8 @@ export abstract class Curve extends Shape {
   @signal()
   public declare readonly arrowSize: SimpleSignal<number, this>;
 
+  protected canHaveSubpath = false;
+
   protected override desiredSize(): SerializedVector2<DesiredLength> {
     return this.childrenBBox().size;
   }
@@ -246,6 +248,7 @@ export abstract class Curve extends Shape {
   @computed()
   protected curveDrawingInfo(): CurveDrawingInfo {
     const path = new Path2D();
+    let subpath = new Path2D();
     const profile = this.profile();
 
     let start = this.percentageToDistance(this.start());
@@ -283,8 +286,18 @@ export abstract class Curve extends Shape {
       const clampedStart = clamp(0, 1, relativeStart);
       const clampedEnd = clamp(0, 1, relativeEnd);
 
+      if (
+        this.canHaveSubpath &&
+        endPoint &&
+        !segment.getPoint(0).position.equals(endPoint)
+      ) {
+        path.addPath(subpath);
+        subpath = new Path2D();
+        startPoint = null;
+      }
+
       const [startCurvePoint, endCurvePoint] = segment.draw(
-        path,
+        subpath,
         clampedStart,
         clampedEnd,
         startPoint === null,
@@ -303,8 +316,9 @@ export abstract class Curve extends Shape {
     }
 
     if (this.end() === 1 && this.closed()) {
-      path.closePath();
+      subpath.closePath();
     }
+    path.addPath(subpath);
 
     return {
       startPoint: startPoint ?? Vector2.zero,

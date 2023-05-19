@@ -12,6 +12,7 @@ export * from './Node';
 export * from './Ray';
 export * from './Rect';
 export * from './Polygon';
+export * from './Path';
 export * from './QuadBezier';
 export * from './Shape';
 export * from './Spline';

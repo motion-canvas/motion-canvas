@@ -8,7 +8,10 @@ export class LineSegment extends Segment {
   private readonly vector: Vector2;
   private readonly normal: Vector2;
 
-  public constructor(private from: Vector2, private to: Vector2) {
+  public constructor(
+    public readonly from: Vector2,
+    public readonly to: Vector2,
+  ) {
     super();
     this.vector = to.sub(from);
     this.length = this.vector.magnitude;
