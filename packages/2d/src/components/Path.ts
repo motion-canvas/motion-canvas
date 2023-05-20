@@ -12,6 +12,9 @@ import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ArcSegment} from '../curves/ArcSegment';
 import {drawLine, lineTo} from '../utils';
 import {Curve, CurveProps} from './Curve';
+import {threadable} from '@motion-canvas/core/lib/decorators';
+import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
+import {interpolateCurveProfile} from '../curves/interpolateCurveProfile';
 
 export interface PathProps extends CurveProps {
   data?: SignalValue<string>;
@@ -67,6 +70,31 @@ export class Path extends Curve {
     }
 
     return coefficient;
+  }
+
+  @threadable()
+  protected *tweenData(
+    newPath: string,
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const fromProfile = this.profile();
+    const toProfile = getPathProfile(newPath);
+
+    const interpolator = interpolateCurveProfile(fromProfile, toProfile);
+
+    this.currentProfile(fromProfile);
+    yield* tween(
+      time,
+      value => {
+        const progress = timingFunction(value);
+        this.currentProfile(interpolator(progress));
+      },
+      () => {
+        this.currentProfile(null);
+        this.data(newPath);
+      },
+    );
   }
 
   public override drawOverlay(
