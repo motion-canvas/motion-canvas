@@ -14,16 +14,13 @@
 
 # Motion Canvas
 
-Motion Canvas is two things:
+Motion Canvas serves as a comprehensive solution encompassing two key components:
 
-- A TypeScript library that uses generators to program animations.
-- An editor providing a real-time preview of said animations.
+- Firstly, it functions as a TypeScript library that leverages generators as a means to program animations effectively. This powerful feature facilitates the creation of dynamic and visually appealing animations with relative ease.
+- Secondly, Motion Canvas offers an integrated editor that provides users with a real-time preview of their animations. This editor not only showcases the animations as they unfold but also grants users the ability to make real-time edits to certain elements of the animation. 
+This functionality proves invaluable as it streamlines the animation creation process, eliminating the need for tedious and time-consuming manual adjustments. 
 
-It's a specialized tool designed to create informative vector animations and
-synchronize them with voice-overs.
-
-Aside from providing the preview, the editor allows you to edit certain aspects
-of the animation which could otherwise be tedious.
+By combining the benefits of a versatile TypeScript library and an intuitive editor, Motion Canvas enables users to craft informative vector animations and seamlessly synchronize them with voice-overs. This specialized tool caters to the needs of animators, designers, and content creators, empowering them to deliver captivating and synchronized visual experiences.
 
 ## Using Motion Canvas
 
