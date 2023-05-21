@@ -10,9 +10,7 @@ Before contributing to the project, please read our
 
 ## Reporting a bug
 
-Before you submit an issue, please search [the issue tracker][issues]. An issue
-for your problem might already exist and the discussion might inform you of
-workarounds readily available.
+Before you submit an issue, please search [the issue tracker][issues]. An issue for your problem might already exist, and the discussion might inform you of readily available workarounds.
 
 You can file new issues by [selecting an issue template][new-issue] and filling
 out the necessary information.
@@ -22,13 +20,9 @@ out the necessary information.
 If you intend to change the public API, make any non-trivial changes to the
 implementation, or create brand-new guides in the documentation, make sure to
 [create an issue][new-feature] first. This will let us discuss a proposal before
-you put significant effort into it. After a proposal has been discussed it may
-receive the [`c-accepted`][label-accepted] label indicating that it's ready to
-be implemented.
+you put significant effort into it. After a proposal has been discussed, it may receive the [`c-accepted`][label-accepted] label, indicating that it's ready to be implemented.
 
-If you're only fixing a bug or a typo, it's fine to submit a pull request right
-away without creating an issue, but make sure it contains a clear and concise
-description of the bug.
+If you're only fixing a bug or a typo, it's fine to submit a pull request right away without creating an issue. However, make sure it contains a clear and concise description of the bug.
 
 ## Working on Issues
 
@@ -36,8 +30,7 @@ Before you start working on an issue make sure that it has been accepted
 (indicated by a [`c-accepted`][label-accepted] label) and that no one has
 claimed it yet. Otherwise, you may duplicate other people's efforts. If somebody
 claims an issue but doesn't follow up for more than two weeks, it’s fine to take
-it over, but you should still leave a comment. You should also leave a comment
-on any issue you're working on, to let others know.
+it over, but you should still leave a comment. You should also leave a comment on any issue you're working on to let others know.
 
 ## Semantic Versioning
 
