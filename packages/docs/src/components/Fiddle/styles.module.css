@@ -98,6 +98,7 @@
   margin: 0;
   border-top: 1px solid var(--ifm-color-danger-dark);
   border-bottom: 1px solid var(--ifm-color-danger-dark);
+  white-space: pre-wrap;
 }
 
 .editor {
