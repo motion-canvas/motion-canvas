@@ -40,6 +40,28 @@ export class Random {
     return value;
   }
 
+  // This is an optimization.
+  // Since gauss() generates a pair of independent Gaussian random numbers,
+  // it returns one immediately and stores the other for the next call to gauss().
+  private nextGauss: number | null = null;
+
+  /**
+   * Get a random float from a gaussian distribution.
+   * @param mean - The mean of the distribution.
+   * @param stdev - The standard deviation of the distribution.
+   */
+  public gauss(mean = 0.0, stdev = 1.0): number {
+    let z = this.nextGauss;
+    this.nextGauss = null;
+    if (z === null) {
+      const x2pi = this.next() * 2 * Math.PI;
+      const g2rad = Math.sqrt(-2.0 * Math.log(1.0 - this.next()));
+      z = Math.cos(x2pi) * g2rad;
+      this.nextGauss = Math.sin(x2pi) * g2rad;
+    }
+    return mean + z * stdev;
+  }
+
   /**
    * Get an array filled with random floats in the given range.
    *
