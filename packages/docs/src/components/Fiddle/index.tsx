@@ -33,6 +33,12 @@ import {
 import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import Dropdown from '@site/src/components/Dropdown';
 import clsx from 'clsx';
+import {
+  areImportsFolded,
+  findImportRange,
+  foldImports,
+  folding,
+} from '@site/src/components/Fiddle/folding';
 
 export interface FiddleProps {
   className?: string;
@@ -99,6 +105,16 @@ export default function Fiddle({
     }
   };
 
+  const switchState = (id: number) => {
+    setSnippetId(id);
+    const isFolded = areImportsFolded(editorView.current.state);
+    editorView.current.setState(snippets[id].state);
+    update(snippets[id].state.doc);
+    if (isFolded) {
+      foldImports(editorView.current);
+    }
+  };
+
   const [snippetId, setSnippetId] = useState(0);
   const snippets = useMemo(
     () =>
@@ -121,9 +137,12 @@ export default function Fiddle({
             ]),
             EditorView.updateListener.of(update => {
               setDoc(update.state.doc);
-              setError(null);
+              if (update.docChanged) {
+                setError(null);
+              }
             }),
             autocomplete(),
+            folding(),
             javascript({
               jsx: true,
               typescript: true,
@@ -141,6 +160,8 @@ export default function Fiddle({
       parent: editorRef.current,
       state: snippets[snippetId].state,
     });
+    foldImports(editorView.current);
+
     const borrowed = tryBorrowPlayer(
       setPlayer,
       previewRef.current,
@@ -158,6 +179,17 @@ export default function Fiddle({
       editorView.current.destroy();
     };
   }, []);
+
+  // Ghost code is displayed before the editor is initialized.
+  const ghostCode = useMemo(() => {
+    const initialState = snippets[0].state;
+    const range = findImportRange(initialState);
+    let text = initialState.doc;
+    if (range) {
+      text = text.replace(range.from, range.to, Text.of(['...']));
+    }
+    return text.toString() + '\n';
+  }, [snippets]);
 
   const hasChangedSinceLastUpdate = lastDoc && doc && !doc.eq(lastDoc);
   const hasChanged =
@@ -259,15 +291,8 @@ export default function Fiddle({
           </button>
         </div>
         <div className={styles.section}>
-          {snippets.length === 0 && hasChanged && (
-            <button
-              className={styles.button}
-              onClick={() => {
-                editorView.current.setState(snippets[snippetId].state);
-                update(snippets[snippetId].state.doc);
-                setDoc(snippets[snippetId].state.doc);
-              }}
-            >
+          {snippets.length === 1 && hasChanged && (
+            <button className={styles.button} onClick={() => switchState(0)}>
               <small>Reset example</small>
             </button>
           )}
@@ -275,11 +300,7 @@ export default function Fiddle({
             <Dropdown
               className={styles.picker}
               value={hasChanged ? -1 : snippetId}
-              onChange={id => {
-                setSnippetId(id);
-                editorView.current.setState(snippets[id].state);
-                update(snippets[id].state.doc);
-              }}
+              onChange={switchState}
               options={snippets
                 .map((snippet, index) => ({
                   value: index,
@@ -293,7 +314,9 @@ export default function Fiddle({
       {error && <pre className={styles.error}>{error.message}</pre>}
       <div className={styles.editor} ref={editorRef}>
         <CodeBlock className={styles.source} language="tsx">
-          {snippets[0].state.doc.toString() + (mode === 'code' ? '' : '\n')}
+          {mode === 'code'
+            ? snippets[snippetId].state.doc.toString()
+            : ghostCode}
         </CodeBlock>
       </div>
     </div>
