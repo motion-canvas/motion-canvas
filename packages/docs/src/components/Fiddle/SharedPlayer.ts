@@ -4,7 +4,6 @@ import type {
   Stage as StageType,
   FullSceneDescription,
   ThreadGeneratorFactory,
-  LogPayload,
 } from '@motion-canvas/core';
 import type {View2D} from '@motion-canvas/2d';
 
@@ -15,7 +14,7 @@ let StageInstance: StageType = null;
 let CurrentSetter: (value: PlayerType) => void = null;
 let CurrentParent: HTMLElement = null;
 let CurrentRatio = 1;
-let ErrorHandler: (message: LogPayload) => void = null;
+let ErrorHandler: (message: string) => void = null;
 
 export function disposePlayer(setter: (value: PlayerType) => void) {
   if (CurrentSetter !== setter || !ProjectInstance) return;
@@ -35,7 +34,7 @@ export async function borrowPlayer(
   setter: (value: PlayerType) => void,
   parent: HTMLDivElement,
   ratio: number,
-  onError?: (message: LogPayload) => void,
+  onError?: (message: string) => void,
 ): Promise<PlayerType> {
   if (setter === CurrentSetter) return;
   if (
@@ -99,7 +98,7 @@ export async function borrowPlayer(
 
     ProjectInstance.logger.onLogged.subscribe(payload => {
       if (payload.level === 'error') {
-        ErrorHandler?.(payload);
+        ErrorHandler?.(`Runtime error: ${payload.message}`);
       }
     });
   }
@@ -125,7 +124,7 @@ export async function tryBorrowPlayer(
   setter: (value: PlayerType) => void,
   parent: HTMLDivElement,
   ratio: number,
-  onError?: (error: LogPayload) => void,
+  onError?: (error: string) => void,
 ): Promise<PlayerType | null> {
   if (!CurrentSetter) {
     return borrowPlayer(setter, parent, ratio, onError);

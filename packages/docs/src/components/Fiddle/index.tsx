@@ -27,7 +27,11 @@ import {
   updatePlayer,
 } from '@site/src/components/Fiddle/SharedPlayer';
 import styles from './styles.module.css';
-import {compileScene, transform} from '@site/src/components/Fiddle/transformer';
+import {
+  compileScene,
+  transform,
+  TransformError,
+} from '@site/src/components/Fiddle/transformer';
 import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import Dropdown from '@site/src/components/Dropdown';
 import clsx from 'clsx';
@@ -39,6 +43,11 @@ import {
 } from '@site/src/components/Fiddle/folding';
 import {useLocation} from '@docusaurus/router';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import {
+  clearErrors,
+  errorExtension,
+  underlineErrors,
+} from '@site/src/components/Fiddle/errorHighlighting';
 
 export interface FiddleProps {
   className?: string;
@@ -74,7 +83,7 @@ export default function Fiddle({
   const [mode, setMode] = useState(initialMode);
   const {pathname} = useLocation();
 
-  const [error, setError] = useState<{message: string}>(null);
+  const [error, setError] = useState<string>(null);
   const duration = useSubscribableValue(player?.onDurationChanged);
   const frame = useSubscribableValue(player?.onFrameChanged);
   const state = useSubscribableValue(player?.onStateChanged);
@@ -105,7 +114,10 @@ export default function Fiddle({
       }
       return true;
     } catch (e) {
-      setError(e);
+      if (e instanceof TransformError) {
+        underlineErrors(editorView.current, e.errors, e.message);
+      }
+      setError(e.message);
       player?.togglePlayback(false);
       return false;
     }
@@ -145,10 +157,12 @@ export default function Fiddle({
               setDoc(update.state.doc);
               if (update.docChanged) {
                 setError(null);
+                clearErrors(editorView.current);
               }
             }),
             autocomplete(),
             folding(),
+            errorExtension(),
             javascript({
               jsx: true,
               typescript: true,
@@ -329,7 +343,7 @@ export default function Fiddle({
           )}
         </div>
       </div>
-      {error && <pre className={styles.error}>{error.message}</pre>}
+      {error && <pre className={styles.error}>{error}</pre>}
       <div className={styles.editor} ref={editorRef}>
         <CodeBlock className={styles.source} language="tsx">
           {mode === 'code'
