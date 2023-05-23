@@ -10,6 +10,7 @@
   "types": "./lib/scenes/index.d.ts",
   "scripts": {
     "build": "ttsc",
+    "bundle": "rollup -c rollup.config.mjs",
     "watch": "ttsc -w",
     "test": "vitest"
   },
