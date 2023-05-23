@@ -2,13 +2,14 @@
   "name": "@motion-canvas/core",
   "version": "3.8.0",
   "description": "Web-based tool for creating animations programmatically",
-  "main": "lib/app/index.js",
+  "main": "lib/index.js",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
     "build": "ttsc -p tsconfig.build.json",
+    "bundle": "rollup -c rollup.config.mjs",
     "watch": "ttsc -p tsconfig.build.json -w",
     "test": "vitest"
   },

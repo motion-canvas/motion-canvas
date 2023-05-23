@@ -31,7 +31,6 @@ module.exports = () => ({
         excludeInternal: true,
         excludePrivate: true,
         entryPoints: [
-          '../core/src/index.ts',
           '../core/src/decorators',
           '../core/src/events',
           '../core/src/flow',
