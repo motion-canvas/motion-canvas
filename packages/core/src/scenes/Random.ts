@@ -6,6 +6,17 @@ import {range} from '../utils';
  * {@link https://gist.github.com/tommyettinger/46a874533244883189143505d203312c | Mulberry32}.
  */
 export class Random {
+  /**
+   * Previously generated Gaussian random number.
+   *
+   * @remarks
+   * This is an optimization.
+   * Since {@link gauss} generates a pair of independent Gaussian random
+   * numbers, it returns one immediately and stores the other for the next call
+   * to {@link gauss}.
+   */
+  private nextGauss: number | null = null;
+
   public constructor(private state: number) {}
 
   /**
@@ -38,6 +49,23 @@ export class Random {
     }
 
     return value;
+  }
+
+  /**
+   * Get a random float from a gaussian distribution.
+   * @param mean - The mean of the distribution.
+   * @param stdev - The standard deviation of the distribution.
+   */
+  public gauss(mean = 0, stdev = 1): number {
+    let z = this.nextGauss;
+    this.nextGauss = null;
+    if (z === null) {
+      const x2pi = this.next() * 2 * Math.PI;
+      const g2rad = Math.sqrt(-2 * Math.log(1 - this.next()));
+      z = Math.cos(x2pi) * g2rad;
+      this.nextGauss = Math.sin(x2pi) * g2rad;
+    }
+    return mean + z * stdev;
   }
 
   /**
