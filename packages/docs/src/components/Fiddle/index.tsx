@@ -5,7 +5,7 @@ import {Text, EditorState} from '@codemirror/state';
 import {javascript} from '@codemirror/lang-javascript';
 import {syntaxHighlighting} from '@codemirror/language';
 import {indentWithTab} from '@codemirror/commands';
-import {Player} from '@motion-canvas/core';
+import type {Player} from '@motion-canvas/core';
 import {
   EditorTheme,
   SyntaxHighlightStyle,
@@ -24,12 +24,10 @@ import {
   borrowPlayer,
   disposePlayer,
   tryBorrowPlayer,
+  updatePlayer,
 } from '@site/src/components/Fiddle/SharedPlayer';
 import styles from './styles.module.css';
-import {
-  transform,
-  TransformError,
-} from '@site/src/components/Fiddle/transformer';
+import {compileScene, transform} from '@site/src/components/Fiddle/transformer';
 import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import Dropdown from '@site/src/components/Dropdown';
 import clsx from 'clsx';
@@ -39,6 +37,8 @@ import {
   foldImports,
   folding,
 } from '@site/src/components/Fiddle/folding';
+import {useLocation} from '@docusaurus/router';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
 export interface FiddleProps {
   className?: string;
@@ -72,8 +72,9 @@ export default function Fiddle({
   const editorRef = useRef<HTMLDivElement>();
   const previewRef = useRef<HTMLDivElement>();
   const [mode, setMode] = useState(initialMode);
+  const {pathname} = useLocation();
 
-  const [error, setError] = useState<TransformError>(null);
+  const [error, setError] = useState<{message: string}>(null);
   const duration = useSubscribableValue(player?.onDurationChanged);
   const frame = useSubscribableValue(player?.onFrameChanged);
   const state = useSubscribableValue(player?.onStateChanged);
@@ -93,23 +94,28 @@ export default function Fiddle({
     return isNaN(value) ? 4 : value;
   }, [ratio]);
 
-  const update = (newDoc: Text, animate = true) => {
-    borrowPlayer(setPlayer, previewRef.current, parsedRatio);
-    const newError = transform(newDoc.sliceString(0));
-    setError(newError);
-    if (!newError) {
+  const update = async (newDoc: Text, animate = true) => {
+    await borrowPlayer(setPlayer, previewRef.current, parsedRatio, setError);
+    try {
+      const scene = await compileScene(newDoc.sliceString(0), pathname);
+      updatePlayer(scene);
       setLastDoc(newDoc);
       if (animate && !lastDoc?.eq(newDoc)) {
         previewRef.current.animate(highlight(), {duration: 300});
       }
+      return true;
+    } catch (e) {
+      setError(e);
+      player?.togglePlayback(false);
+      return false;
     }
   };
 
-  const switchState = (id: number) => {
+  const switchState = async (id: number) => {
     setSnippetId(id);
     const isFolded = areImportsFolded(editorView.current.state);
     editorView.current.setState(snippets[id].state);
-    update(snippets[id].state.doc);
+    await update(snippets[id].state.doc);
     if (isFolded) {
       foldImports(editorView.current);
     }
@@ -155,6 +161,13 @@ export default function Fiddle({
     [children],
   );
 
+  if (!ExecutionEnvironment.canUseDOM) {
+    // Validate the snippets during Server-Side Rendering.
+    snippets.forEach(snippet => {
+      transform(snippet.state.doc.sliceString(0), pathname);
+    });
+  }
+
   useEffect(() => {
     editorView.current = new EditorView({
       parent: editorRef.current,
@@ -162,17 +175,16 @@ export default function Fiddle({
     });
     foldImports(editorView.current);
 
-    const borrowed = tryBorrowPlayer(
-      setPlayer,
-      previewRef.current,
-      parsedRatio,
+    tryBorrowPlayer(setPlayer, previewRef.current, parsedRatio, setError).then(
+      async borrowed => {
+        if (borrowed) {
+          const success = await update(snippets[snippetId].state.doc, false);
+          if (success && mode !== 'code') {
+            borrowed.togglePlayback(true);
+          }
+        }
+      },
     );
-    if (borrowed) {
-      update(snippets[snippetId].state.doc, false);
-      if (mode !== 'code') {
-        borrowed.togglePlayback(true);
-      }
-    }
 
     return () => {
       disposePlayer(setPlayer);
@@ -264,20 +276,26 @@ export default function Fiddle({
           </button>
           <button
             className={styles.icon}
-            onClick={() => {
+            onClick={async () => {
               if (!player) {
-                const borrowed = borrowPlayer(
+                const borrowed = await borrowPlayer(
                   setPlayer,
                   previewRef.current,
                   parsedRatio,
+                  setError,
                 );
-                update(editorView.current.state.doc);
-                borrowed.togglePlayback(true);
-              } else {
-                if (!lastDoc) {
-                  update(editorView.current.state.doc);
+                const success = await update(editorView.current.state.doc);
+                if (success) {
+                  borrowed.togglePlayback(true);
                 }
-                player.togglePlayback();
+              } else {
+                let success = true;
+                if (!lastDoc) {
+                  success = await update(editorView.current.state.doc);
+                }
+                if (success) {
+                  player.togglePlayback();
+                }
               }
             }}
           >

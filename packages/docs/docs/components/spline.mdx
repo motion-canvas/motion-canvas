@@ -6,10 +6,8 @@ slug: /spline
 # Spline
 
 ```tsx editor
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Spline, Knot} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {waitFor} from '@motion-canvas/core/lib/flow';
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const spline = createRef<Spline>();
@@ -54,6 +52,8 @@ via the spline's `points` property. Each point will be treated as the position
 of one of the spline's knots.
 
 ```tsx editor
+import {makeScene2D, Spline} from '@motion-canvas/2d';
+
 export default makeScene2D(function* (view) {
   view.add(
     <Spline
@@ -83,6 +83,9 @@ We can alter the shape of the curve by passing a value between `0` and `1` to
 the `smoothness` property.
 
 ```tsx editor
+import {makeScene2D, Spline} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const spline = createRef<Spline>();
 
@@ -128,6 +131,8 @@ The second way of defining knots is by—fittingly—using the [Knot][knot] node
 The same spline from above can also be written like this.
 
 ```tsx editor
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+
 export default makeScene2D(function* (view) {
   view.add(
     <Spline lineWidth={6} stroke={'lightseagreen'}>
@@ -146,6 +151,8 @@ allows us to control the positions of each knot's handles via the `startHandle`
 and `endHandle` properties.
 
 ```tsx editor
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+
 export default makeScene2D(function* (view) {
   view.add(
     <Spline lineWidth={6} stroke={'lightseagreen'}>
@@ -187,6 +194,8 @@ knot**. Broken knots are very useful because they allow us to add sharp corners
 to our spline.
 
 ```tsx editor
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+
 export default makeScene2D(function* (view) {
   view.add(
     <Spline lineWidth={16} stroke={'lightseagreen'} closed>
@@ -247,6 +256,9 @@ handles (`1`).
 Since `auto` is a signal, it can also be animated.
 
 ```tsx editor
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+import {all, makeRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const knots: Knot[] = [];
 
@@ -311,6 +323,9 @@ taking the offset into account.
 We can then animate drawing a spline by tweening these properties:
 
 ```tsx editor
+import {makeScene2D, Spline} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const spline = createRef<Spline>();
 
@@ -361,6 +376,9 @@ transformations.
 
 ```tsx editor
 // snippet Position
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+import {all, makeRef, PossibleVector2} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const knotPositions: PossibleVector2[] = [
     [-200, 0],
@@ -387,6 +405,9 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Rotation
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+import {createRef, linear} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const knot = createRef<Knot>();
 
@@ -402,6 +423,9 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Scale
+import {makeScene2D, Spline, Knot} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const knot = createRef<Knot>();
 
@@ -423,6 +447,9 @@ Splines can be useful to model the path that an object should follow. You can
 use the `getPointAtPercentage` method to achieve this.
 
 ```tsx editor
+import {makeScene2D, Spline, Rect} from '@motion-canvas/2d';
+import {createRef, createSignal} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const spline = createRef<Spline>();
   const progress = createSignal(0);

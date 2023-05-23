@@ -1,65 +1,74 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as Babel from '@babel/standalone';
-import runtime from '@site/src/components/Fiddle/runtime';
-
-Babel.registerPlugin('mc', ({types}) => ({
-  visitor: {
-    Program(path) {
-      path.node.body.unshift(
-        types.variableDeclaration('const', [
-          types.variableDeclarator(
-            types.objectPattern(
-              Object.keys(runtime).map(key =>
-                types.objectProperty(
-                  types.identifier(key),
-                  types.identifier(key),
-                  false,
-                  true,
-                ),
-              ),
-            ),
-            types.memberExpression(
-              types.identifier('window'),
-              types.identifier('mc'),
-            ),
-          ),
-        ]),
-      );
-    },
-    ImportDeclaration(path) {
-      path.remove();
-    },
-    ExportDefaultDeclaration(path) {
-      path.replaceWith(path.node.declaration);
-    },
-  },
-}));
+import type {View2D} from '@motion-canvas/2d';
+import type {
+  FullSceneDescription,
+  ThreadGeneratorFactory,
+} from '@motion-canvas/core';
 
 export interface TransformError {
   message: string;
   loc: {line: number; column: number; index: number};
 }
 
-export function transform(code: string): TransformError | null {
-  try {
-    const result = Babel.transform(code, {
-      filename: 'fiddle.tsx',
-      presets: [
-        'typescript',
-        [
-          'react',
-          {
-            runtime: 'automatic',
-            importSource: '@motion-canvas/2d/lib',
-          },
-        ],
+export function transform(code: string, name: string): string {
+  const undeclaredVariables = new Set();
+  let referenceError = null;
+  const result = Babel.transform(code, {
+    filename: `${name}.tsx`,
+    presets: [
+      'typescript',
+      [
+        'react',
+        {
+          runtime: 'automatic',
+          importSource: '@motion-canvas/2d',
+        },
       ],
-      plugins: ['mc'],
-    });
-    eval(result.code);
-  } catch (e) {
-    return e as TransformError;
-  }
+    ],
+    plugins: [
+      ({types}) => ({
+        visitor: {
+          ImportDeclaration(path) {
+            if (path.node.source.value.startsWith('@motion-canvas/core')) {
+              path.node.source.value = '@motion-canvas/core';
+            }
+            if (path.node.source.value.startsWith('@motion-canvas/2d')) {
+              path.node.source.value = '@motion-canvas/2d';
+            }
+          },
+          ReferencedIdentifier(path) {
+            const {node, scope} = path;
 
-  return null;
+            if (types.isIdentifier(node) && !scope.hasBinding(node.name)) {
+              undeclaredVariables.add(node.name);
+              referenceError ??= path.buildCodeFrameError(
+                `Undeclared variable: ${node.name}`,
+              );
+            }
+          },
+        },
+        post() {
+          if (undeclaredVariables.size > 0) {
+            throw referenceError;
+          }
+        },
+      }),
+    ],
+  });
+
+  return result.code;
+}
+
+export async function compileScene(
+  code: string,
+  name: string,
+): Promise<FullSceneDescription<ThreadGeneratorFactory<View2D>>> {
+  const transformedCode = transform(code, name);
+  const scene = await import(
+    /* webpackIgnore: true */ URL.createObjectURL(
+      new Blob([transformedCode], {type: 'text/javascript'}),
+    )
+  );
+  return scene.default;
 }
