@@ -210,6 +210,7 @@ jobs:
             packages/ui/dist
             packages/player/dist
             packages/vite-plugin/lib
+      - run: npx lerna run bundle
       - run: npm run docs:build
         env:
           NODE_OPTIONS: "--max-old-space-size=8192"

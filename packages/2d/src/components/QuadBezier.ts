@@ -26,6 +26,9 @@ export interface QuadBezierProps extends CurveProps {
  *
  * @preview
  * ```tsx editor
+ * import {makeScene2D, QuadBezier} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const bezier = createRef<QuadBezier>();
  *

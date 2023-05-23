@@ -121,6 +121,7 @@ const config = {
   ],
   plugins: [
     './typedoc',
+    './bundle',
     [
       '@docusaurus/plugin-content-docs',
       {

@@ -32,6 +32,9 @@ export interface CubicBezierProps extends CurveProps {
  * Defining a cubic Bézier curve using `points` property.
  *
  * ```tsx editor
+ * import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const bezier = createRef<CubicBezier>();
  *

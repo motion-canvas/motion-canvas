@@ -8,8 +8,8 @@
   flex-grow: 0;
   white-space: nowrap;
   display: flex;
-  justify-content: end;
-  align-items: start;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
 
 .icon {

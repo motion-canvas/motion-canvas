@@ -7,9 +7,8 @@ slug: /bezier-curves
 
 ```tsx editor
 // snippet Cubic Bézier
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {CubicBezier} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
@@ -32,9 +31,8 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Quadratic Bézier
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {QuadBezier} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, QuadBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const bezier = createRef<QuadBezier>();
@@ -81,6 +79,9 @@ a cubic Bézier curve has two.
 
 ```tsx editor
 // snippet Cubic Bézier
+import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
 
@@ -100,6 +101,9 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Quadratic Bézier
+import {makeScene2D, QuadBezier} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<QuadBezier>();
 
@@ -146,6 +150,9 @@ control the size of the arrowheads with the [`arrowSize`][arrow-size] signal.
 
 ```tsx editor
 // snippet Cubic Bézier
+import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
 
@@ -168,6 +175,9 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Quadratic Bézier
+import {makeScene2D, QuadBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<QuadBezier>();
 
@@ -219,6 +229,9 @@ The following section shows examples of common animations for Bézier curves.
 
 ```tsx editor
 // snippet Drawing Bézier curves
+import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
 
@@ -239,6 +252,14 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Moving nodes along a curve
+import {makeScene2D, CubicBezier, Rect} from '@motion-canvas/2d';
+import {
+  createRef,
+  waitFor,
+  createSignal,
+  createComputed,
+} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
 
