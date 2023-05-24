@@ -7,6 +7,7 @@ export class LineSegment extends Segment {
   private readonly length: number;
   private readonly vector: Vector2;
   private readonly normal: Vector2;
+  public override readonly points: Vector2[];
 
   public constructor(
     public readonly from: Vector2,
@@ -16,6 +17,7 @@ export class LineSegment extends Segment {
     this.vector = to.sub(from);
     this.length = this.vector.magnitude;
     this.normal = this.vector.perpendicular.normalized.safe;
+    this.points = [from, to];
   }
 
   public get arcLength(): number {

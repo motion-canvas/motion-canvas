@@ -1,6 +1,9 @@
+import {Vector2} from '@motion-canvas/core/lib/types';
 import {CurvePoint} from './CurvePoint';
 
 export abstract class Segment {
+  public abstract readonly points: Vector2[];
+
   public abstract draw(
     context: CanvasRenderingContext2D | Path2D,
     start: number,

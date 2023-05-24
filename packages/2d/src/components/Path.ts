@@ -5,11 +5,9 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {BBox, Vector2} from '@motion-canvas/core/lib/types';
-import {CurveProfile, LineSegment} from '../curves';
+import {CurveProfile} from '../curves';
 import {getPathProfile} from '../curves/getPathProfile';
 import {computed, signal} from '../decorators';
-import {PolynomialSegment} from '../curves/PolynomialSegment';
-import {ArcSegment} from '../curves/ArcSegment';
 import {drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
 import {threadable} from '@motion-canvas/core/lib/decorators';
@@ -36,12 +34,7 @@ export class Path extends Curve {
   }
 
   protected override childrenBBox() {
-    const points = this.profile().segments.flatMap(segment => {
-      if (segment instanceof LineSegment) return [segment.from, segment.to];
-      else if (segment instanceof PolynomialSegment) return segment.points;
-      else if (segment instanceof ArcSegment) return segment.extremePoint;
-      return [];
-    });
+    const points = this.profile().segments.flatMap(segment => segment.points);
     return BBox.fromPoints(...points);
   }
 

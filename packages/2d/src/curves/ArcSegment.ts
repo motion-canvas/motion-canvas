@@ -20,7 +20,7 @@ export class ArcSegment extends Segment {
   public readonly deltaAngle: number;
   public readonly xAxisRotation: number;
   private xAxisRotationMatrix: DOMMatrix;
-  public readonly extremePoint: Vector2[];
+  public override readonly points: Vector2[];
   private length: number;
 
   public constructor(
@@ -85,7 +85,7 @@ export class ArcSegment extends Segment {
     this.length = ArcSegment.el.getTotalLength();
 
     const bbox = new BBox(ArcSegment.el.getBBox());
-    this.extremePoint = [bbox.topLeft, bbox.bottomRight];
+    this.points = [bbox.topLeft, bbox.bottomRight];
   }
 
   public getAnglePosition(angle: number) {

@@ -12,7 +12,7 @@ export abstract class PolynomialSegment extends Segment {
     return this.length;
   }
 
-  public abstract get points(): Vector2[];
+  public abstract override get points(): Vector2[];
 
   protected constructor(
     protected readonly curve: Polynomial2D,
