@@ -39,7 +39,7 @@ export class Path extends Curve {
     const points = this.profile().segments.flatMap(segment => {
       if (segment instanceof LineSegment) return [segment.from, segment.to];
       else if (segment instanceof PolynomialSegment) return segment.points;
-      else if (segment instanceof ArcSegment) return segment.extremPoint;
+      else if (segment instanceof ArcSegment) return segment.extremePoint;
       return [];
     });
     return BBox.fromPoints(...points);
