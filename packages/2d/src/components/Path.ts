@@ -1,5 +1,6 @@
 import {
   createSignal,
+  isReactive,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
@@ -10,7 +11,7 @@ import {computed, signal} from '../decorators';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ArcSegment} from '../curves/ArcSegment';
-import {drawLine, lineTo} from '../utils';
+import {drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
@@ -34,7 +35,7 @@ export class Path extends Curve {
 
     if (!props.data) {
       useLogger().warn({
-        message: `Path data not specified for Path. Path need path data.`,
+        message: `No data specified for the path.`,
         inspect: this.key,
       });
     }
@@ -42,9 +43,7 @@ export class Path extends Curve {
 
   @computed()
   public override profile(): CurveProfile {
-    const currentProfile = this.currentProfile();
-    if (currentProfile) return currentProfile;
-    return getPathProfile(this.data());
+    return this.currentProfile() ?? getPathProfile(this.data());
   }
 
   protected override childrenBBox() {
@@ -74,12 +73,12 @@ export class Path extends Curve {
 
   @threadable()
   protected *tweenData(
-    newPath: string,
+    newPath: SignalValue<string>,
     time: number,
     timingFunction: TimingFunction,
   ) {
     const fromProfile = this.profile();
-    const toProfile = getPathProfile(newPath);
+    const toProfile = getPathProfile(isReactive(newPath) ? newPath() : newPath);
 
     const interpolator = interpolateCurveProfile(fromProfile, toProfile);
 
@@ -127,13 +126,8 @@ export class Path extends Curve {
     context.stroke(path);
     context.restore();
 
-    const radius = 8;
     context.beginPath();
-    lineTo(context, offset.addY(-radius));
-    lineTo(context, offset.addY(radius));
-    lineTo(context, offset);
-    lineTo(context, offset.addX(-radius));
-    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    drawPivot(context, offset);
     context.stroke();
 
     context.beginPath();
