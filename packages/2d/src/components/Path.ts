@@ -9,7 +9,6 @@ import {CurveProfile, LineSegment} from '../curves';
 import {getPathProfile} from '../curves/getPathProfile';
 import {computed, signal} from '../decorators';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
-import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ArcSegment} from '../curves/ArcSegment';
 import {drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
@@ -18,27 +17,17 @@ import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
 import {interpolateCurveProfile} from '../curves/interpolateCurveProfile';
 
 export interface PathProps extends CurveProps {
-  data?: SignalValue<string>;
-  tweenAlignPath?: SignalValue<boolean>;
+  data: SignalValue<string>;
 }
 
 export class Path extends Curve {
   private currentProfile = createSignal<CurveProfile | null>(null);
   @signal()
   public declare readonly data: SimpleSignal<string, this>;
-  @signal()
-  public declare readonly tweenAlignPath: SimpleSignal<boolean, this>;
 
   public constructor(props: PathProps) {
     super(props);
     this.canHaveSubpath = true;
-
-    if (!props.data) {
-      useLogger().warn({
-        message: `No data specified for the path.`,
-        inspect: this.key,
-      });
-    }
   }
 
   @computed()
