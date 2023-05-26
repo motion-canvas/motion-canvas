@@ -1,7 +1,10 @@
 <br/>
 <p align="center">
   <a href="https://motion-canvas.github.io">
-    <img width="180" src="https://motion-canvas.github.io/img/logo_dark.svg" alt="Motion Canvas logo">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://motion-canvas.github.io/img/logo_dark.svg">
+      <img width="180" alt="Motion Canvas logo" src="https://motion-canvas.github.io/img/logo.svg">
+    </picture>
   </a>
 </p>
 <p align="center">
