@@ -193,7 +193,7 @@ This is similar to above, but uses a `for` loop and an array of generators.
 
 ```tsx
 const generators = [];
-for (const ref of rects) {
+for (const rect of rects) {
   // No yield here, just store the generators.
   generators.push(rect.position.y(100, 1).to(-100, 2).to(0, 1));
 }
@@ -209,7 +209,7 @@ would take for the generator in the loop to complete, but is useful in some
 situations.
 
 ```tsx
-for (const ref of rects) {
+for (const rect of rects) {
   // Note the absence of a * after this yield
   yield rect.position.y(100, 1).to(-100, 2).to(0, 1);
 }
