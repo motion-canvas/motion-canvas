@@ -298,23 +298,19 @@ function getInterpolationPoints(
  * Interpolate between two polygon points.
  * @param from - source polygon points
  * @param to - target polygon points
- * @param progress - interpolation progress
+ * @param value - interpolation progress
  * @returns - new polygon points
  */
 
-function interpolatePolygon(
-  from: Vector2[],
-  to: Vector2[],
-  progress: number,
-): Vector2[] {
+function polygonLerp(from: Vector2[], to: Vector2[], value: number): Vector2[] {
   const points: Vector2[] = [];
-  if (progress === 0) return [...from];
-  if (progress === 1) return [...to];
+  if (value === 0) return [...from];
+  if (value === 1) return [...to];
 
   for (let i = 0; i < from.length; i++) {
     const a = from[i];
     const b = to[i];
-    points.push(Vector2.lerp(a, b, progress));
+    points.push(Vector2.lerp(a, b, value));
   }
   return points;
 }
@@ -326,11 +322,11 @@ function interpolatePolygon(
  * @returns - curve interpolator
  */
 
-export function interpolateCurveProfile(a: CurveProfile, b: CurveProfile) {
+export function createCurveProfileLerp(a: CurveProfile, b: CurveProfile) {
   const {from, to} = getInterpolationPoints(a, b, 5, 4);
 
   return (progress: number) => {
-    const polygon = interpolatePolygon(from, to, progress);
+    const polygon = polygonLerp(from, to, progress);
     return getPolylineProfile(polygon, 0, true);
   };
 }

@@ -12,7 +12,7 @@ import {drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
-import {interpolateCurveProfile} from '../curves/interpolateCurveProfile';
+import {createCurveProfileLerp} from '../curves/createCurveProfileLerp';
 
 export interface PathProps extends CurveProps {
   data: SignalValue<string>;
@@ -62,7 +62,7 @@ export class Path extends Curve {
     const fromProfile = this.profile();
     const toProfile = getPathProfile(isReactive(newPath) ? newPath() : newPath);
 
-    const interpolator = interpolateCurveProfile(fromProfile, toProfile);
+    const interpolator = createCurveProfileLerp(fromProfile, toProfile);
 
     this.currentProfile(fromProfile);
     yield* tween(
