@@ -1,44 +1,36 @@
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Vector2} from '@motion-canvas/core/lib/types';
-import {useLogger} from '@motion-canvas/core/lib/utils';
 import {ArcSegment} from './ArcSegment';
 import {CubicBezierSegment} from './CubicBezierSegment';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {QuadBezierSegment} from './QuadBezierSegment';
 import {Segment} from './Segment';
-
-const SegmentRegex = /[astvzqmhlc][^astvzqmhlc]*/gi;
-const ArgumentRegex = /-?[0-9]*\.?[0-9]+(?:e[-+]?\d+)?/gi;
-const SegmentArgsCount: Record<string, number> = {
-  m: 2,
-  l: 2,
-  h: 1,
-  v: 1,
-  c: 6,
-  s: 4,
-  q: 4,
-  t: 2,
-  a: 7,
-  z: 0,
-};
+import parse, {PathCommand} from 'parse-svg-path';
 
 function addSegmentToProfile(profile: CurveProfile, segment: Segment) {
   profile.segments.push(segment);
   profile.arcLength += segment.arcLength;
 }
 
-function parseVector2(args: string[], index: number) {
-  return new Vector2(parseFloat(args[index]!), parseFloat(args[index + 1]));
+function getArg(command: PathCommand, argumentIndex: number) {
+  return command[argumentIndex + 1] as number;
 }
 
-function parsePoint(
-  args: string[],
-  index: number,
+function getVector2(command: PathCommand, argumentIndex: number) {
+  return new Vector2(
+    command[argumentIndex + 1] as number,
+    command[argumentIndex + 2] as number,
+  );
+}
+
+function getPoint(
+  command: PathCommand,
+  argumentIndex: number,
   isRelative: boolean,
   currentPoint: Vector2,
 ) {
-  const point = parseVector2(args, index);
+  const point = getVector2(command, argumentIndex);
   return isRelative ? currentPoint.add(point) : point;
 }
 
@@ -71,129 +63,114 @@ export function getPathProfile(data: string): CurveProfile {
     minSin: 1,
   };
 
-  const segments = data.match(SegmentRegex) ?? [];
+  const segments = parse(data);
   let currentPoint = new Vector2(0, 0);
   let firstPoint: Vector2 | null = null;
 
   for (const segment of segments) {
     const command = segment[0].toLowerCase();
     const isRelative = segment[0] === command;
-    const allArgs = segment.match(ArgumentRegex) ?? [];
-    const argCount = SegmentArgsCount[command];
-    let firstArgs = true;
 
-    do {
-      const args = allArgs.splice(0, argCount);
-      if (args.length < argCount)
-        useLogger().error(
-          `Path segment argument count not match at ${segment} ` +
-            args.join('|'),
-        );
+    if (command === 'm') {
+      currentPoint = getPoint(segment, 0, isRelative, currentPoint);
+      firstPoint = currentPoint;
+    } else if (command === 'l') {
+      const nextPoint = getPoint(segment, 0, isRelative, currentPoint);
+      addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
+      currentPoint = nextPoint;
+    } else if (command === 'h') {
+      const x = getArg(segment, 0);
+      const nextPoint = isRelative
+        ? currentPoint.addX(x)
+        : new Vector2(x, currentPoint.y);
+      addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
+      currentPoint = nextPoint;
+    } else if (command === 'v') {
+      const y = getArg(segment, 0);
+      const nextPoint = isRelative
+        ? currentPoint.addY(y)
+        : new Vector2(currentPoint.x, y);
+      addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
+      currentPoint = nextPoint;
+    } else if (command === 'q') {
+      const controlPoint = getPoint(segment, 0, isRelative, currentPoint);
+      const nextPoint = getPoint(segment, 2, isRelative, currentPoint);
+      addSegmentToProfile(
+        profile,
+        new QuadBezierSegment(currentPoint, controlPoint, nextPoint),
+      );
+      currentPoint = nextPoint;
+    } else if (command === 't') {
+      const lastSegment = profile.segments.at(-1);
+      const controlPoint =
+        lastSegment instanceof QuadBezierSegment
+          ? reflectControlPoint(lastSegment.p1, currentPoint)
+          : currentPoint;
 
-      if (command === 'm' && firstArgs) {
-        currentPoint = parsePoint(args, 0, isRelative, currentPoint);
+      const nextPoint = getPoint(segment, 0, isRelative, currentPoint);
+      addSegmentToProfile(
+        profile,
+        new QuadBezierSegment(currentPoint, controlPoint, nextPoint),
+      );
+      currentPoint = nextPoint;
+    } else if (command === 'c') {
+      const startControlPoint = getPoint(segment, 0, isRelative, currentPoint);
+      const endControlPoint = getPoint(segment, 2, isRelative, currentPoint);
+      const nextPoint = getPoint(segment, 4, isRelative, currentPoint);
+      addSegmentToProfile(
+        profile,
+        new CubicBezierSegment(
+          currentPoint,
+          startControlPoint,
+          endControlPoint,
+          nextPoint,
+        ),
+      );
+      currentPoint = nextPoint;
+    } else if (command === 's') {
+      const lastSegment = profile.segments.at(-1);
+      const startControlPoint =
+        lastSegment instanceof CubicBezierSegment
+          ? reflectControlPoint(lastSegment.p2, currentPoint)
+          : currentPoint;
 
-        firstPoint = currentPoint;
-      } else if (command === 'l' || (command === 'm' && !firstArgs)) {
-        const nextPoint = parsePoint(args, 0, isRelative, currentPoint);
-        addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
-        currentPoint = nextPoint;
-      } else if (command === 'h') {
-        const x = parseFloat(args[0]!);
-        const nextPoint = isRelative
-          ? currentPoint.addX(x)
-          : new Vector2(x, currentPoint.y);
-        addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
-        currentPoint = nextPoint;
-      } else if (command === 'v') {
-        const y = parseFloat(args[0]!);
-        const nextPoint = isRelative
-          ? currentPoint.addY(y)
-          : new Vector2(currentPoint.x, y);
-        addSegmentToProfile(profile, new LineSegment(currentPoint, nextPoint));
-        currentPoint = nextPoint;
-      } else if (command === 'q') {
-        const controlPoint = parsePoint(args, 0, isRelative, currentPoint);
-        const nextPoint = parsePoint(args, 2, isRelative, currentPoint);
-        addSegmentToProfile(
-          profile,
-          new QuadBezierSegment(currentPoint, controlPoint, nextPoint),
-        );
-        currentPoint = nextPoint;
-      } else if (command === 't') {
-        const lastSegment = profile.segments.at(-1);
-        const controlPoint =
-          lastSegment instanceof QuadBezierSegment
-            ? reflectControlPoint(lastSegment.p1, currentPoint)
-            : currentPoint;
+      const endControlPoint = getPoint(segment, 0, isRelative, currentPoint);
+      const nextPoint = getPoint(segment, 2, isRelative, currentPoint);
+      addSegmentToProfile(
+        profile,
+        new CubicBezierSegment(
+          currentPoint,
+          startControlPoint,
+          endControlPoint,
+          nextPoint,
+        ),
+      );
+      currentPoint = nextPoint;
+    } else if (command === 'a') {
+      const radius = getVector2(segment, 0);
+      const angle = getArg(segment, 2);
+      const largeArcFlag = getArg(segment, 3);
+      const sweepFlag = getArg(segment, 4);
+      const nextPoint = getPoint(segment, 5, isRelative, currentPoint);
+      addSegmentToProfile(
+        profile,
+        new ArcSegment(
+          currentPoint,
+          radius,
+          angle,
+          largeArcFlag,
+          sweepFlag,
+          nextPoint,
+        ),
+      );
+      currentPoint = nextPoint;
+    } else if (command === 'z') {
+      if (!firstPoint) continue;
+      if (currentPoint.equals(firstPoint)) continue;
 
-        const nextPoint = parsePoint(args, 0, isRelative, currentPoint);
-        addSegmentToProfile(
-          profile,
-          new QuadBezierSegment(currentPoint, controlPoint, nextPoint),
-        );
-        currentPoint = nextPoint;
-      } else if (command === 'c') {
-        const startControlPoint = parsePoint(args, 0, isRelative, currentPoint);
-        const endControlPoint = parsePoint(args, 2, isRelative, currentPoint);
-        const nextPoint = parsePoint(args, 4, isRelative, currentPoint);
-        addSegmentToProfile(
-          profile,
-          new CubicBezierSegment(
-            currentPoint,
-            startControlPoint,
-            endControlPoint,
-            nextPoint,
-          ),
-        );
-        currentPoint = nextPoint;
-      } else if (command === 's') {
-        const lastSegment = profile.segments.at(-1);
-        const startControlPoint =
-          lastSegment instanceof CubicBezierSegment
-            ? reflectControlPoint(lastSegment.p2, currentPoint)
-            : currentPoint;
-
-        const endControlPoint = parsePoint(args, 0, isRelative, currentPoint);
-        const nextPoint = parsePoint(args, 2, isRelative, currentPoint);
-        addSegmentToProfile(
-          profile,
-          new CubicBezierSegment(
-            currentPoint,
-            startControlPoint,
-            endControlPoint,
-            nextPoint,
-          ),
-        );
-        currentPoint = nextPoint;
-      } else if (command === 'a') {
-        const radius = parseVector2(args, 0);
-        const angle = parseFloat(args[2]);
-        const largeArcFlag = parseFloat(args[3]);
-        const sweepFlag = parseFloat(args[4]);
-        const nextPoint = parsePoint(args, 5, isRelative, currentPoint);
-        addSegmentToProfile(
-          profile,
-          new ArcSegment(
-            currentPoint,
-            radius,
-            angle,
-            largeArcFlag,
-            sweepFlag,
-            nextPoint,
-          ),
-        );
-        currentPoint = nextPoint;
-      } else if (command === 'z') {
-        if (!firstPoint) continue;
-        if (currentPoint.equals(firstPoint)) continue;
-
-        addSegmentToProfile(profile, new LineSegment(currentPoint, firstPoint));
-        currentPoint = firstPoint;
-      }
-
-      firstArgs = false;
-    } while (allArgs.length > 0);
+      addSegmentToProfile(profile, new LineSegment(currentPoint, firstPoint));
+      currentPoint = firstPoint;
+    }
   }
   updateMinSin(profile);
 

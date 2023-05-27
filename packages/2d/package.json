@@ -31,6 +31,7 @@
   "dependencies": {
     "@motion-canvas/core": "^3.8.0",
     "code-fns": "^0.8.2",
-    "mathjax-full": "^3.2.2"
+    "mathjax-full": "^3.2.2",
+    "parse-svg-path": "^0.1.2"
   }
 }
