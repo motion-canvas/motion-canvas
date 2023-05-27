@@ -3,7 +3,6 @@ import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {getPointAtDistance} from './getPointAtDistance';
 import {getPolylineProfile} from './getPolylineProfile';
-import {useLogger} from '@motion-canvas/core/lib/utils';
 
 // Based on kute.js svgMorph plugin
 
@@ -14,6 +13,12 @@ interface SubcurveProfile extends CurveProfile {
 interface PolygonProfile {
   points: Vector2[];
   closed: boolean;
+  forceClosed?: {
+    firstPoint: Vector2;
+    firstPointIndex: number;
+    lastPoint: Vector2;
+    lastPointIndex: number;
+  };
 }
 
 /**
@@ -250,35 +255,57 @@ function addPoints(points: Vector2[], numPoints: number) {
   }
 }
 
-/**
- * Rotate polygon in order to minimize moving points
- * @param points - polygon points to be rotated
- * @param reference - polygon points to be reference
- */
-
-function rotatePolygonPoints(points: Vector2[], reference: Vector2[]) {
+function calculateLerpDistance(
+  points: Vector2[],
+  reference: Vector2[],
+  offset: number,
+) {
   const len = points.length;
-  let min = Infinity;
-  let bestOffset = 0;
+  let sumOfSquares = 0;
 
-  for (let offset = 0; offset < len; offset += 1) {
-    let sumOfSquares = 0;
-
-    for (let i = 0; i < reference.length; i += 1) {
-      const a = points[(offset + i) % len];
-      const b = reference[i];
-      sumOfSquares += a.sub(b).squaredMagnitude;
-    }
-
-    if (sumOfSquares < min) {
-      min = sumOfSquares;
-      bestOffset = offset;
-    }
+  for (let i = 0; i < reference.length; i += 1) {
+    const a = points[(offset + i) % len];
+    const b = reference[i];
+    sumOfSquares += a.sub(b).squaredMagnitude;
   }
 
-  if (bestOffset) {
-    const spliced = points.splice(0, bestOffset);
-    points.splice(points.length, 0, ...spliced);
+  return sumOfSquares;
+}
+
+/**
+ * Rotate polygon in order to minimize moving points
+ * @param polygon - polygon to be rotated
+ * @param reference - polygon to be reference
+ */
+
+function rotatePolygon(polygon: PolygonProfile, reference: PolygonProfile) {
+  const {points, closed} = polygon;
+  const len = points.length;
+
+  if (!closed) {
+    const originalDistance = calculateLerpDistance(points, reference.points, 0);
+    const reversedPoints = [...points].reverse();
+    const reversedDistance = calculateLerpDistance(
+      reversedPoints,
+      reference.points,
+      0,
+    );
+    if (reversedDistance < originalDistance) polygon.points = reversedPoints;
+  } else {
+    let minDistance = Infinity;
+    let bestOffset = 0;
+    for (let offset = 0; offset < len; offset += 1) {
+      const distance = calculateLerpDistance(points, reference.points, offset);
+      if (distance < minDistance) {
+        minDistance = distance;
+        bestOffset = offset;
+      }
+    }
+
+    if (bestOffset) {
+      const spliced = points.splice(0, bestOffset);
+      points.splice(points.length, 0, ...spliced);
+    }
   }
 }
 
@@ -290,7 +317,7 @@ function rotatePolygonPoints(points: Vector2[], reference: Vector2[]) {
  */
 
 function roundPolygon(
-  {points, closed}: PolygonProfile,
+  {points, closed, ...rest}: PolygonProfile,
   round: number,
 ): PolygonProfile {
   const pow = round >= 1 ? 10 ** round : 1;
@@ -300,7 +327,39 @@ function roundPolygon(
       const [x, y] = [point.x, point.y].map(n => Math.round(n * pow) / pow);
       return new Vector2(x, y);
     }),
+    ...rest,
   };
+}
+
+/**
+ *  Force close a polygon.
+ * @param polygon - polygon profile
+ */
+
+function forceClosePolygon(polygon: PolygonProfile) {
+  polygon.closed = true;
+  polygon.forceClosed = {
+    firstPoint: polygon.points[0],
+    lastPoint: polygon.points[polygon.points.length - 1],
+    lastPointIndex: 0,
+    firstPointIndex: 0,
+  };
+  polygon.points.push(
+    ...polygon.points.slice(1, polygon.points.length - 1).reverse(),
+  );
+}
+
+function reconfigureForceClosedPolygon(polygon: PolygonProfile) {
+  const fc = polygon.forceClosed!;
+  fc.firstPointIndex = polygon.points.indexOf(fc.firstPoint);
+  fc.lastPointIndex = polygon.points.indexOf(fc.lastPoint);
+  if (fc.firstPointIndex > fc.lastPointIndex) {
+    [fc.firstPointIndex, fc.lastPointIndex] = [
+      fc.lastPointIndex,
+      fc.firstPointIndex,
+    ];
+    [fc.firstPoint, fc.lastPoint] = [fc.lastPoint, fc.firstPoint];
+  }
 }
 
 /**
@@ -321,18 +380,34 @@ function getSubcurveInterpolationPolygon(
   const morphPrecision = precision;
   const fromRing = subcurveToPolygon(from, morphPrecision);
   const toRing = subcurveToPolygon(to, morphPrecision);
+
+  if (fromRing.closed && !toRing.closed) forceClosePolygon(toRing);
+  else if (!fromRing.closed && toRing.closed) forceClosePolygon(fromRing);
+
   const diff = fromRing.points.length - toRing.points.length;
 
   addPoints(fromRing.points, diff < 0 ? diff * -1 : 0);
   addPoints(toRing.points, diff > 0 ? diff : 0);
 
-  rotatePolygonPoints(fromRing.points, toRing.points);
+  rotatePolygon(fromRing, toRing);
+
+  if (fromRing.forceClosed) {
+    reconfigureForceClosedPolygon(fromRing);
+  } else if (toRing.forceClosed) {
+    reconfigureForceClosedPolygon(toRing);
+  }
 
   return {
     from: roundPolygon(fromRing, round),
     to: roundPolygon(toRing, round),
   };
 }
+
+/**
+ * Make two sub curve list have equal length
+ * @param subcurves - List to add
+ * @param reference - Reference list
+ */
 
 function balanceSubcurves(
   subcurves: SubcurveProfile[],
@@ -357,10 +432,6 @@ function getInterpolationPolygon(
 ) {
   const fromSub = splitCurve(from);
   const toSub = splitCurve(to);
-  useLogger().info({
-    message: 'from',
-    object: fromSub,
-  });
 
   if (fromSub.length < toSub.length) balanceSubcurves(fromSub, toSub);
   else balanceSubcurves(toSub, fromSub);
@@ -368,6 +439,13 @@ function getInterpolationPolygon(
   return fromSub.map((sub, i) =>
     getSubcurveInterpolationPolygon(sub, toSub[i], precision, round),
   );
+}
+
+function addCurveToCurve(target: CurveProfile, source: CurveProfile) {
+  const {segments, arcLength, minSin} = source;
+  target.segments.push(...segments);
+  target.arcLength += arcLength;
+  target.minSin = Math.min(target.minSin, minSin);
 }
 
 /**
@@ -404,10 +482,6 @@ function polygonPointsLerp(
 
 export function createCurveProfileLerp(a: CurveProfile, b: CurveProfile) {
   const interpolations = getInterpolationPolygon(a, b, 5, 4);
-  useLogger().info({
-    message: 'interpolation',
-    object: interpolations,
-  });
 
   return (progress: number) => {
     const curve: CurveProfile = {
@@ -417,14 +491,32 @@ export function createCurveProfileLerp(a: CurveProfile, b: CurveProfile) {
     };
     for (const {from, to} of interpolations) {
       const polygon = polygonPointsLerp(from.points, to.points, progress);
-      const {segments, arcLength, minSin} = getPolylineProfile(
-        polygon,
-        0,
-        false,
-      );
-      curve.segments.push(...segments);
-      curve.arcLength += arcLength;
-      curve.minSin = Math.min(curve.minSin, minSin);
+      addCurveToCurve(curve, getPolylineProfile(polygon, 0, from.closed));
+      if (to.forceClosed) {
+        addCurveToCurve(
+          curve,
+          getPolylineProfile(
+            polygon.slice(
+              to.forceClosed!.firstPointIndex,
+              to.forceClosed!.lastPointIndex + 1,
+            ),
+            0,
+            false,
+          ),
+        );
+      } else if (from.forceClosed) {
+        addCurveToCurve(
+          curve,
+          getPolylineProfile(
+            polygon.slice(
+              from.forceClosed!.firstPointIndex,
+              from.forceClosed!.lastPointIndex + 1,
+            ),
+            0,
+            false,
+          ),
+        );
+      }
     }
     return curve;
   };
