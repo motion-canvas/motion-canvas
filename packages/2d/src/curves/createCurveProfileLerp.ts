@@ -3,8 +3,18 @@ import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {getPointAtDistance} from './getPointAtDistance';
 import {getPolylineProfile} from './getPolylineProfile';
+import {useLogger} from '@motion-canvas/core/lib/utils';
 
 // Based on kute.js svgMorph plugin
+
+interface SubcurveProfile extends CurveProfile {
+  closed: boolean;
+}
+
+interface PolygonProfile {
+  points: Vector2[];
+  closed: boolean;
+}
 
 /**
  * Remove last point if it equal first point. This function mutate original points.
@@ -23,13 +33,14 @@ function removeRecurringPoint(points: Vector2[]) {
  * @param maxLength - max distance between two point
  */
 
-function bisect(points: Vector2[], maxLength: number) {
+function bisect(points: Vector2[], closed: boolean, maxLength: number) {
   let a: Vector2;
   let b: Vector2;
 
   for (let i = 0; i < points.length; i++) {
+    if (i === points.length - 1 && !closed) break;
     a = points[i];
-    b = i === points.length - 1 ? points[0] : points[i + 1];
+    b = points[(i + 1) % points.length];
     while (a.sub(b).magnitude > maxLength) {
       b = Vector2.lerp(a, b, 0.5);
       points.splice(i + 1, 0, b);
@@ -44,8 +55,8 @@ function bisect(points: Vector2[], maxLength: number) {
  * @returns - null if curve contain segment other than LineSegment
  */
 
-function exactPolygon(
-  curve: CurveProfile,
+function exactPolygonPoints(
+  curve: SubcurveProfile,
   maxLength: number,
 ): Vector2[] | null {
   const points: Vector2[] = [];
@@ -64,7 +75,7 @@ function exactPolygon(
   removeRecurringPoint(points);
 
   if (!Number.isNaN(maxLength) && maxLength > 0) {
-    bisect(points, maxLength);
+    bisect(points, curve.closed, maxLength);
   }
 
   return points;
@@ -99,7 +110,10 @@ function polygonArea(points: Vector2[]) {
  * @returns - always return polygon points
  */
 
-function approximatePolygon(curve: CurveProfile, maxLength: number): Vector2[] {
+function approximatePolygonPoints(
+  curve: SubcurveProfile,
+  maxLength: number,
+): Vector2[] {
   const points: Vector2[] = [];
 
   let numPoints = 3;
@@ -126,21 +140,28 @@ function approximatePolygon(curve: CurveProfile, maxLength: number): Vector2[] {
  */
 
 function splitCurve(curve: CurveProfile) {
-  let current: CurveProfile = {
+  if (curve.segments.length == 0) return [];
+
+  let current: SubcurveProfile = {
     arcLength: 0,
     minSin: 0,
     segments: [],
+    closed: false,
   };
+
   let endPoint: Vector2 | null = null;
 
-  const composite: CurveProfile[] = [current];
+  const composite: SubcurveProfile[] = [current];
 
   for (const segment of curve.segments) {
-    if (endPoint && !segment.getPoint(0).position.equals(endPoint)) {
+    const start = segment.getPoint(0).position;
+
+    if (endPoint && !start.equals(endPoint)) {
       current = {
         arcLength: 0,
         minSin: 0,
         segments: [],
+        closed: false,
       };
       composite.push(current);
     }
@@ -148,6 +169,14 @@ function splitCurve(curve: CurveProfile) {
     current.segments.push(segment);
     current.arcLength += segment.arcLength;
     endPoint = segment.getPoint(1).position;
+  }
+
+  for (const sub of composite) {
+    sub.closed = sub.segments[0]
+      .getPoint(0)
+      .position.equals(
+        sub.segments[sub.segments.length - 1].getPoint(1).position,
+      );
   }
 
   return composite;
@@ -160,12 +189,17 @@ function splitCurve(curve: CurveProfile) {
  * @returns - polgon points
  */
 
-function curveToPolygon(curve: CurveProfile, maxLength: number) {
-  const firstCurve = splitCurve(curve)[0];
+function subcurveToPolygon(
+  curve: SubcurveProfile,
+  maxLength: number,
+): PolygonProfile {
   const points =
-    exactPolygon(firstCurve, maxLength) ||
-    approximatePolygon(firstCurve, maxLength);
-  return [...points];
+    exactPolygonPoints(curve, maxLength) ||
+    approximatePolygonPoints(curve, maxLength);
+  return {
+    points: [...points],
+    closed: curve.closed,
+  };
 }
 
 /**
@@ -222,7 +256,7 @@ function addPoints(points: Vector2[], numPoints: number) {
  * @param reference - polygon points to be reference
  */
 
-function rotatePolygon(points: Vector2[], reference: Vector2[]) {
+function rotatePolygonPoints(points: Vector2[], reference: Vector2[]) {
   const len = points.length;
   let min = Infinity;
   let bestOffset = 0;
@@ -255,12 +289,18 @@ function rotatePolygon(points: Vector2[], reference: Vector2[]) {
  * @returns - new polygon point
  */
 
-function roundPolygon(points: Vector2[], round: number) {
+function roundPolygon(
+  {points, closed}: PolygonProfile,
+  round: number,
+): PolygonProfile {
   const pow = round >= 1 ? 10 ** round : 1;
-  return points.map(point => {
-    const [x, y] = [point.x, point.y].map(n => Math.round(n * pow) / pow);
-    return new Vector2(x, y);
-  });
+  return {
+    closed: closed,
+    points: points.map(point => {
+      const [x, y] = [point.x, point.y].map(n => Math.round(n * pow) / pow);
+      return new Vector2(x, y);
+    }),
+  };
 }
 
 /**
@@ -272,26 +312,62 @@ function roundPolygon(points: Vector2[], round: number) {
  * @returns two polygon ready to tween
  */
 
-function getInterpolationPoints(
-  from: CurveProfile,
-  to: CurveProfile,
+function getSubcurveInterpolationPolygon(
+  from: SubcurveProfile,
+  to: SubcurveProfile,
   precision: number,
   round: number,
 ) {
   const morphPrecision = precision;
-  const fromRing = curveToPolygon(from, morphPrecision);
-  const toRing = curveToPolygon(to, morphPrecision);
-  const diff = fromRing.length - toRing.length;
+  const fromRing = subcurveToPolygon(from, morphPrecision);
+  const toRing = subcurveToPolygon(to, morphPrecision);
+  const diff = fromRing.points.length - toRing.points.length;
 
-  addPoints(fromRing, diff < 0 ? diff * -1 : 0);
-  addPoints(toRing, diff > 0 ? diff : 0);
+  addPoints(fromRing.points, diff < 0 ? diff * -1 : 0);
+  addPoints(toRing.points, diff > 0 ? diff : 0);
 
-  rotatePolygon(fromRing, toRing);
+  rotatePolygonPoints(fromRing.points, toRing.points);
 
   return {
     from: roundPolygon(fromRing, round),
     to: roundPolygon(toRing, round),
   };
+}
+
+function balanceSubcurves(
+  subcurves: SubcurveProfile[],
+  reference: SubcurveProfile[],
+) {
+  for (let i = subcurves.length; i < reference.length; i++) {
+    const point = reference[i].segments[0].getPoint(0).position;
+    subcurves.push({
+      arcLength: 0,
+      closed: false,
+      minSin: 0,
+      segments: [new LineSegment(point, point)],
+    });
+  }
+}
+
+function getInterpolationPolygon(
+  from: CurveProfile,
+  to: CurveProfile,
+  precision: number,
+  round: number,
+) {
+  const fromSub = splitCurve(from);
+  const toSub = splitCurve(to);
+  useLogger().info({
+    message: 'from',
+    object: fromSub,
+  });
+
+  if (fromSub.length < toSub.length) balanceSubcurves(fromSub, toSub);
+  else balanceSubcurves(toSub, fromSub);
+
+  return fromSub.map((sub, i) =>
+    getSubcurveInterpolationPolygon(sub, toSub[i], precision, round),
+  );
 }
 
 /**
@@ -302,7 +378,11 @@ function getInterpolationPoints(
  * @returns - new polygon points
  */
 
-function polygonLerp(from: Vector2[], to: Vector2[], value: number): Vector2[] {
+function polygonPointsLerp(
+  from: Vector2[],
+  to: Vector2[],
+  value: number,
+): Vector2[] {
   const points: Vector2[] = [];
   if (value === 0) return [...from];
   if (value === 1) return [...to];
@@ -323,10 +403,29 @@ function polygonLerp(from: Vector2[], to: Vector2[], value: number): Vector2[] {
  */
 
 export function createCurveProfileLerp(a: CurveProfile, b: CurveProfile) {
-  const {from, to} = getInterpolationPoints(a, b, 5, 4);
+  const interpolations = getInterpolationPolygon(a, b, 5, 4);
+  useLogger().info({
+    message: 'interpolation',
+    object: interpolations,
+  });
 
   return (progress: number) => {
-    const polygon = polygonLerp(from, to, progress);
-    return getPolylineProfile(polygon, 0, true);
+    const curve: CurveProfile = {
+      segments: [],
+      arcLength: 0,
+      minSin: 1,
+    };
+    for (const {from, to} of interpolations) {
+      const polygon = polygonPointsLerp(from.points, to.points, progress);
+      const {segments, arcLength, minSin} = getPolylineProfile(
+        polygon,
+        0,
+        false,
+      );
+      curve.segments.push(...segments);
+      curve.arcLength += arcLength;
+      curve.minSin = Math.min(curve.minSin, minSin);
+    }
+    return curve;
   };
 }
