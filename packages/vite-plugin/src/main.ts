@@ -75,6 +75,7 @@ export interface MotionCanvasPluginConfig {
    * @defaultValue '\@motion-canvas/ui'
    */
   editor?: string;
+  editorFileName?: string;
   /**
    * Configuration of the Proxy used for remote sources
    *
@@ -92,13 +93,15 @@ export default ({
   output = './output',
   bufferedAssets = /\.(wav|ogg)$/,
   editor = '@motion-canvas/ui',
+  editorFileName = 'editor.html',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
   const plugins: PluginOptions[] = [
     {entryPoint: '@motion-canvas/core/lib/plugin/DefaultPlugin'},
   ];
+
   const editorPath = path.dirname(require.resolve(editor));
-  const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
+  const editorFile = fs.readFileSync(path.resolve(editorPath, editorFileName));
   const htmlParts = editorFile
     .toString()
     .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
@@ -107,6 +110,7 @@ export default ({
   const versions = JSON.stringify(getVersions());
 
   const resolvedEditorId = '\0virtual:editor';
+  const resolvedRendererId = '\x00virtual:renderer';
 
   const settingsId = '\0settings';
   const settingsPath = path.resolve(
@@ -172,6 +176,18 @@ export default ({
     async load(id) {
       const [base, query] = id.split('?');
       const {name, dir} = path.posix.parse(base);
+
+      if (id.startsWith(resolvedRendererId)) {
+        const params = new URLSearchParams(query);
+        const name = params.get('project');
+        if (name && name in projectLookup) {
+          return source(
+            `import {render} from '${editor}';`,
+            `import project from '${projectLookup[name].url}?project';`,
+            `render(project);`,
+          );
+        }
+      }
 
       if (id.startsWith(resolvedEditorId)) {
         if (projects.length === 1) {
@@ -371,14 +387,24 @@ export default ({
         const url = req.url
           ? new URL(req.url, `http://${req.headers.host}`)
           : undefined;
-        if (url?.pathname === '/') {
+        const pathArray = url?.pathname.split('/');
+
+        if (url?.pathname === '/' || !pathArray) {
           res.setHeader('Content-Type', 'text/html');
           res.end(createHtml('/@id/__x00__virtual:editor'));
           return;
         }
 
-        const name = url?.pathname?.slice(1);
+        const name = pathArray[1];
+        const service = pathArray[2];
+
         if (name && name in projectLookup) {
+          if (service === 'renderer') {
+            res.setHeader('Content-Type', 'text/html');
+            res.end(createHtml(`/@id/__x00__virtual:renderer?project=${name}`));
+            return;
+          }
+
           res.setHeader('Content-Type', 'text/html');
           res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
           return;

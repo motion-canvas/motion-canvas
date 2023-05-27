@@ -1,0 +1,33 @@
+{
+  "name": "@motion-canvas/renderer",
+  "version": "3.3.4",
+  "description": "A headless renderer for Motion Canvas",
+  "homepage": "https://motioncanvas.io/",
+  "license": "MIT",
+  "main": "dist/main.js",
+  "type": "module",
+  "directories": {
+    "dist": "dist",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/motion-canvas/motion-canvas.git"
+  },
+  "scripts": {
+    "build": "ttsc",
+    "watch": "ttsc -w",
+    "render": "node ./dist/render.js"
+  },
+  "devDependencies": {
+    "@motion-canvas/core": "*",
+    "@motion-canvas/vite-plugin": "*",
+    "puppeteer": "^19.3.0"
+  },
+  "bugs": {
+    "url": "https://github.com/motion-canvas/motion-canvas/issues"
+  }
+}

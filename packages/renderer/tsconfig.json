@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "dist",
+    "strict": true,
+    "module": "esnext",
+    "esModuleInterop": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "plugins": [
+      {
+        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
+      }
+    ]
+  },
+  "include": ["src"]
+}
