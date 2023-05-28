@@ -25,6 +25,8 @@ interface ServerResponse {
 
 /**
  * Image sequence exporter.
+ *
+ * @internal
  */
 export class ImageExporter implements Exporter {
   public static readonly id = '@motion-canvas/core/image-sequence';

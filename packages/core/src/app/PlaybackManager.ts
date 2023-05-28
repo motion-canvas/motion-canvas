@@ -14,6 +14,8 @@ export enum PlaybackState {
  * @remarks
  * This class provides primitive operations that can be executed on a scene
  * sequence, such as {@link progress} or {@link seek}.
+ *
+ * @internal
  */
 export class PlaybackManager {
   /**
