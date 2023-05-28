@@ -133,7 +133,12 @@ export class ArcSegment extends Segment {
     const angle = this.startAngle + distance * this.deltaAngle;
     const tangent = this.getAngleDerivative(angle).normalized;
     return {
-      position: this.getAnglePosition(angle),
+      position:
+        distance == 0
+          ? this.startPoint
+          : distance == 1
+          ? this.endPoint
+          : this.getAnglePosition(angle),
       tangent,
       normal: tangent.perpendicular,
     };
