@@ -34,7 +34,10 @@ export function editor(project: Project) {
   });
 
   const renderer = new Renderer(project);
+  project.plugins.forEach(plugin => plugin.renderer?.(renderer));
+
   const presenter = new Presenter(project);
+  project.plugins.forEach(plugin => plugin.presenter?.(presenter));
 
   const settings = project.settings;
   settings.appearance.color.onChanged.subscribe(() => {
