@@ -1,4 +1,11 @@
-import type {ExporterClass, Project, Player, ProjectSettings} from '../app';
+import type {
+  ExporterClass,
+  Project,
+  Player,
+  ProjectSettings,
+  Presenter,
+  Renderer,
+} from '../app';
 
 /**
  * Represents a runtime Motion Canvas plugin.
@@ -26,6 +33,20 @@ export interface Plugin {
    * @param player - The player instance.
    */
   player?(player: Player): void;
+
+  /**
+   * Receive the presenter instance right after it is initialized.
+   *
+   * @param presenter - The presenter instance.
+   */
+  presenter?(presenter: Presenter): void;
+
+  /**
+   * Receive the renderer instance right after it is initialized.
+   *
+   * @param renderer - The renderer instance.
+   */
+  renderer?(renderer: Renderer): void;
 
   /**
    * Provide custom exporters for the project.
