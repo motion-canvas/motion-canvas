@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0-alpha.0) (2023-05-28)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
 
 ### Features

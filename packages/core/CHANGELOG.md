@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0-alpha.0) (2023-05-28)
+
+### Bug Fixes
+
+- **core:** project `variables`
+  ([#690](https://github.com/motion-canvas/motion-canvas/issues/690))
+  ([149f39c](https://github.com/motion-canvas/motion-canvas/commit/149f39c3219aa74115be80490bd6c5f236779b0e)),
+  closes [#689](https://github.com/motion-canvas/motion-canvas/issues/689)
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- **core:** add `gauss` function to `Random`
+  ([#709](https://github.com/motion-canvas/motion-canvas/issues/709))
+  ([d7de3d5](https://github.com/motion-canvas/motion-canvas/commit/d7de3d56d05dc88c7cbd557a73a25d083abb54e4))
+- export everything from entry points
+  ([#710](https://github.com/motion-canvas/motion-canvas/issues/710))
+  ([3c885d9](https://github.com/motion-canvas/motion-canvas/commit/3c885d9083b52fbbaccf1e2560ae50817949bc52))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
 
 ### Features
