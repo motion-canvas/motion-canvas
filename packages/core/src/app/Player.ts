@@ -35,7 +35,7 @@ const MAX_AUDIO_DESYNC = 1 / 50;
  * The player logic used by the editor and embeddable player.
  *
  * @remarks
- * This class builds on top of the {@link PlaybackManager} to provide a simple
+ * This class builds on top of the `PlaybackManager` to provide a simple
  * interface similar to other media players. It plays through the animation
  * using a real-time update loop and optionally synchronises it with audio.
  */
