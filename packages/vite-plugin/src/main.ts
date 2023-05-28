@@ -94,9 +94,7 @@ export default ({
   editor = '@motion-canvas/ui',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
-  const plugins: PluginOptions[] = [
-    {entryPoint: '@motion-canvas/core/lib/plugin/DefaultPlugin'},
-  ];
+  const plugins: PluginOptions[] = [];
   const editorPath = path.dirname(require.resolve(editor));
   const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
   const htmlParts = editorFile
