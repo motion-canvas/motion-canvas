@@ -25,12 +25,9 @@ interface PolygonProfile {
  */
 
 function bisect(points: Vector2[], maxLength: number) {
-  let a: Vector2;
-  let b: Vector2;
-
   for (let i = 0; i < points.length - 1; i++) {
-    a = points[i];
-    b = points[i + 1];
+    const a = points[i];
+    let b = points[i + 1];
     while (a.sub(b).magnitude > maxLength) {
       b = Vector2.lerp(a, b, 0.5);
       points.splice(i + 1, 0, b);
@@ -76,19 +73,12 @@ function exactPolygonPoints(
  */
 
 function polygonArea(points: Vector2[]) {
-  const n = points.length;
-  let i = -1;
-  let a;
-  let b = points[n - 1];
-  let area = 0;
-
-  while (++i < n) {
-    a = b;
-    b = points[i];
-    area += a.y * b.x - a.x * b.y;
-  }
-
-  return area / 2;
+  return (
+    points.reduce((area, a, i) => {
+      const b = points[(i + 1) % points.length];
+      return area + (a.y * b.x - a.x * b.y);
+    }, 0) / 2
+  );
 }
 
 /**
@@ -239,6 +229,14 @@ function addPoints(points: Vector2[], numPoints: number) {
   }
 }
 
+/**
+ * Calculate total moving point distance when morphing between polygon points
+ * @param points - first polygon points
+ * @param reference - second polygon points
+ * @param offset - offset for first polygon points
+ * @returns
+ */
+
 function calculateLerpDistance(
   points: Vector2[],
   reference: Vector2[],
@@ -248,8 +246,7 @@ function calculateLerpDistance(
   let sumOfSquares = 0;
 
   for (let i = 0; i < reference.length; i += 1) {
-    const pointIndex = (offset + i) % len;
-    const a = points[pointIndex];
+    const a = points[(offset + i) % len];
     const b = reference[i];
     sumOfSquares += a.sub(b).squaredMagnitude;
   }
@@ -332,7 +329,7 @@ function roundPolygon(
 }
 
 /**
- * Create two polygon ready to tween.
+ * Create two polygon to tween between sub curve/path
  * @param from - source curve
  * @param to - targe curve
  * @param precision - desired distance between two point
@@ -385,6 +382,15 @@ function balanceSubcurves(
   }
 }
 
+/**
+ * Create two polygon to tween between curve
+ * @param from - source curve
+ * @param to - targe curve
+ * @param precision - desired distance between two point
+ * @param round - amount of decimal when rounding
+ * @returns list that contain list of polygon before and after tween
+ */
+
 function getInterpolationPolygon(
   from: CurveProfile,
   to: CurveProfile,
@@ -401,6 +407,12 @@ function getInterpolationPolygon(
     getSubcurveInterpolationPolygon(sub, toSub[i], precision, round),
   );
 }
+
+/**
+ * Add curve into another curve
+ * @param target - target curve
+ * @param source - curve to add
+ */
 
 function addCurveToCurve(target: CurveProfile, source: CurveProfile) {
   const {segments, arcLength, minSin} = source;
