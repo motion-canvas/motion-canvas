@@ -245,6 +245,17 @@ export abstract class Curve extends Shape {
     return Math.abs(this.start() - this.end());
   }
 
+  protected processSubpath(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _path: Path2D,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _startPoint: Vector2 | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _endPoint: Vector2 | null,
+  ) {
+    // do nothing
+  }
+
   @computed()
   protected curveDrawingInfo(): CurveDrawingInfo {
     const path = new Path2D();
@@ -292,6 +303,7 @@ export abstract class Curve extends Shape {
         !segment.getPoint(0).position.equals(endPoint)
       ) {
         path.addPath(subpath);
+        this.processSubpath(subpath, startPoint, endPoint);
         subpath = new Path2D();
         startPoint = null;
       }
@@ -318,6 +330,7 @@ export abstract class Curve extends Shape {
     if (this.end() === 1 && this.closed()) {
       subpath.closePath();
     }
+    this.processSubpath(subpath, startPoint, endPoint);
     path.addPath(subpath);
 
     return {

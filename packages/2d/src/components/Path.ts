@@ -53,6 +53,16 @@ export class Path extends Curve {
     return coefficient;
   }
 
+  protected override processSubpath(
+    path: Path2D,
+    startPoint: Vector2 | null,
+    endPoint: Vector2 | null,
+  ): void {
+    if (startPoint && endPoint && startPoint.equals(endPoint)) {
+      path.closePath();
+    }
+  }
+
   @threadable()
   protected *tweenData(
     newPath: SignalValue<string>,
