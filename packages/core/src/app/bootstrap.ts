@@ -2,6 +2,7 @@ import {Logger} from './Logger';
 import {Project, ProjectSettings, Versions} from './Project';
 import {ProjectMetadata} from './ProjectMetadata';
 import {Plugin} from '../plugin';
+import DefaultPlugin from '../plugin/DefaultPlugin';
 import {MetaFile} from '../meta';
 import {createSettingsMetadata} from './SettingsMetadata';
 
@@ -27,6 +28,13 @@ export function bootstrap(
 ): Project {
   const settings = createSettingsMetadata();
   settingsFile.attach(settings);
+
+  const defaultPlugin = DefaultPlugin();
+  plugins = [
+    defaultPlugin,
+    ...(config.plugins ?? []),
+    ...plugins.filter(plugin => plugin.name !== defaultPlugin.name),
+  ];
 
   const reducedSettings = plugins.reduce(
     (settings, plugin) => ({
