@@ -62,7 +62,7 @@ For instance, we could extract the flickering code from the above example to a
 separate generator and delegate our scene function to it:
 
 ```tsx
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {ThreadGenerator} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();
@@ -140,10 +140,8 @@ There are many ways to animate multiple objects. Here are some examples. Try
 using them in the below editor.
 
 ```tsx editor ratio=2
-import {makeScene2D} from '@motion-canvas/2d';
-import {Rect} from '@motion-canvas/2d/lib/components';
-import {all, waitFor} from '@motion-canvas/core/lib/flow';
-import {makeRef, range} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, Rect} from '@motion-canvas/2d';
+import {all, waitFor, makeRef, range} from '@motion-canvas/core/lib/flow';
 
 export default makeScene2D(function* (view) {
   const rects: Rect[] = [];

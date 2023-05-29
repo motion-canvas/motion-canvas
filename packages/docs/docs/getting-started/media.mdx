@@ -75,8 +75,7 @@ Then we can use Motion Canvas [`Img`](/api/2d/components/Img) component to
 display the image:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Img} from '@motion-canvas/2d/lib/components';
+import {makeScene2D, Img} from '@motion-canvas/2d';
 
 import examplePng from '../../images/example.png';
 
@@ -91,8 +90,7 @@ this, we need to create a [`Reference`](/docs/references) and pass that to the
 
 ```tsx
 // ...
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {all, createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const imageRef = createRef<Img>();
@@ -131,8 +129,7 @@ Then we can use Motion Canvas [`Video`](/api/2d/components/Video) component to
 display the video as follows:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Video} from '@motion-canvas/2d/lib/components';
+import {makeScene2D, Video} from '@motion-canvas/2d';
 
 import exampleMp4 from '../../videos/example.mp4';
 
@@ -146,7 +143,7 @@ the video we need to create a [`Reference`](/docs/references) to the element.
 
 ```tsx
 // ...
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const videoRef = createRef<Video>();

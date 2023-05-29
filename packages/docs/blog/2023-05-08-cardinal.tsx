@@ -1,6 +1,5 @@
-import {makeScene2D} from '@motion-canvas/2d';
-import {Rect} from '@motion-canvas/2d/lib';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, Rect} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const rect = createRef<Rect>();

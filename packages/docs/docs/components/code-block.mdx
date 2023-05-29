@@ -154,7 +154,7 @@ To remove a selection, the value of `.selection()` signal can be set to its
 [`DEFAULT`][signal-default], i.e. "all selected". For example:
 
 ```ts
-import {DEFAULT} from '@motion-canvas/core/lib/signals';
+import {DEFAULT} from '@motion-canvas/core';
 
 // highlight lines 1 and 2
 yield * codeRef().selection(lines(1, 2));
@@ -179,7 +179,7 @@ code.
 
 ```tsx
 import {CodeBlock, insert} from '@motion-canvas/2d/lib/components/CodeBlock';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core';
 
 const codeRef = createRef<CodeBlock>();
 
