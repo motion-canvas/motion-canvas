@@ -20,7 +20,7 @@ Signals for primitive types are created using the
 argument specifies their initial value:
 
 ```ts
-import {createSignal} from '@motion-canvas/core/lib/signals';
+import {createSignal} from '@motion-canvas/core';
 
 const signal = createSignal(0);
 ```
@@ -29,7 +29,7 @@ Additionally, each complex type has a static `createSignal()` method that can be
 used to create a signal for said type:
 
 ```ts
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2} from '@motion-canvas/core';
 
 const signal = Vector2.createSignal(Vector2.up);
 ```
@@ -124,7 +124,7 @@ we can reset a signal to its initial value by passing the
 [`DEFAULT`](/api/core/signals#DEFAULT) symbol to it:
 
 ```ts
-import {DEFAULT, createSignal} from '@motion-canvas/core/lib/signals';
+import {DEFAULT, createSignal} from '@motion-canvas/core';
 
 const signal = createSignal(3); // <- initial value is 3
 signal(2);

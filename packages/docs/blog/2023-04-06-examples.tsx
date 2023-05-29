@@ -1,7 +1,6 @@
 // snippet Cubic Bezier
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {CubicBezier} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const bezier = createRef<CubicBezier>();
@@ -23,9 +22,8 @@ export default makeScene2D(function* (view) {
 });
 
 // snippet Quadratic Bezier
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {QuadBezier} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, QuadBezier} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const bezier = createRef<QuadBezier>();
