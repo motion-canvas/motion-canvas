@@ -3,7 +3,8 @@
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Motion Canvas',
-  tagline: 'Visualize complex ideas programmatically',
+  tagline:
+    'A TypeScript library for creating animated videos using the Canvas API.',
   url: 'https://motioncanvas.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
