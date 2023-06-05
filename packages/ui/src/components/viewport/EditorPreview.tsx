@@ -23,6 +23,7 @@ import {Button, Select} from '../controls';
 import {Recenter, Grid as GridIcon} from '../icons';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
 import {ColorPicker} from './ColorPicker';
+import {Coordinates} from './Coordinates';
 
 const ZOOM_SPEED = 0.1;
 
@@ -39,6 +40,7 @@ export function EditorPreview() {
   };
 
   const [grid, setGrid] = useStorage('viewport-grid', false);
+  const [coords, setCoords] = useStorage('viewport-coordinates', true);
   const [zoomToFit, setZoomToFit] = useStorage('viewport-zoom-to-fill', true);
   const [zoom, setZoom] = useStorage('viewport-zoom', 1);
   const [position, setPosition] = useStorage('viewport-position', {
@@ -49,6 +51,7 @@ export function EditorPreview() {
   const state: ViewportState = useMemo(() => {
     const state = {
       grid,
+      coords,
       width: size.width,
       height: size.height,
       ...position,
@@ -68,7 +71,7 @@ export function EditorPreview() {
     }
 
     return state;
-  }, [grid, zoomToFit, zoom, position, settings, size]);
+  }, [grid, coords, zoomToFit, zoom, position, settings, size]);
 
   const [handleDrag, isDragging] = useDrag(
     useCallback(
@@ -115,6 +118,9 @@ export function EditorPreview() {
           case "'":
             setGrid(!grid);
             break;
+          case 'v':
+            setCoords(!coords);
+            break;
           case 'ArrowUp':
             // TODO Support hierarchy traversal.
             break;
@@ -124,7 +130,7 @@ export function EditorPreview() {
           }
         }
       },
-      [state.zoom, grid],
+      [state.zoom, grid, coords],
     ),
   );
 
@@ -246,6 +252,7 @@ export function EditorPreview() {
             <GridIcon />
           </ButtonCheckbox>
           <ColorPicker />
+          {coords && <Coordinates viewState={state} viewSize={size} />}
         </div>
       </div>
     </ViewportContext.Provider>
