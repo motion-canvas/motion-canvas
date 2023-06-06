@@ -1,17 +1,14 @@
 import {useEffect, useState} from 'react';
 import {InfoBox} from '../controls/InfoBox';
-import {useCallback} from 'preact/hooks';
+import {useCallback, useContext} from 'preact/hooks';
 import {useDocumentEvent} from '../../hooks';
-import {ViewportState} from './ViewportContext';
+import {ViewportContext} from './ViewportContext';
 
-interface CoordinatesProps {
-  viewState: ViewportState;
-  viewSize: DOMRectReadOnly;
-}
-
-export function Coordinates({viewState, viewSize}: CoordinatesProps) {
+export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});
   const [hover, setHover] = useState(true);
+
+  const state = useContext(ViewportContext);
 
   useEffect(() => {
     const handleMouseMove = (event: {x: number; y: number}) => {
@@ -33,13 +30,13 @@ export function Coordinates({viewState, viewSize}: CoordinatesProps) {
       } else {
         setHover?.(true);
         // Only need to set position coordinates if hovering over the overlay
-        let canvasPosX = event.x - viewSize.x;
-        let canvasPosY = event.y - viewSize.y;
+        let canvasPosX = event.x - state.size.x;
+        let canvasPosY = event.y - state.size.y;
 
-        canvasPosX -= viewState.x + viewState.width / 2;
-        canvasPosY -= viewState.y + viewState.height / 2;
-        canvasPosX /= viewState.zoom;
-        canvasPosY /= viewState.zoom;
+        canvasPosX -= state.x + state.width / 2;
+        canvasPosY -= state.y + state.height / 2;
+        canvasPosX /= state.zoom;
+        canvasPosY /= state.zoom;
 
         canvasPosX = Math.round(canvasPosX);
         canvasPosY = Math.round(canvasPosY);
@@ -56,7 +53,7 @@ export function Coordinates({viewState, viewSize}: CoordinatesProps) {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [viewState, viewSize]);
+  }, [state]);
 
   // Below method is used for the copy to clipboard keybind
   useDocumentEvent(

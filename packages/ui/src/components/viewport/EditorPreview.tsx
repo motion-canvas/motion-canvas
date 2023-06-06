@@ -52,6 +52,7 @@ export function EditorPreview() {
     const state = {
       grid,
       coords,
+      size,
       width: size.width,
       height: size.height,
       ...position,
@@ -252,7 +253,7 @@ export function EditorPreview() {
             <GridIcon />
           </ButtonCheckbox>
           <ColorPicker />
-          {coords && <Coordinates viewState={state} viewSize={size} />}
+          {coords && <Coordinates />}
         </div>
       </div>
     </ViewportContext.Provider>
