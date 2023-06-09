@@ -14,7 +14,7 @@ import {Debug} from './Debug';
 import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
+import {isInspectable} from '@motion-canvas/core';
 import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
 import {PreviewStage} from './PreviewStage';

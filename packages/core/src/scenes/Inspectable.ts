@@ -1,3 +1,5 @@
+import {Vector2} from '../types/Vector';
+
 /**
  * Represents an element to inspect.
  *
@@ -67,6 +69,18 @@ export interface Inspectable {
     matrix: DOMMatrix,
     context: CanvasRenderingContext2D,
   ): void;
+
+  /**
+   * Transform the absolute mouse coordinates into the scene's coordinate system.
+   *
+   * @param x - The x coordinate.
+   * @param y - The y coordinate.
+   */
+  transformMousePosition(
+    x: number,
+    y: number,
+    size?: {width: number; height: number},
+  ): Vector2 | null;
 }
 
 export function isInspectable(value: any): value is Inspectable {

@@ -1,21 +1,53 @@
 import {useEffect, useState} from 'react';
-import {InfoBox} from '../controls/InfoBox';
 import {useCallback, useContext} from 'preact/hooks';
-import {useDocumentEvent} from '../../hooks';
+import {
+  useCurrentScene,
+  useDocumentEvent,
+  usePreviewSettings,
+  useSharedSettings,
+} from '../../hooks';
 import {ViewportContext} from './ViewportContext';
+import {isInspectable} from '@motion-canvas/core';
+import clsx from 'clsx';
+import styles from '@motion-canvas/ui/src/components/controls/Controls.module.scss';
 
 export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});
   const [hover, setHover] = useState(true);
 
   const state = useContext(ViewportContext);
+  const settings = {
+    ...useSharedSettings(),
+    ...usePreviewSettings(),
+  };
+  const scene = useCurrentScene();
 
   useEffect(() => {
     const handleMouseMove = (event: {x: number; y: number}) => {
+      if (!isInspectable(scene)) return;
+      const absoluteCoords = {
+        x: event.x - state.size.x,
+        y: event.y - state.size.y,
+      };
+
+      absoluteCoords.x -= state.x + state.width / 2;
+      absoluteCoords.y -= state.y + state.height / 2;
+      absoluteCoords.x /= state.zoom;
+      absoluteCoords.y /= state.zoom;
+      absoluteCoords.x += settings.size.width / 2;
+      absoluteCoords.y += settings.size.height / 2;
+
+      const point = scene.transformMousePosition(
+        absoluteCoords.x,
+        absoluteCoords.y,
+        settings.size,
+      );
       // This selector probably needs to be improved to select the overlay more reliably (future proof).
       // Possibly use the internal state instead of a selector.
       const canvas = document.getElementsByTagName('canvas')[1];
       const rect = canvas.getBoundingClientRect();
+
+      // These coordinates are used purely for bounds detection of the preview window.
       const xPos = Math.round(
         ((event.x - rect.x) / rect.width - 0.5) * canvas.width,
       );
@@ -28,22 +60,12 @@ export function Coordinates() {
       ) {
         setHover?.(false);
       } else {
-        setHover?.(true);
         // Only need to set position coordinates if hovering over the overlay
-        let canvasPosX = event.x - state.size.x;
-        let canvasPosY = event.y - state.size.y;
-
-        canvasPosX -= state.x + state.width / 2;
-        canvasPosY -= state.y + state.height / 2;
-        canvasPosX /= state.zoom;
-        canvasPosY /= state.zoom;
-
-        canvasPosX = Math.round(canvasPosX);
-        canvasPosY = Math.round(canvasPosY);
+        setHover?.(true);
 
         setMousePos({
-          x: canvasPosX,
-          y: canvasPosY,
+          x: point.x,
+          y: point.y,
         });
       }
     };
@@ -72,9 +94,12 @@ export function Coordinates() {
   return (
     <>
       {hover && (
-        <InfoBox>
+        <div className={clsx(styles.input)}>
           ({mousePos.x}, {mousePos.y})
-        </InfoBox>
+        </div>
+        // <InfoBox>
+        //   ({mousePos.x}, {mousePos.y})
+        // </InfoBox>
       )}
     </>
   );
