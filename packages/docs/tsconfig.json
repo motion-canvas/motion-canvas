@@ -1,7 +1,8 @@
 {
-  "extends": "@tsconfig/docusaurus/tsconfig.json",
+  "extends": ["@tsconfig/docusaurus/tsconfig.json",  "@motion-canvas/2d/tsconfig.project.json"],
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["."]
+  "include": [".", "docs"],
+  "target": "es2020",
 }
