@@ -20,6 +20,9 @@ export function createSettingsMetadata() {
       font: new BoolMetaField('legacy font', false).describe(
         "Use the 'JetBrains Mono' font for the user interface.",
       ),
+      coordinates: new BoolMetaField('coordinates', true).describe(
+        'Display coordinates within the preview window.',
+      ),
     }),
     defaults: new ObjectMetaField('Defaults', {
       background: new ColorMetaField('background', null).describe(

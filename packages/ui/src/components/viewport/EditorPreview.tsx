@@ -9,6 +9,7 @@ import {
   useSize,
   useStorage,
   useSubscribable,
+  useSubscribableValue,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
@@ -28,7 +29,10 @@ import {Coordinates} from './Coordinates';
 const ZOOM_SPEED = 0.1;
 
 export function EditorPreview() {
-  const {player} = useApplication();
+  const {player, settings: appSettings} = useApplication();
+  const coordinateSetting = useSubscribableValue(
+    appSettings.appearance.coordinates.onChanged,
+  );
   const scene = useCurrentScene();
   const {setInspectedElement} = useInspection();
   const containerRef = useRef<HTMLDivElement>();
@@ -40,7 +44,6 @@ export function EditorPreview() {
   };
 
   const [grid, setGrid] = useStorage('viewport-grid', false);
-  const [coords, setCoords] = useStorage('viewport-coordinates', true);
   const [zoomToFit, setZoomToFit] = useStorage('viewport-zoom-to-fill', true);
   const [zoom, setZoom] = useStorage('viewport-zoom', 1);
   const [position, setPosition] = useStorage('viewport-position', {
@@ -51,7 +54,6 @@ export function EditorPreview() {
   const state: ViewportState = useMemo(() => {
     const state = {
       grid,
-      coords,
       size,
       width: size.width,
       height: size.height,
@@ -72,7 +74,7 @@ export function EditorPreview() {
     }
 
     return state;
-  }, [grid, coords, zoomToFit, zoom, position, settings, size]);
+  }, [grid, zoomToFit, zoom, position, settings, size]);
 
   const [handleDrag, isDragging] = useDrag(
     useCallback(
@@ -119,9 +121,6 @@ export function EditorPreview() {
           case "'":
             setGrid(!grid);
             break;
-          case 'v':
-            setCoords(!coords);
-            break;
           case 'ArrowUp':
             // TODO Support hierarchy traversal.
             break;
@@ -131,7 +130,7 @@ export function EditorPreview() {
           }
         }
       },
-      [state.zoom, grid, coords],
+      [state.zoom, grid],
     ),
   );
 
@@ -253,7 +252,7 @@ export function EditorPreview() {
             <GridIcon />
           </ButtonCheckbox>
           <ColorPicker />
-          {coords && <Coordinates />}
+          {coordinateSetting && <Coordinates />}
         </div>
       </div>
     </ViewportContext.Provider>

@@ -75,6 +75,7 @@ export interface Inspectable {
    *
    * @param x - The x coordinate.
    * @param y - The y coordinate.
+   * @param size - (Optional) The size from the shared meta settings. Used to calculate coordinate offsets
    */
   transformMousePosition(
     x: number,

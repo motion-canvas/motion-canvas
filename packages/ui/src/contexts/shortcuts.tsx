@@ -30,8 +30,7 @@ const InitialShortcuts: ShortcutsByModule = {
     {key: '=', action: 'Zoom in'},
     {key: '-', action: 'Zoom out'},
     {key: "'", action: 'Toggle grid'},
-    {key: 'v', action: 'Toggle coordinates'},
-    {key: 'c', action: 'Copy coordinates'},
+    {key: 'P', action: 'Copy coordinates'},
     {
       key: 'I',
       action: 'Use color picker',

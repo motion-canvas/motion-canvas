@@ -3,7 +3,6 @@ import {useCallback, useContext} from 'preact/hooks';
 import {
   useCurrentScene,
   useDocumentEvent,
-  usePreviewSettings,
   useSharedSettings,
 } from '../../hooks';
 import {ViewportContext} from './ViewportContext';
@@ -18,7 +17,6 @@ export function Coordinates() {
   const state = useContext(ViewportContext);
   const settings = {
     ...useSharedSettings(),
-    ...usePreviewSettings(),
   };
   const scene = useCurrentScene();
 
@@ -42,21 +40,17 @@ export function Coordinates() {
         absoluteCoords.y,
         settings.size,
       );
-      // This selector probably needs to be improved to select the overlay more reliably (future proof).
-      // Possibly use the internal state instead of a selector.
-      const canvas = document.getElementsByTagName('canvas')[1];
-      const rect = canvas.getBoundingClientRect();
 
       // These coordinates are used purely for bounds detection of the preview window.
-      const xPos = Math.round(
-        ((event.x - rect.x) / rect.width - 0.5) * canvas.width,
+      const boundX = Math.round(
+        ((event.x - state.size.x) / state.width - 0.5) * state.width,
       );
-      const yPos = Math.round(
-        ((event.y - rect.y) / rect.height - 0.5) * canvas.height,
+      const boundY = Math.round(
+        ((event.y - state.size.y) / state.height - 0.5) * state.height,
       );
       if (
-        Math.abs(xPos) > canvas.width / 2 ||
-        Math.abs(yPos) > canvas.height / 2
+        Math.abs(boundX) > state.width / 2 ||
+        Math.abs(boundY) > state.height / 2
       ) {
         setHover?.(false);
       } else {
@@ -82,7 +76,7 @@ export function Coordinates() {
     'keydown',
     useCallback(
       async event => {
-        if (document.activeElement.tagName !== 'INPUT' && event.key === 'c') {
+        if (document.activeElement.tagName !== 'INPUT' && event.key === 'p') {
           const positionString = `${mousePos.x}, ${mousePos.y}`;
           await window.navigator.clipboard.writeText(positionString);
         }
@@ -94,12 +88,9 @@ export function Coordinates() {
   return (
     <>
       {hover && (
-        <div className={clsx(styles.input)}>
+        <div title={'Coordinates'} className={clsx(styles.input)}>
           ({mousePos.x}, {mousePos.y})
         </div>
-        // <InfoBox>
-        //   ({mousePos.x}, {mousePos.y})
-        // </InfoBox>
       )}
     </>
   );
