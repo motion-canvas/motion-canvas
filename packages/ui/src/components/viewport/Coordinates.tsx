@@ -7,8 +7,7 @@ import {
 } from '../../hooks';
 import {ViewportContext} from './ViewportContext';
 import {isInspectable} from '@motion-canvas/core';
-import clsx from 'clsx';
-import styles from '@motion-canvas/ui/src/components/controls/Controls.module.scss';
+import styles from '../controls/Controls.module.scss';
 
 export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});
@@ -38,8 +37,10 @@ export function Coordinates() {
       const point = scene.transformMousePosition(
         absoluteCoords.x,
         absoluteCoords.y,
-        settings.size,
       );
+
+      point.x = Math.round(point.x);
+      point.y = Math.round(point.y);
 
       // These coordinates are used purely for bounds detection of the preview window.
       const boundX = Math.round(
@@ -88,7 +89,7 @@ export function Coordinates() {
   return (
     <>
       {hover && (
-        <div title={'Coordinates'} className={clsx(styles.input)}>
+        <div title={'Coordinates'} className={styles.input}>
           ({mousePos.x}, {mousePos.y})
         </div>
       )}

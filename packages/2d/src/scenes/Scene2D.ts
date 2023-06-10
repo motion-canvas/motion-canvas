@@ -117,20 +117,10 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     }
   }
 
-  public transformMousePosition(
-    x: number,
-    y: number,
-    size?: {width: number; height: number},
-  ): Vector2 | null {
-    if (size !== undefined) {
-      x -= size.width / 2;
-      y -= size.height / 2;
-    }
-
-    x = Math.round(x);
-    y = Math.round(y);
-
-    return new Vector2(x, y);
+  public transformMousePosition(x: number, y: number): Vector2 | null {
+    return new Vector2(x, y)
+      .scale(this.resolutionScale)
+      .transformAsPoint(this.getView().localToParent().inverse());
   }
 
   public registerNode(node: Node, key?: string): string {

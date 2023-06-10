@@ -75,13 +75,8 @@ export interface Inspectable {
    *
    * @param x - The x coordinate.
    * @param y - The y coordinate.
-   * @param size - (Optional) The size from the shared meta settings. Used to calculate coordinate offsets
    */
-  transformMousePosition(
-    x: number,
-    y: number,
-    size?: {width: number; height: number},
-  ): Vector2 | null;
+  transformMousePosition(x: number, y: number): Vector2 | null;
 }
 
 export function isInspectable(value: any): value is Inspectable {
