@@ -6,6 +6,6 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": [".", "docs"],
+  "include": ["."],
   "target": "es2020"
 }
