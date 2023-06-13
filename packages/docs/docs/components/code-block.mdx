@@ -145,9 +145,9 @@ yield view.add(
 );
 
 // second line only
-yield * codeRef().selection(lines(1));
+yield * codeRef().selection(lines(1), 1);
 // second and third line (line 1 to line 2)
-yield * codeRef().selection(lines(1, 2));
+yield * codeRef().selection(lines(1, 2), 1);
 ```
 
 To remove a selection, the value of `.selection()` signal can be set to its
@@ -157,10 +157,10 @@ To remove a selection, the value of `.selection()` signal can be set to its
 import {DEFAULT} from '@motion-canvas/core';
 
 // highlight lines 1 and 2
-yield * codeRef().selection(lines(1, 2));
+yield * codeRef().selection(lines(1, 2), 1);
 
 // highlight all lines
-yield * codeRef().selection(DEFAULT);
+yield * codeRef().selection(DEFAULT, 1);
 ```
 
 Alternatively, the selected range can be set from `[0, 0]` to
