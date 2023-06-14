@@ -1,3 +1,4 @@
+export * from './Bezier';
 export * from './Circle';
 export * from './CubicBezier';
 export * from './Curve';
