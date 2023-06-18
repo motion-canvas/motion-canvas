@@ -7,7 +7,7 @@
   "license": "MIT",
   "main": "src/project.ts",
   "scripts": {
-    "serve": "vite",
+    "dev": "vite",
     "build": "tsc && vite build"
   },
   "dependencies": {

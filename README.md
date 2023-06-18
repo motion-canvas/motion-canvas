@@ -55,23 +55,22 @@ packages.
 
 ### Developing Core & 2D
 
-When developing the core, start both `core:watch` and `template:serve`.
+When developing the core, start both `core:dev` and `template:dev`.
 
 This will pick up any changes you make to the core package, automatically
 rebuild the `template` project and refresh the page.
 
-Similarly, when developing the 2D package, start `2d:watch` and
-`template:serve`.
+Similarly, when developing the 2D package, start `2d:dev` and `template:dev`.
 
 ### Developing UI
 
 If you want to develop the UI, first build the template project by running:
-`template:build`. Next, start `ui:serve`.
+`template:build`. Next, start `ui:dev`.
 
 ### Developing Player
 
 Like with UI, to develop the player, first build the template: `template:build`.
-Then, start `player:serve`.
+Then, start `player:dev`.
 
 ## Contributing
 

@@ -8,9 +8,9 @@
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
+    "dev": "ttsc -p tsconfig.build.json -w",
     "build": "ttsc -p tsconfig.build.json",
     "bundle": "rollup -c rollup.config.mjs",
-    "watch": "ttsc -p tsconfig.build.json -w",
     "test": "vitest"
   },
   "sideEffects": false,
