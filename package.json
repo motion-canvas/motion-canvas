@@ -10,6 +10,8 @@
     "core:bundle": "npm run bundle -w packages/core",
     "core:watch": "npm run watch -w packages/core",
     "core:test": "npm run test -w packages/core",
+    "cli:build": "npm run build -w packages/cli",
+    "cli:watch": "npm run watch -w packages/cli",
     "2d:build": "npm run build -w packages/2d",
     "2d:bundle": "npm run bundle -w packages/2d",
     "2d:watch": "npm run watch -w packages/2d",
