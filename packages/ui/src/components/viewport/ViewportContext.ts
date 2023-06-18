@@ -5,6 +5,7 @@ export interface ViewportState {
   height: number;
   x: number;
   y: number;
+  size: {x: number; y: number};
   zoom: number;
   grid: boolean;
 }
@@ -14,6 +15,7 @@ const ViewportContext = createContext<ViewportState>({
   height: 1080,
   x: 0,
   y: 0,
+  size: {x: 0, y: 0},
   zoom: 1,
   grid: false,
 });
