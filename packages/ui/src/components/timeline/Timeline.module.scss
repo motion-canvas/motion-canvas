@@ -302,6 +302,8 @@
 
   .range:hover > & {
     color: rgba(255, 255, 255, 0.24);
+    z-index: 1;
+    min-width: 24px;
   }
 
   .range > &:hover,
