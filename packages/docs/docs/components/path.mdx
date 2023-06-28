@@ -6,9 +6,8 @@ slug: /path
 # Path
 
 ```tsx editor
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Path} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, Path} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const path = createRef<Path>();
@@ -44,6 +43,9 @@ You can define path to display by setting `data` property of Path component.
 To morph between two path you can tween `data` property.
 
 ```tsx editor
+import {makeScene2D, Path} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const path = createRef<Path>();
 
@@ -71,6 +73,9 @@ Like Spline and Bezier, you can also make other components follow this component
 path. You can use the `getPointAtPercentage` to get point along this path.
 
 ```tsx editor
+import {makeScene2D, Path} from '@motion-canvas/2d';
+import {createRef, createSignal} from '@motion-canvas/core';
+
 export default makeScene2D(function* (view) {
   const path = createRef<Path>();
   const progress = createSignal(0);
