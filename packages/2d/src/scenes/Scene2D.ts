@@ -8,7 +8,7 @@ import {
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2} from '@motion-canvas/core';
 import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
@@ -115,6 +115,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
         );
       });
     }
+  }
+
+  public transformMousePosition(x: number, y: number): Vector2 | null {
+    return new Vector2(x, y)
+      .scale(this.resolutionScale)
+      .transformAsPoint(this.getView().localToParent().inverse());
   }
 
   public registerNode(node: Node, key?: string): string {

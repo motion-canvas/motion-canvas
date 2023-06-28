@@ -76,10 +76,8 @@ animations. Open `example.tsx` in a text editor, and replace all code in the
 file with the following snippet.
 
 ```tsx editor
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {makeScene2D, Circle} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const myCircle = createRef<Circle>();
@@ -131,7 +129,7 @@ A scene is a set of elements displayed on the screen and an animation that
 governs them. The most basic scene looks as follows:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {makeScene2D} from '@motion-canvas/2d';
 
 export default makeScene2D(function* (view) {
   // animation
@@ -344,6 +342,17 @@ Did you run the `cd` command to switch to the directory containing your project?
   </summary>
 
 You can press `0` to refocus the camera on the preview.
+
+</details>
+<details>
+  <summary>
+    The animation ends abruptly or does not start at the beginning.
+  </summary>
+
+Make sure the playback range selector in the timeline starts and ends where you
+expect it to, e.g., at the beginning and end of your animation. The range
+selector is a gray bar in the time axis of your timeline. When you move your
+mouse over it, six dots will appear allowing you to manipulate it.
 
 </details>
 <details>

@@ -7,7 +7,12 @@ import {PresentationMode} from './components/presentation';
 import {EditorPanel, BottomPanel, SidebarPanel} from './signals';
 import {Timeline} from './components/timeline';
 import {Console} from './components/console';
-import {Properties, Threads, VideoSettings} from './components/sidebar';
+import {
+  Properties,
+  Settings,
+  Threads,
+  VideoSettings,
+} from './components/sidebar';
 import styles from './Editor.module.scss';
 
 export function Editor() {
@@ -34,6 +39,7 @@ export function Editor() {
               [EditorPanel.Inspector]: Properties,
               [EditorPanel.Threads]: Threads,
               [EditorPanel.Console]: Console,
+              [EditorPanel.Settings]: Settings,
             }}
           />
           <Viewport />

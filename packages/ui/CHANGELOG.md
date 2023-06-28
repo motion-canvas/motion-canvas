@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Bug Fixes
+
+- **ui:** fix collapse
+  ([#698](https://github.com/motion-canvas/motion-canvas/issues/698))
+  ([6bd8703](https://github.com/motion-canvas/motion-canvas/commit/6bd8703ec9b16f55b3817f6a1f9130f17b66c69a))
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- new plugin hooks
+  ([#723](https://github.com/motion-canvas/motion-canvas/issues/723))
+  ([9a2b5ab](https://github.com/motion-canvas/motion-canvas/commit/9a2b5ab8be0d001414fd00da3053d408e00fd1cd))
+- **ui:** add color picker
+  ([#691](https://github.com/motion-canvas/motion-canvas/issues/691))
+  ([a33059c](https://github.com/motion-canvas/motion-canvas/commit/a33059c0f455814919db31bc9e5e932907c797e4))
+- **ui:** include function names in stack traces
+  ([#693](https://github.com/motion-canvas/motion-canvas/issues/693))
+  ([835c0fa](https://github.com/motion-canvas/motion-canvas/commit/835c0fa4b70429db6fe96be96d6d9e44949f7f6c))
+- **ui:** new sidebar
+  ([#692](https://github.com/motion-canvas/motion-canvas/issues/692))
+  ([b555ee1](https://github.com/motion-canvas/motion-canvas/commit/b555ee1d10f8a6e1b380c043dff2717ffa01a068)),
+  closes [#492](https://github.com/motion-canvas/motion-canvas/issues/492)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
 
 ### Bug Fixes

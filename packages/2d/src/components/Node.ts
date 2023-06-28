@@ -1338,6 +1338,9 @@ export class Node implements Promisable<Node> {
    * node to a previously saved state. Restoring a node to a previous state
    * removes that state from the state stack.
    *
+   * Providing a duration will tween the node to the restored state. Otherwise,
+   * it will be restored immediately.
+   *
    * @example
    * ```tsx
    * const node = <Circle width={100} height={100} fill={"lightseagreen"} />
@@ -1355,20 +1358,25 @@ export class Node implements Promisable<Node> {
    * yield* node.restore(1);
    * ```
    *
-   * @param duration - The duration of the transition
-   * @param timing - The timing function to use for the transition
+   * @param duration - The duration of the transition.
+   * @param timing - The timing function to use for the transition.
    */
-  public restore(duration: number, timing: TimingFunction = easeInOutCubic) {
+  public restore(duration?: number, timing: TimingFunction = easeInOutCubic) {
     const state = this.stateStack.pop();
 
     if (state === undefined) {
       return;
     }
 
+    if (duration === undefined) {
+      this.applyState(state);
+      return;
+    }
+
     const currentState = this.getState();
     for (const key in state) {
       // Filter out any properties that haven't changed between the current and
-      // previous states so we don't perform unnecessary tweens.
+      // previous states, so we don't perform unnecessary tweens.
       if (currentState[key] === state[key]) {
         delete state[key];
       }

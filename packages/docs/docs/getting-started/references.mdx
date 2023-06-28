@@ -89,7 +89,7 @@ The preferred way of using the `ref` property is in conjunction with the
 example, we can rewrite it as:
 
 ```tsx
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core';
 
 // ...
 
@@ -142,7 +142,7 @@ We can use the [`makeRef()`](/api/core/utils#makeRef) function to simplify this
 process:
 
 ```tsx
-import {makeRef} from '@motion-canvas/core/lib/utils';
+import {makeRef} from '@motion-canvas/core';
 
 // ...
 
@@ -197,7 +197,7 @@ function Label({
   );
 }
 
-const label = {rect: null as Rect, text: null as Text};
+const label = {rect: null as Rect, text: null as Txt};
 view.add(<Label refs={label}>HELLO</Label>);
 
 // we can now animate both the Rect and the Text of our label:
@@ -233,7 +233,7 @@ function Label({
 }
 
 // highlight-next-line
-const label = {rect: null as Rect, text: null as Text};
+const label = {rect: null as Rect, text: null as Txt};
 view.add(<Label refs={label}>HELLO</Label>);
 ```
 
@@ -242,7 +242,7 @@ redundancy. It can extract the type from the `Label` declaration and create an
 empty object matching it:
 
 ```tsx
-import {makeRef, makeRefs} from '@motion-canvas/core/lib/utils';
+import {makeRef, makeRefs} from '@motion-canvas/core';
 
 // ...
 

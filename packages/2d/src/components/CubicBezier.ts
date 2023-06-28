@@ -29,21 +29,25 @@ export interface CubicBezierProps extends CurveProps {
  * A node for drawing a cubic Bézier curve.
  *
  * @preview
- * Defining a cubic Bézier curve using `points` property.
- *
  * ```tsx editor
+ * import {makeScene2D, CubicBezier} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const bezier = createRef<CubicBezier>();
  *
- *   <CubicBezier
- *     lineWidth={4}
- *     stroke={'lightseagreen'}
- *     p0={[-200, -200]}
- *     p1={[100, -200]}
- *     p2={[-100, 200]}
- *     p3={[200, 200]}
- *     end={0}
- *   />
+ *   view.add(
+ *     <CubicBezier
+ *       ref={bezier}
+ *       lineWidth={4}
+ *       stroke={'lightseagreen'}
+ *       p0={[-200, -100]}
+ *       p1={[100, -100]}
+ *       p2={[-100, 100]}
+ *       p3={[200, 100]}
+ *       end={0}
+ *     />
+ *   );
  *
  *   yield* bezier().end(1, 1);
  *   yield* bezier().start(1, 1).to(0, 1);

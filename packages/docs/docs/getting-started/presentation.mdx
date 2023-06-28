@@ -18,10 +18,8 @@ beginning of a new slide. When this function is yielded, the playback will pause
 and wait for you to press `SPACE`:
 
 ```ts
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Txt} from '@motion-canvas/2d/lib/components';
-import {beginSlide, createRef} from '@motion-canvas/core/lib/utils';
-import {waitFor} from '@motion-canvas/core/lib/flow';
+import {makeScene2D, Txt} from '@motion-canvas/2d';
+import {beginSlide, createRef, waitFor} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const title = createRef<Txt>();

@@ -12,8 +12,8 @@ To get a reference to the Logger in motion-canvas you can use the `useLogger`
 function:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {makeScene2D} from '@motion-canvas/2d';
+import {useLogger} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const logger = useLogger();

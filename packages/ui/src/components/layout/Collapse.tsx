@@ -60,7 +60,9 @@ function AnimatedCollapse({open, children, className, ...rest}: CollapseProps) {
 
     ref.current.dataset.open = open ? 'true' : 'false';
     if (open) {
-      ref.current.style.height = `${ref.current.scrollHeight}px`;
+      if (ref.current.style.height !== 'auto') {
+        ref.current.style.height = `${ref.current.scrollHeight}px`;
+      }
     } else {
       if (ref.current.style.height === 'auto') {
         ref.current.style.height = `${ref.current.scrollHeight}px`;

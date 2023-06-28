@@ -28,6 +28,8 @@ export interface CircleProps extends ShapeProps {
  * @preview
  * ```tsx editor
  * // snippet Simple circle
+ * import {makeScene2D, Circle} from '@motion-canvas/2d';
+ *
  * export default makeScene2D(function* (view) {
  *   view.add(
  *     <Circle
@@ -38,6 +40,8 @@ export interface CircleProps extends ShapeProps {
  * });
  *
  * // snippet Ellipse
+ * import {makeScene2D, Circle} from '@motion-canvas/2d';
+ *
  * export default makeScene2D(function* (view) {
  *   view.add(
  *     <Circle
@@ -49,6 +53,9 @@ export interface CircleProps extends ShapeProps {
  * });
  *
  * // snippet Sector (pie chart):
+ * import {makeScene2D, Circle} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const ref = createRef<Circle>();
  *   view.add(
@@ -66,6 +73,9 @@ export interface CircleProps extends ShapeProps {
  * });
  *
  * // snippet Arc:
+ * import {makeScene2D, Circle} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const ref = createRef<Circle>();
  *   view.add(

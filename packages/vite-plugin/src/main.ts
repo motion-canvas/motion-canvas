@@ -11,6 +11,7 @@ import {
 import {getVersions} from './versions';
 import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
 import {openInExplorer} from './openInExplorer';
+import * as os from 'os';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -93,9 +94,7 @@ export default ({
   editor = '@motion-canvas/ui',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
-  const plugins: PluginOptions[] = [
-    {entryPoint: '@motion-canvas/core/lib/plugin/DefaultPlugin'},
-  ];
+  const plugins: PluginOptions[] = [];
   const editorPath = path.dirname(require.resolve(editor));
   const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
   const htmlParts = editorFile
@@ -107,6 +106,11 @@ export default ({
 
   const resolvedEditorId = '\0virtual:editor';
 
+  const settingsId = '\0settings';
+  const settingsPath = path.resolve(
+    os.homedir(),
+    '.motion-canvas/settings.json',
+  );
   const timeStamps: Record<string, number> = {};
   const outputPath = path.resolve(output);
   const projects: ProjectData[] = [];
@@ -244,17 +248,30 @@ export default ({
             }
           }
 
+          let parsed = {};
+          try {
+            parsed = JSON.parse(
+              await fs.promises.readFile(settingsPath, 'utf8'),
+            );
+          } catch (_) {
+            // Ignore an invalid settings file
+          }
+
           return source(
             ...imports,
             `import {bootstrap} from '@motion-canvas/core/lib/app';`,
+            `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
             `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
+            `const settings = new MetaFile('settings', '${settingsId}');`,
+            `settings.loadData(${JSON.stringify(parsed)});`,
             `export default bootstrap(`,
             `  '${name}',`,
             `  ${versions},`,
             `  [${pluginNames.join(', ')}],`,
             `  config,`,
-            `  metaFile`,
+            `  metaFile,`,
+            `  settings,`,
             `);`,
           );
         }
@@ -382,12 +399,24 @@ export default ({
       }
 
       server.ws.on('motion-canvas:meta', async ({source, data}, client) => {
-        timeStamps[source] = Date.now();
-        await fs.promises.writeFile(
-          source,
-          JSON.stringify(data, undefined, 2),
-          'utf8',
-        );
+        if (source === settingsId) {
+          const outputDirectory = path.dirname(settingsPath);
+          if (!fs.existsSync(outputDirectory)) {
+            fs.mkdirSync(outputDirectory, {recursive: true});
+          }
+          await fs.promises.writeFile(
+            settingsPath,
+            JSON.stringify(data, undefined, 2),
+            'utf8',
+          );
+        } else {
+          timeStamps[source] = Date.now();
+          await fs.promises.writeFile(
+            source,
+            JSON.stringify(data, undefined, 2),
+            'utf8',
+          );
+        }
         client.send('motion-canvas:meta-ack', {source});
       });
       server.ws.on(

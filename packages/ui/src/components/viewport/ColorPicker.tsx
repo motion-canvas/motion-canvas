@@ -1,7 +1,7 @@
 import {Colorize} from '../icons';
 import {useState} from 'react';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
-import {useCallback} from 'preact/hooks';
+import {useCallback, useRef} from 'preact/hooks';
 import {useDocumentEvent} from '../../hooks';
 
 export function ColorPicker() {
@@ -10,8 +10,12 @@ export function ColorPicker() {
 
 function ColorPickerImpl() {
   const [active, setActive] = useState(false);
+  const isActive = useRef(active);
   const pickColor = useCallback(async () => {
+    if (isActive.current) return;
+
     try {
+      isActive.current = true;
       setActive(true);
       const dropper = new EyeDropper();
       const {sRGBHex} = await dropper.open();
@@ -19,6 +23,8 @@ function ColorPickerImpl() {
     } catch (_) {
       // User canceled the operation.
     }
+
+    isActive.current = false;
     setActive(false);
   }, []);
 
@@ -26,7 +32,7 @@ function ColorPickerImpl() {
     'keydown',
     useCallback(
       event => {
-        if (event.key === 'i') {
+        if (document.activeElement.tagName !== 'INPUT' && event.key === 'i') {
           pickColor();
         }
       },

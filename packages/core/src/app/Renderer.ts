@@ -35,10 +35,9 @@ export enum RendererResult {
  * The rendering logic used by the editor to export animations.
  *
  * @remarks
- * This class uses the {@link PlaybackManager} to render animations.
- * In contrast to a player, a renderer does not use an update loop.
- * It plays through the animation as fast as it can, occasionally pausing
- * to keep the UI responsive.
+ * This class uses the `PlaybackManager` to render animations. In contrast to a
+ * player, a renderer does not use an update loop. It plays through the
+ * animation as fast as it can, occasionally pausing to keep the UI responsive.
  *
  * The actual exporting is outsourced to an {@link Exporter}.
  */
@@ -129,7 +128,7 @@ export class Renderer {
    * Export an individual frame.
    *
    * @remarks
-   * This method always uses the default {@link ImageExporter}.
+   * This method always uses the default `ImageExporter`.
    *
    * @param settings - The rendering settings.
    * @param time - The timestamp to export.

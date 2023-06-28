@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Bug Fixes
+
+- **2d:** fix package.json entry
+  ([#720](https://github.com/motion-canvas/motion-canvas/issues/720))
+  ([12e9bf6](https://github.com/motion-canvas/motion-canvas/commit/12e9bf6f40ab7afc02e2f55260544f3864920ded))
+- **core:** project `variables`
+  ([#690](https://github.com/motion-canvas/motion-canvas/issues/690))
+  ([149f39c](https://github.com/motion-canvas/motion-canvas/commit/149f39c3219aa74115be80490bd6c5f236779b0e)),
+  closes [#689](https://github.com/motion-canvas/motion-canvas/issues/689)
+- **ui:** fix collapse
+  ([#698](https://github.com/motion-canvas/motion-canvas/issues/698))
+  ([6bd8703](https://github.com/motion-canvas/motion-canvas/commit/6bd8703ec9b16f55b3817f6a1f9130f17b66c69a))
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- **core:** add `gauss` function to `Random`
+  ([#709](https://github.com/motion-canvas/motion-canvas/issues/709))
+  ([d7de3d5](https://github.com/motion-canvas/motion-canvas/commit/d7de3d56d05dc88c7cbd557a73a25d083abb54e4))
+- **docs:** fiddle error highlighting
+  ([#713](https://github.com/motion-canvas/motion-canvas/issues/713))
+  ([f281aff](https://github.com/motion-canvas/motion-canvas/commit/f281aff27e31c7e06a415cdbfc44157b1d13a2f1))
+- **docs:** import folding
+  ([#706](https://github.com/motion-canvas/motion-canvas/issues/706))
+  ([bdb035f](https://github.com/motion-canvas/motion-canvas/commit/bdb035f045f96e58cadbe7f9e6e3d25e2ffb04b2))
+- export everything from entry points
+  ([#710](https://github.com/motion-canvas/motion-canvas/issues/710))
+  ([3c885d9](https://github.com/motion-canvas/motion-canvas/commit/3c885d9083b52fbbaccf1e2560ae50817949bc52))
+- new plugin hooks
+  ([#723](https://github.com/motion-canvas/motion-canvas/issues/723))
+  ([9a2b5ab](https://github.com/motion-canvas/motion-canvas/commit/9a2b5ab8be0d001414fd00da3053d408e00fd1cd))
+- **ui:** add color picker
+  ([#691](https://github.com/motion-canvas/motion-canvas/issues/691))
+  ([a33059c](https://github.com/motion-canvas/motion-canvas/commit/a33059c0f455814919db31bc9e5e932907c797e4))
+- **ui:** include function names in stack traces
+  ([#693](https://github.com/motion-canvas/motion-canvas/issues/693))
+  ([835c0fa](https://github.com/motion-canvas/motion-canvas/commit/835c0fa4b70429db6fe96be96d6d9e44949f7f6c))
+- **ui:** new sidebar
+  ([#692](https://github.com/motion-canvas/motion-canvas/issues/692))
+  ([b555ee1](https://github.com/motion-canvas/motion-canvas/commit/b555ee1d10f8a6e1b380c043dff2717ffa01a068)),
+  closes [#492](https://github.com/motion-canvas/motion-canvas/issues/492)
+- use ES modules in fiddles
+  ([#712](https://github.com/motion-canvas/motion-canvas/issues/712))
+  ([dbe2ad5](https://github.com/motion-canvas/motion-canvas/commit/dbe2ad5644219c5a98d38c6557abfb66d793c821))
+- **vite-plugin:** add entry point
+  ([#721](https://github.com/motion-canvas/motion-canvas/issues/721))
+  ([e634b6c](https://github.com/motion-canvas/motion-canvas/commit/e634b6cb67b3c569d21d424661708ca946ea4cc3))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
 
 ### Bug Fixes

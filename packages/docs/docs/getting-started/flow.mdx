@@ -20,9 +20,9 @@ function* example() {
 
 const generator = example();
 
-console.log(generator.next()); // 1;
-console.log(generator.next()); // 2;
-console.log(generator.next()); // 3;
+console.log(generator.next().value); // 1;
+console.log(generator.next().value); // 2;
+console.log(generator.next().value); // 3;
 ```
 
 When the `yield` keyword is encountered, the execution of the function pauses,
@@ -62,7 +62,7 @@ For instance, we could extract the flickering code from the above example to a
 separate generator and delegate our scene function to it:
 
 ```tsx
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {ThreadGenerator} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();
@@ -140,10 +140,8 @@ There are many ways to animate multiple objects. Here are some examples. Try
 using them in the below editor.
 
 ```tsx editor ratio=2
-import {makeScene2D} from '@motion-canvas/2d';
-import {Rect} from '@motion-canvas/2d/lib/components';
-import {all, waitFor} from '@motion-canvas/core/lib/flow';
-import {makeRef, range} from '@motion-canvas/core/lib/utils';
+import {makeScene2D, Rect} from '@motion-canvas/2d';
+import {all, waitFor, makeRef, range} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const rects: Rect[] = [];
@@ -193,7 +191,7 @@ This is similar to above, but uses a `for` loop and an array of generators.
 
 ```tsx
 const generators = [];
-for (const ref of rects) {
+for (const rect of rects) {
   // No yield here, just store the generators.
   generators.push(rect.position.y(100, 1).to(-100, 2).to(0, 1));
 }
@@ -209,7 +207,7 @@ would take for the generator in the loop to complete, but is useful in some
 situations.
 
 ```tsx
-for (const ref of rects) {
+for (const rect of rects) {
   // Note the absence of a * after this yield
   yield rect.position.y(100, 1).to(-100, 2).to(0, 1);
 }

@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Bug Fixes
+
+- **2d:** fix package.json entry
+  ([#720](https://github.com/motion-canvas/motion-canvas/issues/720))
+  ([12e9bf6](https://github.com/motion-canvas/motion-canvas/commit/12e9bf6f40ab7afc02e2f55260544f3864920ded))
+
+### Features
+
+- export everything from entry points
+  ([#710](https://github.com/motion-canvas/motion-canvas/issues/710))
+  ([3c885d9](https://github.com/motion-canvas/motion-canvas/commit/3c885d9083b52fbbaccf1e2560ae50817949bc52))
+- use ES modules in fiddles
+  ([#712](https://github.com/motion-canvas/motion-canvas/issues/712))
+  ([dbe2ad5](https://github.com/motion-canvas/motion-canvas/commit/dbe2ad5644219c5a98d38c6557abfb66d793c821))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
 
 ### Bug Fixes

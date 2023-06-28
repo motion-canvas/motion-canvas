@@ -52,7 +52,9 @@ Motion Canvas follows [semantic versioning][semver].
    ```
 3. Update the code.
 4. Commit your changes using a **descriptive commit message** that follows the
-   [Angular Commit Message Conventions][commit-format].
+   [Angular Commit Message Conventions][commit-format]. We strongly discourage
+   using AI to generate commit descriptions. If you believe the description is
+   not worth writing then it's probably not necessary.
    ```shell
    git commit --all
    ```
@@ -92,6 +94,12 @@ it. There are a few checks that can fail:
    git commit --all --fixup HEAD
    git push
    ```
+
+## Using generative AI
+
+Using generative AI to help you write code and documentation is allowed, but use
+it to enhance your work, not replace it. Pull requests that are a mindless copy
+of the output of an AI model will be rejected.
 
 ## Getting the _Contributor_ Discord role
 

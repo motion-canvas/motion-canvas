@@ -18,7 +18,7 @@ export class PlaybackStatus {
   /**
    * Convert frames to seconds using the current framerate.
    *
-   * @param seconds - The frames to convert.
+   * @param frames - The frames to convert.
    */
   public framesToSeconds(frames: number) {
     return frames / this.playback.fps;
