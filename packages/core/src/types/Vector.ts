@@ -9,6 +9,7 @@ import {
   SignalValue,
 } from '../signals';
 import {DEG2RAD, RAD2DEG} from '../utils';
+import {Matrix2D, PossibleMatrix2D} from './Matrix2D';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -91,6 +92,95 @@ export class Vector2 implements Type {
   public static createArcLerp(reverse?: boolean, ratio?: number) {
     return (from: Vector2, to: Vector2, value: number) =>
       Vector2.arcLerp(from, to, value, reverse, ratio);
+  }
+
+  /**
+   * Interpolates between two vectors on the polar plane by interpolating
+   * the angles and magnitudes of the vectors individually.
+   *
+   * @param from - The starting vector.
+   * @param to - The target vector.
+   * @param value - The t-value of the interpolation.
+   * @param counterclockwise - Whether the vector should get rotated
+   *                           counterclockwise. Defaults to `false`.
+   * @param origin - The center of rotation. Defaults to the origin.
+   *
+   * @remarks
+   * This function is useful when used in conjunction with {@link rotate} to
+   * animate an object's position on a circular arc (see examples).
+   *
+   * @example
+   * Animating an object in a circle around the origin
+   * ```tsx
+   * circle().position(
+   *   circle().position().rotate(180),
+   *   1,
+   *   easeInOutCubic,
+   *   Vector2.polarLerp
+   * );
+   * ```
+   * @example
+   * Rotating an object around the point `[-200, 100]`
+   * ```ts
+   * circle().position(
+   *   circle().position().rotate(180, [-200, 100]),
+   *   1,
+   *   easeInOutCubic,
+   *   Vector2.createPolarLerp(false, [-200, 100]),
+   * );
+   * ```
+   * @example
+   * Rotating an object counterclockwise around the origin
+   * ```ts
+   * circle().position(
+   *   circle().position().rotate(180),
+   *   1,
+   *   easeInOutCubic,
+   *   Vector2.createPolarLerp(true),
+   * );
+   * ```
+   */
+  public static polarLerp(
+    from: Vector2,
+    to: Vector2,
+    value: number,
+    counterclockwise = false,
+    origin = Vector2.zero,
+  ) {
+    from = from.sub(origin);
+    to = to.sub(origin);
+
+    const fromAngle = from.degrees;
+    let toAngle = to.degrees;
+    const isCounterclockwise = fromAngle > toAngle;
+
+    if (isCounterclockwise !== counterclockwise) {
+      toAngle = toAngle + (counterclockwise ? -360 : 360);
+    }
+
+    const angle = map(fromAngle, toAngle, value) * DEG2RAD;
+    const magnitude = map(from.magnitude, to.magnitude, value);
+
+    return new Vector2(
+      magnitude * Math.cos(angle) + origin.x,
+      magnitude * Math.sin(angle) + origin.y,
+    );
+  }
+
+  /**
+   * Helper function to create a {@link Vector2.polarLerp} interpolation
+   * function with additional parameters.
+   *
+   * @param counterclockwise - Whether the point should get rotated
+   *                           counterclockwise.
+   * @param center - The center of rotation. Defaults to the origin.
+   */
+  public static createPolarLerp(
+    counterclockwise = false,
+    center: PossibleVector2 = Vector2.zero,
+  ) {
+    return (from: Vector2, to: Vector2, value: number) =>
+      Vector2.polarLerp(from, to, value, counterclockwise, new Vector2(center));
   }
 
   public static fromOrigin(origin: Origin | Direction) {
@@ -271,17 +361,21 @@ export class Vector2 implements Type {
     return new Vector2(this.x * value, this.y * value);
   }
 
-  public transformAsPoint(matrix: DOMMatrix) {
+  public transformAsPoint(matrix: PossibleMatrix2D) {
+    const m = new Matrix2D(matrix);
+
     return new Vector2(
-      this.x * matrix.m11 + this.y * matrix.m21 + matrix.m41,
-      this.x * matrix.m12 + this.y * matrix.m22 + matrix.m42,
+      this.x * m.scaleX + this.y * m.skewY + m.translateX,
+      this.x * m.skewX + this.y * m.scaleY + m.translateY,
     );
   }
 
-  public transform(matrix: DOMMatrix) {
+  public transform(matrix: PossibleMatrix2D) {
+    const m = new Matrix2D(matrix);
+
     return new Vector2(
-      this.x * matrix.m11 + this.y * matrix.m21,
-      this.x * matrix.m12 + this.y * matrix.m22,
+      this.x * m.scaleX + this.y * m.skewY,
+      this.x * m.skewX + this.y * m.scaleY,
     );
   }
 
@@ -313,6 +407,25 @@ export class Vector2 implements Type {
   public mod(possibleVector: PossibleVector2): Vector2 {
     const vector = new Vector2(possibleVector);
     return new Vector2(this.x % vector.x, this.y % vector.y);
+  }
+
+  /**
+   * Rotates the vector around a point by the provided angle.
+   *
+   * @param angle - The angle by which to rotate in degrees.
+   * @param center - The center of rotation. Defaults to the origin.
+   */
+  public rotate(
+    angle: number,
+    center: PossibleVector2 = Vector2.zero,
+  ): Vector2 {
+    const originVector = new Vector2(center);
+
+    const matrix = Matrix2D.fromTranslation(originVector)
+      .rotate(angle)
+      .translate(originVector.flipped);
+
+    return this.transformAsPoint(matrix);
   }
 
   public addX(value: number) {

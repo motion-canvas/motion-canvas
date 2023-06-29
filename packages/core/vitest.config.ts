@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [markdownLiterals()],
   test: {
     environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
   },
 });
