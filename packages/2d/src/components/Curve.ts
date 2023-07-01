@@ -391,8 +391,10 @@ export abstract class Curve extends Shape {
     return (
       !this.start.isInitial() ||
       !this.startOffset.isInitial() ||
+      !this.startArrow.isInitial() ||
       !this.end.isInitial() ||
-      !this.endOffset.isInitial()
+      !this.endOffset.isInitial() ||
+      !this.endArrow.isInitial()
     );
   }
 
