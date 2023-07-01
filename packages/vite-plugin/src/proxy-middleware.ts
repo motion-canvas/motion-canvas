@@ -160,7 +160,7 @@ function isReceivedUrlInAllowedHosts(
   hostname: string,
   allowListHosts: string[] | undefined,
 ) {
-  if (!allowListHosts || allowListHosts.length == 0) {
+  if (!allowListHosts || allowListHosts.length === 0) {
     // if the allowListHosts is just the predefinedAllowlist, the user has not
     // set any additional hosts. In this case, allow any hostname
     return true;
@@ -236,7 +236,7 @@ async function tryGetResource(
         res(data);
       });
       request.on('error', (err: any) => {
-        if (err.code && err.code == 'ENOTFOUND') {
+        if (err.code && err.code === 'ENOTFOUND') {
           // This is a bit hacky, but this basically returns as a
           // 404 instead of crashing the Node Server with ENOTFOUND
           res({statusCode: 404} as any);
