@@ -4,6 +4,7 @@ import {DEG2RAD} from '../utils';
 
 export type PossibleMatrix2D =
   | Matrix2D
+  | DOMMatrix
   | [number, number, number, number, number, number]
   | [PossibleVector2, PossibleVector2, PossibleVector2]
   | undefined;
@@ -60,12 +61,20 @@ export class Matrix2D implements Type {
     return new Vector2(this.values[2], this.values[3]);
   }
 
+  public set scaleX(value: number) {
+    this.values[0] = this.x.normalized.scale(value).x;
+  }
+
   public get scaleX(): number {
     return this.values[0];
   }
 
-  public set scaleX(value: number) {
-    this.values[0] = this.x.normalized.scale(value).x;
+  public set skewX(value: number) {
+    this.values[1] = value;
+  }
+
+  public get skewX(): number {
+    return this.values[1];
   }
 
   public set scaleY(value: number) {
@@ -74,6 +83,14 @@ export class Matrix2D implements Type {
 
   public get scaleY(): number {
     return this.values[3];
+  }
+
+  public set skewY(value: number) {
+    this.values[2] = value;
+  }
+
+  public get skewY(): number {
+    return this.values[2];
   }
 
   public set translateX(value: number) {
@@ -233,6 +250,16 @@ export class Matrix2D implements Type {
       this.values[3] = d as number;
       this.values[4] = tx as number;
       this.values[5] = ty as number;
+      return;
+    }
+
+    if (a instanceof DOMMatrix) {
+      this.values[0] = a.m11;
+      this.values[1] = a.m12;
+      this.values[2] = a.m21;
+      this.values[3] = a.m22;
+      this.values[4] = a.m41;
+      this.values[5] = a.m42;
       return;
     }
 
