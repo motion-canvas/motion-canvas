@@ -86,7 +86,7 @@ export function deepLerp(
   if (value === 0) return from;
   if (value === 1) return to;
 
-  if (from == undefined || to == undefined) {
+  if (from == null || to == null) {
     if (!suppressWarnings) {
       useLogger().warn(
         `Attempting to lerp ${from} -> ${to} may result in unexpected behavior.`,

@@ -119,7 +119,7 @@ function approximatePolygonPoints(
  */
 
 function splitCurve(curve: CurveProfile) {
-  if (curve.segments.length == 0) return [];
+  if (curve.segments.length === 0) return [];
 
   let current: SubcurveProfile = {
     arcLength: 0,

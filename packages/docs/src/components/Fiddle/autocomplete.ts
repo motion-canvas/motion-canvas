@@ -41,7 +41,7 @@ export function autocomplete() {
       if (nodeBefore.name === 'String') return;
 
       const word = context.matchBefore(/\w*/);
-      if (word.from == word.to && !context.explicit) return null;
+      if (word.from === word.to && !context.explicit) return null;
       return {
         from: word.from,
         options: Options,

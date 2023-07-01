@@ -172,7 +172,7 @@ export function drawPolygon(
     const theta = (i * 2 * Math.PI) / sides;
     const direction = Vector2.fromRadians(theta).perpendicular;
     const vertex = direction.mul(size);
-    if (i == 0) {
+    if (i === 0) {
       moveTo(path, vertex);
     } else {
       lineTo(path, vertex);

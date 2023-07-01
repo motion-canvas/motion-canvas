@@ -73,10 +73,12 @@ export class ArcSegment extends Segment {
     const s = pAccent.scale(-1).sub(cAccent).div(radius);
     this.startAngle = q.radians;
     this.deltaAngle = Vector2.angleBetween(q, s) % (Math.PI * 2);
-    if (this.sweepFlag === 0 && this.deltaAngle > 0)
+    if (this.sweepFlag === 0 && this.deltaAngle > 0) {
       this.deltaAngle -= Math.PI * 2;
-    if (this.sweepFlag === 1 && this.deltaAngle < 0)
+    }
+    if (this.sweepFlag === 1 && this.deltaAngle < 0) {
       this.deltaAngle += Math.PI * 2;
+    }
 
     ArcSegment.el.setAttribute(
       'd',
@@ -134,9 +136,9 @@ export class ArcSegment extends Segment {
     const tangent = this.getAngleDerivative(angle).normalized;
     return {
       position:
-        distance == 0
+        distance === 0
           ? this.startPoint
-          : distance == 1
+          : distance === 1
           ? this.endPoint
           : this.getAnglePosition(angle),
       tangent,

@@ -35,6 +35,13 @@ export class ValueDispatcher<T> extends EventDispatcherBase<T> {
     new SubscribableValueEvent(this);
 
   /**
+   * {@inheritDoc SubscribableValueEvent.current}
+   */
+  public get current() {
+    return this.value;
+  }
+
+  /**
    * Set the current value of this dispatcher.
    *
    * @remarks
@@ -45,13 +52,6 @@ export class ValueDispatcher<T> extends EventDispatcherBase<T> {
   public set current(value: T) {
     this.value = value;
     this.notifySubscribers(value);
-  }
-
-  /**
-   * {@inheritDoc SubscribableValueEvent.current}
-   */
-  public get current() {
-    return this.value;
   }
 
   /**
