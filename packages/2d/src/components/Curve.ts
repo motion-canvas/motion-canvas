@@ -153,6 +153,8 @@ export abstract class Curve extends Shape {
   @signal()
   public declare readonly arrowSize: SimpleSignal<number, this>;
 
+  protected canHaveSubpath = false;
+
   protected override desiredSize(): SerializedVector2<DesiredLength> {
     return this.childrenBBox().size;
   }
@@ -243,9 +245,21 @@ export abstract class Curve extends Shape {
     return Math.abs(this.start() - this.end());
   }
 
+  protected processSubpath(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _path: Path2D,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _startPoint: Vector2 | null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _endPoint: Vector2 | null,
+  ) {
+    // do nothing
+  }
+
   @computed()
   protected curveDrawingInfo(): CurveDrawingInfo {
     const path = new Path2D();
+    let subpath = new Path2D();
     const profile = this.profile();
 
     let start = this.percentageToDistance(this.start());
@@ -283,8 +297,19 @@ export abstract class Curve extends Shape {
       const clampedStart = clamp(0, 1, relativeStart);
       const clampedEnd = clamp(0, 1, relativeEnd);
 
+      if (
+        this.canHaveSubpath &&
+        endPoint &&
+        !segment.getPoint(0).position.equals(endPoint)
+      ) {
+        path.addPath(subpath);
+        this.processSubpath(subpath, startPoint, endPoint);
+        subpath = new Path2D();
+        startPoint = null;
+      }
+
       const [startCurvePoint, endCurvePoint] = segment.draw(
-        path,
+        subpath,
         clampedStart,
         clampedEnd,
         startPoint === null,
@@ -303,8 +328,10 @@ export abstract class Curve extends Shape {
     }
 
     if (this.end() === 1 && this.closed()) {
-      path.closePath();
+      subpath.closePath();
     }
+    this.processSubpath(subpath, startPoint, endPoint);
+    path.addPath(subpath);
 
     return {
       startPoint: startPoint ?? Vector2.zero,

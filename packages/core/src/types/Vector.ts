@@ -1,5 +1,5 @@
 import {arcLerp, InterpolationFunction} from '../tweening';
-import {map} from '../tweening/interpolationFunctions';
+import {clamp, map} from '../tweening/interpolationFunctions';
 import {Direction, Origin} from './Origin';
 import {EPSILON, Type} from './Type';
 import {
@@ -160,6 +160,13 @@ export class Vector2 implements Type {
     return x * x + y * y;
   }
 
+  public static angleBetween(u: Vector2, v: Vector2) {
+    return (
+      Math.acos(clamp(-1, 1, u.dot(v) / (u.magnitude * v.magnitude))) *
+      (u.cross(v) >= 0 ? 1 : -1)
+    );
+  }
+
   public get width(): number {
     return this.x;
   }
@@ -308,6 +315,11 @@ export class Vector2 implements Type {
   public dot(possibleVector: PossibleVector2): number {
     const vector = new Vector2(possibleVector);
     return this.x * vector.x + this.y * vector.y;
+  }
+
+  public cross(possibleVector: PossibleVector2): number {
+    const vector = new Vector2(possibleVector);
+    return this.x * vector.y - this.y * vector.x;
   }
 
   public mod(possibleVector: PossibleVector2): Vector2 {
