@@ -129,7 +129,7 @@ export function drawRoundRect(
   context.arcTo(rect.left, rect.top, rect.right, rect.top, topLeft);
 }
 
-function adjustRectRadius(
+export function adjustRectRadius(
   radius: number,
   horizontal: number,
   vertical: number,

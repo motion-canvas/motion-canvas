@@ -131,7 +131,7 @@ export class Video extends Rect {
   }
 
   @computed()
-  public completion(): number {
+  public override completion(): number {
     return this.clampTime(this.time()) / this.video().duration;
   }
 
