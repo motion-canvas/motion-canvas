@@ -1,39 +1,29 @@
 import {
-  Gradient,
+  Grid,
   Img,
   Layout,
-  Rect,
   makeScene2D,
   Node,
+  Rect,
   Txt,
-  Grid,
 } from '@motion-canvas/2d';
 import {
-  Vector2,
   all,
   createRef,
   createSignal,
+  Origin,
+  Vector2,
   waitFor,
 } from '@motion-canvas/core';
 
 const ImageSource =
-  'https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=50';
+  'https://images.unsplash.com/photo-1685901088371-f498db7f8c46';
 
-export default makeScene2D(function* (scene) {
-  scene.fill(
-    new Gradient({
-      type: 'linear',
-      from: new Vector2(400, 100),
-      to: new Vector2(-400, -100),
-      stops: [
-        {offset: 0, color: '#a66'},
-        {offset: 1, color: '#66a'},
-      ],
-    }),
-  );
+export default makeScene2D(function* (view) {
+  view.fontSize(20).fill('#141414');
 
-  const valuePosition = createSignal(new Vector2(100, -30));
-  const maskPosition = createSignal(new Vector2(-100, -30));
+  const valuePosition = createSignal(new Vector2(150, -30));
+  const maskPosition = createSignal(new Vector2(-150, -30));
 
   const maskLayerRotation = createSignal(0);
   const valueLayerRotation = createSignal(0);
@@ -42,7 +32,7 @@ export default makeScene2D(function* (scene) {
   const fakeValueLayerGroup = createRef<Node>();
 
   // First show fake a Mask Layer. Funnily enough, this also makes use of masking!
-  yield scene.add(
+  yield view.add(
     <Node ref={fakeMaskLayerGroup} opacity={0} cache>
       <Img
         src="/img/logo_dark.svg"
@@ -60,15 +50,15 @@ export default makeScene2D(function* (scene) {
       />
     </Node>,
   );
-  yield scene.add(
+  yield view.add(
     <Node ref={fakeValueLayerGroup} opacity={0} cache>
-      {/* 
-                We do not specifically need to use the Image here, a simple Rectangle would be enough. 
-                It is however convenient because we get the correct aspect ratio.
-            */}
+      {/*
+      We do not specifically need to use the Image here, a simple Rectangle would be enough.
+      It is however convenient because we get the correct aspect ratio.
+      */}
       <Img
         src={ImageSource}
-        width={200}
+        width={360}
         position={valuePosition}
         rotation={valueLayerRotation}
       />
@@ -85,11 +75,15 @@ export default makeScene2D(function* (scene) {
   );
 
   // Legend (Bottom Center)
-  yield scene.add(
-    <Rect fill={'#111111A0'} width={600} height={100} y={130} radius={10} />,
-  );
-  yield scene.add(
-    <Layout layout direction={'row'} gap={20} y={100}>
+  yield view.add(
+    <Rect
+      fill={'#1a1a1aa0'}
+      layout
+      direction={'row'}
+      gap={20}
+      padding={20}
+      bottom={() => view.getOriginDelta(Origin.Bottom)}
+    >
       <Layout gap={5} alignItems={'center'}>
         <Grid
           stroke={'white'}
@@ -98,9 +92,7 @@ export default makeScene2D(function* (scene) {
           spacing={5}
           lineWidth={1}
         />
-        <Txt fill={'white'} fontSize={20}>
-          Hidden Stencil / Mask Layer
-        </Txt>
+        <Txt fill={'white'}>Hidden Stencil / Mask Layer</Txt>
       </Layout>
       <Layout gap={5} alignItems={'center'}>
         <Grid
@@ -111,19 +103,17 @@ export default makeScene2D(function* (scene) {
           spacing={5}
           lineWidth={1}
         />
-        <Txt fill={'white'} fontSize={20}>
-          Hidden Value Layer
-        </Txt>
+        <Txt fill={'white'}>Hidden Value Layer</Txt>
       </Layout>
-    </Layout>,
+    </Rect>,
   );
   yield* all(
     fakeMaskLayerGroup().opacity(1, 1),
     fakeValueLayerGroup().opacity(1, 1),
   );
   // Here comes the *actual* value and stencil mask. Because it got added last it will be ontop of the "fake" layers.
-  yield scene.add(
-    <Node cache={true}>
+  yield view.add(
+    <Node cache>
       {/** Stencil / Mask Layer. It defines if the Value Layer is visible or not */}
       <Img
         src="/img/logo_dark.svg"
@@ -134,7 +124,7 @@ export default makeScene2D(function* (scene) {
       {/** Value Layer. Anything from here will be visible if the Stencil Layer allows for it. */}
       <Img
         src={ImageSource}
-        width={200}
+        width={360}
         position={valuePosition}
         rotation={valueLayerRotation}
         compositeOperation={'source-in'}
@@ -151,8 +141,8 @@ export default makeScene2D(function* (scene) {
   yield* valueLayerRotation(-360, 2);
   yield* waitFor(1);
   yield* all(
-    maskPosition(new Vector2(-100, -30), 2),
-    valuePosition(new Vector2(100, -30), 2),
+    maskPosition(new Vector2(-150, -30), 2),
+    valuePosition(new Vector2(150, -30), 2),
   );
   yield* all(
     fakeMaskLayerGroup().opacity(0, 1),
@@ -168,7 +158,7 @@ export default makeScene2D(function* (scene) {
   yield* valueLayerRotation(2 * -360, 2);
   yield* waitFor(1);
   yield* all(
-    maskPosition(new Vector2(-100, -30), 2),
-    valuePosition(new Vector2(100, -30), 2),
+    maskPosition(new Vector2(-150, -30), 2),
+    valuePosition(new Vector2(150, -30), 2),
   );
 });

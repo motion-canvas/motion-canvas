@@ -1,89 +1,74 @@
-import {makeScene2D} from '@motion-canvas/2d';
-import {createSignal} from '@motion-canvas/core/lib/signals';
-import {linear} from '@motion-canvas/core/lib/tweening';
-import {contrast, saturate} from '@motion-canvas/2d/lib/partials';
 import {
+  makeScene2D,
   Circle,
   Grid,
-  Img,
   Layout,
   Rect,
   Txt,
-  TxtProps,
-} from '@motion-canvas/2d/lib/components';
+  contrast,
+  saturate,
+} from '@motion-canvas/2d';
+import {createSignal, linear, map, waitFor} from '@motion-canvas/core';
 
-export default makeScene2D(function* (scene) {
+export default makeScene2D(function* (view) {
+  view.fontFamily('monospace').fontSize(20).fill('#141414');
+  view.add(<Rect size={5000} fill={'#111'} />);
+
   const t = createSignal(0);
-  scene.add(<Rect size={5000} fill={'#111'} />);
-
-  const commonTxtValues: Partial<TxtProps> = {
-    fontFamily: 'monospace',
-    fill: 'white',
-    fontSize: 20,
-  };
-
   const saturateValue = createSignal(1);
   const contrastValue = createSignal(1);
 
-  scene.add(
+  view.add(
     // Left Segment
-    <Layout x={-300} direction={'column'} layout={true}>
-      <Img
-        size={200}
-        src={'/img/logo_dark.svg'}
+    <Layout x={-300} direction={'column'} alignItems={'center'} gap={20} layout>
+      <Circle
+        size={150}
+        fill={'#99c47a'}
         filters={[saturate(saturateValue), contrast(contrastValue)]}
       />
       <Layout direction={'row'} gap={20}>
-        <Txt {...commonTxtValues} fill={'#ffa'}>
-          saturation
-        </Txt>
-        <Txt {...commonTxtValues} fill={'#aff'}>
-          constrast
-        </Txt>
+        <Txt fill={'#ffa'}>saturation</Txt>
+        <Txt fill={'#aff'}>constrast</Txt>
       </Layout>
     </Layout>,
   );
 
   // Right Segment
-  yield scene.add(
-    <Layout x={300} direction={'column'} layout={true}>
-      <Img
-        size={200}
-        src={'/img/logo_dark.svg'}
+  yield view.add(
+    <Layout x={300} direction={'column'} alignItems={'center'} gap={20} layout>
+      <Circle
+        size={150}
+        fill={'#99c47a'}
         filters={[contrast(contrastValue), saturate(saturateValue)]}
       />
       <Layout direction={'row'} gap={20}>
-        <Txt {...commonTxtValues} fill={'#aff'}>
-          constrast
-        </Txt>
-        <Txt {...commonTxtValues} fill={'#ffa'}>
-          saturation
-        </Txt>
+        <Txt fill={'#aff'}>constrast</Txt>
+        <Txt fill={'#ffa'}>saturation</Txt>
       </Layout>
     </Layout>,
   );
 
   // Center Segment
-  scene.add(
+  view.add(
     <Layout y={-10}>
       <Grid size={200} stroke={'gray'} lineWidth={1} spacing={40} />
       <Grid size={200} stroke={'#333'} lineWidth={1} spacing={20} />
       <Rect size={200} stroke={'gray'} lineWidth={2} />
       <Txt
-        {...commonTxtValues}
+        fill={'white'}
         text={'saturation'}
         rotation={-90}
         x={-115}
         fill={'#ffa'}
       />
-      <Txt {...commonTxtValues} text={'contrast'} y={115} fill={'#aff'} />
-      <Txt {...commonTxtValues} text={'1'} position={[-115, 100]} />
-      <Txt {...commonTxtValues} text={'1'} position={[-100, 115]} />
-      <Txt {...commonTxtValues} text={'5'} position={[-115, -90]} />
-      <Txt {...commonTxtValues} text={'5'} position={[100, 115]} />
+      <Txt fill={'white'} text={'contrast'} y={115} fill={'#aff'} />
+      <Txt fill={'white'} text={'1'} position={[-115, 100]} />
+      <Txt fill={'white'} text={'1'} position={[-100, 115]} />
+      <Txt fill={'white'} text={'5'} position={[-115, -90]} />
+      <Txt fill={'white'} text={'5'} position={[100, 115]} />
       <Circle
-        x={() => -100 + (contrastValue() - 1) * 50}
-        y={() => 100 - (saturateValue() - 1) * 50}
+        x={() => map(-150, -100, contrastValue())}
+        y={() => map(150, 100, saturateValue())}
         fill={'white'}
         size={20}
       />
@@ -93,6 +78,7 @@ export default makeScene2D(function* (scene) {
   yield t(2, 8, linear);
   yield* saturateValue(5, 2);
   yield* contrastValue(5, 2);
+  yield* waitFor(1);
   yield* saturateValue(1, 2);
   yield* contrastValue(1, 2);
 });
