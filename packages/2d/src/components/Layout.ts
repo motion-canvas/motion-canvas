@@ -503,6 +503,22 @@ export class Layout extends Node {
   public declare readonly offset: Vector2Signal<this>;
 
   /**
+   * The position of the center of this node.
+   *
+   * @remarks
+   * When set, this shortcut property will modify the node's position so that
+   * the center ends up in the given place.
+   *
+   * If the {@link offset} has not been changed, this will be the same as the
+   * {@link position}.
+   *
+   * When retrieved, it will return the position of the center in the parent
+   * space.
+   */
+  @originSignal(Origin.Middle)
+  public declare readonly middle: SimpleVector2Signal<this>;
+
+  /**
    * The position of the top edge of this node.
    *
    * @remarks
