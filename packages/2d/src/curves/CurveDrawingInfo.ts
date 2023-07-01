@@ -2,7 +2,8 @@ import {Vector2} from '@motion-canvas/core/lib/types';
 
 export interface CurveDrawingInfo {
   path: Path2D;
-  arrowSize: number;
+  startArrowSize: number;
+  endArrowSize: number;
   endPoint: Vector2;
   endTangent: Vector2;
   startPoint: Vector2;

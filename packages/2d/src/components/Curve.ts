@@ -28,7 +28,7 @@ export interface CurveProps extends ShapeProps {
   /**
    * {@inheritDoc Curve.startArrow}
    */
-  startArrow?: SignalValue<boolean>;
+  startArrow?: SignalValue<Node | boolean>;
   /**
    * {@inheritDoc Curve.end}
    */
@@ -40,7 +40,7 @@ export interface CurveProps extends ShapeProps {
   /**
    * {@inheritDoc Curve.endArrow}
    */
-  endArrow?: SignalValue<boolean>;
+  endArrow?: SignalValue<Node | boolean>;
   /**
    * {@inheritDoc Curve.arrowSize}
    */
@@ -94,11 +94,14 @@ export abstract class Curve extends Shape {
    * Whether to display an arrow at the start of the visible curve.
    *
    * @remarks
-   * Use {@link arrowSize} to control the size of the arrow.
-   */
+   * If `true`, a default arrow will be drawn. The size of the arrow can be
+   * controlled with {@link arrowSize}.
+   * If set to a {@link Node}, the node will be used as the arrow. If a custom
+   * arrow is used, the {@link arrowSize} signal will be ignored.
+   **/
   @initial(false)
   @signal()
-  public declare readonly startArrow: SimpleSignal<boolean, this>;
+  public declare readonly startArrow: SimpleSignal<Node | boolean, this>;
 
   /**
    * A percentage from the start after which the curve should be clipped.
@@ -136,11 +139,14 @@ export abstract class Curve extends Shape {
    * Whether to display an arrow at the end of the visible curve.
    *
    * @remarks
-   * Use {@link arrowSize} to control the size of the arrow.
-   */
+   * If `true`, a default arrow will be drawn. The size of the arrow can be
+   * controlled with {@link arrowSize}.
+   * If set to a {@link Node}, the node will be used as the arrow. If a custom
+   * arrow is used, the {@link arrowSize} signal will be ignored.
+   **/
   @initial(false)
   @signal()
-  public declare readonly endArrow: SimpleSignal<boolean, this>;
+  public declare readonly endArrow: SimpleSignal<Node | boolean, this>;
 
   /**
    * Controls the size of the end and start arrows.
@@ -269,14 +275,24 @@ export abstract class Curve extends Shape {
     }
 
     const distance = end - start;
-    const arrowSize = Math.min(distance / 2, this.arrowSize());
+    const startArrow = this.startArrow();
+    const endArrow = this.endArrow();
 
-    if (this.startArrow()) {
-      start += arrowSize / 2;
+    const startArrowSize = Math.min(
+      distance / 2,
+      this.calculateArrowSize(startArrow),
+    );
+    const endArrowSize = Math.min(
+      distance / 2,
+      this.calculateArrowSize(endArrow),
+    );
+
+    if (startArrow) {
+      start += startArrowSize / 2;
     }
 
-    if (this.endArrow()) {
-      end -= arrowSize / 2;
+    if (endArrow) {
+      end -= endArrowSize / 2;
     }
 
     let length = 0;
@@ -338,7 +354,8 @@ export abstract class Curve extends Shape {
       startTangent: startTangent ?? Vector2.right,
       endPoint: endPoint ?? Vector2.zero,
       endTangent: endTangent ?? Vector2.right,
-      arrowSize,
+      startArrowSize,
+      endArrowSize,
       path,
       startOffset: start,
     };
@@ -385,30 +402,80 @@ export abstract class Curve extends Shape {
     return this.lineCap() === 'square' ? 0.5 * 1.4143 : 0.5;
   }
 
+  private calculateArrowSize(arrow: Node | boolean): number {
+    if (arrow instanceof Node) {
+      return BBox.fromPoints(
+        ...arrow.cacheBBox().transformCorners(arrow.localToParent()),
+      ).width;
+    }
+
+    return this.arrowSize();
+  }
+
   protected override drawShape(context: CanvasRenderingContext2D) {
     super.drawShape(context);
-    const {startPoint, startTangent, endPoint, endTangent, arrowSize} =
-      this.curveDrawingInfo();
-    if (arrowSize < 0.001) {
+    const {
+      startPoint,
+      startTangent,
+      endPoint,
+      endTangent,
+      startArrowSize,
+      endArrowSize,
+    } = this.curveDrawingInfo();
+
+    if (startArrowSize < 0.001 && endArrowSize < 0.001) {
       return;
     }
 
     context.save();
     context.beginPath();
-    if (this.endArrow()) {
-      this.drawArrow(context, endPoint, endTangent.flipped, arrowSize);
+
+    const startArrow = this.startArrow();
+    const endArrow = this.endArrow();
+
+    if (endArrowSize >= 0.001 && endArrow) {
+      this.drawArrowHead(context, endArrow, endPoint, endTangent, endArrowSize);
     }
-    if (this.startArrow()) {
-      this.drawArrow(context, startPoint, startTangent, arrowSize);
+
+    if (startArrowSize >= 0.001 && startArrow) {
+      this.drawArrowHead(
+        context,
+        startArrow,
+        startPoint,
+        startTangent,
+        startArrowSize,
+        true,
+      );
     }
+
     context.fillStyle = resolveCanvasStyle(this.stroke(), context);
     context.closePath();
     context.fill();
     context.restore();
   }
 
+  private drawArrowHead(
+    context: CanvasRenderingContext2D,
+    arrow: Node | boolean,
+    center: Vector2,
+    tangent: Vector2,
+    arrowSize: number,
+    start = false,
+  ): void {
+    if (arrow instanceof Node) {
+      this.drawArrowNode(context, arrow, arrowSize, center, tangent, start);
+    } else {
+      this.drawArrow(
+        context,
+        center,
+        start ? tangent : tangent.flipped,
+        arrowSize,
+      );
+    }
+  }
+
   private drawArrow(
-    context: CanvasRenderingContext2D | Path2D,
+    context: CanvasRenderingContext2D,
     center: Vector2,
     tangent: Vector2,
     arrowSize: number,
@@ -421,5 +488,25 @@ export abstract class Curve extends Shape {
     lineTo(context, origin.add(tangent.sub(normal).scale(arrowSize)));
     lineTo(context, origin);
     context.closePath();
+  }
+
+  private drawArrowNode(
+    context: CanvasRenderingContext2D,
+    arrow: Node,
+    arrowSize: number,
+    arrowPoint: Vector2,
+    tangent: Vector2,
+    flipped: boolean,
+  ) {
+    const scale = arrowSize / this.calculateArrowSize(arrow);
+
+    context.save();
+    context.translate(arrowPoint.x, arrowPoint.y);
+    context.rotate(tangent.radians);
+    context.scale(scale * (flipped ? -1 : 1), scale);
+
+    arrow.render(context);
+
+    context.restore();
   }
 }
