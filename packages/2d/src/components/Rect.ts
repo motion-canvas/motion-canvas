@@ -2,6 +2,7 @@ import {
   PossibleSpacing,
   BBox,
   SpacingSignal,
+  SerializedVector2,
 } from '@motion-canvas/core/lib/types';
 import {initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
@@ -9,6 +10,7 @@ import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {Curve, CurveProps} from './Curve';
 import {CurveProfile, getRectProfile} from '../curves';
 import {drawRoundRect} from '../utils';
+import {DesiredLength} from '../partials';
 
 export interface RectProps extends CurveProps {
   /**
@@ -133,7 +135,7 @@ export class Rect extends Curve {
     );
   }
 
-  protected override desiredSize() {
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
     return {
       x: this.width.context.getter(),
       y: this.height.context.getter(),
