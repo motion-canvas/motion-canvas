@@ -2,7 +2,6 @@ import {
   PossibleSpacing,
   BBox,
   SpacingSignal,
-  Vector2,
 } from '@motion-canvas/core/lib/types';
 import {initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
@@ -134,13 +133,19 @@ export class Rect extends Curve {
     );
   }
 
+  protected override desiredSize() {
+    return {
+      x: this.width.context.getter(),
+      y: this.height.context.getter(),
+    };
+  }
+
+  protected override offsetComputedLayout(box: BBox): BBox {
+    return box;
+  }
+
   protected override childrenBBox(): BBox {
-    return BBox.fromSizeCentered(
-      new Vector2({
-        x: this.width.context.getter(),
-        y: this.height.context.getter(),
-      }),
-    );
+    return BBox.fromSizeCentered(this.computedSize());
   }
 
   protected override getPath(): Path2D {
