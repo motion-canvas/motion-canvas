@@ -6,6 +6,7 @@ export * from './CurveProfile';
 export * from './getBezierSplineProfile';
 export * from './getPointAtDistance';
 export * from './getPolylineProfile';
+export * from './getRectProfile';
 export * from './KnotInfo';
 export * from './LineSegment';
 export * from './Polynomial';

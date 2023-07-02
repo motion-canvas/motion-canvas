@@ -352,12 +352,6 @@ export abstract class Curve extends Shape {
     return getPointAtDistance(this.profile(), this.percentageToDistance(value));
   }
 
-  protected override applyStyle(context: CanvasRenderingContext2D) {
-    super.applyStyle(context);
-    const {arcLength} = this.profile();
-    context.lineDashOffset -= arcLength / 2;
-  }
-
   protected override getComputedLayout(): BBox {
     return this.offsetComputedLayout(super.getComputedLayout());
   }
@@ -385,8 +379,33 @@ export abstract class Curve extends Shape {
     return this.lineCap() === 'square' ? 0.5 * 1.4143 : 0.5;
   }
 
+  /**
+   * Check if the path requires a profile.
+   *
+   * @remarks
+   * The profile is only required if certain features are used. Otherwise, the
+   * profile generation can be skipped, and the curve can be drawn directly
+   * using the 2D context.
+   */
+  protected requiresProfile(): boolean {
+    return (
+      !this.start.isInitial() ||
+      !this.startOffset.isInitial() ||
+      !this.startArrow.isInitial() ||
+      !this.end.isInitial() ||
+      !this.endOffset.isInitial() ||
+      !this.endArrow.isInitial()
+    );
+  }
+
   protected override drawShape(context: CanvasRenderingContext2D) {
     super.drawShape(context);
+    if (this.startArrow() || this.endArrow()) {
+      this.drawArrows(context);
+    }
+  }
+
+  private drawArrows(context: CanvasRenderingContext2D) {
     const {startPoint, startTangent, endPoint, endTangent, arrowSize} =
       this.curveDrawingInfo();
     if (arrowSize < 0.001) {

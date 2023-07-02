@@ -2,14 +2,17 @@ import {
   PossibleSpacing,
   BBox,
   SpacingSignal,
+  SerializedVector2,
 } from '@motion-canvas/core/lib/types';
-import {Shape, ShapeProps} from './Shape';
-import {drawRoundRect} from '../utils';
 import {initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {Curve, CurveProps} from './Curve';
+import {CurveProfile, getRectProfile} from '../curves';
+import {drawRoundRect} from '../utils';
+import {DesiredLength} from '../partials';
 
-export interface RectProps extends ShapeProps {
+export interface RectProps extends CurveProps {
   /**
    * {@inheritDoc Rect.radius}
    */
@@ -26,7 +29,7 @@ export interface RectProps extends ShapeProps {
   cornerSharpness?: SignalValue<number>;
 }
 
-export class Rect extends Shape {
+export class Rect extends Curve {
   /**
    * Rounds the corners of this rectangle.
    *
@@ -123,7 +126,35 @@ export class Rect extends Shape {
     super(props);
   }
 
+  public profile(): CurveProfile {
+    return getRectProfile(
+      this.childrenBBox(),
+      this.radius(),
+      this.smoothCorners(),
+      this.cornerSharpness(),
+    );
+  }
+
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
+    return {
+      x: this.width.context.getter(),
+      y: this.height.context.getter(),
+    };
+  }
+
+  protected override offsetComputedLayout(box: BBox): BBox {
+    return box;
+  }
+
+  protected override childrenBBox(): BBox {
+    return BBox.fromSizeCentered(this.computedSize());
+  }
+
   protected override getPath(): Path2D {
+    if (this.requiresProfile()) {
+      return this.curveDrawingInfo().path;
+    }
+
     const path = new Path2D();
     const radius = this.radius();
     const smoothCorners = this.smoothCorners();
