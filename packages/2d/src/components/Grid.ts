@@ -40,14 +40,14 @@ export interface GridProps extends ShapeProps {
  *       width={'100%'}
  *       height={'100%'}
  *       stroke={'#666'}
- *       start={0.5}
- *       end={0.5}
+ *       start={0}
+ *       end={1}
  *     />,
  *   );
  *
  *   yield* all(
- *     grid().end(1, 1).wait(1).to(0.5, 1),
- *     grid().start(0, 1).wait(1).to(0.5, 1),
+ *     grid().end(0.5, 1).to(1, 1).wait(1),
+ *     grid().start(0.5, 1).to(0, 1).wait(1),
  *   );
  * });
  * ```
@@ -67,7 +67,7 @@ export class Grid extends Shape {
    * The portion of each grid line that comes before the given percentage will
    * be made invisible.
    *
-   * This property is usefully for animating the grid appearing on screen.
+   * This property is useful for animating the grid appearing on-screen.
    */
   @initial(0)
   @signal()
@@ -80,7 +80,7 @@ export class Grid extends Shape {
    * The portion of each grid line that comes after the given percentage will
    * be made invisible.
    *
-   * This property is usefully for animating the grid appearing on screen.
+   * This property is useful for animating the grid appearing on-screen.
    */
   @initial(1)
   @signal()
