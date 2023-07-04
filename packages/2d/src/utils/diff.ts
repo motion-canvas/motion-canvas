@@ -26,15 +26,19 @@ interface Idable {
 }
 
 function getIdMap<T extends Idable>(list: T[]) {
-  const map: Record<string, TransformDiffItem<T>[]> = {};
+  const map = new Map<string, TransformDiffItem<T>[]>();
   let before: T | undefined = undefined;
   for (const current of list) {
-    if (!map[current.id]) map[current.id] = [];
+    let currentArray = map.get(current.id);
+    if (!currentArray) {
+      currentArray = [];
+      map.set(current.id, currentArray);
+    }
 
-    map[current.id].push({
+    currentArray.push({
       before,
       current,
-      beforeIdIndex: before ? map[before.id].length - 1 : -1,
+      beforeIdIndex: before ? map.get(before.id)!.length - 1 : -1,
     });
     before = current;
   }
@@ -52,18 +56,12 @@ export function getTransformDiff<T extends Idable>(
   };
 
   const fromMap = getIdMap(from);
-  const fromKeys = Object.keys(fromMap);
   const toMap = getIdMap(to);
-  const toKeys = Object.keys(toMap);
 
-  while (fromKeys.length > 0) {
-    const key = fromKeys.pop()!;
-    const fromItem = fromMap[key];
-    const toIndex = toKeys.indexOf(key);
-    if (toIndex >= 0) {
-      toKeys.splice(toIndex, 1);
-      const toItem = toMap[key];
-
+  for (const [key, fromItem] of fromMap.entries()) {
+    const toItem = toMap.get(key);
+    if (toItem) {
+      toMap.delete(key);
       for (let i = 0; i < Math.max(fromItem.length, toItem.length); i++) {
         const insert = i >= fromItem.length;
         const remove = i >= toItem.length;
@@ -85,11 +83,9 @@ export function getTransformDiff<T extends Idable>(
     }
   }
 
-  if (toKeys.length > 0) {
-    for (const key of toKeys) {
-      for (const node of toMap[key]) {
-        diff.inserted.push(node);
-      }
+  for (const toItem of toMap.values()) {
+    for (const node of toItem) {
+      diff.inserted.push(node);
     }
   }
 

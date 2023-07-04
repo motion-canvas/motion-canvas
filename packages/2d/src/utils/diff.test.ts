@@ -238,10 +238,10 @@ describe('diff', () => {
     const diff = getTransformDiff(from, to);
     expect(diff.deleted.map(({current}) => current)).toEqual([
       {
-        id: '3',
+        id: '2',
       },
       {
-        id: '2',
+        id: '3',
       },
     ]);
   });
