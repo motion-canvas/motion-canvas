@@ -406,19 +406,6 @@ export class SVG extends Shape {
     }
   }
 
-  private cloneNodeExact(node: Node) {
-    const props: ShapeProps = {
-      position: node.position(),
-      scale: node.scale(),
-      rotation: node.rotation(),
-      children: node.children().map(child => this.cloneNodeExact(child)),
-    };
-    if (node instanceof Layout) {
-      props.size = node.size();
-    }
-    return node.clone(props);
-  }
-
   protected *generateTransformator(
     from: Node,
     to: Node,
@@ -472,7 +459,7 @@ export class SVG extends Shape {
       diff,
       ({shape, ...rest}) => ({
         ...rest,
-        shape: this.cloneNodeExact(shape),
+        shape: shape.clone(),
       }),
     );
     this.wrapper.children(currentSVG.nodes.map(shape => shape.shape));
