@@ -366,4 +366,48 @@ describe('diff', () => {
       },
     });
   });
+
+  it('Insert single item with moving', () => {
+    const from = [
+      {
+        id: '1',
+      },
+      {
+        id: '2',
+      },
+      {
+        id: '3',
+      },
+    ];
+    const to = [
+      {
+        id: '1',
+      },
+      {
+        id: '3',
+      },
+      {
+        id: '5',
+      },
+      {
+        id: '2',
+      },
+    ];
+    const diff = getTransformDiff(from, to);
+    applyTransformDiff(from, diff, ({id}) => ({id}));
+    expect(from).toEqual([
+      {
+        id: '1',
+      },
+      {
+        id: '2',
+      },
+      {
+        id: '3',
+      },
+      {
+        id: '5',
+      },
+    ]);
+  });
 });
