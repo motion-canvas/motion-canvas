@@ -92,6 +92,12 @@ export class SVG extends Shape {
     return this.document().nodes.map(node => node.shape);
   }
 
+  public getChildrenById(id: string) {
+    return this.document()
+      .nodes.filter(node => node.id === id)
+      .map(({shape}) => shape);
+  }
+
   protected buildDocument(data: SVGDocumentData): SVGDocument {
     return {
       size: data.size,
