@@ -65,6 +65,8 @@ export class SVG extends Shape {
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
   public wrapper: Node;
+  private lastTweenTargetSrc: string | null = null;
+  private lastTweenTargetDocument: SVGDocument | null = null;
 
   public constructor(props: SVGProps) {
     super(props);
@@ -83,8 +85,17 @@ export class SVG extends Shape {
   }
 
   @computed()
-  private document() {
-    return this.parseSVG(this.svg());
+  private document(): SVGDocument {
+    try {
+      const src = this.svg();
+      if (this.lastTweenTargetDocument && src === this.lastTweenTargetSrc) {
+        return this.lastTweenTargetDocument;
+      }
+      return this.parseSVG(src);
+    } finally {
+      this.lastTweenTargetSrc = null;
+      this.lastTweenTargetDocument = null;
+    }
   }
 
   @computed()
@@ -460,6 +471,9 @@ export class SVG extends Shape {
     const currentSVG = this.document();
     const diff = getTransformDiff(currentSVG.nodes, newSVG.nodes);
 
+    this.lastTweenTargetSrc = newValue;
+    this.lastTweenTargetDocument = newSVG;
+
     const applyResult = applyTransformDiff(
       currentSVG.nodes,
       diff,
@@ -535,13 +549,9 @@ export class SVG extends Shape {
         if (autoWidth) this.width.reset();
         if (autoHeight) this.height.reset();
 
-        for (const {current} of diff.inserted) {
-          current.shape.dispose();
-        }
         for (const {current} of diff.deleted) current.shape.dispose();
-        for (const {from, to} of diff.transformed) {
+        for (const {from} of diff.transformed) {
           from.current.shape.dispose();
-          to.current.shape.dispose();
         }
       },
     );
