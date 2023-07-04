@@ -529,9 +529,13 @@ export class SVG extends Shape {
         if (autoWidth) this.width.reset();
         if (autoHeight) this.height.reset();
 
+        for (const {current} of diff.inserted) {
+          current.shape.dispose();
+        }
         for (const {current} of diff.deleted) current.shape.dispose();
-        for (const {from} of diff.transformed) {
+        for (const {from, to} of diff.transformed) {
           from.current.shape.dispose();
+          to.current.shape.dispose();
         }
       },
     );
