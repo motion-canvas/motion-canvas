@@ -6,8 +6,9 @@ interface TransformDiff<T> {
 
 interface TransformDiffItem<T> {
   before?: T;
-  current: T;
   beforeIdIndex: number;
+  current: T;
+  currentIndex: number;
 }
 
 interface TransformDiffItemTransformed<T> {
@@ -17,8 +18,13 @@ interface TransformDiffItemTransformed<T> {
   to: TransformDiffItem<T>;
 }
 
+interface ApplyTransformInserted<T> {
+  item: TransformDiffItem<T>;
+  order: number;
+}
+
 interface ApplyTransformResult<T> {
-  inserted: TransformDiffItem<T>[];
+  inserted: ApplyTransformInserted<T>[];
 }
 
 interface Idable {
@@ -28,7 +34,7 @@ interface Idable {
 function getIdMap<T extends Idable>(list: T[]) {
   const map = new Map<string, TransformDiffItem<T>[]>();
   let before: T | undefined = undefined;
-  for (const current of list) {
+  for (const [index, current] of list.entries()) {
     let currentArray = map.get(current.id);
     if (!currentArray) {
       currentArray = [];
@@ -39,6 +45,7 @@ function getIdMap<T extends Idable>(list: T[]) {
       before,
       current,
       beforeIdIndex: before ? map.get(before.id)!.length - 1 : -1,
+      currentIndex: index,
     });
     before = current;
   }
@@ -97,11 +104,7 @@ export function applyTransformDiff<T extends Idable>(
   diff: TransformDiff<T>,
   cloner: (original: T) => T,
 ): ApplyTransformResult<T> {
-  const result: ApplyTransformResult<T> = {
-    inserted: [],
-  };
   function insert(item: TransformDiffItem<T>) {
-    result.inserted.push(item);
     let idIndex = -1;
     const index = item.before
       ? current.findIndex(({id}) => {
@@ -115,9 +118,12 @@ export function applyTransformDiff<T extends Idable>(
     current.splice(index + 1, 0, item.current);
   }
 
-  for (const item of diff.inserted) {
-    insert(item);
-  }
+  const result: ApplyTransformResult<T> = {
+    inserted: diff.inserted.map(item => ({
+      item,
+      order: item.currentIndex,
+    })),
+  };
 
   for (const item of diff.transformed) {
     if (!item.insert) continue;
@@ -127,7 +133,16 @@ export function applyTransformDiff<T extends Idable>(
       ...item.to,
       current: cloner(from.current),
     };
-    insert(item.from);
+    result.inserted.push({
+      item: item.from,
+      order: item.to.currentIndex,
+    });
+  }
+
+  result.inserted.sort((a, b) => a.order - b.order);
+
+  for (const item of result.inserted) {
+    insert(item.item);
   }
 
   return result;

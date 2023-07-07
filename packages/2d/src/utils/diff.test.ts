@@ -282,6 +282,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 3,
       },
       insert: false,
       remove: true,
@@ -291,6 +292,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 0,
       },
     });
   });
@@ -334,6 +336,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 2,
       },
       insert: false,
       remove: true,
@@ -343,6 +346,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 0,
       },
     });
     expect(diff.transformed).toContainEqual({
@@ -354,6 +358,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 4,
       },
       insert: false,
       remove: true,
@@ -363,6 +368,7 @@ describe('diff', () => {
         current: {
           id: '1',
         },
+        currentIndex: 0,
       },
     });
   });
@@ -409,5 +415,39 @@ describe('diff', () => {
         id: '5',
       },
     ]);
+  });
+
+  it('Insert item after transformed insert', () => {
+    const from = [
+      {
+        id: '1',
+      },
+      {
+        id: '2',
+      },
+      {
+        id: '3',
+      },
+    ];
+    const to = [
+      {
+        id: '1',
+      },
+      {
+        id: '2',
+      },
+      {
+        id: '1',
+      },
+      {
+        id: '4',
+      },
+      {
+        id: '3',
+      },
+    ];
+    const diff = getTransformDiff(from, to);
+    applyTransformDiff(from, diff, ({id}) => ({id}));
+    expect(from).toEqual(to);
   });
 });

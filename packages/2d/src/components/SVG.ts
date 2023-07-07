@@ -483,7 +483,7 @@ export class SVG extends Shape {
       }),
     );
     this.wrapper.children(currentSVG.nodes.map(shape => shape.shape));
-    for (const item of applyResult.inserted) {
+    for (const {item} of applyResult.inserted) {
       item.current.shape.parent(this.wrapper);
     }
 
