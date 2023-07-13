@@ -3,6 +3,129 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Bug Fixes
+
+- **core:** project `variables`
+  ([#690](https://github.com/motion-canvas/motion-canvas/issues/690))
+  ([149f39c](https://github.com/motion-canvas/motion-canvas/commit/149f39c3219aa74115be80490bd6c5f236779b0e)),
+  closes [#689](https://github.com/motion-canvas/motion-canvas/issues/689)
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- **core:** add `gauss` function to `Random`
+  ([#709](https://github.com/motion-canvas/motion-canvas/issues/709))
+  ([d7de3d5](https://github.com/motion-canvas/motion-canvas/commit/d7de3d56d05dc88c7cbd557a73a25d083abb54e4))
+- export everything from entry points
+  ([#710](https://github.com/motion-canvas/motion-canvas/issues/710))
+  ([3c885d9](https://github.com/motion-canvas/motion-canvas/commit/3c885d9083b52fbbaccf1e2560ae50817949bc52))
+- new plugin hooks
+  ([#723](https://github.com/motion-canvas/motion-canvas/issues/723))
+  ([9a2b5ab](https://github.com/motion-canvas/motion-canvas/commit/9a2b5ab8be0d001414fd00da3053d408e00fd1cd))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
+
+### Features
+
+- add new hooks for plugins
+  ([#679](https://github.com/motion-canvas/motion-canvas/issues/679))
+  ([74e18bc](https://github.com/motion-canvas/motion-canvas/commit/74e18bce71abd7e26a6415240603241b48cb36c2))
+- display array values in inspector
+  ([#670](https://github.com/motion-canvas/motion-canvas/issues/670))
+  ([e71d74c](https://github.com/motion-canvas/motion-canvas/commit/e71d74c9c04995393ad8ee942b8e6e5baa6f982f))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+### Bug Fixes
+
+- prevent Color tree shaking
+  ([#666](https://github.com/motion-canvas/motion-canvas/issues/666))
+  ([e5028e3](https://github.com/motion-canvas/motion-canvas/commit/e5028e3c176d5ba74dd3f28c2f25672390c76936)),
+  closes [#577](https://github.com/motion-canvas/motion-canvas/issues/577)
+
+### Features
+
+- finalize custom exporters
+  ([#660](https://github.com/motion-canvas/motion-canvas/issues/660))
+  ([6a50430](https://github.com/motion-canvas/motion-canvas/commit/6a50430cdf9928992ca078eba39c484a5253da2b))
+- meta field descriptions
+  ([#664](https://github.com/motion-canvas/motion-canvas/issues/664))
+  ([80c9d07](https://github.com/motion-canvas/motion-canvas/commit/80c9d07f88f4a3df0f99e5741b31313f891a5d51))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
+
+### Bug Fixes
+
+- prevent consumePromises from halting
+  ([#657](https://github.com/motion-canvas/motion-canvas/issues/657))
+  ([363a189](https://github.com/motion-canvas/motion-canvas/commit/363a189b0c7f5926c9d5ae00b58b48e8ed4d9b48))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/motion-canvas/motion-canvas/compare/v3.5.1...v3.6.0) (2023-05-08)
+
+### Bug Fixes
+
+- **core:** clear DependencyContext promises once resolved
+  ([#617](https://github.com/motion-canvas/motion-canvas/issues/617))
+  ([97b68da](https://github.com/motion-canvas/motion-canvas/commit/97b68dabfdf86c0e0a188212308b8aba0fb35cab))
+- **core:** fix snapshots
+  ([#638](https://github.com/motion-canvas/motion-canvas/issues/638))
+  ([437cc5e](https://github.com/motion-canvas/motion-canvas/commit/437cc5efddbb242b10f7902e18fe15162a45d7bd))
+
+### Features
+
+- **2d:** add fromDegrees method to Vector2
+  ([#622](https://github.com/motion-canvas/motion-canvas/issues/622))
+  ([e78b9d5](https://github.com/motion-canvas/motion-canvas/commit/e78b9d51674269ab82e0c2fe4c475b5799b94975))
+- add DEG2RAD and RAD2DEG constants
+  ([#630](https://github.com/motion-canvas/motion-canvas/issues/630))
+  ([01801e8](https://github.com/motion-canvas/motion-canvas/commit/01801e8766058e75a6a020400650fb00f8f430cc))
+- **core:** add `loopFor` function
+  ([#650](https://github.com/motion-canvas/motion-canvas/issues/650))
+  ([a42eb52](https://github.com/motion-canvas/motion-canvas/commit/a42eb520fef7de06038f0df9eaad1fa35122c97a))
+- **core:** add `loopUntil` function
+  ([#624](https://github.com/motion-canvas/motion-canvas/issues/624))
+  ([b7aa4b5](https://github.com/motion-canvas/motion-canvas/commit/b7aa4b57c76374e67bd19ce40c44cd650cf67327))
+- **core:** add helper method for arc lerps
+  ([#640](https://github.com/motion-canvas/motion-canvas/issues/640))
+  ([bc304d2](https://github.com/motion-canvas/motion-canvas/commit/bc304d242e4819650fa86636180ac5594ba743d3))
+- **core:** improve `SignalGenerator` chaining
+  ([#651](https://github.com/motion-canvas/motion-canvas/issues/651))
+  ([de72f1f](https://github.com/motion-canvas/motion-canvas/commit/de72f1f70edf7cc48fd670d9b38e0cc27f8bdb57)),
+  closes [#480](https://github.com/motion-canvas/motion-canvas/issues/480)
+- **core:** thread pausing
+  ([#639](https://github.com/motion-canvas/motion-canvas/issues/639))
+  ([c0aab58](https://github.com/motion-canvas/motion-canvas/commit/c0aab588b18c267d3bc04e25b2f80c792496dda2))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
 
 ### Features

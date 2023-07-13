@@ -22,7 +22,7 @@ export interface ShapeProps extends LayoutProps {
   lineWidth?: SignalValue<number>;
   lineJoin?: SignalValue<CanvasLineJoin>;
   lineCap?: SignalValue<CanvasLineCap>;
-  lineDash?: SignalValue<number>[];
+  lineDash?: SignalValue<number[]>;
   lineDashOffset?: SignalValue<number>;
   antialiased?: SignalValue<boolean>;
 }

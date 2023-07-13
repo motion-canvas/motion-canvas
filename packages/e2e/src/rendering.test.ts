@@ -17,7 +17,6 @@ describe('Rendering', () => {
   });
 
   test('Animation renders correctly', async () => {
-    await app.page.click('#rendering-tab');
     await app.page.click('#render');
     await app.page.waitForSelector('#render:not([data-rendering="true"])');
 

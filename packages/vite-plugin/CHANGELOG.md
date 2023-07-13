@@ -3,6 +3,58 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- **vite-plugin:** add entry point
+  ([#721](https://github.com/motion-canvas/motion-canvas/issues/721))
+  ([e634b6c](https://github.com/motion-canvas/motion-canvas/commit/e634b6cb67b3c569d21d424661708ca946ea4cc3))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
+
+### Bug Fixes
+
+- remove dependency pre-bundling warning
+  ([#676](https://github.com/motion-canvas/motion-canvas/issues/676))
+  ([38c81ff](https://github.com/motion-canvas/motion-canvas/commit/38c81ffa5ea0ef2d2beec9d015896f5873629d74))
+
+### Features
+
+- add new hooks for plugins
+  ([#679](https://github.com/motion-canvas/motion-canvas/issues/679))
+  ([74e18bc](https://github.com/motion-canvas/motion-canvas/commit/74e18bce71abd7e26a6415240603241b48cb36c2))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+### Features
+
+- button for opening the output directory
+  ([#663](https://github.com/motion-canvas/motion-canvas/issues/663))
+  ([79f320c](https://github.com/motion-canvas/motion-canvas/commit/79f320c07c422ca927b34bf339094fe0e70ffd0d))
+- finalize custom exporters
+  ([#660](https://github.com/motion-canvas/motion-canvas/issues/660))
+  ([6a50430](https://github.com/motion-canvas/motion-canvas/commit/6a50430cdf9928992ca078eba39c484a5253da2b))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
 
 ### Features

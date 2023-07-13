@@ -1,16 +1,25 @@
 import {
   deepLerp,
   InterpolationFunction,
+  TimingFunction,
 } from '@motion-canvas/core/lib/tweening';
 import {addInitializer, initialize} from './initializers';
 import {capitalize, useLogger} from '@motion-canvas/core/lib/utils';
-import {patchSignal} from '../utils/patchSignal';
+import {makeSignalExtensions} from '../utils/makeSignalExtensions';
 import {SignalContext} from '@motion-canvas/core/lib/signals';
 
 export interface PropertyMetadata<T> {
   default?: T;
   interpolationFunction?: InterpolationFunction<T>;
   parser?: (value: any) => T;
+  getter?: () => T;
+  setter?: (value: any) => void;
+  tweener?: (
+    value: T,
+    duration: number,
+    timingFunction: TimingFunction,
+    interpolationFunction: InterpolationFunction<T>,
+  ) => void;
   cloneable?: boolean;
   inspectable?: boolean;
   compoundParent?: string;
@@ -112,8 +121,9 @@ export function signal<T>(): PropertyDecorator {
         getDefault ?? meta.default,
         meta.interpolationFunction ?? deepLerp,
         instance,
+        meta.parser?.bind(instance),
+        makeSignalExtensions(meta, instance, <string>key),
       );
-      patchSignal(signal, meta.parser, instance, <string>key);
       instance[key] = signal.toSignal();
     });
   };

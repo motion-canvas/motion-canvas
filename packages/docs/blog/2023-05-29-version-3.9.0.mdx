@@ -1,0 +1,91 @@
+---
+slug: version-3.9.0
+title: Motion Canvas v3.9.0
+description: Big changes. Big plans.
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PullRequest from '@site/src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import CodeBlock from '@theme/CodeBlock';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} pr={710}>
+    All entities are now imported from the main entry point of each package. The
+    only exception is the <code>CodeBlock</code> node which still requires the
+    full import path:
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {`import {all, createRef} from '@motion-canvas/core';
+import {makeScene2D, Circle} from '@motion-canvas/2d';
+// the only exception:
+import {CodeBlock, insert} from '@motion-canvas/2d/lib/components/CodeBlock';`}
+    </CodeBlock>
+    Importing from subdirectories will continue to work until version 4.
+    <PullRequest id={721} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={723}>
+    New{' '}
+    <Link to="/api/core/plugin/Plugin#presenter">
+      <code>presenter</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/core/plugin/Plugin#renderer">
+      <code>renderer</code>
+    </Link>{' '}
+    plugin hooks.
+    <br />
+    You can learn how to create your own plugins in the new{' '}
+    <Link to="/docs/plugins">Authoring Plugins</Link> guide.
+  </Issue>
+  <Issue user={'ajs1998'} pr={709}>
+    New{' '}
+    <Link to="/api/core/scenes/Random#gauss">
+      <code>Random.gauss()</code>
+    </Link>{' '}
+    method lets you generate random numbers using a gaussian (normal)
+    distribution.
+  </Issue>
+  <Issue user={'aarthificial'} pr={692}>
+    Updated sidebar design lets you hide the timeline and collapse panels by
+    dragging.
+  </Issue>
+  <Issue user={'aarthificial'} pr={697}>
+    Application-wide settings let you configure the project defaults and change
+    the editor appearance. You can edit them in the settings tab on the left.
+  </Issue>
+  <Issue user={'aarthificial'} pr={691}>
+    You can use a new eye dropper tool to pick colors from the canvas
+    <br />
+    (see{' '}
+    <Link to="https://developer.mozilla.org/en-US/docs/Web/API/EyeDropper_API#browser_compatibility">
+      browser compatibility
+    </Link>
+    )
+  </Issue>
+  <Issue user={'aarthificial'} pr={693}>
+    Error stack traces now include function names.
+  </Issue>
+  <Issue user={'aarthificial'} pr={713}>
+    Overall improvements to the Fiddle editor.
+    <PullRequest id={706} />
+    <PullRequest id={712} />
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={720}>
+    Fix <code>package.json</code> entry.
+  </Issue>
+  <Issue user={'aarthificial'} pr={698}>
+    Fix collapsable sections.
+  </Issue>
+  <Issue user={'rtkid-nt'} pr={690}>
+    Use project variables when rendering/presenting.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

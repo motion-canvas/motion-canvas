@@ -8,19 +8,26 @@ import {
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2} from '@motion-canvas/core';
 import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
   private registeredNodes: Record<string, Node> = {};
   private nodeCounters: Record<string, number> = {};
+  private assetHash = Date.now().toString();
 
   public constructor(
     description: FullSceneDescription<ThreadGeneratorFactory<View2D>>,
   ) {
     super(description);
     this.recreateView();
+    if (import.meta.hot) {
+      import.meta.hot.on('motion-canvas:assets', () => {
+        this.assetHash = Date.now().toString();
+        this.getView().assetHash(this.assetHash);
+      });
+    }
   }
 
   public getView(): View2D {
@@ -110,6 +117,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     }
   }
 
+  public transformMousePosition(x: number, y: number): Vector2 | null {
+    return new Vector2(x, y)
+      .scale(this.resolutionScale)
+      .transformAsPoint(this.getView().localToParent().inverse());
+  }
+
   public registerNode(node: Node, key?: string): string {
     const className = node.constructor?.name ?? 'unknown';
     this.nodeCounters[className] ??= 0;
@@ -131,6 +144,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
       this.view = new View2D({
         position: size.scale(this.resolutionScale / 2),
         scale: this.resolutionScale,
+        assetHash: this.assetHash,
         size,
       });
     });

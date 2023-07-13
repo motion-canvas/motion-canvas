@@ -12,8 +12,8 @@ To get a reference to the Logger in motion-canvas you can use the `useLogger`
 function:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {makeScene2D} from '@motion-canvas/2d';
+import {useLogger} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const logger = useLogger();
@@ -30,7 +30,7 @@ different ways to log messages. On way is to use standard logging functions like
 ```tsx
 logger.debug('Just here to debug some code.');
 logger.info('All fine just a little info.');
-logger.warn('Be careful somethis has gone wrong.');
+logger.warn('Be careful something has gone wrong.');
 logger.error('Ups. An error occured.');
 ```
 
@@ -40,9 +40,8 @@ side.
 ## Payloads
 
 In some cases you might want to have a bit more detail in your log messages like
-a `stacktrace` or an `object`. That's where
-[`LogPayloads`](/api/core/index/LogPayload) come in. These can be used to
-provide more information to your log messages.
+a `stacktrace` or an `object`. You can use payloads to provide more information
+to your log messages.
 
 ```ts
 logger.debug({
@@ -71,7 +70,7 @@ don't have to `useLogger` manually and create a payload.
 ## Profiling
 
 Besides logging messages its also possible to profile certain sections of code
-with the [`Logger`](/api/core/index/Logger):
+with the `Logger`:
 
 ```ts
 logger.profile('id'); // <-- starts the profiling

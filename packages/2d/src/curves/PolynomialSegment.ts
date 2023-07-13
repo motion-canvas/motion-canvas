@@ -12,7 +12,7 @@ export abstract class PolynomialSegment extends Segment {
     return this.length;
   }
 
-  public abstract get points(): Vector2[];
+  public abstract override get points(): Vector2[];
 
   protected constructor(
     protected readonly curve: Polynomial2D,
@@ -91,10 +91,10 @@ export abstract class PolynomialSegment extends Segment {
 
       startT = this.pointSampler.distanceToT(startDistance);
       endT = this.pointSampler.distanceToT(endDistance);
-      endT = (endT - startT) / (1 - startT);
+      const relativeEndT = (endT - startT) / (1 - startT);
 
       const [, startSegment] = this.split(startT);
-      [curve] = startSegment.split(endT);
+      [curve] = startSegment.split(relativeEndT);
       points = curve.points;
     }
 

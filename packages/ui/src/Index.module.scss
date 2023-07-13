@@ -1,6 +1,6 @@
 .root {
   background-color: var(--surface-color);
-  border-radius: 4px;
+  border-radius: var(--radius);
   width: 100%;
   margin: 16px;
   max-width: 480px;
@@ -11,14 +11,11 @@
 .header {
   position: sticky;
   top: 0;
-  font-size: 16px;
-  line-height: 24px;
-  text-transform: uppercase;
-  font-weight: bold;
+  margin: 0;
   display: flex;
   gap: 16px;
   padding: 16px;
-  border-radius: 4px 4px 0 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   background-color: var(--surface-color);
   border-bottom: 1px solid var(--background-color-dark);
 }
@@ -34,7 +31,7 @@
   text-decoration: none;
   display: block;
   padding: 8px;
-  border-radius: 4px;
+  border-radius: var(--radius);
 
   &:hover {
     background-color: var(--surface-color-hover);
@@ -42,11 +39,10 @@
 }
 
 .title {
-  padding-bottom: 4px;
   color: rgba(255, 255, 255, 0.6);
 }
 
 .subtitle {
-  font-size: 11px;
+  font-size: var(--font-size-small);
   color: rgba(255, 255, 255, 0.32);
 }

@@ -4,8 +4,8 @@ import highlight from 'highlight.js';
 
 const ExternalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const StackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
-  ? /^ +at.* \(?(.*):([0-9]+):([0-9]+)/
-  : /@(.*):([0-9]+):([0-9]+)/;
+  ? /^ +at(.*) \(?(.*):([0-9]+):([0-9]+)/
+  : /([^@]*)@(.*):([0-9]+):([0-9]+)/;
 const Cache = new Map<string, SourceMapConsumer>();
 
 async function getSourceMap(
@@ -29,6 +29,7 @@ export interface StackTraceEntry {
   line: number;
   column: number;
   isExternal: boolean;
+  functionName?: string;
   source?: string;
   sourceMap?: SourceMapConsumer;
 }
@@ -48,7 +49,7 @@ export async function resolveStackTrace(
   for (const textLine of stack.split('\n')) {
     const match = textLine.match(StackTraceRegex);
     if (!match) continue;
-    const [, uri, line, column] = match;
+    const [, functionName, uri, line, column] = match;
     const parsed = new URL(uri);
     const file = parsed.pathname;
     const entry: StackTraceEntry = {
@@ -57,6 +58,7 @@ export async function resolveStackTrace(
       line: parseInt(line),
       column: parseInt(column),
       isExternal: ExternalFileRegex.test(file),
+      functionName: functionName?.trim(),
     };
 
     if (!ExternalFileRegex.test(file)) {

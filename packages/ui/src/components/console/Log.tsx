@@ -10,6 +10,8 @@ import {StackTrace} from './StackTrace';
 import {SourceCodeFrame} from './SourceCodeFrame';
 import clsx from 'clsx';
 import {Locate} from '../icons';
+import {Collapse} from '../layout';
+import {EditorPanel, SidebarPanel} from '../../signals';
 
 export interface LogProps {
   payload: LogPayload;
@@ -49,19 +51,22 @@ export function Log({payload}: LogProps) {
         {hasBody && <Toggle open={open} onToggle={setOpen} />}
         <div className={styles.message}>{payload.message}</div>
         {duration !== null && (
-          <div className={styles.duration}>{duration} ms</div>
+          <code className={styles.duration}>{duration} ms</code>
         )}
         {payload.inspect && (
           <IconButton
             title="Select related node"
-            onClick={() => setInspectedElement(payload.inspect)}
+            onClick={() => {
+              setInspectedElement(payload.inspect);
+              SidebarPanel.set(EditorPanel.Inspector);
+            }}
           >
             <Locate />
           </IconButton>
         )}
       </div>
-      {hasBody && open && (
-        <div>
+      {hasBody && (
+        <Collapse open={open}>
           {payload.remarks && (
             <div
               className={clsx(styles.section, styles.remarks)}
@@ -81,7 +86,7 @@ export function Log({payload}: LogProps) {
               <StackTrace entries={entries} />
             </div>
           )}
-        </div>
+        </Collapse>
       )}
     </div>
   );

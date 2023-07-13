@@ -1,0 +1,78 @@
+---
+slug: version-3.8.0
+title: Motion Canvas v3.8.0
+description: We don't talk about v3.7.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PullRequest from '@site/src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import CodeBlock from '@theme/CodeBlock';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} pr={660}>
+    The brand new <Link to="/docs/rendering/video">Video (FFmpeg)</Link>{' '}
+    exporter lets you render your animations directly to a video file. It's
+    included by default (with the option to opt out) in all new projects created
+    with <code>npm init @motion-canvas</code>. Check out the docs to learn{' '}
+    <Link to="/docs/rendering/video#existing-project">how to install it</Link>{' '}
+    in your existing projects.
+    <PullRequest id={673} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={681}>
+    An improved rendering button provides visual feedback about the rendering
+    process.
+    <PullRequest id={662} />
+  </Issue>
+  <Issue user={'aarthificial'} pr={663}>
+    A new <code>OUTPUT DIRECTORY</code> button lets you reveal the current
+    output directory in your file explorer. You can find it directly below the{' '}
+    <code>RENDER</code> button.
+  </Issue>
+  <Issue user={'aarthificial'} pr={671}>
+    Collapsible panels are now animated.
+  </Issue>
+  <Issue user={'aarthificial'} pr={670}>
+    Array values, such as points of a Line, are now displayed in the inspector.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    The <code>create</code> package now supports command-line arguments for
+    providing answers without having to go through the interactive prompt:
+    <PullRequest id={668} />
+    <CodeBlock language={'shell'} className="margin-top--sm margin-bottom--sm">
+      {`npm init @motion-canvas@latest -- --name Hello --path ./hello --language ts`}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'aarthificial'} pr={664}>
+    Meta fields can declare descriptions. When hovering over the field in the
+    editor, the description will be displayed in a form of a tooltip.
+  </Issue>
+  <Issue user={'aarthificial'} pr={679}>
+    New hooks let plugins extend the behavior of the player (The plugin
+    documentation will be available soon).
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={678}>
+    Correctly support URLs to external images.
+  </Issue>
+  <Issue user={'aarthificial'} pr={676}>
+    Remove the yellow dependency pre-bundling warning.
+  </Issue>
+  <Issue user={'aarthificial'} pr={674}>
+    Fix editing the audio offset by dragging the waveform.
+  </Issue>
+  <Issue user={'aarthificial'} pr={669}>
+    Ignore children with disabled layout.
+  </Issue>
+  <Issue user={'aarthificial'} pr={666}>
+    Prevent Color tree shaking.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

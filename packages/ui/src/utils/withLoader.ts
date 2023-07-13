@@ -12,7 +12,7 @@ export async function withLoader(callback: () => Promise<unknown>) {
     await callback();
   } finally {
     LoaderCount--;
-    if (LoaderCount == 0) {
+    if (LoaderCount === 0) {
       document.body.classList.remove('wait');
     }
   }

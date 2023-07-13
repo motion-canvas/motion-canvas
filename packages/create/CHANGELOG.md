@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
+
+### Features
+
+- **create:** add exporter selection
+  ([#673](https://github.com/motion-canvas/motion-canvas/issues/673))
+  ([82fd47d](https://github.com/motion-canvas/motion-canvas/commit/82fd47d93ffad6125a685880a132ce0d3a388693))
+- **create:** support command-line arguments
+  ([#668](https://github.com/motion-canvas/motion-canvas/issues/668))
+  ([fa62a98](https://github.com/motion-canvas/motion-canvas/commit/fa62a9868d5cd33f1cb6ac5f147cca81917457dc))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.6.2](https://github.com/motion-canvas/motion-canvas/compare/v3.6.1...v3.6.2) (2023-05-09)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/motion-canvas/motion-canvas/compare/v3.5.1...v3.6.0) (2023-05-08)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.5.1](https://github.com/motion-canvas/motion-canvas/compare/v3.5.0...v3.5.1) (2023-04-08)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/motion-canvas/motion-canvas/compare/v3.4.0...v3.5.0) (2023-04-06)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
 
 **Note:** Version bump only for package @motion-canvas/create

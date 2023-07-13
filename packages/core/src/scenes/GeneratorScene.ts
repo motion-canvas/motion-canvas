@@ -151,19 +151,16 @@ export abstract class GeneratorScene<T>
   }
 
   public async render(context: CanvasRenderingContext2D): Promise<void> {
-    let promises = DependencyContext.consumePromises();
     let iterations = 0;
     do {
       iterations++;
-      await Promise.all(promises.map(handle => handle.promise));
+      await DependencyContext.consumePromises();
       context.save();
       const box = BBox.fromSizeCentered(this.getSize());
       context.clearRect(box.x, box.y, box.width, box.height);
       this.execute(() => this.draw(context));
       context.restore();
-
-      promises = DependencyContext.consumePromises();
-    } while (promises.length > 0 && iterations < 10);
+    } while (DependencyContext.hasPromises() && iterations < 10);
 
     if (iterations > 1) {
       this.logger.debug(`render iterations: ${iterations}`);
@@ -255,9 +252,8 @@ export abstract class GeneratorScene<T>
       this.update();
     }
 
-    const promises = DependencyContext.consumePromises();
-    if (promises.length > 0) {
-      await Promise.all(promises.map(handle => handle.promise));
+    if (DependencyContext.hasPromises()) {
+      const promises = await DependencyContext.consumePromises();
       this.logger.error({
         message:
           'Tried to access an asynchronous property before the node was ready. ' +

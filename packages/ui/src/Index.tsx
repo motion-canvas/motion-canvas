@@ -1,3 +1,4 @@
+import {Header} from './components/layout';
 import styles from './Index.module.scss';
 
 export interface ProjectData {
@@ -13,7 +14,7 @@ export interface IndexProps {
 export function Index({projects}: IndexProps) {
   return (
     <div className={styles.root}>
-      <div className={styles.header}>Projects</div>
+      <Header className={styles.header}>Projects</Header>
       <div className={styles.list}>
         {projects.map(project => (
           <a className={styles.element} href={`./${project.fileName}`}>

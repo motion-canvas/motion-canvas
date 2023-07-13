@@ -1,0 +1,150 @@
+---
+sidebar_position: 5
+slug: /filters-and-effects
+---
+
+import Fiddle from '@site/src/components/Fiddle';
+import filtersPreview from '!!raw-loader!./code/filters-and-effects/filters-preview.tsx';
+import filtersOrder from '!!raw-loader!./code/filters-and-effects/filters-order.tsx';
+import filtersMaskingVisualizedSourceIn from '!!raw-loader!./code/filters-and-effects/masking-visualized-source-in.tsx';
+
+# Filters and Effects
+
+Because Motion Canvas is built on top of the Browser's 2D Rendering Context, we
+can make use of several canvas operations that are provided by the Browser.
+
+## Filters
+
+Filters let you apply various effects to your nodes. You can find all available
+filters on
+[MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter).
+
+<Fiddle mode="preview">{filtersPreview}</Fiddle>
+
+Every node has a `filters` property containing an array of
+[filters](/api/2d/partials#Functions) that will be applied to the node. You can
+declare this array yourself, or use the `filters` property to configure
+individual filters. Both ways are shown in the following example:
+
+:::info
+
+Some filters, like `opacity` and `drop-shadow`, have their own dedicated
+properties directly on the [`Node`](/api/2d/components/Node#opacity), class.
+
+:::
+
+```tsx editor
+// snippet Filters Property
+import {Img, makeScene2D} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  view.fill('#141414');
+
+  const iconRef = createRef<Img>();
+  yield view.add(<Img src={'/img/logo_dark.svg'} size={200} ref={iconRef} />);
+  // Modification happens by accessing the `filters` property.
+  // Individual filters don't need to be initialized. If a filter you set doesn't
+  // exists, it will be automatically created and added to the list of filters.
+  // If you have multiple filters of the same type, this will only
+  // modify the first instance (you can use the array method for more control).
+  yield* iconRef().filters.blur(10, 1);
+  yield* iconRef().filters.blur(0, 1);
+});
+
+// snippet Filters Array
+import {makeScene2D, Img, blur} from '@motion-canvas/2d';
+import {createSignal} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  view.fill('#141414');
+
+  const blurSignal = createSignal(0);
+  yield view.add(
+    <Img
+      src={'/img/logo_dark.svg'}
+      size={200}
+      /* Modification happens by changing the Filters inside the 'filters' array */
+      filters={[blur(blurSignal)]}
+    />,
+  );
+  yield* blurSignal(10, 1);
+  yield* blurSignal(0, 1);
+});
+```
+
+Keep in mind that the order in which you apply the effects does matter, as can
+be seen in the following example:
+
+<Fiddle mode="preview" ratio={'3'}>
+  {filtersOrder}
+</Fiddle>
+
+## Masking and composite operations
+
+Composite operations define how the thing we draw (source) interacts with what
+is already on the canvas (destination). Among other things, it allows us to
+define complex masks. MDN has a
+[great visualisation of all available composite operations](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation#operations).
+
+You can create a mask by treating one node as the "masking" / "stencil" layer,
+and another node as the "value" layer. The mask layer will define if the value
+layer will be visible or not. The value layer will be what's actually visible in
+the end.
+
+<Fiddle mode="preview" ratio={'3'}>
+  {filtersMaskingVisualizedSourceIn}
+</Fiddle>
+
+Any of the following composite operations can be used to create a mask:
+`source-in`, `source-out`, `destination-in`, and `destination-out`. There is
+also a `xor` operation which can be helpful if you want two value layers that
+hide each other on overlap. Use the dropdown below to browse all examples.
+
+import sourceInExample from '!!raw-loader!./code/filters-and-effects/source-in-example.tsx';
+import sourceOutExample from '!!raw-loader!./code/filters-and-effects/source-out-example.tsx';
+import destinationInExample from '!!raw-loader!./code/filters-and-effects/destination-in-example.tsx';
+import destinationOutExample from '!!raw-loader!./code/filters-and-effects/destination-out-example.tsx';
+import xorExampleExample from '!!raw-loader!./code/filters-and-effects/xor-example.tsx';
+import xorExampleWithSourceInExample from '!!raw-loader!./code/filters-and-effects/xor-destination-in-example.tsx';
+
+<Fiddle>
+  {'// snippet source-in\n' +
+    sourceInExample +
+    '\n// snippet source-out\n' +
+    sourceOutExample +
+    '\n// snippet destination-in\n' +
+    destinationInExample +
+    '\n// snippet destination-out\n' +
+    destinationOutExample +
+    '\n// snippet xor\n' +
+    xorExampleExample +
+    '\n//snippet xor and source-in\n' +
+    xorExampleWithSourceInExample}
+</Fiddle>
+
+## Cached nodes
+
+Both filters and composite operations require a cached
+[`Node`](/api/2d/components/Node). Filters can set it automatically, while
+composite operations require you to set it explicitly on an ancestor
+[`Node`](/api/2d/components/Node) (usually the parent node).
+
+A cached [`Node`](/api/2d/components/Node) and its children are rendered on an
+offscreen canvas first, before getting added to the main scene.  
+For filters this is needed because they are applied to the entire canvas. By
+creating a new canvas and moving the elements that should get affected by the
+filters over, applying filters to the entire "new" canvas, and then moving back
+the result, you effectively only apply the filters to the moved elements.
+
+To turn a [`Node`](/api/2d/components/Node) into a cached node, simply pass the
+[`cache`](/api/2d/components/NodeProps/#cache) property
+
+```tsx
+<Node cache>...</Node>
+// or
+<Node cache={true}>...</Node>
+```
+
+All components inherit from [`Node`](/api/2d/components/Node), so you can set
+the cache on all of them.

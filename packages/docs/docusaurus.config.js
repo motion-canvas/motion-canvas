@@ -3,11 +3,12 @@
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Motion Canvas',
-  tagline: 'Visualize complex ideas programmatically',
+  tagline:
+    'A TypeScript library for creating animated videos using the Canvas API.',
   url: 'https://motioncanvas.io',
   baseUrl: '/',
-  onBrokenLinks: 'log',
-  onBrokenMarkdownLinks: 'warn',
+  onBrokenLinks: 'throw',
+  onBrokenMarkdownLinks: 'throw',
   favicon: 'img/favicon.svg',
   organizationName: 'motion-canvas',
   projectName: 'motion-canvas.github.io',
@@ -21,7 +22,7 @@ const config = {
   customFields: {
     discordApi:
       'https://discord.com/api/guilds/1071029581009657896/widget.json',
-    discordUrl: 'https://discord.gg/XnnWTrHYAW',
+    discordUrl: 'https://chat.motioncanvas.io',
     githubApi: 'https://api.github.com/repos/motion-canvas/motion-canvas',
     githubUrl: 'https://github.com/motion-canvas/motion-canvas',
   },
@@ -79,7 +80,7 @@ const config = {
               },
               {
                 label: 'Discord',
-                href: 'https://discord.gg/XnnWTrHYAW',
+                href: 'https://chat.motioncanvas.io',
               },
             ],
           },
@@ -121,6 +122,7 @@ const config = {
   ],
   plugins: [
     './typedoc',
+    './bundle',
     [
       '@docusaurus/plugin-content-docs',
       {

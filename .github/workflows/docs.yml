@@ -17,6 +17,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx lerna run build
+      - run: npx lerna run bundle
       - run: npm run examples:build
       - run: npm run ui:showcase
       - run: npm run docs:build

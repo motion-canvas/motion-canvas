@@ -17,7 +17,7 @@ export interface IconProps extends ImgProps {
 }
 
 /**
- * An Icon Component that provides an easy access to over 150k icons.
+ * An Icon Component that provides easy access to over 150k icons.
  * See https://icones.js.org/collection/all for all available Icons.
  */
 export class Icon extends Img {

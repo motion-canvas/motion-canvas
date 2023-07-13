@@ -6,6 +6,7 @@ import {CurvePoint} from './CurvePoint';
 export class CircleSegment extends Segment {
   private readonly length: number;
   private readonly angle: number;
+  public override readonly points: Vector2[];
 
   public constructor(
     private center: Vector2,
@@ -17,6 +18,8 @@ export class CircleSegment extends Segment {
     super();
     this.angle = Math.acos(clamp(-1, 1, from.dot(to)));
     this.length = Math.abs(this.angle * radius);
+    const edgeVector = new Vector2(1, 1).scale(radius);
+    this.points = [center.sub(edgeVector), center.add(edgeVector)];
   }
 
   public get arcLength(): number {

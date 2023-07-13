@@ -129,7 +129,7 @@ export function drawRoundRect(
   context.arcTo(rect.left, rect.top, rect.right, rect.top, topLeft);
 }
 
-function adjustRectRadius(
+export function adjustRectRadius(
   radius: number,
   horizontal: number,
   vertical: number,
@@ -172,7 +172,7 @@ export function drawPolygon(
     const theta = (i * 2 * Math.PI) / sides;
     const direction = Vector2.fromRadians(theta).perpendicular;
     const vertex = direction.mul(size);
-    if (i == 0) {
+    if (i === 0) {
       moveTo(path, vertex);
     } else {
       lineTo(path, vertex);
@@ -247,6 +247,18 @@ export function drawLine(
   for (const point of points.slice(1)) {
     lineTo(context, point);
   }
+}
+
+export function drawPivot(
+  context: CanvasRenderingContext2D | Path2D,
+  offset: Vector2,
+  radius = 8,
+) {
+  lineTo(context, offset.addY(-radius));
+  lineTo(context, offset.addY(radius));
+  lineTo(context, offset);
+  lineTo(context, offset.addX(-radius));
+  arc(context, offset, radius);
 }
 
 export function arc(

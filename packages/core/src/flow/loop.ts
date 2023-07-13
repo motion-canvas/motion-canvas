@@ -16,7 +16,7 @@ decorate(loop, threadable());
  * Run the given generator N times.
  *
  * @remarks
- * Each time iteration waits until the previous one is completed.
+ * Each iteration waits until the previous one is completed.
  *
  * @example
  * ```ts
@@ -30,12 +30,13 @@ decorate(loop, threadable());
  * yield* loop(
  *   colors.length,
  *   i => rect.fill(colors[i], 2),
- * });
+ * );
  * ```
  *
  * @param iterations - The number of iterations.
  * @param factory - A function creating the generator to run. Because generators
- *                can't be reset, a new generator is created on each iteration.
+ *                  can't be reset, a new generator is created on each
+ *                  iteration.
  */
 export function* loop(
   iterations: number,

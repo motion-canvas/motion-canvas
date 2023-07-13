@@ -29,6 +29,24 @@ export interface LatexProps extends ImgProps {
   renderProps?: SignalValue<OptionList>;
 }
 
+/**
+ * A node for rendering equations with LaTeX.
+ *
+ * @preview
+ * ```tsx editor
+ * import {Latex, makeScene2D} from '@motion-canvas/2d';
+ *
+ * export default makeScene2D(function* (view) {
+ *   view.add(
+ *     <Latex
+ *       // Note how this uses \color to set the color.
+ *       tex="{\color{white} ax^2+bx+c=0 \implies x=\frac{-b \pm \sqrt{b^2-4ac}}{2a}}"
+ *       width={600} // height and width can calculate based on each other
+ *     />,
+ *   );
+ * });
+ * ```
+ */
 export class Latex extends Img {
   private static svgContentsPool: Record<string, string> = {};
 

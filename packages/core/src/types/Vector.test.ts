@@ -1,5 +1,5 @@
 import {describe, expect, test} from 'vitest';
-import {Vector2} from '../types';
+import {PossibleVector2, Vector2} from '../types';
 import {createSignal} from '../signals';
 
 describe('Vector2', () => {
@@ -115,6 +115,58 @@ describe('Vector2', () => {
 
       expect(vector.squaredMagnitude).toBe(expected);
       expect(Vector2.squaredMagnitude(points[0], points[1])).toBe(expected);
+    },
+  );
+
+  test.each([
+    [0, [1, 0]],
+    [30, [Math.sqrt(3) / 2, 0.5]],
+    [60, [0.5, Math.sqrt(3) / 2]],
+    [90, [0, 1]],
+    [180, [-1, 0]],
+    [270, [0, -1]],
+    [360, [1, 0]],
+    [-90, [0, -1]],
+    [-180, [-1, 0]],
+    [-270, [0, 1]],
+  ])('Creates a Vector from an angle in degrees: (%s°)', (angle, expected) => {
+    const vector = Vector2.fromDegrees(angle);
+    expect(vector.equals(new Vector2(expected as PossibleVector2))).toBe(true);
+  });
+
+  test.each([
+    [0, [5, 10]],
+    [30, [-0.669872981, 11.1602540378]],
+    [45, [-3.535533905, 10.6066017178]],
+    [60, [-6.160254037, 9.3301270189]],
+    [90, [-10, 5]],
+    [180, [-5, -10]],
+    [270, [10, -5]],
+    [360, [5, 10]],
+    [-90, [10, -5]],
+    [-180, [-5, -10]],
+    [-270, [-10, 5]],
+  ])('Rotates a vector around the origin: (%s°)', (angle, expected) => {
+    const vector = new Vector2(5, 10);
+    const result = vector.rotate(angle);
+    expect(result.equals(new Vector2(expected as PossibleVector2))).toBe(true);
+  });
+
+  test.each([
+    [[1, 0], 90, [1, -1]],
+    [[1, 0], -90, [1, 1]],
+    [[-1, 0], 90, [-1, 1]],
+    [[-1, 0], -90, [-1, -1]],
+    [[0, 1], 90, [1, 1]],
+    [[0, 1], -90, [-1, 1]],
+    [[0, -1], 90, [-1, -1]],
+    [[0, -1], -90, [1, -1]],
+  ])(
+    'Rotates a vector around an arbitrary point: (%s, %s°)',
+    (center, angle, expected) => {
+      const vector = Vector2.zero;
+      const result = vector.rotate(angle, center as PossibleVector2);
+      expect(result).toEqual(new Vector2(expected as PossibleVector2));
     },
   );
 });

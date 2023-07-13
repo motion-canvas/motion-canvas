@@ -1,8 +1,10 @@
 import {Type, EPSILON} from './Type';
 import {PossibleVector2, Vector2} from './Vector';
+import {DEG2RAD} from '../utils';
 
 export type PossibleMatrix2D =
   | Matrix2D
+  | DOMMatrix
   | [number, number, number, number, number, number]
   | [PossibleVector2, PossibleVector2, PossibleVector2]
   | undefined;
@@ -41,13 +43,11 @@ export class Matrix2D implements Type {
     return Matrix2D.identity.rotate(angle);
   }
 
-  public static fromTranslation(
-    translation: PossibleVector2<number>,
-  ): Matrix2D {
+  public static fromTranslation(translation: PossibleVector2): Matrix2D {
     return Matrix2D.identity.translate(new Vector2(translation));
   }
 
-  public static fromScaling(scale: PossibleVector2<number>): Matrix2D {
+  public static fromScaling(scale: PossibleVector2): Matrix2D {
     return Matrix2D.identity.scale(new Vector2(scale));
   }
 
@@ -67,28 +67,48 @@ export class Matrix2D implements Type {
     this.values[0] = this.x.normalized.scale(value).x;
   }
 
-  public set scaleY(value: number) {
-    this.values[3] = this.y.normalized.scale(value).y;
+  public get skewX(): number {
+    return this.values[1];
+  }
+
+  public set skewX(value: number) {
+    this.values[1] = value;
   }
 
   public get scaleY(): number {
     return this.values[3];
   }
 
-  public set translateX(value: number) {
-    this.values[4] = value;
+  public set scaleY(value: number) {
+    this.values[3] = this.y.normalized.scale(value).y;
+  }
+
+  public get skewY(): number {
+    return this.values[2];
+  }
+
+  public set skewY(value: number) {
+    this.values[2] = value;
   }
 
   public get translateX(): number {
     return this.values[4];
   }
 
-  public set translateY(value: number) {
-    this.values[5] = value;
+  public set translateX(value: number) {
+    this.values[4] = value;
   }
 
   public get translateY(): number {
     return this.values[5];
+  }
+
+  public set translateY(value: number) {
+    this.values[5] = value;
+  }
+
+  public get rotation(): number {
+    return Vector2.degrees(this.values[0], this.values[1]);
   }
 
   public set rotation(angle: number) {
@@ -100,21 +120,21 @@ export class Matrix2D implements Type {
     this.values[3] = result.values[3];
   }
 
-  public get rotation(): number {
-    return (Math.atan2(this.values[1], this.values[0]) * 180) / Math.PI;
+  public get translation(): Vector2 {
+    return new Vector2(this.values[4], this.values[5]);
   }
 
-  public set translation(translation: PossibleVector2<number>) {
+  public set translation(translation: PossibleVector2) {
     const vec = new Vector2(translation);
     this.values[4] = vec.x;
     this.values[5] = vec.y;
   }
 
-  public get translation(): Vector2 {
-    return new Vector2(this.values[4], this.values[5]);
+  public get scaling(): Vector2 {
+    return new Vector2(this.values[0], this.values[3]);
   }
 
-  public set scaling(value: PossibleVector2<number>) {
+  public set scaling(value: PossibleVector2) {
     const scale = new Vector2(value);
 
     const x = new Vector2(this.values[0], this.values[1]).normalized;
@@ -124,10 +144,6 @@ export class Matrix2D implements Type {
     this.values[1] = x.y * scale.y;
     this.values[2] = y.x * scale.x;
     this.values[3] = y.y * scale.y;
-  }
-
-  public get scaling(): Vector2 {
-    return new Vector2(this.values[0], this.values[3]);
   }
 
   /**
@@ -200,9 +216,9 @@ export class Matrix2D implements Type {
   public constructor();
   public constructor(matrix: PossibleMatrix2D);
   public constructor(
-    x: PossibleVector2<number>,
-    y: PossibleVector2<number>,
-    z: PossibleVector2<number>,
+    x: PossibleVector2,
+    y: PossibleVector2,
+    z: PossibleVector2,
   );
   public constructor(
     a: number,
@@ -213,9 +229,9 @@ export class Matrix2D implements Type {
     ty: number,
   );
   public constructor(
-    a?: PossibleMatrix2D | PossibleVector2<number>,
-    b?: PossibleVector2<number>,
-    c?: PossibleVector2<number>,
+    a?: PossibleMatrix2D | PossibleVector2,
+    b?: PossibleVector2,
+    c?: PossibleVector2,
     d?: number,
     tx?: number,
     ty?: number,
@@ -232,6 +248,16 @@ export class Matrix2D implements Type {
       this.values[3] = d as number;
       this.values[4] = tx as number;
       this.values[5] = ty as number;
+      return;
+    }
+
+    if (a instanceof DOMMatrix) {
+      this.values[0] = a.m11;
+      this.values[1] = a.m12;
+      this.values[2] = a.m21;
+      this.values[3] = a.m22;
+      this.values[4] = a.m41;
+      this.values[5] = a.m42;
       return;
     }
 
@@ -273,7 +299,7 @@ export class Matrix2D implements Type {
       return;
     }
 
-    const x = new Vector2(a as PossibleVector2<number>);
+    const x = new Vector2(a as PossibleVector2);
     const y = new Vector2(b);
     const z = new Vector2(c);
     this.values[0] = x.x;
@@ -421,12 +447,12 @@ export class Matrix2D implements Type {
    * //   )
    * ```
    *
-   * @param angle - The angle by which to rotate the matrix
-   * @param radians - Whether the angle is provided in radians
+   * @param angle - The angle by which to rotate the matrix.
+   * @param degrees - Whether the angle is provided in degrees.
    */
   public rotate(angle: number, degrees = true): Matrix2D {
     if (degrees) {
-      angle = (angle * Math.PI) / 180;
+      angle *= DEG2RAD;
     }
 
     const a0 = this.values[0],

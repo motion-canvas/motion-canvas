@@ -5,7 +5,7 @@ import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
 import {Pane} from '../tabs';
 import {useInspection} from '../../contexts';
 import {AutoField} from '../fields';
-import {Button, Group, Label} from '../controls';
+import {Button, Group, Label, Separator} from '../controls';
 import {findAndOpenFirstUserFile} from '../../utils';
 
 export function Properties() {
@@ -29,6 +29,7 @@ export function Properties() {
 
   return (
     <Pane title="Properties" id="properties-pane">
+      <Separator size={1} />
       {stack && (
         <Group>
           <Label />
@@ -39,7 +40,10 @@ export function Properties() {
       )}
       {attributes
         ? Object.entries(attributes).map(([key, value]) => (
-            <AutoField label={key} value={value} />
+            <Group>
+              <Label>{key}</Label>
+              <AutoField value={value} />
+            </Group>
           ))
         : inspectable
         ? 'Click on a node to view its properties.'

@@ -91,7 +91,7 @@ numbers but to animate more complex types we'll need to use interpolation
 functions. Consider the following example:
 
 ```ts
-// import { Color } from "@motion-canvas/core/lib/types";
+// import { Color } from "@motion-canvas/core";
 yield *
   tween(2, value => {
     circle().fill(
@@ -104,8 +104,7 @@ yield *
   });
 ```
 
-[`Color.lerp`](/api/core/types/Color#lerp) is a static function that
-interpolates between two colors:
+`Color.lerp` is a static function that interpolates between two colors:
 
 <AnimationPlayer small name="tweening-color" />
 

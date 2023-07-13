@@ -5,7 +5,7 @@ import {Text, EditorState} from '@codemirror/state';
 import {javascript} from '@codemirror/lang-javascript';
 import {syntaxHighlighting} from '@codemirror/language';
 import {indentWithTab} from '@codemirror/commands';
-import {Player} from '@motion-canvas/core';
+import type {Player} from '@motion-canvas/core';
 import {
   EditorTheme,
   SyntaxHighlightStyle,
@@ -16,22 +16,44 @@ import {SkipPrevious} from '@site/src/Icon/SkipPrevious';
 import {SkipNext} from '@site/src/Icon/SkipNext';
 import {PlayArrow} from '@site/src/Icon/PlayArrow';
 import {Pause} from '@site/src/Icon/Pause';
+import IconText from '@site/src/Icon/Text';
+import IconSplit from '@site/src/Icon/Split';
+import IconImage from '@site/src/Icon/Image';
 import {autocomplete} from '@site/src/components/Fiddle/autocomplete';
 import {
   borrowPlayer,
   disposePlayer,
   tryBorrowPlayer,
+  updatePlayer,
 } from '@site/src/components/Fiddle/SharedPlayer';
 import styles from './styles.module.css';
 import {
+  compileScene,
   transform,
   TransformError,
 } from '@site/src/components/Fiddle/transformer';
 import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import Dropdown from '@site/src/components/Dropdown';
+import clsx from 'clsx';
+import {
+  areImportsFolded,
+  findImportRange,
+  foldImports,
+  folding,
+} from '@site/src/components/Fiddle/folding';
+import {useLocation} from '@docusaurus/router';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import {
+  clearErrors,
+  errorExtension,
+  underlineErrors,
+} from '@site/src/components/Fiddle/errorHighlighting';
 
 export interface FiddleProps {
+  className?: string;
   children: string;
+  mode?: 'code' | 'editor' | 'preview';
+  ratio?: string;
 }
 
 function highlight(sizePixels = 4) {
@@ -48,13 +70,20 @@ function highlight(sizePixels = 4) {
   ];
 }
 
-export default function Fiddle({children}: FiddleProps) {
+export default function Fiddle({
+  children,
+  className,
+  mode: initialMode = 'editor',
+  ratio = '4',
+}: FiddleProps) {
   const [player, setPlayer] = useState<Player>(null);
   const editorView = useRef<EditorView>(null);
   const editorRef = useRef<HTMLDivElement>();
   const previewRef = useRef<HTMLDivElement>();
+  const [mode, setMode] = useState(initialMode);
+  const {pathname} = useLocation();
 
-  const [error, setError] = useState<TransformError>(null);
+  const [error, setError] = useState<string>(null);
   const duration = useSubscribableValue(player?.onDurationChanged);
   const frame = useSubscribableValue(player?.onFrameChanged);
   const state = useSubscribableValue(player?.onStateChanged);
@@ -62,15 +91,45 @@ export default function Fiddle({children}: FiddleProps) {
   const [doc, setDoc] = useState<Text | null>(null);
   const [lastDoc, setLastDoc] = useState<Text | null>(null);
 
-  const update = (newDoc: Text, animate = true) => {
-    borrowPlayer(setPlayer, previewRef.current);
-    const newError = transform(newDoc.sliceString(0));
-    setError(newError);
-    if (!newError) {
+  const parsedRatio = useMemo(() => {
+    if (ratio.includes('/')) {
+      const parts = ratio.split('/');
+      const calculated = parseFloat(parts[0]) / parseFloat(parts[1]);
+      if (!isNaN(calculated)) {
+        return calculated;
+      }
+    }
+    const value = parseFloat(ratio);
+    return isNaN(value) ? 4 : value;
+  }, [ratio]);
+
+  const update = async (newDoc: Text, animate = true) => {
+    await borrowPlayer(setPlayer, previewRef.current, parsedRatio, setError);
+    try {
+      const scene = await compileScene(newDoc.sliceString(0), pathname);
+      updatePlayer(scene);
       setLastDoc(newDoc);
       if (animate && !lastDoc?.eq(newDoc)) {
         previewRef.current.animate(highlight(), {duration: 300});
       }
+      return true;
+    } catch (e) {
+      if (e instanceof TransformError) {
+        underlineErrors(editorView.current, e.errors, e.message);
+      }
+      setError(e.message);
+      player?.togglePlayback(false);
+      return false;
+    }
+  };
+
+  const switchState = async (id: number) => {
+    setSnippetId(id);
+    const isFolded = areImportsFolded(editorView.current.state);
+    editorView.current.setState(snippets[id].state);
+    await update(snippets[id].state.doc);
+    if (isFolded) {
+      foldImports(editorView.current);
     }
   };
 
@@ -96,9 +155,14 @@ export default function Fiddle({children}: FiddleProps) {
             ]),
             EditorView.updateListener.of(update => {
               setDoc(update.state.doc);
-              setError(null);
+              if (update.docChanged) {
+                setError(null);
+                clearErrors(editorView.current);
+              }
             }),
             autocomplete(),
+            folding(),
+            errorExtension(),
             javascript({
               jsx: true,
               typescript: true,
@@ -111,15 +175,30 @@ export default function Fiddle({children}: FiddleProps) {
     [children],
   );
 
+  if (!ExecutionEnvironment.canUseDOM) {
+    // Validate the snippets during Server-Side Rendering.
+    snippets.forEach(snippet => {
+      transform(snippet.state.doc.sliceString(0), pathname);
+    });
+  }
+
   useEffect(() => {
     editorView.current = new EditorView({
       parent: editorRef.current,
       state: snippets[snippetId].state,
     });
-    const borrowed = tryBorrowPlayer(setPlayer, previewRef.current);
-    if (borrowed) {
-      update(snippets[snippetId].state.doc, false);
-    }
+    foldImports(editorView.current);
+
+    tryBorrowPlayer(setPlayer, previewRef.current, parsedRatio, setError).then(
+      async borrowed => {
+        if (borrowed) {
+          const success = await update(snippets[snippetId].state.doc, false);
+          if (success && mode !== 'code') {
+            borrowed.togglePlayback(true);
+          }
+        }
+      },
+    );
 
     return () => {
       disposePlayer(setPlayer);
@@ -127,14 +206,60 @@ export default function Fiddle({children}: FiddleProps) {
     };
   }, []);
 
+  // Ghost code is displayed before the editor is initialized.
+  const ghostCode = useMemo(() => {
+    const initialState = snippets[0].state;
+    const range = findImportRange(initialState);
+    let text = initialState.doc;
+    if (range) {
+      text = text.replace(range.from, range.to, Text.of(['...']));
+    }
+    return text.toString() + '\n';
+  }, [snippets]);
+
   const hasChangedSinceLastUpdate = lastDoc && doc && !doc.eq(lastDoc);
   const hasChanged =
     (doc && !doc.eq(snippets[snippetId].state.doc)) ||
     hasChangedSinceLastUpdate;
 
   return (
-    <div className={styles.root}>
-      <div className={styles.preview} ref={previewRef}>
+    <div
+      className={clsx(styles.root, className, {
+        [styles.codeOnly]: mode === 'code',
+        [styles.previewOnly]: mode === 'preview',
+      })}
+    >
+      <div className={styles.layoutControl}>
+        <button
+          className={clsx(styles.icon, mode === 'code' && styles.active)}
+          onClick={() => {
+            setMode('code');
+            player?.togglePlayback(false);
+          }}
+          title="Source code"
+        >
+          <IconText />
+        </button>
+        <button
+          className={clsx(styles.icon, mode === 'editor' && styles.active)}
+          onClick={() => setMode('editor')}
+          title="Editor with preview"
+        >
+          <IconSplit />
+        </button>
+        <button
+          className={clsx(styles.icon, mode === 'preview' && styles.active)}
+          onClick={() => setMode('preview')}
+          title="Preview"
+        >
+          <IconImage />
+        </button>
+      </div>
+      <div
+        className={styles.preview}
+        style={{aspectRatio: ratio}}
+        ref={previewRef}
+      >
         {!player && <div>Press play to preview the animation</div>}
       </div>
       {duration > 0 && (
@@ -165,16 +290,26 @@ export default function Fiddle({children}: FiddleProps) {
           </button>
           <button
             className={styles.icon}
-            onClick={() => {
+            onClick={async () => {
               if (!player) {
-                const borrowed = borrowPlayer(setPlayer, previewRef.current);
-                update(editorView.current.state.doc);
-                borrowed.togglePlayback(true);
-              } else {
-                if (!lastDoc) {
-                  update(editorView.current.state.doc);
+                const borrowed = await borrowPlayer(
+                  setPlayer,
+                  previewRef.current,
+                  parsedRatio,
+                  setError,
+                );
+                const success = await update(editorView.current.state.doc);
+                if (success) {
+                  borrowed.togglePlayback(true);
                 }
-                player.togglePlayback();
+              } else {
+                let success = true;
+                if (!lastDoc) {
+                  success = await update(editorView.current.state.doc);
+                }
+                if (success) {
+                  player.togglePlayback();
+                }
               }
             }}
           >
@@ -188,15 +323,8 @@ export default function Fiddle({children}: FiddleProps) {
           </button>
         </div>
         <div className={styles.section}>
-          {snippets.length === 0 && hasChanged && (
-            <button
-              className={styles.button}
-              onClick={() => {
-                editorView.current.setState(snippets[snippetId].state);
-                update(snippets[snippetId].state.doc);
-                setDoc(snippets[snippetId].state.doc);
-              }}
-            >
+          {snippets.length === 1 && hasChanged && (
+            <button className={styles.button} onClick={() => switchState(0)}>
               <small>Reset example</small>
             </button>
           )}
@@ -204,11 +332,7 @@ export default function Fiddle({children}: FiddleProps) {
             <Dropdown
               className={styles.picker}
               value={hasChanged ? -1 : snippetId}
-              onChange={id => {
-                setSnippetId(id);
-                editorView.current.setState(snippets[id].state);
-                update(snippets[id].state.doc);
-              }}
+              onChange={switchState}
               options={snippets
                 .map((snippet, index) => ({
                   value: index,
@@ -219,10 +343,12 @@ export default function Fiddle({children}: FiddleProps) {
           )}
         </div>
       </div>
-      {error && <pre className={styles.error}>{error.message}</pre>}
+      {error && <pre className={styles.error}>{error}</pre>}
       <div className={styles.editor} ref={editorRef}>
         <CodeBlock className={styles.source} language="tsx">
-          {snippets[0].state.doc.toString() + '\n'}
+          {mode === 'code'
+            ? snippets[snippetId].state.doc.toString()
+            : ghostCode}
         </CodeBlock>
       </div>
     </div>

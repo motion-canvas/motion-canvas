@@ -1,6 +1,7 @@
 import type {NumberMetaField} from '@motion-canvas/core/lib/meta';
-import {Group, Input, InputSelect, Label} from '../controls';
+import {Input, InputSelect} from '../controls';
 import {useSubscribableValue} from '../../hooks';
+import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface NumberMetaFieldViewProps {
   field: NumberMetaField;
@@ -11,8 +12,7 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
   const presets = field.getPresets();
 
   return (
-    <Group>
-      <Label>{field.name}</Label>
+    <MetaFieldGroup field={field}>
       {presets.length ? (
         <InputSelect
           type="number"
@@ -31,6 +31,6 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
           }}
         />
       )}
-    </Group>
+    </MetaFieldGroup>
   );
 }

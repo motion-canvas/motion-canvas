@@ -1,6 +1,7 @@
-import {Group, Input, Label} from '../controls';
+import {Input} from '../controls';
 import {useSubscribableValue} from '../../hooks';
 import {Vector2MetaField} from '@motion-canvas/core/lib/meta';
+import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface Vector2MetaFieldViewProps {
   field: Vector2MetaField;
@@ -10,8 +11,7 @@ export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
   const value = useSubscribableValue(field.onChanged);
 
   return (
-    <Group>
-      <Label>{field.name}</Label>
+    <MetaFieldGroup field={field}>
       <Input
         type="number"
         value={value.x}
@@ -28,6 +28,6 @@ export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
           field.set([value.x, y]);
         }}
       />
-    </Group>
+    </MetaFieldGroup>
   );
 }

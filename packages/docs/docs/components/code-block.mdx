@@ -145,12 +145,25 @@ yield view.add(
 );
 
 // second line only
-yield * codeRef().selection(lines(1));
+yield * codeRef().selection(lines(1), 1);
 // second and third line (line 1 to line 2)
-yield * codeRef().selection(lines(1, 2));
+yield * codeRef().selection(lines(1, 2), 1);
 ```
 
-To remove a selection, you must set the selected range from `[0, 0]` to
+To remove a selection, the value of `.selection()` signal can be set to its
+[`DEFAULT`][signal-default], i.e. "all selected". For example:
+
+```ts
+import {DEFAULT} from '@motion-canvas/core';
+
+// highlight lines 1 and 2
+yield * codeRef().selection(lines(1, 2), 1);
+
+// highlight all lines
+yield * codeRef().selection(DEFAULT, 1);
+```
+
+Alternatively, the selected range can be set from `[0, 0]` to
 `[Infinity, Infinity]` to select all text. This is most easily performed by
 setting the selection to `lines(0, Infinity)`.
 
@@ -166,7 +179,7 @@ code.
 
 ```tsx
 import {CodeBlock, insert} from '@motion-canvas/2d/lib/components/CodeBlock';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core';
 
 const codeRef = createRef<CodeBlock>();
 
@@ -262,3 +275,4 @@ const myBool = true;
 ```
 
 [languages]: https://github.com/wooorm/starry-night#languages
+[signal-default]: /docs/signals#default-values

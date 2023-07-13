@@ -5,6 +5,7 @@ import {Color} from '@motion-canvas/core/lib/types';
 import {valid} from 'chroma-js';
 import {Input} from './Input';
 import {shake} from '../animations';
+import {useReducedMotion} from '../../hooks';
 
 export interface ColorInputProps {
   value: Color | null;
@@ -12,6 +13,7 @@ export interface ColorInputProps {
 }
 
 export function ColorInput({value, onChange}: ColorInputProps) {
+  const reducedMotion = useReducedMotion();
   return (
     <div className={clsx(styles.input, styles.color)}>
       <Input
@@ -22,9 +24,11 @@ export function ColorInput({value, onChange}: ColorInputProps) {
             onChange(newValue);
           } else {
             input.value = value?.serialize() ?? '';
-            input.parentElement.animate(shake(2), {
-              duration: 300,
-            });
+            if (!reducedMotion) {
+              input.parentElement.animate(shake(2), {
+                duration: 300,
+              });
+            }
           }
         }}
         placeholder="none"

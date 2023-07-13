@@ -5,6 +5,8 @@ slug: /rendering
 
 import {VideoSettings} from '@site/src/Icon/VideoSettings';
 import {PhotoCamera} from '@site/src/Icon/PhotoCamera';
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
 
 # Rendering
 
@@ -13,8 +15,8 @@ to the display of your animation. You can open it by pressing the <VideoSettings
   className="icon-inline"
   alt="Video Settings"
   title="Video Settings"
-/> icon. Here, you can configure various settings related to your animation,
-initialize the rendering process, and enter the presentation mode.
+/> icon. Here, you can configure various animation settings, initialize the
+rendering process, and enter the presentation mode.
 
 ## Configuration
 
@@ -89,42 +91,29 @@ The HTML Canvas color space to use when previewing or rendering the animation.
 Current options include sRGB, a common color space for images and video, and
 DCI-P3, a wide-gamut color space.
 
-### File Type
+### Exporter
 
-The type of image file to which Motion Canvas will convert the frames. Current
-options are PNG, JPEG, and WebP. Note that Motion Canvas depends on the
-capabilities of your browser to generate image files, and so WebP may not work
-on Safari or older browsers.
+The exporter to use when rendering the animation. Exporters are responsible for
+processing the rendered frames and saving them to the output directory. If you
+don't see this option, it means that you don't have any additional exporters
+installed and the default _Image sequence_ exporter will be used.
 
-### Quality
-
-The quality target for compression from 0 to 1, where a lower setting will
-result in smaller file sizes but might degrade image quality. A setting of 1
-will result in lossless images, such that no detail is lost, but lower settings
-will often produce no discernible difference. Note that output to a file type of
-PNG does not allow for different quality settings, so this option will be
-ignored when outputting to PNG.
-
-### Group by scene
-
-When enabled, each scene will be rendered into a separate image sequence located
-in a subdirectory called the same as the scene.
+<DocCardList items={useCurrentSidebarCategory().items} />
 
 ## Rendering
 
-Clicking the `RENDER` button will initialize rendering. Motion Canvas will play
-through the animation and save each frame as an image to `/output` in your
-project directory. You can
-[change the output directory](/docs/configuration#output) in the configuration
-file.
+Clicking the `RENDER` button will initialize rendering (The button will display
+an in-progress animation during the process). Motion Canvas will play through
+the animation and save the result to `/output` in your project directory. You
+can [change the output directory](/docs/configuration#output) in the
+configuration file. You can also use the `OUTPUT DIRECTORY` button to reveal the
+current output directory in your file explorer.
 
-The rendering process will finish once the playhead reaches the end of the
-selected range. You can also stop the process at any time by pressing the
-`RENDER` button again.
+The rendering process will finish once the button changes back to `RENDER`.
+Usually, this happens when the playhead reaches the end of the selected range
+but some exporters may take longer to finish processing the frames.
 
-After rendering, you can import the rendered image sequence into a video editor
-of your choice, or convert the frames directly to a video using a tool like
-`ffmpeg`.
+You can abort the process at any time by pressing the `ABORT` button.
 
 ## Taking Snapshots
 

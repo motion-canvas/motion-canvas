@@ -19,18 +19,21 @@
 .tab {
   padding: 8px;
   margin: 4px;
-  border-radius: 4px;
   cursor: pointer;
   position: relative;
   color: rgba(255, 255, 255, 0.54);
+  border-radius: 50%;
 
   &:hover {
     color: white;
+    background-color: var(--surface-color);
   }
 
   &.active {
-    background: var(--surface-color);
-    color: white;
+    border-radius: var(--radius);
+    background: var(--theme-overlay);
+    color: var(--theme-light);
+    transition: border-radius var(--duration-normal) var(--timing-ease-out);
   }
 
   &.disabled {
@@ -40,7 +43,8 @@
 }
 
 .badge {
-  font-size: 12px;
+  font-size: var(--font-size-small);
+  line-height: 16px;
   color: rgba(255, 255, 255, 0.7);
   position: absolute;
   font-weight: 900;
@@ -51,7 +55,6 @@
   height: 16px;
   background-color: var(--red);
   border-radius: 8px;
-  line-height: 16px;
   text-align: center;
   z-index: 1;
 }
@@ -71,4 +74,5 @@
   height: 100%;
   padding: 16px;
   overflow-y: scroll;
+  background-color: var(--surface-color);
 }

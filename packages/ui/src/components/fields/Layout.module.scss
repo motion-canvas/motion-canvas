@@ -1,8 +1,11 @@
 .surface {
-  background: var(--surface-color-light);
+  --field-color: var(--surface-color-light);
+  --field-color-hover: var(--surface-color-hover);
+  --field-color-border: var(--surface-color);
+
+  background: var(--field-color);
   color: rgba(255, 255, 255, 0.6);
-  border-radius: 4px;
-  line-height: 24px;
+  border-radius: var(--radius);
   flex-shrink: 1;
   flex-grow: 1;
   flex-basis: 100%;
@@ -13,27 +16,35 @@
     opacity: 0.54;
     pointer-events: none;
   }
+
+  .surface {
+    --field-color: var(--surface-color);
+    --field-color-hover: var(--surface-color-hover);
+    --field-color-border: var(--surface-color-light);
+  }
 }
 
 .header {
   display: flex;
   align-items: center;
   height: 24px;
+  transition: color var(--duration-normal);
 
-  .open & {
+  .open > & {
     color: rgba(255, 255, 255, 0.32);
   }
 }
 
 .fields {
-  display: none;
-
-  .open & {
-    display: block;
+  &.nested {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 4px;
   }
 
-  .field {
-    border-top: 1px solid var(--surface-color);
+  & > .field {
+    border-top: 1px solid var(--field-color-border);
   }
 }
 
@@ -47,7 +58,7 @@
   &.copy {
     cursor: pointer;
     &:hover {
-      background-color: var(--surface-color-hover);
+      background-color: var(--field-color-hover);
     }
   }
 
@@ -57,10 +68,10 @@
     left: 0;
     right: 0;
     text-align: center;
-    background-color: var(--surface-color-hover);
+    background-color: var(--field-color-hover);
     color: white;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity var(--duration-normal);
   }
 
   &.copied::before {
@@ -75,6 +86,7 @@
 }
 
 .value {
+  font-family: var(--font-family-mono);
   padding: 0 8px;
   flex-shrink: 0;
   overflow: hidden;

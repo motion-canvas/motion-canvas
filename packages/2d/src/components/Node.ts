@@ -46,6 +46,8 @@ import {
   SignalValue,
   SimpleSignal,
   isReactive,
+  modify,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 
 export type NodeState = NodeProps & Record<string, any>;
@@ -113,6 +115,13 @@ export class Node implements Promisable<Node> {
   @vector2Signal()
   public declare readonly position: Vector2Signal<this>;
 
+  public get x() {
+    return this.position.x as SimpleSignal<number, this>;
+  }
+  public get y() {
+    return this.position.y as SimpleSignal<number, this>;
+  }
+
   /**
    * A helper signal for operating on the position in world space.
    *
@@ -139,12 +148,12 @@ export class Node implements Promisable<Node> {
     return new Vector2(matrix.m41, matrix.m42);
   }
 
-  protected setAbsolutePosition(value: SignalValue<Vector2>) {
-    if (isReactive(value)) {
-      this.position(() => value().transformAsPoint(this.worldToParent()));
-    } else {
-      this.position(value.transformAsPoint(this.worldToParent()));
-    }
+  protected setAbsolutePosition(value: SignalValue<PossibleVector2>) {
+    this.position(
+      modify(value, unwrapped =>
+        new Vector2(unwrapped).transformAsPoint(this.worldToParent()),
+      ),
+    );
   }
 
   /**
@@ -171,15 +180,15 @@ export class Node implements Promisable<Node> {
 
   protected getAbsoluteRotation() {
     const matrix = this.localToWorld();
-    return (Math.atan2(matrix.m12, matrix.m11) * 180) / Math.PI;
+    return Vector2.degrees(matrix.m11, matrix.m12);
   }
 
   protected setAbsoluteRotation(value: SignalValue<number>) {
-    if (isReactive(value)) {
-      this.rotation(() => transformAngle(value(), this.worldToParent()));
-    } else {
-      this.rotation(transformAngle(value, this.worldToParent()));
-    }
+    this.rotation(
+      modify(value, unwrapped =>
+        transformAngle(unwrapped, this.worldToParent()),
+      ),
+    );
   }
 
   /**
@@ -243,12 +252,10 @@ export class Node implements Promisable<Node> {
     );
   }
 
-  protected setAbsoluteScale(value: SignalValue<Vector2>) {
-    if (isReactive(value)) {
-      this.scale(() => this.getRelativeScale(value()));
-    } else {
-      this.scale(this.getRelativeScale(value));
-    }
+  protected setAbsoluteScale(value: SignalValue<PossibleVector2>) {
+    this.scale(
+      modify(value, unwrapped => this.getRelativeScale(new Vector2(unwrapped))),
+    );
   }
 
   private getRelativeScale(scale: Vector2): Vector2 {
@@ -283,7 +290,7 @@ export class Node implements Promisable<Node> {
     time: number,
     timingFunction: TimingFunction,
   ) {
-    const nextValue = isReactive(value) ? value() : value;
+    const nextValue = unwrap(value);
     if (nextValue === 'source-over') {
       yield* this.compositeOverride(1, time, timingFunction);
       this.compositeOverride(0);
@@ -1273,12 +1280,10 @@ export class Node implements Promisable<Node> {
    * before continuing the animation.
    */
   public async toPromise(): Promise<this> {
-    let promises = DependencyContext.consumePromises();
     do {
-      await Promise.all(promises.map(handle => handle.promise));
+      await DependencyContext.consumePromises();
       this.collectAsyncResources();
-      promises = DependencyContext.consumePromises();
-    } while (promises.length > 0);
+    } while (DependencyContext.hasPromises());
     return this;
   }
 
@@ -1333,6 +1338,9 @@ export class Node implements Promisable<Node> {
    * node to a previously saved state. Restoring a node to a previous state
    * removes that state from the state stack.
    *
+   * Providing a duration will tween the node to the restored state. Otherwise,
+   * it will be restored immediately.
+   *
    * @example
    * ```tsx
    * const node = <Circle width={100} height={100} fill={"lightseagreen"} />
@@ -1350,20 +1358,25 @@ export class Node implements Promisable<Node> {
    * yield* node.restore(1);
    * ```
    *
-   * @param duration - The duration of the transition
-   * @param timing - The timing function to use for the transition
+   * @param duration - The duration of the transition.
+   * @param timing - The timing function to use for the transition.
    */
-  public restore(duration: number, timing: TimingFunction = easeInOutCubic) {
+  public restore(duration?: number, timing: TimingFunction = easeInOutCubic) {
     const state = this.stateStack.pop();
 
     if (state === undefined) {
       return;
     }
 
+    if (duration === undefined) {
+      this.applyState(state);
+      return;
+    }
+
     const currentState = this.getState();
     for (const key in state) {
       // Filter out any properties that haven't changed between the current and
-      // previous states so we don't perform unnecessary tweens.
+      // previous states, so we don't perform unnecessary tweens.
       if (currentState[key] === state[key]) {
         delete state[key];
       }

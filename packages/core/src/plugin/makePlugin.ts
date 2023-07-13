@@ -12,6 +12,6 @@ import type {Plugin} from './Plugin';
  * });
  * ```
  */
-export function makePlugin(plugin: Plugin): Plugin {
-  return plugin;
+export function makePlugin(plugin: Plugin | (() => Plugin)): () => Plugin {
+  return typeof plugin === 'function' ? plugin : () => plugin;
 }

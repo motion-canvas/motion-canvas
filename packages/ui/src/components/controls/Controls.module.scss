@@ -61,7 +61,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  line-height: 24px;
 }
 
 .select,
@@ -70,11 +69,9 @@
   background-color: var(--input-background);
   color: rgba(255, 255, 255, 0.6);
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--radius);
   padding: 0 8px;
-  font-size: 14px;
   height: 24px;
-  line-height: 24px;
   flex-shrink: 1;
   flex-grow: 1;
   min-width: 0;
@@ -84,6 +81,7 @@
   }
 
   &.main {
+    --loading-stripe-color: var(--theme-light);
     background-color: var(--theme);
     color: rgba(0, 0, 0, 0.87);
     font-weight: bold;
@@ -92,6 +90,16 @@
       box-shadow: 0 0 0 2px white inset;
     }
   }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.54;
+  }
+}
+
+.select,
+.input {
+  font-family: var(--font-family-mono);
 }
 
 .inputSelect {
@@ -100,21 +108,22 @@
   flex-shrink: 1;
 
   .button {
-    border-radius: 4px 0 0 4px;
+    padding-left: 32px;
+    border-radius: var(--radius) 0 0 var(--radius);
   }
 
   .input {
     width: 0;
-    border-radius: 4px 0 0 4px;
+    border-radius: var(--radius) 0 0 var(--radius);
     border-right: 1px solid var(--surface-color);
   }
 
   .select {
-    font-size: 0;
+    width: 0;
     flex-grow: 0;
     flex-basis: 0;
     padding: 0 12px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 var(--radius) var(--radius) 0;
   }
 }
 
@@ -125,7 +134,7 @@
   align-self: center;
   border: none;
   background-color: var(--input-background);
-  border-radius: 4px;
+  border-radius: var(--radius);
   appearance: none;
   cursor: pointer;
 
@@ -188,7 +197,7 @@
 .colorPreview {
   width: 16px;
   height: 16px;
-  border-radius: 4px;
+  border-radius: var(--radius);
   flex-shrink: 0;
   text-align: center;
   background-color: rgba(0, 0, 0, 0.16);
@@ -212,6 +221,7 @@
   justify-content: center;
   overflow: hidden;
   white-space: nowrap;
+  text-transform: uppercase;
   gap: 8px;
 
   &:disabled {
@@ -246,7 +256,7 @@
   }
 
   svg {
-    transition: rotate 0.2s;
+    transition: rotate var(--duration-normal) var(--timing-ease-in-out);
   }
 
   &.open svg {
@@ -258,7 +268,6 @@
   color: rgba(255, 255, 255, 0.7);
   background-color: var(--surface-color-light);
   user-select: none;
-  line-height: 24px;
   border-radius: 12px;
   padding: 0 12px;
   cursor: pointer;

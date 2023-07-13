@@ -28,7 +28,9 @@ node -v
 
 ### Creating a new project
 
-Run the following command in order to scaffold a new Motion Canvas project:
+Run the following command in order to scaffold a new Motion Canvas project (If
+the command fails check out the [troubleshooting](#troubleshooting) section
+below):
 
 ```bash
 npm init @motion-canvas@latest
@@ -39,24 +41,32 @@ to use; either TypeScript or plain JavaScript. We recommend using TypeScript in
 your first project, since that's the language we're using throughout this
 documentation.
 
-To complete the scaffolding process, run the following command in your newly
-created project directory:
+You'll also be asked to choose how you'd like to export your animations. Motion
+Canvas comes with a built-in [_Image sequence_](/docs/rendering/image-sequence)
+exporter - perfect if you want to import your animations into a video editor.
+However, if you want to directly produce a finished video, you can choose to
+install the [_Video (FFmpeg)_](/docs/rendering/video) exporter. Don't worry, you
+can select multiple exporters, and you can always
+[add more](/docs/rendering/video#existing-project) later.
 
-```shell
-npm install
-```
+To complete the scaffolding process, you'll need to run the following commands:
 
-### Starting the editor
-
-To start the editor, run:
-
-```shell
-npm run serve
-```
-
-The editor can be accessed by visiting
-[http://localhost:9000/](http://localhost:9000/). We'll use it to preview our
-animation, but for now there's not much to see.
+1. **C**hange **D**irectory (`cd`) to the project root (You should replace
+   `<project-path>` with the path you picked during scaffolding):
+   ```shell
+   cd <project-path>
+   ```
+2. Install necessary dependencies:
+   ```shell
+   npm install
+   ```
+3. Start the editor:
+   ```shell
+   npm run serve
+   ```
+   The editor can be accessed by visiting
+   [http://localhost:9000/](http://localhost:9000/). We'll use it to preview our
+   animation, although for now there's not much to see.
 
 ### Programming an animation
 
@@ -66,10 +76,8 @@ animations. Open `example.tsx` in a text editor, and replace all code in the
 file with the following snippet.
 
 ```tsx editor
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {makeScene2D, Circle} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const myCircle = createRef<Circle>();
@@ -121,7 +129,7 @@ A scene is a set of elements displayed on the screen and an animation that
 governs them. The most basic scene looks as follows:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {makeScene2D} from '@motion-canvas/2d';
 
 export default makeScene2D(function* (view) {
   // animation
@@ -334,6 +342,17 @@ Did you run the `cd` command to switch to the directory containing your project?
   </summary>
 
 You can press `0` to refocus the camera on the preview.
+
+</details>
+<details>
+  <summary>
+    The animation ends abruptly or does not start at the beginning.
+  </summary>
+
+Make sure the playback range selector in the timeline starts and ends where you
+expect it to, e.g., at the beginning and end of your animation. The range
+selector is a gray bar in the time axis of your timeline. When you move your
+mouse over it, six dots will appear allowing you to manipulate it.
 
 </details>
 <details>

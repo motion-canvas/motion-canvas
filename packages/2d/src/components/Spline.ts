@@ -1,7 +1,7 @@
 import {
-  isReactive,
   SignalValue,
   SimpleSignal,
+  unwrap,
 } from '@motion-canvas/core/lib/signals';
 import {
   BBox,
@@ -23,6 +23,7 @@ import {
   arc,
   bezierCurveTo,
   drawLine,
+  drawPivot,
   lineTo,
   moveTo,
   quadraticCurveTo,
@@ -111,7 +112,9 @@ export class Spline extends Curve {
     super(props);
 
     if (
-      (props.children === undefined || props.children.length < 2) &&
+      (props.children === undefined ||
+        !Array.isArray(props.children) ||
+        props.children.length < 2) &&
       (props.points === undefined || props.points.length < 2) &&
       props.spawner === undefined
     ) {
@@ -139,7 +142,7 @@ export class Spline extends Curve {
 
     if (points) {
       return points.map(signal => {
-        const point = new Vector2(isReactive(signal) ? signal() : signal);
+        const point = new Vector2(unwrap(signal));
 
         return {
           position: point,
@@ -293,13 +296,8 @@ export class Spline extends Curve {
     }
 
     context.lineWidth = 1;
-    const radius = 8;
     context.beginPath();
-    lineTo(context, offset.addY(-radius));
-    lineTo(context, offset.addY(radius));
-    lineTo(context, offset);
-    lineTo(context, offset.addX(-radius));
-    context.arc(offset.x, offset.y, radius, 0, Math.PI * 2);
+    drawPivot(context, offset);
     context.stroke();
 
     context.beginPath();

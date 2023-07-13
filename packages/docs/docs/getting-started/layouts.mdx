@@ -70,6 +70,60 @@ class has additional `size` and `offset` properties:
 <ApiSnippet url={'/api/2d/components/Layout#offset'} />
 <hr />
 
+## Cardinal directions
+
+Layout nodes come with a set of helper properties that let you position them in
+respect to their edges/corners. In the example below we use them to place two
+squares on the left and right side of a gray rectangle. The yellow square is
+positioned so that its right edge is in the same place as the left edge of the
+rectangle. Meanwhile, the red square is placed so that its bottom left corner
+aligns with the bottom right corner of the rectangle. All possible directions
+include: [`middle`](/api/2d/components/Layout#middle),
+[`top`](/api/2d/components/Layout#top),
+[`bottom`](/api/2d/components/Layout#bottom),
+[`left`](/api/2d/components/Layout#left),
+[`right`](/api/2d/components/Layout#right),
+[`topLeft`](/api/2d/components/Layout#topLeft),
+[`topRight`](/api/2d/components/Layout#topRight),
+[`bottomLeft`](/api/2d/components/Layout#bottomLeft), and
+[`bottomRight`](/api/2d/components/Layout#bottomRight).
+
+```tsx editor
+import {makeScene2D, Rect} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const rect = createRef<Rect>();
+
+  view.add(
+    <>
+      <Rect
+        ref={rect}
+        width={200}
+        height={100}
+        rotation={-10}
+        fill={'#333333'}
+      />
+      <Rect
+        size={50}
+        fill={'#e6a700'}
+        rotation={rect().rotation}
+        // Try changing "right" to "top"
+        right={rect().left}
+      />
+      <Rect
+        size={100}
+        fill={'#e13238'}
+        rotation={10}
+        bottomLeft={rect().bottomRight}
+      />
+    </>,
+  );
+
+  yield* rect().rotation(10, 1).to(-10, 1);
+});
+```
+
 ## Flexbox configuration
 
 Most flexbox attributes available in CSS are available as

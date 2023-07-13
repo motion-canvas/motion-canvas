@@ -1,24 +1,32 @@
 import React from 'react';
 import clsx from 'clsx';
-import styles from './styles.module.css';
 import Link from '@docusaurus/Link';
+import ThemedImage from '@theme/ThemedImage';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import {ThemeConfig} from '@docusaurus/preset-classic';
+import styles from './styles.module.css';
 
 export default function HomepageHeader() {
+  const {siteConfig} = useDocusaurusContext();
+  const logo = (siteConfig.themeConfig as ThemeConfig).navbar.logo;
+
   return (
-    <>
-      <header className={styles.banner}>
+    <div className={clsx(styles.feature, styles.banner)}>
+      <ThemedImage
+        sources={{
+          dark: logo.srcDark,
+          light: logo.src,
+        }}
+        alt={logo.alt}
+        className={clsx(styles.logo, logo.className)}
+      />
+      <div className={styles.content}>
         <h1 className={styles.title}>
-          Visualize Complex
+          <b>Visualize</b> Your
           <br />
-          Ideas <b>Programmatically</b>
+          <b>Ideas</b> With Code
         </h1>
-        <h1 className={clsx(styles.title, styles.mobile)}>
-          Visualize
-          <br />
-          Complex Ideas
-          <br />
-          <b>Programmatically</b>
-        </h1>
+        <p className={styles.description}>{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link className="button button--primary button--lg" to="/docs">
             Get Started
@@ -31,7 +39,7 @@ export default function HomepageHeader() {
             Contribute
           </a>
         </div>
-      </header>
-    </>
+      </div>
+    </div>
   );
 }

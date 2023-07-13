@@ -27,22 +27,22 @@ export function Viewport() {
         <CurrentTime
           render={time => {
             return (
-              <div className={styles.time} title="Current time">
+              <code className={styles.time} title="Current time">
                 {formatDuration(player.status.framesToSeconds(time))}
                 <span className={styles.frames}>
                   [{formatFrames(time, speed)}]
                 </span>
-              </div>
+              </code>
             );
           }}
         />
         <PlaybackControls />
-        <div className={styles.duration} title="Duration">
+        <code className={styles.duration} title="Duration">
           <span className={styles.frames}>
             [{formatFrames(duration, speed)}]
           </span>
           {formatDuration(player.status.framesToSeconds(duration))}
-        </div>
+        </code>
       </div>
     </div>
   );

@@ -1,15 +1,15 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "3.4.0",
+  "version": "3.9.0",
   "description": "A Vite plugin for Motion Canvas projects",
-  "main": "lib/main.js",
+  "main": "lib/index.js",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
-    "build": "ttsc",
-    "watch": "ttsc -w"
+    "dev": "ttsc -w",
+    "build": "ttsc"
   },
   "repository": {
     "type": "git",

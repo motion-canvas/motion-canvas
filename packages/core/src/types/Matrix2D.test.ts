@@ -145,6 +145,26 @@ describe('Matrix2D', () => {
       expect(matrix).toEqual(new Matrix2D(1, 0, 0, 5, 0, 0));
     });
 
+    test('can get only the horizontal skewing', () => {
+      expect(a.skewX).toEqual(2);
+    });
+
+    test('can set only the horizontal skewing', () => {
+      const matrix = new Matrix2D();
+      matrix.skewX = 5;
+      expect(matrix).toEqual(new Matrix2D(1, 5, 0, 1, 0, 0));
+    });
+
+    test('can get only the vertical skewing', () => {
+      expect(a.skewY).toEqual(3);
+    });
+
+    test('can set only the vertical skewing', () => {
+      const matrix = new Matrix2D();
+      matrix.skewY = 5;
+      expect(matrix).toEqual(new Matrix2D(1, 0, 5, 1, 0, 0));
+    });
+
     test('can set the scaling', () => {
       const matrix = new Matrix2D(1, 0, 0, 1, 0, 0);
       matrix.scaling = [2, 5];

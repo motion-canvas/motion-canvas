@@ -24,12 +24,15 @@ export interface PolygonProps extends ShapeProps {
  *
  * Since the polygon is inscribed in the circle, the actual displayed
  * height and width may differ somewhat from the bounding rectangle. This
- * will be particularly noticable if the number of sides is low, e.g. for a
+ * will be particularly noticeable if the number of sides is low, e.g. for a
  * triangle.
  *
  * @preview
  * ```tsx editor
  * // snippet Polygon
+ * import {makeScene2D, Polygon} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
+ *
  * export default makeScene2D(function* (view) {
  *   const ref = createRef<Polygon>();
  *   view.add(
@@ -45,6 +48,8 @@ export interface PolygonProps extends ShapeProps {
  * });
  *
  * // snippet Pentagon outline
+ * import {makeScene2D, Polygon} from '@motion-canvas/2d';
+ *
  * export default makeScene2D(function* (view) {
  *   view.add(
  *     <Polygon

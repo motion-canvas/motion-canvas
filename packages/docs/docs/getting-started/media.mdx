@@ -4,6 +4,7 @@ slug: /media
 ---
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
+import {VideoSettings} from '@site/src/Icon/VideoSettings';
 
 # Media
 
@@ -26,9 +27,8 @@ import audio from '../audio/voice.mp3';
 ```
 
 Once imported we need to let Motion Canvas know that we want to use this audio
-file. We can do this by specifying the
-[`audio`](/api/core/index/ProjectConfig#audio) property in the
-[`ProjectConfiguration`](/api/core/index/ProjectConfig):
+file. We can do this by specifying the `audio` property in the project
+configuration:
 
 ```ts
 export default makeProject({
@@ -42,17 +42,13 @@ If we open the editor now, we should see that your audio track has been added.
 ![](@site/static/img/media/editor-audio-track.png)
 
 However, it's not always ideal to start with the audio at the beginning.
-Sometimes it's better to start with a bit of delay. This can be done by using
-the [`audioOffset`](/api/core/index/ProjectConfig#audioOffset) property and
-specifying a amount of seconds.
-
-```ts
-export default makeProject({
-  // ...
-  audio: audio,
-  audioOffset: 1.5, // delays the audio by 1.5 second
-});
-```
+Sometimes it's better to start with a bit of delay. After configuring the audio,
+you can edit the offset in the Video Settings <VideoSettings
+  className="icon-inline"
+  alt="Video Settings"
+  title="Video Settings"
+/> tab. You can also hold <kbd>SHIFT</kbd> and drag the audio track left and
+right directly on the timeline.
 
 ![](@site/static/img/media/editor-audio-track-delayed.png)
 
@@ -79,8 +75,7 @@ Then we can use Motion Canvas [`Img`](/api/2d/components/Img) component to
 display the image:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Img} from '@motion-canvas/2d/lib/components';
+import {makeScene2D, Img} from '@motion-canvas/2d';
 
 import examplePng from '../../images/example.png';
 
@@ -95,8 +90,7 @@ this, we need to create a [`Reference`](/docs/references) and pass that to the
 
 ```tsx
 // ...
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {all, createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const imageRef = createRef<Img>();
@@ -135,13 +129,12 @@ Then we can use Motion Canvas [`Video`](/api/2d/components/Video) component to
 display the video as follows:
 
 ```tsx
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Video} from '@motion-canvas/2d/lib/components';
+import {makeScene2D, Video} from '@motion-canvas/2d';
 
 import exampleMp4 from '../../videos/example.mp4';
 
 export default makeScene2D(function* (view) {
-  view.add(<Video ref={videoRef} src={exampleMp4} />);
+  view.add(<Video src={exampleMp4} />);
 });
 ```
 
@@ -150,7 +143,7 @@ the video we need to create a [`Reference`](/docs/references) to the element.
 
 ```tsx
 // ...
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {createRef} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const videoRef = createRef<Video>();

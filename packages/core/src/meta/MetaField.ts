@@ -16,6 +16,7 @@ export class MetaField<
    */
   public readonly type: any = undefined;
   public spacing = false;
+  public description = '';
 
   /**
    * Triggered when the data of this field changes.
@@ -41,10 +42,13 @@ export class MetaField<
 
   /**
    * @param name - The name of this field displayed in the editor.
-   * @param value - The initial value of this field.
+   * @param initial - The initial value of this field.
    */
-  public constructor(public readonly name: string, value: TValue) {
-    this.value = new ValueDispatcher(value);
+  public constructor(
+    public readonly name: string,
+    public readonly initial: TValue,
+  ) {
+    this.value = new ValueDispatcher(initial);
   }
 
   /**
@@ -103,6 +107,16 @@ export class MetaField<
    */
   public space(value = true): this {
     this.spacing = value;
+    return this;
+  }
+
+  /**
+   * Set the description of this field.
+   *
+   * @param description - The description.
+   */
+  public describe(description: string): this {
+    this.description = description;
     return this;
   }
 }

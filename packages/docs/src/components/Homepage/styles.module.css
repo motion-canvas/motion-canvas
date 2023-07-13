@@ -1,19 +1,32 @@
-.title {
-  font-family: var(--ifm-font-family-monospace);
-  font-size: min(3rem, 5.5vw);
+.feature {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  padding: 0 var(--ifm-spacing-horizontal);
+  margin-bottom: 4rem;
 }
 
-.title.mobile {
-  font-size: min(3rem, 7.5vw);
-  display: none;
+.feature b {
+  color: var(--ifm-color-primary);
 }
 
 .banner {
-  background: transparent;
-  padding: 4rem 0;
   text-align: center;
-  position: relative;
-  overflow: hidden;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.logo {
+  width: 100%;
+  max-width: 15rem;
+}
+
+.title {
+  font-size: 2rem;
+}
+
+.description {
+  font-size: 1.25rem;
 }
 
 .buttons {
@@ -24,25 +37,14 @@
   justify-content: center;
 }
 
-.features {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2rem;
+.wrapper {
   width: 100%;
+  max-width: 40rem;
 }
 
-.feature {
-  flex-wrap: wrap-reverse;
-  padding: 2rem 0;
-}
-
-.title b,
-.feature b {
-  color: var(--ifm-color-primary);
-}
-
-.feature.flip {
-  flex-direction: row-reverse;
+.content {
+  width: 100%;
+  max-width: 30rem;
 }
 
 .preview {
@@ -50,6 +52,8 @@
   border-radius: var(--ifm-global-radius);
   border: 1px solid var(--ifm-color-emphasis-100);
   --ifm-leading: 0;
+  width: 100%;
+  max-width: 40rem;
 }
 
 .preview iframe {
@@ -79,35 +83,41 @@
   }
 }
 
-@media screen and (max-width: 996px) {
-  .feature {
-    flex-wrap: wrap-reverse;
-    padding: 1rem 0;
-  }
-}
-
-@media screen and (max-width: 540px) {
-  .banner {
-    padding: 2rem;
+@media screen and (min-width: 640px) {
+  .logo {
+    max-width: 20rem;
   }
 
-  :global(.button) {
-    --ifm-button-size-multiplier: 1;
-  }
-}
-
-@media screen and (max-width: 400px) {
   .title {
-    display: none;
+    font-size: 3rem;
   }
 
-  .title.mobile {
-    font-size: min(3rem, 7.5vw);
-    display: block;
+  .description {
+    font-size: 1.5rem;
+  }
+}
+
+@media screen and (min-width: 960px) {
+  .feature {
+    flex-direction: row;
+    align-items: start;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .banner {
+    align-items: center;
+    text-align: start;
+    margin-top: 4rem;
+    margin-bottom: 6rem;
   }
 
   .buttons {
-    flex-direction: column;
-    align-items: stretch;
+    justify-content: start;
+  }
+
+  .wrapper {
+    margin-top: 2rem;
+    max-width: 26rem;
   }
 }

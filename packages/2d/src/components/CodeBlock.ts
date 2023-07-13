@@ -261,8 +261,8 @@ export class CodeBlock extends Shape {
     if (typeof code === 'function') throw new Error();
     if (!CodeBlock.initialized()) return;
 
-    const autoWidth = this.customWidth() === null;
-    const autoHeight = this.customHeight() === null;
+    const autoWidth = this.width.isInitial();
+    const autoHeight = this.height.isInitial();
     const fromSize = this.size();
     const toSize = this.getTokensSize(parse(code, {codeStyle: this.theme()}));
 
@@ -278,20 +278,20 @@ export class CodeBlock extends Shape {
         const remapped = clampRemap(beginning, ending, 0, 1, progress);
         this.codeProgress(progress);
         if (autoWidth) {
-          this.customWidth(easeInOutSine(remapped, fromSize.x, toSize.x));
+          this.width(easeInOutSine(remapped, fromSize.x, toSize.x));
         }
         if (autoHeight) {
-          this.customHeight(easeInOutSine(remapped, fromSize.y, toSize.y));
+          this.height(easeInOutSine(remapped, fromSize.y, toSize.y));
         }
       },
       () => {
         this.codeProgress(null);
         this.diffed = null;
         if (autoWidth) {
-          this.customWidth(null);
+          this.width.reset();
         }
         if (autoHeight) {
-          this.customHeight(null);
+          this.height.reset();
         }
         this.code(code);
       },

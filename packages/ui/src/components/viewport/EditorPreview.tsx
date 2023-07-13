@@ -9,12 +9,13 @@ import {
   useSize,
   useStorage,
   useSubscribable,
+  useSubscribableValue,
 } from '../../hooks';
 import {Debug} from './Debug';
 import {Grid} from './Grid';
 import styles from './Viewport.module.scss';
 import {ViewportContext, ViewportState} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
+import {isInspectable} from '@motion-canvas/core';
 import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
 import {PreviewStage} from './PreviewStage';
@@ -22,11 +23,16 @@ import clsx from 'clsx';
 import {Button, Select} from '../controls';
 import {Recenter, Grid as GridIcon} from '../icons';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
+import {ColorPicker} from './ColorPicker';
+import {Coordinates} from './Coordinates';
 
 const ZOOM_SPEED = 0.1;
 
 export function EditorPreview() {
-  const {player} = useApplication();
+  const {player, settings: appSettings} = useApplication();
+  const coordinateSetting = useSubscribableValue(
+    appSettings.appearance.coordinates.onChanged,
+  );
   const scene = useCurrentScene();
   const {setInspectedElement} = useInspection();
   const containerRef = useRef<HTMLDivElement>();
@@ -48,6 +54,7 @@ export function EditorPreview() {
   const state: ViewportState = useMemo(() => {
     const state = {
       grid,
+      size,
       width: size.width,
       height: size.height,
       ...position,
@@ -238,12 +245,14 @@ export function EditorPreview() {
             <Recenter />
           </Button>
           <ButtonCheckbox
-            title={'Toggle grid'}
+            title={"Toggle grid [']"}
             onChecked={setGrid}
             checked={grid}
           >
             <GridIcon />
           </ButtonCheckbox>
+          <ColorPicker />
+          {coordinateSetting && <Coordinates />}
         </div>
       </div>
     </ViewportContext.Provider>

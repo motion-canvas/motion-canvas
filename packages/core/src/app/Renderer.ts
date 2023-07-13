@@ -4,7 +4,6 @@ import type {Scene} from '../scenes';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {Stage, StageSettings} from './Stage';
 import {EventDispatcher, ValueDispatcher} from '../events';
-import {ImageExporter} from './ImageExporter';
 import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
@@ -36,10 +35,9 @@ export enum RendererResult {
  * The rendering logic used by the editor to export animations.
  *
  * @remarks
- * This class uses the {@link PlaybackManager} to render animations.
- * In contrast to a player, a renderer does not use an update loop.
- * It plays through the animation as fast as it can, occasionally pausing
- * to keep the UI responsive.
+ * This class uses the `PlaybackManager` to render animations. In contrast to a
+ * player, a renderer does not use an update loop. It plays through the
+ * animation as fast as it can, occasionally pausing to keep the UI responsive.
  *
  * The actual exporting is outsourced to an {@link Exporter}.
  */
@@ -64,7 +62,7 @@ export class Renderer {
   private readonly lock = new Semaphore();
   private readonly playback: PlaybackManager;
   private readonly status: PlaybackStatus;
-  private readonly exporter: Exporter = new ImageExporter(this.project.logger);
+  private exporter: Exporter | null = null;
   private abortController: AbortController | null = null;
 
   public constructor(private project: Project) {
@@ -102,6 +100,14 @@ export class Renderer {
     } catch (e: any) {
       this.project.logger.error(e);
       result = RendererResult.Error;
+      if (this.exporter) {
+        try {
+          await this.exporter.stop?.(result);
+        } catch (_) {
+          // do nothing
+        }
+        this.exporter = null;
+      }
     }
 
     this.state.current = RendererState.Initial;
@@ -122,22 +128,23 @@ export class Renderer {
    * Export an individual frame.
    *
    * @remarks
-   * This method always uses the default {@link ImageExporter}.
+   * This method always uses the default `ImageExporter`.
    *
    * @param settings - The rendering settings.
-   * @param frame - The frame to export.
+   * @param time - The timestamp to export.
    */
-  public async renderFrame(settings: RendererSettings, frame: number) {
+  public async renderFrame(settings: RendererSettings, time: number) {
     await this.lock.acquire();
 
     try {
+      const frame = this.status.secondsToFrames(time);
       this.stage.configure(settings);
       this.playback.fps = settings.fps;
       this.playback.state = PlaybackState.Rendering;
 
       await this.reloadScenes(settings);
       await this.playback.reset();
-      await this.playback.seek(this.status.secondsToFrames(settings.range[0]));
+      await this.playback.seek(frame);
       await this.stage.render(
         this.playback.currentScene!,
         this.playback.previousScene,
@@ -162,7 +169,23 @@ export class Renderer {
     settings: RendererSettings,
     signal: AbortSignal,
   ): Promise<RendererResult> {
-    settings = (await this.exporter.configure(settings)) ?? settings;
+    const exporterClass = this.project.meta.rendering.exporter.exporters.find(
+      exporter => exporter.id === settings.exporter.name,
+    );
+    if (!exporterClass) {
+      this.project.logger.error(
+        `Could not find the "${settings.exporter.name}" exporter.`,
+      );
+      return RendererResult.Error;
+    }
+
+    this.exporter = await exporterClass.create(this.project, settings);
+    if (this.exporter.configuration) {
+      settings = {
+        ...settings,
+        ...((await this.exporter.configuration()) ?? {}),
+      };
+    }
     this.stage.configure(settings);
     this.playback.fps = settings.fps;
     this.playback.state = PlaybackState.Rendering;
@@ -177,7 +200,7 @@ export class Renderer {
     await this.playback.seek(from);
     if (signal.aborted) return RendererResult.Aborted;
 
-    await this.exporter.start();
+    await this.exporter.start?.();
 
     let lastRefresh = performance.now();
     let result = RendererResult.Success;
@@ -208,7 +231,8 @@ export class Renderer {
       result = RendererResult.Error;
     }
 
-    await this.exporter.stop(result);
+    await this.exporter.stop?.(result);
+    this.exporter = null;
     return result;
   }
 
@@ -222,6 +246,7 @@ export class Renderer {
         resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
+      scene.variables.updateSignals(this.project.variables ?? {});
     }
   }
 
@@ -234,7 +259,7 @@ export class Renderer {
 
     const sceneFrame =
       this.playback.frame - this.playback.currentScene.firstFrame;
-    await this.exporter.handleFrame(
+    await this.exporter!.handleFrame(
       this.stage.finalBuffer,
       this.playback.frame,
       sceneFrame,

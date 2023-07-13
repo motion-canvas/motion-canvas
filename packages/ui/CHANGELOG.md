@@ -3,6 +3,124 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
+
+### Bug Fixes
+
+- **ui:** fix collapse
+  ([#698](https://github.com/motion-canvas/motion-canvas/issues/698))
+  ([6bd8703](https://github.com/motion-canvas/motion-canvas/commit/6bd8703ec9b16f55b3817f6a1f9130f17b66c69a))
+
+### Features
+
+- application settings
+  ([#697](https://github.com/motion-canvas/motion-canvas/issues/697))
+  ([54016f5](https://github.com/motion-canvas/motion-canvas/commit/54016f5cf3500abe13a217537307a3735d60f536)),
+  closes [#167](https://github.com/motion-canvas/motion-canvas/issues/167)
+- new plugin hooks
+  ([#723](https://github.com/motion-canvas/motion-canvas/issues/723))
+  ([9a2b5ab](https://github.com/motion-canvas/motion-canvas/commit/9a2b5ab8be0d001414fd00da3053d408e00fd1cd))
+- **ui:** add color picker
+  ([#691](https://github.com/motion-canvas/motion-canvas/issues/691))
+  ([a33059c](https://github.com/motion-canvas/motion-canvas/commit/a33059c0f455814919db31bc9e5e932907c797e4))
+- **ui:** include function names in stack traces
+  ([#693](https://github.com/motion-canvas/motion-canvas/issues/693))
+  ([835c0fa](https://github.com/motion-canvas/motion-canvas/commit/835c0fa4b70429db6fe96be96d6d9e44949f7f6c))
+- **ui:** new sidebar
+  ([#692](https://github.com/motion-canvas/motion-canvas/issues/692))
+  ([b555ee1](https://github.com/motion-canvas/motion-canvas/commit/b555ee1d10f8a6e1b380c043dff2717ffa01a068)),
+  closes [#492](https://github.com/motion-canvas/motion-canvas/issues/492)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.8.0](https://github.com/motion-canvas/motion-canvas/compare/v3.7.0...v3.8.0) (2023-05-13)
+
+### Bug Fixes
+
+- **2d:** fix audio offset editing
+  ([#674](https://github.com/motion-canvas/motion-canvas/issues/674))
+  ([58d6ef7](https://github.com/motion-canvas/motion-canvas/commit/58d6ef79fa06e377e0c1821efe73585586d124a6))
+
+### Features
+
+- **2d:** expand animations and reduced motion
+  ([#671](https://github.com/motion-canvas/motion-canvas/issues/671))
+  ([b8e9d03](https://github.com/motion-canvas/motion-canvas/commit/b8e9d03488f8ca7085b3e7e1b095a52f39f2bc89))
+- **2d:** visual feedback about rendering process
+  ([#681](https://github.com/motion-canvas/motion-canvas/issues/681))
+  ([d0495f5](https://github.com/motion-canvas/motion-canvas/commit/d0495f5c6396c05454a5323e4486ab4829adbc9e))
+- add new hooks for plugins
+  ([#679](https://github.com/motion-canvas/motion-canvas/issues/679))
+  ([74e18bc](https://github.com/motion-canvas/motion-canvas/commit/74e18bce71abd7e26a6415240603241b48cb36c2))
+- display array values in inspector
+  ([#670](https://github.com/motion-canvas/motion-canvas/issues/670))
+  ([e71d74c](https://github.com/motion-canvas/motion-canvas/commit/e71d74c9c04995393ad8ee942b8e6e5baa6f982f))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.7.0](https://github.com/motion-canvas/motion-canvas/compare/v3.6.2...v3.7.0) (2023-05-10)
+
+### Features
+
+- button for opening the output directory
+  ([#663](https://github.com/motion-canvas/motion-canvas/issues/663))
+  ([79f320c](https://github.com/motion-canvas/motion-canvas/commit/79f320c07c422ca927b34bf339094fe0e70ffd0d))
+- meta field descriptions
+  ([#664](https://github.com/motion-canvas/motion-canvas/issues/664))
+  ([80c9d07](https://github.com/motion-canvas/motion-canvas/commit/80c9d07f88f4a3df0f99e5741b31313f891a5d51))
+- **ui:** improve rendering button
+  ([#662](https://github.com/motion-canvas/motion-canvas/issues/662))
+  ([2b4ae70](https://github.com/motion-canvas/motion-canvas/commit/2b4ae70ea0b0305fbb2596e95bbc70440718bbe2))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.6.1](https://github.com/motion-canvas/motion-canvas/compare/v3.6.0...v3.6.1) (2023-05-08)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.6.0](https://github.com/motion-canvas/motion-canvas/compare/v3.5.1...v3.6.0) (2023-05-08)
+
+### Bug Fixes
+
+- **ui:** fix snapshot
+  ([#643](https://github.com/motion-canvas/motion-canvas/issues/643))
+  ([590216a](https://github.com/motion-canvas/motion-canvas/commit/590216ac094d6b6ef3e9c773499bc52063f617b1))
+- **ui:** fix typo in viewport ID
+  ([#620](https://github.com/motion-canvas/motion-canvas/issues/620))
+  ([3a83f20](https://github.com/motion-canvas/motion-canvas/commit/3a83f20cb1b8ddc7b95a8e36bf6f3d0cd036693b))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.5.0](https://github.com/motion-canvas/motion-canvas/compare/v3.4.0...v3.5.0) (2023-04-06)
+
+### Bug Fixes
+
+- **2d:** fix version link
+  ([#608](https://github.com/motion-canvas/motion-canvas/issues/608))
+  ([4fe5b7a](https://github.com/motion-canvas/motion-canvas/commit/4fe5b7a5150fbdf43ea50ecf3dc8b4690c0e2e34))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.4.0](https://github.com/motion-canvas/motion-canvas/compare/v3.3.4...v3.4.0) (2023-03-28)
 
 ### Bug Fixes

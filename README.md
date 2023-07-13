@@ -1,14 +1,17 @@
 <br/>
 <p align="center">
   <a href="https://motion-canvas.github.io">
-    <img width="180" src="https://motion-canvas.github.io/img/logo_dark.svg" alt="Vite logo">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://motion-canvas.github.io/img/logo_dark.svg">
+      <img width="180" alt="Motion Canvas logo" src="https://motion-canvas.github.io/img/logo.svg">
+    </picture>
   </a>
 </p>
 <p align="center">
   <a href="https://lerna.js.org"><img src="https://img.shields.io/badge/published%20with-lerna-c084fc?style=flat" alt="published with lerna"></a>
-  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/powered%20by-vite-646cff?style=flat" alt="powered by lerna"></a>
+  <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/powered%20by-vite-646cff?style=flat" alt="powered by vite"></a>
   <a href="https://www.npmjs.com/package/@motion-canvas/core"><img src="https://img.shields.io/npm/v/@motion-canvas/core?style=flat" alt="npm package version"></a>
-  <a href="https://discord.gg/XnnWTrHYAW"><img src="https://img.shields.io/discord/1071029581009657896?style=flat&logo=discord&logoColor=fff&color=404eed" alt="discord"></a>
+  <a href="https://chat.motioncanvas.io"><img src="https://img.shields.io/discord/1071029581009657896?style=flat&logo=discord&logoColor=fff&color=404eed" alt="discord"></a>
 </p>
 <br/>
 
@@ -52,23 +55,22 @@ packages.
 
 ### Developing Core & 2D
 
-When developing the core, start both `core:watch` and `template:serve`.
+When developing the core, start both `core:dev` and `template:dev`.
 
 This will pick up any changes you make to the core package, automatically
 rebuild the `template` project and refresh the page.
 
-Similarly, when developing the 2D package, start `2d:watch` and
-`template:serve`.
+Similarly, when developing the 2D package, start `2d:dev` and `template:dev`.
 
 ### Developing UI
 
 If you want to develop the UI, first build the template project by running:
-`template:build`. Next, start `ui:serve`.
+`template:build`. Next, start `ui:dev`.
 
 ### Developing Player
 
 Like with UI, to develop the player, first build the template: `template:build`.
-Then, start `player:serve`.
+Then, start `player:dev`.
 
 ## Contributing
 
@@ -78,5 +80,5 @@ help make Motion Canvas better.
 [authenticate]:
   https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token
 [template]: https://github.com/motion-canvas/project-template#using-the-template
-[discord]: https://discord.gg/XnnWTrHYAW
+[discord]: https://chat.motioncanvas.io
 [docs]: https://motioncanvas.io/docs/quickstart

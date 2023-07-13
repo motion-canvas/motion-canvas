@@ -6,27 +6,29 @@
   ],
   "scripts": {
     "prepare": "husky install",
+    "core:dev": "npm run dev -w packages/core",
     "core:build": "npm run build -w packages/core",
-    "core:watch": "npm run watch -w packages/core",
+    "core:bundle": "npm run bundle -w packages/core",
     "core:test": "npm run test -w packages/core",
+    "2d:dev": "npm run dev -w packages/2d",
     "2d:build": "npm run build -w packages/2d",
-    "2d:watch": "npm run watch -w packages/2d",
+    "2d:bundle": "npm run bundle -w packages/2d",
     "2d:test": "npm run test -w packages/2d",
+    "ui:dev": "npm run dev -w packages/ui",
     "ui:build": "npm run build -w packages/ui",
-    "ui:serve": "npm run dev -w packages/ui",
     "ui:showcase": "npm run showcase -w packages/ui",
     "ui:type": "npm run type -w packages/ui",
-    "template:serve": "npm run serve -w packages/template",
+    "template:dev": "npm run dev -w packages/template",
     "template:build": "npm run build -w packages/template",
-    "examples:serve": "npm run serve -w packages/examples",
+    "examples:dev": "npm run dev -w packages/examples",
     "examples:build": "npm run build -w packages/examples",
-    "player:serve": "npm run serve -w packages/player",
+    "player:dev": "npm run dev -w packages/player",
     "player:build": "npm run build -w packages/player",
-    "docs:start": "npm run start -w packages/docs",
+    "docs:dev": "npm run dev -w packages/docs",
     "docs:build": "npm run build -w packages/docs",
     "docs:blog": "npm run blog -w packages/docs",
+    "vite-plugin:dev": "npm run dev -w packages/vite-plugin",
     "vite-plugin:build": "npm run build -w packages/vite-plugin",
-    "vite-plugin:watch": "npm run watch -w packages/vite-plugin",
     "e2e:test": "npm run test -w packages/e2e",
     "eslint": "eslint \"**/*.ts?(x)\"",
     "eslint:fix": "eslint --fix \"**/*.ts?(x)\"",
@@ -50,8 +52,5 @@
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",
     "*.{js,jsx,ts,tsx,md,scss}": "prettier --write"
-  },
-  "dependencies": {
-    "@motion-canvas/core": "^3.0.0"
   }
 }

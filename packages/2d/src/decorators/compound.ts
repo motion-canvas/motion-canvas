@@ -1,9 +1,13 @@
 import {useLogger} from '@motion-canvas/core/lib/utils';
 import {getPropertyMetaOrCreate} from './signal';
 import {addInitializer} from './initializers';
-import {deepLerp} from '@motion-canvas/core/lib/tweening';
-import {CompoundSignalContext} from '@motion-canvas/core/lib/signals';
-import {patchSignal} from '../utils/patchSignal';
+import {deepLerp, map} from '@motion-canvas/core/lib/tweening';
+import {
+  CompoundSignalContext,
+  SignalContext,
+} from '@motion-canvas/core/lib/signals';
+import {makeSignalExtensions} from '../utils/makeSignalExtensions';
+import {modify} from '@motion-canvas/core/lib/signals/utils';
 
 /**
  * Create a compound property decorator.
@@ -41,21 +45,27 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
         return;
       }
 
+      const initial = meta.default;
+      const parser = meta.parser.bind(instance);
       const signalContext = new CompoundSignalContext(
-        Object.keys(entries),
-        meta.parser,
-        meta.default,
+        meta.compoundEntries.map(([key, property]) => {
+          const signal = new SignalContext(
+            modify(initial, value => parser(value)[key]),
+            <any>map,
+            instance,
+            undefined,
+            makeSignalExtensions(undefined, instance, property),
+          ).toSignal();
+          return [key, signal];
+        }),
+        parser,
+        initial,
         meta.interpolationFunction ?? deepLerp,
         instance,
+        makeSignalExtensions(meta, instance, <string>key),
       );
-      patchSignal(signalContext, meta.parser, instance, <string>key);
-      const signal = signalContext.toSignal();
 
-      for (const [key, property] of meta.compoundEntries) {
-        patchSignal(signal[key].context, undefined, instance, property);
-      }
-
-      instance[key] = signal;
+      instance[key] = signalContext.toSignal();
     });
   };
 }

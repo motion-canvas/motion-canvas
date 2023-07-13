@@ -29,10 +29,7 @@ function createProjectMetadata(project: Project) {
       fps: new NumberMetaField('frame rate', 60).setPresets(FrameRates),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
       colorSpace: new EnumMetaField('color space', ColorSpaces),
-      exporter: new ExporterMetaField(
-        'exporter',
-        project.plugins.flatMap(plugin => plugin.exporters?.(project) ?? []),
-      ),
+      exporter: new ExporterMetaField('exporter', project),
     }),
   };
 

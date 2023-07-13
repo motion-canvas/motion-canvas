@@ -1,0 +1,72 @@
+---
+slug: /rendering/video
+---
+
+# Video (FFmpeg)
+
+An exporter that uses [FFmpeg](https://ffmpeg.org/) to turn your animation into
+a finished video.
+
+The exporter is still relatively new and may not have all the features you need.
+If you have an idea for how to improve it, feel free to [open a feature
+request][issues] on GitHub.
+
+## Installation
+
+:::info
+
+You do **not** need to install FFmpeg yourself. It will be installed
+automatically together with the exporter.
+
+:::
+
+### New project
+
+When [scaffolding a new project](/docs/quickstart#creating-a-new-project), you
+can select _Video (FFmpeg)_ in the list of available exporters. This will
+automatically install the required dependencies and add the necessary
+configuration.
+
+### Existing project
+
+If you want to install the exporter in an existing project, run the following
+command:
+
+```bash
+npm install --save @motion-canvas/ffmpeg
+```
+
+And then configure it in your `vite.config.ts` file:
+
+```diff
+  import {defineConfig} from 'vite';
+  import motionCanvas from '@motion-canvas/vite-plugin';
++ import ffmpeg from '@motion-canvas/ffmpeg';
+
+  export default defineConfig({
+    plugins: [
+      motionCanvas(),
++     ffmpeg(),
+    ],
+  });
+```
+
+## Configuration
+
+After selecting the Video (FFmpeg) exporter in the Video Settings tab, the
+following configuration options will become available:
+
+### Include audio
+
+When enabled, the audio track will be included in the rendered video. This
+option is only available if you've [set up audio](/docs/media#audio) for the
+current project.
+
+### Fast start
+
+When enabled, the video will be rendered with the Fast Start option. It's an
+optimization for videos that will be served over the web. It rearranges the
+video data in the file, allowing the video to begin playing before it has
+finished downloading.
+
+[issues]: https://github.com/motion-canvas/exporters/issues/new/choose

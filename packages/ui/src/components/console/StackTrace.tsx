@@ -14,7 +14,7 @@ export function StackTrace({entries}: StackTraceProps) {
         <div
           className={clsx(styles.entry, entry.isExternal && styles.external)}
         >
-          at (
+          at {entry.functionName} (
           {entry.isExternal ? (
             `${entry.file}:${entry.line}:${entry.column}`
           ) : (

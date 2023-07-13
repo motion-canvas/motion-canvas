@@ -1,6 +1,7 @@
-import {Group, Input, InputSelect, Label} from '../controls';
+import {Input, InputSelect} from '../controls';
 import {useSubscribableValue} from '../../hooks';
 import type {StringMetaField} from '@motion-canvas/core/lib/meta';
+import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface StringMetaFieldViewProps {
   field: StringMetaField;
@@ -11,8 +12,7 @@ export function StringMetaFieldView({field}: StringMetaFieldViewProps) {
   const presets = field.getPresets();
 
   return (
-    <Group>
-      <Label>{field.name}</Label>
+    <MetaFieldGroup field={field}>
       {presets.length > 0 ? (
         <InputSelect
           value={value}
@@ -29,6 +29,6 @@ export function StringMetaFieldView({field}: StringMetaFieldViewProps) {
           }}
         />
       )}
-    </Group>
+    </MetaFieldGroup>
   );
 }

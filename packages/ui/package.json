@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "3.4.0",
+  "version": "3.9.0",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
   "types": "types/main.d.ts",
@@ -25,10 +25,11 @@
     "types"
   ],
   "dependencies": {
-    "@motion-canvas/core": "^3.4.0"
+    "@motion-canvas/core": "^3.9.0"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.5.0",
+    "@preact/signals": "^1.1.3",
     "clsx": "^1.2.1",
     "highlight.js": "^11.7.0",
     "preact": "^10.13.0",

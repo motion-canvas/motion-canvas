@@ -1,20 +1,42 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 
 :root {
   --theme: #33a6ff;
-  --theme-overlay: rgba(51, 166, 255, 0.24);
+  --theme-light: #52bbff;
+  --theme-overlay: rgba(51, 166, 255, 0.16);
   --background-color: #181818;
   --background-color-dark: #141414;
   --surface-color: #242424;
   --surface-color-light: #444444;
   --surface-color-hover: #333333;
+  --border-color: var(--background-color-dark);
   --scrollbar-background: var(--surface-color);
   --input-background: var(--surface-color-light);
   --input-background-hover: var(--surface-color-hover);
+  --radius: 4px;
+
+  --timing-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --timing-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-normal: 0.2s;
+  --duration-fast: 0.1s;
+
+  --font-family: 'Roboto', sans-serif;
+  --font-family-mono: 'JetBrains Mono', monospace;
+  --font-size: 14px;
+  --font-size-small: 12px;
+  --font-size-big: 16px;
 
   --red: #e13238;
   --yellow: #e6a700;
   --blue: #4cb3d4;
+}
+
+@media (prefers-reduced-motion) {
+  :root {
+    --duration-normal: 0;
+    --duration-fast: 0;
+  }
 }
 
 .wait * {
@@ -23,8 +45,6 @@
 
 * {
   box-sizing: border-box;
-  font-family: 'JetBrains Mono', sans-serif;
-  font-size: 14px;
   accent-color: var(--theme);
 
   &::-webkit-scrollbar {
@@ -46,6 +66,9 @@
 
 html,
 body {
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: 24px;
   overflow: hidden;
   padding: 0;
   margin: 0;
@@ -61,6 +84,19 @@ main {
   justify-content: center;
 }
 
+button,
+input,
+select {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+code,
+pre {
+  font-family: var(--font-family-mono);
+}
+
 svg {
   display: block;
   width: 24px;
@@ -72,4 +108,31 @@ button {
   appearance: none;
   border: 0;
   padding: 0;
+}
+
+.loading {
+  --loading-stripe-color: var(--surface-color-hover);
+
+  background-image: linear-gradient(
+    45deg,
+    var(--loading-stripe-color) 25%,
+    #0000 25%,
+    #0000 50%,
+    var(--loading-stripe-color) 50%,
+    var(--loading-stripe-color) 75%,
+    #0000 75%,
+    #0000 100%
+  );
+
+  background-size: 22.63px 22.63px;
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 22.63px 0;
+  }
 }

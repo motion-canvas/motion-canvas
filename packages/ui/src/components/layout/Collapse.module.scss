@@ -1,0 +1,5 @@
+.root {
+  height: 0;
+  overflow: hidden;
+  transition: height var(--duration-normal) var(--timing-ease-in-out);
+}
