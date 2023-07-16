@@ -35,9 +35,8 @@ function getIdMap<T extends Idable>(list: T[]) {
   const map = new Map<string, TransformDiffItem<T>[]>();
   let before: T | undefined = undefined;
   for (const [index, current] of list.entries()) {
-    let currentArray = map.get(current.id);
-    if (!currentArray) {
-      currentArray = [];
+    const currentArray = map.get(current.id) ?? [];
+    if (!map.has(current.id)) {
       map.set(current.id, currentArray);
     }
 
