@@ -62,9 +62,12 @@ export class SVG extends Shape {
   })
   protected static containerElement: HTMLDivElement;
   private static svgNodesPool: Record<string, SVGDocumentData> = {};
+
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
+
   public wrapper: Node;
+
   private lastTweenTargetSrc: string | null = null;
   private lastTweenTargetDocument: SVGDocument | null = null;
 
@@ -75,6 +78,12 @@ export class SVG extends Shape {
     this.add(this.wrapper);
   }
 
+  public getChildrenById(id: string) {
+    return this.document()
+      .nodes.filter(node => node.id === id)
+      .map(({shape}) => shape);
+  }
+
   protected override desiredSize(): SerializedVector2<DesiredLength> {
     const custom = super.desiredSize();
     const {x, y} = this.document().size.mul(this.wrapper.scale());
@@ -82,6 +91,162 @@ export class SVG extends Shape {
       x: custom.x ?? x,
       y: custom.y ?? y,
     };
+  }
+
+  protected buildDocument(data: SVGDocumentData): SVGDocument {
+    return {
+      size: data.size,
+      nodes: data.nodes.map(ch => this.buildShape(ch)),
+    };
+  }
+
+  protected buildShape({id, type, props, children}: SVGShapeData): SVGShape {
+    return {
+      id,
+      shape: new type({
+        children: children?.map(ch => this.buildShape(ch).shape),
+        ...this.processElementStyle(props),
+      }),
+    };
+  }
+
+  protected parseSVG(svg: string): SVGDocument {
+    return this.buildDocument(SVG.parseSVGData(svg));
+  }
+
+  protected *generateTransformator(
+    from: Node,
+    to: Node,
+    time: number,
+    timing: TimingFunction,
+  ): Generator<ThreadGenerator> {
+    yield from.position(to.position(), time, timing);
+    yield from.scale(to.scale(), time, timing);
+    yield from.rotation(to.rotation(), time, timing);
+    if (
+      from instanceof Path &&
+      to instanceof Path &&
+      from.data() !== to.data()
+    ) {
+      yield from.data(to.data(), time, timing);
+    }
+    if (from instanceof Layout && to instanceof Layout) {
+      yield from.size(to.size(), time, timing);
+    }
+    if (from instanceof Shape && to instanceof Shape) {
+      yield from.fill(to.fill(), time, timing);
+      yield from.stroke(to.stroke(), time, timing);
+      yield from.lineWidth(to.lineWidth(), time, timing);
+    }
+
+    const fromChildren = from.children();
+    const toChildren = to.children();
+    for (let i = 0; i < fromChildren.length; i++) {
+      yield* this.generateTransformator(
+        fromChildren[i],
+        toChildren[i],
+        time,
+        timing,
+      );
+    }
+  }
+
+  @threadable()
+  protected *tweenSvg(
+    value: SignalValue<string>,
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const newValue = typeof value === 'string' ? value : value();
+    const newSVG = this.parseSVG(newValue);
+    const currentSVG = this.document();
+    const diff = getTransformDiff(currentSVG.nodes, newSVG.nodes);
+
+    this.lastTweenTargetSrc = newValue;
+    this.lastTweenTargetDocument = newSVG;
+
+    const applyResult = applyTransformDiff(
+      currentSVG.nodes,
+      diff,
+      ({shape, ...rest}) => ({
+        ...rest,
+        shape: shape.clone(),
+      }),
+    );
+    this.wrapper.children(currentSVG.nodes.map(shape => shape.shape));
+    for (const {item} of applyResult.inserted) {
+      item.current.shape.parent(this.wrapper);
+    }
+
+    const beginning = 0.2;
+    const ending = 0.8;
+    const overlap = 0.15;
+
+    const transformator: ThreadGenerator[] = [];
+    const transformatorTime = (ending - beginning) * time;
+    const transformatorDelay = beginning * time;
+
+    for (const item of diff.transformed) {
+      transformator.push(
+        ...this.generateTransformator(
+          item.from.current.shape,
+          item.to.current.shape,
+          transformatorTime,
+          timingFunction,
+        ),
+      );
+    }
+
+    const autoWidth = this.width.isInitial();
+    const autoHeight = this.height.isInitial();
+
+    const baseTween = tween(
+      time,
+      value => {
+        const progress = timingFunction(value);
+        const remapped = clampRemap(beginning, ending, 0, 1, progress);
+
+        const scale = this.wrapper.scale();
+        if (autoWidth) {
+          this.width(
+            easeInOutSine(remapped, currentSVG.size.x, newSVG.size.x) * scale.x,
+          );
+        }
+
+        if (autoHeight) {
+          this.height(
+            easeInOutSine(remapped, currentSVG.size.y, newSVG.size.y) * scale.y,
+          );
+        }
+
+        const deletedOpacity = clampRemap(
+          0,
+          beginning + overlap,
+          1,
+          0,
+          progress,
+        );
+        for (const {current} of diff.deleted) {
+          current.shape.opacity(deletedOpacity);
+        }
+
+        const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
+        for (const {current} of diff.inserted) {
+          current.shape.opacity(insertedOpacity);
+        }
+      },
+      () => {
+        this.wrapper.children(this.documentNodes);
+        if (autoWidth) this.width.reset();
+        if (autoHeight) this.height.reset();
+
+        for (const {current} of diff.deleted) current.shape.dispose();
+        for (const {from} of diff.transformed) {
+          from.current.shape.dispose();
+        }
+      },
+    );
+    yield* all(baseTween, delay(transformatorDelay, all(...transformator)));
   }
 
   @computed()
@@ -103,44 +268,6 @@ export class SVG extends Shape {
     return this.document().nodes.map(node => node.shape);
   }
 
-  public getChildrenById(id: string) {
-    return this.document()
-      .nodes.filter(node => node.id === id)
-      .map(({shape}) => shape);
-  }
-
-  protected buildDocument(data: SVGDocumentData): SVGDocument {
-    return {
-      size: data.size,
-      nodes: data.nodes.map(ch => this.buildShape(ch)),
-    };
-  }
-
-  protected buildShape({id, type, props, children}: SVGShapeData): SVGShape {
-    return {
-      id,
-      shape: new type({
-        children: children?.map(ch => this.buildShape(ch).shape),
-        ...this.processElementStyle(props),
-      }),
-    };
-  }
-
-  private static processSVGColor(
-    color: SignalValue<PossibleCanvasStyle> | undefined,
-  ): SignalValue<PossibleCanvasStyle> | undefined {
-    if (color === 'transparent' || color === 'none') {
-      return {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 0,
-      };
-    }
-
-    return color;
-  }
-
   private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
     return {
       fill: fill === 'currentColor' ? this.fill : SVG.processSVGColor(fill),
@@ -148,10 +275,6 @@ export class SVG extends Shape {
         stroke === 'currentColor' ? this.stroke : SVG.processSVGColor(stroke),
       ...rest,
     };
-  }
-
-  protected parseSVG(svg: string): SVGDocument {
-    return this.buildDocument(SVG.parseSVGData(svg));
   }
 
   protected static parseSVGData(svg: string) {
@@ -207,6 +330,44 @@ export class SVG extends Shape {
     return builder;
   }
 
+  protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
+    const position = {
+      x: transform.m41,
+      y: transform.m42,
+    };
+    const rotation = (Math.atan2(transform.m12, transform.m11) * 180) / Math.PI;
+    const scale = {
+      x: Vector2.magnitude(transform.m11, transform.m12),
+      y: Vector2.magnitude(transform.m21, transform.m22),
+    };
+    const determinant =
+      transform.m11 * transform.m22 - transform.m12 * transform.m21;
+    if (determinant < 0) {
+      if (transform.m11 < transform.m22) scale.x = -scale.x;
+      else scale.y = -scale.y;
+    }
+    return {
+      position,
+      rotation,
+      scale,
+    };
+  }
+
+  private static processSVGColor(
+    color: SignalValue<PossibleCanvasStyle> | undefined,
+  ): SignalValue<PossibleCanvasStyle> | undefined {
+    if (color === 'transparent' || color === 'none') {
+      return {
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
+      };
+    }
+
+    return color;
+  }
+
   private static getElementTransformation(
     element: SVGGraphicsElement,
     parentTransform: DOMMatrix,
@@ -232,29 +393,6 @@ export class SVG extends Shape {
         ? parseFloat(element.getAttribute('stroke-width')!)
         : inheritedStyle.lineWidth,
       layout: false,
-    };
-  }
-
-  protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
-    const position = {
-      x: transform.m41,
-      y: transform.m42,
-    };
-    const rotation = (Math.atan2(transform.m12, transform.m11) * 180) / Math.PI;
-    const scale = {
-      x: Vector2.magnitude(transform.m11, transform.m12),
-      y: Vector2.magnitude(transform.m21, transform.m22),
-    };
-    const determinant =
-      transform.m11 * transform.m22 - transform.m12 * transform.m21;
-    if (determinant < 0) {
-      if (transform.m11 < transform.m22) scale.x = -scale.x;
-      else scale.y = -scale.y;
-    }
-    return {
-      position,
-      rotation,
-      scale,
     };
   }
 
@@ -421,140 +559,5 @@ export class SVG extends Shape {
         } as ImgProps,
       };
     }
-  }
-
-  protected *generateTransformator(
-    from: Node,
-    to: Node,
-    time: number,
-    timing: TimingFunction,
-  ): Generator<ThreadGenerator> {
-    yield from.position(to.position(), time, timing);
-    yield from.scale(to.scale(), time, timing);
-    yield from.rotation(to.rotation(), time, timing);
-    if (
-      from instanceof Path &&
-      to instanceof Path &&
-      from.data() !== to.data()
-    ) {
-      yield from.data(to.data(), time, timing);
-    }
-    if (from instanceof Layout && to instanceof Layout) {
-      yield from.size(to.size(), time, timing);
-    }
-    if (from instanceof Shape && to instanceof Shape) {
-      yield from.fill(to.fill(), time, timing);
-      yield from.stroke(to.stroke(), time, timing);
-      yield from.lineWidth(to.lineWidth(), time, timing);
-    }
-
-    const fromChildren = from.children();
-    const toChildren = to.children();
-    for (let i = 0; i < fromChildren.length; i++) {
-      yield* this.generateTransformator(
-        fromChildren[i],
-        toChildren[i],
-        time,
-        timing,
-      );
-    }
-  }
-
-  @threadable()
-  protected *tweenSvg(
-    value: SignalValue<string>,
-    time: number,
-    timingFunction: TimingFunction,
-  ) {
-    const newValue = typeof value === 'string' ? value : value();
-    const newSVG = this.parseSVG(newValue);
-    const currentSVG = this.document();
-    const diff = getTransformDiff(currentSVG.nodes, newSVG.nodes);
-
-    this.lastTweenTargetSrc = newValue;
-    this.lastTweenTargetDocument = newSVG;
-
-    const applyResult = applyTransformDiff(
-      currentSVG.nodes,
-      diff,
-      ({shape, ...rest}) => ({
-        ...rest,
-        shape: shape.clone(),
-      }),
-    );
-    this.wrapper.children(currentSVG.nodes.map(shape => shape.shape));
-    for (const {item} of applyResult.inserted) {
-      item.current.shape.parent(this.wrapper);
-    }
-
-    const beginning = 0.2;
-    const ending = 0.8;
-    const overlap = 0.15;
-
-    const transformator: ThreadGenerator[] = [];
-    const transformatorTime = (ending - beginning) * time;
-    const transformatorDelay = beginning * time;
-
-    for (const item of diff.transformed) {
-      transformator.push(
-        ...this.generateTransformator(
-          item.from.current.shape,
-          item.to.current.shape,
-          transformatorTime,
-          timingFunction,
-        ),
-      );
-    }
-
-    const autoWidth = this.width.isInitial();
-    const autoHeight = this.height.isInitial();
-
-    const baseTween = tween(
-      time,
-      value => {
-        const progress = timingFunction(value);
-        const remapped = clampRemap(beginning, ending, 0, 1, progress);
-
-        const scale = this.wrapper.scale();
-        if (autoWidth) {
-          this.width(
-            easeInOutSine(remapped, currentSVG.size.x, newSVG.size.x) * scale.x,
-          );
-        }
-
-        if (autoHeight) {
-          this.height(
-            easeInOutSine(remapped, currentSVG.size.y, newSVG.size.y) * scale.y,
-          );
-        }
-
-        const deletedOpacity = clampRemap(
-          0,
-          beginning + overlap,
-          1,
-          0,
-          progress,
-        );
-        for (const {current} of diff.deleted) {
-          current.shape.opacity(deletedOpacity);
-        }
-
-        const insertedOpacity = clampRemap(ending - overlap, 1, 0, 1, progress);
-        for (const {current} of diff.inserted) {
-          current.shape.opacity(insertedOpacity);
-        }
-      },
-      () => {
-        this.wrapper.children(this.documentNodes);
-        if (autoWidth) this.width.reset();
-        if (autoHeight) this.height.reset();
-
-        for (const {current} of diff.deleted) current.shape.dispose();
-        for (const {from} of diff.transformed) {
-          from.current.shape.dispose();
-        }
-      },
-    );
-    yield* all(baseTween, delay(transformatorDelay, all(...transformator)));
   }
 }
