@@ -1,6 +1,7 @@
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {
   BBox,
+  Matrix2D,
   PossibleSpacing,
   SerializedVector2,
   Vector2,
@@ -409,19 +410,17 @@ export class SVG extends Shape {
    * @returns MotionCanvas Shape properties
    */
   protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
-    const position = {
-      x: transform.m41,
-      y: transform.m42,
-    };
-    const rotation = (Math.atan2(transform.m12, transform.m11) * 180) / Math.PI;
+    const matrix2 = new Matrix2D(transform);
+
+    const position = matrix2.translation;
+    const rotation = matrix2.rotation;
+    // matrix.scaling can give incorrect result when matrix contain skew operation
     const scale = {
-      x: Vector2.magnitude(transform.m11, transform.m12),
-      y: Vector2.magnitude(transform.m21, transform.m22),
+      x: matrix2.x.magnitude,
+      y: matrix2.y.magnitude,
     };
-    const determinant =
-      transform.m11 * transform.m22 - transform.m12 * transform.m21;
-    if (determinant < 0) {
-      if (transform.m11 < transform.m22) scale.x = -scale.x;
+    if (matrix2.determinant < 0) {
+      if (matrix2.values[0] < matrix2.values[3]) scale.x = -scale.x;
       else scale.y = -scale.y;
     }
     return {
