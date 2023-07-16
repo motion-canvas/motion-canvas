@@ -438,8 +438,11 @@ export class SVG extends Shape {
     } else if (child.tagName === 'use') {
       const hrefElement = svgRoot.querySelector(
         (child as SVGUseElement).href.baseVal,
-      )!;
-      if (!(hrefElement instanceof SVGGraphicsElement)) return;
+      );
+      if (!(hrefElement instanceof SVGGraphicsElement)) {
+        useLogger().warn(`invalid SVG use tag. element "${child.outerHTML}"`);
+        return;
+      }
 
       yield* SVG.extractElementNodes(
         hrefElement,
