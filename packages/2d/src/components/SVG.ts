@@ -28,11 +28,20 @@ import {Line, LineProps} from './Line';
 import {Img, ImgProps} from './Img';
 import {applyTransformDiff, getTransformDiff} from '../utils/diff';
 
+/**
+ * Represent SVG shape.
+ * This only used single time because `node` may have reference to parent SVG renderer.
+ */
 export interface SVGShape {
   id: string;
   shape: Node;
 }
 
+/**
+ * Data of SVGShape.
+ * This can used many times  because it do not reference parent SVG.
+ * This must build into SVGShape
+ */
 export interface SVGShapeData {
   id: string;
   type: new (props: NodeProps) => Node;
@@ -40,11 +49,20 @@ export interface SVGShapeData {
   children?: SVGShapeData[];
 }
 
+/**
+ * Represent SVG document that contains SVG shapes.
+ * This only used single time because `nodes` have reference to parent SVG renderer.
+ */
 export interface SVGDocument {
   size: Vector2;
   nodes: SVGShape[];
 }
 
+/**
+ * Data of SVGDocument.
+ * This can used many times because it do not reference parent SVG.
+ * This must build into SVGDocument
+ */
 export interface SVGDocumentData {
   size: Vector2;
   nodes: SVGShapeData[];
@@ -54,6 +72,10 @@ export interface SVGProps extends ShapeProps {
   svg?: SignalValue<string>;
 }
 
+/**
+ * Node to render and animating SVG.
+ * You should use Image node if you do not want to animate children.
+ */
 export class SVG extends Shape {
   @lazy(() => {
     const element = document.createElement('div');
@@ -63,9 +85,15 @@ export class SVG extends Shape {
   protected static containerElement: HTMLDivElement;
   private static svgNodesPool: Record<string, SVGDocumentData> = {};
 
+  /**
+   * SVG string to be rendered
+   */
   @signal()
   public declare readonly svg: SimpleSignal<string, this>;
 
+  /**
+   * Child to wrap all SVG node
+   */
   public wrapper: Node;
 
   private lastTweenTargetSrc: string | null = null;
@@ -78,6 +106,11 @@ export class SVG extends Shape {
     this.add(this.wrapper);
   }
 
+  /**
+   * Get SVG node by id.
+   * @param id - id
+   * @returns list of Node that have matched id
+   */
   public getChildrenById(id: string) {
     return this.document()
       .nodes.filter(node => node.id === id)
@@ -93,6 +126,11 @@ export class SVG extends Shape {
     };
   }
 
+  /**
+   * Convert SVGDocumentData into SVGDocument
+   * @param data - SVGDocumentData
+   * @returns SVGDocument
+   */
   protected buildDocument(data: SVGDocumentData): SVGDocument {
     return {
       size: data.size,
@@ -100,6 +138,11 @@ export class SVG extends Shape {
     };
   }
 
+  /**
+   * Build SVGShapeData into SVGShape
+   * @param data - SVGShapeData
+   * @returns SVGShape
+   */
   protected buildShape({id, type, props, children}: SVGShapeData): SVGShape {
     return {
       id,
@@ -110,10 +153,22 @@ export class SVG extends Shape {
     };
   }
 
+  /**
+   * Parse SVG as SVGDocument
+   * @param svg - svg string to be parsed
+   * @returns - SVGDocument
+   */
   protected parseSVG(svg: string): SVGDocument {
     return this.buildDocument(SVG.parseSVGData(svg));
   }
 
+  /**
+   * Create tweening list to tween node from initial node to final node.
+   * @param from - Initial node
+   * @param to - Final node
+   * @param time - time for tweening
+   * @param timing - timing for tweening
+   */
   protected *generateTransformator(
     from: Node,
     to: Node,
@@ -249,6 +304,10 @@ export class SVG extends Shape {
     yield* all(baseTween, delay(transformatorDelay, all(...transformator)));
   }
 
+  /**
+   * Get current SVGDocument
+   * @returns
+   */
   @computed()
   private document(): SVGDocument {
     try {
@@ -263,11 +322,19 @@ export class SVG extends Shape {
     }
   }
 
+  /**
+   * Get current document nodes
+   */
   @computed()
   private documentNodes() {
     return this.document().nodes.map(node => node.shape);
   }
 
+  /**
+   * Convert SVG color in Shape properties into MotionCanvas color.
+   * @param param - Shape properties
+   * @returns Converted Shape properties
+   */
   private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
     return {
       fill: fill === 'currentColor' ? this.fill : SVG.processSVGColor(fill),
@@ -276,6 +343,12 @@ export class SVG extends Shape {
       ...rest,
     };
   }
+
+  /**
+   * Parse SVG as SVGDocumentData
+   * @param svg - svg string to be parsed
+   * @returns SVGDocumentData that can be used to build SVGDocument
+   */
 
   protected static parseSVGData(svg: string) {
     const cached = SVG.svgNodesPool[svg];
@@ -330,6 +403,11 @@ export class SVG extends Shape {
     return builder;
   }
 
+  /**
+   * Get position, rotation and scale from Matrix transformation as Shape properties
+   * @param transform - Matrix transformation
+   * @returns MotionCanvas Shape properties
+   */
   protected static getMatrixTransformation(transform: DOMMatrix): ShapeProps {
     const position = {
       x: transform.m41,
@@ -353,6 +431,11 @@ export class SVG extends Shape {
     };
   }
 
+  /**
+   * Convert SVG color into MotionCanvas color
+   * @param color - SVG color
+   * @returns MotionCanvas color
+   */
   private static processSVGColor(
     color: SignalValue<PossibleCanvasStyle> | undefined,
   ): SignalValue<PossibleCanvasStyle> | undefined {
@@ -368,6 +451,12 @@ export class SVG extends Shape {
     return color;
   }
 
+  /**
+   * Get final SVG element transformation.
+   * @param element - SVG element
+   * @param parentTransform - Tranformation that applied into children
+   * @returns - Current SVG element final transformation
+   */
   private static getElementTransformation(
     element: SVGGraphicsElement,
     parentTransform: DOMMatrix,
@@ -382,6 +471,12 @@ export class SVG extends Shape {
     return transformMatrix;
   }
 
+  /**
+   * Convert SVG style into MotionCanvas Shape
+   * @param element - SVG element
+   * @param inheritedStyle - Parent style that must inherited to this element
+   * @returns - MotionCanvas Shape properties
+   */
   private static getElementStyle(
     element: SVGGraphicsElement,
     inheritedStyle: ShapeProps,
@@ -395,6 +490,15 @@ export class SVG extends Shape {
       layout: false,
     };
   }
+
+  /**
+   * Extract SVGShapeData list from SVG element children.
+   * This will not extract current element shape.
+   * @param element - Element to be extracted
+   * @param svgRoot - SVG root ("svg" tag) of element
+   * @param parentTransform - Matrix transformation applied to parent
+   * @param inheritedStyle - style of current SVG `element` that must inherited to its children
+   */
 
   private static *extractGroupNodes(
     element: SVGElement,
@@ -414,12 +518,27 @@ export class SVG extends Shape {
     }
   }
 
+  /**
+   * Parse number from SVG element attribute
+   * @param element - SVG element whoose element will be parsed
+   * @param name - attribute name to be parse
+   * @returns  parsed number or 0 if attribute is not defined
+   */
+
   private static parseNumberAttribute(
     element: SVGElement,
     name: string,
   ): number {
     return parseFloat(element.getAttribute(name) ?? '0');
   }
+
+  /**
+   * Extract SVGShapeData list from SVG element. This also will extract shape from children.
+   * @param child - SVG element to extract
+   * @param svgRoot - SVG root ("svg" tag) of element
+   * @param parentTransform - Matrix transformation applied to parent
+   * @param inheritedStyle - parent style that must inherited into current shape style
+   */
 
   private static *extractElementNodes(
     child: SVGGraphicsElement,
