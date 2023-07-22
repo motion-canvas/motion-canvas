@@ -3,6 +3,7 @@ import {arcLerp, InterpolationFunction, map} from '../tweening';
 import {Type} from './Type';
 import {Spacing} from './Spacing';
 import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
+import {PossibleMatrix2D} from './Matrix2D';
 
 export type SerializedBBox = {
   x: number;
@@ -272,14 +273,14 @@ export class BBox implements Type {
     this.height = one.height;
   }
 
-  public transform(matrix: DOMMatrix): BBox {
+  public transform(matrix: PossibleMatrix2D): BBox {
     return new BBox(
       this.position.transformAsPoint(matrix),
       this.size.transform(matrix),
     );
   }
 
-  public transformCorners(matrix: DOMMatrix) {
+  public transformCorners(matrix: PossibleMatrix2D) {
     return this.corners.map(corner => corner.transformAsPoint(matrix));
   }
 
