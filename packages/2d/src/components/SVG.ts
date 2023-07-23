@@ -1,4 +1,8 @@
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {
+  SignalValue,
+  SimpleSignal,
+  isReactive,
+} from '@motion-canvas/core/lib/signals';
 import {
   BBox,
   Matrix2D,
@@ -213,7 +217,7 @@ export class SVG extends Shape {
     time: number,
     timingFunction: TimingFunction,
   ) {
-    const newValue = typeof value === 'string' ? value : value();
+    const newValue = isReactive(value) ? value() : value;
     const newSVG = this.parseSVG(newValue);
     const currentSVG = this.document();
     const diff = getTransformDiff(currentSVG.nodes, newSVG.nodes);
