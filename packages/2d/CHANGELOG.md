@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
+
+### Features
+
+- **2d:** add Path component
+  ([#700](https://github.com/motion-canvas/motion-canvas/issues/700))
+  ([2128b6b](https://github.com/motion-canvas/motion-canvas/commit/2128b6bf871cabe19e1abc749f18945c78c01f84))
+- **2d:** add start and end signals to Grid node
+  ([#761](https://github.com/motion-canvas/motion-canvas/issues/761))
+  ([e37ea80](https://github.com/motion-canvas/motion-canvas/commit/e37ea806b94e93c6324d8e1b502468925b731e8e))
+- **2d:** always clip images and videos
+  ([#773](https://github.com/motion-canvas/motion-canvas/issues/773))
+  ([3938c59](https://github.com/motion-canvas/motion-canvas/commit/3938c59394bfc42e5562504687d783ff306d7d32))
+- **2d:** immediate restore
+  ([#736](https://github.com/motion-canvas/motion-canvas/issues/736))
+  ([634d51d](https://github.com/motion-canvas/motion-canvas/commit/634d51d2afe8a536673c364874f8f3d1a450b846))
+- **2d:** make Circle extend Curve
+  ([#771](https://github.com/motion-canvas/motion-canvas/issues/771))
+  ([4c8cf19](https://github.com/motion-canvas/motion-canvas/commit/4c8cf1954093958eac507921dc18f67dd64b2052))
+- **2d:** make Rect extend Curve
+  ([#759](https://github.com/motion-canvas/motion-canvas/issues/759))
+  ([9810212](https://github.com/motion-canvas/motion-canvas/commit/9810212648824b9a2fa2ecd6b597e3319d20b325))
+- add coordinates to preview
+  ([#737](https://github.com/motion-canvas/motion-canvas/issues/737))
+  ([330c1f9](https://github.com/motion-canvas/motion-canvas/commit/330c1f962fb920269301e7ee8a2c49cbfc723d85))
+- add middle cardinal point
+  ([#758](https://github.com/motion-canvas/motion-canvas/issues/758))
+  ([b036eaf](https://github.com/motion-canvas/motion-canvas/commit/b036eafc00381831c08267a78cf9d74973f4025a))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
 
 ### Bug Fixes

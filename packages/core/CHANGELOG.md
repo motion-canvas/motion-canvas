@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
+
+### Bug Fixes
+
+- **docs:** fix last updated footer
+  ([#776](https://github.com/motion-canvas/motion-canvas/issues/776))
+  ([09c0085](https://github.com/motion-canvas/motion-canvas/commit/09c008587fcd4b52edbc5e7599ee378482f4230b)),
+  closes [#767](https://github.com/motion-canvas/motion-canvas/issues/767)
+
+### Features
+
+- **2d:** add Path component
+  ([#700](https://github.com/motion-canvas/motion-canvas/issues/700))
+  ([2128b6b](https://github.com/motion-canvas/motion-canvas/commit/2128b6bf871cabe19e1abc749f18945c78c01f84))
+- add coordinates to preview
+  ([#737](https://github.com/motion-canvas/motion-canvas/issues/737))
+  ([330c1f9](https://github.com/motion-canvas/motion-canvas/commit/330c1f962fb920269301e7ee8a2c49cbfc723d85))
+- **core:** accept PossibleMatrix2D when transforming bbox
+  ([#770](https://github.com/motion-canvas/motion-canvas/issues/770))
+  ([ae05282](https://github.com/motion-canvas/motion-canvas/commit/ae0528266f5794aa0517f32b897c5fe6ff092a58))
+- **core:** add rotate and polarLerp methods to vector
+  ([#756](https://github.com/motion-canvas/motion-canvas/issues/756))
+  ([a18bac3](https://github.com/motion-canvas/motion-canvas/commit/a18bac3c1755fa3e3240b5469ac7bc1f08b4fd24))
+- **core:** helper methods for references
+  ([#775](https://github.com/motion-canvas/motion-canvas/issues/775))
+  ([3255add](https://github.com/motion-canvas/motion-canvas/commit/3255add1b05a37017d60c2eaccf4368ab4f7f568))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
 
 ### Bug Fixes

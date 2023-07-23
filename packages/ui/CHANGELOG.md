@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
+
+### Bug Fixes
+
+- **ui:** prevent spawning multiple color pickers
+  ([#747](https://github.com/motion-canvas/motion-canvas/issues/747))
+  ([48ffd1f](https://github.com/motion-canvas/motion-canvas/commit/48ffd1f2eec21f9880e172632a2310f5676e3c19)),
+  closes [#744](https://github.com/motion-canvas/motion-canvas/issues/744)
+- **ui:** support small ranges
+  ([#739](https://github.com/motion-canvas/motion-canvas/issues/739))
+  ([cf32d8b](https://github.com/motion-canvas/motion-canvas/commit/cf32d8b08b94f5044987eb554cd250fc79fbc99d)),
+  closes [#738](https://github.com/motion-canvas/motion-canvas/issues/738)
+
+### Features
+
+- add coordinates to preview
+  ([#737](https://github.com/motion-canvas/motion-canvas/issues/737))
+  ([330c1f9](https://github.com/motion-canvas/motion-canvas/commit/330c1f962fb920269301e7ee8a2c49cbfc723d85))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.9.0](https://github.com/motion-canvas/motion-canvas/compare/v3.8.0...v3.9.0) (2023-05-29)
 
 ### Bug Fixes
