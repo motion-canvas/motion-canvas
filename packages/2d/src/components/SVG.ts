@@ -174,7 +174,7 @@ export class SVG extends Shape {
    * @param time - time for tweening
    * @param timing - timing for tweening
    */
-  protected *generateTransformator(
+  protected *generateTransformer(
     from: Node,
     to: Node,
     time: number,
@@ -202,7 +202,7 @@ export class SVG extends Shape {
     const fromChildren = from.children();
     const toChildren = to.children();
     for (let i = 0; i < fromChildren.length; i++) {
-      yield* this.generateTransformator(
+      yield* this.generateTransformer(
         fromChildren[i],
         toChildren[i],
         time,
@@ -248,7 +248,7 @@ export class SVG extends Shape {
 
     for (const item of diff.transformed) {
       transformator.push(
-        ...this.generateTransformator(
+        ...this.generateTransformer(
           item.from.current.shape,
           item.to.current.shape,
           transformatorTime,
