@@ -1,0 +1,148 @@
+---
+slug: version-3.10.0
+title: Motion Canvas v3.10.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PR from '@site/src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import Fiddle from '@site/src/components/Fiddle';
+import sourceCurve from '!!raw-loader!@site/blog/2023-07-23-curve.tsx';
+import sourcePath from '!!raw-loader!@site/blog/2023-07-23-path.tsx';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    The{' '}
+    <Link to="/api/2d/components/Rect">
+      <code>Rect</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/2d/components/Circle">
+      <code>Circle</code>
+    </Link>{' '}
+    nodes now extend{' '}
+    <Link to="/api/2d/components/Curve">
+      <code>Curve</code>
+    </Link>
+    giving them access to all its properties and methods:
+    <PR id={771} />
+    <PR id={759} />
+    <Fiddle ratio="3" className="margin-top--sm margin-bottom--sm">
+      {sourceCurve}
+    </Fiddle>
+  </Issue>
+  <Issue user={'levirs565'}>
+    New SVG{' '}
+    <Link to="/api/2d/components/Path">
+      <code>Path</code>
+    </Link>{' '}
+    component:
+    <PR id={700} />
+    <Fiddle
+      mode="preview"
+      ratio="3"
+      className="margin-top--sm margin-bottom--sm"
+    >
+      {sourcePath}
+    </Fiddle>
+  </Issue>
+  <Issue user={'ksassnowski'} pr={761}>
+    New{' '}
+    <Link to="/api/2d/components/Grid#start">
+      <code>start</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/2d/components/Grid#end">
+      <code>end</code>
+    </Link>{' '}
+    signals for animating the{' '}
+    <Link to="/api/2d/components/Grid">
+      <code>Grid</code>
+    </Link>{' '}
+    node.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New helper methods for managing references: <PR id={775} />
+    <ul>
+      <li>
+        <Link to="/api/core/utils#createRefArray">
+          <code>createRefArray</code>
+        </Link>
+      </li>
+      <li>
+        <Link to="/api/core/utils#createRefMap">
+          <code>createRefMap</code>
+        </Link>
+      </li>
+    </ul>
+  </Issue>
+  <Issue user={'aarthificial'} pr={773}>
+    <Link to={'/api/2d/components/Img'}>
+      <code>Img</code>
+    </Link>{' '}
+    and{' '}
+    <Link to={'/api/2d/components/Video'}>
+      <code>Video</code>
+    </Link>{' '}
+    nodes with radius are automatically clipped.
+  </Issue>
+  <Issue user={'ksassnowski'} pr={770}>
+    <Link to="/api/core/types/BBox">
+      <code>BBox</code>
+    </Link>{' '}
+    transformation methods accept{' '}
+    <Link to="/api/core/types/Matrix2D#PossibleMatrix2D">
+      <code>PossibleMatrix2D</code>
+    </Link>
+    .
+  </Issue>
+  <Issue user={'aarthificial'} pr={758}>
+    New{' '}
+    <Link to="/api/2d/components/Layout#middle">
+      <code>middle</code>
+    </Link>{' '}
+    <Link to="/docs/layouts#cardinal-directions">cardinal point</Link>.
+  </Issue>
+  <Issue user={'ksassnowski'} pr={756}>
+    New{' '}
+    <Link to="/api/core/types/Vector2#rotate">
+      <code>rotate</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/core/types/Vector2#polarLerp">
+      <code>polarLerp</code>
+    </Link>{' '}
+    methods for{' '}
+    <Link to="/api/core/types/Vector2">
+      <code>Vector2</code>
+    </Link>
+    .
+  </Issue>
+  <Issue user={'Logon27'} pr={737}>
+    The editor now lets you copy the mouse coordinates by pressing <kbd>P</kbd>
+  </Issue>
+  <Issue user={'aarthificial'} pr={736}>
+    <Link to="/api/2d/components/Node#restore">
+      <code>restore()</code>
+    </Link>{' '}
+    can be called without duration to restore the state immediately.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={776}>
+    Fixed the "Last updated by" information on documentation pages.
+  </Issue>
+  <Issue user={'Caesarovich'} pr={739}>
+    Timeline correctly displays small time ranges.
+  </Issue>
+  <Issue user={'aarthificial'} pr={747}>
+    It's no longer possible to spawn multiple color pickers.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>
