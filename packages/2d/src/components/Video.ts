@@ -209,10 +209,6 @@ export class Video extends Rect {
 
   protected override draw(context: CanvasRenderingContext2D) {
     this.drawShape(context);
-    if (this.clip()) {
-      context.clip(this.getPath());
-    }
-
     const alpha = this.alpha();
     if (alpha > 0) {
       const playbackState = this.view().playbackState();
@@ -224,12 +220,17 @@ export class Video extends Rect {
 
       const box = BBox.fromSizeCentered(this.computedSize());
       context.save();
+      context.clip(this.getPath());
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
       context.imageSmoothingEnabled = this.smoothing();
       drawImage(context, video, box);
       context.restore();
+    }
+
+    if (this.clip()) {
+      context.clip(this.getPath());
     }
 
     this.drawChildren(context);
