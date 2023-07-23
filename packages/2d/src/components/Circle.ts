@@ -1,7 +1,12 @@
-import {Shape, ShapeProps} from './Shape';
+import {ShapeProps} from './Shape';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {initial, signal} from '../decorators';
+import {computed, initial, signal} from '../decorators';
 import {DEG2RAD} from '@motion-canvas/core/lib/utils';
+import {Curve} from './Curve';
+import {BBox} from '@motion-canvas/core';
+import {CurveProfile, getCircleProfile} from '../curves';
+import {SerializedVector2} from '@motion-canvas/core/lib/types';
+import {DesiredLength} from '../partials';
 
 export interface CircleProps extends ShapeProps {
   /**
@@ -12,6 +17,10 @@ export interface CircleProps extends ShapeProps {
    * {@inheritDoc Circle.endAngle}
    */
   endAngle?: SignalValue<number>;
+  /**
+   * {@inheritDoc Circle.counterclockwise}
+   */
+  counterclockwise?: SignalValue<boolean>;
   /**
    * {@inheritDoc Circle.closed}
    */
@@ -91,9 +100,31 @@ export interface CircleProps extends ShapeProps {
  *
  *   yield* ref().startAngle(-270, 2).to(-90, 2);
  * });
+ *
+ * // snippet Curve properties:
+ * import {makeScene2D, Circle} from '@motion-canvas/2d';
+ * import {all, createRef, easeInCubic, easeOutCubic} from '@motion-canvas/core';
+ *
+ * export default makeScene2D(function* (view) {
+ *   const ref = createRef<Circle>();
+ *   view.add(
+ *     <Circle
+ *       ref={ref}
+ *       size={160}
+ *       stroke={'lightseagreen'}
+ *       lineWidth={8}
+ *       endAngle={270}
+ *       endArrow
+ *     />,
+ *   );
+ *
+ *   yield* all(ref().start(1, 1), ref().rotation(180, 1, easeInCubic));
+ *   ref().start(0).end(0);
+ *   yield* all(ref().end(1, 1), ref().rotation(360, 1, easeOutCubic));
+ * });
  * ```
  */
-export class Circle extends Shape {
+export class Circle extends Curve {
   /**
    * The starting angle in degrees for the circle sector.
    *
@@ -119,6 +150,18 @@ export class Circle extends Shape {
   @initial(360)
   @signal()
   public declare readonly endAngle: SimpleSignal<number, this>;
+
+  /**
+   * Whether the circle sector should be drawn counterclockwise.
+   *
+   * @remarks
+   * By default, the circle begins at {@link startAngle} and is drawn clockwise
+   * until reaching {@link endAngle}. Setting this property to true will reverse
+   * this direction.
+   */
+  @initial(false)
+  @signal()
+  public declare readonly counterclockwise: SimpleSignal<boolean, this>;
 
   /**
    * Whether the path of this circle should be closed.
@@ -150,15 +193,43 @@ export class Circle extends Shape {
    *
    * @defaultValue false
    */
-  @initial(false)
-  @signal()
   public declare readonly closed: SimpleSignal<boolean, this>;
 
   public constructor(props: CircleProps) {
     super(props);
   }
 
+  @computed()
+  public profile(): CurveProfile {
+    return getCircleProfile(
+      this.size().scale(0.5),
+      this.startAngle() * DEG2RAD,
+      this.endAngle() * DEG2RAD,
+      this.closed(),
+      this.counterclockwise(),
+    );
+  }
+
+  protected override desiredSize(): SerializedVector2<DesiredLength> {
+    return {
+      x: this.width.context.getter(),
+      y: this.height.context.getter(),
+    };
+  }
+
+  protected override offsetComputedLayout(box: BBox): BBox {
+    return box;
+  }
+
+  protected override childrenBBox(): BBox {
+    return BBox.fromSizeCentered(this.computedSize());
+  }
+
   protected override getPath(): Path2D {
+    if (this.requiresProfile()) {
+      return this.curveDrawingInfo().path;
+    }
+
     return this.createPath();
   }
 
@@ -166,16 +237,26 @@ export class Circle extends Shape {
     return this.createPath(this.rippleSize());
   }
 
+  protected override getCacheBBox(): BBox {
+    return super.getCacheBBox().expand(this.rippleSize());
+  }
+
   protected createPath(expand = 0) {
     const path = new Path2D();
     const start = this.startAngle() * DEG2RAD;
-    const end = this.endAngle() * DEG2RAD;
-    const size = this.size().scale(0.5);
+    let end = this.endAngle() * DEG2RAD;
+    const size = this.size().scale(0.5).add(expand);
     const closed = this.closed();
+
+    if (end > start + Math.PI * 2) {
+      const loops = Math.floor((end - start) / (Math.PI * 2));
+      end -= Math.PI * 2 * loops;
+    }
+
     if (closed) {
       path.moveTo(0, 0);
     }
-    path.ellipse(0, 0, size.x + expand, size.y + expand, 0, start, end);
+    path.ellipse(0, 0, size.x, size.y, 0, start, end, this.counterclockwise());
     if (closed) {
       path.closePath();
     }
