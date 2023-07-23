@@ -44,8 +44,16 @@ declare module 'chroma-js' {
   }
 }
 
-// iife prevents tree shaking from stripping our methods.
+/**
+ * Represents a color.
+ *
+ * @remarks
+ * This is the same class as the one created by
+ * {@link https://gka.github.io/chroma.js/ | chroma.js}. Check out their
+ * documentation for more information on how to use it.
+ */
 type ExtendedColor = Color;
+// iife prevents tree shaking from stripping our methods.
 const ExtendedColor: typeof Color = (() => {
   Color.symbol = Color.prototype.symbol = Symbol.for(
     '@motion-canvas/core/types/Color',
