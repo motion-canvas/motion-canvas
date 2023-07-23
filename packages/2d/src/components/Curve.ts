@@ -327,7 +327,13 @@ export abstract class Curve extends Shape {
       }
     }
 
-    if (this.end() === 1 && this.closed()) {
+    if (
+      this.closed() &&
+      this.start.isInitial() &&
+      this.end.isInitial() &&
+      this.startOffset.isInitial() &&
+      this.endOffset.isInitial()
+    ) {
       subpath.closePath();
     }
     this.processSubpath(subpath, startPoint, endPoint);

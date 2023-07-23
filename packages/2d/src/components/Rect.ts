@@ -4,7 +4,7 @@ import {
   SpacingSignal,
   SerializedVector2,
 } from '@motion-canvas/core/lib/types';
-import {initial, signal} from '../decorators';
+import {computed, initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {Curve, CurveProps} from './Curve';
@@ -126,6 +126,7 @@ export class Rect extends Curve {
     super(props);
   }
 
+  @computed()
   public profile(): CurveProfile {
     return getRectProfile(
       this.childrenBBox(),
