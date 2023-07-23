@@ -470,6 +470,52 @@ export class SVG extends Shape {
     return transformMatrix;
   }
 
+  private static parseLineCap(name: string | null): CanvasLineCap | null {
+    if (!name) return null;
+    if (name === 'butt' || name === 'round' || name === 'square') return name;
+
+    useLogger().warn(`SVG: invalid line cap "${name}"`);
+    return null;
+  }
+
+  private static parseLineJoin(name: string | null): CanvasLineJoin | null {
+    if (!name) return null;
+    if (name === 'bevel' || name === 'miter' || name === 'round') return name;
+
+    if (name === 'arcs' || name === 'miter-clip') {
+      useLogger().warn(`SVG: line join is not supported "${name}"`);
+    } else {
+      useLogger().warn(`SVG: invalid line join "${name}"`);
+    }
+    return null;
+  }
+
+  private static parseLineDash(value: string | null): number[] | null {
+    if (!value) return null;
+
+    const list = value.split(/,|\s+/);
+    if (list.findIndex(str => str.endsWith('%'))) {
+      useLogger().warn(`SVG: percentage line dash are ignored`);
+      return null;
+    }
+    return list.map(str => parseFloat(str));
+  }
+
+  private static parseDashOffset(value: string | null): number | null {
+    if (!value) return null;
+    const trimmed = value.trim();
+    if (trimmed.endsWith('%')) {
+      useLogger().warn(`SVG: percentage line dash offset are ignored`);
+    }
+    return parseFloat(trimmed);
+  }
+
+  private static parseOpacity(value: string | null): number | null {
+    if (!value) return null;
+    if (value.endsWith('%')) return parseFloat(value) / 100;
+    return parseFloat(value);
+  }
+
   /**
    * Convert SVG style into MotionCanvas Shape
    * @param element - SVG element
@@ -486,6 +532,21 @@ export class SVG extends Shape {
       lineWidth: element.hasAttribute('stroke-width')
         ? parseFloat(element.getAttribute('stroke-width')!)
         : inheritedStyle.lineWidth,
+      lineCap:
+        this.parseLineCap(element.getAttribute('stroke-linecap')) ??
+        inheritedStyle.lineCap,
+      lineJoin:
+        this.parseLineJoin(element.getAttribute('stroke-linejoin')) ??
+        inheritedStyle.lineJoin,
+      lineDash:
+        this.parseLineDash(element.getAttribute('stroke-dasharray')) ??
+        inheritedStyle.lineDash,
+      lineDashOffset:
+        this.parseDashOffset(element.getAttribute('stroke-dashoffset')) ??
+        inheritedStyle.lineDashOffset,
+      opacity:
+        this.parseOpacity(element.getAttribute('opacity')) ??
+        inheritedStyle.opacity,
       layout: false,
     };
   }
