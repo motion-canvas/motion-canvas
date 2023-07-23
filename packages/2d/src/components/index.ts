@@ -17,6 +17,7 @@ export * from './Path';
 export * from './QuadBezier';
 export * from './Shape';
 export * from './Spline';
+export * from './SVG';
 export * from './Txt';
 export * from './types';
 export * from './Video';
