@@ -43,13 +43,12 @@ export interface ImgProps extends RectProps {
  *
  * export default makeScene2D(function* (view) {
  *   const ref = createRef<Img>();
- *   view.add(
+ *   yield view.add(
  *     <Img
  *       ref={ref}
  *       src="https://images.unsplash.com/photo-1679218407381-a6f1660d60e9"
  *       width={300}
  *       radius={20}
- *       clip
  *     />,
  *   );
  *
@@ -194,13 +193,11 @@ export class Img extends Rect {
 
   protected override draw(context: CanvasRenderingContext2D) {
     this.drawShape(context);
-    if (this.clip()) {
-      context.clip(this.getPath());
-    }
     const alpha = this.alpha();
     if (alpha > 0) {
       const box = BBox.fromSizeCentered(this.computedSize());
       context.save();
+      context.clip(this.getPath());
       if (alpha < 1) {
         context.globalAlpha *= alpha;
       }
@@ -208,6 +205,11 @@ export class Img extends Rect {
       drawImage(context, this.image(), box);
       context.restore();
     }
+
+    if (this.clip()) {
+      context.clip(this.getPath());
+    }
+
     this.drawChildren(context);
   }
 
