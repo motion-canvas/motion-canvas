@@ -175,6 +175,34 @@ In JavaScript, arrays are objects whose properties are their indices. So
 circle. As a result, we end up with an array of size `10` filled with circles
 that we can use to animate all of them.
 
+You can also use the [`createRefArray()`](/api/core/utils#createRefArray) helper
+function to achieve the same result:
+
+```tsx
+import {createRefArray, range} from '@motion-canvas/core';
+
+// ...
+
+const circles = createRefArray<Circle>();
+view.add(
+  <Layout>
+    {range(10).map(() => (
+      <Circle ref={circles} />
+    ))}
+  </Layout>,
+);
+```
+
+This time we don't specify the index. Whenever we pass the `circles` array to
+the `ref` property, the newly created circle will be appended to our array.
+
+:::tip
+
+Check out [the looping section in the flow guide](/docs/flow#looping) to see how
+an array of references can be used to orchestrate animations.
+
+:::
+
 ### Custom functions
 
 `makeRef()` can also be used to return more than one reference from a custom
@@ -209,6 +237,58 @@ In this example, we define a function component called `Label` consisting of a
 rectangle with some text inside. When using the component, we use the `refs`
 property to pass the `label` object created by us. `makeRef()` is then used to
 fill this object with all the necessary references.
+
+## `createRefMap()` function
+
+As the scene grows in complexity, declaring a reference for each node can become
+tedious. The [`createRefMap()`](/api/core/utils#createRefMap) helper function
+lets us group references together based on the type of the node:
+
+```tsx
+import {createRefMap} from '@motion-canvas/core';
+
+// ...
+
+const labels = createRefMap<Txt>();
+view.add(
+  <>
+    <Txt ref={labels.a}>A</Txt>
+    <Txt ref={labels.b}>B</Txt>
+    <Txt ref={labels.c}>C</Txt>
+  </>,
+);
+```
+
+The returned object is a map that can store however many references we need. In
+the above example, we assign three `Txt` references under the keys `a`, `b`, and
+`c`. Simply accessing a property of the map, like `labels.a` will create a
+reference for us. The names of the properties are arbitrary and can be anything
+we want.
+
+Later on, we can retrieve the references using the same keys:
+
+```tsx
+yield * labels.a().text('A changes', 0.3);
+yield * labels.b().text('B changes', 0.3);
+yield * labels.c().text('C changes', 0.3);
+```
+
+To check if a reference exists, we can use the `in` operator. This will avoid
+creating a reference:
+
+```tsx
+if ('d' in labels) {
+  yield * labels.d().text('D changes', 0.3);
+}
+```
+
+The returned object comes with a `mapRefs` method that lets us map over all
+references in the map. It's similar to the [Array.prototype.map][array map]
+function:
+
+```ts
+yield * all(...labels.mapRefs(label => label.fill('white', 0.3)));
+```
 
 ## `makeRefs()` function
 
@@ -265,3 +345,6 @@ function Label({
 const label = makeRefs<typeof Label>();
 view.add(<Label refs={label}>HELLO</Label>);
 ```
+
+[array map]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map

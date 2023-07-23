@@ -17,6 +17,8 @@ export * from './Semaphore';
 export * from './usePlayback';
 export * from './useRandom';
 export * from './createRef';
+export * from './createRefArray';
+export * from './createRefMap';
 export * from './useScene';
 export * from './useThread';
 export * from './useTime';
