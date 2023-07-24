@@ -108,6 +108,7 @@ export class SVG extends Shape {
     super(props);
     this.wrapper = new Node({});
     this.wrapper.children(this.documentNodes);
+    this.wrapper.scale(this.wrapperScale);
     this.add(this.wrapper);
   }
 
@@ -123,12 +124,37 @@ export class SVG extends Shape {
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
-    const custom = super.desiredSize();
-    const {x, y} = this.document().size.mul(this.wrapper.scale());
+    const docSize = this.document().size;
+    const scale = this.calculateWrapperScale(
+      docSize,
+      super.desiredSize() as SerializedVector2<number | null>,
+    );
+    return docSize.mul(scale);
+  }
+
+  protected getCurrentSize() {
     return {
-      x: custom.x ?? x,
-      y: custom.y ?? y,
+      x: this.width.isInitial() ? null : this.width(),
+      y: this.height.isInitial() ? null : this.height(),
     };
+  }
+
+  protected calculateWrapperScale(
+    documentSize: Vector2,
+    parentSize: SerializedVector2<number | null>,
+  ) {
+    const result = new Vector2(1, 1);
+    if (parentSize.x && parentSize.y) {
+      result.x = parentSize.x / documentSize.width;
+      result.y = parentSize.y / documentSize.height;
+    } else if (parentSize.x && !parentSize.y) {
+      result.x = parentSize.x / documentSize.width;
+      result.y = result.x;
+    } else if (!parentSize.x && parentSize.y) {
+      result.y = parentSize.y / documentSize.height;
+      result.x = result.y;
+    }
+    return result;
   }
 
   /**
@@ -259,6 +285,9 @@ export class SVG extends Shape {
 
     const autoWidth = this.width.isInitial();
     const autoHeight = this.height.isInitial();
+    this.wrapper.scale(
+      this.calculateWrapperScale(currentSVG.size, this.getCurrentSize()),
+    );
 
     const baseTween = tween(
       time,
@@ -304,9 +333,26 @@ export class SVG extends Shape {
         for (const {from} of diff.transformed) {
           from.current.shape.dispose();
         }
+        this.wrapper.scale(this.wrapperScale);
       },
     );
-    yield* all(baseTween, delay(transformatorDelay, all(...transformator)));
+    yield* all(
+      this.wrapper.scale(
+        this.calculateWrapperScale(newSVG.size, this.getCurrentSize()),
+        time,
+        timingFunction,
+      ),
+      baseTween,
+      delay(transformatorDelay, all(...transformator)),
+    );
+  }
+
+  @computed()
+  private wrapperScale(): Vector2 {
+    return this.calculateWrapperScale(
+      this.document().size,
+      this.getCurrentSize(),
+    );
   }
 
   /**
