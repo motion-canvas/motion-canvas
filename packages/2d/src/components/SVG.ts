@@ -251,17 +251,13 @@ export class SVG extends Shape {
     this.lastTweenTargetSrc = newValue;
     this.lastTweenTargetDocument = newSVG;
 
-    const applyResult = applyTransformDiff(
-      currentSVG.nodes,
-      diff,
-      ({shape, ...rest}) => ({
-        ...rest,
-        shape: shape.clone(),
-      }),
-    );
+    applyTransformDiff(currentSVG.nodes, diff, ({shape, ...rest}) => ({
+      ...rest,
+      shape: shape.clone(),
+    }));
     this.wrapper.children(currentSVG.nodes.map(shape => shape.shape));
-    for (const {item} of applyResult.inserted) {
-      item.current.shape.parent(this.wrapper);
+    for (const item of currentSVG.nodes) {
+      item.shape.parent(this.wrapper);
     }
 
     const beginning = 0.2;
