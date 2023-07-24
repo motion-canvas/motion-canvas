@@ -373,7 +373,8 @@ export abstract class Curve extends Shape {
 
   protected override getCacheBBox(): BBox {
     const box = this.childrenBBox();
-    const arrowSize = this.arrowSize();
+    const arrowSize =
+      this.startArrow() || this.endArrow() ? this.arrowSize() : 0;
     const lineWidth = this.lineWidth();
 
     const coefficient = this.lineWidthCoefficient();
