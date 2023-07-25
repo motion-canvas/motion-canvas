@@ -8,7 +8,7 @@ import {computed, initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {Curve, CurveProps} from './Curve';
-import {CurveProfile, getRectProfile} from '../curves';
+import {getRectProfile} from '../curves/getRectProfile';
 import {drawRoundRect} from '../utils';
 import {DesiredLength} from '../partials';
 
@@ -127,7 +127,7 @@ export class Rect extends Curve {
   }
 
   @computed()
-  public profile(): CurveProfile {
+  public profile() {
     return getRectProfile(
       this.childrenBBox(),
       this.radius(),
