@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.10.1](https://github.com/motion-canvas/motion-canvas/compare/v3.10.0...v3.10.1) (2023-07-25)
+
+### Bug Fixes
+
+- **2d:** improve Curve hitbox
+  ([#778](https://github.com/motion-canvas/motion-canvas/issues/778))
+  ([8af723c](https://github.com/motion-canvas/motion-canvas/commit/8af723c0322de39d2defe0363bba03f4f9542f08))
+- **2d:** remove circular dependencies
+  ([#780](https://github.com/motion-canvas/motion-canvas/issues/780))
+  ([cdf3af5](https://github.com/motion-canvas/motion-canvas/commit/cdf3af500a58151ee3549c6e728751aab3e6f75c))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
 
 ### Bug Fixes
