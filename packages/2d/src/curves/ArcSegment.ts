@@ -1,9 +1,9 @@
-import {lazy} from '@motion-canvas/core/lib/decorators';
+import {lazy} from '@motion-canvas/core/lib/decorators/lazy';
 import {BBox, Matrix2D, Vector2} from '@motion-canvas/core/lib/types';
 import {CurvePoint} from './CurvePoint';
 import {Segment} from './Segment';
 import {DEG2RAD} from '@motion-canvas/core/lib/utils';
-import {View2D} from '../components';
+import {View2D} from '../components/View2D';
 
 export class ArcSegment extends Segment {
   @lazy(() => {

@@ -1,12 +1,10 @@
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
-import {
-  CurveDrawingInfo,
-  CurvePoint,
-  CurveProfile,
-  getPointAtDistance,
-} from '../curves';
+import {CurveDrawingInfo} from '../curves/CurveDrawingInfo';
+import {CurvePoint} from '../curves/CurvePoint';
+import {CurveProfile} from '../curves/CurveProfile';
+import {getPointAtDistance} from '../curves/getPointAtDistance';
 import {computed, initial, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {lineTo, moveTo, resolveCanvasStyle} from '../utils';
