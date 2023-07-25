@@ -540,7 +540,7 @@ export class SVG extends Shape {
     if (!value) return null;
 
     const list = value.split(/,|\s+/);
-    if (list.findIndex(str => str.endsWith('%'))) {
+    if (list.findIndex(str => str.endsWith('%')) > 0) {
       useLogger().warn(`SVG: percentage line dash are ignored`);
       return null;
     }
