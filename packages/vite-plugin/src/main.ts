@@ -315,7 +315,10 @@ export default ({
       }
 
       if (ext === '.meta') {
-        const sourceFile = viteConfig.command === 'build' ? false : `'${id}'`;
+        const sourceFile =
+          viteConfig.command === 'build'
+            ? false
+            : `'${id.replace(/'/g, "\\'")}'`;
         return source(
           `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
           `let meta;`,
