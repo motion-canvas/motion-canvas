@@ -3,10 +3,9 @@ sidebar_position: 1
 slug: /code-block
 ---
 
-import AnimationPlayer from '@site/src/components/AnimationPlayer';
-import signalSource from '!!raw-loader!@motion-canvas/examples/src/scenes/node-signal';
-
 # CodeBlock
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
 
 <AnimationPlayer banner name="code-block" />
 
@@ -97,10 +96,34 @@ Code may be "selected" to call attention to it. The default behavior is to
 desaturate any unselected text.
 
 A selection can be made using the `selection` property when the `CodeBlock` is
-first created. Selections are specified using two `[line, position]` arrays,
-where `line` and `position` are zero indexed, and `position` is an insert
-position between characters. So `[[0, 5], [1, 2]]` will select the sixth
-character on the first line through to the second character on the second line.
+first created. Selections are specified using two `[line, position]` arrays
+nested inside another array which allows you to have multiple selections.
+
+The `line` and `position` are zero indexed, and `position` is an insert position
+between characters. So `[[[0, 5], [1, 2]]]` will select the sixth character on
+the first line through to the second character on the second line.
+
+The following named example should make the structure easier to understand:
+
+```tsx
+<CodeBlock
+  selection={[
+    [
+      // First selection
+      [lineFrom, characterFrom],
+      [lineTo, characterTo],
+    ],
+    [
+      // Second selection
+      [lineFrom, characterFrom],
+      [lineTo, characterTo],
+    ],
+    [
+      //... etc
+    ],
+  ]}
+/>
+```
 
 The following code will select `myBool` out of the code snippet.
 
@@ -109,20 +132,24 @@ yield view.add(
   <CodeBlock
     code={`var myBool;`}
     selection={[
-      [0, 4],
-      [0, 10],
+      [
+        // Creates a selection from the 5th (index 4) to the 11th
+        // (index 10) character on the first line (index 0)
+        [0, 4],
+        [0, 10],
+      ],
     ]}
   />,
 );
 ```
 
 It is often better, however, to use one of the three provided utility functions
-for selection. Though they all return a two by two array of numbers, they can be
-more descriptive than an array literal.
+for selection. Though they all return a array with one selection entry they can
+be more descriptive than an array literal.
 
 The first and most commonly used is the `range` function. `range(0, 4, 0, 10)`
-is equivalent to `[[0, 4], [0, 10]]`, making `range` a direct substitute for an
-array literal.
+is equivalent to `[[[0, 4], [0, 10]]]`, making `range` a direct substitute for
+an array literal.
 
 The second is the `word` function, which creates a range on a single line using
 a position and a length. So `word(2, 4, 6)` will make a selection on the third
@@ -149,6 +176,19 @@ yield * codeRef().selection(lines(1), 1);
 // second and third line (line 1 to line 2)
 yield * codeRef().selection(lines(1, 2), 1);
 ```
+
+:::tip
+
+You can also mix and match helpers by using the spread operator!
+
+You could select the 3rd line and a 10 character long word on the 5th line
+starting at the 6th character using the following expression:
+
+```tsx
+yield * codeRef().selection([...lines(2), ...word(4, 5, 10)], 1);
+```
+
+:::
 
 To remove a selection, the value of `.selection()` signal can be set to its
 [`DEFAULT`][signal-default], i.e. "all selected". For example:
