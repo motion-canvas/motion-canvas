@@ -201,26 +201,26 @@ export class SVG extends Shape {
   protected *generateTransformer(
     from: Node,
     to: Node,
-    duration : number,
+    duration: number,
     timing: TimingFunction,
   ): Generator<ThreadGenerator> {
-    yield from.position(to.position(), time, timing);
-    yield from.scale(to.scale(), time, timing);
-    yield from.rotation(to.rotation(), time, timing);
+    yield from.position(to.position(), duration, timing);
+    yield from.scale(to.scale(), duration, timing);
+    yield from.rotation(to.rotation(), duration, timing);
     if (
       from instanceof Path &&
       to instanceof Path &&
       from.data() !== to.data()
     ) {
-      yield from.data(to.data(), time, timing);
+      yield from.data(to.data(), duration, timing);
     }
     if (from instanceof Layout && to instanceof Layout) {
-      yield from.size(to.size(), time, timing);
+      yield from.size(to.size(), duration, timing);
     }
     if (from instanceof Shape && to instanceof Shape) {
-      yield from.fill(to.fill(), time, timing);
-      yield from.stroke(to.stroke(), time, timing);
-      yield from.lineWidth(to.lineWidth(), time, timing);
+      yield from.fill(to.fill(), duration, timing);
+      yield from.stroke(to.stroke(), duration, timing);
+      yield from.lineWidth(to.lineWidth(), duration, timing);
     }
 
     const fromChildren = from.children();
@@ -229,7 +229,7 @@ export class SVG extends Shape {
       yield* this.generateTransformer(
         fromChildren[i],
         toChildren[i],
-        time,
+        duration,
         timing,
       );
     }
