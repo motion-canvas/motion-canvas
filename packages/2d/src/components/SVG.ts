@@ -78,8 +78,10 @@ export interface SVGProps extends ShapeProps {
 }
 
 /**
- * Node to render and animating SVG.
- * You should use Image node if you do not want to animate children.
+A Node for drawing and animating SVG images.
+
+@remarks
+If you're not interested in animating SVG, you can use {@link Img} instead.
  */
 export class SVG extends Shape {
   @lazy(() => {
@@ -113,9 +115,8 @@ export class SVG extends Shape {
   }
 
   /**
-   * Get SVG node by id.
-   * @param id - id
-   * @returns list of Node that have matched id
+   * Get all SVG nodes with the given id.
+   * @param id - An id to query.
    */
   public getChildrenById(id: string) {
     return this.document()
@@ -158,9 +159,8 @@ export class SVG extends Shape {
   }
 
   /**
-   * Convert SVGDocumentData into SVGDocument
-   * @param data - SVGDocumentData
-   * @returns SVGDocument
+   * Convert `SVGDocumentData` to `SVGDocument`.
+   * @param data - `SVGDocumentData` to convert.
    */
   protected buildDocument(data: SVGDocumentData): SVGDocument {
     return {
@@ -170,9 +170,8 @@ export class SVG extends Shape {
   }
 
   /**
-   * Build SVGShapeData into SVGShape
-   * @param data - SVGShapeData
-   * @returns SVGShape
+   * Convert `SVGShapeData` to `SVGShape`.
+   * @param data - `SVGShapeData` to convert.
    */
   protected buildShape({id, type, props, children}: SVGShapeData): SVGShape {
     return {
@@ -185,25 +184,24 @@ export class SVG extends Shape {
   }
 
   /**
-   * Parse SVG as SVGDocument
-   * @param svg - svg string to be parsed
-   * @returns - SVGDocument
+   * Convert an SVG string to `SVGDocument`.
+   * @param svg - An SVG string to be parsed.
    */
   protected parseSVG(svg: string): SVGDocument {
     return this.buildDocument(SVG.parseSVGData(svg));
   }
 
   /**
-   * Create tweening list to tween node from initial node to final node.
-   * @param from - Initial node
-   * @param to - Final node
-   * @param time - time for tweening
-   * @param timing - timing for tweening
+   * Create a tweening list to tween between two SVG nodes.
+   * @param from - The initial node,
+   * @param to - The final node.
+   * @param duration - The duration of the tween.
+   * @param timing - The timing function.
    */
   protected *generateTransformer(
     from: Node,
     to: Node,
-    time: number,
+    duration : number,
     timing: TimingFunction,
   ): Generator<ThreadGenerator> {
     yield from.position(to.position(), time, timing);
@@ -352,8 +350,7 @@ export class SVG extends Shape {
   }
 
   /**
-   * Get current SVGDocument
-   * @returns
+   * Get the current `SVGDocument`.
    */
   @computed()
   private document(): SVGDocument {
@@ -370,7 +367,7 @@ export class SVG extends Shape {
   }
 
   /**
-   * Get current document nodes
+   * Get current document nodes.
    */
   @computed()
   private documentNodes() {
@@ -378,9 +375,9 @@ export class SVG extends Shape {
   }
 
   /**
-   * Convert SVG color in Shape properties into MotionCanvas color.
-   * @param param - Shape properties
-   * @returns Converted Shape properties
+   * Convert SVG colors in Shape properties to Motion Canvas colors.
+   * @param param - Shape properties.
+   * @returns Converted Shape properties.
    */
   private processElementStyle({fill, stroke, ...rest}: ShapeProps): ShapeProps {
     return {
@@ -392,11 +389,10 @@ export class SVG extends Shape {
   }
 
   /**
-   * Parse SVG as SVGDocumentData
-   * @param svg - svg string to be parsed
-   * @returns SVGDocumentData that can be used to build SVGDocument
+   * Parse an SVG string as `SVGDocumentData`.
+   * @param svg - And SVG string to be parsed.
+   * @returns `SVGDocumentData` that can be used to build SVGDocument.
    */
-
   protected static parseSVGData(svg: string) {
     const cached = SVG.svgNodesPool[svg];
     if (cached && (cached.size.x > 0 || cached.size.y > 0)) return cached;
@@ -477,9 +473,9 @@ export class SVG extends Shape {
   }
 
   /**
-   * Convert SVG color into MotionCanvas color
-   * @param color - SVG color
-   * @returns MotionCanvas color
+   * Convert an SVG color into a Motion Canvas color.
+   * @param color - SVG color.
+   * @returns Motion Canvas color.
    */
   private static processSVGColor(
     color: SignalValue<PossibleCanvasStyle> | undefined,
@@ -497,10 +493,9 @@ export class SVG extends Shape {
   }
 
   /**
-   * Get final SVG element transformation.
-   * @param element - SVG element
-   * @param parentTransform - Tranformation that applied into children
-   * @returns - Current SVG element final transformation
+   * Get the final transformation matrix for the given SVG element.
+   * @param element - SVG element.
+   * @param parentTransform - The transformation matrix of the parent.
    */
   private static getElementTransformation(
     element: SVGGraphicsElement,
@@ -563,10 +558,9 @@ export class SVG extends Shape {
   }
 
   /**
-   * Convert SVG style into MotionCanvas Shape
-   * @param element - SVG element
-   * @param inheritedStyle - Parent style that must inherited to this element
-   * @returns - MotionCanvas Shape properties
+   * Convert the SVG element's style to a Motion Canvas Shape properties.
+   * @param element - An SVG element whose style should be converted.
+   * @param inheritedStyle - The parent style that should be inherited.
    */
   private static getElementStyle(
     element: SVGGraphicsElement,
@@ -598,14 +592,13 @@ export class SVG extends Shape {
   }
 
   /**
-   * Extract SVGShapeData list from SVG element children.
-   * This will not extract current element shape.
-   * @param element - Element to be extracted
-   * @param svgRoot - SVG root ("svg" tag) of element
-   * @param parentTransform - Matrix transformation applied to parent
-   * @param inheritedStyle - style of current SVG `element` that must inherited to its children
+   * Extract `SVGShapeData` list from the SVG element's children.
+   * This will not extract the current element's shape.
+   * @param element - An element whose children will be extracted.
+   * @param svgRoot - The SVG root ("svg" tag) of the element.
+   * @param parentTransform - The transformation matrix applied to the parent.
+   * @param inheritedStyle - The style of the current SVG `element` that the children should inherit.
    */
-
   private static *extractGroupNodes(
     element: SVGElement,
     svgRoot: Element,
@@ -625,10 +618,10 @@ export class SVG extends Shape {
   }
 
   /**
-   * Parse number from SVG element attribute
-   * @param element - SVG element whoose element will be parsed
-   * @param name - attribute name to be parse
-   * @returns  parsed number or 0 if attribute is not defined
+   * Parse a number from an SVG element attribute.
+   * @param element - SVG element whose attribute will be parsed.
+   * @param name - The name of the attribute to parse.
+   * @returns a parsed number or `0` if the attribute is not defined.
    */
 
   private static parseNumberAttribute(
@@ -639,13 +632,13 @@ export class SVG extends Shape {
   }
 
   /**
-   * Extract SVGShapeData list from SVG element. This also will extract shape from children.
-   * @param child - SVG element to extract
-   * @param svgRoot - SVG root ("svg" tag) of element
-   * @param parentTransform - Matrix transformation applied to parent
-   * @param inheritedStyle - parent style that must inherited into current shape style
+   * Extract `SVGShapeData` list from the SVG element.
+   * This will also recursively extract shapes from its children.
+   * @param child - An SVG element to extract.
+   * @param svgRoot - The SVG root ("svg" tag) of the element.
+   * @param parentTransform - The transformation matrix applied to the parent.
+   * @param inheritedStyle - The style of the parent SVG element that the element should inherit.
    */
-
   private static *extractElementNodes(
     child: SVGGraphicsElement,
     svgRoot: Element,
