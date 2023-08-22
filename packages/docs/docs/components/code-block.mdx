@@ -126,8 +126,9 @@ range(
 );
 ```
 
-For this specific use case there is however another helper, `word`. It expects 3
-parameters - the starting line and character offset, aswell as a word length.
+For this specific use case there is however another helper, `word`. It expects
+2-3 parameters - the starting line and character offset, aswell as an optional
+word length.
 
 The aforementioned `range`-Example could be rewritten as follows using the
 `word`-Helper:
@@ -166,7 +167,7 @@ yield * codeRef().selection([...lines(2), ...word(4, 5, 10)], 1);
 :::
 
 If you wish to undo a selection, you can either select all lines from `0` to
-`Infinity`, or simply pass `DEFAULT` from as a selection:
+`Infinity`, or simply pass `DEFAULT` as a selection, as shown below:
 
 ```ts
 import {DEFAULT} from '@motion-canvas/core';
