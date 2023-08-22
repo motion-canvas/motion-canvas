@@ -74,7 +74,7 @@ export interface SVGDocumentData {
 }
 
 export interface SVGProps extends ShapeProps {
-  svg?: SignalValue<string>;
+  svg: SignalValue<string>;
 }
 
 /**
