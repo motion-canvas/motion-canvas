@@ -493,12 +493,7 @@ export class SVG extends Shape {
     color: SignalValue<PossibleCanvasStyle> | undefined,
   ): SignalValue<PossibleCanvasStyle> | undefined {
     if (color === 'transparent' || color === 'none') {
-      return {
-        r: 0,
-        g: 0,
-        b: 0,
-        a: 0,
-      };
+      return null;
     }
 
     return color;
