@@ -186,8 +186,30 @@ export function Timeline() {
               event.x - rect.x + newOffset
             }px`;
           }}
-          onMouseMove={event => {
+          onPointerDown={event => {
+            if (event.button === 1) {
+              event.preventDefault();
+              event.currentTarget.setPointerCapture(event.pointerId);
+              containerRef.current.style.cursor = 'grabbing';
+            }
+          }}
+          onPointerMove={event => {
             playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              const newOffset = clamp(
+                0,
+                sizes.playableLength,
+                offset - event.movementX,
+              );
+              setOffset(newOffset);
+              containerRef.current.scrollLeft = newOffset;
+            }
+          }}
+          onPointerUp={event => {
+            if (event.button === 1) {
+              event.currentTarget.releasePointerCapture(event.pointerId);
+              containerRef.current.style.cursor = '';
+            }
           }}
         >
           <div
