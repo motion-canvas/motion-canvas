@@ -1,4 +1,3 @@
-import React from 'react';
 import {useShortcuts, ShortcutModules} from '../contexts/shortcuts';
 import {useHover} from './useHover';
 

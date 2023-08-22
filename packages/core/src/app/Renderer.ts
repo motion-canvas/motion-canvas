@@ -8,6 +8,8 @@ import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
+import {clampRemap} from '../tweening';
+import {TimeEstimator} from './TimeEstimator';
 
 export interface RendererSettings extends StageSettings {
   name: string;
@@ -58,6 +60,7 @@ export class Renderer {
   private readonly frame = new ValueDispatcher(0);
 
   public readonly stage = new Stage();
+  public readonly estimator = new TimeEstimator();
 
   private readonly lock = new Semaphore();
   private readonly playback: PlaybackManager;
@@ -92,6 +95,7 @@ export class Renderer {
   public async render(settings: RendererSettings) {
     if (this.state.current !== RendererState.Initial) return;
     await this.lock.acquire();
+    this.estimator.reset();
     this.state.current = RendererState.Working;
     let result: RendererResult;
     try {
@@ -110,6 +114,7 @@ export class Renderer {
       }
     }
 
+    this.estimator.update(1);
     this.state.current = RendererState.Initial;
     this.finished.dispatch(result);
     this.lock.release();
@@ -190,22 +195,29 @@ export class Renderer {
     this.playback.fps = settings.fps;
     this.playback.state = PlaybackState.Rendering;
     const from = this.status.secondsToFrames(settings.range[0]);
-    const to = this.status.secondsToFrames(settings.range[1]);
+    this.frame.current = from;
 
     await this.reloadScenes(settings);
     await this.playback.recalculate();
     if (signal.aborted) return RendererResult.Aborted;
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
+
+    const to = Math.min(
+      this.playback.duration,
+      this.status.secondsToFrames(settings.range[1]),
+    );
     await this.playback.seek(from);
     if (signal.aborted) return RendererResult.Aborted;
 
     await this.exporter.start?.();
-
     let lastRefresh = performance.now();
     let result = RendererResult.Success;
     try {
+      this.estimator.reset(1 / (to - from));
       await this.exportFrame(signal);
+      this.estimator.update(clampRemap(from, to, 0, 1, this.playback.frame));
+
       if (signal.aborted) {
         result = RendererResult.Aborted;
       } else {
@@ -213,6 +225,9 @@ export class Renderer {
         while (!finished) {
           await this.playback.progress();
           await this.exportFrame(signal);
+          this.estimator.update(
+            clampRemap(from, to, 0, 1, this.playback.frame),
+          );
           if (performance.now() - lastRefresh > 1 / 30) {
             lastRefresh = performance.now();
             await new Promise(resolve => setTimeout(resolve, 0));
