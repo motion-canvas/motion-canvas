@@ -399,7 +399,19 @@ export class SVG extends Shape {
 
     SVG.containerElement.innerHTML = svg;
 
-    const svgRoot = SVG.containerElement.querySelector('svg')!;
+    const svgRoot = SVG.containerElement.querySelector('svg');
+
+    if (!svgRoot) {
+      useLogger().error({
+        message: 'Invalid SVG',
+        object: svg,
+      });
+      return {
+        size: new Vector2(0, 0),
+        nodes: [],
+      } as SVGDocumentData;
+    }
+
     let viewBox = new BBox();
     let size = new Vector2();
 
