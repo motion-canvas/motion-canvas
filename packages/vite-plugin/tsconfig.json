@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "outDir": "lib",
     "strict": true,
     "module": "commonjs",

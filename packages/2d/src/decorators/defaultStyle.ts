@@ -1,5 +1,5 @@
 import {capitalize} from '@motion-canvas/core/lib/utils';
-import {Layout} from 'components';
+import {Layout} from '../components';
 
 export function defaultStyle<T>(
   styleName: string,
