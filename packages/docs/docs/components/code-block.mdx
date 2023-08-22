@@ -20,7 +20,7 @@ important snippets.
 
 To display code, set the `code` and `language` property.
 
-```ts
+```tsx
 import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
 
 yield view.add(
@@ -95,15 +95,94 @@ yield view.add(
 Code may be "selected" to call attention to it. The default behavior is to
 desaturate any unselected text.
 
-A selection can be made using the `selection` property when the `CodeBlock` is
-first created. Selections are specified using two `[line, position]` arrays
-nested inside another array which allows you to have multiple selections.
+#### Using Helpers
 
-The `line` and `position` are zero indexed, and `position` is an insert position
-between characters. So `[[[0, 5], [1, 2]]]` will select the sixth character on
-the first line through to the second character on the second line.
+You can define the selection with the help of three helper functions — `range`,
+`word` and `lines`.
 
-The following named example should make the structure easier to understand:
+```tsx
+import {CodeBlock} from '@motion-canvas/2d/lib/components/CodeBlock';
+import {createRef} from '@motion-canvas/core';
+
+const codeBlockRef = createRef<CodeBlock>();
+yield view.add(
+  <CodeBlock ref={codeBlockRef} code={`...`} selection={range(0, 2, 0, 4)} />,
+);
+// or
+yield codeBlockRef.selection(range(0, 2, 0, 4));
+```
+
+`range` expects 4 parameters: the starting line, starting character offset,
+ending line and ending character offset. Do note however that all values are
+**zero-indexed**. So if you want to select a 5 character long word on the first
+line that has another 4 characters before it, you would use the following call:
+
+```ts
+range(
+  0, // starting on the first line
+  4, // starting with the 5th character
+  0, // ending on the first line
+  8, // ending with the 9th character
+);
+```
+
+For this specific use case there is however another helper, `word`. It expects 3
+parameters - the starting line and character offset, aswell as a word length.
+
+The aforementioned `range`-Example could be rewritten as follows using the
+`word`-Helper:
+
+```ts
+word(
+  0, // starting on the first line
+  4, // starting with the 5th character,
+  5, // the selection will have a total of 5 chars, can be ommited, which will select the remainder of this line
+);
+```
+
+Do note that the `word`-Helper can only be applied on a per-line basis.
+
+Finally, you can use the `lines` function to select whole lines of code. The
+following will select the 5th up to the 10th line:
+
+```ts
+lines(
+  4, // starting line
+  9, // ending line, can be ommited, which will only select the starting line
+);
+```
+
+:::tip
+
+You can also mix and match helpers by using the spread operator!
+
+You could select the 3rd line and a 10 character long word on the 5th line
+starting at the 6th character using the following expression:
+
+```tsx
+yield * codeRef().selection([...lines(2), ...word(4, 5, 10)], 1);
+```
+
+:::
+
+If you wish to undo a selection, you can either select all lines from `0` to
+`Infinity`, or simply pass `DEFAULT` from as a selection:
+
+```ts
+import {DEFAULT} from '@motion-canvas/core';
+
+// highlight lines 1 and 2
+yield * codeRef().selection(lines(1, 2), 1);
+
+// highlight all lines
+yield * codeRef().selection(DEFAULT, 1);
+```
+
+#### Raw Usage
+
+Under the hood the helpers return a nested array which defines multiple
+selections using two tuples, each defining a line and character offset per
+selection.
 
 ```tsx
 <CodeBlock
@@ -125,87 +204,16 @@ The following named example should make the structure easier to understand:
 />
 ```
 
-The following code will select `myBool` out of the code snippet.
-
-```tsx
-yield view.add(
-  <CodeBlock
-    code={`var myBool;`}
-    selection={[
-      [
-        // Creates a selection from the 5th (index 4) to the 11th
-        // (index 10) character on the first line (index 0)
-        [0, 4],
-        [0, 10],
-      ],
-    ]}
-  />,
-);
-```
-
-It is often better, however, to use one of the three provided utility functions
-for selection. Though they all return a array with one selection entry they can
-be more descriptive than an array literal.
-
-The first and most commonly used is the `range` function. `range(0, 4, 0, 10)`
-is equivalent to `[[[0, 4], [0, 10]]]`, making `range` a direct substitute for
-an array literal.
-
-The second is the `word` function, which creates a range on a single line using
-a position and a length. So `word(2, 4, 6)` will make a selection on the third
-line, starting at the fifth character, and selecting a total of six characters.
-
-Finally, you can use the `lines` function to select whole lines of code.
-
-```tsx
-import {CodeBlock, lines} from '@motion-canvas/2d/lib/components/CodeBlock';
-
-const codeRef = createRef();
-yield view.add(
-  <CodeBlock
-    ref={codeRef}
-    code={`
-      // first line
-      // second line
-      // third line`}
-  />,
-);
-
-// second line only
-yield * codeRef().selection(lines(1), 1);
-// second and third line (line 1 to line 2)
-yield * codeRef().selection(lines(1, 2), 1);
-```
-
-:::tip
-
-You can also mix and match helpers by using the spread operator!
-
-You could select the 3rd line and a 10 character long word on the 5th line
-starting at the 6th character using the following expression:
-
-```tsx
-yield * codeRef().selection([...lines(2), ...word(4, 5, 10)], 1);
-```
-
-:::
-
-To remove a selection, the value of `.selection()` signal can be set to its
-[`DEFAULT`][signal-default], i.e. "all selected". For example:
+`lines(4,7)` will for example return the following structure:
 
 ```ts
-import {DEFAULT} from '@motion-canvas/core';
-
-// highlight lines 1 and 2
-yield * codeRef().selection(lines(1, 2), 1);
-
-// highlight all lines
-yield * codeRef().selection(DEFAULT, 1);
+[
+  [
+    [4, Infinity],
+    [7, Infinity],
+  ],
+];
 ```
-
-Alternatively, the selected range can be set from `[0, 0]` to
-`[Infinity, Infinity]` to select all text. This is most easily performed by
-setting the selection to `lines(0, Infinity)`.
 
 ### Animating code
 
