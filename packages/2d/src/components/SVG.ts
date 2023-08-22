@@ -400,8 +400,8 @@ export class SVG extends Shape {
     SVG.containerElement.innerHTML = svg;
 
     const svgRoot = SVG.containerElement.querySelector('svg')!;
-    let viewBox: BBox = new BBox();
-    let size: Vector2 = new Vector2();
+    let viewBox = new BBox();
+    let size = new Vector2();
 
     const hasViewBox = svgRoot.hasAttribute('viewBox');
     const hasSize =
