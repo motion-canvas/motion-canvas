@@ -13,11 +13,6 @@
   justify-content: center;
   gap: 16px;
 
-  &.disabled {
-    opacity: 0.54;
-    pointer-events: none;
-  }
-
   select,
   input {
     width: 100px;
