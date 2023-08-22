@@ -25,7 +25,6 @@ export class AudioManager {
       });
     }
   }
-
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);
   }
@@ -107,7 +106,12 @@ export class AudioManager {
     const response = await fetch(this.source, {signal});
     const rawBuffer = await response.arrayBuffer();
     if (signal.aborted) return;
-    const audioBuffer = await this.decodeAudioData(rawBuffer);
+    let audioBuffer: AudioBuffer;
+    try {
+      audioBuffer = await this.decodeAudioData(rawBuffer);
+    } catch (e) {
+      return;
+    }
     if (signal.aborted) return;
 
     const sampleSize = 256;
@@ -164,7 +168,7 @@ export class AudioManager {
 
   private decodeAudioData(buffer: ArrayBuffer): Promise<AudioBuffer> {
     return new Promise<AudioBuffer>((resolve, reject) =>
-      this.context.decodeAudioData(buffer, resolve, reject),
+      this.context.decodeAudioData(buffer, resolve, reject).catch(reject),
     );
   }
 }

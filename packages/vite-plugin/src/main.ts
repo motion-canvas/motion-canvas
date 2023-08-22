@@ -13,6 +13,8 @@ import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
 import {openInExplorer} from './openInExplorer';
 import * as os from 'os';
 
+const AudioExtensions = new Set(['.mp3', '.wav', '.ogg', '.aac', '.flac']);
+
 export interface MotionCanvasPluginConfig {
   /**
    * The import path of the project file or an array of paths.
@@ -53,7 +55,7 @@ export interface MotionCanvasPluginConfig {
    * there. This leaves the original files open for modification with hot module
    * replacement still working.
    *
-   * @defaultValue /\.(wav|ogg)$/
+   * @defaultValue /^$/
    */
   bufferedAssets?: RegExp | false;
   /**
@@ -90,7 +92,7 @@ export interface MotionCanvasPluginConfig {
 export default ({
   project = './src/project.ts',
   output = './output',
-  bufferedAssets = /\.(wav|ogg)$/,
+  bufferedAssets = /^$/,
   editor = '@motion-canvas/ui',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
@@ -329,6 +331,15 @@ export default ({
           `}`,
           `meta.loadData(${code});`,
           `export default meta;`,
+        );
+      }
+
+      if (AudioExtensions.has(ext)) {
+        return source(
+          code,
+          `if (import.meta.hot) {`,
+          `  import.meta.hot.accept();`,
+          `}`,
         );
       }
     },
