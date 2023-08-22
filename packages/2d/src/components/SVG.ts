@@ -630,7 +630,6 @@ export class SVG extends Shape {
    * @param name - The name of the attribute to parse.
    * @returns a parsed number or `0` if the attribute is not defined.
    */
-
   private static parseNumberAttribute(
     element: SVGElement,
     name: string,
