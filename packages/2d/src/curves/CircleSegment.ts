@@ -53,7 +53,7 @@ export class CircleSegment extends Segment {
       {
         position: this.center.add(startNormal.scale(this.radius)),
         tangent: this.counter ? startNormal : startNormal.flipped,
-        normal: this.counter ? startNormal : startNormal.flipped,
+        normal: this.counter ? startNormal.flipped : startNormal,
       },
       {
         position: this.center.add(endNormal.scale(this.radius)),
