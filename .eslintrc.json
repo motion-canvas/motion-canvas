@@ -15,6 +15,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
+  "root": true,
   "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
   "rules": {
     "require-yield": "off",
