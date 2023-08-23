@@ -1,5 +1,9 @@
-import {useDuration, usePlayerState, useRendererState} from '../../hooks';
-import {PlaybackControls, PlaybackProgress} from '../playback';
+import {useDuration, useRendererState} from '../../hooks';
+import {
+  PlaybackControls,
+  PlaybackProgress,
+  RenderingProgress,
+} from '../playback';
 import {CurrentTime} from '../playback/CurrentTime';
 import {EditorPreview} from './EditorPreview';
 import styles from './Viewport.module.scss';
@@ -7,61 +11,80 @@ import {useApplication} from '../../contexts';
 import {CustomStage} from './CustomStage';
 import {RendererState} from '@motion-canvas/core';
 import {useShortcut} from '../../hooks/useShortcut';
+import {formatDuration} from '../../utils';
+import {useEffect, useState} from 'preact/hooks';
+import {Timestamp} from './Timestamp';
 
 export function Viewport() {
-  const [hoverRef] = useShortcut<HTMLDivElement>('viewport');
-  const {player, renderer} = useApplication();
-  const duration = useDuration();
-  const {speed} = usePlayerState();
   const state = useRendererState();
+  return state === RendererState.Working ? (
+    <RenderingViewport />
+  ) : (
+    <EditorViewport />
+  );
+}
+
+function EditorViewport() {
+  const [hoverRef] = useShortcut<HTMLDivElement>('viewport');
+  const duration = useDuration();
 
   return (
     <div ref={hoverRef} className={styles.root}>
-      {state === RendererState.Working ? (
-        <CustomStage stage={renderer.stage} />
-      ) : (
-        <EditorPreview />
-      )}
+      <EditorPreview />
       <PlaybackProgress />
       <div className={styles.playback}>
         <CurrentTime
-          render={time => {
-            return (
-              <code className={styles.time} title="Current time">
-                {formatDuration(player.status.framesToSeconds(time))}
-                <span className={styles.frames}>
-                  [{formatFrames(time, speed)}]
-                </span>
-              </code>
-            );
-          }}
+          render={time => (
+            <Timestamp
+              className={styles.time}
+              title="Current Time"
+              frame={time}
+            />
+          )}
         />
         <PlaybackControls />
-        <code className={styles.duration} title="Duration">
-          <span className={styles.frames}>
-            [{formatFrames(duration, speed)}]
-          </span>
-          {formatDuration(player.status.framesToSeconds(duration))}
-        </code>
+        <Timestamp
+          className={styles.duration}
+          title="Duration"
+          frame={duration}
+        />
       </div>
     </div>
   );
 }
 
-function formatDuration(duration: number) {
-  const minutes = Math.floor(duration / 60) % 60;
-  const seconds = Math.floor(duration % 60);
+function RenderingViewport() {
+  const {renderer} = useApplication();
+  const [estimate, setEstimate] = useState(renderer.estimator.estimate());
 
-  return `${minutes.toString().padStart(2, '0')}:${seconds
-    .toString()
-    .padStart(2, '0')}`;
-}
+  useEffect(() => {
+    const id = setInterval(() => {
+      setEstimate(renderer.estimator.estimate());
+    }, 100);
+    return () => clearInterval(id);
+  }, []);
 
-function formatFrames(frames: number, speed: number) {
-  const round = speed % 1 === 0;
-  if (round) {
-    return frames;
-  } else {
-    return frames.toFixed(2);
-  }
+  return (
+    <div className={styles.root}>
+      <CustomStage stage={renderer.stage} />
+      <RenderingProgress />
+      <div className={styles.playback}>
+        <code
+          className={styles.time}
+          title="Time elapsed since the rendering started"
+        >
+          {formatDuration(estimate.elapsed / 1000)}
+          <span className={styles.frames}>Elapsed</span>
+        </code>
+        <div />
+        <code
+          className={styles.duration}
+          title="Estimated time remaining until the rendering is complete"
+        >
+          <span className={styles.frames}>ETA:</span>
+          {formatDuration(estimate.eta / 1000)}
+        </code>
+      </div>
+    </div>
+  );
 }

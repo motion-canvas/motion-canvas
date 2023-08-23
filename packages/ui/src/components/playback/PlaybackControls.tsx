@@ -1,12 +1,10 @@
 import styles from './Playback.module.scss';
 
 import {IconButton, IconCheckbox, Input, Select} from '../controls';
-import {useDocumentEvent, usePlayerState, useRendererState} from '../../hooks';
+import {useDocumentEvent, usePlayerState} from '../../hooks';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
-import clsx from 'clsx';
-import React from 'react';
 import {
   Pause,
   PhotoCamera,
@@ -17,12 +15,10 @@ import {
   VolumeOff,
   VolumeOn,
 } from '../icons';
-import {RendererState} from '@motion-canvas/core';
 
 export function PlaybackControls() {
   const {player, renderer, meta, project} = useApplication();
   const state = usePlayerState();
-  const rendererState = useRendererState();
 
   useDocumentEvent(
     'keydown',
@@ -67,12 +63,7 @@ export function PlaybackControls() {
   );
 
   return (
-    <div
-      className={clsx(
-        styles.controls,
-        rendererState === RendererState.Working && styles.disabled,
-      )}
-    >
+    <div className={styles.controls}>
       <Select
         title="Playback speed"
         options={[
@@ -127,13 +118,7 @@ export function PlaybackControls() {
           <Input
             title="Current framerate"
             readOnly
-            value={
-              rendererState === RendererState.Working
-                ? 'RENDERING'
-                : paused
-                ? 'PAUSED'
-                : `${framerate} FPS`
-            }
+            value={paused ? 'PAUSED' : `${framerate} FPS`}
           />
         )}
       />
