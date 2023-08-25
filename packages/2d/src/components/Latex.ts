@@ -4,15 +4,25 @@ import {SVG} from 'mathjax-full/js/output/svg';
 import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
 import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
 import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
-import {initial, signal} from '../decorators';
-import {Img, ImgProps} from './Img';
+import {computed, initial, parser, signal} from '../decorators';
 import {
-  DependencyContext,
+  Signal,
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
 import {OptionList} from 'mathjax-full/js/util/Options';
+import {
+  SVGProps,
+  SVG as SVGNode,
+  SVGDocument,
+  SVGShapeData,
+  SVGDocumentData,
+} from './SVG';
+import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
+import {TimingFunction} from '@motion-canvas/core/lib/tweening';
 import {useLogger} from '@motion-canvas/core/lib/utils';
+import {Node} from './Node';
+import {Vector2, SerializedVector2} from '@motion-canvas/core';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
@@ -24,64 +34,171 @@ const JaxDocument = mathjax.document('', {
   OutputJax: new SVG({fontCache: 'local'}),
 });
 
-export interface LatexProps extends ImgProps {
-  tex?: SignalValue<string>;
+export interface LatexProps extends Omit<SVGProps, 'svg'> {
+  tex?: SignalValue<string[] | string>;
   renderProps?: SignalValue<OptionList>;
 }
 
-/**
- * A node for rendering equations with LaTeX.
- *
- * @preview
- * ```tsx editor
- * import {Latex, makeScene2D} from '@motion-canvas/2d';
- *
- * export default makeScene2D(function* (view) {
- *   view.add(
- *     <Latex
- *       // Note how this uses \color to set the color.
- *       tex="{\color{white} ax^2+bx+c=0 \implies x=\frac{-b \pm \sqrt{b^2-4ac}}{2a}}"
- *       width={600} // height and width can calculate based on each other
- *     />,
- *   );
- * });
- * ```
- */
-export class Latex extends Img {
+export class Latex extends SVGNode {
+  @lazy(() => {
+    return parseFloat(
+      window.getComputedStyle(SVGNode.containerElement).fontSize,
+    );
+  })
+  private static containerFontSize: number;
   private static svgContentsPool: Record<string, string> = {};
-
-  private readonly imageElement = document.createElement('img');
+  private static texNodesPool: Record<string, SVGDocumentData> = {};
+  private svgSubTexMap: Record<string, string[]> = {};
 
   @initial({})
   @signal()
   public declare readonly options: SimpleSignal<OptionList, this>;
 
+  @initial('')
+  @parser(function (this: SVGNode, value: string[] | string): string[] {
+    const array = typeof value === 'string' ? [value] : value;
+    const subtex = array
+      .reduce<string[]>((prev, current) => {
+        prev.push(...current.split(/{{(.*?)}}/));
+        return prev;
+      }, [])
+      .map(sub => sub.trim())
+      .filter(sub => sub.length > 0);
+    return subtex;
+  })
   @signal()
-  public declare readonly tex: SimpleSignal<string, this>;
+  public declare readonly tex: Signal<string[] | string, string[], this>;
 
   public constructor(props: LatexProps) {
-    super(props);
+    super({
+      fontSize: 48,
+      ...props,
+      svg: '',
+    });
+    this.svg(this.latexSVG);
   }
 
-  protected override image(): HTMLImageElement {
-    // Render props may change the look of the TeX, so we need to cache both
-    // source and render props together.
-    const src = `${this.tex()}::${JSON.stringify(this.options())}`;
-    if (Latex.svgContentsPool[src]) {
-      this.imageElement.src = Latex.svgContentsPool[src];
-      if (!this.imageElement.complete) {
-        DependencyContext.collectPromise(
-          new Promise((resolve, reject) => {
-            this.imageElement.addEventListener('load', resolve);
-            this.imageElement.addEventListener('error', reject);
-          }),
-        );
+  protected override calculateWrapperScale(
+    documentSize: Vector2,
+    parentSize: SerializedVector2<number | null>,
+  ): Vector2 {
+    if (parentSize.x || parentSize.y) {
+      return super.calculateWrapperScale(documentSize, parentSize);
+    }
+    return new Vector2(this.fontSize() / Latex.containerFontSize);
+  }
+
+  @computed()
+  protected latexSVG() {
+    return this.texToSvg(this.tex());
+  }
+
+  protected subtexsToLatex(subtexs: string[]) {
+    return subtexs.join('');
+  }
+
+  private getNodeCharacterId({id}: SVGShapeData) {
+    if (!id.includes('-')) return id;
+    return id.substring(id.lastIndexOf('-') + 1);
+  }
+
+  protected override parseSVG(svg: string): SVGDocument {
+    const subtexs = this.svgSubTexMap[svg]!;
+    const key = `[${subtexs.join(',')}]::${JSON.stringify(this.options())}`;
+    const cached = Latex.texNodesPool[key];
+    if (cached && (cached.size.x > 0 || cached.size.y > 0)) {
+      return this.buildDocument(Latex.texNodesPool[key]);
+    }
+    const oldSVG = SVGNode.parseSVGData(svg);
+    const oldNodes = [...oldSVG.nodes];
+
+    const newNodes: SVGShapeData[] = [];
+    for (const sub of subtexs) {
+      const subsvg = this.subTexToSVG(sub);
+      const subnodes = SVGNode.parseSVGData(subsvg).nodes;
+
+      const firstId = this.getNodeCharacterId(subnodes[0]);
+      const spliceIndex = oldNodes.findIndex(
+        node => this.getNodeCharacterId(node) === firstId,
+      );
+      const children = oldNodes.splice(spliceIndex, subnodes.length);
+
+      if (children.length === 1) {
+        newNodes.push({
+          ...children[0],
+          id: sub,
+        });
+        continue;
       }
-      return this.imageElement;
+
+      newNodes.push({
+        id: sub,
+        type: Node,
+        props: {},
+        children,
+      });
+    }
+    if (oldNodes.length > 0) {
+      useLogger().error('matching between Latex SVG and subtex failed');
     }
 
-    // Convert to TeX, look for any errors
-    const tex = this.tex();
+    const newSVG: SVGDocumentData = {
+      size: oldSVG.size,
+      nodes: newNodes,
+    };
+    Latex.texNodesPool[key] = newSVG;
+    return this.buildDocument(newSVG);
+  }
+
+  private texToSvg(subtexs: string[]) {
+    const singleTex = subtexs.join('');
+    const svg = this.singleTexToSVG(singleTex);
+    this.svgSubTexMap[svg] = subtexs;
+    return svg;
+  }
+
+  private subTexToSVG(subtex: string) {
+    let tex = subtex.trim();
+    if (
+      ['\\overline', '\\sqrt', '\\sqrt{'].includes(tex) ||
+      tex.endsWith('_') ||
+      tex.endsWith('^') ||
+      tex.endsWith('dot')
+    ) {
+      tex += '{\\quad}';
+    }
+
+    if (tex === '\\substack') tex = '\\quad';
+
+    const numLeft = tex.match(/\\left[()[\]|.\\]/g)?.length ?? 0;
+    const numRight = tex.match(/\\right[()[\]|.\\]/g)?.length ?? 0;
+    if (numLeft !== numRight) {
+      tex = tex.replace(/\\left/g, '\\big').replace(/\\right/g, '\\big');
+    }
+
+    const bracesLeft = tex.match(/((?<!\\)|(?<=\\\\)){/g)?.length ?? 0;
+    const bracesRight = tex.match(/((?<!\\)|(?<=\\\\))}/g)?.length ?? 0;
+
+    if (bracesLeft < bracesRight) {
+      tex = '{'.repeat(bracesRight - bracesLeft) + tex;
+    } else if (bracesRight < bracesLeft) {
+      tex += '}'.repeat(bracesLeft - bracesRight);
+    }
+
+    const hasArrayBegin = tex.includes('\\begin{array}');
+    const hasArrayEnd = tex.includes('\\end{array}');
+    if (hasArrayBegin !== hasArrayEnd) tex = '';
+
+    return this.singleTexToSVG(tex);
+  }
+
+  private singleTexToSVG(tex: string): string {
+    const src = `${tex}::${JSON.stringify(this.options())}`;
+    if (Latex.svgContentsPool[src]) {
+      const svg = Latex.svgContentsPool[src];
+      return svg;
+    }
+
     const svg = Adaptor.innerHTML(JaxDocument.convert(tex, this.options()));
     if (svg.includes('data-mjx-error')) {
       const errors = svg.match(/data-mjx-error="(.*?)"/);
@@ -89,24 +206,18 @@ export class Latex extends Img {
         useLogger().error(`Invalid MathJax: ${errors[1]}`);
       }
     }
+    Latex.svgContentsPool[src] = svg;
+    return svg;
+  }
 
-    // Encode to raw base64 image format
-    const text = `data:image/svg+xml;base64,${btoa(
-      `<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n${svg}`,
-    )}`;
-    Latex.svgContentsPool[src] = text;
-    const image = document.createElement('img');
-    image.src = text;
-    image.src = text;
-    if (!image.complete) {
-      DependencyContext.collectPromise(
-        new Promise((resolve, reject) => {
-          image.addEventListener('load', resolve);
-          image.addEventListener('error', reject);
-        }),
-      );
-    }
-
-    return image;
+  @threadable()
+  protected *tweenTex(
+    value: string[],
+    time: number,
+    timingFunction: TimingFunction,
+  ) {
+    const newSVG = this.texToSvg(this.tex.context.parse(value));
+    yield* this.svg(newSVG, time, timingFunction);
+    this.svg(this.latexSVG);
   }
 }
