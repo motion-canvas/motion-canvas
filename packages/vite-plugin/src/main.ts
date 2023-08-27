@@ -383,6 +383,9 @@ export default ({
         }
 
         if (name === '__open-output-path') {
+          if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, {recursive: true});
+          }
           openInExplorer(outputPath);
           res.end();
           return;

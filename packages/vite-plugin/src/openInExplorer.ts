@@ -1,36 +1,30 @@
 import {execSync, spawn} from 'child_process';
 import {platform} from 'os';
-import {existsSync, mkdirSync} from 'fs';
 
 export function openInExplorer(file: string) {
-  let explorer: string | null = null;
+  let command: string | null = null;
+  let args = [file];
   const os = platform();
-
-  if (!existsSync(file)) {
-    mkdirSync(file, {recursive: true});
-  }
 
   switch (os) {
     case 'win32':
-      explorer = 'explorer';
+      command = 'explorer';
       break;
     case 'linux':
       if (isRunningOnWSL()) {
-        explorer = 'bash';
-        file = `cd ${file} && explorer.exe .`;
+        command = 'bash';
+        args = ['-c', `cd ${file} && explorer.exe .`];
       } else {
-        explorer = 'xdg-open';
+        command = 'xdg-open';
       }
       break;
     case 'darwin':
-      explorer = 'open';
+      command = 'open';
       break;
   }
 
-  if (explorer === 'bash') {
-    spawn(explorer, ['-c', file], {detached: true}).unref();
-  } else if (explorer) {
-    spawn(explorer, [file], {detached: true}).unref();
+  if (command) {
+    spawn(command, args, {detached: true}).unref();
   } else {
     console.warn(`Unsupported OS: ${os}`);
   }
