@@ -61,7 +61,8 @@ You must set fill, if not Tex will not appear.
 ## Font Size
 
 To set the size of Tex you can set `fontSize` property. The size of this
-component will be equal to the size of `Txt` component that has equal `fontSize`.
+component will be equal to the size of `Txt` component that has equal
+`fontSize`.
 
 ```tsx editor
 import {Rect, Txt, Latex} from '@motion-canvas/2d/lib/components';
@@ -126,7 +127,7 @@ export default makeScene2D(function* (view) {
 ```
 
 When any part of the Tex whose numbers in the source and target do not match,
-all the parts of the Tex will be transformed (Number of parts greater than 0). In
-the example above, source has 1 `+` part and target has 2 `+` part, there no
+all the parts of the Tex will be transformed (Number of parts greater than 0).
+In the example above, source has 1 `+` part and target has 2 `+` part, there no
 insertion, instead a `+` part of source is transformed into first and second `+`
 part of the target.
