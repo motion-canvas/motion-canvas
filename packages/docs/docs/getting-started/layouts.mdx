@@ -180,6 +180,28 @@ From the layout's perspective, all `<Rect>`s in the example below are siblings:
 </Layout>
 ```
 
-<AnimationPlayer name="layout-group" small />
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Node, Rect, Layout} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const group = createRef<Node>();
+
+  view.add(
+    <>
+      <Layout direction={'column'} width={960} gap={40} layout>
+        <Node ref={group}>
+          <Rect height={240} fill={'#ff6470'} />
+          <Rect height={240} fill={'#ff6470'} />
+        </Node>
+        <Rect height={240} fill={'#ff6470'} />
+      </Layout>
+    </>,
+  );
+
+  yield* group().opacity(0.1, 1).to(1, 1);
+});
+```
 
 [flexbox]: https://css-tricks.com/snippets/css/a-guide-to-flexbox/

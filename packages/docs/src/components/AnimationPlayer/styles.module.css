@@ -8,11 +8,6 @@
   border: 1px solid var(--ifm-color-emphasis-300);
 }
 
-.container.small {
-  max-width: 480px;
-  margin: 0 auto var(--ifm-leading);
-}
-
 .banner {
   aspect-ratio: 3;
   display: flex;

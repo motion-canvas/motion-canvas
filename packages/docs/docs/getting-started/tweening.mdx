@@ -5,9 +5,6 @@ slug: /tweening
 
 import AnimationPlayer from '@site/src/components/AnimationPlayer';
 import CodeBlock from '@theme/CodeBlock';
-import linearSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-linear';
-import saveRestoreSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-save-restore';
-import springSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tweening-spring';
 
 # Tweening
 
@@ -19,7 +16,32 @@ special type of generators that animate between two values over given time.
 The simplest way to create a tween is via the
 [`tween`](/api/core/tweening#tween) function:
 
-<CodeBlock language="tsx">{linearSource}</CodeBlock>
+```tsx editor ratio=4
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {tween, map} from '@motion-canvas/core/lib/tweening';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      x={-150}
+      width={120}
+      height={120}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().position.x(map(-150, 150, value));
+  });
+  //highlight-end
+});
+```
 
 In the example above, we animate the x coordinate of our circle from `-300` to
 `300` over a span of `2` second.
@@ -30,9 +52,7 @@ that will be called each frame the tween takes place. The `value` parameter it
 receives is a number ranging from `0` to `1`, informing us about the progress of
 the tween. We can use it to calculate the values that our tween animates. In the
 case of our circle, we use the `map` function to map the `value` range from
-`[0, 1]` to `[-300, 300]` and set it as the `x` coordinate:
-
-<AnimationPlayer small name="tweening-linear" />
+`[0, 1]` to `[-300, 300]` and set it as the `x` coordinate.
 
 ### Timing functions
 
@@ -54,11 +74,36 @@ fix our animation:
 ```ts
 yield *
   tween(2, value => {
-    circle().position.x(map(-300, 300, easeInOutCubic(value)));
+    circle().position.x(map(-150, 150, easeInOutCubic(value)));
   });
 ```
 
-<AnimationPlayer small name="tweening-cubic" />
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {tween, map, easeInOutCubic} from '@motion-canvas/core/lib/tweening';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      x={-150}
+      width={120}
+      height={120}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().position.x(map(-150, 150, easeInOutCubic(value)));
+  });
+  //highlight-end
+});
+```
 
 `easeInOut` means that the object will speed up at the start (`in`) and slow
 down at the end (`Out`). `Cubic` denotes the mathematical function used - in
@@ -70,7 +115,134 @@ The effects of a particular easing function can be visualised by animating the
 `y` coordinate of an object as time changes with a constant rate, such as
 bouncing it in and out.
 
-<AnimationPlayer small name="tweening-visualiser" />
+```tsx editor mode=code ratio=16/9
+import {
+  Circle,
+  Grid,
+  Rect,
+  Line,
+  Node,
+  Layout,
+  Txt,
+} from '@motion-canvas/2d/lib/components';
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {all, waitFor} from '@motion-canvas/core/lib/flow';
+import {createSignal} from '@motion-canvas/core/lib/signals';
+import {linear, easeInOutBounce} from '@motion-canvas/core/lib/tweening';
+
+export default makeScene2D(function* (view) {
+  // Signals
+  const time = createSignal(0);
+  const value = createSignal(0);
+
+  // Animation time
+  const TIME = 3.5;
+
+  view.add(
+    <Node y={-15}>
+      {/* Grid and animated point */}
+      <Grid size={350} stroke={'#444'} lineWidth={1.5} spacing={50}>
+        <Rect
+          layout
+          size={50}
+          offset={[-1, 1]}
+          x={() => time() * 250 - 150}
+          y={() => value() * -250 + 150}
+        >
+          <Circle size={30} fill={'#C22929'} margin={10}></Circle>
+        </Rect>
+      </Grid>
+
+      {/* Vertical */}
+      <Node position={[-200, -200]}>
+        {/* Axis */}
+        <Line
+          lineWidth={4}
+          points={[
+            [0, 375],
+            [0, 18.5],
+          ]}
+          stroke={'#DDD'}
+          lineCap={'round'}
+          endArrow
+          arrowSize={15}
+        ></Line>
+
+        {/* Tracker */}
+        <Layout y={() => value() * -250 + 325}>
+          <Txt
+            fill={'#DDD'}
+            text={() => value().toFixed(2).toString()}
+            fontWeight={150}
+            fontSize={15}
+            x={-55}
+            y={1.5}
+          ></Txt>
+          <Circle size={15} fill={'#DDD'}></Circle>
+        </Layout>
+
+        {/* Label */}
+        <Txt
+          y={200}
+          x={-80}
+          fontWeight={200}
+          fontSize={25}
+          padding={10}
+          fontFamily={'Candara'}
+          fill={'#DDD'}
+          text={'VALUE'}
+        ></Txt>
+      </Node>
+
+      {/* Horizontal */}
+      <Node position={[-200, -200]}>
+        {/* Axis */}
+        <Line
+          lineWidth={4}
+          points={[
+            [25, 400],
+            [382.5, 400],
+          ]}
+          stroke={'#DDD'}
+          lineCap={'round'}
+          endArrow
+          arrowSize={7.5}
+        ></Line>
+
+        {/* Tracker */}
+        <Layout y={400} x={() => time() * 250 + 75}>
+          <Circle size={15} fill={'#DDD'}></Circle>
+          <Txt
+            fill={'#DDD'}
+            text={() => (time() * TIME).toFixed(2).toString()}
+            fontWeight={150}
+            fontSize={15}
+            y={25}
+          ></Txt>
+        </Layout>
+
+        {/* Label */}
+        <Txt
+          y={450}
+          x={200}
+          fontWeight={200}
+          fontSize={25}
+          padding={10}
+          fontFamily={'Candara'}
+          fill={'#DDD'}
+          text={'TIME'}
+        ></Txt>
+      </Node>
+    </Node>,
+  );
+
+  yield* waitFor(0.5);
+
+  yield* all(time(1, TIME, linear), value(1, TIME, easeInOutBounce));
+
+  yield* waitFor(0.8);
+});
+```
 
 Because using timing functions to map a range of values is a really common
 pattern, it's possible to skip `map` entirely and pass the range to the timing
@@ -106,7 +278,38 @@ yield *
 
 `Color.lerp` is a static function that interpolates between two colors:
 
-<AnimationPlayer small name="tweening-color" />
+```tsx editor
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {tween, easeInOutCubic} from '@motion-canvas/core/lib/tweening';
+import {Color} from '@motion-canvas/core/lib/types';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      width={120}
+      height={120}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().fill(
+      Color.lerp(
+        new Color('#e13238'),
+        new Color('#e6a700'),
+        easeInOutCubic(value),
+      ),
+    );
+  });
+  //highlight-end
+});
+```
 
 :::tip
 
@@ -125,15 +328,48 @@ yield *
     circle().position(
       // highlight-next-line
       Vector2.arcLerp(
-        new Vector2(-300, 200),
-        new Vector2(300, -200),
+        new Vector2(-150, 100),
+        new Vector2(150, -100),
         easeInOutCubic(value),
       ),
     );
   });
 ```
 
-<AnimationPlayer small name="tweening-vector" />
+```tsx editor ratio=2
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {tween, easeInOutCubic} from '@motion-canvas/core/lib/tweening';
+import {Vector2} from '@motion-canvas/core/lib/types';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      x={-150}
+      y={100}
+      width={120}
+      height={120}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().position(
+      Vector2.arcLerp(
+        new Vector2(-120, 100),
+        new Vector2(120, -100),
+        easeInOutCubic(value),
+      ),
+    );
+  });
+  //highlight-end
+});
+```
 
 ### Tweening properties
 
@@ -212,9 +448,37 @@ animations.
 In the example below, we use springs to animate a position of a circle, but this
 method can be used for more things than just position.
 
-<CodeBlock language="tsx">{springSource}</CodeBlock>
+```tsx editor ratio=4
+import {makeScene2D} from '@motion-canvas/2d';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {
+  PlopSpring,
+  SmoothSpring,
+  spring,
+} from '@motion-canvas/core/lib/tweening';
 
-<AnimationPlayer small name="tweening-spring" />
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      // highlight-start
+      ref={circle}
+      x={-200}
+      size={120}
+      fill={'#e13238'}
+    />,
+  );
+
+  yield* spring(PlopSpring, -200, 200, 1, value => {
+    circle().position.x(value);
+  });
+  yield* spring(SmoothSpring, 200, -200, value => {
+    circle().position.x(value);
+  });
+});
+```
 
 ### Spring description
 
@@ -292,6 +556,36 @@ state stack. If there is no saved state, this method does nothing.
 The example below shows a more complete example of how we can store and restore
 multiple states across an animation.
 
-<CodeBlock language="tsx">{saveRestoreSource}</CodeBlock>
+```tsx editor ratio=2
+import {makeScene2D} from '@motion-canvas/2d';
+import {Circle} from '@motion-canvas/2d/lib/components';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {all} from '@motion-canvas/core/lib/flow';
 
-<AnimationPlayer small name="tweening-save-restore" />
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      // highlight-start
+      ref={circle}
+      size={75}
+      position={[-150, -150]}
+      fill={'#e13238'}
+    />,
+  );
+
+  circle().save();
+  yield* all(circle().position.x(0, 1), circle().scale(1.5, 1));
+
+  circle().save();
+  yield* all(circle().position.y(0, 1), circle().scale(0.5, 1));
+
+  circle().save();
+  yield* all(circle().position.x(150, 1), circle().scale(1, 1));
+
+  yield* circle().restore(1);
+  yield* circle().restore(1);
+  yield* circle().restore(1);
+});
+```
