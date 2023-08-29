@@ -1,17 +1,31 @@
-import {Direction, Vector2} from '../types';
+import {Direction, Origin, Vector2} from '../types';
 import {useScene} from '../utils';
 import {useTransition} from './useTransition';
 import {all} from '../flow';
 import {ThreadGenerator} from '../threading';
 
 /**
- * Perform a transition that slides the scene in a given direction.
+ * Perform a transition that slides the scene in the given direction.
  *
  * @param direction - The direction in which to slide.
  * @param duration - The duration of the transition.
  */
+export function slideTransition(
+  direction: Direction,
+  duration?: number,
+): ThreadGenerator;
+/**
+ * Perform a transition that slides the scene towards the given origin.
+ *
+ * @param origin - The origin towards which to slide.
+ * @param duration - The duration of the transition.
+ */
+export function slideTransition(
+  origin: Origin,
+  duration?: number,
+): ThreadGenerator;
 export function* slideTransition(
-  direction: Direction = Direction.Top,
+  direction: Direction | Origin = Direction.Top,
   duration = 0.6,
 ): ThreadGenerator {
   const size = useScene().getSize();
