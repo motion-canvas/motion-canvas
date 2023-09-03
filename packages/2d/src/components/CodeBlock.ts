@@ -99,6 +99,38 @@ export class CodeBlock extends Shape {
   private selectionProgress = createSignal<number | null>(null);
   private oldSelection: CodeRange[] | null = null;
   private diffed: MorphToken[] | null = null;
+  private currentLineCount = 0;
+  private newLineCount = 0;
+
+  protected getLineCountOfTokenArray(tokens: Token[]): number {
+    let count = 0;
+
+    for (const token of tokens) {
+      for (let i = 0; i < token.code.length; i++) {
+        if (token.code[i] === '\n') {
+          count++;
+        }
+      }
+    }
+
+    if (tokens.length > 0) {
+      count++;
+    }
+
+    return count;
+  }
+
+  @computed()
+  public lineCount(): number {
+    const progress = this.codeProgress();
+    if (progress !== null) {
+      return Math.round(
+        map(this.currentLineCount, this.newLineCount, progress),
+      );
+    }
+
+    return this.getLineCountOfTokenArray(this.parsed());
+  }
 
   @computed()
   protected parsed() {
@@ -260,10 +292,15 @@ export class CodeBlock extends Shape {
     if (typeof code === 'function') throw new Error();
     if (!CodeBlock.initialized()) return;
 
+    const currentParsedCode = parse(this.code(), {codeStyle: this.theme()});
+    const newParsedCode = parse(code, {codeStyle: this.theme()});
+    this.currentLineCount = this.getLineCountOfTokenArray(currentParsedCode);
+    this.newLineCount = this.getLineCountOfTokenArray(newParsedCode);
+
     const autoWidth = this.width.isInitial();
     const autoHeight = this.height.isInitial();
     const fromSize = this.size();
-    const toSize = this.getTokensSize(parse(code, {codeStyle: this.theme()}));
+    const toSize = this.getTokensSize(newParsedCode);
 
     const beginning = 0.2;
     const ending = 0.8;
