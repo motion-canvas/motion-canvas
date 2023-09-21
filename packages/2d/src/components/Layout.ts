@@ -679,12 +679,7 @@ export class Layout extends Node {
   }
 
   public override localToParent(): DOMMatrix {
-    const matrix = new DOMMatrix();
-
-    matrix.translateSelf(this.x(), this.y());
-    matrix.rotateSelf(0, 0, this.rotation());
-    matrix.scaleSelf(this.scale.x(), this.scale.y());
-
+    const matrix = super.localToParent();
     const offset = this.offset();
     if (!offset.exactlyEquals(Vector2.zero)) {
       const translate = this.size().mul(offset).scale(-0.5);

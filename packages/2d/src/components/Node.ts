@@ -65,6 +65,9 @@ export interface NodeProps {
   scaleX?: SignalValue<number>;
   scaleY?: SignalValue<number>;
   scale?: SignalValue<PossibleVector2>;
+  skewX?: SignalValue<number>;
+  skewY?: SignalValue<number>;
+  skew?: SignalValue<PossibleVector2>;
   zIndex?: SignalValue<number>;
 
   opacity?: SignalValue<number>;
@@ -224,6 +227,40 @@ export class Node implements Promisable<Node> {
   @initial(Vector2.one)
   @vector2Signal('scale')
   public declare readonly scale: Vector2Signal<this>;
+
+  /**
+   * Represents the skew of this node in local space of its parent.
+   *
+   * @example
+   * Initializing the skew:
+   * ```tsx
+   * // with a possible vector:
+   * <Node skew={[40, 20]} />
+   * // with individual components:
+   * <Node skewX={40} skewY={20} />
+   * ```
+   *
+   * Accessing the skew:
+   * ```tsx
+   * // retrieving the vector:
+   * const skew = node.skew();
+   * // retrieving an individual component:
+   * const skewX = node.skew.x();
+   * ```
+   *
+   * Setting the skew:
+   * ```tsx
+   * // with a possible vector:
+   * node.skew([40, 20]);
+   * node.skew(() => [40, 20]);
+   * // with individual components:
+   * node.skew.x(40);
+   * node.skew.x(() => 40);
+   * ```
+   */
+  @initial(Vector2.zero)
+  @vector2Signal('skew')
+  public declare readonly skew: Vector2Signal<this>;
 
   /**
    * A helper signal for operating on the scale in world space.
@@ -490,9 +527,11 @@ export class Node implements Promisable<Node> {
   @computed()
   public localToParent(): DOMMatrix {
     const matrix = new DOMMatrix();
-    matrix.translateSelf(this.position.x(), this.position.y());
+    matrix.translateSelf(this.x(), this.y());
     matrix.rotateSelf(0, 0, this.rotation());
     matrix.scaleSelf(this.scale.x(), this.scale.y());
+    matrix.skewXSelf(this.skew.x());
+    matrix.skewYSelf(this.skew.y());
 
     return matrix;
   }
