@@ -1,14 +1,13 @@
-import {ShapeProps} from './Shape';
 import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {computed, initial, signal} from '../decorators';
 import {DEG2RAD} from '@motion-canvas/core/lib/utils';
-import {Curve} from './Curve';
+import {Curve, CurveProps} from './Curve';
 import {BBox} from '@motion-canvas/core';
 import {CurveProfile, getCircleProfile} from '../curves';
 import {SerializedVector2} from '@motion-canvas/core/lib/types';
 import {DesiredLength} from '../partials';
 
-export interface CircleProps extends ShapeProps {
+export interface CircleProps extends CurveProps {
   /**
    * {@inheritDoc Circle.startAngle}
    */
