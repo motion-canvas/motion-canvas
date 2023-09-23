@@ -16,9 +16,9 @@ import texSource from '!!raw-loader!@motion-canvas/examples/src/scenes/tex';
 ## A note on tweening LaTeX
 
 Because we use a canvas renderer, we're rendering the LaTeX to an image instead
-using a full graphics backend to render the TeX. This means that for all intents
-and purposes, LaTeX should be treated as if it were an image rather than more
-flexible TeX rendering like you may see in other software.
+of using a full graphics backend to render the TeX. This means that for all
+intents and purposes, LaTeX should be treated as if it were an image rather than
+more flexible TeX rendering like you may see in other software.
 
 In other words, opacity, position, size, etc. should be fine to tween, but we do
 not recommend tweening the `tex` signal.
