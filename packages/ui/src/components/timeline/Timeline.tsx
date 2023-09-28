@@ -194,7 +194,17 @@ export function Timeline() {
             }
           }}
           onPointerMove={event => {
-            playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+            const elem = document.elementFromPoint(
+              event.clientX,
+              event.clientY,
+            );
+            if (elem.classList.contains(styles.labelClip)) {
+              playheadRef.current.style.left = `${
+                elem.getBoundingClientRect().left + offset - rect.x
+              }px`;
+            } else {
+              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+            }
             if (event.currentTarget.hasPointerCapture(event.pointerId)) {
               const newOffset = clamp(
                 0,
