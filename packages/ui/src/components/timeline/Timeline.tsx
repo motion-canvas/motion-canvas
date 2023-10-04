@@ -23,6 +23,7 @@ import {
 } from '../../contexts';
 import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
+import {labelClipDragging} from '../../signals';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -194,13 +195,11 @@ export function Timeline() {
             }
           }}
           onPointerMove={event => {
-            const elem = document.elementFromPoint(
-              event.clientX,
-              event.clientY,
-            );
-            if (elem.classList.contains(styles.labelClip)) {
+            if (labelClipDragging.value.dragging) {
               playheadRef.current.style.left = `${
-                elem.getBoundingClientRect().left + offset - rect.x
+                player.status.secondsToFrames(
+                  state.framesToPixels(labelClipDragging.value.left),
+                ) + offset
               }px`;
             } else {
               playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
