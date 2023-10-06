@@ -6,7 +6,7 @@ import {useDrag} from '../../hooks';
 import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
 import {findAndOpenFirstUserFile} from '../../utils';
-import {labelClipDragging} from '../../signals';
+import {labelClipDraggingSignal} from '../../signals';
 
 interface LabelProps {
   event: TimeEvent;
@@ -23,7 +23,6 @@ export function Label({event, scene}: LabelProps) {
         setEventTime(
           eventTime + player.status.framesToSeconds(pixelsToFrames(dx)),
         );
-        labelClipDragging.value = {left: eventTime, dragging: true};
       },
       [eventTime, player, pixelsToFrames],
     ),
@@ -61,9 +60,18 @@ export function Label({event, scene}: LabelProps) {
             handleDrag(e);
           }
         }}
-        onMouseLeave={() =>
-          (labelClipDragging.value = {left: 0, dragging: false})
-        }
+        onPointerDown={event => {
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }}
+        onPointerMove={event => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            labelClipDraggingSignal.value = {left: eventTime, dragging: true};
+          }
+        }}
+        onPointerUp={event => {
+          event.currentTarget.releasePointerCapture(event.pointerId);
+          labelClipDraggingSignal.value = {left: null, dragging: false};
+        }}
         className={styles.labelClip}
         data-name={event.name}
         style={{

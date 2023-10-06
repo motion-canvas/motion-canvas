@@ -23,7 +23,7 @@ import {
 } from '../../contexts';
 import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
-import {labelClipDragging} from '../../signals';
+import {labelClipDraggingSignal} from '../../signals';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -195,11 +195,13 @@ export function Timeline() {
             }
           }}
           onPointerMove={event => {
-            if (labelClipDragging.value.dragging) {
+            if (labelClipDraggingSignal.value.dragging) {
               playheadRef.current.style.left = `${
-                player.status.secondsToFrames(
-                  state.framesToPixels(labelClipDragging.value.left),
-                ) + offset
+                state.framesToPixels(
+                  player.status.secondsToFrames(
+                    labelClipDraggingSignal.value.left,
+                  ),
+                ) + sizes.paddingLeft
               }px`;
             } else {
               playheadRef.current.style.left = `${event.x - rect.x + offset}px`;

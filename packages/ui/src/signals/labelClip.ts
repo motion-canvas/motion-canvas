@@ -1,11 +1,11 @@
 import {signal} from '@preact/signals';
 
 interface LabelClipDrag {
-  left: number;
+  left: number | null;
   dragging: boolean;
 }
 
-export const labelClipDragging = signal<LabelClipDrag>({
-  left: 0,
+export const labelClipDraggingSignal = signal<LabelClipDrag>({
+  left: null,
   dragging: false,
 });
