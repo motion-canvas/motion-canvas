@@ -1,7 +1,11 @@
 export function SkipNext() {
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      transform="matrix(-1,0,0,1,0,0)"
+    >
+      <path d="M3 12l8.5 6V6zm9 0l8.5 6V6z"></path>
     </svg>
   );
 }

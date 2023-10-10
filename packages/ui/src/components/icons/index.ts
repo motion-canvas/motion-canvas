@@ -21,6 +21,8 @@ export * from './Schedule';
 export * from './Settings';
 export * from './SkipNext';
 export * from './SkipPrevious';
+export * from './SkipStart';
+export * from './SkipEnd';
 export * from './Tune';
 export * from './UnfoldMore';
 export * from './Videocam';

@@ -12,6 +12,8 @@ import {
   Repeat,
   SkipNext,
   SkipPrevious,
+  SkipStart,
+  SkipEnd,
   VolumeOff,
   VolumeOn,
 } from '../icons';
@@ -85,6 +87,12 @@ export function PlaybackControls() {
         {state.muted ? <VolumeOff /> : <VolumeOn />}
       </IconCheckbox>
       <IconButton
+        title="Start [Shift + Left arrow]"
+        onClick={() => player.requestReset()}
+      >
+        <SkipStart />
+      </IconButton>
+      <IconButton
         title="Previous frame [Left arrow]"
         onClick={() => player.requestPreviousFrame()}
       >
@@ -104,6 +112,12 @@ export function PlaybackControls() {
         onClick={() => player.requestNextFrame()}
       >
         <SkipNext />
+      </IconButton>
+      <IconButton
+        title="End [Shift + Right arrow]"
+        onClick={() => player.requestSeek(Infinity)}
+      >
+        <SkipEnd />
       </IconButton>
       <IconCheckbox
         titleOn="Disable looping [L]"
