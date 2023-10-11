@@ -12,6 +12,8 @@ import {
   Repeat,
   SkipNext,
   SkipPrevious,
+  FastForward,
+  FastRewind,
   VolumeOff,
   VolumeOn,
 } from '../icons';
@@ -85,10 +87,16 @@ export function PlaybackControls() {
         {state.muted ? <VolumeOff /> : <VolumeOn />}
       </IconCheckbox>
       <IconButton
+        title="Start [Shift + Left arrow]"
+        onClick={() => player.requestReset()}
+      >
+        <SkipPrevious />
+      </IconButton>
+      <IconButton
         title="Previous frame [Left arrow]"
         onClick={() => player.requestPreviousFrame()}
       >
-        <SkipPrevious />
+        <FastRewind />
       </IconButton>
       <IconCheckbox
         main
@@ -102,6 +110,12 @@ export function PlaybackControls() {
       <IconButton
         title="Next frame [Right arrow]"
         onClick={() => player.requestNextFrame()}
+      >
+        <FastForward />
+      </IconButton>
+      <IconButton
+        title="End [Shift + Right arrow]"
+        onClick={() => player.requestSeek(Infinity)}
       >
         <SkipNext />
       </IconButton>

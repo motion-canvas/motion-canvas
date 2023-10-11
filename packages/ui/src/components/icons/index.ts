@@ -21,6 +21,8 @@ export * from './Schedule';
 export * from './Settings';
 export * from './SkipNext';
 export * from './SkipPrevious';
+export * from './FastForward';
+export * from './FastRewind';
 export * from './Tune';
 export * from './UnfoldMore';
 export * from './Videocam';
