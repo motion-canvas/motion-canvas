@@ -2,11 +2,10 @@ import styles from './Timeline.module.scss';
 
 import type {Scene} from '@motion-canvas/core/lib/scenes';
 import type {TimeEvent} from '@motion-canvas/core/lib/scenes/timeEvents';
-import {useDrag} from '../../hooks';
-import {useCallback, useLayoutEffect, useState} from 'preact/hooks';
+import {useLayoutEffect, useState} from 'preact/hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
 import {findAndOpenFirstUserFile} from '../../utils';
-import {labelClipDraggingSignal} from '../../signals';
+import {labelClipDraggingLeftSignal} from '../../signals';
 
 interface LabelProps {
   event: TimeEvent;
@@ -17,25 +16,6 @@ export function Label({event, scene}: LabelProps) {
   const {framesToPercents, pixelsToFrames} = useTimelineContext();
   const {player} = useApplication();
   const [eventTime, setEventTime] = useState(event.offset);
-  const [handleDrag] = useDrag(
-    useCallback(
-      dx => {
-        setEventTime(
-          eventTime + player.status.framesToSeconds(pixelsToFrames(dx)),
-        );
-      },
-      [eventTime, player, pixelsToFrames],
-    ),
-    useCallback(
-      e => {
-        const newFrame = Math.max(0, eventTime);
-        if (event.offset !== newFrame) {
-          scene.timeEvents.set(event.name, newFrame, e.shiftKey);
-        }
-      },
-      [event, eventTime],
-    ),
-  );
 
   useLayoutEffect(() => {
     setEventTime(event.offset);
@@ -49,28 +29,32 @@ export function Label({event, scene}: LabelProps) {
             await findAndOpenFirstUserFile(event.stack);
           }
         }}
-        onMouseDown={e => {
+        onPointerDown={e => {
+          e.currentTarget.setPointerCapture(e.pointerId);
           if (e.button === 1) {
             e.preventDefault();
             player.requestSeek(
               scene.firstFrame +
                 player.status.secondsToFrames(event.initialTime + event.offset),
             );
-          } else {
-            handleDrag(e);
           }
         }}
-        onPointerDown={event => {
-          event.currentTarget.setPointerCapture(event.pointerId);
-        }}
-        onPointerMove={event => {
-          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-            labelClipDraggingSignal.value = {left: eventTime, dragging: true};
+        onPointerMove={e => {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            labelClipDraggingLeftSignal.value = eventTime;
+            setEventTime(
+              eventTime +
+                player.status.framesToSeconds(pixelsToFrames(e.movementX)),
+            );
           }
         }}
-        onPointerUp={event => {
-          event.currentTarget.releasePointerCapture(event.pointerId);
-          labelClipDraggingSignal.value = {left: null, dragging: false};
+        onPointerUp={e => {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+          labelClipDraggingLeftSignal.value = null;
+          const newFrame = Math.max(0, eventTime);
+          if (event.offset !== newFrame) {
+            scene.timeEvents.set(event.name, newFrame, e.shiftKey);
+          }
         }}
         className={styles.labelClip}
         data-name={event.name}
