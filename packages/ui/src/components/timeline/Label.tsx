@@ -41,8 +41,9 @@ export function Label({event, scene}: LabelProps) {
         }}
         onPointerMove={e => {
           if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-            const newTime = eventTime +
-                player.status.framesToSeconds(pixelsToFrames(e.movementX));
+            const newTime =
+              eventTime +
+              player.status.framesToSeconds(pixelsToFrames(e.movementX));
             labelClipDraggingLeftSignal.value = newTime;
             setEventTime(newTime);
           }
