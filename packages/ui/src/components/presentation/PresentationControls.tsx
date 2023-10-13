@@ -2,7 +2,7 @@ import styles from './PresentationControls.module.scss';
 
 import {IconButton} from '../controls';
 import {useDocumentEvent, useSubscribableValue} from '../../hooks';
-import {MutableRef, useCallback, Ref} from 'preact/hooks';
+import {useCallback, Ref, StateUpdater} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {
   Close,
@@ -15,11 +15,12 @@ import {
 import { PresentationKeyBindings } from './PresentationKeyBindings';
  
 export interface PresentationControlsProps {
-  customStage?: Ref<HTMLDivElement>
+  customStage?: Ref<HTMLDivElement>,
+  onShowOverlay? : () => void;
 }
 
-export function PresentationControls({customStage} : PresentationControlsProps) {
-  const {presenter, renderer} = useApplication();
+export function PresentationControls({customStage, onShowOverlay} : PresentationControlsProps) {
+  const {presenter} = useApplication();
   const status = useSubscribableValue(presenter.onInfoChanged);
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
@@ -62,6 +63,10 @@ export function PresentationControls({customStage} : PresentationControlsProps) 
         else if(PresentationKeyBindings.TOGGLE_FULLSCREEN.includes(event.key)){
           event.preventDefault();
           toggleFullscreen();
+        }
+        else if(PresentationKeyBindings.SHOW_OVERLAY.includes(event.key)){
+          event.preventDefault();
+          onShowOverlay();
         }
       },
       [presenter],

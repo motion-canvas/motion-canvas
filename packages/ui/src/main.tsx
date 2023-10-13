@@ -4,6 +4,8 @@ import type {Project} from '@motion-canvas/core';
 import {Player, Presenter, Renderer} from '@motion-canvas/core';
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
+import {CustomStageOverlay} from "./components/viewport/CustomStageOverlay"
+import type {CustomStageOverlayPropsType} from "./components/viewport/CustomStageOverlay"
 import {Index, ProjectData} from './Index';
 import {
   InspectionProvider,
@@ -13,6 +15,7 @@ import {
 import {getItem, setItem} from './utils';
 import {ShortcutsProvider} from './contexts/shortcuts';
 import {projectNameSignal} from './signals';
+import { JSXInternal } from 'preact/src/jsx';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -20,9 +23,17 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export function editor(project: Project) {
+export * from "../src/components/viewport/CustomStageOverlay"
+
+export function stageOverlay() : (a?: CustomStageOverlayPropsType) => JSXInternal.Element{
+  return CustomStageOverlay;
+}
+
+export function editor(project: Project, stageOverlayEl?: (a?: CustomStageOverlayPropsType) => JSXInternal.Element) {
   Error.stackTraceLimit = Infinity;
   projectNameSignal.value = project.name;
+  // const customStageOverlay : JSX.Element = stageOverlayEl({});
+  const customStageOverlay = stageOverlayEl;
 
   project.logger.onLogged.subscribe(log => {
     const {level, message, stack, object, durationMs, ...rest} = log;
@@ -100,6 +111,7 @@ export function editor(project: Project) {
         project,
         meta,
         settings,
+        customStageOverlay
       }}
     >
       <ShortcutsProvider>
@@ -112,6 +124,7 @@ export function editor(project: Project) {
     </ApplicationProvider>,
   );
 }
+
 
 export function index(projects: ProjectData[]) {
   renderRoot(<Index projects={projects} />);

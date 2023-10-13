@@ -9,6 +9,9 @@ import type {
   SettingsMetadata,
 } from '@motion-canvas/core';
 
+import type {CustomStageOverlayPropsType} from "../components/viewport/CustomStageOverlay"
+import { JSXInternal } from 'preact/src/jsx';
+
 interface Application {
   project: Project;
   player: Player;
@@ -16,6 +19,8 @@ interface Application {
   presenter: Presenter;
   meta: ProjectMetadata;
   settings: SettingsMetadata;
+  // customStageOverlay: JSX.Element;
+  customStageOverlay: (a: CustomStageOverlayPropsType) => JSXInternal.Element
 }
 
 const ApplicationContext = createContext<Application | null>(null);

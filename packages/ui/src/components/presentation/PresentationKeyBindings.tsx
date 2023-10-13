@@ -46,7 +46,7 @@ export class KeyBindings {
   public static readonly KEY_Y = new Key('y', 'Y');
   public static readonly KEY_Z = new Key('z', 'Z');
   public static readonly SPACEBAR = new Key(' ', 'Space');
-  public static readonly ESC = new Key('esc', 'Space');
+  public static readonly ESCAPE = new Key('Escape', 'ESC');
 }
 
 export class PresentationKeyBindings {
@@ -65,5 +65,9 @@ export class PresentationKeyBindings {
   public static readonly RESUME = new KeyBinding(
     [KeyBindings.SPACEBAR, KeyBindings.RIGHT_ARROW],
     'Resume',
+  );
+  public static readonly SHOW_OVERLAY = new KeyBinding(
+    [KeyBindings.ESCAPE, KeyBindings.KEY_Q],
+    'Show Overlay',
   );
 }

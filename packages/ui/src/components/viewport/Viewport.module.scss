@@ -91,10 +91,32 @@
   display: flex;
 }
  
-.darkModeToggle{
+.customStageOverlay{
   position: absolute;
   display: flex;
+  justify-content: center;
+  padding: 0.5rem;
+  bottom: 0;
   bottom: 0;
   right: 0;
-  color: red
+  left: 0;
+  color: #ffffff52;
+  overflow: hidden;
+  opacity: 1;
+  max-height: 100%;
+  transform: translateY(0);
+  transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
+  &.hidden{
+    opacity: 0;
+    max-height: 0%;
+    transform: translateY(200%);
+    transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
+  }
+  .overlayContainer{
+    display: flex;
+    background-color: color-mix(in srgb, var(--surface-color) 70%, transparent);
+    backdrop-filter: blur(3px);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
 }

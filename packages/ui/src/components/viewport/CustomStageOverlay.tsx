@@ -1,22 +1,32 @@
-import type {Stage} from '@motion-canvas/core';
-import {useLayoutEffect, useRef} from 'preact/hooks';
-import {useSharedSettings} from '../../hooks';
+import { useRef } from 'preact/hooks';
 
 import styles from './Viewport.module.scss';
 import clsx from 'clsx';
+import {useEffect, useState} from 'react';
+import { JSXInternal } from 'preact/src/jsx';
 
 export interface CustomStageOverlayProps {
-  stage?: Stage;
+  showOverlay?: boolean,
+  content?: JSXInternal.Element
 }
 
-export function CustomStageOverlay(props : CustomStageOverlayProps) {
+export function CustomStageOverlay(props?: CustomStageOverlayProps, callbacks?: any) {
   const ref = useRef<HTMLDivElement>();
-  const settings = useSharedSettings();
-  const stage = props.stage;
+  const {showOverlay, content} = props;
+  
+  useEffect(() => {
+    callbacks?.test();
+  }, [showOverlay])
   return (
-    <div
-      className={clsx(styles.darkModeToggle,)}
-      ref={ref}
-    >TEST</div>
+    <div 
+      // style={{opacity: `${showOverlay ? 1 : 'none'}`}}
+      className={clsx(styles.customStageOverlay, !showOverlay && styles.hidden)}
+      ref={ref}>
+        <div className={clsx(styles.overlayContainer)}>{content}</div>
+
+      </div>
   );
 }
+
+export type {CustomStageOverlayProps as CustomStageOverlayPropsType}
+
