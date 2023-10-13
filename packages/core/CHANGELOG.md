@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.10.1...v3.11.0-alpha.0) (2023-10-13)
+
+### Bug Fixes
+
+- **core:** handle malicious event names
+  ([#819](https://github.com/motion-canvas/motion-canvas/issues/819))
+  ([aba8eba](https://github.com/motion-canvas/motion-canvas/commit/aba8ebaf347ac3cbf6a9446c1aa60f629c7c18bd))
+
+### Features
+
+- **core:** hot module replacement for audio
+  ([#793](https://github.com/motion-canvas/motion-canvas/issues/793))
+  ([d40c1a8](https://github.com/motion-canvas/motion-canvas/commit/d40c1a83c645c8984cca1ebc6fe687b445a0550c))
+- **core:** support Origin in slideTransition
+  ([#801](https://github.com/motion-canvas/motion-canvas/issues/801))
+  ([0a3df28](https://github.com/motion-canvas/motion-canvas/commit/0a3df2829fd7b308604eda3d005e90daf032e284))
+- **ui:** estimate remaining rendering time
+  ([#795](https://github.com/motion-canvas/motion-canvas/issues/795))
+  ([1a46148](https://github.com/motion-canvas/motion-canvas/commit/1a4614801869ab36827ca857d66eed8de9cffd09)),
+  closes [#784](https://github.com/motion-canvas/motion-canvas/issues/784)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
 
 ### Bug Fixes

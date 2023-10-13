@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.10.1...v3.11.0-alpha.0) (2023-10-13)
+
+### Bug Fixes
+
+- **2d:** add missing Curve properties to Circle
+  ([#805](https://github.com/motion-canvas/motion-canvas/issues/805))
+  ([38c7900](https://github.com/motion-canvas/motion-canvas/commit/38c79000403d7c3c99dde9e4c825a448d5f55054))
+- **2d:** point arrow heads in correct direction
+  ([#792](https://github.com/motion-canvas/motion-canvas/issues/792))
+  ([52ed52e](https://github.com/motion-canvas/motion-canvas/commit/52ed52e963cc69a066a0353680acaca35b9c937a)),
+  closes [#783](https://github.com/motion-canvas/motion-canvas/issues/783)
+- **core:** handle malicious event names
+  ([#819](https://github.com/motion-canvas/motion-canvas/issues/819))
+  ([aba8eba](https://github.com/motion-canvas/motion-canvas/commit/aba8ebaf347ac3cbf6a9446c1aa60f629c7c18bd))
+
+### Features
+
+- **2d:** add line counter for CodeBlock
+  ([#802](https://github.com/motion-canvas/motion-canvas/issues/802))
+  ([c3f9676](https://github.com/motion-canvas/motion-canvas/commit/c3f9676b6984731a09a44ab0b1fcfc226975fa08))
+- **2d:** add skew property
+  ([#803](https://github.com/motion-canvas/motion-canvas/issues/803))
+  ([eff7c7b](https://github.com/motion-canvas/motion-canvas/commit/eff7c7be0c013139140b398350242457736d48c7))
+- **2d:** add SVG component
+  ([#763](https://github.com/motion-canvas/motion-canvas/issues/763))
+  ([8eadc11](https://github.com/motion-canvas/motion-canvas/commit/8eadc11937d4201545894f2f5b204d477a3f9094))
+- **2d:** warn about missing image source
+  ([#817](https://github.com/motion-canvas/motion-canvas/issues/817))
+  ([6dcdb5f](https://github.com/motion-canvas/motion-canvas/commit/6dcdb5f3b83d4860b1557e4745972e0af68f92f3))
+- **core:** hot module replacement for audio
+  ([#793](https://github.com/motion-canvas/motion-canvas/issues/793))
+  ([d40c1a8](https://github.com/motion-canvas/motion-canvas/commit/d40c1a83c645c8984cca1ebc6fe687b445a0550c))
+- **core:** support Origin in slideTransition
+  ([#801](https://github.com/motion-canvas/motion-canvas/issues/801))
+  ([0a3df28](https://github.com/motion-canvas/motion-canvas/commit/0a3df2829fd7b308604eda3d005e90daf032e284))
+- **ui:** add goto start and goto end buttons
+  ([#814](https://github.com/motion-canvas/motion-canvas/issues/814))
+  ([449f194](https://github.com/motion-canvas/motion-canvas/commit/449f1946474af9886135571c14c83b8440bdf28c))
+- **ui:** estimate remaining rendering time
+  ([#795](https://github.com/motion-canvas/motion-canvas/issues/795))
+  ([1a46148](https://github.com/motion-canvas/motion-canvas/commit/1a4614801869ab36827ca857d66eed8de9cffd09)),
+  closes [#784](https://github.com/motion-canvas/motion-canvas/issues/784)
+- **ui:** timeline dragging
+  ([#794](https://github.com/motion-canvas/motion-canvas/issues/794))
+  ([248e454](https://github.com/motion-canvas/motion-canvas/commit/248e4546367f9d99221f64b811a07d54a9988e48)),
+  closes [#699](https://github.com/motion-canvas/motion-canvas/issues/699)
+- **ui:** vertical line on time event
+  ([#808](https://github.com/motion-canvas/motion-canvas/issues/808))
+  ([18015d6](https://github.com/motion-canvas/motion-canvas/commit/18015d6714ffe2a6255f26895aa9a7c1908a4f7a)),
+  closes [#804](https://github.com/motion-canvas/motion-canvas/issues/804)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.10.1](https://github.com/motion-canvas/motion-canvas/compare/v3.10.0...v3.10.1) (2023-07-25)
 
 ### Bug Fixes

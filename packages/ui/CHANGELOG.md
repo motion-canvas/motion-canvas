@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.10.1...v3.11.0-alpha.0) (2023-10-13)
+
+### Features
+
+- **ui:** add goto start and goto end buttons
+  ([#814](https://github.com/motion-canvas/motion-canvas/issues/814))
+  ([449f194](https://github.com/motion-canvas/motion-canvas/commit/449f1946474af9886135571c14c83b8440bdf28c))
+- **ui:** estimate remaining rendering time
+  ([#795](https://github.com/motion-canvas/motion-canvas/issues/795))
+  ([1a46148](https://github.com/motion-canvas/motion-canvas/commit/1a4614801869ab36827ca857d66eed8de9cffd09)),
+  closes [#784](https://github.com/motion-canvas/motion-canvas/issues/784)
+- **ui:** timeline dragging
+  ([#794](https://github.com/motion-canvas/motion-canvas/issues/794))
+  ([248e454](https://github.com/motion-canvas/motion-canvas/commit/248e4546367f9d99221f64b811a07d54a9988e48)),
+  closes [#699](https://github.com/motion-canvas/motion-canvas/issues/699)
+- **ui:** vertical line on time event
+  ([#808](https://github.com/motion-canvas/motion-canvas/issues/808))
+  ([18015d6](https://github.com/motion-canvas/motion-canvas/commit/18015d6714ffe2a6255f26895aa9a7c1908a4f7a)),
+  closes [#804](https://github.com/motion-canvas/motion-canvas/issues/804)
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [3.10.0](https://github.com/motion-canvas/motion-canvas/compare/v3.9.0...v3.10.0) (2023-07-23)
 
 ### Bug Fixes
