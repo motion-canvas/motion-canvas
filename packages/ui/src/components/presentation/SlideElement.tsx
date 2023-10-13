@@ -24,3 +24,4 @@ export function SlideElement({slide, active, inProgress}: SlideElementProps) {
     </button>
   );
 }
+ 

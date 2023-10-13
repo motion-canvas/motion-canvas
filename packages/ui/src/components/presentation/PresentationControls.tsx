@@ -12,7 +12,7 @@ import {
   SkipNext,
   SkipPrevious,
 } from '../icons';
-
+ 
 export function PresentationControls() {
   const {presenter} = useApplication();
   const status = useSubscribableValue(presenter.onInfoChanged);
