@@ -14,7 +14,8 @@ import {
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
-import {viaProxy} from '@motion-canvas/core/lib/utils';
+import {useLogger, viaProxy} from '@motion-canvas/core/lib/utils';
+import imageWithoutSource from './__logs__/image-without-source.md';
 
 export interface ImgProps extends RectProps {
   /**
@@ -123,6 +124,13 @@ export class Img extends Rect {
 
   public constructor(props: ImgProps) {
     super(props);
+    if (!('src' in props)) {
+      useLogger().warn({
+        message: 'No source specified for the image',
+        remarks: imageWithoutSource,
+        inspect: this.key,
+      });
+    }
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
@@ -140,19 +148,25 @@ export class Img extends Rect {
 
   @computed()
   protected image(): HTMLImageElement {
-    const src = viaProxy(this.src());
-    const url = new URL(src, window.location.origin);
-    if (url.origin === window.location.origin) {
-      const hash = this.view().assetHash();
-      url.searchParams.set('asset-hash', hash);
+    const rawSrc = this.src();
+    let src = '';
+    let key = '';
+    if (rawSrc) {
+      key = viaProxy(rawSrc);
+      const url = new URL(key, window.location.origin);
+      if (url.origin === window.location.origin) {
+        const hash = this.view().assetHash();
+        url.searchParams.set('asset-hash', hash);
+      }
+      src = url.toString();
     }
 
-    let image = Img.pool[src];
+    let image = Img.pool[key];
     if (!image) {
       image = document.createElement('img');
       image.crossOrigin = 'anonymous';
-      image.src = url.toString();
-      Img.pool[src] = image;
+      image.src = src;
+      Img.pool[key] = image;
     }
 
     if (!image.complete) {
