@@ -2,7 +2,7 @@ import styles from './PresentationControls.module.scss';
 
 import {IconButton} from '../controls';
 import {useDocumentEvent, useSubscribableValue} from '../../hooks';
-import {useCallback} from 'preact/hooks';
+import {MutableRef, useCallback, Ref} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {
   Close,
@@ -12,15 +12,22 @@ import {
   SkipNext,
   SkipPrevious,
 } from '../icons';
+import { PresentationKeyBindings } from './PresentationKeyBindings';
  
-export function PresentationControls() {
-  const {presenter} = useApplication();
+export interface PresentationControlsProps {
+  customStage?: Ref<HTMLDivElement>
+}
+
+export function PresentationControls({customStage} : PresentationControlsProps) {
+  const {presenter, renderer} = useApplication();
   const status = useSubscribableValue(presenter.onInfoChanged);
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
       document.exitFullscreen();
     } else {
-      presenter.stage.finalBuffer.requestFullscreen();
+      customStage.current.requestFullscreen();
+      // presenter.stage.finalBuffer.requestFullscreen();
+      
     }
   };
 
@@ -31,31 +38,30 @@ export function PresentationControls() {
         if (document.activeElement.tagName === 'INPUT') {
           return;
         }
-        switch (event.key) {
-          case ' ':
-            event.preventDefault();
-            presenter.resume();
-            break;
-          case 'ArrowLeft':
-            event.preventDefault();
-            if (event.shiftKey) {
-              presenter.requestFirstSlide();
-              return;
-            }
-            presenter.requestPreviousSlide();
-            break;
-          case 'ArrowRight':
-            event.preventDefault();
-            if (event.shiftKey) {
-              presenter.requestLastSlide();
-              return;
-            }
-            presenter.requestNextSlide();
-            break;
-          case 'f':
-            event.preventDefault();
-            toggleFullscreen();
-            break;
+        if(PresentationKeyBindings.RESUME.includes(event.key)){
+          event.preventDefault();
+          presenter.resume();
+        }
+        else if(PresentationKeyBindings.PREV_SLIDE.includes(event.key)){
+          if (event.shiftKey) {
+            presenter.requestFirstSlide();
+            return;
+          }
+          presenter.requestPreviousSlide();
+          
+        }
+        else if(PresentationKeyBindings.NEXT_SLIDE.includes(event.key)){
+          event.preventDefault();
+          if (event.shiftKey) {
+            presenter.requestLastSlide();
+            return;
+          }
+          presenter.requestNextSlide();
+          
+        }
+        else if(PresentationKeyBindings.TOGGLE_FULLSCREEN.includes(event.key)){
+          event.preventDefault();
+          toggleFullscreen();
         }
       },
       [presenter],

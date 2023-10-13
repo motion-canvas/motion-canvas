@@ -1,20 +1,22 @@
 import type {Stage} from '@motion-canvas/core';
-import {useLayoutEffect, useRef} from 'preact/hooks';
+import {useLayoutEffect, useRef, Ref} from 'preact/hooks';
 import {useSharedSettings} from '../../hooks';
+import React, {ComponentProps} from 'react';
 
 import styles from './Viewport.module.scss';
 import clsx from 'clsx';
+import { CustomStageOverlay } from './CustomStageOverlay';
 
 export interface CustomStageProps {
-  stage: Stage;
+  stage: Stage,
+  forwardRef?: Ref<HTMLDivElement>
 }
 
-export function CustomStage({stage}: CustomStageProps) {
-  const ref = useRef<HTMLDivElement>();
+export function CustomStage({stage, forwardRef} : CustomStageProps) {
   const settings = useSharedSettings();
 
   useLayoutEffect(() => {
-    ref.current.append(stage.finalBuffer);
+    forwardRef.current.append(stage.finalBuffer);
     return () => stage.finalBuffer.remove();
   }, [stage]);
 
@@ -25,7 +27,10 @@ export function CustomStage({stage}: CustomStageProps) {
         styles.renderingPreview,
         settings.background ? styles.canvasOutline : styles.alphaBackground,
       )}
-      ref={ref}
-    />
+      ref={forwardRef}>
+        <CustomStageOverlay />
+      </div>
   );
 }
+
+
