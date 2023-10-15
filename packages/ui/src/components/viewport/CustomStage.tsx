@@ -19,7 +19,7 @@ const heyTest = ()  => {
   return <div>"HEYYY"</div>
 }
 
-export function CustomStage({stage, forwardRef, showOverlay} : CustomStageProps) {
+export function CustomStage({stage, forwardRef, showOverlay=false} : CustomStageProps) {
   const settings = useSharedSettings();
   const {customStageOverlay} = useApplication();
 

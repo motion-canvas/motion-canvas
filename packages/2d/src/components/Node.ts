@@ -57,6 +57,7 @@ export interface NodeProps {
   children?: ComponentChildren;
   spawner?: SignalValue<Node[]>;
   key?: string;
+  nodeId?: string;
 
   x?: SignalValue<number>;
   y?: SignalValue<number>;
@@ -448,12 +449,14 @@ export class Node implements Promisable<Node> {
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
   public readonly key: string;
+  public readonly nodeId: string;
   public readonly creationStack?: string;
 
-  public constructor({children, spawner, key, ...rest}: NodeProps) {
+  public constructor({children, spawner, key, nodeId, ...rest}: NodeProps) {
     const scene = useScene2D();
     this.key = scene.registerNode(this, key);
     this.view2D = scene.getView();
+    this.nodeId = nodeId ?? this.key;
     this.creationStack = new Error().stack;
     initializeSignals(this, rest);
     this.add(children);
@@ -888,6 +891,16 @@ export class Node implements Promisable<Node> {
     this.absolutePosition(position);
     this.absoluteRotation(rotation);
     this.absoluteScale(scale);
+  }
+
+  /**
+   * Get a child by the new nodeId property
+   */
+  public getChildNode(childId: string) {
+    for (const node of this.children()) {
+      if(node.nodeId == childId)
+        return node
+    }
   }
 
   /**

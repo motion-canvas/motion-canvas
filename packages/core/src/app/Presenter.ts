@@ -23,6 +23,10 @@ export interface PresenterInfo extends Record<string, unknown> {
   isWaiting: boolean;
   count: number;
   index: number | null;
+  videoDuration: number;
+  framesRendered: number;
+  fps: number;
+  sceneFramesRendered: number;
 }
 
 export enum PresenterState {
@@ -51,12 +55,17 @@ export class Presenter {
     isWaiting: false,
     index: null,
     count: 0,
+    videoDuration: 0,
+    framesRendered: 0,
+    sceneFramesRendered: 0,
+    fps: 0
   });
 
   public get onSlidesChanged() {
     return this.slides.subscribable;
   }
   private readonly slides = new ValueDispatcher<Slide[]>([]);
+  private sceneFrames = 0;
 
   public readonly stage = new Stage();
 
@@ -218,12 +227,14 @@ export class Presenter {
         await this.playback.goTo(slide);
       }
       this.logger.profile('slide time');
+      this.sceneFrames = this.playback.frame;
     }
 
     // Move forward one frame
     else if (!this.playback.finished) {
       this.playback.state = PlaybackState.Presenting;
       await this.playback.progress();
+      this.sceneFrames += this.playback.currentScene.slides.isWaiting() ? 0 : 1
     }
 
     // Draw the project
@@ -272,6 +283,10 @@ export class Presenter {
       isWaiting: slides.isWaiting(),
       count: this.playback.slides.length,
       index,
+      videoDuration: this.playback.duration,
+      framesRendered: this.playback.frame,
+      sceneFramesRendered: this.sceneFrames,
+      fps: this.playback.fps
     };
 
     for (const [key, value] of Object.entries(info)) {

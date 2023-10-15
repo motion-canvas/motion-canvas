@@ -94,8 +94,9 @@
 .customStageOverlay{
   position: absolute;
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  padding: 0.5rem;
+  align-items: center;
   bottom: 0;
   bottom: 0;
   right: 0;
@@ -103,20 +104,51 @@
   color: #ffffff52;
   overflow: hidden;
   opacity: 1;
-  max-height: 100%;
-  transform: translateY(0);
-  transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
-  &.hidden{
-    opacity: 0;
-    max-height: 0%;
-    transform: translateY(200%);
-    transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
-  }
   .overlayContainer{
-    display: flex;
-    background-color: color-mix(in srgb, var(--surface-color) 70%, transparent);
-    backdrop-filter: blur(3px);
-    border-radius: var(--radius);
-    padding: 1rem;
+    padding: 0.5rem;
+    overflow: hidden;
+    opacity: 1;
+    max-height: 100%;
+    transform: translateY(0);
+    transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
+    &.hidden{
+      opacity: 0;
+      max-height: 0%;
+      transform: translateY(200%);
+      transition: opacity .3s ease-out,max-height .8s ease-out, transform .1s ease-in;
+    }
+    .controls{
+      display: flex;
+      background-color: color-mix(in srgb, var(--surface-color) 70%, transparent);
+      backdrop-filter: blur(3px);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+  }
+
+
+  .overlayProgress{
+    width: 100%;
+    height: 3%;
+    .progress {
+      transition: all 1s ease-out;
+      height: 2px;
+      background-color: transparent;
+    }
+    
+    .progressFill {
+      transition: all 1s ease-out;
+      height: 2px;
+      background-color: var(--theme);
+      opacity: 0.9;
+    }
+  }
+  &.paused{
+    .progressFill {
+      height: 1.5px;
+      transition: all 1s ease-out;
+      opacity: 0.4;
+    }
+    
   }
 }

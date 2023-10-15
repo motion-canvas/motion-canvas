@@ -7,7 +7,7 @@ import {SlideGraph} from './SlideGraph';
 export function PresentationMode() {
   const {presenter} = useApplication();
   const stageRef = useRef<HTMLDivElement>();
-  const [showOverlay, setShowOverlay] = useState(true);
+  const [showOverlay, setShowOverlay] = useState(false);
   return (
     <>
       <CustomStage forwardRef={stageRef} showOverlay={showOverlay} stage={presenter.stage} />

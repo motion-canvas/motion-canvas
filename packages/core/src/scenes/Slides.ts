@@ -14,9 +14,9 @@ export class Slides {
   public get onChanged() {
     return this.slides.subscribable;
   }
-  private readonly slides = new ValueDispatcher<Slide[]>([]);
+  public readonly slides = new ValueDispatcher<Slide[]>([]);
 
-  private readonly lookup = new Map<string, Slide>();
+  public readonly lookup = new Map<string, Slide>();
   private readonly collisionLookup = new Set<string>();
   private current: Slide | null = null;
   private canResume = false;
