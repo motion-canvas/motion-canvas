@@ -7,6 +7,7 @@ import {
   useSubscribable,
 } from '../../hooks';
 import {JSX} from 'preact';
+import {CustomStageOverlay} from './CustomStageOverlay'
 
 export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());
@@ -36,5 +37,12 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
     return () => stage.finalBuffer.remove();
   }, []);
 
-  return <div ref={ref} {...props} />;
+  return <div ref={ref} {...props} >
+       <CustomStageOverlay 
+         style={{
+         aspectRatio: 'unset',
+         width: '100%',
+         height: '100%'}}
+         isPlayer={true}/>
+     </div>;
 }

@@ -87,9 +87,6 @@ export interface MotionCanvasPluginConfig {
    * to enable it.
    **/
   proxy?: boolean | MotionCanvasCorsProxyOptions;
-
-  stageOverlay?: string;
-  // stageOverlayCallbacks?: string;
 }
 
 export default ({
@@ -97,8 +94,6 @@ export default ({
   output = './output',
   bufferedAssets = /^$/,
   editor = '@motion-canvas/ui',
-  stageOverlay = '@motion-canvas/ui',
-  // stageOverlayCallbacks = '@motion-canvas/ui',
   proxy,
 }: MotionCanvasPluginConfig = {}): Plugin => {
   const plugins: PluginOptions[] = [];
@@ -177,18 +172,13 @@ export default ({
     async load(id) {
       const [base, query] = id.split('?');
       const {name, dir} = path.posix.parse(base);
-      const stageOverlayDir = stageOverlay.includes('@') ? stageOverlay : path.resolve(stageOverlay);
-      // const stageOverlayCallbacksDir = stageOverlayCallbacks.includes('@') ? stageOverlayCallbacks : path.resolve(stageOverlayCallbacks);
 
       if (id.startsWith(resolvedEditorId)) {
         if (projects.length === 1) {
           return source(
             `import {editor} from '${editor}';`,
             `import project from '${projects[0].url}?project';`,
-            `import {stageOverlay} from '${stageOverlayDir}';`,
-            // `import {stageOverlayCallbacks} from '${stageOverlayCallbacksDir}';`,
-            // `editor(project, stageOverlay(stageOverlayCallbacks));`,
-            `editor(project, stageOverlay());`,
+            `editor(project);`,
           );
         }
 
@@ -199,10 +189,7 @@ export default ({
             return source(
               `import {editor} from '${editor}';`,
               `import project from '${projectLookup[name].url}?project';`,
-              `import {stageOverlay} from '${stageOverlayDir}';`,
-              // `import {stageOverlayCallbacks} from '${stageOverlayCallbacksDir}';`,
-              // `editor(project, stageOverlay(stageOverlayCallbacks));`,
-              `editor(project, stageOverlay());`,
+              `editor(project);`,
             );
           }
         }

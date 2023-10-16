@@ -95,12 +95,10 @@
   position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
-  bottom: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
+  width: 100%;
+  aspect-ratio: calc(16/9);
   color: #ffffff52;
   overflow: hidden;
   opacity: 1;
@@ -129,10 +127,10 @@
 
   .overlayProgress{
     width: 100%;
-    height: 3%;
+    height: 2px;
     .progress {
       transition: all 0.8s ease-out;
-      height: 2px;
+      height: 100%;
       background-color: transparent;
     }
     
@@ -143,11 +141,20 @@
       opacity: 0.9;
     }
   }
+  .pauseIcon{
+    align-self: flex-end;
+    transition: all 0.8s ease-out;
+    opacity: 0;
+  }
   &.paused{
     .progressFill {
       height: 1.5px;
       transition: all 0.8s ease-out;
       opacity: 0.4;
+    }
+    .pauseIcon{
+      transition: all 0.8s ease-out;
+      opacity: 0.7;
     }
     
   }

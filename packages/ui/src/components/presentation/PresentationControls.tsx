@@ -16,10 +16,10 @@ import { PresentationKeyBindings } from './PresentationKeyBindings';
  
 export interface PresentationControlsProps {
   customStage?: Ref<HTMLDivElement>,
-  onShowOverlay? : () => void;
+  onKeyPressed? : (key: string) => void;
 }
 
-export function PresentationControls({customStage, onShowOverlay} : PresentationControlsProps) {
+export function PresentationControls({customStage, onKeyPressed} : PresentationControlsProps) {
   const {presenter} = useApplication();
   const status = useSubscribableValue(presenter.onInfoChanged);
   const toggleFullscreen = () => {
@@ -64,10 +64,7 @@ export function PresentationControls({customStage, onShowOverlay} : Presentation
           event.preventDefault();
           toggleFullscreen();
         }
-        else if(PresentationKeyBindings.SHOW_OVERLAY.includes(event.key)){
-          event.preventDefault();
-          onShowOverlay();
-        }
+        onKeyPressed(event.key);
       },
       [presenter],
     ),

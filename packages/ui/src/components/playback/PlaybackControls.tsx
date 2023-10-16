@@ -19,7 +19,7 @@ import {
 } from '../icons';
 
 export function PlaybackControls() {
-  const {player, renderer, meta, project} = useApplication();
+  const {player, renderer, meta, project, presenter} = useApplication();
   const state = usePlayerState();
 
   useDocumentEvent(
@@ -58,6 +58,13 @@ export function PlaybackControls() {
           case 'l':
             player.toggleLoop();
             break;
+          case 'p':
+          presenter.present({
+            ...meta.getFullRenderingSettings(),
+            name: project.name,
+            slide: null,
+          });
+          break;
         }
       },
       [player],

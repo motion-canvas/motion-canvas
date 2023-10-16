@@ -66,7 +66,9 @@ function RenderingViewport() {
 
   return (
     <div className={styles.root}>
-      <CustomStage stage={renderer.stage} />
+      <CustomStage stage={renderer.stage} >
+        <PlaybackProgress />
+      </CustomStage> 
       <RenderingProgress />
       <div className={styles.playback}>
         <code

@@ -6,22 +6,19 @@ import React, {ComponentProps} from 'react';
 import styles from './Viewport.module.scss';
 import clsx from 'clsx';
 import { CustomStageOverlay } from './CustomStageOverlay';
-import {useApplication} from '../../contexts';
-import type {ReactElement} from 'react';
+import {ComponentChildren} from 'preact';
+import {JSX} from 'preact';
 
-export interface CustomStageProps {
+export interface CustomStageProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  children?: ComponentChildren,
   stage: Stage,
   forwardRef?: Ref<HTMLDivElement>,
-  showOverlay?: boolean
+  keyPressed?: string
 }
 
-const heyTest = ()  => {
-  return <div>"HEYYY"</div>
-}
-
-export function CustomStage({stage, forwardRef, showOverlay=false} : CustomStageProps) {
+export function CustomStage({stage, forwardRef, children, keyPressed} : CustomStageProps) {
   const settings = useSharedSettings();
-  const {customStageOverlay} = useApplication();
+  // const {customStageOverlay} = useApplication();
 
   useLayoutEffect(() => {
     forwardRef.current.append(stage.finalBuffer);
@@ -36,8 +33,8 @@ export function CustomStage({stage, forwardRef, showOverlay=false} : CustomStage
         settings.background ? styles.canvasOutline : styles.alphaBackground,
       )}
       ref={forwardRef}>
-        {customStageOverlay({showOverlay:showOverlay, content: heyTest()})}
-      {/* <CustomStageOverlay showOverlay={showOverlay} /> */}
+
+        <CustomStageOverlay keyPressed={keyPressed}> {children} </CustomStageOverlay>
     </div>
   );
 }

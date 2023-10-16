@@ -7,12 +7,12 @@ import {SlideGraph} from './SlideGraph';
 export function PresentationMode() {
   const {presenter} = useApplication();
   const stageRef = useRef<HTMLDivElement>();
-  const [showOverlay, setShowOverlay] = useState(false);
+  const [keyPressed, setKeyPressed] = useState(null);
   return (
     <>
-      <CustomStage forwardRef={stageRef} showOverlay={showOverlay} stage={presenter.stage} />
+      <CustomStage forwardRef={stageRef} keyPressed={keyPressed} stage={presenter.stage} />
       <SlideGraph />
-      <PresentationControls onShowOverlay={() => setShowOverlay(prev => !prev)} customStage={stageRef} />
+      <PresentationControls onKeyPressed={(key) => setKeyPressed(key)} customStage={stageRef} />
     </>
   );
 }

@@ -37,6 +37,11 @@ export class Slides {
     this.canResume = true;
   }
 
+  public resumeNoWait() {
+    this.canResume = true;
+    this.waitsForId = null;
+  }
+
   public isWaitingFor(slide: string) {
     return this.waitsForId === slide;
   }

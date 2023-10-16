@@ -1,16 +1,40 @@
-import { useRef } from 'preact/hooks';
-
 import viewportStyles from './Viewport.module.scss';
 import clsx from 'clsx';
-import {useEffect, useState} from 'react';
 import { JSXInternal } from 'preact/src/jsx';
-import {usePlayerTime, useSubscribableValue} from '../../hooks';
+import {usePlayerTime, usePresenterState, useSubscribableValue} from '../../hooks';
 import {useInspection, useApplication} from '../../contexts';
+import {usePlayerState} from '../../hooks';
+import {IconButton, IconCheckbox, Input, Select} from '../controls';
+import {ComponentChildren} from 'preact';
+import { PresentationKeyBindings } from '../presentation/PresentationKeyBindings';
+import {ViewportContext} from './ViewportContext';
+import {JSX} from 'preact';
 
+import {
+  useEffect,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
+import {
+  Pause,
+  PhotoCamera,
+  PlayArrow,
+  Repeat,
+  SkipNext,
+  SkipPrevious,
+  FastForward,
+  FastRewind,
+  VolumeOff,
+  VolumeOn,
+} from '../icons';
 
-export interface CustomStageOverlayProps {
-  showOverlay?: boolean,
-  content?: JSXInternal.Element
+export interface CustomStageOverlayProps extends JSX.HTMLAttributes<HTMLDivElement> {
+  children?: ComponentChildren;
+  keyPressed?: any,
+  isPlayer?: boolean
 }
 interface ProgressProps {
   completion: number;
@@ -33,35 +57,64 @@ function PlaybackProgress() {
   return <ProgressBar completion={presenterInfo.sceneFramesRendered/presenterInfo.videoDuration} />
 }
 
-
 function PresentationProgress() {
   const {presenter} = useApplication();
   const presenterInfo = useSubscribableValue(presenter.onInfoChanged)
   return <ProgressBar completion={presenterInfo.index/presenterInfo.count} />
 }
 
-export function CustomStageOverlay(props?: CustomStageOverlayProps, callbacks?: any) {
-  const ref = useRef<HTMLDivElement>();
-  const {showOverlay, content} = props;
+export function PlayerPauseOverlay(){
+  const {paused} = usePlayerState();
+  return(<IconButton className={clsx(viewportStyles.pauseIcon, paused && viewportStyles.hidden)}>
+    <Pause />
+  </IconButton>)
+}
+
+export function PresenterPauseOverlay(){
   const {presenter} = useApplication();
-  const presenterInfo = useSubscribableValue(presenter.onInfoChanged)
-  
+  const info = useSubscribableValue(presenter.onInfoChanged);
+  return(<IconButton className={clsx(viewportStyles.pauseIcon, info.isWaiting && viewportStyles.hidden)}>
+    <Pause />
+  </IconButton>)
+}
+
+export function CustomStageOverlay(props?: CustomStageOverlayProps) {
+  const ref = useRef<HTMLDivElement>();
+  const {keyPressed, children, isPlayer = false} = props;
+  const [showOverlay, setShowOverlay] = useState(false);
+  const {presenter, player} = useApplication();
+  const state = useContext(ViewportContext);
+  let paused = false;
+  if(isPlayer){
+    paused = usePlayerState().paused;
+  }
+  else{
+    paused = useSubscribableValue(presenter.onInfoChanged).isWaiting
+  }
+
   useEffect(() => {
-    callbacks?.test();
-  }, [showOverlay])
+    if(PresentationKeyBindings.SHOW_OVERLAY.includes(keyPressed)){
+      setShowOverlay(prev => !prev)
+    }
+  }, [keyPressed])
+
   return (
     <div 
-      // style={{opacity: `${showOverlay ? 1 : 'none'}`}}
-      className={clsx(viewportStyles.customStageOverlay, presenterInfo.isWaiting && viewportStyles.paused)}
+    style={{aspectRatio: `${state.width / state.height}`}}
+    {...props}
+      className={clsx(viewportStyles.customStageOverlay, paused && viewportStyles.paused)}
       ref={ref}>
-        <div
-        className={clsx(viewportStyles.overlayContainer, !showOverlay && viewportStyles.hidden)}>
-          {content}</div>
-          {/* <PresentationProgress /> */}
-          <PlaybackProgress />
+          <div
+            className={clsx(viewportStyles.overlayContainer, !showOverlay && viewportStyles.hidden)}>
+            {children}
+          </div>
+          {isPlayer ? <PlayerPauseOverlay /> : <PresenterPauseOverlay />}
+          {/* { showProgress && <PresentationProgress /> } */}
+          { !isPlayer && <PlaybackProgress /> }
         </div>
   );
 }
 
 export type {CustomStageOverlayProps as CustomStageOverlayPropsType}
+export type CustomStageOverlayType = typeof CustomStageOverlay
 
