@@ -338,12 +338,14 @@ export class Player {
     }
 
     // Pause if reached the end or the range is 0
+    // Seek to the beginning
     if (
       (!state.loop && this.finished && !state.paused && state.seek < 0) ||
       this.endFrame === this.startFrame
     ) {
       this.togglePlayback(false);
       state.paused = true;
+      state.seek = this.startFrame;
     }
 
     // Seek to the beginning if looping is enabled
