@@ -1,57 +1,38 @@
 import {ComponentChildren, createContext} from 'preact';
-import {useContext, useState} from 'preact/hooks';
+import {useContext, useMemo, useState} from 'preact/hooks';
+import KeyCodes from '../utils/KeyCodes';
+import ViewportKeybindings from '../components/viewport/ViewportKeybindings';
+import TimelineKeyBindings from '../components/timeline/TimelineKeybindings';
+import PresentationKeyBindings from '../components/presentation/PresentationKeybindings';
+import {GlobalKeyBindings} from '../Editor'
+import { Module, ModuleShortcuts, ShortcutsByModule } from '../global';
 
-export type Shortcut = {
-  key: string;
-  action: string;
-  available?: () => boolean;
+export declare type ShortcutsState = {
+  currentModule: Module;
+  moduleShortcuts: ModuleShortcuts<any>,
+  allShortcuts: ShortcutsByModule;
+  setCurrentModule?: (module: Module) => void;
 };
 
-export type ShortcutModules = 'global' | 'timeline' | 'viewport' | 'none';
-type ShortcutsByModule = Record<ShortcutModules, Shortcut[]>;
-type ShortcutsState = {
-  currentModule: ShortcutModules;
-  shortcuts: ShortcutsByModule;
-  setCurrentModule?: (module: ShortcutModules) => void;
-};
-
-const InitialShortcuts: ShortcutsByModule = {
-  global: [
-    {key: 'Space', action: 'Toggle playback'},
-    {key: '<-', action: 'Previous frame'},
-    {key: '->', action: 'Next frame'},
-    {key: 'Shift + <-', action: 'Reset to first frame'},
-    {key: 'Shift + ->', action: 'Seek to last frame'},
-    {key: 'M', action: 'Toggle audio'},
-    {key: 'L', action: 'Toggle loop'},
-  ],
-  viewport: [
-    {key: '0', action: 'Zoom to fit'},
-    {key: '=', action: 'Zoom in'},
-    {key: '-', action: 'Zoom out'},
-    {key: "'", action: 'Toggle grid'},
-    {key: 'P', action: 'Copy coordinates'},
-    {
-      key: 'I',
-      action: 'Use color picker',
-      available: () => typeof EyeDropper === 'function',
-    },
-  ],
-  timeline: [{key: 'F', action: 'Focus playhead'}],
-  none: [],
-};
+declare const InitialShortcuts: ShortcutsByModule;
+InitialShortcuts[Module.Global] = GlobalKeyBindings
+InitialShortcuts[Module.Viewport] = ViewportKeybindings
+InitialShortcuts[Module.Timeline] = TimelineKeyBindings
+InitialShortcuts[Module.Presentation] = PresentationKeyBindings
+InitialShortcuts[Module.None] = {}
 
 const ShortcutsContext = createContext<ShortcutsState>({
-  currentModule: 'none',
-  shortcuts: InitialShortcuts,
+  currentModule: Module.None,
+  moduleShortcuts:  InitialShortcuts[Module.None],
+  allShortcuts: InitialShortcuts,
 });
 
 export function ShortcutsProvider({children}: {children: ComponentChildren}) {
-  const [currentModule, setCurrentModule] = useState<ShortcutModules>('none');
-
+  const [currentModule, setCurrentModule] = useState<Module>(Module.None);
+  const moduleShortcuts = useMemo<ModuleShortcuts<any>>(() => InitialShortcuts[currentModule], [currentModule]);
   return (
     <ShortcutsContext.Provider
-      value={{currentModule, setCurrentModule, shortcuts: InitialShortcuts}}
+      value={{moduleShortcuts, currentModule, setCurrentModule, allShortcuts: InitialShortcuts}}
     >
       {children}
     </ShortcutsContext.Provider>

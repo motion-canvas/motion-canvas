@@ -1,7 +1,7 @@
 import styles from './Playback.module.scss';
 
 import {IconButton, IconCheckbox, Input, Select} from '../controls';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
+import {useDocumentEvent, usePlayerState, usePresenterState} from '../../hooks';
 import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
@@ -17,10 +17,12 @@ import {
   VolumeOff,
   VolumeOn,
 } from '../icons';
+import { PresenterState } from '@motion-canvas/core';
 
 export function PlaybackControls() {
   const {player, renderer, meta, project, presenter} = useApplication();
   const state = usePlayerState();
+  const presenterState = usePresenterState();
 
   useDocumentEvent(
     'keydown',
@@ -59,11 +61,16 @@ export function PlaybackControls() {
             player.toggleLoop();
             break;
           case 'p':
-          presenter.present({
-            ...meta.getFullRenderingSettings(),
-            name: project.name,
-            slide: null,
-          });
+            if(presenterState != PresenterState.Aborting){
+              presenter.abort();
+            }
+            else{
+              presenter.present({
+                ...meta.getFullRenderingSettings(),
+                name: project.name,
+                slide: null,
+              });
+            }
           break;
         }
       },

@@ -1,10 +1,11 @@
-import {useShortcuts, ShortcutModules} from '../contexts/shortcuts';
+import { Module } from '../global';
 import {useHover} from './useHover';
+import { useShortcuts } from '../contexts/shortcuts';
 
 type UseHoverType<T extends HTMLElement> = [React.RefObject<T>, boolean];
 
 export function useShortcut<T extends HTMLElement>(
-  shortcutModule: ShortcutModules,
+  shortcutModule: Module,
 ): UseHoverType<T> {
   const {setCurrentModule} = useShortcuts();
   const [ref, value] = useHover<T>(
@@ -12,7 +13,7 @@ export function useShortcut<T extends HTMLElement>(
       setCurrentModule(shortcutModule);
     },
     () => {
-      setCurrentModule('none');
+      setCurrentModule(Module.None);
     },
   );
 

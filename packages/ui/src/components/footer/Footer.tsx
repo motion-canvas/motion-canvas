@@ -3,16 +3,16 @@ import {Versions} from './Versions';
 import styles from './Footer.module.scss';
 
 export function Footer() {
-  const {shortcuts, currentModule} = useShortcuts();
+  const {moduleShortcuts, currentModule} = useShortcuts();
   return (
     <div className={styles.root}>
       <div className={styles.shortcuts}>
-        {shortcuts[currentModule]
+        {Object.values(moduleShortcuts)
           .filter(({available}) => !available || available())
-          .map(({key, action}) => (
+          .map(({name, keys}) => (
             <div className={styles.shortcut}>
-              <code className={styles.key}>{key}</code>
-              <span className={styles.action}>{action}</span>
+              {keys.map(k => <code className={styles.key}>{k}</code>)}
+              <span className={styles.action}>{name}</span>
             </div>
           ))}
       </div>

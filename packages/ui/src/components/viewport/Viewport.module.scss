@@ -145,6 +145,12 @@
     align-self: flex-end;
     transition: all 0.8s ease-out;
     opacity: 0;
+    svg{
+      width: 1.5rem;
+      height: 1.5rem;
+      filter: drop-shadow(0.05rem 0.3rem 0.2rem rgba(0, 0, 0, 0.3));
+      color: #cccccc;
+    }
   }
   &.paused{
     .progressFill {
@@ -155,6 +161,12 @@
     .pauseIcon{
       transition: all 0.8s ease-out;
       opacity: 0.7;
+      svg{
+        width: 1.5rem;
+        height: 1.5rem;
+        filter: drop-shadow(0.05rem 0.3rem 0.2rem rgba(0, 0, 0, 0.3));
+        color: #cccccc;
+      }
     }
     
   }

@@ -1,28 +1,8 @@
-import {useEffect, useState} from 'preact/hooks';
+import { useKeyUp, useKeyDown} from '.';
+import { KeyBindingType } from '../utils/KeyCodes';
 
-export function useKeyHold(key: string) {
-  const [isHeld, setHeld] = useState(false);
-
-  useEffect(() => {
-    const handleDown = (event: KeyboardEvent) => {
-      if (event.key === key) {
-        setHeld(true);
-      }
-    };
-    const handleUp = (event: KeyboardEvent) => {
-      if (event.key === key) {
-        setHeld(false);
-      }
-    };
-
-    document.addEventListener('keydown', handleDown, true);
-    document.addEventListener('keyup', handleUp, true);
-
-    return () => {
-      document.removeEventListener('keydown', handleDown, true);
-      document.removeEventListener('keyup', handleUp, true);
-    };
-  }, [key]);
-
-  return isHeld;
+export function useKeyHold(key: KeyBindingType) {
+  const isDown = useKeyDown(key);
+  const isUp = useKeyUp(key);
+  return isDown && !isUp;
 }

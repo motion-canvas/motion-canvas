@@ -1,7 +1,7 @@
 import styles from './PresentationControls.module.scss';
 
 import {IconButton} from '../controls';
-import {useDocumentEvent, useSubscribableValue} from '../../hooks';
+import {useDocumentEvent, useKeyDown, useSubscribableValue} from '../../hooks';
 import {useCallback, Ref, StateUpdater} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {
@@ -12,7 +12,11 @@ import {
   SkipNext,
   SkipPrevious,
 } from '../icons';
-import { PresentationKeyBindings } from './PresentationKeyBindings';
+import { useShortcuts } from '../../contexts/shortcuts';
+import { useKeyBinding } from '../../hooks/useKeyBinding';
+import {PresentationKeybindings} from './PresentationKeybindings';
+import { Module } from '../../global';
+import { useAction } from '../../hooks/useAction';
  
 export interface PresentationControlsProps {
   customStage?: Ref<HTMLDivElement>,
@@ -21,6 +25,8 @@ export interface PresentationControlsProps {
 
 export function PresentationControls({customStage, onKeyPressed} : PresentationControlsProps) {
   const {presenter} = useApplication();
+  const {moduleShortcuts, currentModule} : {moduleShortcuts : typeof PresentationKeybindings, currentModule : Module} = useShortcuts();
+  const state = useSubscribableValue(presenter.onStateChanged);
   const status = useSubscribableValue(presenter.onInfoChanged);
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
@@ -31,6 +37,13 @@ export function PresentationControls({customStage, onKeyPressed} : PresentationC
       
     }
   };
+  
+  useAction(moduleShortcuts.RESUME, () => presenter.resume());
+  useAction(moduleShortcuts.PREV_SLIDE, () => presenter.resume());
+  useAction(moduleShortcuts., () => presenter.resume());
+  // useKeyAction(PresentationActions.NEXT_SLIDE,
+  //   [KeyBindings.SPACEBAR, KeyBindings.RIGHT_ARROW],
+  //   () => presenter.resume())
 
   useDocumentEvent(
     'keydown',
@@ -63,6 +76,18 @@ export function PresentationControls({customStage, onKeyPressed} : PresentationC
         else if(PresentationKeyBindings.TOGGLE_FULLSCREEN.includes(event.key)){
           event.preventDefault();
           toggleFullscreen();
+        }
+        else if(PresentationKeyBindings.TOGGLE_PRESENT_MODE.includes(event.key)){
+          if(state != PresenterState.Aborting){
+            presenter.abort();
+          }
+          else{
+            presenter.present({
+              ...meta.getFullRenderingSettings(),
+              name: project.name,
+              slide: null,
+            });
+          }
         }
         onKeyPressed(event.key);
       },

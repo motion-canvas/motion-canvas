@@ -14,6 +14,7 @@ import {useShortcut} from '../../hooks/useShortcut';
 import {formatDuration} from '../../utils';
 import {useEffect, useState} from 'preact/hooks';
 import {Timestamp} from './Timestamp';
+import { Module } from '../../contexts/shortcuts';
 
 export function Viewport() {
   const state = useRendererState();
@@ -25,7 +26,7 @@ export function Viewport() {
 }
 
 function EditorViewport() {
-  const [hoverRef] = useShortcut<HTMLDivElement>('viewport');
+  const [hoverRef] = useShortcut<HTMLDivElement>(Module.Viewport);
   const duration = useDuration();
 
   return (

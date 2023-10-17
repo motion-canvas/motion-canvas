@@ -139,6 +139,18 @@ export class Presenter {
     this.requestedResume = true;
   }
 
+  /**
+   * Toggle presentation mode but do nothing if it's still in its initial state
+   */
+  public togglePresentation(settings: PresenterSettings){
+    if(this.state.current == PresenterState.Working){
+      return this.abort();
+    }
+    if(this.state.current != PresenterState.Initial){
+      return this.present(settings);
+    }
+  }
+
   public requestFirstSlide() {
     const first = this.playback.slides[0];
     if (first) {
