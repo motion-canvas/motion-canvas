@@ -61,16 +61,12 @@ export function PlaybackControls() {
             player.toggleLoop();
             break;
           case 'p':
-            if(presenterState != PresenterState.Aborting){
-              presenter.abort();
-            }
-            else{
-              presenter.present({
-                ...meta.getFullRenderingSettings(),
-                name: project.name,
-                slide: null,
-              });
-            }
+            console.log("P pressed on playback!");
+            presenter.present({
+              ...meta.getFullRenderingSettings(),
+              name: project.name,
+              slide: null,
+            });
           break;
         }
       },

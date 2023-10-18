@@ -1,18 +1,20 @@
-import { KeyCode, ModuleShortcuts, UIAction } from "../../global";
-import KeyCodes from "../../utils/KeyCodes";
+import { ModuleShortcuts } from '../../contexts';
+import { UIAction } from '../../Index';
+import { KeyCodes } from '@motion-canvas/core';
 
-export interface PresentationActions {
-   NEXT_SLIDE : UIAction,
-   PREV_SLIDE : UIAction,
-   TOGGLE_FULLSCREEN : UIAction,
-   RESUME : UIAction,
-   SHOW_OVERLAY : UIAction,
-   TOGGLE_PRESENT_MODE : UIAction,
-   TO_FIRST_SLIDE: string,
-   TO_LAST_SLIDE: string,
+export enum PresentationActions {
+   NEXT_SLIDE,
+   TO_LAST_SLIDE,
+   PREV_SLIDE,
+   TO_FIRST_SLIDE,
+   TOGGLE_FULLSCREEN,
+   RESUME,
+   SHOW_OVERLAY,
+   TOGGLE_PRESENT_MODE,
 }
 
-export const PresentationKeybindings : ModuleShortcuts<PresentationActions> = {
+export type PresentationKeybindingsType = Record<keyof typeof PresentationActions , UIAction> | ModuleShortcuts
+export const PresentationKeybindings : PresentationKeybindingsType = {
    NEXT_SLIDE: new UIAction(
       'Next slide', [KeyCodes.UP_ARROW]
    ),

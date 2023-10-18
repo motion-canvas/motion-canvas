@@ -1,7 +1,7 @@
 import { useKeyUp, useKeyDown} from '.';
-import { KeyBindingType } from '../utils/KeyCodes';
+import { Action, KeyCode, KeyBindingMapping } from '@motion-canvas/core';
 
-export function useKeyHold(key: KeyBindingType) {
+export function useKeyHold(key: KeyCode) {
   const isDown = useKeyDown(key);
   const isUp = useKeyUp(key);
   return isDown && !isUp;

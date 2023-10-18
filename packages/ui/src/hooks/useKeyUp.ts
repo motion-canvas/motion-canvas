@@ -1,6 +1,6 @@
 import {useEffect, useState, useCallback } from 'preact/hooks';
 import {useDocumentEvent} from './useDocumentEvent';
-import { KeyCode } from '../global';
+import { Action, KeyCode, KeyBindingMapping } from '@motion-canvas/core';
 
 export declare type KeyUpCallbackType = (...args: any) => void;
 export function useKeyUp(key: KeyCode, callback?: KeyUpCallbackType) {
@@ -12,7 +12,7 @@ export function useKeyUp(key: KeyCode, callback?: KeyUpCallbackType) {
         if (event.key === key.code) {
           event.preventDefault();
           setUp(true);
-          callback && callback();
+          callback && callback(event);
         }
       }, [key])
     )

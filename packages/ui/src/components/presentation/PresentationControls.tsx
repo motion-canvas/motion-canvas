@@ -3,7 +3,7 @@ import styles from './PresentationControls.module.scss';
 import {IconButton} from '../controls';
 import {useDocumentEvent, useKeyDown, useSubscribableValue} from '../../hooks';
 import {useCallback, Ref, StateUpdater} from 'preact/hooks';
-import {useApplication} from '../../contexts';
+import {useApplication, useShortcuts } from '../../contexts';
 import {
   Close,
   Fullscreen,
@@ -12,11 +12,10 @@ import {
   SkipNext,
   SkipPrevious,
 } from '../icons';
-import { useShortcuts } from '../../contexts/shortcuts';
-import { useKeyBinding } from '../../hooks/useKeyBinding';
-import {PresentationKeybindings} from './PresentationKeybindings';
-import { Module } from '../../global';
+
+import { PresentationKeybindings, PresentationKeybindingsType} from './PresentationKeybindings';
 import { useAction } from '../../hooks/useAction';
+import { PresenterState } from '@motion-canvas/core';
  
 export interface PresentationControlsProps {
   customStage?: Ref<HTMLDivElement>,
@@ -25,7 +24,7 @@ export interface PresentationControlsProps {
 
 export function PresentationControls({customStage, onKeyPressed} : PresentationControlsProps) {
   const {presenter} = useApplication();
-  const {moduleShortcuts, currentModule} : {moduleShortcuts : typeof PresentationKeybindings, currentModule : Module} = useShortcuts();
+  // const {moduleShortcuts} : {moduleShortcuts: PresentationKeybindingsType} = useShortcuts();
   const state = useSubscribableValue(presenter.onStateChanged);
   const status = useSubscribableValue(presenter.onInfoChanged);
   const toggleFullscreen = () => {
@@ -38,62 +37,71 @@ export function PresentationControls({customStage, onKeyPressed} : PresentationC
     }
   };
   
-  useAction(moduleShortcuts.RESUME, () => presenter.resume());
-  useAction(moduleShortcuts.PREV_SLIDE, () => presenter.resume());
-  useAction(moduleShortcuts., () => presenter.resume());
+  useAction(PresentationKeybindings.RESUME, () => presenter.resume());
+  useAction(PresentationKeybindings.TOGGLE_FULLSCREEN, () => toggleFullscreen());
+  useAction(PresentationKeybindings.PREV_SLIDE, (event) => event.shiftKey? presenter.requestFirstSlide() : presenter.requestPreviousSlide());
+  useAction(PresentationKeybindings.NEXT_SLIDE, (event) => event.shiftKey? presenter.requestLastSlide() : presenter.requestNextSlide());
+  useAction(PresentationKeybindings.TOGGLE_PRESENT_MODE, () => {
+    console.log("P pressed on presentation mode!");
+    if(state != PresenterState.Aborting){
+      presenter.abort();
+    }
+  });
+
+  // useAction(moduleShortcuts., () => presenter.resume());
   // useKeyAction(PresentationActions.NEXT_SLIDE,
   //   [KeyBindings.SPACEBAR, KeyBindings.RIGHT_ARROW],
   //   () => presenter.resume())
 
-  useDocumentEvent(
-    'keydown',
-    useCallback(
-      event => {
-        if (document.activeElement.tagName === 'INPUT') {
-          return;
-        }
-        if(PresentationKeyBindings.RESUME.includes(event.key)){
-          event.preventDefault();
-          presenter.resume();
-        }
-        else if(PresentationKeyBindings.PREV_SLIDE.includes(event.key)){
-          if (event.shiftKey) {
-            presenter.requestFirstSlide();
-            return;
-          }
-          presenter.requestPreviousSlide();
+  // useDocumentEvent(
+  //   'keydown',
+  //   useCallback(
+  //     event => {
+  //       if (document.activeElement.tagName === 'INPUT') {
+  //         return;
+  //       }
+  //       if(PresentationKeybindings.RESUME.includes(event.key)){
+  //         event.preventDefault();
+  //         presenter.resume();
+  //       }
+  //       else if(PresentationKeybindings.PREV_SLIDE.includes(event.key)){
+  //         if (event.shiftKey) {
+  //           presenter.requestFirstSlide();
+  //           return;
+  //         }
+  //         presenter.requestPreviousSlide();
           
-        }
-        else if(PresentationKeyBindings.NEXT_SLIDE.includes(event.key)){
-          event.preventDefault();
-          if (event.shiftKey) {
-            presenter.requestLastSlide();
-            return;
-          }
-          presenter.requestNextSlide();
+  //       }
+  //       else if(PresentationKeybindings.NEXT_SLIDE.includes(event.key)){
+  //         event.preventDefault();
+  //         if (event.shiftKey) {
+  //           presenter.requestLastSlide();
+  //           return;
+  //         }
+  //         presenter.requestNextSlide();
           
-        }
-        else if(PresentationKeyBindings.TOGGLE_FULLSCREEN.includes(event.key)){
-          event.preventDefault();
-          toggleFullscreen();
-        }
-        else if(PresentationKeyBindings.TOGGLE_PRESENT_MODE.includes(event.key)){
-          if(state != PresenterState.Aborting){
-            presenter.abort();
-          }
-          else{
-            presenter.present({
-              ...meta.getFullRenderingSettings(),
-              name: project.name,
-              slide: null,
-            });
-          }
-        }
-        onKeyPressed(event.key);
-      },
-      [presenter],
-    ),
-  );
+  //       }
+  //       else if(PresentationKeybindings.TOGGLE_FULLSCREEN.includes(event.key)){
+  //         event.preventDefault();
+  //         toggleFullscreen();
+  //       }
+  //       else if(PresentationKeybindings.TOGGLE_PRESENT_MODE.includes(event.key)){
+  //         if(state != PresenterState.Aborting){
+  //           presenter.abort();
+  //         }
+  //         else{
+  //           presenter.present({
+  //             ...meta.getFullRenderingSettings(),
+  //             name: project.name,
+  //             slide: null,
+  //           });
+  //         }
+  //       }
+  //       onKeyPressed(event.key);
+  //     },
+  //     [presenter],
+  //   ),
+  // );
 
   return (
     <div className={styles.controls}>

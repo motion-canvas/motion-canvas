@@ -24,7 +24,7 @@ import {
 import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
 import {labelClipDraggingLeftSignal} from '../../signals';
-import { Module } from '../../contexts/shortcuts';
+import { Modules } from '@motion-canvas/core';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -32,7 +32,7 @@ const TIMESTAMP_SPACING = 32;
 const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
-  const [hoverRef] = useShortcut<HTMLDivElement>(Module.Timeline);
+  const {hoverRef} = useShortcut<HTMLDivElement>(Modules.Timeline);
   const {player} = useApplication();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
@@ -142,7 +142,7 @@ export function Timeline() {
 
   return (
     <TimelineContextProvider state={state}>
-      <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
+      <div ref={hoverRef.ref} className={clsx(styles.root, isReady && styles.show)}>
         <div
           className={styles.timelineWrapper}
           ref={containerRef}

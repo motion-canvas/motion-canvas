@@ -6,9 +6,10 @@ import {useInspection, useApplication} from '../../contexts';
 import {usePlayerState} from '../../hooks';
 import {IconButton, IconCheckbox, Input, Select} from '../controls';
 import {ComponentChildren} from 'preact';
-import { PresentationKeyBindings } from '../presentation/PresentationKeyBindings';
+import { PresentationKeybindings } from '../presentation/PresentationKeybindings';
 import {ViewportContext} from './ViewportContext';
 import {JSX} from 'preact';
+import { ModuleType } from '@motion-canvas/core';
 
 import {
   useEffect,
@@ -92,11 +93,13 @@ export function CustomStageOverlay(props?: CustomStageOverlayProps) {
     paused = useSubscribableValue(presenter.onInfoChanged).isWaiting
   }
 
-  useEffect(() => {
-    if(PresentationKeyBindings.SHOW_OVERLAY.includes(keyPressed)){
-      setShowOverlay(prev => !prev)
-    }
-  }, [keyPressed])
+  // useAction(moduleShortcuts.SHOW_OVERLAY, () => setShowOverlay(prev => !prev));
+
+  // useEffect(() => {
+  //   if(PresentationKeybindings.SHOW_OVERLAY.includes(keyPressed)){
+  //     setShowOverlay(prev => !prev)
+  //   }
+  // }, [keyPressed])
 
   return (
     <div 

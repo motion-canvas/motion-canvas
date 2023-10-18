@@ -14,7 +14,7 @@ import {useShortcut} from '../../hooks/useShortcut';
 import {formatDuration} from '../../utils';
 import {useEffect, useState} from 'preact/hooks';
 import {Timestamp} from './Timestamp';
-import { Module } from '../../contexts/shortcuts';
+import { Modules } from '@motion-canvas/core';
 
 export function Viewport() {
   const state = useRendererState();
@@ -26,11 +26,11 @@ export function Viewport() {
 }
 
 function EditorViewport() {
-  const [hoverRef] = useShortcut<HTMLDivElement>(Module.Viewport);
+  const {hoverRef} = useShortcut<HTMLDivElement>(Modules.Viewport);
   const duration = useDuration();
 
   return (
-    <div ref={hoverRef} className={styles.root}>
+    <div ref={hoverRef.ref} className={styles.root}>
       <EditorPreview />
       <PlaybackProgress />
       <div className={styles.playback}>

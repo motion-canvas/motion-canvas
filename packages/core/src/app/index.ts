@@ -17,3 +17,4 @@ export * from './ProjectMetadata';
 export * from './Renderer';
 export * from './SettingsMetadata';
 export * from './Stage';
+export * from './KeyMapper';

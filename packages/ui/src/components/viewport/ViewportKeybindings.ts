@@ -1,8 +1,19 @@
-import KeyCodes from "../../utils/KeyCodes"
-import { ModuleShortcuts } from "../../global";
+import { ModuleShortcuts } from '../../contexts';
+import { UIAction } from '../../Index';
+import { KeyCodes } from '@motion-canvas/core';
 
-export default ViewportKeyBindings;
-const ViewportKeyBindings : ModuleShortcut = {
+
+export enum ViewportActions {
+   ZOOM_TO_FIT,
+   ZOOM_IN,
+   ZOOM_OUT,
+   TOGGLE_GRID,
+   COPY_COORDINATES,
+   USE_COLOR_PICKER,
+}
+
+export type ViewportKeybindingsType = Record<keyof typeof ViewportActions , UIAction> | ModuleShortcuts
+export const ViewportKeybindings : ViewportKeybindingsType = {
    ZOOM_TO_FIT: new UIAction(
       'Zoom to fit', KeyCodes.KEY_0),
    

@@ -15,7 +15,6 @@ import {
 import {getItem, setItem} from './utils';
 import {ShortcutsProvider} from './contexts/shortcuts';
 import {projectNameSignal} from './signals';
-import { JSXInternal } from 'preact/src/jsx';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');

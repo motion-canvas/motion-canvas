@@ -2,9 +2,7 @@
 import {useEffect, useState, useCallback } from 'preact/hooks';
 import {useDocumentEvent} from './useDocumentEvent';
 import { useKeyDown } from './useKeyDown';
-import { Action, KeyCode, UIAction } from '../global';
-import { KeyBindingMap } from '../utils/keyBindingMap';
-import { useAction } from './useAction';
+import { Action, KeyCode, KeyBindingMapping } from '@motion-canvas/core';
 
 /**
  * In case you want to add a new key binding that is not a pre-defined UIAction (testing/debug purposes maybe?)
@@ -14,6 +12,6 @@ import { useAction } from './useAction';
  * @param callback 
  */
 export function useKeyBinding(key: KeyCode, actionName: string, callback: () => void) {
-   KeyBindingMap.bindKeyToAction(key, new Action(actionName, key));
+   KeyBindingMapping.bindKeyToAction(key, new Action(actionName, key));
    return useKeyDown(key, callback, actionName);
 }

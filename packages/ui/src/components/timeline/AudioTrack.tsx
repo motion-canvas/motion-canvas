@@ -15,6 +15,7 @@ import {
 } from '../../hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
 import clsx from 'clsx';
+import { KeyCodes } from '@motion-canvas/core';
 
 const HEIGHT = 48;
 
@@ -23,7 +24,7 @@ export function AudioTrack() {
   const {player, meta} = useApplication();
   const {audioOffset} = useSharedSettings();
   const [hover, setHover] = useState(false);
-  const shiftHeld = useKeyHold('Shift');
+  const shiftHeld = useKeyHold(KeyCodes.SHIFT);
   const [editingOffset, setEditingOffset] = useState(0);
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
   const {

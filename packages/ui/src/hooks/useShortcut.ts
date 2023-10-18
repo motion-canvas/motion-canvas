@@ -1,21 +1,25 @@
-import { Module } from '../global';
 import {useHover} from './useHover';
 import { useShortcuts } from '../contexts/shortcuts';
+import { Modules, Action, KeyBindingMapping, ModuleType } from '@motion-canvas/core';
+import { ModuleShortcuts } from '../contexts/shortcuts';
 
-type UseHoverType<T extends HTMLElement> = [React.RefObject<T>, boolean];
+type UseHoverType<T extends HTMLElement> = {ref: React.RefObject<T>, value: boolean};
 
 export function useShortcut<T extends HTMLElement>(
-  shortcutModule: Module,
-): UseHoverType<T> {
-  const {setCurrentModule} = useShortcuts();
+  shortcutModule: string,
+): {
+  hoverRef: UseHoverType<T>;
+  moduleShortcuts: ModuleShortcuts;
+}{
+  const {moduleShortcuts, setCurrentModule} = useShortcuts();
   const [ref, value] = useHover<T>(
     () => {
-      setCurrentModule(shortcutModule);
+      setCurrentModule(shortcutModule as ModuleType);
     },
     () => {
-      setCurrentModule(Module.None);
+      setCurrentModule(Modules.None as ModuleType);
     },
   );
 
-  return [ref, value];
+  return {hoverRef: {ref, value}, moduleShortcuts};
 }

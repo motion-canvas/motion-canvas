@@ -13,3 +13,4 @@ export * from './BBox';
 export * from './Spacing';
 export * from './Type';
 export * from './Vector';
+export * from './Module';
