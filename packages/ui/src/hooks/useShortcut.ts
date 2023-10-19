@@ -13,13 +13,9 @@ export function useShortcut<T extends HTMLElement>(
 }{
   const {moduleShortcuts, setCurrentModule} = useShortcuts();
   const [ref, value] = useHover<T>(
-    () => {
-      setCurrentModule(shortcutModule as ModuleType);
-    },
-    () => {
-      setCurrentModule(Modules.None as ModuleType);
-    },
-  );
+    () => setCurrentModule(shortcutModule as ModuleType),
+    () => setCurrentModule(Modules.None as ModuleType)
+    );
 
   return {hoverRef: {ref, value}, moduleShortcuts};
 }
