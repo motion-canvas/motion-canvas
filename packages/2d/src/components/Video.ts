@@ -2,7 +2,7 @@ import {BBox, SerializedVector2} from '@motion-canvas/core/lib/types';
 import {drawImage} from '../utils';
 import {computed, initial, signal} from '../decorators';
 import {useThread} from '@motion-canvas/core/lib/utils';
-import {PlaybackState} from '@motion-canvas/core';
+import {PlaybackState, useLogger} from '@motion-canvas/core';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 import {Rect, RectProps} from './Rect';
 import {DesiredLength} from '../partials';
@@ -10,7 +10,9 @@ import {
   DependencyContext,
   SignalValue,
   SimpleSignal,
+  isReactive,
 } from '@motion-canvas/core/lib/signals';
+import reactivePlaybackRate from './__logs__/reactive-playback-rate.md';
 
 export interface VideoProps extends RectProps {
   /**
@@ -29,6 +31,10 @@ export interface VideoProps extends RectProps {
    * {@inheritDoc Video.loop}
    */
   loop?: SignalValue<boolean>;
+  /**
+   * {@inheritDoc Video.playbackRate}
+   */
+  playbackRate?: number;
   /**
    * The starting time for this video in seconds.
    */
@@ -87,6 +93,15 @@ export class Video extends Rect {
   @initial(false)
   @signal()
   public declare readonly loop: SimpleSignal<boolean, this>;
+
+  /**
+   * The rate at which the video plays, as multiples of the normal speed.
+   *
+   * @defaultValue 1
+   */
+  @initial(1)
+  @signal()
+  public declare readonly playbackRate: SimpleSignal<number, this>;
 
   @initial(0)
   @signal()
@@ -166,6 +181,8 @@ export class Video extends Rect {
     const video = this.video();
     const time = this.clampTime(this.time());
 
+    video.playbackRate = this.playbackRate();
+
     if (!video.paused) {
       video.pause();
     }
@@ -183,11 +200,15 @@ export class Video extends Rect {
   protected fastSeekedVideo(): HTMLVideoElement {
     const video = this.video();
     const time = this.clampTime(this.time());
+
+    video.playbackRate = this.playbackRate();
+
     if (this.lastTime === time) {
       return video;
     }
 
-    const playing = this.playing() && time < video.duration;
+    const playing =
+      this.playing() && time < video.duration && video.playbackRate > 0;
     if (playing) {
       if (video.paused) {
         DependencyContext.collectPromise(video.play());
@@ -263,11 +284,40 @@ export class Video extends Rect {
     }
   }
 
+  protected setPlaybackRate(playbackRate: number) {
+    let value: number;
+    if (isReactive(playbackRate)) {
+      value = playbackRate();
+      useLogger().warn({
+        message: 'Invalid value set as the playback rate',
+        remarks: reactivePlaybackRate,
+        inspect: this.key,
+        stack: new Error().stack,
+      });
+    } else {
+      value = playbackRate;
+    }
+    this.playbackRate.context.setter(value);
+
+    if (this.playing()) {
+      if (value === 0) {
+        this.pause();
+      } else {
+        const time = useThread().time;
+        const start = time();
+        const offset = this.time();
+        this.time(() => this.clampTime(offset + (time() - start) * value));
+      }
+    }
+  }
+
   public play() {
     const time = useThread().time;
-    const start = time() - this.time();
+    const start = time();
+    const offset = this.time();
+    const playbackRate = this.playbackRate();
     this.playing(true);
-    this.time(() => this.clampTime(time() - start));
+    this.time(() => this.clampTime(offset + (time() - start) * playbackRate));
   }
 
   public pause() {
