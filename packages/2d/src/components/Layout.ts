@@ -1022,6 +1022,7 @@ function originSignal(origin: Origin): PropertyDecorator {
     signal()(target, key);
     cloneable(false)(target, key);
     const meta = getPropertyMeta<any>(target, key);
+    meta!.parser = value => new Vector2(value);
     meta!.getter = function (this: Layout) {
       return this.getOriginDelta(origin).transformAsPoint(this.localToParent());
     };
