@@ -11,6 +11,7 @@ import type {LifecycleEvents} from './LifecycleEvents';
 import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
 import type {Slides} from './Slides';
+import type {SignalValue} from '../signals';
 
 /**
  * The constructor used when creating new scenes.
@@ -301,4 +302,9 @@ export interface Scene<T = unknown> {
    * Should always return `true`.
    */
   isCached(): boolean;
+
+  /**
+   * Should this scene be rendered below the previous scene during a transition?
+   */
+  previousOnTop: SignalValue<boolean>;
 }
