@@ -6,9 +6,18 @@ import styles from './Viewport.module.scss';
 
 interface TimestampProps extends JSX.HTMLAttributes<HTMLInputElement> {
   frame: number;
+  title: string;
+  frameTitle: string;
+  reverse?: boolean;
 }
 
-export function Timestamp({frame, ...rest}: TimestampProps) {
+export function Timestamp({
+  frame,
+  reverse = false,
+  title,
+  frameTitle,
+  ...rest
+}: TimestampProps) {
   const {player} = useApplication();
   const {speed} = usePlayerState();
 
@@ -19,13 +28,20 @@ export function Timestamp({frame, ...rest}: TimestampProps) {
     padding += 3;
   }
 
+  const frames = (
+    <span title={frameTitle} className={styles.frames}>
+      [{frame.toFixed(precision)}]
+    </span>
+  );
+
   return (
     <code {...rest}>
-      <span>
+      {reverse && frames}
+      <span title={`${title} [HH:MM:SS:FF]`}>
         {formatDuration(player.status.framesToSeconds(frame))}:
         {(frame % player.status.fps).toFixed(precision).padStart(padding, '0')}
       </span>
-      <span className={styles.frames}>[{frame.toFixed(precision)}]</span>
+      {!reverse && frames}
     </code>
   );
 }
