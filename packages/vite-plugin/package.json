@@ -28,6 +28,7 @@
     "@types/node": "^18.14.0"
   },
   "dependencies": {
+    "fast-glob": "^3.3.1",
     "follow-redirects": "^1.15.2",
     "mime-types": "^2.1.35"
   }
