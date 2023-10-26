@@ -30,9 +30,12 @@ export function Label({event, scene}: LabelProps) {
           }
         }}
         onPointerDown={e => {
-          e.currentTarget.setPointerCapture(e.pointerId);
-          if (e.button === 1) {
-            e.preventDefault();
+          e.preventDefault();
+          if (e.button === 0) {
+            e.stopPropagation();
+            e.currentTarget.setPointerCapture(e.pointerId);
+            labelClipDraggingLeftSignal.value = eventTime;
+          } else if (e.button === 1) {
             player.requestSeek(
               scene.firstFrame +
                 player.status.secondsToFrames(event.initialTime + event.offset),
@@ -41,19 +44,22 @@ export function Label({event, scene}: LabelProps) {
         }}
         onPointerMove={e => {
           if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            e.stopPropagation();
             const newTime =
               eventTime +
               player.status.framesToSeconds(pixelsToFrames(e.movementX));
-            labelClipDraggingLeftSignal.value = newTime;
+            labelClipDraggingLeftSignal.value = Math.max(0, newTime);
             setEventTime(newTime);
           }
         }}
         onPointerUp={e => {
-          e.currentTarget.releasePointerCapture(e.pointerId);
-          labelClipDraggingLeftSignal.value = null;
-          const newFrame = Math.max(0, eventTime);
-          if (event.offset !== newFrame) {
-            scene.timeEvents.set(event.name, newFrame, e.shiftKey);
+          if (e.button === 0) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+            labelClipDraggingLeftSignal.value = null;
+            const newFrame = Math.max(0, eventTime);
+            if (event.offset !== newFrame) {
+              scene.timeEvents.set(event.name, newFrame, e.shiftKey);
+            }
           }
         }}
         className={styles.labelClip}

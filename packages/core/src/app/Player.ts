@@ -205,6 +205,24 @@ export class Player {
     }
   }
 
+  /**
+   * Whether the given frame is inside the animation range.
+   *
+   * @param frame - The frame to check.
+   */
+  public isInRange(frame: number): boolean {
+    return frame >= 0 && frame <= this.playback.duration;
+  }
+
+  /**
+   * Whether the given frame is inside the user-defined range.
+   *
+   * @param frame - The frame to check.
+   */
+  public isInUserRange(frame: number): boolean {
+    return frame >= this.startFrame && frame <= this.endFrame;
+  }
+
   public requestSeek(value: number): void {
     this.requestedSeek = this.clampRange(value);
   }
@@ -374,7 +392,7 @@ export class Player {
       : PlaybackState.Playing;
 
     // Seek to the given frame
-    if (state.seek >= 0 || !this.isInRange(this.status.frame)) {
+    if (state.seek >= 0 || !this.isInUserRange(this.status.frame)) {
       const seekFrame = state.seek < 0 ? this.status.frame : state.seek;
       const clampedFrame = this.clampRange(seekFrame);
       this.logger.profile('seek time');
@@ -460,10 +478,6 @@ export class Player {
 
   private clampRange(frame: number): number {
     return clamp(this.startFrame, this.endFrame, frame);
-  }
-
-  private isInRange(frame: number): boolean {
-    return frame >= this.startFrame && frame <= this.endFrame;
   }
 
   private syncAudio(frameOffset = 0) {

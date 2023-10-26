@@ -5,6 +5,7 @@ import {
   useDocumentEvent,
   useDuration,
   usePreviewSettings,
+  useReducedMotion,
   useSize,
   useStateChange,
   useStorage,
@@ -24,6 +25,8 @@ import {
 import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
 import {labelClipDraggingLeftSignal} from '../../signals';
+import {borderHighlight} from '../animations';
+import {effect} from '@preact/signals';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -35,11 +38,13 @@ export function Timeline() {
   const {player} = useApplication();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
+  const rangeRef = useRef<HTMLDivElement>();
   const duration = useDuration();
   const {fps} = usePreviewSettings();
   const rect = useSize(containerRef);
   const [offset, setOffset] = useStorage('timeline-offset', 0);
   const [scale, setScale] = useStorage('timeline-scale', 1);
+  const reduceMotion = useReducedMotion();
   const isReady = duration > 0;
 
   useLayoutEffect(() => {
@@ -139,6 +144,16 @@ export function Timeline() {
     containerRef.current.scrollLeft = offset;
   }, [scale]);
 
+  effect(() => {
+    const offset = labelClipDraggingLeftSignal.value;
+    if (offset !== null) {
+      playheadRef.current.style.left = `${
+        state.framesToPixels(player.status.secondsToFrames(offset)) +
+        sizes.paddingLeft
+      }px`;
+    }
+  });
+
   return (
     <TimelineContextProvider state={state}>
       <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
@@ -195,17 +210,6 @@ export function Timeline() {
             }
           }}
           onPointerMove={event => {
-            if (labelClipDraggingLeftSignal.value) {
-              playheadRef.current.style.left = `${
-                state.framesToPixels(
-                  player.status.secondsToFrames(
-                    labelClipDraggingLeftSignal.value,
-                  ),
-                ) + sizes.paddingLeft
-              }px`;
-            } else {
-              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
-            }
             if (event.currentTarget.hasPointerCapture(event.pointerId)) {
               const newOffset = clamp(
                 0,
@@ -214,9 +218,14 @@ export function Timeline() {
               );
               setOffset(newOffset);
               containerRef.current.scrollLeft = newOffset;
+            } else if (labelClipDraggingLeftSignal.value === null) {
+              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
             }
           }}
           onPointerUp={event => {
+            if (labelClipDraggingLeftSignal.value === null) {
+              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+            }
             if (event.button === 1) {
               event.currentTarget.releasePointerCapture(event.pointerId);
               containerRef.current.style.cursor = '';
@@ -228,13 +237,22 @@ export function Timeline() {
             style={{width: `${sizes.fullLength}px`}}
             onMouseUp={event => {
               if (event.button === 0) {
-                player.requestSeek(
-                  Math.floor(
-                    state.pixelsToFrames(
-                      offset - sizes.paddingLeft + event.x - rect.x,
-                    ),
+                const frame = Math.floor(
+                  state.pixelsToFrames(
+                    offset - sizes.paddingLeft + event.x - rect.x,
                   ),
                 );
+
+                player.requestSeek(frame);
+                if (
+                  !reduceMotion &&
+                  player.isInRange(frame) &&
+                  !player.isInUserRange(frame)
+                ) {
+                  rangeRef.current?.animate(borderHighlight(), {
+                    duration: 200,
+                  });
+                }
               }
             }}
           >
@@ -245,7 +263,7 @@ export function Timeline() {
                 left: `${sizes.paddingLeft}px`,
               }}
             >
-              <RangeSelector />
+              <RangeSelector rangeRef={rangeRef} />
               <Timestamps />
               <div className={styles.trackContainer}>
                 <SceneTrack />
