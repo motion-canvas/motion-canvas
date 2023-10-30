@@ -14,10 +14,20 @@ import {
   VideoSettings,
 } from './components/sidebar';
 import styles from './Editor.module.scss';
+import { useApplication } from './contexts';
 
 
 export function Editor() {
   const state = usePresenterState();
+  const {renderer, presenter, meta, project} = useApplication();
+  if(project.variables?.presentOnStart){
+    presenter.present({
+        ...meta.getFullRenderingSettings(),
+        name: project.name,
+        slide: null,
+        startFullscreen: !!project.variables?.fullscreen
+      });
+  }
 
   return state === PresenterState.Initial ? (
     <div className={styles.root}>

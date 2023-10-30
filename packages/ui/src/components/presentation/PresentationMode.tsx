@@ -11,7 +11,7 @@ export function PresentationMode() {
   const stageRef = useRef<HTMLDivElement>();
   const [keyPressed, setKeyPressed] = useState(null);
   const {setCurrentModule, setHoverEnabled} = useShortcuts();
-
+  
   // setHoverEnabled(false);
   // setCurrentModule(Modules.Presentation); // The hover would only work on the canvas, which is still the same viewport anyway, so we'll just force it
   return (

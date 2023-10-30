@@ -8,11 +8,13 @@ import {Vector2} from '../types';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Semaphore} from '../utils';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
+import {Ref} from 'preact/hooks';
 
 export interface PresenterSettings extends StageSettings {
   name: string;
   fps: number;
   slide: string | null;
+  startFullscreen?: boolean;
 }
 
 export interface PresenterInfo extends Record<string, unknown> {
@@ -61,6 +63,19 @@ export class Presenter {
     fps: 0
   });
 
+  public setCustomStage(customStage : HTMLElement){
+    this.customStage =  customStage; 
+  }
+
+  public toggleFullscreen(){
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else if (!!this.customStage){
+      this.customStage.requestFullscreen();
+      // presenter.stage.finalBuffer.requestFullscreen();      
+    }
+  }
+
   public get onSlidesChanged() {
     return this.slides.subscribable;
   }
@@ -68,6 +83,7 @@ export class Presenter {
   private sceneFrames = 0;
 
   public readonly stage = new Stage();
+  public declare customStage : HTMLElement;
 
   private readonly lock = new Semaphore();
   public readonly playback: PlaybackManager;
@@ -121,6 +137,9 @@ export class Presenter {
 
     this.state.current = PresenterState.Initial;
     this.lock.release();
+    if(settings.startFullscreen){
+      this.toggleFullscreen();
+    }
   }
 
   /**
