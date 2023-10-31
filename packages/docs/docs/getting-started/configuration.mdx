@@ -25,9 +25,9 @@ export default defineConfig({
 - Type: `string | string[]`
 - Default: `./src/project.ts`
 
-The import path of the project file, relative to the configuration file. A
-project file must contain a default export with an instance of the `Project`
-class.
+The import path of the project file, relative to the configuration file. Globs
+are also supported. A project file must contain a default export with an
+instance of the `Project` class.
 
 When set to an array, the Editor will display a project selection screen, making
 it possible to change the project without restarting Vite.
