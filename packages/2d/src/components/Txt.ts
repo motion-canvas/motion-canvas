@@ -105,6 +105,24 @@ export class Txt extends Shape {
     context.restore();
   }
 
+  protected override getCacheBBox(): BBox {
+    const size = this.computedSize();
+    const range = document.createRange();
+    range.selectNodeContents(this.element);
+    const bbox = range.getBoundingClientRect();
+
+    const lineWidth = this.lineWidth();
+    // We take the default value of the miterLimit as 10.
+    const miterLimitCoefficient = this.lineJoin() === 'miter' ? 0.5 * 10 : 0.5;
+
+    return new BBox(
+      -size.width / 2,
+      -size.height / 2,
+      bbox.width,
+      bbox.height,
+    ).expand(lineWidth * miterLimitCoefficient);
+  }
+
   @computed()
   protected formattedText() {
     Txt.formatter.innerText = this.text();
