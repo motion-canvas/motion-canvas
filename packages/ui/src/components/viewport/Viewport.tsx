@@ -37,15 +37,18 @@ function EditorViewport() {
           render={time => (
             <Timestamp
               className={styles.time}
-              title="Current Time"
+              title="Current time"
+              frameTitle="Current frame"
               frame={time}
             />
           )}
         />
         <PlaybackControls />
         <Timestamp
+          reverse
           className={styles.duration}
           title="Duration"
+          frameTitle="Duration in frames"
           frame={duration}
         />
       </div>

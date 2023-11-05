@@ -6,6 +6,7 @@ import {
   initial,
   initializeSignals,
   inspectable,
+  parser,
   signal,
   vector2Signal,
   wrapper,
@@ -30,6 +31,7 @@ import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
 import {
+  clamp,
   deepLerp,
   easeInOutCubic,
   TimingFunction,
@@ -339,7 +341,14 @@ export class Node implements Promisable<Node> {
     }
   }
 
+  /**
+   * Represents the opacity of this node in the range 0-1.
+   *
+   * @remarks
+   * The value is clamped to the range 0-1.
+   */
   @initial(1)
+  @parser((value: number) => clamp(0, 1, value))
   @signal()
   public declare readonly opacity: SimpleSignal<number, this>;
 

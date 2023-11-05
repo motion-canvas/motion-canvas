@@ -12,12 +12,14 @@ import {getVersions} from './versions';
 import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
 import {openInExplorer} from './openInExplorer';
 import * as os from 'os';
+import fg from 'fast-glob';
 
 const AudioExtensions = new Set(['.mp3', '.wav', '.ogg', '.aac', '.flac']);
 
 export interface MotionCanvasPluginConfig {
   /**
    * The import path of the project file or an array of paths.
+   * Also supports globs.
    *
    * @remarks
    * Each file must contain a default export exposing an instance of the
@@ -117,7 +119,26 @@ export default ({
   const outputPath = path.resolve(output);
   const projects: ProjectData[] = [];
   const projectLookup: Record<string, ProjectData> = {};
-  for (const url of typeof project === 'string' ? [project] : project) {
+
+  function expandFilePaths(filePaths: string[] | string): string[] {
+    const expandedFilePaths = [];
+
+    for (const filePath of typeof filePaths === 'string'
+      ? [filePaths]
+      : filePaths) {
+      if (fg.isDynamicPattern(filePath)) {
+        const matchingFilePaths = fg.sync(filePath, {onlyFiles: true});
+        expandedFilePaths.push(...matchingFilePaths);
+      } else {
+        expandedFilePaths.push(filePath);
+      }
+    }
+
+    return expandedFilePaths;
+  }
+
+  const projectList = expandFilePaths(project);
+  for (const url of projectList) {
     const {name, dir} = path.posix.parse(url);
     const metaFile = `${name}.meta`;
     const metaData = getMeta(path.join(dir, metaFile));
@@ -395,6 +416,9 @@ export default ({
         }
 
         if (name === '__open-output-path') {
+          if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, {recursive: true});
+          }
           openInExplorer(outputPath);
           res.end();
           return;

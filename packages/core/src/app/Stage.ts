@@ -2,6 +2,7 @@ import {getContext} from '../utils';
 import {Scene} from '../scenes';
 import {CanvasColorSpace, Vector2} from '../types';
 import type {Color} from '../types';
+import {unwrap} from '../signals';
 
 export interface StageSettings {
   size: Vector2;
@@ -75,6 +76,10 @@ export class Stage {
   }
 
   public async render(currentScene: Scene, previousScene: Scene | null) {
+    const previousOnTop = previousScene
+      ? unwrap(currentScene.previousOnTop)
+      : false;
+
     if (previousScene) {
       this.transformCanvas(this.previousContext);
       await previousScene.render(this.previousContext);
@@ -92,10 +97,13 @@ export class Stage {
       this.context.restore();
     }
 
-    if (previousScene) {
+    if (previousScene && !previousOnTop) {
       this.context.drawImage(this.previousBuffer, 0, 0);
     }
     this.context.drawImage(this.currentBuffer, 0, 0);
+    if (previousOnTop) {
+      this.context.drawImage(this.previousBuffer, 0, 0);
+    }
   }
 
   public transformCanvas(context: CanvasRenderingContext2D) {

@@ -23,7 +23,7 @@ import {Threadable} from './Threadable';
 import {BBox, Vector2} from '../types';
 import {SceneState} from './SceneState';
 import {Random} from './Random';
-import {DependencyContext} from '../signals';
+import {DependencyContext, SignalValue} from '../signals';
 import {SceneMetadata} from './SceneMetadata';
 import {Slides} from './Slides';
 
@@ -48,6 +48,7 @@ export abstract class GeneratorScene<T>
   public readonly variables: Variables;
   public random: Random;
   public creationStack?: string;
+  public previousOnTop: SignalValue<boolean>;
 
   public get firstFrame() {
     return this.cache.current.firstFrame;
@@ -134,6 +135,7 @@ export abstract class GeneratorScene<T>
     this.slides = new Slides(this);
 
     this.random = new Random(this.meta.seed.get());
+    this.previousOnTop = false;
   }
 
   public abstract getView(): T;
@@ -271,6 +273,7 @@ export abstract class GeneratorScene<T>
   public async reset(previousScene: Scene | null = null) {
     this.counters = {};
     this.previousScene = previousScene;
+    this.previousOnTop = false;
     this.random = new Random(this.meta.seed.get());
     this.runner = threads(
       () => this.runnerFactory(this.getView()),
