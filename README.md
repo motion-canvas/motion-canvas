@@ -49,28 +49,30 @@ The project is maintained as one monorepo containing the following packages:
 | `ui`          | The user interface used for editing.                           |
 | `vite-plugin` | A plugin for Vite used for developing and bundling animations. |
 
-After cloning the repo, run `npm install` in the root of the project to install
-all necessary dependencies. Then run `npx lerna run build` to build all the
+1. Clone the repo to your local machine.
+2. Run `npm install` in the root of the project to install
+all necessary dependencies.
+3. Then run `npx lerna run build` to build all the
 packages.
 
 ### Developing Core & 2D
 
-When developing the core, start both `core:dev` and `template:dev`.
+When developing the core, start both `npm run core:dev` and `npm run template:dev`.
 
 This will pick up any changes you make to the core package, automatically
 rebuild the `template` project and refresh the page.
 
-Similarly, when developing the 2D package, start `2d:dev` and `template:dev`.
+Similarly, when developing the 2D package, start `npm run 2d:dev` and `npm run template:dev`.
 
 ### Developing UI
 
 If you want to develop the UI, first build the template project by running:
-`template:build`. Next, start `ui:dev`.
+`npm run template:build`. Next, start `npm run ui:dev`.
 
 ### Developing Player
 
-Like with UI, to develop the player, first build the template: `template:build`.
-Then, start `player:dev`.
+Like with UI, to develop the player, first build the template: `npm run template:build`.
+Then, start `npm run player:dev`.
 
 ## Contributing
 
