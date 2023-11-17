@@ -30,18 +30,21 @@ export default makeScene2D(function* (view) {
 });
 ```
 
-The `Path` allows us to draw and animate SVG paths.
+The `Path` node allows us to draw and animate SVG paths.
 
 :::tip
 
-Path nodes are great for displaying pre-calculated SVG paths, but the format can be confusing. If you want to have more
-intuitive control of the path, and control each point within Motion Canvas, we reccomend checking out the [`Spline`][spline] component.
+`Path` nodes are great for displaying precalculated SVG paths, but the format
+can be confusing. If you want to have more intuitive control of the path, and
+control each point within Motion Canvas, we recommend checking out the
+[`Spline`][spline] component.
 
 :::
 
 ## Defining paths
 
-We can specify the path to be displayed by setting the data property of the Path component:
+We can specify the path to be displayed by setting the `data` property of the
+`Path` node:
 
 ```tsx editor
 import {makeScene2D, Path} from '@motion-canvas/2d';
@@ -58,7 +61,7 @@ export default makeScene2D(function* (view) {
       data="M301.113,12.011L576.715,584.766L25.508,584.766L301.113,12.011z"
       position={[-100, -100]}
       scale={0.25}
-    ></Path>,
+    />,
   );
 ```
 
@@ -95,8 +98,8 @@ export default makeScene2D(function* (view) {
 
 ### Animating objects along a path
 
-Similar to the [`Spline`][spline] and [`Bézier curve`][bezier] components, the `Path` component has
-a `getPointAtPercentage` method that can be used to animate an object along it.
+Like all nodes extending the [`Curve`][curve] class, the `Path` node has a
+`getPointAtPercentage` method that can be used to animate an object along it:
 
 ```tsx editor
 import {makeScene2D, Path, Rect} from '@motion-canvas/2d';
