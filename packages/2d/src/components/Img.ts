@@ -14,7 +14,11 @@ import {
   SignalValue,
   SimpleSignal,
 } from '@motion-canvas/core/lib/signals';
-import {useLogger, viaProxy} from '@motion-canvas/core/lib/utils';
+import {
+  useLogger,
+  viaProxy,
+  DetailedError,
+} from '@motion-canvas/core/lib/utils';
 import imageWithoutSource from './__logs__/image-without-source.md';
 
 export interface ImgProps extends RectProps {
@@ -173,7 +177,22 @@ export class Img extends Rect {
       DependencyContext.collectPromise(
         new Promise((resolve, reject) => {
           image.addEventListener('load', resolve);
-          image.addEventListener('error', reject);
+          image.addEventListener('error', () =>
+            reject(
+              new DetailedError({
+                message: `Failed to load an image`,
+                remarks: `\
+The <code>src</code> property was set to:
+<pre><code>${rawSrc}</code></pre>
+...which resolved to the following url:
+<pre><code>${src}</code></pre>
+Make sure that source is correct and that the image exists.<br/>
+<a target='_blank' href='https://motioncanvas.io/docs/media#images'>Learn more</a>
+about working with images.`,
+                inspect: this.key,
+              }),
+            ),
+          );
         }),
       );
     }
