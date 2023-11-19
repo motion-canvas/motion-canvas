@@ -7,12 +7,12 @@ import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import {
   AccountTree,
   Bug,
-  Docs,
+  HourglassBottom,
   MotionCanvas,
   Movie,
+  School,
   Settings,
   Videocam,
-  ViewTimeline,
 } from '../icons';
 import styles from './Navigation.module.scss';
 
@@ -77,7 +77,7 @@ export function Navigation() {
           <AccountTree />
         </Tab>
         <Tab title="Thread Debugger" id="threads-tab" tab={EditorPanel.Threads}>
-          <ViewTimeline />
+          <HourglassBottom />
         </Tab>
         <Tab
           title={errorCount > 0 ? `Console (${errorCount})` : 'Console'}
@@ -102,7 +102,7 @@ export function Navigation() {
         href="https://motioncanvas.io/docs/"
         target="_blank"
       >
-        <Docs />
+        <School />
       </TabLink>
       <TabGroup tab={BottomPanel.get()} setTab={BottomPanel.set}>
         <Tab title="Timeline" id="timeline-tab" tab={EditorPanel.Timeline}>
