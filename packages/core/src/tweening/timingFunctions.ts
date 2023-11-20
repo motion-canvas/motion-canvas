@@ -134,10 +134,10 @@ export function easeInOutExpo(value: number, from = 0, to = 1) {
     value === 0
       ? 0
       : value === 1
-      ? 1
-      : value < 0.5
-      ? Math.pow(2, 20 * value - 10) / 2
-      : (2 - Math.pow(2, -20 * value + 10)) / 2;
+        ? 1
+        : value < 0.5
+          ? Math.pow(2, 20 * value - 10) / 2
+          : (2 - Math.pow(2, -20 * value + 10)) / 2;
 
   return map(from, to, value);
 }
@@ -202,8 +202,8 @@ export function createEaseInElastic(s = 2.094395): TimingFunction {
       value === 0
         ? 0
         : value === 1
-        ? 1
-        : -Math.pow(2, 10 * value - 10) * Math.sin((value * 10 - 10.75) * s);
+          ? 1
+          : -Math.pow(2, 10 * value - 10) * Math.sin((value * 10 - 10.75) * s);
 
     return map(from, to, value);
   };
@@ -215,8 +215,8 @@ export function createEaseOutElastic(s = 2.094395): TimingFunction {
       value === 0
         ? 0
         : value === 1
-        ? 1
-        : Math.pow(2, -10 * value) * Math.sin((value * 10 - 0.75) * s) + 1;
+          ? 1
+          : Math.pow(2, -10 * value) * Math.sin((value * 10 - 0.75) * s) + 1;
 
     return map(from, to, value);
   };
@@ -228,15 +228,16 @@ export function createEaseInOutElastic(s = 1.39626): TimingFunction {
       value === 0
         ? 0
         : value === 1
-        ? 1
-        : value < 0.5
-        ? -(
-            Math.pow(2, 20 * value - 10) * Math.sin((20 * value - 11.125) * s)
-          ) / 2
-        : (Math.pow(2, -20 * value + 10) *
-            Math.sin((20 * value - 11.125) * s)) /
-            2 +
-          1;
+          ? 1
+          : value < 0.5
+            ? -(
+                Math.pow(2, 20 * value - 10) *
+                Math.sin((20 * value - 11.125) * s)
+              ) / 2
+            : (Math.pow(2, -20 * value + 10) *
+                Math.sin((20 * value - 11.125) * s)) /
+                2 +
+              1;
 
     return map(from, to, value);
   };

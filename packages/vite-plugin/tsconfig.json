@@ -6,8 +6,10 @@
     "esModuleInterop": true,
     "target": "es2021",
     "moduleResolution": "node",
+    "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "plugins": [
       {
         "transform": "@motion-canvas/internal/transformers/markdown-literals.js"

@@ -63,7 +63,9 @@ $states: ('initial' 'loading' 'ready' 'error');
   max-width: 96px;
   aspect-ratio: 1;
   scale: 0.5;
-  transition: scale 0.1s ease-in, opacity 0.1s;
+  transition:
+    scale 0.1s ease-in,
+    opacity 0.1s;
   background-color: transparent;
   border: none;
 
@@ -115,7 +117,8 @@ $states: ('initial' 'loading' 'ready' 'error');
   display: none;
 
   rotate: -90deg;
-  animation: stroke 2s cubic-bezier(0.5, 0, 0.5, 1) infinite,
+  animation:
+    stroke 2s cubic-bezier(0.5, 0, 0.5, 1) infinite,
     rotate 2s linear infinite;
 }
 

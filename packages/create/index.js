@@ -189,10 +189,10 @@ const PLUGINS = {
   const boldManager = kleur.bold(manager);
   if (manager === 'yarn') {
     console.log(`  ${boldManager}`);
-    console.log(`  ${boldManager} serve`);
+    console.log(`  ${boldManager} start`);
   } else {
     console.log(`  ${boldManager} install`);
-    console.log(`  ${boldManager} run serve`);
+    console.log(`  ${boldManager} start`);
   }
   console.log();
 })();

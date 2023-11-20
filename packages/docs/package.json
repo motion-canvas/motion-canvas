@@ -36,8 +36,7 @@
     "@docusaurus/module-type-aliases": "^2.4.0",
     "@tsconfig/docusaurus": "^1.0.5",
     "mdn-links": "^0.1.0",
-    "typedoc": "^0.23.21",
-    "typescript": "^4.7.4"
+    "typedoc": "^0.23.21"
   },
   "browserslist": {
     "production": [

@@ -8,8 +8,8 @@
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
-    "dev": "ttsc -w",
-    "build": "ttsc"
+    "dev": "tspc -w",
+    "build": "tspc"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "lib"
   ],
   "peerDependencies": {
-    "vite": "4.x"
+    "vite": "4.x || 5.x"
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",

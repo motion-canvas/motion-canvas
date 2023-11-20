@@ -9,9 +9,9 @@
   "dependencies": {
     "@motion-canvas/2d": "*",
     "@motion-canvas/core": "*",
-    "jest-image-snapshot": "^6.1.0",
-    "puppeteer": "^19.3.0",
-    "vitest": "^0.29.2"
+    "jest-image-snapshot": "^6.2.0",
+    "puppeteer": "^21.5.2",
+    "vitest": "^0.34.6"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",

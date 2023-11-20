@@ -80,7 +80,11 @@ describe('Matrix2D', () => {
       ],
       ['number', [1, 0, 0], [1, 1, 0, 0, 0, 0]],
       ['undefined', [undefined, undefined, undefined], [0, 0, 0, 0, 0, 0]],
-    ] as [string, [PossibleVector2, PossibleVector2, PossibleVector2], Matrix2DValues][])(
+    ] as [
+      string,
+      [PossibleVector2, PossibleVector2, PossibleVector2],
+      Matrix2DValues,
+    ][])(
       'can be constructed from three PossibleVector2 %s',
       (_, [vec1, vec2, vec3], expected) => {
         const matrix = new Matrix2D(vec1, vec2, vec3);

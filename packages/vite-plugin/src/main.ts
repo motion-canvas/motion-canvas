@@ -181,11 +181,12 @@ export default ({
           .map(plugin => plugin[PLUGIN_OPTIONS]),
       );
       await Promise.all(
-        plugins.map(plugin =>
-          plugin.config?.({
-            output: outputPath,
-            projects,
-          }),
+        plugins.map(
+          plugin =>
+            plugin.config?.({
+              output: outputPath,
+              projects,
+            }),
         ),
       );
       viteConfig = resolvedConfig;
