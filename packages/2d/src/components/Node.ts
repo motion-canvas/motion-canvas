@@ -913,14 +913,14 @@ export class Node implements Promisable<Node> {
    *
    * @param predicate - A function that returns true if the node matches.
    */
-  public find<T extends Node>(predicate: (node: any) => node is T): T[];
+  public findAll<T extends Node>(predicate: (node: any) => node is T): T[];
   /**
    * Find all descendants of this node that match the given predicate.
    *
    * @param predicate - A function that returns true if the node matches.
    */
-  public find<T extends Node = Node>(predicate: (node: any) => boolean): T[];
-  public find<T extends Node>(predicate: (node: any) => node is T): T[] {
+  public findAll<T extends Node = Node>(predicate: (node: any) => boolean): T[];
+  public findAll<T extends Node>(predicate: (node: any) => node is T): T[] {
     const result: T[] = [];
     const queue = this.reversedChildren();
     while (queue.length > 0) {
@@ -1013,7 +1013,7 @@ export class Node implements Promisable<Node> {
   }
 
   /**
-   * Find the first ancestor of this node that matches the given predicate.
+   * Find the closest ancestor of this node that matches the given predicate.
    *
    * @param predicate - A function that returns true if the node matches.
    */
@@ -1021,7 +1021,7 @@ export class Node implements Promisable<Node> {
     predicate: (node: Node) => node is T,
   ): T | null;
   /**
-   * Find the first ancestor of this node that matches the given predicate.
+   * Find the closest ancestor of this node that matches the given predicate.
    *
    * @param predicate - A function that returns true if the node matches.
    */

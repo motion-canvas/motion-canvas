@@ -22,7 +22,7 @@ describe('query', () => {
       </>,
     );
 
-    const query = view.find(is(Circle));
+    const query = view.findAll(is(Circle));
     expect(query.length).toBe(2);
     expect(query).toEqual([...circles]);
   });
@@ -39,7 +39,7 @@ describe('query', () => {
       </>,
     );
 
-    const query = view.find(node => node.scale.x() === 2);
+    const query = view.findAll(node => node.scale.x() === 2);
     expect(query.length).toBe(2);
     expect(query).toEqual([...nodes]);
   });

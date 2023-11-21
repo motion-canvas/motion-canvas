@@ -185,30 +185,30 @@ export default makeScene2D(function* (view) {
     </Layout>,
   );
 
-  const texts = view.find(is(Txt));
+  const texts = view.findAll(is(Txt));
 
   yield* all(...texts.map(text => text.fill('#FFC66D', 1).back(1)));
 });
 ```
 
 It contains multiple text nodes whose color oscillates between white and yellow.
-To achieve that, we used `view.find(is(Txt))` to search through all descendants
-of the view node and select only those of type `Txt`. The first argument passed
-to the [`find`](/api/2d/components/Node#find) method is a so-called `predicate`.
-It's a function that takes a node and returns `true` if it's a node we're
-looking for.
+To achieve that, we used `view.findAll(is(Txt))` to search through all
+descendants of the view node and select only those of type `Txt`. The first
+argument passed to the [`findAll`](/api/2d/components/Node#findAll) method is a
+so-called `predicate`. It's a function that takes a node and returns `true` if
+it's a node we're looking for.
 
 For instance, if we wanted to find all nodes whose scale x is greater than `1`,
 we could write:
 
 ```ts
-const wideNodes = view.find(node => node.scale.x() > 1);
+const wideNodes = view.findAll(node => node.scale.x() > 1);
 ```
 
 Knowing this, we could try to find all nodes of type `Txt` as follows:
 
 ```ts
-const texts = view.find(node => node instanceof Txt);
+const texts = view.findAll(node => node instanceof Txt);
 ```
 
 But Motion Canvas comes with a helpful utility function called
@@ -217,12 +217,12 @@ But Motion Canvas comes with a helpful utility function called
 ```ts
 import {is} from '@motion-canvas/2d';
 // ...
-const texts = view.find(is(Txt));
+const texts = view.findAll(is(Txt));
 ```
 
 These can be used with any JavaScript function that accepts a predicate. The
-`find` method has been implemented to traverse all descendants of a node, but if
-we wanted to query only the direct children, we could retrieve the
+`findAll` method has been implemented to traverse all descendants of a node, but
+if we wanted to query only the direct children, we could retrieve the
 [`children`](/api/2d/components/Node#children) array and call the built-in
 `filter` method with our predicate:
 
@@ -233,9 +233,9 @@ const textChildren = someParent.children().filter(is(Txt));
 There are a few other methods that can be used to query the hierarchy depending
 on your needs:
 
-### `Node.find`
+### `Node.findAll`
 
-<ApiSnippet url={'/api/2d/components/Node#find'} />
+<ApiSnippet url={'/api/2d/components/Node#findAll'} />
 <hr />
 
 ### `Node.findFirst`
