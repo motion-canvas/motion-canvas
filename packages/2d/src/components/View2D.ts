@@ -1,8 +1,10 @@
+import type {Node} from './Node';
 import {Rect, RectProps} from './Rect';
 import {initial, signal} from '../decorators';
 import {PlaybackState} from '@motion-canvas/core';
 import {SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {lazy} from '@motion-canvas/core/lib/decorators';
+import {useScene2D} from '../scenes/useScene2D';
 
 export interface View2DProps extends RectProps {
   assetHash: string;
@@ -63,6 +65,15 @@ export class View2D extends Rect {
     this.computedSize();
     this.computedPosition();
     super.render(context);
+  }
+
+  /**
+   * Find a node by its key.
+   *
+   * @param key - The key of the node.
+   */
+  public findKey<T extends Node = Node>(key: string): T | null {
+    return (useScene2D().getNode(key) as T) ?? null;
   }
 
   protected override requestLayoutUpdate() {

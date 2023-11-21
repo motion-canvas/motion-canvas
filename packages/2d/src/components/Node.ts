@@ -909,6 +909,163 @@ export class Node implements Promisable<Node> {
   }
 
   /**
+   * Find all descendants of this node that match the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public find<T extends Node>(predicate: (node: any) => node is T): T[];
+  /**
+   * Find all descendants of this node that match the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public find<T extends Node = Node>(predicate: (node: any) => boolean): T[];
+  public find<T extends Node>(predicate: (node: any) => node is T): T[] {
+    const result: T[] = [];
+    const queue = this.reversedChildren();
+    while (queue.length > 0) {
+      const node = queue.pop()!;
+      if (predicate(node)) {
+        result.push(node);
+      }
+      const children = node.children();
+      for (let i = children.length - 1; i >= 0; i--) {
+        queue.push(children[i]);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Find the first descendant of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findFirst<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null;
+  /**
+   * Find the first descendant of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findFirst<T extends Node = Node>(
+    predicate: (node: Node) => boolean,
+  ): T | null;
+  public findFirst<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null {
+    const queue = this.reversedChildren();
+    while (queue.length > 0) {
+      const node = queue.pop()!;
+      if (predicate(node)) {
+        return node;
+      }
+      const children = node.children();
+      for (let i = children.length - 1; i >= 0; i--) {
+        queue.push(children[i]);
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Find the last descendant of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findLast<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null;
+  /**
+   * Find the last descendant of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findLast<T extends Node = Node>(
+    predicate: (node: Node) => boolean,
+  ): T | null;
+  public findLast<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null {
+    const search: Node[] = [];
+    const queue = this.reversedChildren();
+
+    while (queue.length > 0) {
+      const node = queue.pop()!;
+      search.push(node);
+      const children = node.children();
+      for (let i = children.length - 1; i >= 0; i--) {
+        queue.push(children[i]);
+      }
+    }
+
+    while (search.length > 0) {
+      const node = search.pop()!;
+      if (predicate(node)) {
+        return node;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Find the first ancestor of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findAncestor<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null;
+  /**
+   * Find the first ancestor of this node that matches the given predicate.
+   *
+   * @param predicate - A function that returns true if the node matches.
+   */
+  public findAncestor<T extends Node = Node>(
+    predicate: (node: Node) => boolean,
+  ): T | null;
+  public findAncestor<T extends Node>(
+    predicate: (node: Node) => node is T,
+  ): T | null {
+    let parent: Node | null = this.parent();
+    while (parent) {
+      if (predicate(parent)) {
+        return parent;
+      }
+      parent = parent.parent();
+    }
+
+    return null;
+  }
+
+  /**
+   * Get the nth children cast to the specified type.
+   *
+   * @param index - The index of the child to retrieve.
+   */
+  public childAs<T extends Node = Node>(index: number): T | null {
+    return (this.children()[index] as T) ?? null;
+  }
+
+  /**
+   * Get the children array cast to the specified type.
+   */
+  public childrenAs<T extends Node = Node>(): T[] {
+    return this.children() as T[];
+  }
+
+  /**
+   * Get the parent cast to the specified type.
+   */
+  public parentAs<T extends Node = Node>(): T | null {
+    return (this.parent() as T) ?? null;
+  }
+
+  /**
    * Prepare this node to be disposed of.
    *
    * @remarks
@@ -1452,6 +1609,15 @@ export class Node implements Promisable<Node> {
 
   private signalByKey(key: string): SimpleSignal<any> {
     return (<Record<string, SimpleSignal<any>>>(<unknown>this))[key];
+  }
+
+  private reversedChildren() {
+    const children = this.children();
+    const result: Node[] = [];
+    for (let i = children.length - 1; i >= 0; i--) {
+      result.push(children[i]);
+    }
+    return result;
   }
 }
 
