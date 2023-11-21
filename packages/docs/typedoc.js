@@ -152,10 +152,7 @@ module.exports = () => ({
 });
 
 async function parseTypes(options, projectName, externalProject) {
-  const app = new Application();
-  app.options.addReader(new TSConfigReader());
-  app.bootstrap(options);
-
+  const app = await Application.bootstrap(options, [new TSConfigReader()]);
   app.converter.addUnknownSymbolResolver(ref => {
     const name = ref.symbolReference.path[0].path;
     if (externalProject) {
@@ -183,7 +180,7 @@ async function parseTypes(options, projectName, externalProject) {
     return mdn.getLink(name) ?? undefined;
   });
 
-  const project = app.convert();
+  const project = await app.convert();
   if (!project) return null;
 
   const hasOwnPage = [
@@ -270,7 +267,7 @@ async function parseTypes(options, projectName, externalProject) {
   const urlLookup = {};
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -1000,
     supports() {
       return true;
     },
@@ -281,7 +278,7 @@ async function parseTypes(options, projectName, externalProject) {
   });
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -1000,
     supports(item) {
       return (
         item instanceof DeclarationReflection &&
@@ -289,16 +286,13 @@ async function parseTypes(options, projectName, externalProject) {
       );
     },
     toObject(item, obj) {
-      obj.importPath =
-        item.name === 'index'
-          ? `${project.name}/lib`
-          : `${project.name}/lib/${item.name}`;
+      obj.importPath = project.name;
       return obj;
     },
   });
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -2000,
     supports(item) {
       return item instanceof Reflection;
     },
@@ -323,7 +317,7 @@ async function parseTypes(options, projectName, externalProject) {
   const promises = [];
   const mdContents = [];
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -1000,
     supports(item) {
       return item instanceof Comment || item instanceof CommentTag;
     },
@@ -355,7 +349,7 @@ async function parseTypes(options, projectName, externalProject) {
       return obj;
     },
   });
-  app.serializer.projectToObject(project);
+  app.serializer.projectToObject(project, `../${projectName}`);
 
   await Promise.all(promises);
 

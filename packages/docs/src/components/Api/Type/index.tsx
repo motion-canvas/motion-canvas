@@ -35,7 +35,7 @@ export default function CodeType(props: CodeTypeProps) {
         return ReflectionType;
       case 'query':
         return QueryType;
-      case 'named-tuple-member':
+      case 'namedTupleMember':
         return NamedTupleMemberType;
       case 'optional':
         break;
@@ -61,7 +61,7 @@ export default function CodeType(props: CodeTypeProps) {
         return InferredType;
       case 'mapped':
         return MappedType;
-      case 'template-literal':
+      case 'templateLiteral':
         return TemplateLiteralType;
       case 'indexedAccess':
         return IndexedAccessType;
