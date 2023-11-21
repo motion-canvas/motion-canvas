@@ -19,7 +19,10 @@ export class UniformPolynomialCurveSampler {
    *                  more points get sampled, the higher the resolution–and
    *                  therefore precision–of the sampler.
    */
-  public constructor(private readonly curve: PolynomialSegment, samples = 20) {
+  public constructor(
+    private readonly curve: PolynomialSegment,
+    samples = 20,
+  ) {
     this.resample(samples);
   }
 

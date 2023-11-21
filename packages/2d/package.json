@@ -9,8 +9,8 @@
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "dev": "ttsc -w",
-    "build": "ttsc",
+    "dev": "tspc -w",
+    "build": "tspc",
     "bundle": "rollup -c rollup.config.mjs",
     "test": "vitest"
   },
@@ -26,8 +26,8 @@
   ],
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
-    "jsdom": "^21.1.0",
-    "vitest": "^0.29.2"
+    "jsdom": "^22.1.0",
+    "vitest": "^0.34.6"
   },
   "dependencies": {
     "@motion-canvas/core": "^3.11.0",

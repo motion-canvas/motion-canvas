@@ -30,7 +30,11 @@ export class ExporterMetaField extends MetaField<{
   private readonly optionFields: MetaField<unknown>[];
   public readonly exporters: ExporterClass[];
 
-  public constructor(name: string, project: Project, private current = 0) {
+  public constructor(
+    name: string,
+    project: Project,
+    private current = 0,
+  ) {
     const exporters = project.plugins.flatMap(
       plugin => plugin.exporters?.(project) ?? [],
     );

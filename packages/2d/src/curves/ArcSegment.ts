@@ -139,8 +139,8 @@ export class ArcSegment extends Segment {
         distance === 0
           ? this.startPoint
           : distance === 1
-          ? this.endPoint
-          : this.getAnglePosition(angle),
+            ? this.endPoint
+            : this.getAnglePosition(angle),
       tangent,
       normal: tangent.perpendicular,
     };

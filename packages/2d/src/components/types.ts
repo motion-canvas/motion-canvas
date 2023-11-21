@@ -17,8 +17,8 @@ export type NodeChildren = Node | Node[];
 export type PropsOf<T> = T extends NodeConstructor<infer P>
   ? P
   : T extends FunctionComponent<infer P>
-  ? P
-  : never;
+    ? P
+    : never;
 
 export interface JSXProps {
   children?: ComponentChildren;

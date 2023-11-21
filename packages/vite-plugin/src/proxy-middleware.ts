@@ -17,7 +17,7 @@
 
 import {Connect} from 'vite';
 import {ServerResponse, IncomingMessage} from 'http';
-import {http, https} from 'follow-redirects';
+import followRedirects from 'follow-redirects';
 
 /**
  * Configuration used by the Proxy plugin
@@ -231,7 +231,9 @@ async function tryGetResource(
     try {
       // We check what protocol was used and decide if we use http or https
       const request = (
-        sourceUrl.protocol.startsWith('https') ? https : http
+        sourceUrl.protocol.startsWith('https')
+          ? followRedirects.https
+          : followRedirects.http
       ).get(sourceUrl, data => {
         res(data);
       });

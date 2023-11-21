@@ -46,8 +46,8 @@ export function Properties() {
             </Group>
           ))
         : inspectable
-        ? 'Click on a node to view its properties.'
-        : "The current scene doesn't support inspecting."}
+          ? 'Click on a node to view its properties.'
+          : "The current scene doesn't support inspecting."}
     </Pane>
   );
 }
