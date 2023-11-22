@@ -5,7 +5,7 @@ import {CircleSegment} from './CircleSegment';
 import {clamp} from '@motion-canvas/core/lib/tweening';
 
 export function getPolylineProfile(
-  points: Vector2[],
+  points: readonly Vector2[],
   radius: number,
   closed: boolean,
 ): CurveProfile {
@@ -21,8 +21,7 @@ export function getPolylineProfile(
 
   if (closed) {
     const middle = points[0].add(points[points.length - 1]).scale(0.5);
-    points.unshift(middle);
-    points.push(middle);
+    points = [middle, ...points, middle];
   }
 
   let last = points[0];

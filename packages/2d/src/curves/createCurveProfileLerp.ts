@@ -187,7 +187,7 @@ function subcurveToPolygon(
  * @returns - perimeter of polygon
  */
 
-function polygonLength(points: Vector2[]) {
+export function polygonLength(points: Vector2[]) {
   return points.reduce((length, point, i) => {
     if (i) return length + points[i - 1].sub(point).magnitude;
     return 0;
@@ -237,7 +237,7 @@ function addPoints(points: Vector2[], numPoints: number) {
  * @returns
  */
 
-function calculateLerpDistance(
+export function calculateLerpDistance(
   points: Vector2[],
   reference: Vector2[],
   offset: number,
@@ -429,7 +429,7 @@ function addCurveToCurve(target: CurveProfile, source: CurveProfile) {
  * @returns - new polygon points
  */
 
-function polygonPointsLerp(
+export function polygonPointsLerp(
   from: Vector2[],
   to: Vector2[],
   value: number,

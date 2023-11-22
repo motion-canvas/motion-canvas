@@ -281,7 +281,12 @@ export default function Fiddle({
             </button>
           )}
         </div>
-        <div className={styles.section}>
+        <div
+          className={clsx(
+            styles.section,
+            duration === 0 && player && styles.disabled,
+          )}
+        >
           <button
             className={styles.icon}
             onClick={() => player?.requestPreviousFrame()}
