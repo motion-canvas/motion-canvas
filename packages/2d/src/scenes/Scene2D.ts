@@ -8,13 +8,13 @@ import {
   SceneRenderEvent,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core/lib/scenes';
-import {Vector2} from '@motion-canvas/core';
+import {useLogger, Vector2} from '@motion-canvas/core';
 import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
-  private registeredNodes: Record<string, Node> = {};
-  private nodeCounters: Record<string, number> = {};
+  private readonly registeredNodes = new Map<string, Node>();
+  private readonly nodeCounters = new Map<string, number>();
   private assetHash = Date.now().toString();
 
   public constructor(
@@ -53,15 +53,15 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   public override reset(previousScene?: Scene): Promise<void> {
-    for (const key in this.registeredNodes) {
+    for (const key of this.registeredNodes.keys()) {
       try {
-        this.registeredNodes[key].dispose();
+        this.registeredNodes.get(key)!.dispose();
       } catch (e: any) {
         this.logger.error(e);
       }
     }
-    this.registeredNodes = {};
-    this.nodeCounters = {};
+    this.registeredNodes.clear();
+    this.nodeCounters.clear();
     this.recreateView();
 
     return super.reset(previousScene);
@@ -125,17 +125,26 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
 
   public registerNode(node: Node, key?: string): string {
     const className = node.constructor?.name ?? 'unknown';
-    this.nodeCounters[className] ??= 0;
-    const counter = this.nodeCounters[className]++;
+    const counter = (this.nodeCounters.get(className) ?? 0) + 1;
+    this.nodeCounters.set(className, counter);
+
+    if (key && this.registeredNodes.has(key)) {
+      useLogger().error({
+        message: `Duplicated node key: "${key}".`,
+        inspect: key,
+        stack: new Error().stack,
+      });
+      key = undefined;
+    }
 
     key ??= `${this.name}/${className}[${counter}]`;
-    this.registeredNodes[key] = node;
+    this.registeredNodes.set(key, node);
     return key;
   }
 
   public getNode(key: any): Node | null {
     if (typeof key !== 'string') return null;
-    return this.registeredNodes[key] ?? null;
+    return this.registeredNodes.get(key) ?? null;
   }
 
   protected recreateView() {

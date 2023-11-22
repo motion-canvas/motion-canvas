@@ -25,6 +25,7 @@ export const Fragment = Symbol.for('@motion-canvas/2d/fragment');
 export function jsx(
   type: NodeConstructor | FunctionComponent | typeof Fragment,
   config: JSXProps,
+  key?: any,
 ): ComponentChildren {
   const {ref, children, ...rest} = config;
   const flatChildren = Array.isArray(children) ? children.flat() : children;
@@ -34,11 +35,11 @@ export function jsx(
   }
 
   if (isClassComponent(type)) {
-    const node = new type({...rest, children: flatChildren});
+    const node = new type({...rest, children: flatChildren, key});
     ref?.(node);
     return node;
   } else {
-    return type({...rest, ref, children: flatChildren});
+    return type({...rest, ref, children: flatChildren, key});
   }
 }
 export {jsx as jsxs};

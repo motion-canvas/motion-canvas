@@ -64,7 +64,7 @@ module.exports = () => ({
           '../2d/src/scenes',
           '../2d/src/utils',
         ],
-        tsconfig: '../2d/tsconfig.json',
+        tsconfig: '../2d/tsconfig.build.json',
       },
       '2d',
       core,

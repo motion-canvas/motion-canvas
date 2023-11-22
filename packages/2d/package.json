@@ -10,7 +10,7 @@
   "types": "./lib/index.d.ts",
   "scripts": {
     "dev": "tspc -w",
-    "build": "tspc",
+    "build": "tspc -p tsconfig.build.json",
     "bundle": "rollup -c rollup.config.mjs",
     "test": "vitest"
   },

@@ -41,7 +41,7 @@ import {
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {Node, NodeProps} from './Node';
-import {drawLine, drawPivot} from '../utils';
+import {drawLine, drawPivot, is} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
   modify,
@@ -640,15 +640,7 @@ export class Layout extends Node {
 
   @computed()
   protected parentTransform(): Layout | null {
-    let parent: Node | null = this.parent();
-    while (parent) {
-      if (parent instanceof Layout) {
-        return parent;
-      }
-      parent = parent.parent();
-    }
-
-    return null;
+    return this.findAncestor(is(Layout));
   }
 
   @computed()
