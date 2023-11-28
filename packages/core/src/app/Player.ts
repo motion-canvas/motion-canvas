@@ -18,6 +18,7 @@ export interface PlayerState extends Record<string, unknown> {
   paused: boolean;
   loop: boolean;
   muted: boolean;
+  volume: number;
   speed: number;
 }
 
@@ -127,6 +128,7 @@ export class Player {
     this.playerState = new ValueDispatcher<PlayerState>({
       loop: true,
       muted: true,
+      volume: 1,
       speed: 1,
       ...initialState,
       paused: true,
@@ -278,6 +280,25 @@ export class Player {
     }
   }
 
+  public setAudioVolume(value: number): void {
+    if (value !== this.playerState.current.volume) {
+      this.playerState.current = {
+        ...this.playerState.current,
+        volume: value,
+      };
+    }
+  }
+
+  public addAudioVolume(value: number): void {
+    const newValue = clamp(0, 1, this.playerState.current.volume + value);
+    if (newValue !== this.playerState.current.volume) {
+      this.playerState.current = {
+        ...this.playerState.current,
+        volume: newValue,
+      };
+    }
+  }
+
   public setSpeed(value: number) {
     if (value !== this.playerState.current.speed) {
       this.playback.speed = value;
@@ -383,6 +404,7 @@ export class Player {
       this.syncAudio(-3);
     }
     this.audio.setMuted(state.muted);
+    this.audio.setVolume(state.volume);
 
     return state;
   }

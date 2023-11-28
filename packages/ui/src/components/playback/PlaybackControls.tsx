@@ -55,6 +55,12 @@ export function PlaybackControls() {
           case 'm':
             player.toggleAudio();
             break;
+          case 'ArrowUp':
+            player.addAudioVolume(0.1);
+            break;
+          case 'ArrowDown':
+            player.addAudioVolume(-0.1);
+            break;
           case 'l':
             player.toggleLoop();
             break;
