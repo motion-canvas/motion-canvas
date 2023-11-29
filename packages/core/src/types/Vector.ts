@@ -47,6 +47,31 @@ export class Vector2 implements Type {
   public static readonly up = new Vector2(0, 1);
   public static readonly down = new Vector2(0, -1);
 
+  /**
+   * A constant equal to `Vector2(0, -1)`
+   */
+  public static readonly top = new Vector2(0, -1);
+  /**
+   * A constant equal to `Vector2(0, 1)`
+   */
+  public static readonly bottom = new Vector2(0, 1);
+  /**
+   * A constant equal to `Vector2(-1, -1)`
+   */
+  public static readonly topLeft = new Vector2(-1, -1);
+  /**
+   * A constant equal to `Vector2(1, -1)`
+   */
+  public static readonly topRight = new Vector2(1, -1);
+  /**
+   * A constant equal to `Vector2(-1, 1)`
+   */
+  public static readonly bottomLeft = new Vector2(-1, 1);
+  /**
+   * A constant equal to `Vector2(1, 1)`
+   */
+  public static readonly bottomRight = new Vector2(1, 1);
+
   public x = 0;
   public y = 0;
 
