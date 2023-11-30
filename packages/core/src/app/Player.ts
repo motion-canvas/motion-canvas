@@ -281,22 +281,17 @@ export class Player {
   }
 
   public setAudioVolume(value: number): void {
-    if (value !== this.playerState.current.volume) {
+    const clampedValue = clamp(0, 1, value);
+    if (clampedValue !== this.playerState.current.volume) {
       this.playerState.current = {
         ...this.playerState.current,
-        volume: value,
+        volume: clampedValue,
       };
     }
   }
 
   public addAudioVolume(value: number): void {
-    const newValue = clamp(0, 1, this.playerState.current.volume + value);
-    if (newValue !== this.playerState.current.volume) {
-      this.playerState.current = {
-        ...this.playerState.current,
-        volume: newValue,
-      };
-    }
+    this.setAudioVolume(this.playerState.current.volume + value);
   }
 
   public setSpeed(value: number) {
