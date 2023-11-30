@@ -24,14 +24,12 @@ import {
 } from '@motion-canvas/core/lib/types';
 import {ReferenceReceiver, useLogger} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
-import {Promisable} from '@motion-canvas/core/lib/threading';
+import {Promisable, ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
 import {
   clamp,
-  deepLerp,
   easeInOutCubic,
   TimingFunction,
-  tween,
 } from '@motion-canvas/core/lib/tweening';
 import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
@@ -48,6 +46,7 @@ import {
   modify,
   unwrap,
 } from '@motion-canvas/core/lib/signals';
+import {all} from '@motion-canvas/core';
 
 export type NodeState = NodeProps & Record<string, any>;
 
@@ -1093,8 +1092,8 @@ export class Node implements Promisable<Node> {
    *
    * @param customProps - Properties to override.
    */
-  public clone(customProps: NodeProps = {}): this {
-    const props: NodeProps & Record<string, any> = {...customProps};
+  public clone(customProps: NodeState = {}): this {
+    const props = {...customProps};
     if (isReactive(this.children.context.raw())) {
       props.children ??= this.children.context.raw();
     } else if (this.children().length > 0) {
@@ -1106,11 +1105,14 @@ export class Node implements Promisable<Node> {
       if (meta.compound) {
         for (const [key, property] of meta.compoundEntries) {
           if (property in props) continue;
-          props[property] = (<Record<string, SimpleSignal<any>>>(
+          const component = (<Record<string, SimpleSignal<any>>>(
             (<unknown>signal)
-          ))[key].context.raw();
+          ))[key];
+          if (!component.context.isInitial()) {
+            props[property] = component.context.raw();
+          }
         }
-      } else {
+      } else if (!signal.context.isInitial()) {
         props[key] = signal.context.raw();
       }
     }
@@ -1127,8 +1129,8 @@ export class Node implements Promisable<Node> {
    *
    * @param customProps - Properties to override.
    */
-  public snapshotClone(customProps: NodeProps = {}): this {
-    const props: NodeProps & Record<string, any> = {
+  public snapshotClone(customProps: NodeState = {}): this {
+    const props = {
       ...this.getState(),
       ...customProps,
     };
@@ -1149,8 +1151,8 @@ export class Node implements Promisable<Node> {
    *
    * @param customProps - Properties to override.
    */
-  public reactiveClone(customProps: NodeProps = {}): this {
-    const props: NodeProps & Record<string, any> = {...customProps};
+  public reactiveClone(customProps: NodeState = {}): this {
+    const props = {...customProps};
     if (this.children().length > 0) {
       props.children ??= this.children().map(child => child.reactiveClone());
     }
@@ -1581,13 +1583,43 @@ export class Node implements Promisable<Node> {
    *
    * @param state - The state to apply to the node.
    */
-  public applyState(state: NodeState) {
-    for (const key in state) {
-      const signal = this.signalByKey(key);
-      if (signal) {
-        signal(state[key]);
+  public applyState(state: NodeState): void;
+  /**
+   * Smoothly transition between the current state of the node and the given
+   * state.
+   *
+   * @param state - The state to transition to.
+   * @param duration - The duration of the transition.
+   * @param timing - The timing function to use for the transition.
+   */
+  public applyState(
+    state: NodeState,
+    duration: number,
+    timing?: TimingFunction,
+  ): ThreadGenerator;
+  public applyState(
+    state: NodeState,
+    duration?: number,
+    timing: TimingFunction = easeInOutCubic,
+  ): ThreadGenerator | void {
+    if (duration === undefined) {
+      for (const key in state) {
+        const signal = this.signalByKey(key);
+        if (signal) {
+          signal(state[key]);
+        }
       }
     }
+
+    const tasks: ThreadGenerator[] = [];
+    for (const key in state) {
+      const signal = this.signalByKey(key);
+      if (state[key] !== signal.context.raw()) {
+        tasks.push(signal(state[key], duration!, timing));
+      }
+    }
+
+    return all(...tasks);
   }
 
   /**
@@ -1610,8 +1642,31 @@ export class Node implements Promisable<Node> {
    * node to a previously saved state. Restoring a node to a previous state
    * removes that state from the state stack.
    *
-   * Providing a duration will tween the node to the restored state. Otherwise,
-   * it will be restored immediately.
+   * @example
+   * ```tsx
+   * const node = <Circle width={100} height={100} fill={"lightseagreen"} />
+   *
+   * view.add(node);
+   *
+   * // Save the node's current state
+   * node.save();
+   *
+   * // Modify some of the node's properties
+   * yield* node.scale(2, 1);
+   * yield* node.fill('hotpink', 1);
+   *
+   * // Restore the node to its saved state
+   * node.restore();
+   * ```
+   */
+  public restore(): void;
+  /**
+   * Tween the node to its last saved state.
+   *
+   * @remarks
+   * This method can be used together with the {@link save} method to restore a
+   * node to a previously saved state. Restoring a node to a previous state
+   * removes that state from the state stack.
    *
    * @example
    * ```tsx
@@ -1626,44 +1681,23 @@ export class Node implements Promisable<Node> {
    * yield* node.scale(2, 1);
    * yield* node.fill('hotpink', 1);
    *
-   * // Restore the node to its saved state over 1 second
+   * // Tween the node to its saved state over 1 second
    * yield* node.restore(1);
    * ```
    *
    * @param duration - The duration of the transition.
    * @param timing - The timing function to use for the transition.
    */
-  public restore(duration?: number, timing: TimingFunction = easeInOutCubic) {
+  public restore(duration: number, timing?: TimingFunction): ThreadGenerator;
+  public restore(
+    duration?: number,
+    timing: TimingFunction = easeInOutCubic,
+  ): ThreadGenerator | void {
     const state = this.stateStack.pop();
 
-    if (state === undefined) {
-      return;
+    if (state !== undefined) {
+      return this.applyState(state, duration!, timing);
     }
-
-    if (duration === undefined) {
-      this.applyState(state);
-      return;
-    }
-
-    const currentState = this.getState();
-    for (const key in state) {
-      // Filter out any properties that haven't changed between the current and
-      // previous states, so we don't perform unnecessary tweens.
-      if (currentState[key] === state[key]) {
-        delete state[key];
-      }
-    }
-
-    return tween(duration, value => {
-      const t = timing(value);
-
-      const nextState = Object.keys(state).reduce((newState, key) => {
-        newState[key] = deepLerp(currentState[key], state[key], t);
-        return newState;
-      }, {} as NodeState);
-
-      this.applyState(nextState);
-    });
   }
 
   public *[Symbol.iterator]() {
