@@ -22,11 +22,7 @@ import {
   ColorSignal,
   SimpleVector2Signal,
 } from '@motion-canvas/core/lib/types';
-import {
-  DetailedError,
-  ReferenceReceiver,
-  useLogger,
-} from '@motion-canvas/core/lib/utils';
+import {ReferenceReceiver, useLogger} from '@motion-canvas/core/lib/utils';
 import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 import {Promisable} from '@motion-canvas/core/lib/threading';
 import {useScene2D} from '../scenes/useScene2D';
@@ -47,6 +43,7 @@ import {
   DependencyContext,
   SignalValue,
   SimpleSignal,
+  Signal,
   isReactive,
   modify,
   unwrap,
@@ -56,8 +53,11 @@ export type NodeState = NodeProps & Record<string, any>;
 
 export interface NodeProps {
   ref?: ReferenceReceiver<any>;
-  children?: ComponentChildren;
-  spawner?: SignalValue<Node[]>;
+  children?: SignalValue<ComponentChildren>;
+  /**
+   * @deprecated Use {@link children} instead.
+   */
+  spawner?: SignalValue<ComponentChildren>;
   key?: string;
 
   x?: SignalValue<number>;
@@ -399,49 +399,45 @@ export class Node implements Promisable<Node> {
     return filters;
   }
 
+  /**
+   * @deprecated Use {@link children} instead.
+   */
   @inspectable(false)
   @cloneable(false)
-  @initial([])
   @signal()
-  protected declare readonly spawner: SimpleSignal<Node[], this>;
+  protected declare readonly spawner: SimpleSignal<ComponentChildren, this>;
+  protected getSpawner(): ComponentChildren {
+    return this.children();
+  }
+  protected setSpawner(value: SignalValue<ComponentChildren>) {
+    this.children(value);
+  }
 
   @inspectable(false)
   @cloneable(false)
   @signal()
-  public declare readonly children: SimpleSignal<Node[], this>;
-  protected setChildren(value: SignalValue<Node[]>) {
-    this.spawner(value);
+  public declare readonly children: Signal<ComponentChildren, Node[], this>;
+  protected setChildren(value: SignalValue<ComponentChildren>) {
+    this.children.context.setter(value);
+    if (!isReactive(value)) {
+      this.spawnChildren(false, value);
+    } else if (!this.hasSpawnedChildren) {
+      for (const oldChild of this.realChildren) {
+        oldChild.parent(null);
+      }
+    }
   }
   protected getChildren(): Node[] {
-    this.spawnChildren();
-    return this.realChildren;
+    return this.spawnedChildren();
   }
 
   @computed()
-  protected spawnChildren() {
-    const children = this.spawner();
-    if (isReactive(this.spawner.context.raw())) {
-      const keep = new Set<string>();
-      for (const realChild of children) {
-        const current = realChild.parent.context.raw();
-        if (current && current !== this) {
-          throw new DetailedError(
-            'The spawner returned a node that already has a parent',
-            'A spawner should either create entirely new nodes or reuse nodes from a pool.',
-          );
-        }
-        realChild.parent(this);
-        keep.add(realChild.key);
-      }
-      for (const realChild of this.realChildren) {
-        if (!keep.has(realChild.key)) {
-          realChild.parent(null);
-        }
-      }
-      this.realChildren = children;
-    } else {
-      this.realChildren = children;
+  protected spawnedChildren(): Node[] {
+    const children = this.children.context.getter();
+    if (isReactive(this.children.context.raw())) {
+      this.spawnChildren(true, children);
     }
+    return this.realChildren;
   }
 
   @computed()
@@ -453,7 +449,9 @@ export class Node implements Promisable<Node> {
 
   protected view2D: View2D;
   private stateStack: NodeState[] = [];
-  private realChildren: Node[] = [];
+  protected realChildren: Node[] = [];
+  protected hasSpawnedChildren = false;
+  private unregister: () => void;
   public readonly parent = createSignal<Node | null>(null);
   public readonly properties = getPropertiesOf(this);
   public readonly key: string;
@@ -461,14 +459,19 @@ export class Node implements Promisable<Node> {
 
   public constructor({children, spawner, key, ...rest}: NodeProps) {
     const scene = useScene2D();
-    this.key = scene.registerNode(this, key);
+    [this.key, this.unregister] = scene.registerNode(this, key);
     this.view2D = scene.getView();
     this.creationStack = new Error().stack;
     initializeSignals(this, rest);
-    this.add(children);
     if (spawner) {
-      this.children(spawner);
+      useLogger().warn({
+        message: 'Node.spawner() has been deprecated.',
+        remarks: 'Use <code>Node.children()</code> instead.',
+        inspect: this.key,
+        stack: new Error().stack,
+      });
     }
+    this.children(spawner ?? children);
   }
 
   /**
@@ -658,7 +661,7 @@ export class Node implements Promisable<Node> {
     }
 
     newChildren.push(...children.slice(index));
-    this.children(newChildren);
+    this.setParsedChildren(newChildren);
 
     return this;
   }
@@ -672,7 +675,7 @@ export class Node implements Promisable<Node> {
       return this;
     }
 
-    current.children(current.children().filter(child => child !== this));
+    current.removeChild(this);
     this.parent(null);
     return this;
   }
@@ -722,7 +725,7 @@ export class Node implements Promisable<Node> {
       }
     }
 
-    parent.children(newChildren);
+    parent.setParsedChildren(newChildren);
 
     return this;
   }
@@ -903,9 +906,10 @@ export class Node implements Promisable<Node> {
    * Remove all children of this node.
    */
   public removeChildren() {
-    for (const node of this.children()) {
-      node.remove();
+    for (const oldChild of this.realChildren) {
+      oldChild.parent(null);
     }
+    this.setParsedChildren([]);
   }
 
   /**
@@ -1077,6 +1081,8 @@ export class Node implements Promisable<Node> {
    */
   public dispose() {
     this.stateStack = [];
+    this.unregister();
+    this.unregister = null!;
     for (const {signal} of this) {
       signal?.context.dispose();
     }
@@ -1089,8 +1095,8 @@ export class Node implements Promisable<Node> {
    */
   public clone(customProps: NodeProps = {}): this {
     const props: NodeProps & Record<string, any> = {...customProps};
-    if (isReactive(this.spawner.context.raw())) {
-      props.spawner = this.spawner.context.raw();
+    if (isReactive(this.children.context.raw())) {
+      props.children ??= this.children.context.raw();
     } else if (this.children().length > 0) {
       props.children ??= this.children().map(child => child.clone());
     }
@@ -1164,6 +1170,67 @@ export class Node implements Promisable<Node> {
    */
   public instantiate(props: NodeProps = {}): this {
     return new (<NodeConstructor<NodeProps, this>>this.constructor)(props);
+  }
+
+  /**
+   * Set the children without parsing them.
+   *
+   * @remarks
+   * This method assumes that the caller took care of parsing the children and
+   * updating the hierarchy.
+   *
+   * @param value - The children to set.
+   */
+  protected setParsedChildren(value: Node[]) {
+    this.children.context.setter(value);
+    this.realChildren = value;
+  }
+
+  protected spawnChildren(reactive: boolean, children: ComponentChildren) {
+    const parsedChildren = this.parseChildren(children);
+
+    const keep = new Set<string>();
+    for (const newChild of parsedChildren) {
+      const current = newChild.parent.context.raw() as Node | null;
+      if (current && current !== this) {
+        current.removeChild(newChild);
+      }
+      keep.add(newChild.key);
+      newChild.parent(this);
+    }
+
+    for (const oldChild of this.realChildren) {
+      if (!keep.has(oldChild.key)) {
+        oldChild.parent(null);
+      }
+    }
+
+    this.hasSpawnedChildren = reactive;
+    this.realChildren = parsedChildren;
+  }
+
+  /**
+   * Parse any `ComponentChildren` into an array of nodes.
+   *
+   * @param children - The children to parse.
+   */
+  protected parseChildren(children: ComponentChildren): Node[] {
+    const result: Node[] = [];
+    const array = Array.isArray(children) ? children : [children];
+    for (const child of array) {
+      if (child instanceof Node) {
+        result.push(child);
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Remove the given child.
+   */
+  protected removeChild(child: Node) {
+    this.setParsedChildren(this.children().filter(node => node !== child));
   }
 
   /**
