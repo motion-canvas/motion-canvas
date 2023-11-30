@@ -13,7 +13,7 @@ import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
-  private readonly registeredNodes = new Map<string, Node>();
+  private registeredNodes = new Map<string, Node>();
   private readonly nodeCounters = new Map<string, number>();
   private assetHash = Date.now().toString();
 
@@ -61,6 +61,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
       }
     }
     this.registeredNodes.clear();
+    this.registeredNodes = new Map<string, Node>();
     this.nodeCounters.clear();
     this.recreateView();
 
@@ -123,7 +124,7 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
       .transformAsPoint(this.getView().localToParent().inverse());
   }
 
-  public registerNode(node: Node, key?: string): string {
+  public registerNode(node: Node, key?: string): [string, () => void] {
     const className = node.constructor?.name ?? 'unknown';
     const counter = (this.nodeCounters.get(className) ?? 0) + 1;
     this.nodeCounters.set(className, counter);
@@ -139,7 +140,8 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
 
     key ??= `${this.name}/${className}[${counter}]`;
     this.registeredNodes.set(key, node);
-    return key;
+    const currentNodeMap = this.registeredNodes;
+    return [key, () => currentNodeMap.delete(key!)];
   }
 
   public getNode(key: any): Node | null {
