@@ -41,6 +41,10 @@ export class AudioManager {
     this.audioElement.muted = isMuted;
   }
 
+  public setVolume(volume: number) {
+    this.audioElement.volume = volume;
+  }
+
   public setSource(src: string) {
     this.source = src;
     this.audioElement.src = src;
