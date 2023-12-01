@@ -5,6 +5,7 @@ import {
   defaultStyle,
   getPropertyMeta,
   initial,
+  interpolation,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -25,6 +26,7 @@ import {
   InterpolationFunction,
   TimingFunction,
   tween,
+  boolLerp,
 } from '@motion-canvas/core/lib/tweening';
 import {
   FlexItems,
@@ -179,6 +181,7 @@ export interface LayoutProps extends NodeProps {
 
 export class Layout extends Node {
   @initial(null)
+  @interpolation(boolLerp)
   @signal()
   public declare readonly layout: SimpleSignal<LayoutMode, this>;
 
@@ -628,6 +631,7 @@ export class Layout extends Node {
 
   public constructor(props: LayoutProps) {
     super(props);
+    this.element.dataset.motionCanvasKey = this.key;
   }
 
   public lockSize() {

@@ -139,6 +139,10 @@ export function deepLerp(
   return to;
 }
 
+export function boolLerp<T>(from: T, to: T, value: number): T {
+  return value < 0.5 ? from : to;
+}
+
 export function map(from: number, to: number, value: number) {
   return from + (to - from) * value;
 }

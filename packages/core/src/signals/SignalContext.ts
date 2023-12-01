@@ -59,6 +59,7 @@ export class SignalContext<
   protected extensions: SignalExtensions<TSetterValue, TValue>;
   protected current: SignalValue<TSetterValue> | undefined;
   protected last: TValue | undefined;
+  protected tweening = false;
 
   public constructor(
     private initial: SignalValue<TSetterValue> | undefined,
@@ -248,6 +249,7 @@ export class SignalContext<
       value = this.initial!;
     }
 
+    this.tweening = true;
     yield* this.extensions.tweener(
       value,
       duration,
@@ -255,6 +257,7 @@ export class SignalContext<
       interpolationFunction,
     );
     this.set(value);
+    this.tweening = false;
   }
 
   public *tweener(
@@ -341,6 +344,13 @@ export class SignalContext<
   }
 
   /**
+   * Get the initial value of this signal.
+   */
+  public getInitial() {
+    return this.initial;
+  }
+
+  /**
    * Get the raw value of this signal.
    *
    * @remarks
@@ -365,5 +375,12 @@ export class SignalContext<
    */
   public raw() {
     return this.current;
+  }
+
+  /**
+   * Is the signal undergoing a tween?
+   */
+  public isTweening() {
+    return this.tweening;
   }
 }

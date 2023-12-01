@@ -7,6 +7,7 @@ import {addInitializer, initialize} from './initializers';
 import {capitalize, useLogger} from '@motion-canvas/core/lib/utils';
 import {makeSignalExtensions} from '../utils/makeSignalExtensions';
 import {SignalContext} from '@motion-canvas/core/lib/signals';
+import {SignalValue} from '@motion-canvas/core';
 
 export interface PropertyMetadata<T> {
   default?: T;
@@ -113,12 +114,19 @@ export function initializeSignals(instance: any, props: Record<string, any>) {
  */
 export function signal<T>(): PropertyDecorator {
   return (target: any, key) => {
+    // FIXME property metadata is not inherited
+    // Consider retrieving it inside the initializer using the instance and not
+    // the class.
     const meta = getPropertyMetaOrCreate<T>(target, key);
     addInitializer(target, (instance: any) => {
-      const getDefault =
-        instance[`getDefault${capitalize(key as string)}`]?.bind(instance);
+      let initial: SignalValue<T> = meta.default!;
+      const defaultMethod = instance[`getDefault${capitalize(key as string)}`];
+      if (defaultMethod) {
+        initial = () => defaultMethod.call(instance, meta.default);
+      }
+
       const signal = new SignalContext<T, T, any>(
-        getDefault ?? meta.default,
+        initial,
         meta.interpolationFunction ?? deepLerp,
         instance,
         meta.parser?.bind(instance),
