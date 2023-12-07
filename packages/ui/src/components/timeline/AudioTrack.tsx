@@ -1,20 +1,10 @@
 import styles from './Timeline.module.scss';
 
-import {
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
-import {
-  useDrag,
-  useKeyHold,
-  useSharedSettings,
-  useSubscribableValue,
-} from '../../hooks';
+import {useLayoutEffect, useMemo, useRef, useState} from 'preact/hooks';
+import {useKeyHold, useSharedSettings, useSubscribableValue} from '../../hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
 import clsx from 'clsx';
+import {MouseButton} from '../../utils';
 
 const HEIGHT = 48;
 
@@ -22,7 +12,6 @@ export function AudioTrack() {
   const ref = useRef<HTMLCanvasElement>();
   const {player, meta} = useApplication();
   const {audioOffset} = useSharedSettings();
-  const [hover, setHover] = useState(false);
   const shiftHeld = useKeyHold('Shift');
   const [editingOffset, setEditingOffset] = useState(0);
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
@@ -37,22 +26,6 @@ export function AudioTrack() {
 
   const audioData = useSubscribableValue(player.audio.onDataChanged);
   const fullOffset = audioOffset + editingOffset;
-
-  const [handleDrag, isDragging] = useDrag(
-    useCallback(
-      dx => {
-        setEditingOffset(
-          editingOffset + player.status.framesToSeconds(pixelsToFrames(dx)),
-        );
-      },
-      [editingOffset, pixelsToFrames],
-    ),
-    useCallback(() => {
-      meta.shared.audioOffset.set(fullOffset);
-    }, [fullOffset]),
-  );
-
-  const isActive = (hover && shiftHeld) || isDragging;
 
   useLayoutEffect(() => {
     if (!context) return;
@@ -90,7 +63,7 @@ export function AudioTrack() {
 
     context.lineWidth = 1;
     context.lineJoin = 'round';
-    context.strokeStyle = '#444';
+    context.strokeStyle = '#fff';
     context.stroke();
   }, [
     fullOffset,
@@ -120,17 +93,31 @@ export function AudioTrack() {
       ref={ref}
       className={clsx(
         styles.audioTrack,
-        isActive && styles.active,
+        shiftHeld && styles.active,
         audioData && styles.show,
       )}
       style={style}
       width={viewLength}
       height={HEIGHT * 2}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onMouseDown={event => {
-        if (event.shiftKey) {
-          handleDrag(event);
+      onPointerDown={e => {
+        if (e.button === MouseButton.Left) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
+      }}
+      onPointerMove={e => {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          setEditingOffset(
+            editingOffset +
+              player.status.framesToSeconds(pixelsToFrames(e.movementX)),
+          );
+        }
+      }}
+      onPointerUp={e => {
+        if (e.button === MouseButton.Left) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+          meta.shared.audioOffset.set(fullOffset);
         }
       }}
     />

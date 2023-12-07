@@ -2,17 +2,24 @@ import styles from './Timeline.module.scss';
 
 import {usePlayerState, usePlayerTime} from '../../hooks';
 import {useTimelineContext} from '../../contexts';
+import {Signal} from '@preact/signals';
 
-export function Playhead() {
+interface PlayheadProps {
+  seeking: Signal<number | null>;
+}
+
+export function Playhead({seeking}: PlayheadProps) {
   const {framesToPixels} = useTimelineContext();
   const {speed} = usePlayerState();
   const time = usePlayerTime();
+  const frame = seeking.value ?? time.frame;
+
   return (
     <div
       className={styles.playhead}
-      data-frame={formatFrames(time.frame, speed)}
+      data-frame={formatFrames(frame, speed)}
       style={{
-        left: `${framesToPixels(time.frame)}px`,
+        left: `${framesToPixels(frame)}px`,
       }}
     />
   );
