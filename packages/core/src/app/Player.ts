@@ -496,7 +496,7 @@ export class Player {
     });
   }
 
-  private clampRange(frame: number): number {
+  public clampRange(frame: number): number {
     return clamp(this.startFrame, this.endFrame, frame);
   }
 

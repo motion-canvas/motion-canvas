@@ -293,6 +293,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+
+  &.active {
+    pointer-events: auto;
+    border-color: rgba(255, 255, 255, 0.24);
+  }
 }
 
 .handle {
@@ -300,7 +306,7 @@
   margin-top: 2px;
   color: rgba(255, 255, 255, 0);
 
-  .range:hover > & {
+  .range.active > & {
     color: rgba(255, 255, 255, 0.24);
     z-index: 1;
     min-width: 24px;
@@ -323,13 +329,16 @@
   margin: 24px 0;
   opacity: 0;
   transition: opacity var(--duration-normal);
+  pointer-events: none;
+  filter: brightness(0.27);
 
   &.show {
     opacity: 1;
   }
 
   &.active {
+    pointer-events: auto;
     cursor: move;
-    filter: brightness(0.9);
+    filter: brightness(0.32);
   }
 }

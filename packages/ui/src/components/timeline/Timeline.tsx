@@ -15,7 +15,7 @@ import {Timestamps} from './Timestamps';
 import {LabelTrack} from './LabelTrack';
 import {SceneTrack} from './SceneTrack';
 import {RangeSelector} from './RangeSelector';
-import {clamp} from '../../utils';
+import {clamp, MouseButton, MouseMask} from '../../utils';
 import {AudioTrack} from './AudioTrack';
 import {
   useApplication,
@@ -26,7 +26,7 @@ import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
 import {labelClipDraggingLeftSignal} from '../../signals';
 import {borderHighlight} from '../animations';
-import {effect} from '@preact/signals';
+import {effect, useSignal} from '@preact/signals';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -45,6 +45,8 @@ export function Timeline() {
   const [offset, setOffset] = useStorage('timeline-offset', 0);
   const [scale, setScale] = useStorage('timeline-scale', 1);
   const reduceMotion = useReducedMotion();
+  const seeking = useSignal<number | null>(null);
+  const warnedAboutRange = useRef(false);
   const isReady = duration > 0;
 
   useLayoutEffect(() => {
@@ -146,13 +148,37 @@ export function Timeline() {
 
   effect(() => {
     const offset = labelClipDraggingLeftSignal.value;
-    if (offset !== null) {
+    if (offset !== null && playheadRef.current) {
       playheadRef.current.style.left = `${
         state.framesToPixels(player.status.secondsToFrames(offset)) +
         sizes.paddingLeft
       }px`;
     }
   });
+
+  const scrub = (x: number) => {
+    const frame = Math.floor(
+      state.pixelsToFrames(offset - sizes.paddingLeft + x - rect.x),
+    );
+
+    seeking.value = player.clampRange(frame);
+    if (player.onFrameChanged.current !== frame) {
+      player.requestSeek(frame);
+    }
+
+    const isInUserRange = player.isInUserRange(frame);
+    const isOutOfRange = player.isInRange(frame) && !isInUserRange;
+    if (!warnedAboutRange && !reduceMotion && isOutOfRange) {
+      warnedAboutRange.current = true;
+      rangeRef.current?.animate(borderHighlight(), {
+        duration: 200,
+      });
+    }
+
+    if (isInUserRange) {
+      warnedAboutRange.current = false;
+    }
+  };
 
   return (
     <TimelineContextProvider state={state}>
@@ -203,7 +229,12 @@ export function Timeline() {
             }px`;
           }}
           onPointerDown={event => {
-            if (event.button === 1) {
+            if (event.button === MouseButton.Left) {
+              event.preventDefault();
+              event.currentTarget.setPointerCapture(event.pointerId);
+              playheadRef.current.style.display = 'none';
+              scrub(event.x);
+            } else if (event.button === MouseButton.Middle) {
               event.preventDefault();
               event.currentTarget.setPointerCapture(event.pointerId);
               containerRef.current.style.cursor = 'grabbing';
@@ -211,13 +242,17 @@ export function Timeline() {
           }}
           onPointerMove={event => {
             if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-              const newOffset = clamp(
-                0,
-                sizes.playableLength,
-                offset - event.movementX,
-              );
-              setOffset(newOffset);
-              containerRef.current.scrollLeft = newOffset;
+              if (event.buttons & MouseMask.Primary) {
+                scrub(event.x);
+              } else if (event.buttons & MouseMask.Auxiliary) {
+                const newOffset = clamp(
+                  0,
+                  sizes.playableLength,
+                  offset - event.movementX,
+                );
+                setOffset(newOffset);
+                containerRef.current.scrollLeft = newOffset;
+              }
             } else if (labelClipDraggingLeftSignal.value === null) {
               playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
             }
@@ -226,35 +261,21 @@ export function Timeline() {
             if (labelClipDraggingLeftSignal.value === null) {
               playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
             }
-            if (event.button === 1) {
+            if (
+              event.button === MouseButton.Left ||
+              event.button === MouseButton.Middle
+            ) {
+              seeking.value = null;
+              warnedAboutRange.current = false;
               event.currentTarget.releasePointerCapture(event.pointerId);
               containerRef.current.style.cursor = '';
+              playheadRef.current.style.display = '';
             }
           }}
         >
           <div
             className={styles.timeline}
             style={{width: `${sizes.fullLength}px`}}
-            onMouseUp={event => {
-              if (event.button === 0) {
-                const frame = Math.floor(
-                  state.pixelsToFrames(
-                    offset - sizes.paddingLeft + event.x - rect.x,
-                  ),
-                );
-
-                player.requestSeek(frame);
-                if (
-                  !reduceMotion &&
-                  player.isInRange(frame) &&
-                  !player.isInUserRange(frame)
-                ) {
-                  rangeRef.current?.animate(borderHighlight(), {
-                    duration: 200,
-                  });
-                }
-              }
-            }}
           >
             <div
               className={styles.timelineContent}
@@ -270,7 +291,7 @@ export function Timeline() {
                 <LabelTrack />
                 <AudioTrack />
               </div>
-              <Playhead />
+              <Playhead seeking={seeking} />
             </div>
           </div>
           <div ref={playheadRef} className={styles.playheadPreview} />

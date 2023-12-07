@@ -1,10 +1,18 @@
 import styles from './Timeline.module.scss';
 
-import {useDuration, usePreviewSettings, useSharedSettings} from '../../hooks';
+import {
+  useDuration,
+  useKeyHold,
+  usePreviewSettings,
+  useSharedSettings,
+} from '../../hooks';
 import {useCallback, useEffect, useState} from 'preact/hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
 import {DragIndicator} from '../icons';
 import {RefObject} from 'preact';
+import {labelClipDraggingLeftSignal} from '../../signals';
+import clsx from 'clsx';
+import {MouseButton} from '../../utils';
 
 export interface RangeSelectorProps {
   rangeRef: RefObject<HTMLDivElement>;
@@ -21,8 +29,10 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
   const endFrame = Math.min(player.status.secondsToFrames(range[1]), duration);
   const [start, setStart] = useState(startFrame);
   const [end, setEnd] = useState(endFrame);
+  const shiftHeld = useKeyHold('Shift');
 
   const onDrop = useCallback(() => {
+    labelClipDraggingLeftSignal.value = null;
     meta.shared.range.update(start, end, duration, fps);
   }, [start, end, duration, fps]);
 
@@ -43,17 +53,17 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
       ref={rangeRef}
       style={{
         flexDirection: start > end ? 'row-reverse' : 'row',
-        left: `${framesToPercents(Math.max(0, normalizedStart))}%`,
-        right: `${100 - framesToPercents(Math.min(duration, normalizedEnd))}%`,
+        left: `${framesToPercents(Math.ceil(Math.max(0, normalizedStart)))}%`,
+        right: `${
+          100 - framesToPercents(Math.ceil(Math.min(duration, normalizedEnd)))
+        }%`,
       }}
-      className={styles.range}
+      className={clsx(styles.range, shiftHeld && styles.active)}
       onPointerDown={event => {
-        event.preventDefault();
-        if (event.button === 0) {
-          event.currentTarget.setPointerCapture(event.pointerId);
-        } else if (event.button === 1) {
+        if (event.button === MouseButton.Left) {
+          event.preventDefault();
           event.stopPropagation();
-          meta.shared.range.update(0, Infinity, duration, fps);
+          event.currentTarget.setPointerCapture(event.pointerId);
         }
       }}
       onPointerMove={event => {
@@ -63,49 +73,55 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
         }
       }}
       onPointerUp={event => {
-        if (event.button === 0) {
+        if (event.button === MouseButton.Left) {
           event.currentTarget.releasePointerCapture(event.pointerId);
           onDrop();
         }
       }}
+      onDblClick={() => {
+        meta.shared.range.update(0, Infinity, duration, fps);
+      }}
     >
-      <RangeHandle
-        onDrag={event => setStart(start + pixelsToFrames(event.movementX))}
-        onDrop={onDrop}
-      />
+      <RangeHandle value={start} setValue={setStart} onDrop={onDrop} />
       <div class={styles.handleSpacer} />
-      <RangeHandle
-        onDrag={event => setEnd(end + pixelsToFrames(event.movementX))}
-        onDrop={onDrop}
-      />
+      <RangeHandle value={end} setValue={setEnd} onDrop={onDrop} />
     </div>
   );
 }
 
 interface RangeHandleProps {
-  onDrag: (event: PointerEvent) => void;
+  value: number;
+  setValue: (value: number) => void;
   onDrop: (event: PointerEvent) => void;
 }
 
-function RangeHandle({onDrag, onDrop}: RangeHandleProps) {
+function RangeHandle({value, setValue, onDrop}: RangeHandleProps) {
+  const {pixelsToFrames} = useTimelineContext();
+  const {player} = useApplication();
+
   return (
     <DragIndicator
       className={styles.handle}
       onPointerDown={event => {
-        if (event.button === 0) {
+        if (event.button === MouseButton.Left) {
           event.preventDefault();
           event.stopPropagation();
           event.currentTarget.setPointerCapture(event.pointerId);
+          labelClipDraggingLeftSignal.value =
+            player.status.framesToSeconds(value);
         }
       }}
       onPointerMove={event => {
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
           event.stopPropagation();
-          onDrag(event);
+          const newValue = value + pixelsToFrames(event.movementX);
+          setValue(newValue);
+          labelClipDraggingLeftSignal.value =
+            player.status.framesToSeconds(newValue);
         }
       }}
       onPointerUp={event => {
-        if (event.button === 0) {
+        if (event.button === MouseButton.Left) {
           event.stopPropagation();
           event.currentTarget.releasePointerCapture(event.pointerId);
           onDrop(event);
