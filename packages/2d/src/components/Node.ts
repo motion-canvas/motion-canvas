@@ -417,6 +417,10 @@ export class Node implements Promisable<Node> {
   @signal()
   public declare readonly children: Signal<ComponentChildren, Node[], this>;
   protected setChildren(value: SignalValue<ComponentChildren>) {
+    if (this.children.context.raw() === value) {
+      return;
+    }
+
     this.children.context.setter(value);
     if (!isReactive(value)) {
       this.spawnChildren(false, value);
@@ -1079,11 +1083,18 @@ export class Node implements Promisable<Node> {
    * node to be garbage collected.
    */
   public dispose() {
+    if (!this.unregister) {
+      return;
+    }
+
     this.stateStack = [];
     this.unregister();
     this.unregister = null!;
     for (const {signal} of this) {
       signal?.context.dispose();
+    }
+    for (const child of this.realChildren) {
+      child.dispose();
     }
   }
 
