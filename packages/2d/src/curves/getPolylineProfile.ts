@@ -65,11 +65,14 @@ export function getPolylineProfile(
       counter,
     );
 
-    profile.segments.push(line);
-    profile.segments.push(circle);
-
-    profile.arcLength += line.arcLength;
-    profile.arcLength += circle.arcLength;
+    if (line.arcLength > 0) {
+      profile.segments.push(line);
+      profile.arcLength += line.arcLength;
+    }
+    if (circle.arcLength > 0) {
+      profile.segments.push(circle);
+      profile.arcLength += circle.arcLength;
+    }
 
     profile.minSin = Math.min(profile.minSin, Math.abs(angleSin));
 
@@ -77,7 +80,10 @@ export function getPolylineProfile(
   }
 
   const line = new LineSegment(last, points[points.length - 1]);
-  profile.segments.push(line);
-  profile.arcLength += line.arcLength;
+  if (line.arcLength > 0) {
+    profile.segments.push(line);
+    profile.arcLength += line.arcLength;
+  }
+
   return profile;
 }
