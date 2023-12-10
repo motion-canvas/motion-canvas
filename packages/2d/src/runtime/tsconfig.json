@@ -1,0 +1,18 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "@motion-canvas/2d/lib",
+    "plugins": [
+      {
+        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
+      }
+    ],
+    "paths": {
+      "@motion-canvas/2d/lib/*": ["./*"]
+    }
+  },
+  "include": ["**/*"],
+  "exclude": ["**/*.test.*", "**/__tests__/**/*"]
+}

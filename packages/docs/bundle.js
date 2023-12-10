@@ -35,7 +35,7 @@ module.exports = () => ({
 });
 
 async function copyBundle(name) {
-  const bundle = `../${name}/dist/index.min.js`;
+  const bundle = `../${name}/dist/index.js`;
   if (!fs.existsSync(bundle)) {
     throw `The '${name}' bundle is missing.\n\tMake sure to first run:\n\tnpm run ${name}:bundle\n`;
   }

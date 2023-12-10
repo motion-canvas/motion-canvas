@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "outDir": "lib",
+    "rootDir": ".",
+    "outDir": "../lib",
     "strict": true,
     "noImplicitOverride": true,
     "module": "esnext",
@@ -12,14 +13,6 @@
     "inlineSourceMap": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "types": ["node"],
-    "jsx": "react-jsx",
-    "jsxImportSource": "@motion-canvas/2d/src",
-    "plugins": [
-      {
-        "transform": "@motion-canvas/internal/transformers/markdown-literals.js"
-      }
-    ]
-  },
-  "include": ["src"]
+    "composite": true
+  }
 }
