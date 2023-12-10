@@ -6,11 +6,27 @@
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
-  "main": "lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "lib/runtime/index.js",
+  "types": "./lib/runtime/index.d.ts",
+  "exports": {
+    ".": "./lib/runtime/index.js",
+    "./lib": "./lib/runtime/index.js",
+    "./lib/components": "./lib/runtime/components/index.js",
+    "./lib/curves": "./lib/runtime/curves/index.js",
+    "./lib/decorators": "./lib/runtime/decorators/index.js",
+    "./lib/partials": "./lib/runtime/partials/index.js",
+    "./lib/scenes": "./lib/runtime/scenes/index.js",
+    "./lib/utils": "./lib/runtime/utils/index.js",
+    "./lib/*": {
+      "import": "./lib/runtime/*.js",
+      "default": "./lib/runtime/*"
+    },
+    "./editor": "./lib/editor/index.js",
+    "./tsconfig.project.json": "./tsconfig.project.json"
+  },
   "scripts": {
-    "dev": "tspc -w",
-    "build": "tspc -p tsconfig.build.json",
+    "dev": "tspc -b src -w",
+    "build": "tspc -b src",
     "bundle": "rollup -c rollup.config.mjs",
     "test": "vitest"
   },
