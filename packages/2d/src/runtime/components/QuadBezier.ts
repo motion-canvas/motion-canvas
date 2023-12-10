@@ -1,5 +1,4 @@
-import {SignalValue} from '@motion-canvas/core/lib/signals';
-import {PossibleVector2, Vector2Signal} from '@motion-canvas/core/lib/types';
+import {PossibleVector2, SignalValue, Vector2Signal} from '@motion-canvas/core';
 import {QuadBezierSegment} from '../curves';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {computed, vector2Signal} from '../decorators';

@@ -1,3 +1,7 @@
+import useIsBrowser from '@docusaurus/useIsBrowser';
+import Comment from '@site/src/components/Api/Comment';
+import {useUrlLookup} from '@site/src/contexts/api';
+import clsx from 'clsx';
 import React, {
   ReactNode,
   useCallback,
@@ -5,11 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import useIsBrowser from '@docusaurus/useIsBrowser';
 import styles from './styles.module.css';
-import clsx from 'clsx';
-import {useUrlLookup} from '@site/src/contexts/api';
-import Comment from '@site/src/components/Api/Comment';
 
 const WIDTH = 480 + 16;
 

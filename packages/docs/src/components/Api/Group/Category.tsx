@@ -1,7 +1,7 @@
-import React from 'react';
+import {FilteredGroup} from '@site/src/components/Api/Group/index';
 import Item from '@site/src/components/Api/Item';
 import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
-import {FilteredGroup} from '@site/src/components/Api/Group/index';
+import React from 'react';
 
 export default function Category({group}: {group: FilteredGroup}) {
   if (

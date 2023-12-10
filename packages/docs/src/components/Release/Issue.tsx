@@ -1,7 +1,7 @@
-import styles from '@site/src/components/Release/styles.module.css';
-import React, {ReactNode} from 'react';
 import Contributor from '@site/src/components/Release/Contributor';
 import PullRequest from '@site/src/components/Release/PullRequest';
+import styles from '@site/src/components/Release/styles.module.css';
+import React, {ReactNode} from 'react';
 
 export interface IssueProps {
   user: string;

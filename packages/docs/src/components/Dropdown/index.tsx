@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
+import React, {useEffect, useRef, useState} from 'react';
 
 export interface DropdownProps {
   options: {

@@ -1,19 +1,21 @@
-import {PossibleCanvasStyle} from '../partials';
-import {computed, initial, signal} from '../decorators';
-import {BBox} from '@motion-canvas/core/lib/types';
-import {Layout, LayoutProps} from './Layout';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {easeOutExpo, linear, map} from '@motion-canvas/core/lib/tweening';
-import {resolveCanvasStyle} from '../utils';
 import {
-  canvasStyleSignal,
-  CanvasStyleSignal,
-} from '../decorators/canvasStyleSignal';
-import {
-  createSignal,
+  BBox,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
+  createSignal,
+  easeOutExpo,
+  linear,
+  map,
+  threadable,
+} from '@motion-canvas/core';
+import {computed, initial, signal} from '../decorators';
+import {
+  CanvasStyleSignal,
+  canvasStyleSignal,
+} from '../decorators/canvasStyleSignal';
+import {PossibleCanvasStyle} from '../partials';
+import {resolveCanvasStyle} from '../utils';
+import {Layout, LayoutProps} from './Layout';
 
 export interface ShapeProps extends LayoutProps {
   fill?: SignalValue<PossibleCanvasStyle>;

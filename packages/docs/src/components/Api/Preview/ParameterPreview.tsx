@@ -1,8 +1,8 @@
-import React from 'react';
-import type {JSONOutput} from 'typedoc';
-import Type from '@site/src/components/Api/Type';
 import Token from '@site/src/components/Api/Code/Token';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
+import Type from '@site/src/components/Api/Type';
+import React from 'react';
+import type {JSONOutput} from 'typedoc';
 
 export default function ParameterPreview({
   reflection,

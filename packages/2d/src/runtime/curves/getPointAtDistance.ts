@@ -1,7 +1,6 @@
-import {clamp} from '@motion-canvas/core/lib/tweening';
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {CurveProfile} from './CurveProfile';
+import {Vector2, clamp} from '@motion-canvas/core';
 import {CurvePoint} from './CurvePoint';
+import {CurveProfile} from './CurveProfile';
 
 export function getPointAtDistance(
   profile: CurveProfile,

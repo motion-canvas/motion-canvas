@@ -15,9 +15,9 @@
  * same host as the main app.
  */
 
-import {Connect} from 'vite';
-import {ServerResponse, IncomingMessage} from 'http';
 import followRedirects from 'follow-redirects';
+import {IncomingMessage, ServerResponse} from 'http';
+import {Connect} from 'vite';
 
 /**
  * Configuration used by the Proxy plugin

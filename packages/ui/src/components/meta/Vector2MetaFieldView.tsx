@@ -1,6 +1,6 @@
-import {Input} from '../controls';
+import {Vector2MetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import {Vector2MetaField} from '@motion-canvas/core/lib/meta';
+import {Input} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface Vector2MetaFieldViewProps {

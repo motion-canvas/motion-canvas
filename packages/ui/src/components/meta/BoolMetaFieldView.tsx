@@ -1,6 +1,6 @@
-import {Checkbox} from '../controls';
+import type {BoolMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import type {BoolMetaField} from '@motion-canvas/core/lib/meta';
+import {Checkbox} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface BoolMetaFieldViewProps {

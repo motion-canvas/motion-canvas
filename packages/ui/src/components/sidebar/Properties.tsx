@@ -1,12 +1,12 @@
+import type {Inspectable} from '@motion-canvas/core';
+import {isInspectable} from '@motion-canvas/core';
 import {useMemo} from 'preact/hooks';
-import {useCurrentScene, useCurrentFrame} from '../../hooks';
-import type {Inspectable} from '@motion-canvas/core/lib/scenes';
-import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
-import {Pane} from '../tabs';
 import {useInspection} from '../../contexts';
-import {AutoField} from '../fields';
-import {Button, Group, Label, Separator} from '../controls';
+import {useCurrentFrame, useCurrentScene} from '../../hooks';
 import {findAndOpenFirstUserFile} from '../../utils';
+import {Button, Group, Label, Separator} from '../controls';
+import {AutoField} from '../fields';
+import {Pane} from '../tabs';
 
 export function Properties() {
   const {inspectedElement} = useInspection();

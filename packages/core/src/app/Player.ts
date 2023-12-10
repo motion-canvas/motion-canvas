@@ -1,18 +1,18 @@
-import {Project} from './Project';
-import {PlaybackManager, PlaybackState} from './PlaybackManager';
-import {AudioManager} from '../media';
-import {clamp} from '../tweening';
-import {Logger} from './Logger';
 import {
   AsyncEventDispatcher,
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
+import {AudioManager} from '../media';
 import {Scene} from '../scenes';
-import {Vector2} from '../types';
-import {PlaybackStatus} from './PlaybackStatus';
-import {Semaphore} from '../utils';
 import {EditableTimeEvents} from '../scenes/timeEvents';
+import {clamp} from '../tweening';
+import {Vector2} from '../types';
+import {Semaphore} from '../utils';
+import {Logger} from './Logger';
+import {PlaybackManager, PlaybackState} from './PlaybackManager';
+import {PlaybackStatus} from './PlaybackStatus';
+import {Project} from './Project';
 
 export interface PlayerState extends Record<string, unknown> {
   paused: boolean;

@@ -1,6 +1,6 @@
-import type {MetaField, ObjectMetaField} from '@motion-canvas/core/lib/meta';
-import {MetaFieldView} from './MetaFieldView';
+import type {MetaField, ObjectMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
+import {MetaFieldView} from './MetaFieldView';
 
 export interface ObjectMetaFieldViewProps {
   field: ObjectMetaField<any>;

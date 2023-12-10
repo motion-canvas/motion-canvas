@@ -1,18 +1,18 @@
-import {mathjax} from 'mathjax-full/js/mathjax';
-import {TeX} from 'mathjax-full/js/input/tex';
-import {SVG} from 'mathjax-full/js/output/svg';
-import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
-import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
-import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
-import {initial, signal} from '../decorators';
-import {Img, ImgProps} from './Img';
 import {
   DependencyContext,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
+  useLogger,
+} from '@motion-canvas/core';
+import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
+import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
+import {TeX} from 'mathjax-full/js/input/tex';
+import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
+import {mathjax} from 'mathjax-full/js/mathjax';
+import {SVG} from 'mathjax-full/js/output/svg';
 import {OptionList} from 'mathjax-full/js/util/Options';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {initial, signal} from '../decorators';
+import {Img, ImgProps} from './Img';
 
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);

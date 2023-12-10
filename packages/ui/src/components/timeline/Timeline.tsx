@@ -1,6 +1,13 @@
 import styles from './Timeline.module.scss';
 
+import {effect, useSignal} from '@preact/signals';
+import clsx from 'clsx';
 import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
+import {
+  TimelineContextProvider,
+  TimelineState,
+  useApplication,
+} from '../../contexts';
 import {
   useDocumentEvent,
   useDuration,
@@ -10,23 +17,16 @@ import {
   useStateChange,
   useStorage,
 } from '../../hooks';
-import {Playhead} from './Playhead';
-import {Timestamps} from './Timestamps';
-import {LabelTrack} from './LabelTrack';
-import {SceneTrack} from './SceneTrack';
-import {RangeSelector} from './RangeSelector';
-import {clamp, MouseButton, MouseMask} from '../../utils';
-import {AudioTrack} from './AudioTrack';
-import {
-  useApplication,
-  TimelineContextProvider,
-  TimelineState,
-} from '../../contexts';
-import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
 import {labelClipDraggingLeftSignal} from '../../signals';
+import {MouseButton, MouseMask, clamp} from '../../utils';
 import {borderHighlight} from '../animations';
-import {effect, useSignal} from '@preact/signals';
+import {AudioTrack} from './AudioTrack';
+import {LabelTrack} from './LabelTrack';
+import {Playhead} from './Playhead';
+import {RangeSelector} from './RangeSelector';
+import {SceneTrack} from './SceneTrack';
+import {Timestamps} from './Timestamps';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;

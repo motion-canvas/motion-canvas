@@ -1,11 +1,11 @@
-import {Input} from '../controls';
-import type {RangeMetaField} from '@motion-canvas/core/lib/meta';
+import type {RangeMetaField} from '@motion-canvas/core';
 import {useApplication} from '../../contexts';
 import {
   useDuration,
   usePreviewSettings,
   useSubscribableValue,
 } from '../../hooks';
+import {Input} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface RangeMetaFieldViewProps {

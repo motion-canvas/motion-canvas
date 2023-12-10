@@ -1,13 +1,14 @@
 import {
+  capitalize,
   deepLerp,
   InterpolationFunction,
+  SignalContext,
+  SignalValue,
   TimingFunction,
-} from '@motion-canvas/core/lib/tweening';
-import {addInitializer, initialize} from './initializers';
-import {capitalize, useLogger} from '@motion-canvas/core/lib/utils';
+  useLogger,
+} from '@motion-canvas/core';
 import {makeSignalExtensions} from '../utils/makeSignalExtensions';
-import {SignalContext} from '@motion-canvas/core/lib/signals';
-import {SignalValue} from '@motion-canvas/core';
+import {addInitializer, initialize} from './initializers';
 
 export interface PropertyMetadata<T> {
   default?: T;

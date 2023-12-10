@@ -1,15 +1,15 @@
-import React from 'react';
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
 import Container from '@site/src/components/Api/Code/Container';
-import Preview from '@site/src/components/Api/Preview';
-import Signatures from '@site/src/components/Api/Signatures';
 import Line from '@site/src/components/Api/Code/Line';
-import type {JSONOutput} from 'typedoc';
 import Comment from '@site/src/components/Api/Comment';
-import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
-import TypeParameters from '@site/src/components/Api/TypeParameters';
 import Filters from '@site/src/components/Api/Filters';
 import Group from '@site/src/components/Api/Group';
+import Preview from '@site/src/components/Api/Preview';
+import Signatures from '@site/src/components/Api/Signatures';
+import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
+import TypeParameters from '@site/src/components/Api/TypeParameters';
+import React from 'react';
+import type {JSONOutput} from 'typedoc';
 
 export default function ClassItem({
   reflection,

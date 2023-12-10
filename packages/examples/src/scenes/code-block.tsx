@@ -1,5 +1,4 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {makeScene2D} from '@motion-canvas/2d';
 import {
   CodeBlock,
   edit,
@@ -7,7 +6,7 @@ import {
   lines,
   remove,
 } from '@motion-canvas/2d/lib/components/CodeBlock';
-import {all, waitFor} from '@motion-canvas/core/lib/flow';
+import {all, createRef, waitFor} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const codeRef = createRef<CodeBlock>();

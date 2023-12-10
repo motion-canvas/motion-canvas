@@ -1,7 +1,6 @@
 import styles from './Sidebar.module.scss';
 
-import {type Thread, getTaskName} from '@motion-canvas/core/lib/threading';
-import {isThreadable} from '@motion-canvas/core/lib/scenes/Threadable';
+import {getTaskName, isThreadable, type Thread} from '@motion-canvas/core';
 import {
   useCurrentFrame,
   useCurrentScene,

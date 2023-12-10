@@ -1,6 +1,6 @@
-import {defineConfig} from 'vite';
 import preact from '@preact/preset-vite';
 import * as fs from 'fs';
+import {defineConfig} from 'vite';
 
 export default defineConfig({
   build: {

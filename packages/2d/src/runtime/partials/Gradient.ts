@@ -1,17 +1,15 @@
-import {initial, initializeSignals, signal} from '../decorators/signal';
-import {vector2Signal} from '../decorators/vector2Signal';
-import {computed} from '../decorators/computed';
 import {
   Color,
   PossibleColor,
   PossibleVector2,
-  Vector2Signal,
-} from '@motion-canvas/core/lib/types';
-import {
   SignalValue,
   SimpleSignal,
+  Vector2Signal,
   unwrap,
-} from '@motion-canvas/core/lib/signals';
+} from '@motion-canvas/core';
+import {computed} from '../decorators/computed';
+import {initial, initializeSignals, signal} from '../decorators/signal';
+import {vector2Signal} from '../decorators/vector2Signal';
 
 export type GradientType = 'linear' | 'conic' | 'radial';
 

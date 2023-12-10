@@ -1,7 +1,7 @@
-import {MetaField} from './MetaField';
 import type {ExporterClass, Project} from '../app';
-import {EnumMetaField} from './EnumMetaField';
 import {ValueDispatcher} from '../events';
+import {EnumMetaField} from './EnumMetaField';
+import {MetaField} from './MetaField';
 
 /**
  * Represents the exporter configuration.

@@ -1,6 +1,6 @@
-import type {NumberMetaField} from '@motion-canvas/core/lib/meta';
-import {Input, InputSelect} from '../controls';
+import type {NumberMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
+import {Input, InputSelect} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface NumberMetaFieldViewProps {

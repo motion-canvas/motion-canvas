@@ -1,18 +1,20 @@
-import {computed, initial, signal} from '../decorators';
 import {
+  DEFAULT,
   InterpolationFunction,
+  SignalValue,
+  SimpleSignal,
+  ThreadGenerator,
   TimingFunction,
-} from '@motion-canvas/core/lib/tweening';
-import {Shape, ShapeProps} from './Shape';
-import {SignalValue} from '@motion-canvas/core/lib/signals';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-import {all, DEFAULT, SimpleSignal} from '@motion-canvas/core';
-import {Node} from './Node';
-import {ComponentChildren} from './types';
-import {TxtLeaf} from './TxtLeaf';
+  all,
+  capitalize,
+  threadable,
+} from '@motion-canvas/core';
+import {computed, initial, signal} from '../decorators';
 import {is} from '../utils';
-import {capitalize} from '@motion-canvas/core/lib/utils';
+import {Node} from './Node';
+import {Shape, ShapeProps} from './Shape';
+import {TxtLeaf} from './TxtLeaf';
+import {ComponentChildren} from './types';
 
 type TxtChildren = string | Node | (string | Node)[];
 type AnyTxt = Txt | TxtLeaf;

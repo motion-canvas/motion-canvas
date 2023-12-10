@@ -1,8 +1,12 @@
-import {Img, ImgProps} from './Img';
+import {
+  ColorSignal,
+  PossibleColor,
+  SignalValue,
+  SimpleSignal,
+  useLogger,
+} from '@motion-canvas/core';
 import {colorSignal, computed, initial, signal} from '../decorators';
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {useLogger} from '@motion-canvas/core/lib/utils';
-import {ColorSignal, PossibleColor} from '@motion-canvas/core/lib/types';
+import {Img, ImgProps} from './Img';
 
 export interface IconProps extends ImgProps {
   /**

@@ -1,9 +1,9 @@
-import {Segment} from './Segment';
-import {BBox, Vector2} from '@motion-canvas/core/lib/types';
-import {UniformPolynomialCurveSampler} from './UniformPolynomialCurveSampler';
+import {BBox, Vector2} from '@motion-canvas/core';
 import {moveTo} from '../utils';
-import {Polynomial2D} from './Polynomial2D';
 import {CurvePoint} from './CurvePoint';
+import {Polynomial2D} from './Polynomial2D';
+import {Segment} from './Segment';
+import {UniformPolynomialCurveSampler} from './UniformPolynomialCurveSampler';
 
 export abstract class PolynomialSegment extends Segment {
   protected readonly pointSampler: UniformPolynomialCurveSampler;

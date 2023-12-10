@@ -1,5 +1,5 @@
-import styles from './Viewport.module.scss';
 import {useContext, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
+import styles from './Viewport.module.scss';
 import {ViewportContext} from './ViewportContext';
 
 const GRID_SIZE = 40;

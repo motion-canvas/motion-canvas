@@ -1,10 +1,10 @@
-import {createComputed} from './createComputed';
 import {
   Computed,
   ComputedContext,
   createSignal,
   PromiseHandle,
 } from '../signals';
+import {createComputed} from './createComputed';
 
 export function createComputedAsync<T>(
   factory: () => Promise<T>,

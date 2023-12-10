@@ -1,18 +1,20 @@
 import {
+  BBox,
   createSignal,
   isReactive,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
-import {BBox, Vector2} from '@motion-canvas/core/lib/types';
+  threadable,
+  TimingFunction,
+  tween,
+  Vector2,
+} from '@motion-canvas/core';
 import {CurveProfile} from '../curves';
+import {createCurveProfileLerp} from '../curves/createCurveProfileLerp';
 import {getPathProfile} from '../curves/getPathProfile';
 import {computed, signal} from '../decorators';
 import {drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
-import {createCurveProfileLerp} from '../curves/createCurveProfileLerp';
 
 export interface PathProps extends CurveProps {
   data: SignalValue<string>;

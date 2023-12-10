@@ -1,6 +1,6 @@
-import {useDuration} from '../utils';
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
+import {useDuration} from '../utils';
 import {LoopCallback} from './loop';
 import {loopFor} from './loopFor';
 

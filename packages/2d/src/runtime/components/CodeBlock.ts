@@ -1,35 +1,35 @@
-import {computed, initial, parser, signal} from '../decorators';
-import {useLogger} from '@motion-canvas/core/lib/utils';
-import {Shape, ShapeProps} from './Shape';
 import {
-  CodeTree,
-  parse,
-  diff,
-  ready,
-  MorphToken,
-  Token,
-  CodeStyle,
-  Code,
-} from 'code-fns';
-import {
-  clampRemap,
-  easeInOutSine,
-  map,
-  TimingFunction,
-  tween,
-} from '@motion-canvas/core/lib/tweening';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {DesiredLength} from '../partials';
-import {SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
-import {
-  createComputedAsync,
-  createSignal,
+  SerializedVector2,
   Signal,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
-import {join, ThreadGenerator} from '@motion-canvas/core/lib/threading';
-import {waitFor} from '@motion-canvas/core/lib/flow';
+  ThreadGenerator,
+  TimingFunction,
+  Vector2,
+  clampRemap,
+  createComputedAsync,
+  createSignal,
+  easeInOutSine,
+  join,
+  map,
+  threadable,
+  tween,
+  useLogger,
+  waitFor,
+} from '@motion-canvas/core';
+import {
+  Code,
+  CodeStyle,
+  CodeTree,
+  MorphToken,
+  Token,
+  diff,
+  parse,
+  ready,
+} from 'code-fns';
+import {computed, initial, parser, signal} from '../decorators';
+import {DesiredLength} from '../partials';
+import {Shape, ShapeProps} from './Shape';
 
 type CodePoint = [number, number];
 type CodeRange = [CodePoint, CodePoint];

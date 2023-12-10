@@ -1,13 +1,13 @@
-import {useEffect, useState} from 'react';
+import {isInspectable} from '@motion-canvas/core';
 import {useCallback, useContext} from 'preact/hooks';
+import {useEffect, useState} from 'react';
 import {
   useCurrentScene,
   useDocumentEvent,
   useSharedSettings,
 } from '../../hooks';
-import {ViewportContext} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core';
 import styles from '../controls/Controls.module.scss';
+import {ViewportContext} from './ViewportContext';
 
 export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});

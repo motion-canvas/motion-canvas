@@ -1,7 +1,5 @@
-import {Latex} from '@motion-canvas/2d/lib/components';
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {waitFor} from '@motion-canvas/core/lib/flow';
-import {createRef} from '@motion-canvas/core/lib/utils';
+import {Latex, makeScene2D} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const tex = createRef<Latex>();

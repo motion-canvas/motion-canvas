@@ -6,13 +6,13 @@ import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {Index, ProjectData} from './Index';
 import {
+  ApplicationProvider,
   InspectionProvider,
   LoggerProvider,
-  ApplicationProvider,
 } from './contexts';
-import {getItem, setItem} from './utils';
 import {ShortcutsProvider} from './contexts/shortcuts';
 import {projectNameSignal} from './signals';
+import {getItem, setItem} from './utils';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');

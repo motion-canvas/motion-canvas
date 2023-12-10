@@ -1,6 +1,6 @@
 import {FlagDispatcher, Subscribable} from '../events';
-import {DetailedError} from '../utils';
 import {Promisable} from '../threading';
+import {DetailedError} from '../utils';
 
 export interface PromiseHandle<T> {
   promise: Promise<T>;

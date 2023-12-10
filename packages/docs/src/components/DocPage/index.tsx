@@ -1,9 +1,9 @@
-import React from 'react';
-import DocItem from '@theme/DocItem';
 import Tooltip from '@site/src/components/Tooltip';
 import {ApiProvider} from '@site/src/contexts/api';
 import {ThemeDictProvider} from '@site/src/contexts/codeTheme';
 import api from '@site/src/generated/api';
+import DocItem from '@theme/DocItem';
+import React from 'react';
 
 export default function DocPage(props) {
   return (

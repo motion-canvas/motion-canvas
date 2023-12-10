@@ -1,9 +1,11 @@
-import {Rect, Txt} from '@motion-canvas/2d/lib/components';
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {all, waitFor} from '@motion-canvas/core/lib/flow';
-import {slideTransition} from '@motion-canvas/core/lib/transitions';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {Direction} from '@motion-canvas/core/lib/types';
+import {Rect, Txt, makeScene2D} from '@motion-canvas/2d';
+import {
+  Direction,
+  all,
+  createRef,
+  slideTransition,
+  waitFor,
+} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const rect = createRef<Rect>();

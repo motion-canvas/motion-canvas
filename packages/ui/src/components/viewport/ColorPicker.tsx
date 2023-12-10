@@ -1,8 +1,8 @@
-import {Colorize} from '../icons';
-import {useState} from 'react';
-import {ButtonCheckbox} from '../controls/ButtonCheckbox';
 import {useCallback, useRef} from 'preact/hooks';
+import {useState} from 'react';
 import {useDocumentEvent} from '../../hooks';
+import {ButtonCheckbox} from '../controls/ButtonCheckbox';
+import {Colorize} from '../icons';
 
 export function ColorPicker() {
   return typeof EyeDropper === 'function' ? <ColorPickerImpl /> : <></>;

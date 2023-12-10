@@ -1,5 +1,5 @@
-import {useLogger} from '../utils';
 import {Vector2} from '../types';
+import {useLogger} from '../utils';
 
 export interface InterpolationFunction<T, TRest extends any[] = any[]> {
   (from: T, to: T, value: number, ...args: TRest): T;

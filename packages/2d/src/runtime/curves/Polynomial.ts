@@ -1,4 +1,4 @@
-import {clamp} from '@motion-canvas/core/lib/tweening';
+import {clamp} from '@motion-canvas/core';
 
 /**
  * A polynomial in the form ax^3 + bx^2 + cx + d up to a cubic polynomial.

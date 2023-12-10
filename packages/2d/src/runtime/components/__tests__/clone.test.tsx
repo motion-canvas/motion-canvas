@@ -1,8 +1,8 @@
-import {describe, it, expect} from 'vitest';
-import {createSignal, range, Vector2} from '@motion-canvas/core';
-import {mockScene2D} from './mockScene2D';
+import {Vector2, createSignal, range} from '@motion-canvas/core';
+import {describe, expect, it} from 'vitest';
 import {Circle} from '../Circle';
 import {Node} from '../Node';
+import {mockScene2D} from './mockScene2D';
 
 describe('clone', () => {
   mockScene2D();

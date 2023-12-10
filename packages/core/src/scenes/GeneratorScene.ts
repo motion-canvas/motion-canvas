@@ -1,3 +1,7 @@
+import {Logger, PlaybackStatus} from '../app';
+import {decorate, threadable} from '../decorators';
+import {EventDispatcher, ValueDispatcher} from '../events';
+import {DependencyContext, SignalValue} from '../signals';
 import {
   isPromisable,
   isPromise,
@@ -5,12 +9,10 @@ import {
   ThreadGenerator,
   threads,
 } from '../threading';
-import {Logger, PlaybackStatus} from '../app';
-import {TimeEvents} from './timeEvents';
-import {Variables} from './Variables';
-import {EventDispatcher, ValueDispatcher} from '../events';
-import {decorate, threadable} from '../decorators';
+import {BBox, Vector2} from '../types';
 import {endPlayback, endScene, startPlayback, startScene} from '../utils';
+import {LifecycleEvents} from './LifecycleEvents';
+import {Random} from './Random';
 import {
   CachedSceneData,
   FullSceneDescription,
@@ -18,14 +20,12 @@ import {
   SceneDescriptionReload,
   SceneRenderEvent,
 } from './Scene';
-import {LifecycleEvents} from './LifecycleEvents';
-import {Threadable} from './Threadable';
-import {BBox, Vector2} from '../types';
-import {SceneState} from './SceneState';
-import {Random} from './Random';
-import {DependencyContext, SignalValue} from '../signals';
 import {SceneMetadata} from './SceneMetadata';
+import {SceneState} from './SceneState';
 import {Slides} from './Slides';
+import {Threadable} from './Threadable';
+import {TimeEvents} from './timeEvents';
+import {Variables} from './Variables';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;

@@ -1,8 +1,8 @@
-import React, {useMemo} from 'react';
-import type {JSONOutput} from 'typedoc';
 import Summary from '@site/src/components/Api/Comment/Summary';
 import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
 import {useApiFinder} from '@site/src/contexts/api';
+import React, {useMemo} from 'react';
+import type {JSONOutput} from 'typedoc';
 
 export default function Parameters({parameters}: {parameters: number[]}) {
   const find = useApiFinder();

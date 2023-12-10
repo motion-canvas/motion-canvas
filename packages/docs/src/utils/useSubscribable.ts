@@ -2,7 +2,7 @@ import type {
   EventHandler,
   Subscribable,
   SubscribableValueEvent,
-} from '@motion-canvas/core/lib/events';
+} from '@motion-canvas/core';
 import {DependencyList, useEffect, useState} from 'react';
 
 export function useSubscribable<TValue, THandler extends EventHandler<TValue>>(

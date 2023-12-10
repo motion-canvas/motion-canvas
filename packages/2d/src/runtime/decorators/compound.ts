@@ -1,13 +1,14 @@
-import {useLogger} from '@motion-canvas/core/lib/utils';
-import {getPropertyMetaOrCreate} from './signal';
-import {addInitializer} from './initializers';
-import {deepLerp, map} from '@motion-canvas/core/lib/tweening';
 import {
   CompoundSignalContext,
   SignalContext,
-} from '@motion-canvas/core/lib/signals';
+  deepLerp,
+  map,
+  modify,
+  useLogger,
+} from '@motion-canvas/core';
 import {makeSignalExtensions} from '../utils/makeSignalExtensions';
-import {modify} from '@motion-canvas/core/lib/signals/utils';
+import {addInitializer} from './initializers';
+import {getPropertyMetaOrCreate} from './signal';
 
 /**
  * Create a compound property decorator.

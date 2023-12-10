@@ -1,12 +1,6 @@
 import styles from './Viewport.module.scss';
 
-import {
-  useCurrentScene,
-  usePlayerTime,
-  usePreviewSettings,
-  useSharedSettings,
-  useSubscribable,
-} from '../../hooks';
+import {isInspectable} from '@motion-canvas/core';
 import {
   useContext,
   useLayoutEffect,
@@ -14,9 +8,15 @@ import {
   useRef,
   useState,
 } from 'preact/hooks';
+import {useApplication, useInspection} from '../../contexts';
+import {
+  useCurrentScene,
+  usePlayerTime,
+  usePreviewSettings,
+  useSharedSettings,
+  useSubscribable,
+} from '../../hooks';
 import {ViewportContext} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core/lib/scenes/Inspectable';
-import {useInspection, useApplication} from '../../contexts';
 
 export function Debug() {
   const time = usePlayerTime();

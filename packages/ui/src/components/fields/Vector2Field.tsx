@@ -1,6 +1,6 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {Field, FieldSet, FieldValue, NumericField} from './Layout';
+import {Vector2} from '@motion-canvas/core';
 import {useFormattedNumber} from '../../hooks';
+import {Field, FieldSet, FieldValue, NumericField} from './Layout';
 
 export interface Vector2FieldProps {
   value: Vector2;

@@ -1,19 +1,19 @@
-import {Footer} from './components/footer';
-import {Viewport} from './components/viewport';
-import {Navigation, ElementSwitch, ResizeableLayout} from './components/layout';
-import {usePresenterState} from './hooks';
 import {PresenterState} from '@motion-canvas/core';
-import {PresentationMode} from './components/presentation';
-import {EditorPanel, BottomPanel, SidebarPanel} from './signals';
-import {Timeline} from './components/timeline';
+import styles from './Editor.module.scss';
 import {Console} from './components/console';
+import {Footer} from './components/footer';
+import {ElementSwitch, Navigation, ResizeableLayout} from './components/layout';
+import {PresentationMode} from './components/presentation';
 import {
   Properties,
   Settings,
   Threads,
   VideoSettings,
 } from './components/sidebar';
-import styles from './Editor.module.scss';
+import {Timeline} from './components/timeline';
+import {Viewport} from './components/viewport';
+import {usePresenterState} from './hooks';
+import {BottomPanel, EditorPanel, SidebarPanel} from './signals';
 
 export function Editor() {
   const state = usePresenterState();

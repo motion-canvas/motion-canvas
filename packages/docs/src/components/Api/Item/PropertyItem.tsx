@@ -3,10 +3,10 @@ import React from 'react';
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
 import Container from '@site/src/components/Api/Code/Container';
 import Line from '@site/src/components/Api/Code/Line';
-import PropertyPreview from '@site/src/components/Api/Preview/PropertyPreview';
-import Heading from '@theme/Heading';
 import Comment from '@site/src/components/Api/Comment';
+import PropertyPreview from '@site/src/components/Api/Preview/PropertyPreview';
 import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
+import Heading from '@theme/Heading';
 import type {JSONOutput} from 'typedoc';
 
 export default function PropertyItem({

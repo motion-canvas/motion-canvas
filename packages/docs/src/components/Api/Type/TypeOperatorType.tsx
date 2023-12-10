@@ -1,8 +1,8 @@
 import React from 'react';
 
-import type {JSONOutput} from 'typedoc';
-import Type from '@site/src/components/Api/Type';
 import Token from '@site/src/components/Api/Code/Token';
+import Type from '@site/src/components/Api/Type';
+import type {JSONOutput} from 'typedoc';
 
 export default function TypeOperatorType({
   type,

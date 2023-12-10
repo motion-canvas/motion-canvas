@@ -1,7 +1,7 @@
-import {AudioData} from './AudioData';
+import {Logger} from '../app';
 import {ValueDispatcher} from '../events';
 import {useLogger} from '../utils';
-import {Logger} from '../app';
+import {AudioData} from './AudioData';
 
 export class AudioManager {
   public get onDataChanged() {

@@ -1,15 +1,15 @@
 import React from 'react';
 
-import {useApiLookup} from '@site/src/contexts/api';
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
 import Container from '@site/src/components/Api/Code/Container';
 import Line from '@site/src/components/Api/Code/Line';
-import Preview from '@site/src/components/Api/Preview';
-import Item from '@site/src/components/Api/Item';
-import Heading from '@theme/Heading';
 import Comment from '@site/src/components/Api/Comment';
-import TypeParameters from '@site/src/components/Api/TypeParameters';
+import Item from '@site/src/components/Api/Item';
+import Preview from '@site/src/components/Api/Preview';
 import Signatures from '@site/src/components/Api/Signatures';
+import TypeParameters from '@site/src/components/Api/TypeParameters';
+import {useApiLookup} from '@site/src/contexts/api';
+import Heading from '@theme/Heading';
 import type {JSONOutput} from 'typedoc';
 
 export default function TypeAliasItem({

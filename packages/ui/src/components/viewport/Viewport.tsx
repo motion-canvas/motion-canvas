@@ -1,19 +1,19 @@
+import {RendererState} from '@motion-canvas/core';
+import {useEffect, useState} from 'preact/hooks';
+import {useApplication} from '../../contexts';
 import {useDuration, useRendererState} from '../../hooks';
+import {useShortcut} from '../../hooks/useShortcut';
+import {formatDuration} from '../../utils';
 import {
   PlaybackControls,
   PlaybackProgress,
   RenderingProgress,
 } from '../playback';
 import {CurrentTime} from '../playback/CurrentTime';
-import {EditorPreview} from './EditorPreview';
-import styles from './Viewport.module.scss';
-import {useApplication} from '../../contexts';
 import {CustomStage} from './CustomStage';
-import {RendererState} from '@motion-canvas/core';
-import {useShortcut} from '../../hooks/useShortcut';
-import {formatDuration} from '../../utils';
-import {useEffect, useState} from 'preact/hooks';
+import {EditorPreview} from './EditorPreview';
 import {Timestamp} from './Timestamp';
+import styles from './Viewport.module.scss';
 
 export function Viewport() {
   const state = useRendererState();

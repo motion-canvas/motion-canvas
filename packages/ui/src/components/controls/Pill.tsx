@@ -1,6 +1,6 @@
-import styles from './Controls.module.scss';
-import {ComponentChildren} from 'preact';
 import clsx from 'clsx';
+import {ComponentChildren} from 'preact';
+import styles from './Controls.module.scss';
 
 export interface PillProps {
   children: ComponentChildren;

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import type {JSONOutput} from 'typedoc';
 import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
+import type {JSONOutput} from 'typedoc';
 
 export default function FunctionPreview({
   reflection,

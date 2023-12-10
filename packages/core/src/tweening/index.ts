@@ -5,6 +5,6 @@
  */
 
 export * from './interpolationFunctions';
+export * from './spring';
 export * from './timingFunctions';
 export * from './tween';
-export * from './spring';

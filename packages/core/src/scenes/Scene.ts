@@ -1,17 +1,17 @@
 import type {Logger, PlaybackStatus} from '../app';
-import type {TimeEvents} from './timeEvents';
-import type {Variables} from './Variables';
 import type {
   SubscribableEvent,
   SubscribableValueEvent,
   ValueDispatcher,
 } from '../events';
+import type {SignalValue} from '../signals';
 import type {Vector2} from '../types';
 import type {LifecycleEvents} from './LifecycleEvents';
 import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
 import type {Slides} from './Slides';
-import type {SignalValue} from '../signals';
+import type {Variables} from './Variables';
+import type {TimeEvents} from './timeEvents';
 
 /**
  * The constructor used when creating new scenes.

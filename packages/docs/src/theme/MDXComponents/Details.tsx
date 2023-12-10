@@ -1,5 +1,5 @@
-import React from 'react';
 import {Details} from '@docusaurus/theme-common/Details';
+import React from 'react';
 import styles from './Details.module.css';
 
 export default function MDXDetails(props) {

@@ -1,6 +1,6 @@
-import {MetaField} from './MetaField';
-import {EPSILON} from '../types';
 import {clamp} from '../tweening';
+import {EPSILON} from '../types';
+import {MetaField} from './MetaField';
 
 /**
  * Represents a range stored in a meta file.

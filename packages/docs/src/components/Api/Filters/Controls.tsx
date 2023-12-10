@@ -1,7 +1,7 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {useFilters} from '@site/src/contexts/filters';
 import IconFilters from '@site/src/Icon/Filters';
+import {useFilters} from '@site/src/contexts/filters';
 import clsx from 'clsx';
+import React, {useEffect, useRef, useState} from 'react';
 import styles from './index.module.css';
 
 export default function Controls() {

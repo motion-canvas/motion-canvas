@@ -1,7 +1,7 @@
+import type {Plugin} from '../plugin';
 import {FullSceneDescription} from '../scenes';
 import {Logger} from './Logger';
 import type {ProjectMetadata} from './ProjectMetadata';
-import type {Plugin} from '../plugin';
 import {SettingsMetadata} from './SettingsMetadata';
 
 export interface ProjectSettings {

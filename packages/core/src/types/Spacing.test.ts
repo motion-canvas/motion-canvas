@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
-import {Spacing} from '../types';
 import {createSignal} from '../signals';
+import {Spacing} from '../types';
 
 describe('Spacing', () => {
   test('Correctly parses values', () => {

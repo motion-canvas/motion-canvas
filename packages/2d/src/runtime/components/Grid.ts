@@ -1,12 +1,12 @@
-import {Shape, ShapeProps} from './Shape';
-import {initial, signal, vector2Signal} from '../decorators';
 import {
-  SimpleSignal,
-  SignalValue,
   PossibleVector2,
+  SignalValue,
+  SimpleSignal,
   Vector2Signal,
   map,
 } from '@motion-canvas/core';
+import {initial, signal, vector2Signal} from '../decorators';
+import {Shape, ShapeProps} from './Shape';
 
 export interface GridProps extends ShapeProps {
   /**

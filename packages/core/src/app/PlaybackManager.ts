@@ -1,5 +1,5 @@
-import type {Scene, SceneDescriptionReload, Slide} from '../scenes';
 import {ValueDispatcher} from '../events';
+import type {Scene, SceneDescriptionReload, Slide} from '../scenes';
 
 export enum PlaybackState {
   Playing,

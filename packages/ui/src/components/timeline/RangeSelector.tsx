@@ -1,18 +1,18 @@
 import styles from './Timeline.module.scss';
 
+import clsx from 'clsx';
+import {RefObject} from 'preact';
+import {useCallback, useEffect, useState} from 'preact/hooks';
+import {useApplication, useTimelineContext} from '../../contexts';
 import {
   useDuration,
   useKeyHold,
   usePreviewSettings,
   useSharedSettings,
 } from '../../hooks';
-import {useCallback, useEffect, useState} from 'preact/hooks';
-import {useApplication, useTimelineContext} from '../../contexts';
-import {DragIndicator} from '../icons';
-import {RefObject} from 'preact';
 import {labelClipDraggingLeftSignal} from '../../signals';
-import clsx from 'clsx';
 import {MouseButton} from '../../utils';
+import {DragIndicator} from '../icons';
 
 export interface RangeSelectorProps {
   rangeRef: RefObject<HTMLDivElement>;

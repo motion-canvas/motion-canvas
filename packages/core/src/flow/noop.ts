@@ -1,5 +1,5 @@
-import {ThreadGenerator} from '../threading';
 import {decorate, threadable} from '../decorators';
+import {ThreadGenerator} from '../threading';
 
 decorate(noop, threadable());
 /**

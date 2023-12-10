@@ -1,6 +1,6 @@
-import {ThreadGenerator} from './ThreadGenerator';
-import {endThread, startThread} from '../utils';
 import {createSignal} from '../signals';
+import {endThread, startThread} from '../utils';
+import {ThreadGenerator} from './ThreadGenerator';
 import {setTaskName} from './names';
 
 /**

@@ -1,9 +1,9 @@
-import styles from './Versions.module.scss';
-import {useApplication} from '../../contexts';
 import clsx from 'clsx';
 import {useEffect} from 'preact/hooks';
 import {useState} from 'react';
+import {useApplication} from '../../contexts';
 import {compareVersions} from '../../utils';
+import styles from './Versions.module.scss';
 
 export function Versions() {
   const {project} = useApplication();

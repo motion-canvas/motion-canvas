@@ -1,7 +1,7 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2} from '@motion-canvas/core';
 import {lineTo, moveTo} from '../utils';
-import {Segment} from './Segment';
 import {CurvePoint} from './CurvePoint';
+import {Segment} from './Segment';
 
 export class LineSegment extends Segment {
   private readonly length: number;

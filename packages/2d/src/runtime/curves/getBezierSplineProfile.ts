@@ -1,10 +1,9 @@
-import {CurveProfile} from './CurveProfile';
+import {Vector2, clamp} from '@motion-canvas/core';
 import {CubicBezierSegment} from './CubicBezierSegment';
+import {CurveProfile} from './CurveProfile';
 import {KnotInfo} from './KnotInfo';
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {QuadBezierSegment} from './QuadBezierSegment';
-import {clamp} from '@motion-canvas/core/lib/tweening';
 import {PolynomialSegment} from './PolynomialSegment';
+import {QuadBezierSegment} from './QuadBezierSegment';
 
 function isCubicSegment(
   segment: PolynomialSegment,

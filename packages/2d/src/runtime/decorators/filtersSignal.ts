@@ -1,20 +1,18 @@
-import {getPropertyMetaOrCreate} from './signal';
-import {Filter, FilterName, FILTERS} from '../partials';
-import {
-  deepLerp,
-  easeInOutCubic,
-  TimingFunction,
-} from '@motion-canvas/core/lib/tweening';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-import {all} from '@motion-canvas/core/lib/flow';
-import {addInitializer} from './initializers';
 import {
   Signal,
   SignalContext,
   SignalValue,
   SimpleSignal,
+  ThreadGenerator,
+  TimingFunction,
+  all,
+  deepLerp,
+  easeInOutCubic,
   unwrap,
-} from '@motion-canvas/core/lib/signals';
+} from '@motion-canvas/core';
+import {FILTERS, Filter, FilterName} from '../partials';
+import {addInitializer} from './initializers';
+import {getPropertyMetaOrCreate} from './signal';
 
 export type FiltersSignal<TOwner> = Signal<
   Filter[],

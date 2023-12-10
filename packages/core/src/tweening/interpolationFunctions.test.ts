@@ -1,6 +1,6 @@
-import {describe, test, expect, vi} from 'vitest';
-import {deepLerp} from './interpolationFunctions';
+import {describe, expect, test, vi} from 'vitest';
 import {Vector2} from '../types';
+import {deepLerp} from './interpolationFunctions';
 
 describe('deepLerp', () => {
   test('falls back to primitive tween for numbers', () => {

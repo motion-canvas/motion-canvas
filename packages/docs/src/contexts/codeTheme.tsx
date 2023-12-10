@@ -1,6 +1,6 @@
+import {usePrismTheme} from '@docusaurus/theme-common';
 import {Language, PrismTheme} from 'prism-react-renderer';
 import React, {ReactNode, useContext, useMemo} from 'react';
-import {usePrismTheme} from '@docusaurus/theme-common';
 
 export type StyleObj = {
   [key: string]: string | number | void;

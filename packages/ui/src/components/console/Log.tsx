@@ -1,17 +1,17 @@
 import styles from './Console.module.scss';
 
 import {LogLevel, LogPayload} from '@motion-canvas/core';
+import clsx from 'clsx';
 import {useEffect, useMemo, useState} from 'preact/hooks';
-import {resolveStackTrace, StackTraceEntry} from '../../utils';
 import {useInspection} from '../../contexts';
 import {useFormattedNumber} from '../../hooks';
+import {EditorPanel, SidebarPanel} from '../../signals';
+import {StackTraceEntry, resolveStackTrace} from '../../utils';
 import {IconButton, Toggle} from '../controls';
-import {StackTrace} from './StackTrace';
-import {SourceCodeFrame} from './SourceCodeFrame';
-import clsx from 'clsx';
 import {Locate} from '../icons';
 import {Collapse} from '../layout';
-import {EditorPanel, SidebarPanel} from '../../signals';
+import {SourceCodeFrame} from './SourceCodeFrame';
+import {StackTrace} from './StackTrace';
 
 export interface LogProps {
   payload: LogPayload;

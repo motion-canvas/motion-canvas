@@ -1,16 +1,16 @@
-import React, {useMemo} from 'react';
-import DocItemMetadata from '@theme/DocItem/Metadata';
-import DocItemLayout from '@theme/DocItem/Layout';
+import {TOCItem} from '@docusaurus/mdx-loader';
 import {DocProvider} from '@docusaurus/theme-common/internal';
+import useIsBrowser from '@docusaurus/useIsBrowser';
 import Item from '@site/src/components/Api/Item';
+import Tooltip from '@site/src/components/Tooltip';
 import {useApiLookup} from '@site/src/contexts/api';
 import {ThemeDictProvider} from '@site/src/contexts/codeTheme';
 import {matchFilters, useFilters} from '@site/src/contexts/filters';
-import {TOCItem} from '@docusaurus/mdx-loader';
-import Tooltip from '@site/src/components/Tooltip';
+import DocItemLayout from '@theme/DocItem/Layout';
+import DocItemMetadata from '@theme/DocItem/Metadata';
+import React, {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 import {ReflectionKind} from './ReflectionKind';
-import useIsBrowser from '@docusaurus/useIsBrowser';
 
 interface ApiItemProps {
   route: {

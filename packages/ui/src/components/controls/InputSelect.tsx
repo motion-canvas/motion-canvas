@@ -1,5 +1,5 @@
-import styles from './Controls.module.scss';
 import type {JSX} from 'preact';
+import styles from './Controls.module.scss';
 import {Input} from './Input';
 import {Select, SelectProps} from './Select';
 

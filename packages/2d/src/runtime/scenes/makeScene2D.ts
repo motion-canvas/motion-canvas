@@ -2,7 +2,7 @@ import {
   createSceneMetadata,
   DescriptionOf,
   ThreadGeneratorFactory,
-} from '@motion-canvas/core/lib/scenes';
+} from '@motion-canvas/core';
 import type {View2D} from '../components';
 import {Scene2D} from './Scene2D';
 

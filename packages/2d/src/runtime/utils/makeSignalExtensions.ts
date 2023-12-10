@@ -1,5 +1,4 @@
-import {capitalize} from '@motion-canvas/core/lib/utils';
-import {SignalExtensions} from '@motion-canvas/core/lib/signals';
+import {SignalExtensions, capitalize} from '@motion-canvas/core';
 import {PropertyMetadata} from '../decorators';
 
 export function makeSignalExtensions<TSetterValue, TValue extends TSetterValue>(

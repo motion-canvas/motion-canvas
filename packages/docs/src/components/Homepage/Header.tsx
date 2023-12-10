@@ -1,9 +1,9 @@
-import React from 'react';
-import clsx from 'clsx';
 import Link from '@docusaurus/Link';
-import ThemedImage from '@theme/ThemedImage';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {ThemeConfig} from '@docusaurus/preset-classic';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import ThemedImage from '@theme/ThemedImage';
+import clsx from 'clsx';
+import React from 'react';
 import styles from './styles.module.css';
 
 export default function HomepageHeader() {

@@ -1,7 +1,11 @@
-import {LogLevel, LogPayload, Logger} from '@motion-canvas/core';
+import {
+  LogLevel,
+  LogPayload,
+  Logger,
+  ValueDispatcher,
+} from '@motion-canvas/core';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useRef} from 'preact/hooks';
-import {ValueDispatcher} from '@motion-canvas/core/lib/events';
 import {useSubscribable, useSubscribableValue} from '../hooks';
 import {useApplication} from './application';
 

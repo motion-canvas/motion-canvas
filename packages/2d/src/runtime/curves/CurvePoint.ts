@@ -1,4 +1,4 @@
-import type {Vector2} from '@motion-canvas/core/lib/types';
+import type {Vector2} from '@motion-canvas/core';
 
 export interface CurvePoint {
   position: Vector2;

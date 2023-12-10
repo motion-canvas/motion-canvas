@@ -1,7 +1,7 @@
-import {Pane} from '../tabs';
 import {useApplication} from '../../contexts';
 import {Expandable} from '../fields';
 import {MetaFieldView} from '../meta';
+import {Pane} from '../tabs';
 
 export function Settings() {
   const {settings} = useApplication();

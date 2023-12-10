@@ -1,16 +1,20 @@
 import {
   Circle,
   Grid,
-  Rect,
+  Layout,
   Line,
   Node,
-  Layout,
+  Rect,
   Txt,
-} from '@motion-canvas/2d/lib/components';
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {all, waitFor} from '@motion-canvas/core/lib/flow';
-import {createSignal} from '@motion-canvas/core/lib/signals';
-import {linear, easeInOutBounce} from '@motion-canvas/core/lib/tweening';
+  makeScene2D,
+} from '@motion-canvas/2d';
+import {
+  all,
+  createSignal,
+  easeInOutBounce,
+  linear,
+  waitFor,
+} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   // Signals

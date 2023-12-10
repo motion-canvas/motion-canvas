@@ -1,7 +1,7 @@
 import React, {ReactNode, useLayoutEffect, useRef} from 'react';
 
-import styles from './styles.module.css';
 import clsx from 'clsx';
+import styles from './styles.module.css';
 
 function compare(a: number, b: number) {
   return a > b ? 1 : a < b ? -1 : 0;

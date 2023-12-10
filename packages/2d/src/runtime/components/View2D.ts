@@ -1,10 +1,8 @@
+import {PlaybackState, SimpleSignal, lazy} from '@motion-canvas/core';
+import {initial, signal} from '../decorators';
+import {useScene2D} from '../scenes/useScene2D';
 import type {Node} from './Node';
 import {Rect, RectProps} from './Rect';
-import {initial, signal} from '../decorators';
-import {PlaybackState} from '@motion-canvas/core';
-import {SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {lazy} from '@motion-canvas/core/lib/decorators';
-import {useScene2D} from '../scenes/useScene2D';
 
 export interface View2DProps extends RectProps {
   assetHash: string;
