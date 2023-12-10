@@ -1,12 +1,12 @@
+import ClassItem from '@site/src/components/Api/Item/ClassItem';
+import FunctionItem from '@site/src/components/Api/Item/FunctionItem';
+import ModuleItem from '@site/src/components/Api/Item/ModuleItem';
+import ProjectItem from '@site/src/components/Api/Item/ProjectItem';
+import PropertyItem from '@site/src/components/Api/Item/PropertyItem';
+import TypeAliasItem from '@site/src/components/Api/Item/TypeAliasItem';
 import React, {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 import {ReflectionKind} from '../ReflectionKind';
-import ClassItem from '@site/src/components/Api/Item/ClassItem';
-import FunctionItem from '@site/src/components/Api/Item/FunctionItem';
-import PropertyItem from '@site/src/components/Api/Item/PropertyItem';
-import TypeAliasItem from '@site/src/components/Api/Item/TypeAliasItem';
-import ModuleItem from '@site/src/components/Api/Item/ModuleItem';
-import ProjectItem from '@site/src/components/Api/Item/ProjectItem';
 
 export default function Item({
   reflection,

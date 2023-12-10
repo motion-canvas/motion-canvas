@@ -1,7 +1,12 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Layout, Rect} from '@motion-canvas/2d/lib/components';
-import {makeRef, range, useRandom} from '@motion-canvas/core/lib/utils';
-import {all, loop, sequence} from '@motion-canvas/core/lib/flow';
+import {Layout, Rect, makeScene2D} from '@motion-canvas/2d';
+import {
+  all,
+  loop,
+  makeRef,
+  range,
+  sequence,
+  useRandom,
+} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   // highlight-next-line

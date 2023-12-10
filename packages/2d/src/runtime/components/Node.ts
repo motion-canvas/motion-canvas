@@ -1,4 +1,32 @@
 import {
+  BBox,
+  ColorSignal,
+  DependencyContext,
+  PossibleColor,
+  PossibleVector2,
+  Promisable,
+  ReferenceReceiver,
+  Signal,
+  SignalValue,
+  SimpleSignal,
+  SimpleVector2Signal,
+  ThreadGenerator,
+  TimingFunction,
+  Vector2,
+  Vector2Signal,
+  all,
+  clamp,
+  createSignal,
+  easeInOutCubic,
+  isReactive,
+  modify,
+  threadable,
+  transformAngle,
+  transformScalar,
+  unwrap,
+  useLogger,
+} from '@motion-canvas/core';
+import {
   cloneable,
   colorSignal,
   computed,
@@ -11,42 +39,12 @@ import {
   vector2Signal,
   wrapper,
 } from '../decorators';
-import {
-  Vector2,
-  BBox,
-  transformScalar,
-  PossibleColor,
-  transformAngle,
-  PossibleVector2,
-  Vector2Signal,
-  ColorSignal,
-  SimpleVector2Signal,
-} from '@motion-canvas/core/lib/types';
-import {ReferenceReceiver, useLogger} from '@motion-canvas/core/lib/utils';
-import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
-import {Promisable, ThreadGenerator} from '@motion-canvas/core/lib/threading';
+import {FiltersSignal, filtersSignal} from '../decorators/filtersSignal';
+import {Filter} from '../partials';
 import {useScene2D} from '../scenes/useScene2D';
-import {
-  clamp,
-  easeInOutCubic,
-  TimingFunction,
-} from '@motion-canvas/core/lib/tweening';
-import {threadable} from '@motion-canvas/core/lib/decorators';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
-import {Filter} from '../partials';
-import {filtersSignal, FiltersSignal} from '../decorators/filtersSignal';
-import {
-  createSignal,
-  DependencyContext,
-  SignalValue,
-  SimpleSignal,
-  Signal,
-  isReactive,
-  modify,
-  unwrap,
-} from '@motion-canvas/core/lib/signals';
-import {all} from '@motion-canvas/core';
+import type {ComponentChild, ComponentChildren, NodeConstructor} from './types';
 
 export type NodeState = NodeProps & Record<string, any>;
 

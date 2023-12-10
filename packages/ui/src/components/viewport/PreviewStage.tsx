@@ -1,12 +1,12 @@
-import {useEffect, useRef, useState} from 'preact/hooks';
 import {Stage} from '@motion-canvas/core';
+import {JSX} from 'preact';
+import {useEffect, useRef, useState} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {
   usePreviewSettings,
   useSharedSettings,
   useSubscribable,
 } from '../../hooks';
-import {JSX} from 'preact';
 
 export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());

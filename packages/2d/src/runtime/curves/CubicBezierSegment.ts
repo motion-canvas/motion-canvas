@@ -1,8 +1,7 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2, lazy} from '@motion-canvas/core';
 import {bezierCurveTo} from '../utils';
-import {PolynomialSegment} from './PolynomialSegment';
 import {Polynomial2D} from './Polynomial2D';
-import {lazy} from '@motion-canvas/core/lib/decorators';
+import {PolynomialSegment} from './PolynomialSegment';
 
 /**
  * A spline segment representing a cubic Bézier curve.

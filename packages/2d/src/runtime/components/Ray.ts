@@ -1,9 +1,9 @@
-import {SignalValue} from '@motion-canvas/core/lib/signals';
 import {
   BBox,
   PossibleVector2,
+  SignalValue,
   Vector2Signal,
-} from '@motion-canvas/core/lib/types';
+} from '@motion-canvas/core';
 import {CurveProfile, LineSegment} from '../curves';
 import {vector2Signal} from '../decorators';
 import {arc, drawLine, drawPivot} from '../utils';
@@ -31,8 +31,8 @@ export interface RayProps extends CurveProps {
  * @preview
  * ```tsx editor
  * import {makeScene2D} from '@motion-canvas/2d';
- * import {Ray} from '@motion-canvas/2d/lib/components';
- * import {createRef} from '@motion-canvas/core/lib/utils';
+ * import {Ray} from '@motion-canvas/2d';
+ * import {createRef} from '@motion-canvas/core';
  *
  * export default makeScene2D(function* (view) {
  *   const ray = createRef<Ray>();

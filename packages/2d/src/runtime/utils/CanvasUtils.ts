@@ -1,5 +1,5 @@
+import {BBox, Color, Spacing, Vector2} from '@motion-canvas/core';
 import {CanvasStyle, Gradient, Pattern, PossibleCanvasStyle} from '../partials';
-import {Color, BBox, Spacing, Vector2} from '@motion-canvas/core/lib/types';
 
 export function canvasStyleParser(style: PossibleCanvasStyle) {
   if (style === null) {

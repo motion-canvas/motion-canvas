@@ -1,6 +1,6 @@
 import {computed} from '@preact/signals';
-import {storedSignal} from './storedSignal';
 import {EditorPanel, isEditorPanel} from './EditorPanel';
+import {storedSignal} from './storedSignal';
 
 function panelSignals(initial: EditorPanel, id: string) {
   const storedPanel = storedSignal<EditorPanel>(initial, id, value => {

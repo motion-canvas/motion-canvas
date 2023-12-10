@@ -1,8 +1,8 @@
-import {describe, test, expect, beforeAll, afterAll} from 'vitest';
-import {threads} from './threads';
+import {afterAll, beforeAll, describe, expect, test} from 'vitest';
+import {PlaybackManager, PlaybackStatus} from '../app';
 import {noop, run} from '../flow';
 import {endPlayback, startPlayback, useThread} from '../utils';
-import {PlaybackManager, PlaybackStatus} from '../app';
+import {threads} from './threads';
 
 describe('threads()', () => {
   const status = new PlaybackStatus(new PlaybackManager());

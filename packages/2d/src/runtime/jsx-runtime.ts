@@ -1,9 +1,9 @@
 import type {
   ComponentChildren,
   FunctionComponent,
+  JSXProps,
   Node,
   NodeConstructor,
-  JSXProps,
 } from './components';
 
 export namespace JSX {

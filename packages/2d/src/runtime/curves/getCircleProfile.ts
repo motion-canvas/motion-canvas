@@ -1,8 +1,8 @@
 import {Vector2} from '@motion-canvas/core';
-import {CurveProfile} from './CurveProfile';
 import {ArcSegment} from './ArcSegment';
-import {Segment} from './Segment';
+import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
+import {Segment} from './Segment';
 
 export function getCircleProfile(
   size: Vector2,

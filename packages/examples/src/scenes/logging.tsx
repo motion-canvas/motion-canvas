@@ -1,7 +1,5 @@
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {waitFor, waitUntil} from '@motion-canvas/core/lib/flow';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {Circle, makeScene2D} from '@motion-canvas/2d';
+import {useLogger, waitFor, waitUntil} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const logger = useLogger();

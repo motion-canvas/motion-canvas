@@ -1,6 +1,6 @@
-import styles from './Controls.module.scss';
-import type {JSX} from 'preact';
 import clsx from 'clsx';
+import type {JSX} from 'preact';
+import styles from './Controls.module.scss';
 
 export interface ButtonProps
   extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'loading'> {

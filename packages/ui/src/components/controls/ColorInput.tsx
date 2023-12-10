@@ -1,11 +1,11 @@
-import styles from './Controls.module.scss';
-import clsx from 'clsx';
-import {ColorPreview} from './ColorPreview';
-import {Color} from '@motion-canvas/core/lib/types';
+import {Color} from '@motion-canvas/core';
 import {valid} from 'chroma-js';
-import {Input} from './Input';
-import {shake} from '../animations';
+import clsx from 'clsx';
 import {useReducedMotion} from '../../hooks';
+import {shake} from '../animations';
+import {ColorPreview} from './ColorPreview';
+import styles from './Controls.module.scss';
+import {Input} from './Input';
 
 export interface ColorInputProps {
   value: Color | null;

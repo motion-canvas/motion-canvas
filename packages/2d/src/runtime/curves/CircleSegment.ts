@@ -1,7 +1,6 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {Segment} from './Segment';
-import {clamp} from '@motion-canvas/core/lib/tweening';
+import {Vector2, clamp} from '@motion-canvas/core';
 import {CurvePoint} from './CurvePoint';
+import {Segment} from './Segment';
 
 export class CircleSegment extends Segment {
   private readonly length: number;

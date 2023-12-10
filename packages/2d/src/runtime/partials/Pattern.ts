@@ -1,6 +1,6 @@
-import {initial, initializeSignals, signal} from '../decorators/signal';
+import {SimpleSignal} from '@motion-canvas/core';
 import {computed} from '../decorators/computed';
-import {SimpleSignal} from '@motion-canvas/core/lib/signals';
+import {initial, initializeSignals, signal} from '../decorators/signal';
 
 export type CanvasRepetition =
   | null

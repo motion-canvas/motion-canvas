@@ -1,7 +1,7 @@
 import {
-  Subscribable,
   EventDispatcherBase,
   EventHandler,
+  Subscribable,
 } from './EventDispatcherBase';
 
 /**

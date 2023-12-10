@@ -1,12 +1,12 @@
 import React from 'react';
 
-import type {JSONOutput} from 'typedoc';
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
-import Type from '@site/src/components/Api/Type';
-import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
+import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
+import Type from '@site/src/components/Api/Type';
 import {useApiFinder} from '@site/src/contexts/api';
+import type {JSONOutput} from 'typedoc';
 
 export default function TypeAliasPreview({
   reflection,

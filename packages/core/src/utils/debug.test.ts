@@ -1,8 +1,8 @@
-import {describe, test, beforeEach, expect, vi} from 'vitest';
-import {useLogger, debug, startScene} from '../utils';
-import {BBox, Vector2} from '../types';
-import {Logger, LogLevel} from '../app';
+import {beforeEach, describe, expect, test, vi} from 'vitest';
+import {LogLevel, Logger} from '../app';
 import {Scene} from '../scenes';
+import {BBox, Vector2} from '../types';
+import {debug, startScene, useLogger} from '../utils';
 
 describe('debug()', () => {
   beforeEach(() => {

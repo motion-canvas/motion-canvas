@@ -1,11 +1,11 @@
 import styles from './Layout.module.scss';
 
+import clsx from 'clsx';
 import {ComponentChildren, JSX} from 'preact';
 import {useRef, useState} from 'preact/hooks';
 import {useFormattedNumber} from '../../hooks';
 import {Toggle} from '../controls';
 import {Collapse} from '../layout';
-import clsx from 'clsx';
 
 export interface FieldSetProps {
   children: ComponentChildren;

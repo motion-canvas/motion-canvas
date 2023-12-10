@@ -1,8 +1,7 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2, clamp} from '@motion-canvas/core';
+import {CircleSegment} from './CircleSegment';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
-import {CircleSegment} from './CircleSegment';
-import {clamp} from '@motion-canvas/core/lib/tweening';
 
 export function getPolylineProfile(
   points: readonly Vector2[],

@@ -1,6 +1,6 @@
+import {Color, PossibleColor} from '@motion-canvas/core';
 import type {Gradient} from './Gradient';
 import type {Pattern} from './Pattern';
-import {Color, PossibleColor} from '@motion-canvas/core/lib/types';
 
 export type FlexDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 

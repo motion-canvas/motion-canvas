@@ -1,11 +1,11 @@
-import {useRendererState, useStorage} from '../../hooks';
-import {Button, ButtonSelect, Group, Label, Separator} from '../controls';
-import {Pane} from '../tabs';
-import {useApplication} from '../../contexts';
-import {Expandable} from '../fields';
 import {RendererState} from '@motion-canvas/core';
-import {MetaFieldView} from '../meta';
+import {useApplication} from '../../contexts';
+import {useRendererState, useStorage} from '../../hooks';
 import {openOutputPath} from '../../utils';
+import {Button, ButtonSelect, Group, Label, Separator} from '../controls';
+import {Expandable} from '../fields';
+import {MetaFieldView} from '../meta';
+import {Pane} from '../tabs';
 
 export function VideoSettings() {
   const {meta} = useApplication();

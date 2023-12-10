@@ -1,4 +1,4 @@
-import {BBox, Vector2} from '@motion-canvas/core/lib/types';
+import {BBox, Vector2} from '@motion-canvas/core';
 
 import {Polynomial} from './Polynomial';
 

@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
 import type {Props} from '@theme/Icon/LightMode';
+import React from 'react';
 
 export default function IconLightMode(props: Props): JSX.Element {
   return (

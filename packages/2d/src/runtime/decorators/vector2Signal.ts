@@ -1,8 +1,7 @@
-import {PossibleVector2, Vector2} from '@motion-canvas/core/lib/types/Vector';
-import {compound} from './compound';
+import {PossibleVector2, Signal, Vector2} from '@motion-canvas/core';
 import type {Length} from '../partials';
+import {compound} from './compound';
 import {wrapper} from './signal';
-import {Signal} from '@motion-canvas/core/lib/signals';
 
 export type Vector2LengthSignal<TOwner> = Signal<
   PossibleVector2<Length>,

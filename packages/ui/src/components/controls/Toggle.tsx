@@ -1,6 +1,6 @@
-import styles from './Controls.module.scss';
 import clsx from 'clsx';
 import {ChevronRight} from '../icons/ChevronRight';
+import styles from './Controls.module.scss';
 
 export interface ToggleProps {
   open?: boolean;

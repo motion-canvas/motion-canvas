@@ -1,9 +1,9 @@
+import {Collapsible} from '@docusaurus/theme-common';
+import Summary from '@site/src/components/Api/Comment/Summary';
+import clsx from 'clsx';
 import React, {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
-import Summary from '@site/src/components/Api/Comment/Summary';
-import {Collapsible} from '@docusaurus/theme-common';
 import styles from './styles.module.css';
-import clsx from 'clsx';
 
 export default function Comment({
   comment,

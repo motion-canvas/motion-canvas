@@ -1,6 +1,6 @@
+import {Vector2} from '@motion-canvas/core';
 import {describe, expect, test} from 'vitest';
 import {getPolylineProfile} from './getPolylineProfile';
-import {Vector2} from '@motion-canvas/core/lib/types';
 
 describe('getPolylineProfile', () => {
   test('Correct arc length', () => {

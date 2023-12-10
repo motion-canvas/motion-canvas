@@ -1,6 +1,6 @@
-import {useTransition} from './useTransition';
-import {ThreadGenerator} from '../threading';
 import {createSignal} from '../signals';
+import {ThreadGenerator} from '../threading';
+import {useTransition} from './useTransition';
 
 /**
  * Perform a transition that fades between the scenes.

@@ -1,10 +1,10 @@
-import {describe, it, expect} from 'vitest';
 import {createRef, createRefArray} from '@motion-canvas/core';
-import {mockScene2D} from './mockScene2D';
+import {describe, expect, it} from 'vitest';
 import {useScene2D} from '../../scenes';
-import {Rect} from '../Rect';
-import {Circle} from '../Circle';
 import {is} from '../../utils';
+import {Circle} from '../Circle';
+import {Rect} from '../Rect';
+import {mockScene2D} from './mockScene2D';
 
 describe('query', () => {
   mockScene2D();

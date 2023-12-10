@@ -1,5 +1,8 @@
 import {useCallback, useMemo, useRef} from 'preact/hooks';
 
+import {isInspectable} from '@motion-canvas/core';
+import clsx from 'clsx';
+import {useApplication, useInspection} from '../../contexts';
 import {
   useCurrentScene,
   useDocumentEvent,
@@ -11,20 +14,17 @@ import {
   useSubscribable,
   useSubscribableValue,
 } from '../../hooks';
-import {Debug} from './Debug';
-import {Grid} from './Grid';
-import styles from './Viewport.module.scss';
-import {ViewportContext, ViewportState} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core';
-import {useApplication, useInspection} from '../../contexts';
 import {highlight} from '../animations';
-import {PreviewStage} from './PreviewStage';
-import clsx from 'clsx';
 import {Button, Select} from '../controls';
-import {Recenter, Grid as GridIcon} from '../icons';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
+import {Grid as GridIcon, Recenter} from '../icons';
 import {ColorPicker} from './ColorPicker';
 import {Coordinates} from './Coordinates';
+import {Debug} from './Debug';
+import {Grid} from './Grid';
+import {PreviewStage} from './PreviewStage';
+import styles from './Viewport.module.scss';
+import {ViewportContext, ViewportState} from './ViewportContext';
 
 const ZOOM_SPEED = 0.1;
 

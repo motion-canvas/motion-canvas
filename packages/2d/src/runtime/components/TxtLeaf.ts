@@ -1,12 +1,15 @@
+import {
+  BBox,
+  SignalValue,
+  SimpleSignal,
+  capitalize,
+  lazy,
+  textLerp,
+} from '@motion-canvas/core';
 import {computed, initial, interpolation, signal} from '../decorators';
-import {textLerp} from '@motion-canvas/core/lib/tweening';
 import {Shape, ShapeProps} from './Shape';
-import {BBox} from '@motion-canvas/core/lib/types';
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {View2D} from './View2D';
-import {lazy} from '@motion-canvas/core/lib/decorators';
 import {Txt} from './Txt';
-import {capitalize} from '@motion-canvas/core/lib/utils';
+import {View2D} from './View2D';
 
 export interface TxtLeafProps extends ShapeProps {
   children?: string;

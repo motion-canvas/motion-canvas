@@ -1,14 +1,14 @@
 import React from 'react';
 
-import type {JSONOutput} from 'typedoc';
-import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
-import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
-import Type from '@site/src/components/Api/Type';
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
-import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
-import {getUrl, useApiFinder} from '@site/src/contexts/api';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
+import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
+import TypeParameterPreview from '@site/src/components/Api/Preview/TypeParameterPreview';
+import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
+import Type from '@site/src/components/Api/Type';
+import {getUrl, useApiFinder} from '@site/src/contexts/api';
+import type {JSONOutput} from 'typedoc';
 
 export default function SignaturePreview({
   reflection,

@@ -1,11 +1,14 @@
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {computed, initial, signal} from '../decorators';
-import {DEG2RAD} from '@motion-canvas/core/lib/utils';
-import {Curve, CurveProps} from './Curve';
-import {BBox} from '@motion-canvas/core';
+import {
+  BBox,
+  DEG2RAD,
+  SerializedVector2,
+  SignalValue,
+  SimpleSignal,
+} from '@motion-canvas/core';
 import {CurveProfile, getCircleProfile} from '../curves';
-import {SerializedVector2} from '@motion-canvas/core/lib/types';
+import {computed, initial, signal} from '../decorators';
 import {DesiredLength} from '../partials';
+import {Curve, CurveProps} from './Curve';
 
 export interface CircleProps extends CurveProps {
   /**

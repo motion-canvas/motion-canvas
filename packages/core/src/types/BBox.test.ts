@@ -1,6 +1,6 @@
 import {describe, expect, test} from 'vitest';
-import {BBox, Vector2} from '../types';
 import {createSignal} from '../signals';
+import {BBox, Vector2} from '../types';
 
 describe('BBox', () => {
   test('Correctly parses values', () => {

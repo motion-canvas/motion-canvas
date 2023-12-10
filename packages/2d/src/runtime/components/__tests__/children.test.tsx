@@ -1,8 +1,8 @@
-import {describe, it, expect} from 'vitest';
 import {createRef, createSignal, range} from '@motion-canvas/core';
-import {mockScene2D} from './mockScene2D';
+import {describe, expect, it} from 'vitest';
 import {useScene2D} from '../../scenes';
 import {Node} from '../Node';
+import {mockScene2D} from './mockScene2D';
 
 describe('children', () => {
   mockScene2D();

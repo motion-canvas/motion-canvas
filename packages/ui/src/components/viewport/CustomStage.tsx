@@ -2,8 +2,8 @@ import type {Stage} from '@motion-canvas/core';
 import {useLayoutEffect, useRef} from 'preact/hooks';
 import {useSharedSettings} from '../../hooks';
 
-import styles from './Viewport.module.scss';
 import clsx from 'clsx';
+import styles from './Viewport.module.scss';
 
 export interface CustomStageProps {
   stage: Stage;

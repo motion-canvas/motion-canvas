@@ -1,11 +1,10 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {BBox, Spacing, Vector2} from '@motion-canvas/core';
+import {adjustRectRadius} from '../utils';
+import {CircleSegment} from './CircleSegment';
+import {CubicBezierSegment} from './CubicBezierSegment';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
-import {CircleSegment} from './CircleSegment';
-import {BBox, Spacing} from '@motion-canvas/core';
-import {adjustRectRadius} from '../utils';
 import {Segment} from './Segment';
-import {CubicBezierSegment} from './CubicBezierSegment';
 
 export function getRectProfile(
   rect: BBox,

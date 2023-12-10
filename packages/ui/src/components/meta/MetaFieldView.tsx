@@ -1,18 +1,22 @@
-import type {MetaField} from '@motion-canvas/core/lib/meta';
+import type {MetaField} from '@motion-canvas/core';
+import {
+  Color,
+  EnumMetaField,
+  RangeMetaField,
+  Vector2,
+} from '@motion-canvas/core';
 import type {FunctionComponent} from 'preact';
-import {NumberMetaFieldView} from './NumberMetaFieldView';
-import {StringMetaFieldView} from './StringMetaFieldView';
-import {BoolMetaFieldView} from './BoolMetaFieldView';
-import {ObjectMetaFieldView} from './ObjectMetaFieldView';
-import {EnumMetaFieldView} from './EnumMetaFieldView';
-import {ColorMetaFieldView} from './ColorMetaFieldView';
-import {Vector2MetaFieldView} from './Vector2MetaFieldView';
-import {UnknownMetaFieldView} from './UnknownMetaFieldView';
-import {RangeMetaFieldView} from './RangeMetaFieldView';
-import {EnumMetaField, RangeMetaField} from '@motion-canvas/core/lib/meta';
-import {Color, Vector2} from '@motion-canvas/core/lib/types';
 import {useSubscribableValue} from '../../hooks';
 import {Separator} from '../controls';
+import {BoolMetaFieldView} from './BoolMetaFieldView';
+import {ColorMetaFieldView} from './ColorMetaFieldView';
+import {EnumMetaFieldView} from './EnumMetaFieldView';
+import {NumberMetaFieldView} from './NumberMetaFieldView';
+import {ObjectMetaFieldView} from './ObjectMetaFieldView';
+import {RangeMetaFieldView} from './RangeMetaFieldView';
+import {StringMetaFieldView} from './StringMetaFieldView';
+import {UnknownMetaFieldView} from './UnknownMetaFieldView';
+import {Vector2MetaFieldView} from './Vector2MetaFieldView';
 
 interface MetaFieldViewProps {
   field: MetaField<any>;

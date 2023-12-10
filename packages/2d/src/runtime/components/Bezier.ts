@@ -1,10 +1,10 @@
-import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
-import {Curve} from './Curve';
+import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core';
 import {CurveProfile} from '../curves';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
+import {computed} from '../decorators';
 import {DesiredLength} from '../partials';
 import {arc, drawLine, drawPivot, moveTo} from '../utils';
-import {computed} from '../decorators';
+import {Curve} from './Curve';
 
 export interface BezierOverlayInfo {
   curve: Path2D;

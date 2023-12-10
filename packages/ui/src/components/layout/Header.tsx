@@ -1,6 +1,6 @@
-import styles from './Header.module.scss';
-import type {JSX} from 'preact';
 import clsx from 'clsx';
+import type {JSX} from 'preact';
+import styles from './Header.module.scss';
 
 export function Header({
   className,

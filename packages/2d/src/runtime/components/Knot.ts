@@ -1,11 +1,11 @@
-import {Signal, SignalValue} from '@motion-canvas/core/lib/signals';
 import {
   PossibleVector2,
+  Signal,
+  SignalValue,
   Vector2,
   Vector2Signal,
-} from '@motion-canvas/core/lib/types';
+} from '@motion-canvas/core';
 import {KnotInfo} from '../curves';
-import {Node, NodeProps} from './Node';
 import {
   cloneable,
   compound,
@@ -15,6 +15,7 @@ import {
   signal,
   wrapper,
 } from '../decorators';
+import {Node, NodeProps} from './Node';
 
 export interface KnotProps extends NodeProps {
   /**

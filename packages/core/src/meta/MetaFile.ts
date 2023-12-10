@@ -1,5 +1,5 @@
-import type {MetaField} from './MetaField';
 import {Semaphore, useLogger} from '../utils';
+import type {MetaField} from './MetaField';
 
 /**
  * Represents the meta file of a given entity.

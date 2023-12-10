@@ -1,16 +1,17 @@
 import {
-  PossibleSpacing,
   BBox,
-  SpacingSignal,
+  PossibleSpacing,
   SerializedVector2,
-} from '@motion-canvas/core/lib/types';
+  SignalValue,
+  SimpleSignal,
+  SpacingSignal,
+} from '@motion-canvas/core';
+import {getRectProfile} from '../curves/getRectProfile';
 import {computed, initial, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {Curve, CurveProps} from './Curve';
-import {getRectProfile} from '../curves/getRectProfile';
-import {drawRoundRect} from '../utils';
 import {DesiredLength} from '../partials';
+import {drawRoundRect} from '../utils';
+import {Curve, CurveProps} from './Curve';
 
 export interface RectProps extends CurveProps {
   /**

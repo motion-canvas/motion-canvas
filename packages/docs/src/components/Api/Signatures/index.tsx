@@ -1,14 +1,14 @@
 import React, {useMemo, useState} from 'react';
 
-import Container from '@site/src/components/Api/Code/Container';
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
-import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
+import Container from '@site/src/components/Api/Code/Container';
 import Line from '@site/src/components/Api/Code/Line';
 import Comment from '@site/src/components/Api/Comment';
-import TypeParameters from '@site/src/components/Api/TypeParameters';
-import type {JSONOutput} from 'typedoc';
 import Parameters from '@site/src/components/Api/Parameters';
+import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
+import TypeParameters from '@site/src/components/Api/TypeParameters';
 import {useApiFinder} from '@site/src/contexts/api';
+import type {JSONOutput} from 'typedoc';
 
 export default function Signatures({
   signatures,

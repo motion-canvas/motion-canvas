@@ -1,5 +1,5 @@
+import type {InspectedElement} from '@motion-canvas/core';
 import {ComponentChildren, createContext} from 'preact';
-import type {InspectedElement} from '@motion-canvas/core/lib/scenes';
 import {useContext, useMemo, useState} from 'preact/hooks';
 
 export interface AppState {

@@ -1,6 +1,6 @@
-import {waitFor} from './scheduling';
 import {decorate, threadable} from '../decorators';
-import {isThreadGenerator, ThreadGenerator} from '../threading';
+import {ThreadGenerator, isThreadGenerator} from '../threading';
+import {waitFor} from './scheduling';
 
 decorate(delay, threadable());
 /**

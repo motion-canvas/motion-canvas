@@ -7,8 +7,9 @@ import {
   Scene,
   SceneRenderEvent,
   ThreadGeneratorFactory,
-} from '@motion-canvas/core/lib/scenes';
-import {useLogger, Vector2} from '@motion-canvas/core';
+  Vector2,
+  useLogger,
+} from '@motion-canvas/core';
 import {Node, View2D} from '../components';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {

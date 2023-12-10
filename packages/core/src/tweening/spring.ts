@@ -1,6 +1,6 @@
 import {decorate, threadable} from '../decorators';
 import {ThreadGenerator} from '../threading';
-import {useThread, useLogger} from '../utils';
+import {useLogger, useThread} from '../utils';
 
 type ProgressFunction = (value: number, time: number) => void;
 

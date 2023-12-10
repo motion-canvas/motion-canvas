@@ -1,12 +1,11 @@
-import {clamp} from '@motion-canvas/core/lib/tweening';
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2, clamp} from '@motion-canvas/core';
+import parse, {PathCommand} from 'parse-svg-path';
 import {ArcSegment} from './ArcSegment';
 import {CubicBezierSegment} from './CubicBezierSegment';
 import {CurveProfile} from './CurveProfile';
 import {LineSegment} from './LineSegment';
 import {QuadBezierSegment} from './QuadBezierSegment';
 import {Segment} from './Segment';
-import parse, {PathCommand} from 'parse-svg-path';
 
 function addSegmentToProfile(profile: CurveProfile, segment: Segment) {
   profile.segments.push(segment);

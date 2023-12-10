@@ -1,9 +1,9 @@
+import {MetaFile} from '../meta';
+import {Plugin} from '../plugin';
+import DefaultPlugin from '../plugin/DefaultPlugin';
 import {Logger} from './Logger';
 import {Project, ProjectSettings, Versions} from './Project';
 import {ProjectMetadata} from './ProjectMetadata';
-import {Plugin} from '../plugin';
-import DefaultPlugin from '../plugin/DefaultPlugin';
-import {MetaFile} from '../meta';
 import {createSettingsMetadata} from './SettingsMetadata';
 
 /**

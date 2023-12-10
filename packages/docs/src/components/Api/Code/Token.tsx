@@ -1,6 +1,6 @@
-import React, {ReactNode} from 'react';
-import {useTokenProps} from '@site/src/contexts/codeTheme';
 import Link from '@docusaurus/Link';
+import {useTokenProps} from '@site/src/contexts/codeTheme';
+import React, {ReactNode} from 'react';
 
 export default function Token({
   children,

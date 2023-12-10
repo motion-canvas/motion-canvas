@@ -1,8 +1,8 @@
+import {all} from '../flow';
+import {ThreadGenerator} from '../threading';
 import {Direction, Origin, Vector2} from '../types';
 import {useScene} from '../utils';
 import {useTransition} from './useTransition';
-import {all} from '../flow';
-import {ThreadGenerator} from '../threading';
 
 /**
  * Perform a transition that slides the scene in the given direction.

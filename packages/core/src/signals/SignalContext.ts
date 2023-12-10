@@ -1,13 +1,14 @@
+import {run, waitFor} from '../flow';
+import {ThreadGenerator} from '../threading';
 import {
-  easeInOutCubic,
   InterpolationFunction,
   TimingFunction,
+  easeInOutCubic,
   tween,
 } from '../tweening';
 import {errorToLog, useLogger} from '../utils';
-import {ThreadGenerator} from '../threading';
-import {run, waitFor} from '../flow';
 import {DependencyContext} from './DependencyContext';
+import {DEFAULT} from './symbols';
 import {
   SignalExtensions,
   SignalGenerator,
@@ -17,7 +18,6 @@ import {
   SignalValue,
 } from './types';
 import {isReactive, unwrap} from './utils';
-import {DEFAULT} from './symbols';
 
 export type SimpleSignal<TValue, TReturn = void> = Signal<
   TValue,

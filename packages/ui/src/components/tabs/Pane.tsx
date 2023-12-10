@@ -1,7 +1,7 @@
 import styles from './Tabs.module.scss';
 
-import {Header} from '../layout';
 import {ComponentChildren} from 'preact';
+import {Header} from '../layout';
 
 export interface PaneProps {
   title: string;

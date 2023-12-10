@@ -1,20 +1,18 @@
 import {
-  SignalValue,
-  SimpleSignal,
-  unwrap,
-} from '@motion-canvas/core/lib/signals';
-import {
   BBox,
   PossibleVector2,
   SerializedVector2,
+  SignalValue,
+  SimpleSignal,
   Vector2,
-} from '@motion-canvas/core/lib/types';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+  unwrap,
+  useLogger,
+} from '@motion-canvas/core';
 import {
   CubicBezierSegment,
   CurveProfile,
-  getBezierSplineProfile,
   KnotInfo,
+  getBezierSplineProfile,
 } from '../curves';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {computed, initial, signal} from '../decorators';

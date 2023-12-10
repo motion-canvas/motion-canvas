@@ -1,4 +1,4 @@
-import {Vector2} from '@motion-canvas/core/lib/types';
+import {Vector2} from '@motion-canvas/core';
 
 export interface CurveDrawingInfo {
   path: Path2D;

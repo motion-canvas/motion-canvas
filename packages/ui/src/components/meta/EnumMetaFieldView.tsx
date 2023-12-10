@@ -1,6 +1,6 @@
-import {Select} from '../controls';
-import type {EnumMetaField} from '@motion-canvas/core/lib/meta';
+import type {EnumMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
+import {Select} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface EnumMetaFieldViewProps {

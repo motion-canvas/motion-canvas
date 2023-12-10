@@ -1,8 +1,7 @@
-import {BBox} from '@motion-canvas/core/lib/types';
-import {Shape, ShapeProps} from './Shape';
+import {BBox, SignalValue, SimpleSignal} from '@motion-canvas/core';
 import {initial, signal} from '../decorators';
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
 import {drawPolygon} from '../utils';
+import {Shape, ShapeProps} from './Shape';
 
 export interface PolygonProps extends ShapeProps {
   /**

@@ -1,8 +1,7 @@
-import {initial, interpolation, parser, signal} from './signal';
-import {canvasStyleParser} from '../utils';
+import {Color, Signal} from '@motion-canvas/core';
 import type {CanvasStyle, PossibleCanvasStyle} from '../partials';
-import {Signal} from '@motion-canvas/core/lib/signals';
-import {Color} from '@motion-canvas/core/lib/types';
+import {canvasStyleParser} from '../utils';
+import {initial, interpolation, parser, signal} from './signal';
 
 export type CanvasStyleSignal<T> = Signal<PossibleCanvasStyle, CanvasStyle, T>;
 

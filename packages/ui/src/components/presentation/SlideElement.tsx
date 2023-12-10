@@ -1,6 +1,6 @@
-import type {Slide} from '@motion-canvas/core/lib/scenes';
-import {useApplication} from '../../contexts';
+import type {Slide} from '@motion-canvas/core';
 import clsx from 'clsx';
+import {useApplication} from '../../contexts';
 import styles from './SlideGraph.module.scss';
 
 interface SlideElementProps {

@@ -1,17 +1,19 @@
-import {BBox, SerializedVector2} from '@motion-canvas/core/lib/types';
-import {drawImage} from '../utils';
-import {computed, initial, signal} from '../decorators';
-import {useThread} from '@motion-canvas/core/lib/utils';
-import {PlaybackState, useLogger} from '@motion-canvas/core';
-import {clamp} from '@motion-canvas/core/lib/tweening';
-import {Rect, RectProps} from './Rect';
-import {DesiredLength} from '../partials';
 import {
+  BBox,
   DependencyContext,
+  PlaybackState,
+  SerializedVector2,
   SignalValue,
   SimpleSignal,
+  clamp,
   isReactive,
-} from '@motion-canvas/core/lib/signals';
+  useLogger,
+  useThread,
+} from '@motion-canvas/core';
+import {computed, initial, signal} from '../decorators';
+import {DesiredLength} from '../partials';
+import {drawImage} from '../utils';
+import {Rect, RectProps} from './Rect';
 import reactivePlaybackRate from './__logs__/reactive-playback-rate.md';
 
 export interface VideoProps extends RectProps {

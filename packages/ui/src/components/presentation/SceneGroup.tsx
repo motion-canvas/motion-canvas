@@ -1,7 +1,7 @@
-import type {Scene} from '@motion-canvas/core/lib/scenes';
+import type {Scene} from '@motion-canvas/core';
+import {useEffect, useState} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {useSubscribableValue} from '../../hooks';
-import {useEffect, useState} from 'preact/hooks';
 import {ControlledExpandable} from '../fields';
 import {SlideElement} from './SlideElement';
 

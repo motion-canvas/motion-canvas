@@ -1,22 +1,22 @@
 import styles from './Playback.module.scss';
 
-import {IconButton, IconCheckbox, Input, Select} from '../controls';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
-import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
+import {useDocumentEvent, usePlayerState} from '../../hooks';
+import {IconButton, IconCheckbox, Input, Select} from '../controls';
 import {
+  FastForward,
+  FastRewind,
   Pause,
   PhotoCamera,
   PlayArrow,
   Repeat,
   SkipNext,
   SkipPrevious,
-  FastForward,
-  FastRewind,
   VolumeOff,
   VolumeOn,
 } from '../icons';
+import {Framerate} from './Framerate';
 
 export function PlaybackControls() {
   const {player, renderer, meta, project} = useApplication();

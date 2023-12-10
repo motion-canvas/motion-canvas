@@ -1,7 +1,7 @@
-import {Group, Label} from '../controls';
+import type {MetaField} from '@motion-canvas/core';
 import type {ComponentChildren} from 'preact';
-import type {MetaField} from '@motion-canvas/core/lib/meta';
 import {useMemo} from 'preact/hooks';
+import {Group, Label} from '../controls';
 
 export interface MetaFieldGroupProps {
   children: ComponentChildren;

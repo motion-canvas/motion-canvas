@@ -1,9 +1,9 @@
 import styles from './Timeline.module.scss';
 
-import type {Scene} from '@motion-canvas/core/lib/scenes';
-import {useScenes, useSubscribableValue} from '../../hooks';
-import {useApplication, useTimelineContext} from '../../contexts';
+import type {Scene} from '@motion-canvas/core';
 import {useMemo} from 'preact/hooks';
+import {useApplication, useTimelineContext} from '../../contexts';
+import {useScenes, useSubscribableValue} from '../../hooks';
 import {findAndOpenFirstUserFile} from '../../utils';
 import {SlideTrack} from './SlideTrack';
 

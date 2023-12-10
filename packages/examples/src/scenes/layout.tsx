@@ -1,7 +1,5 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle, Rect, Layout} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {Circle, Layout, Rect, makeScene2D} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
 
 const RED = '#ff6470';
 

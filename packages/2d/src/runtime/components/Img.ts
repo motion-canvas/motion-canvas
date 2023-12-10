@@ -1,24 +1,20 @@
-import {computed, initial, signal} from '../decorators';
 import {
-  Color,
-  PossibleVector2,
   BBox,
-  SerializedVector2,
-  Vector2,
-} from '@motion-canvas/core/lib/types';
-import {drawImage} from '../utils';
-import {Rect, RectProps} from './Rect';
-import {DesiredLength} from '../partials';
-import {
+  Color,
   DependencyContext,
+  DetailedError,
+  PossibleVector2,
+  SerializedVector2,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
-import {
+  Vector2,
   useLogger,
   viaProxy,
-  DetailedError,
-} from '@motion-canvas/core/lib/utils';
+} from '@motion-canvas/core';
+import {computed, initial, signal} from '../decorators';
+import {DesiredLength} from '../partials';
+import {drawImage} from '../utils';
+import {Rect, RectProps} from './Rect';
 import imageWithoutSource from './__logs__/image-without-source.md';
 
 export interface ImgProps extends RectProps {
@@ -41,9 +37,9 @@ export interface ImgProps extends RectProps {
  *
  * @preview
  * ```tsx editor
- * import {Img} from '@motion-canvas/2d/lib/components';
- * import {all, waitFor} from '@motion-canvas/core/lib/flow';
- * import {createRef} from '@motion-canvas/core/lib/utils';
+ * import {Img} from '@motion-canvas/2d';
+ * import {all, waitFor} from '@motion-canvas/core';
+ * import {createRef} from '@motion-canvas/core';
  * import {makeScene2D} from '@motion-canvas/2d';
  *
  * export default makeScene2D(function* (view) {

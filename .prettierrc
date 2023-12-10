@@ -4,5 +4,6 @@
   "printWidth": 80,
   "trailingComma": "all",
   "arrowParens": "avoid",
-  "proseWrap": "always"
+  "proseWrap": "always",
+  "plugins": ["prettier-plugin-organize-imports"]
 }

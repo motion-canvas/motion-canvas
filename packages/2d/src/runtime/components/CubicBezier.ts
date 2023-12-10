@@ -1,11 +1,10 @@
-import {SignalValue} from '@motion-canvas/core/lib/signals';
-import {PossibleVector2, Vector2Signal} from '@motion-canvas/core/lib/types';
-import {CurveProps} from './Curve';
+import {PossibleVector2, SignalValue, Vector2Signal} from '@motion-canvas/core';
 import {CubicBezierSegment} from '../curves';
 import {PolynomialSegment} from '../curves/PolynomialSegment';
 import {computed, vector2Signal} from '../decorators';
 import {bezierCurveTo, lineTo, moveTo} from '../utils';
 import {Bezier, BezierOverlayInfo} from './Bezier';
+import {CurveProps} from './Curve';
 
 export interface CubicBezierProps extends CurveProps {
   p0?: SignalValue<PossibleVector2>;

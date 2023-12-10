@@ -1,25 +1,28 @@
 import {
+  BBox,
   createSignal,
+  PossibleVector2,
   SignalValue,
   SimpleSignal,
+  threadable,
+  ThreadGenerator,
+  TimingFunction,
+  tween,
   unwrap,
-} from '@motion-canvas/core/lib/signals';
-import {BBox, PossibleVector2, Vector2} from '@motion-canvas/core/lib/types';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+  useLogger,
+  Vector2,
+} from '@motion-canvas/core';
 import {CurveProfile, getPolylineProfile} from '../curves';
-import {computed, initial, signal} from '../decorators';
-import {arc, drawLine, drawPivot, lineTo, moveTo} from '../utils';
-import {Curve, CurveProps} from './Curve';
-import {Layout} from './Layout';
-import lineWithoutPoints from './__logs__/line-without-points.md';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {TimingFunction, tween} from '@motion-canvas/core/lib/tweening';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
 import {
   calculateLerpDistance,
   polygonLength,
   polygonPointsLerp,
 } from '../curves/createCurveProfileLerp';
+import {computed, initial, signal} from '../decorators';
+import {arc, drawLine, drawPivot, lineTo, moveTo} from '../utils';
+import lineWithoutPoints from './__logs__/line-without-points.md';
+import {Curve, CurveProps} from './Curve';
+import {Layout} from './Layout';
 
 export interface LineProps extends CurveProps {
   /**

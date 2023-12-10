@@ -1,6 +1,11 @@
-import {SignalValue, SimpleSignal} from '@motion-canvas/core/lib/signals';
-import {clamp} from '@motion-canvas/core/lib/tweening';
-import {BBox, SerializedVector2, Vector2} from '@motion-canvas/core/lib/types';
+import {
+  BBox,
+  SerializedVector2,
+  SignalValue,
+  SimpleSignal,
+  Vector2,
+  clamp,
+} from '@motion-canvas/core';
 import {CurveDrawingInfo} from '../curves/CurveDrawingInfo';
 import {CurvePoint} from '../curves/CurvePoint';
 import {CurveProfile} from '../curves/CurveProfile';

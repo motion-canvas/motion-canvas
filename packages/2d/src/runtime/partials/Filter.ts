@@ -1,10 +1,10 @@
 import {
   createSignal,
+  map,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
-import {map} from '@motion-canvas/core/lib/tweening';
-import {transformScalar} from '@motion-canvas/core/lib/types';
+  transformScalar,
+} from '@motion-canvas/core';
 
 /**
  * All possible CSS filter names.

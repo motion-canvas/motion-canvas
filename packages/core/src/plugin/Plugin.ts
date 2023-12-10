@@ -1,9 +1,9 @@
 import type {
   ExporterClass,
-  Project,
   Player,
-  ProjectSettings,
   Presenter,
+  Project,
+  ProjectSettings,
   Renderer,
 } from '../app';
 

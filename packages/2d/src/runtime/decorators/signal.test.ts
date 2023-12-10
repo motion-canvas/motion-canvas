@@ -1,6 +1,6 @@
+import {DEFAULT, SimpleSignal} from '@motion-canvas/core';
 import {beforeEach, describe, expect, test, vi} from 'vitest';
 import {initial, initializeSignals, parser, signal} from './signal';
-import {DEFAULT, SimpleSignal} from '@motion-canvas/core/lib/signals';
 
 interface OwnerProps {
   integer?: number;

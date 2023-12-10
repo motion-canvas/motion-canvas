@@ -1,37 +1,35 @@
 import {
-  SignalValue,
-  SimpleSignal,
-  isReactive,
-} from '@motion-canvas/core/lib/signals';
-import {
   BBox,
   Matrix2D,
   PossibleSpacing,
   SerializedVector2,
+  SignalValue,
+  SimpleSignal,
+  ThreadGenerator,
+  TimingFunction,
   Vector2,
-} from '@motion-canvas/core/lib/types';
+  all,
+  clampRemap,
+  delay,
+  easeInOutSine,
+  isReactive,
+  lazy,
+  threadable,
+  tween,
+  useLogger,
+} from '@motion-canvas/core';
 import {computed, signal} from '../decorators';
-import {Shape, ShapeProps} from './Shape';
-import {Node, NodeProps} from './Node';
 import {DesiredLength, PossibleCanvasStyle} from '../partials';
-import {useLogger} from '@motion-canvas/core/lib/utils';
+import {applyTransformDiff, getTransformDiff} from '../utils/diff';
+import {Circle, CircleProps} from './Circle';
+import {Img, ImgProps} from './Img';
+import {Layout} from './Layout';
+import {Line, LineProps} from './Line';
+import {Node, NodeProps} from './Node';
 import {Path, PathProps} from './Path';
 import {Rect, RectProps} from './Rect';
-import {
-  clampRemap,
-  easeInOutSine,
-  TimingFunction,
-  tween,
-} from '@motion-canvas/core/lib/tweening';
-import {Layout} from './Layout';
-import {lazy, threadable} from '@motion-canvas/core/lib/decorators';
+import {Shape, ShapeProps} from './Shape';
 import {View2D} from './View2D';
-import {all, delay} from '@motion-canvas/core/lib/flow';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-import {Circle, CircleProps} from './Circle';
-import {Line, LineProps} from './Line';
-import {Img, ImgProps} from './Img';
-import {applyTransformDiff, getTransformDiff} from '../utils/diff';
 
 /**
  * Represent SVG shape.

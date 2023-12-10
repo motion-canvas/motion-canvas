@@ -1,8 +1,8 @@
-import {describe, it, expect} from 'vitest';
 import {createSignal, join, waitFor} from '@motion-canvas/core';
-import {mockScene2D} from './mockScene2D';
+import {describe, expect, it} from 'vitest';
 import {Circle} from '../Circle';
 import {generatorTest} from './generatorTest';
+import {mockScene2D} from './mockScene2D';
 
 describe('state', () => {
   mockScene2D();

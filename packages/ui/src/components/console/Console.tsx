@@ -1,15 +1,14 @@
 import styles from './Console.module.scss';
 
-import {LogLevel} from '@motion-canvas/core';
-import {capitalize} from '@motion-canvas/core/lib/utils';
-import {Pane} from '../tabs';
-import {useLogs} from '../../contexts';
-import {useLayoutEffect, useRef} from 'preact/hooks';
-import {IconButton, Pill} from '../controls';
-import {Log} from './Log';
+import {LogLevel, capitalize} from '@motion-canvas/core';
 import clsx from 'clsx';
-import {Clear} from '../icons';
+import {useLayoutEffect, useRef} from 'preact/hooks';
+import {useLogs} from '../../contexts';
 import {useStorage} from '../../hooks';
+import {IconButton, Pill} from '../controls';
+import {Clear} from '../icons';
+import {Pane} from '../tabs';
+import {Log} from './Log';
 
 const LOG_LEVELS: Record<string, boolean> = {
   [LogLevel.Error]: true,

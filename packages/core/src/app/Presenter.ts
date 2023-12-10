@@ -1,13 +1,13 @@
-import type {Project} from './Project';
-import type {Logger} from './Logger';
-import type {Scene, Slide} from '../scenes';
-import {PlaybackManager, PlaybackState} from './PlaybackManager';
-import {Stage, StageSettings} from './Stage';
 import {ValueDispatcher} from '../events';
-import {Vector2} from '../types';
-import {PlaybackStatus} from './PlaybackStatus';
-import {Semaphore} from '../utils';
+import type {Scene, Slide} from '../scenes';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
+import {Vector2} from '../types';
+import {Semaphore} from '../utils';
+import type {Logger} from './Logger';
+import {PlaybackManager, PlaybackState} from './PlaybackManager';
+import {PlaybackStatus} from './PlaybackStatus';
+import type {Project} from './Project';
+import {Stage, StageSettings} from './Stage';
 
 export interface PresenterSettings extends StageSettings {
   name: string;

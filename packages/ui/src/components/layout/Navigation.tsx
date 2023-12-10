@@ -1,9 +1,8 @@
-import {useInspection, useLogger} from '../../contexts';
 import {useEffect, useRef, useState} from 'preact/hooks';
+import {useInspection, useLogger} from '../../contexts';
 import {useReducedMotion} from '../../hooks';
+import {BottomPanel, EditorPanel, SidebarPanel} from '../../signals';
 import {emphasize, shake} from '../animations';
-import {EditorPanel, BottomPanel, SidebarPanel} from '../../signals';
-import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import {
   AccountTree,
   Bug,
@@ -14,6 +13,7 @@ import {
   Settings,
   Videocam,
 } from '../icons';
+import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import styles from './Navigation.module.scss';
 
 export function Navigation() {

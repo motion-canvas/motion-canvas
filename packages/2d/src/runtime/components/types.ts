@@ -1,5 +1,5 @@
+import type {ReferenceReceiver} from '@motion-canvas/core';
 import type {Node} from './Node';
-import type {ReferenceReceiver} from '@motion-canvas/core/lib/utils';
 
 export type ComponentChild =
   | Node

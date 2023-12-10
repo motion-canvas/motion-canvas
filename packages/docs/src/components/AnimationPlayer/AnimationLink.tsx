@@ -1,8 +1,8 @@
+import Link from '@docusaurus/Link';
+import IconCode from '@site/src/Icon/Code';
+import clsx from 'clsx';
 import React from 'react';
 import styles from './styles.module.css';
-import IconCode from '@site/src/Icon/Code';
-import Link from '@docusaurus/Link';
-import clsx from 'clsx';
 
 export interface AnimationLinkProps {
   name: string;

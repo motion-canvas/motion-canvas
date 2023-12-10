@@ -1,9 +1,9 @@
 import React from 'react';
 
 import Signatures from '@site/src/components/Api/Signatures';
-import type {JSONOutput} from 'typedoc';
-import Heading from '@theme/Heading';
 import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
+import Heading from '@theme/Heading';
+import type {JSONOutput} from 'typedoc';
 
 export default function FunctionItem({
   reflection,

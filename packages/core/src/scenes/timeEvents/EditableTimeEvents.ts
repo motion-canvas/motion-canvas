@@ -1,8 +1,8 @@
-import type {Scene} from '../Scene';
-import type {TimeEvents} from './TimeEvents';
-import type {TimeEvent} from './TimeEvent';
-import type {SerializedTimeEvent} from './SerializedTimeEvent';
 import {ValueDispatcher} from '../../events';
+import type {Scene} from '../Scene';
+import type {SerializedTimeEvent} from './SerializedTimeEvent';
+import type {TimeEvent} from './TimeEvent';
+import type {TimeEvents} from './TimeEvents';
 
 /**
  * Manages time events during editing.

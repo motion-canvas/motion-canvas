@@ -1,7 +1,7 @@
+import {MetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import {MetaField} from '@motion-canvas/core/lib/meta';
-import {AutoField} from '../fields';
 import {Group, Label} from '../controls';
+import {AutoField} from '../fields';
 
 export interface UnknownMetaFieldViewProps {
   field: MetaField<any>;

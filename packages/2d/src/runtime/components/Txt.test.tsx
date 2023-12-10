@@ -1,9 +1,9 @@
-import {describe, it, expect, vi} from 'vitest';
-import {mockScene2D} from './__tests__/mockScene2D';
+import {linear, waitFor} from '@motion-canvas/core';
+import {describe, expect, it, vi} from 'vitest';
 import {Txt} from './Txt';
 import {TxtLeaf} from './TxtLeaf';
 import {generatorTest} from './__tests__/generatorTest';
-import {linear, waitFor} from '@motion-canvas/core';
+import {mockScene2D} from './__tests__/mockScene2D';
 
 describe('Txt', () => {
   mockScene2D();

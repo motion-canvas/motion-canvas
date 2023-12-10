@@ -1,7 +1,7 @@
-import {afterAll, beforeAll, describe, expect, test} from 'vitest';
-import {toMatchImageSnapshot} from 'jest-image-snapshot';
-import {App, start} from './app';
 import {readFileSync} from 'fs';
+import {toMatchImageSnapshot} from 'jest-image-snapshot';
+import {afterAll, beforeAll, describe, expect, test} from 'vitest';
+import {App, start} from './app';
 
 expect.extend({toMatchImageSnapshot});
 

@@ -1,4 +1,26 @@
 import {
+  BBox,
+  boolLerp,
+  InterpolationFunction,
+  modify,
+  Origin,
+  originToOffset,
+  PossibleSpacing,
+  PossibleVector2,
+  SerializedVector2,
+  Signal,
+  SignalValue,
+  SimpleSignal,
+  SimpleVector2Signal,
+  SpacingSignal,
+  threadable,
+  ThreadGenerator,
+  TimingFunction,
+  tween,
+  Vector2,
+  Vector2Signal,
+} from '@motion-canvas/core';
+import {
   addInitializer,
   cloneable,
   computed,
@@ -10,47 +32,21 @@ import {
   Vector2LengthSignal,
   vector2Signal,
 } from '../decorators';
-import {
-  Origin,
-  originToOffset,
-  PossibleSpacing,
-  PossibleVector2,
-  BBox,
-  SerializedVector2,
-  SpacingSignal,
-  Vector2,
-  Vector2Signal,
-  SimpleVector2Signal,
-} from '@motion-canvas/core/lib/types';
-import {
-  InterpolationFunction,
-  TimingFunction,
-  tween,
-  boolLerp,
-} from '@motion-canvas/core/lib/tweening';
-import {
-  FlexItems,
-  FlexBasis,
-  FlexDirection,
-  FlexContent,
-  FlexWrap,
-  LayoutMode,
-  DesiredLength,
-  TextWrap,
-  Length,
-  LengthLimit,
-} from '../partials';
-import {threadable} from '@motion-canvas/core/lib/decorators';
-import {ThreadGenerator} from '@motion-canvas/core/lib/threading';
-import {Node, NodeProps} from './Node';
-import {drawLine, drawPivot, is} from '../utils';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {
-  modify,
-  Signal,
-  SignalValue,
-  SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
+  DesiredLength,
+  FlexBasis,
+  FlexContent,
+  FlexDirection,
+  FlexItems,
+  FlexWrap,
+  LayoutMode,
+  Length,
+  LengthLimit,
+  TextWrap,
+} from '../partials';
+import {drawLine, drawPivot, is} from '../utils';
+import {Node, NodeProps} from './Node';
 
 export interface LayoutProps extends NodeProps {
   layout?: LayoutMode;

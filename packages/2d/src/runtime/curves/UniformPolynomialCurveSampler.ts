@@ -1,7 +1,6 @@
-import {clamp, remap} from '@motion-canvas/core/lib/tweening';
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {PolynomialSegment} from './PolynomialSegment';
+import {Vector2, clamp, remap} from '@motion-canvas/core';
 import {CurvePoint} from './CurvePoint';
+import {PolynomialSegment} from './PolynomialSegment';
 
 /**
  * Class to uniformly sample points on a given polynomial curve.

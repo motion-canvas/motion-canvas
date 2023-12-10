@@ -1,6 +1,6 @@
+import clsx from 'clsx';
 import {cloneElement, ComponentChildren, JSX, Ref, VNode} from 'preact';
 import styles from './Tabs.module.scss';
-import clsx from 'clsx';
 
 function isTab(node: VNode): node is VNode<TabProps> {
   return node.type === Tab;
