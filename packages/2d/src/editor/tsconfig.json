@@ -4,6 +4,6 @@
     "jsx": "react-jsx",
     "jsxImportSource": "preact"
   },
-  "references": [{"path": "../runtime"}],
+  "references": [{"path": "../runtime/tsconfig.json"}],
   "include": ["**/*"]
 }
