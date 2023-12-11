@@ -13,6 +13,5 @@
       "@motion-canvas/2d/lib/*": ["./*"]
     }
   },
-  "include": ["**/*"],
-  "exclude": ["**/*.test.*", "**/__tests__/**/*"]
+  "include": ["**/*"]
 }

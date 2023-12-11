@@ -26,7 +26,7 @@
   },
   "scripts": {
     "dev": "tspc -b src -w",
-    "build": "tspc -b src",
+    "build": "tspc -b src/tsconfig.build.json",
     "bundle": "rollup -c rollup.config.mjs",
     "test": "vitest"
   },
