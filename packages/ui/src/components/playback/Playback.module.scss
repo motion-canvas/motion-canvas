@@ -26,25 +26,16 @@
 .volumeMargin {
   position: absolute;
   bottom: 24px;
-  left: -12px;
-  width: 48px;
-  height: 180px;
+  left: 0;
+  right: 0;
+  padding-bottom: 18px;
   display: none;
 }
-
 .volume {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 24px;
-  height: 144px;
+  padding: 12px 0;
   border-radius: var(--radius);
   background-color: var(--surface-color);
 }
-
 .volumeTrigger:hover .volumeMargin {
-  display: grid;
+  display: block;
 }

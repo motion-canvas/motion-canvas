@@ -24,9 +24,8 @@ export function Slider({value, onChange}: SliderProps) {
           event.currentTarget.setPointerCapture(event.pointerId);
 
           const rect = event.currentTarget.getBoundingClientRect();
-          // +2 & +4 to account for thumb offset
-          const y = event.clientY - rect.y + 2;
-          const newInternalValue = 1 - y / (rect.height + 4);
+          const y = clamp(0, rect.height, event.clientY - rect.y);
+          const newInternalValue = 1 - y / rect.height;
           setInternalValue(clamp(0, 1, newInternalValue));
         }
       }}
@@ -35,9 +34,8 @@ export function Slider({value, onChange}: SliderProps) {
           event.stopPropagation();
 
           const rect = event.currentTarget.getBoundingClientRect();
-          // +2 & +4 to account for thumb offset
-          const y = event.clientY - rect.y + 2;
-          const newInternalValue = 1 - y / (rect.height + 4);
+          const y = clamp(0, rect.height, event.clientY - rect.y);
+          const newInternalValue = 1 - y / rect.height;
           setInternalValue(clamp(0, 1, newInternalValue));
         }
       }}

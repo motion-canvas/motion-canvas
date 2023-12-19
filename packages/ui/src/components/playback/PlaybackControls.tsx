@@ -105,7 +105,7 @@ export function PlaybackControls() {
                   }
                   player.setAudioVolume(volume);
                 }}
-              ></Slider>
+              />
             </div>
           </div>
         )}
