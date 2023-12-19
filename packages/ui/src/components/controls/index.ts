@@ -11,4 +11,5 @@ export * from './Label';
 export * from './Pill';
 export * from './Select';
 export * from './Separator';
+export * from './Slider';
 export * from './Toggle';
