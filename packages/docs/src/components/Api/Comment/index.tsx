@@ -1,5 +1,6 @@
 import {Collapsible} from '@docusaurus/theme-common';
 import Summary from '@site/src/components/Api/Comment/Summary';
+import Admonition from '@theme/Admonition';
 import clsx from 'clsx';
 import React, {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
@@ -18,9 +19,28 @@ export default function Comment({
 
   return (
     <>
+      {full && <Experimental comment={comment} />}
       <Summary id={comment?.summaryId} />
       <Summary id={remarks?.contentId} />
       {full && <FullComment comment={comment} />}
+    </>
+  );
+}
+
+function Experimental({comment}: {comment: JSONOutput.Comment}) {
+  const experimental = useMemo(
+    () => comment?.modifierTags?.includes('@experimental'),
+    [comment],
+  );
+
+  return (
+    <>
+      {experimental && (
+        <Admonition type="experimental">
+          This is an experimental feature. The behavior and API may change
+          drastically between major releases.
+        </Admonition>
+      )}
     </>
   );
 }
