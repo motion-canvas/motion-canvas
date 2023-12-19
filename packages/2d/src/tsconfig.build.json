@@ -2,7 +2,7 @@
   "files": [],
   "include": [],
   "references": [
-    {"path": "./runtime/tsconfig.build.json"},
+    {"path": "./lib/tsconfig.build.json"},
     {"path": "./editor/tsconfig.build.json"}
   ]
 }

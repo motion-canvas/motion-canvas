@@ -1,5 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "references": [{"path": "../runtime/tsconfig.build.json"}],
+  "references": [{"path": "../lib/tsconfig.build.json"}],
   "include": ["**/*"]
 }
