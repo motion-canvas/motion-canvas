@@ -7,7 +7,7 @@ import CodeBlock from '@theme/CodeBlock';
 
 import UI from '@site/static/img/ui.svg';
 
-const CodeSample = `export makeScene(function* (view) {
+const CodeSample = `export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();
   view.add(
     <Circle 
