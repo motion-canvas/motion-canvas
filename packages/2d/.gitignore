@@ -1,1 +1,2 @@
-editor
+/editor
+!/src/lib

@@ -4,7 +4,7 @@ import {defineConfig} from 'vitest/config';
 export default defineConfig({
   plugins: [markdownLiterals()],
   test: {
-    include: ['./src/runtime/**/*.test.*'],
+    include: ['./src/lib/**/*.test.*'],
     environment: 'jsdom',
   },
 });

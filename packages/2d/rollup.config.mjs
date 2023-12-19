@@ -5,7 +5,7 @@ import terser from '@rollup/plugin-terser';
 
 export default [
   {
-    input: 'src/runtime/index.ts',
+    input: 'src/lib/index.ts',
     output: {
       file: 'dist/index.js',
       format: 'es',
@@ -25,7 +25,7 @@ export default [
       resolve(),
       commonjs(),
       typescript({
-        tsconfig: './src/runtime/tsconfig.json',
+        tsconfig: './src/lib/tsconfig.json',
         compilerOptions: {
           composite: false,
         },
