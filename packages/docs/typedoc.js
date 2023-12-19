@@ -303,6 +303,31 @@ async function parseTypes(options, projectName, externalProject) {
       return item instanceof Reflection;
     },
     toObject(item, obj) {
+      obj.experimental = isExperimental(item);
+
+      if (!obj.experimental && item instanceof DeclarationReflection) {
+        const signatures = [
+          ...(obj.signatures ?? []),
+          obj.setSignature,
+          obj.getSignature,
+          obj.indexSignature,
+        ].filter(item => !!item);
+
+        obj.experimental = signatures.some(signature =>
+          isExperimental(lookup[signature.id]),
+        );
+      }
+
+      return obj;
+    },
+  });
+
+  app.serializer.addSerializer({
+    priority: -Infinity,
+    supports(item) {
+      return item instanceof Reflection;
+    },
+    toObject(item, obj) {
       urlLookup[item.href] = {
         id: item.id,
         projectId: project.id,
@@ -398,4 +423,19 @@ function partsToText(parts) {
       return part.text;
     })
     .join('');
+}
+
+function isExperimental(reflection) {
+  const tags = reflection?.comment?.modifierTags;
+  if (!tags) return false;
+
+  if (typeof tags === 'string') {
+    return tags === '@experimental';
+  }
+
+  if (Array.isArray(tags)) {
+    return tags.some(tag => tag === '@experimental');
+  }
+
+  return tags.has('@experimental');
 }

@@ -190,6 +190,14 @@ a.button:hover {
   margin: 0 0.3rem;
 }
 
+.experimental {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.2em;
+  vertical-align: middle;
+  display: inline-block;
+}
+
 [data-theme='light']:root,
 [data-theme='dark']:root {
   --docsearch-primary-color: var(--ifm-color-primary);
