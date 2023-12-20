@@ -15,7 +15,6 @@ const marked = new Marked(
   },
   markedHighlight({
     highlight(code, lang) {
-      console.log(code);
       const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
       return highlightJs.highlight(code, {language}).value;
     },
