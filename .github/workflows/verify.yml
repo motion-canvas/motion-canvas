@@ -25,6 +25,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm ci
         if: steps.cache-npm.outputs.cache-hit != 'true'
