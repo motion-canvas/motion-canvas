@@ -51,6 +51,7 @@ export function bootstrap(
   project.settings = settings;
   project.meta = new ProjectMetadata(project);
   project.meta.shared.set(settings.defaults.get());
+  project.experimentalFeatures ??= false;
   metaFile.attach(project.meta);
 
   plugins.forEach(plugin => plugin.project?.(project));

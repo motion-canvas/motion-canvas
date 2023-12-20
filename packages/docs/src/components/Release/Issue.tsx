@@ -1,3 +1,4 @@
+import Link from '@docusaurus/Link';
 import IconScience from '@site/src/Icon/Science';
 import Contributor from '@site/src/components/Release/Contributor';
 import PullRequest from '@site/src/components/Release/PullRequest';
@@ -16,9 +17,9 @@ export default function Issue({user, pr, experimental, children}: IssueProps) {
     <li className={styles.element}>
       <Contributor name={user} />
       {experimental && (
-        <span title="Experimental feature">
+        <Link to="/docs/experimental" title="Experimental feature">
           <IconScience className="experimental" />
-        </span>
+        </Link>
       )}
       {children}
       {pr && <PullRequest id={pr} />}

@@ -21,6 +21,7 @@ export * from './Recenter';
 export * from './Repeat';
 export * from './Schedule';
 export * from './School';
+export * from './Science';
 export * from './Settings';
 export * from './SkipNext';
 export * from './SkipPrevious';

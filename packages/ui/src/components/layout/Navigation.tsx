@@ -1,5 +1,6 @@
+import {LogLevel} from '@motion-canvas/core';
 import {useEffect, useRef, useState} from 'preact/hooks';
-import {useInspection, useLogger} from '../../contexts';
+import {useApplication, useInspection, useLogger} from '../../contexts';
 import {useReducedMotion} from '../../hooks';
 import {BottomPanel, EditorPanel, SidebarPanel} from '../../signals';
 import {emphasize, shake} from '../animations';
@@ -10,6 +11,7 @@ import {
   MotionCanvas,
   Movie,
   School,
+  Science,
   Settings,
   Videocam,
 } from '../icons';
@@ -17,6 +19,7 @@ import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import styles from './Navigation.module.scss';
 
 export function Navigation() {
+  const {project} = useApplication();
   const {inspectedElement} = useInspection();
   const inspectorTab = useRef<HTMLButtonElement>();
   const reducedMotion = useReducedMotion();
@@ -96,6 +99,17 @@ export function Navigation() {
         </Tab>
       </TabGroup>
       <Space />
+      {project.experimentalFeatures && (
+        <TabLink
+          title="Experimental features enabled"
+          id="docs-experimental-link"
+          href="https://motioncanvas.io/docs/experimental/"
+          target="_blank"
+        >
+          <Science />
+          <Badge level={LogLevel.Warn}>!</Badge>
+        </TabLink>
+      )}
       <TabLink
         title="Docs"
         id="docs-external-link"
