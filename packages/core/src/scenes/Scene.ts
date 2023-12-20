@@ -63,6 +63,7 @@ export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   logger: Logger;
   onReplaced: ValueDispatcher<FullSceneDescription<T>>;
   timeEventsClass: new (scene: Scene) => TimeEvents;
+  experimentalFeatures?: boolean;
 }
 
 /**
@@ -208,6 +209,11 @@ export interface Scene<T = unknown> {
    * The scene directly before this scene, or null if omitted for performance.
    */
   get previous(): Scene | null;
+
+  /**
+   * Whether experimental features are enabled.
+   */
+  get experimentalFeatures(): boolean;
 
   /**
    * Render the scene onto a canvas.

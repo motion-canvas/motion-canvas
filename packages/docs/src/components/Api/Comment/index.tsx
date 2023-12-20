@@ -1,6 +1,6 @@
 import {Collapsible} from '@docusaurus/theme-common';
 import Summary from '@site/src/components/Api/Comment/Summary';
-import Admonition from '@theme/Admonition';
+import ExperimentalWarning from '@site/src/components/ExperimentalWarning';
 import clsx from 'clsx';
 import React, {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
@@ -33,16 +33,7 @@ function Experimental({comment}: {comment: JSONOutput.Comment}) {
     [comment],
   );
 
-  return (
-    <>
-      {experimental && (
-        <Admonition type="experimental">
-          This is an experimental feature. The behavior and API may change
-          drastically between major releases.
-        </Admonition>
-      )}
-    </>
-  );
+  return experimental ? <ExperimentalWarning /> : null;
 }
 
 function FullComment({comment}: {comment: JSONOutput.Comment}) {

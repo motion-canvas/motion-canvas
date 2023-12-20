@@ -108,6 +108,8 @@ export abstract class GeneratorScene<T>
     return this.previousScene;
   }
 
+  public readonly experimentalFeatures: boolean;
+
   protected resolutionScale: number;
   private runnerFactory: ThreadGeneratorFactory<T>;
   private previousScene: Scene | null = null;
@@ -128,6 +130,7 @@ export abstract class GeneratorScene<T>
     this.meta = description.meta;
     this.runnerFactory = description.config;
     this.creationStack = description.stack;
+    this.experimentalFeatures = description.experimentalFeatures ?? false;
 
     decorate(this.runnerFactory, threadable(this.name));
     this.timeEvents = new description.timeEventsClass(this);

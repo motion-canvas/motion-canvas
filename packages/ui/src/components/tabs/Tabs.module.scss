@@ -1,3 +1,13 @@
+$colors: (
+  'error': var(--red),
+  'warn': var(--yellow),
+  'info': var(--blue),
+  'http': #cccccc,
+  'verbose': #cccccc,
+  'debug': #cccccc,
+  'silly': #cccccc,
+);
+
 .root {
   width: 100%;
   height: 100%;
@@ -53,10 +63,15 @@
   padding: 0 4px;
   min-width: 16px;
   height: 16px;
-  background-color: var(--red);
   border-radius: 8px;
   text-align: center;
   z-index: 1;
+
+  @each $level, $color in $colors {
+    &.#{$level} {
+      background-color: $color;
+    }
+  }
 }
 
 .space {
