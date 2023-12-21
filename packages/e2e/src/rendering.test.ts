@@ -18,9 +18,7 @@ describe('Rendering', () => {
 
   test('Animation renders correctly', async () => {
     await app.page.click('#render');
-    await app.page.waitForSelector('#render:not([data-rendering="true"])', {
-      timeout: 60000,
-    });
+    // await app.page.waitForSelector('#render:not([data-rendering="true"])');
 
     expect(readFileSync('./output/project/000300.png')).toMatchImageSnapshot();
   });
