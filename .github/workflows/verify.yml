@@ -46,6 +46,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
   lint:
@@ -63,6 +64,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm run eslint
   prettier:
@@ -80,6 +82,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm run prettier
   build:
@@ -97,6 +100,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npx lerna run build
       - uses: actions/cache/save@v3
@@ -123,6 +127,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
@@ -149,6 +154,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
@@ -175,6 +181,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
@@ -201,6 +208,7 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
+            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
