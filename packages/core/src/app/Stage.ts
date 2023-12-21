@@ -81,11 +81,9 @@ export class Stage {
       : false;
 
     if (previousScene) {
-      this.transformCanvas(this.previousContext);
       await previousScene.render(this.previousContext);
     }
 
-    this.transformCanvas(this.currentContext);
     await currentScene.render(this.currentContext);
 
     const size = this.canvasSize;
@@ -104,18 +102,6 @@ export class Stage {
     if (previousOnTop) {
       this.context.drawImage(this.previousBuffer, 0, 0);
     }
-  }
-
-  public transformCanvas(context: CanvasRenderingContext2D) {
-    const offset = this.canvasSize.scale(0.5);
-    context.setTransform(
-      this.resolutionScale,
-      0,
-      0,
-      this.resolutionScale,
-      offset.x,
-      offset.y,
-    );
   }
 
   public resizeCanvas(context: CanvasRenderingContext2D) {

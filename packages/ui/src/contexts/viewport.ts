@@ -1,4 +1,5 @@
 import {createContext} from 'preact';
+import {useContext} from 'preact/hooks';
 
 export interface ViewportState {
   width: number;
@@ -20,4 +21,7 @@ const ViewportContext = createContext<ViewportState>({
   grid: false,
 });
 
-export {ViewportContext};
+export const ViewportProvider = ViewportContext.Provider;
+export function useViewportContext() {
+  return useContext(ViewportContext);
+}

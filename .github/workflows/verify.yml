@@ -6,6 +6,7 @@ on:
 
 env:
   HUSKY: 0
+  TSP_SKIP_CACHE: 'true'
 
 jobs:
   prepare:
@@ -25,7 +26,6 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm ci
         if: steps.cache-npm.outputs.cache-hit != 'true'
@@ -46,7 +46,6 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
   lint:
@@ -64,7 +63,6 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm run eslint
   prettier:
@@ -82,7 +80,6 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npm run prettier
   build:
@@ -100,7 +97,6 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - run: npx lerna run build
       - uses: actions/cache/save@v3
@@ -108,6 +104,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -127,13 +124,13 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -154,13 +151,13 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -181,13 +178,13 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -208,13 +205,13 @@ jobs:
           key: ${{ hashFiles('package-lock.json') }}-node-modules
           path: |
             **/node_modules
-            !**/node_modules/.cache
             ~/.cache/puppeteer
       - uses: actions/cache/restore@v3
         with:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist

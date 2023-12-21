@@ -50,10 +50,6 @@ export class View2D extends Rect {
     this.applyFlex();
   }
 
-  protected override transformContext() {
-    // do nothing
-  }
-
   public override dispose() {
     this.removeChildren();
     super.dispose();

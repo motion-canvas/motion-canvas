@@ -9,7 +9,7 @@ import {
   ThreadGenerator,
   threads,
 } from '../threading';
-import {BBox, Vector2} from '../types';
+import {Vector2} from '../types';
 import {endPlayback, endScene, startPlayback, startScene} from '../utils';
 import {LifecycleEvents} from './LifecycleEvents';
 import {Random} from './Random';
@@ -161,8 +161,7 @@ export abstract class GeneratorScene<T>
       iterations++;
       await DependencyContext.consumePromises();
       context.save();
-      const box = BBox.fromSizeCentered(this.getSize());
-      context.clearRect(box.x, box.y, box.width, box.height);
+      context.clearRect(0, 0, context.canvas.width, context.canvas.height);
       this.execute(() => this.draw(context));
       context.restore();
     } while (DependencyContext.hasPromises() && iterations < 10);

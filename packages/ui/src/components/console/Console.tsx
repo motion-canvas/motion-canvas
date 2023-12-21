@@ -3,8 +3,8 @@ import styles from './Console.module.scss';
 import {LogLevel, capitalize} from '@motion-canvas/core';
 import clsx from 'clsx';
 import {useLayoutEffect, useRef} from 'preact/hooks';
-import {useLogs} from '../../contexts';
-import {useStorage} from '../../hooks';
+import {useApplication} from '../../contexts';
+import {useStorage, useSubscribableValue} from '../../hooks';
 import {IconButton, Pill} from '../controls';
 import {Clear} from '../icons';
 import {Pane} from '../tabs';
@@ -19,7 +19,8 @@ const LOG_LEVELS: Record<string, boolean> = {
 
 export function Console() {
   const anchor = useRef<HTMLDivElement>();
-  const [logs, clear] = useLogs();
+  const {logger} = useApplication();
+  const logs = useSubscribableValue(logger.onLogsChanged);
   const [filters, setFilters] = useStorage('log-filters', LOG_LEVELS);
 
   useLayoutEffect(() => {
@@ -48,7 +49,7 @@ export function Console() {
           })}
         </div>
         {logs.length > 0 && (
-          <IconButton onClick={clear} title={'Clear console'}>
+          <IconButton onClick={() => logger.clear()} title={'Clear console'}>
             <Clear />
           </IconButton>
         )}
