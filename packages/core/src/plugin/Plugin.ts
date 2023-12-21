@@ -14,6 +14,20 @@ export interface Plugin {
   name: string;
 
   /**
+   * A path for importing the editor plugin.
+   *
+   * @remarks
+   * Editor plugins can extend the editor UI. They are loaded only when using
+   * the editor and are ignored completely in a production build.
+   *
+   * The path should lead to a module containing a default export of an editor
+   * plugin.
+   *
+   * @experimental
+   */
+  editorPlugin?: string;
+
+  /**
    * Modify the project settings before the project is initialized.
    *
    * @param settings - The project settings.

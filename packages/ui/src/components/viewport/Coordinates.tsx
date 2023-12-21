@@ -1,19 +1,19 @@
 import {isInspectable} from '@motion-canvas/core';
-import {useCallback, useContext} from 'preact/hooks';
+import {useCallback} from 'preact/hooks';
 import {useEffect, useState} from 'react';
+import {useViewportContext} from '../../contexts';
 import {
   useCurrentScene,
   useDocumentEvent,
   useSharedSettings,
 } from '../../hooks';
 import styles from '../controls/Controls.module.scss';
-import {ViewportContext} from './ViewportContext';
 
 export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});
   const [hover, setHover] = useState(true);
 
-  const state = useContext(ViewportContext);
+  const state = useViewportContext();
   const settings = {
     ...useSharedSettings(),
   };

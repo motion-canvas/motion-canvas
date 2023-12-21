@@ -1,3 +1,4 @@
+export * from './LoggerManager';
 export * from './clamp';
 export * from './compareVersions';
 export * from './formatDuration';

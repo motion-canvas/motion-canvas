@@ -3,9 +3,8 @@ import styles from './Console.module.scss';
 import {LogLevel, LogPayload} from '@motion-canvas/core';
 import clsx from 'clsx';
 import {useEffect, useMemo, useState} from 'preact/hooks';
-import {useInspection} from '../../contexts';
+import {useApplication} from '../../contexts';
 import {useFormattedNumber} from '../../hooks';
-import {EditorPanel, SidebarPanel} from '../../signals';
 import {StackTraceEntry, resolveStackTrace} from '../../utils';
 import {IconButton, Toggle} from '../controls';
 import {Locate} from '../icons';
@@ -18,9 +17,9 @@ export interface LogProps {
 }
 
 export function Log({payload}: LogProps) {
+  const {logger} = useApplication();
   const [open, setOpen] = useState(payload.level === LogLevel.Error);
   const [entries, setEntries] = useState<StackTraceEntry[] | null>(null);
-  const {setInspectedElement} = useInspection();
   const duration = useFormattedNumber(payload.durationMs, 2);
   const object = useMemo(
     () =>
@@ -57,8 +56,7 @@ export function Log({payload}: LogProps) {
           <IconButton
             title="Select related node"
             onClick={() => {
-              setInspectedElement(payload.inspect);
-              SidebarPanel.set(EditorPanel.Inspector);
+              logger.inspect(payload.inspect);
             }}
           >
             <Locate />

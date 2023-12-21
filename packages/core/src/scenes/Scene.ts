@@ -4,6 +4,7 @@ import type {
   SubscribableValueEvent,
   ValueDispatcher,
 } from '../events';
+import type {Plugin} from '../plugin';
 import type {SignalValue} from '../signals';
 import type {Vector2} from '../types';
 import type {LifecycleEvents} from './LifecycleEvents';
@@ -46,6 +47,7 @@ export interface SceneDescription<T = unknown> {
    * The stack trace at the moment of creation.
    */
   stack?: string;
+  plugins?: Plugin[];
   meta: SceneMetadata;
 }
 

@@ -5,6 +5,7 @@
  */
 
 export * from './DetailedError';
+export * from './ExperimentalError';
 export * from './Semaphore';
 export * from './beginSlide';
 export * from './capitalize';
@@ -14,6 +15,7 @@ export * from './createRefMap';
 export * from './debug';
 export * from './deprecate';
 export * from './errorToLog';
+export * from './experimentalLog';
 export * from './getContext';
 export * from './math';
 export * from './proxyUtils';

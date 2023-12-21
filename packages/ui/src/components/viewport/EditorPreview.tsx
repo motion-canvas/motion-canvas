@@ -1,10 +1,8 @@
-import {useCallback, useMemo, useRef} from 'preact/hooks';
-
-import {isInspectable} from '@motion-canvas/core';
 import clsx from 'clsx';
-import {useApplication, useInspection} from '../../contexts';
+import {ComponentChildren} from 'preact';
+import {useCallback, useMemo, useRef} from 'preact/hooks';
+import {ViewportProvider, ViewportState, useApplication} from '../../contexts';
 import {
-  useCurrentScene,
   useDocumentEvent,
   useDrag,
   usePreviewSettings,
@@ -14,27 +12,24 @@ import {
   useSubscribable,
   useSubscribableValue,
 } from '../../hooks';
+import {MouseButton} from '../../utils';
 import {highlight} from '../animations';
 import {Button, Select} from '../controls';
 import {ButtonCheckbox} from '../controls/ButtonCheckbox';
 import {Grid as GridIcon, Recenter} from '../icons';
 import {ColorPicker} from './ColorPicker';
 import {Coordinates} from './Coordinates';
-import {Debug} from './Debug';
-import {Grid} from './Grid';
+import {OverlayCanvas} from './OverlayCanvas';
 import {PreviewStage} from './PreviewStage';
 import styles from './Viewport.module.scss';
-import {ViewportContext, ViewportState} from './ViewportContext';
 
 const ZOOM_SPEED = 0.1;
 
 export function EditorPreview() {
-  const {player, settings: appSettings} = useApplication();
+  const {plugins, player, settings: appSettings} = useApplication();
   const coordinateSetting = useSubscribableValue(
     appSettings.appearance.coordinates.onChanged,
   );
-  const scene = useCurrentScene();
-  const {setInspectedElement} = useInspection();
   const containerRef = useRef<HTMLDivElement>();
   const overlayRef = useRef<HTMLDivElement>();
   const size = useSize(containerRef);
@@ -50,6 +45,12 @@ export function EditorPreview() {
     x: 0,
     y: 0,
   });
+
+  const drawHooks = useMemo(
+    () =>
+      plugins.map(plugin => plugin.previewOverlay?.drawHook).filter(Boolean),
+    [plugins],
+  );
 
   const state: ViewportState = useMemo(() => {
     const state = {
@@ -156,7 +157,7 @@ export function EditorPreview() {
   }
 
   return (
-    <ViewportContext.Provider value={state}>
+    <ViewportProvider value={state}>
       <div
         className={clsx(styles.viewport, state.zoom > 1 && styles.pixelated)}
         ref={containerRef}
@@ -174,8 +175,11 @@ export function EditorPreview() {
             outlineWidth: `${1 / state.zoom}px`,
           }}
         />
-        <Grid />
-        <Debug />
+        <OverlayCanvas
+          drawHooks={drawHooks}
+          width={state.width}
+          height={state.height}
+        />
         <div
           ref={overlayRef}
           className={styles.overlay}
@@ -183,25 +187,10 @@ export function EditorPreview() {
             event.preventDefault();
           }}
           onMouseDown={event => {
-            if (event.button === 0 && !event.shiftKey) {
-              if (!isInspectable(scene)) return;
-
-              const position = {
-                x: event.x - size.x,
-                y: event.y - size.y,
-              };
-
-              position.x -= state.x + state.width / 2;
-              position.y -= state.y + state.height / 2;
-              position.x /= state.zoom;
-              position.y /= state.zoom;
-              position.x += settings.size.width / 2;
-              position.y += settings.size.height / 2;
-
-              setInspectedElement(
-                scene.inspectPosition(position.x, position.y),
-              );
-            } else {
+            if (
+              event.button === MouseButton.Middle ||
+              (event.button === MouseButton.Left && event.shiftKey)
+            ) {
               handleDrag(event);
             }
           }}
@@ -221,7 +210,12 @@ export function EditorPreview() {
               y: pointer.y + (state.y - pointer.y) * ratio,
             });
           }}
-        />
+        >
+          {plugins.reduce((children, plugin) => {
+            const Component = plugin.previewOverlay?.component;
+            return Component ? <Component>{children}</Component> : children;
+          }, undefined as ComponentChildren)}
+        </div>
         <div className={clsx(styles.overlay, styles.controls)}>
           <Select
             title="Change zoom"
@@ -255,6 +249,6 @@ export function EditorPreview() {
           {coordinateSetting && <Coordinates />}
         </div>
       </div>
-    </ViewportContext.Provider>
+    </ViewportProvider>
   );
 }

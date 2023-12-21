@@ -26,6 +26,7 @@ export async function start(): Promise<App> {
 
   const page = await browser.newPage();
   await page.goto('http://localhost:9000');
+  await page.waitForSelector('main');
 
   return {
     page,

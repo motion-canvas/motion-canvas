@@ -7,11 +7,11 @@ export interface ProjectData {
   url: string;
 }
 
-export interface IndexProps {
+export interface ProjectSelectionProps {
   projects: ProjectData[];
 }
 
-export function Index({projects}: IndexProps) {
+export function ProjectSelection({projects}: ProjectSelectionProps) {
   return (
     <div className={styles.root}>
       <Header className={styles.header}>Projects</Header>
