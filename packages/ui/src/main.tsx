@@ -4,6 +4,7 @@ import {
   Player,
   Presenter,
   Renderer,
+  errorToLog,
   experimentalLog,
   type Project,
 } from '@motion-canvas/core';
@@ -117,10 +118,14 @@ export async function editor(project: Project) {
   meta.preview.onChanged.subscribe(updatePlayer);
 
   document.title = `${project.name} | Motion Canvas`;
-  const plugins: EditorPlugin[] = [
-    GridPlugin(),
-    ...(await Promise.all(promises)),
-  ];
+
+  const plugins: EditorPlugin[] = [GridPlugin()];
+  try {
+    plugins.push(...(await Promise.all(promises)));
+  } catch (error) {
+    project.logger.error(errorToLog(error));
+  }
+
   renderRoot(
     <ApplicationProvider
       application={{
