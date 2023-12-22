@@ -1016,7 +1016,9 @@ function originSignal(origin: Origin): PropertyDecorator {
     const meta = getPropertyMeta<any>(target, key);
     meta!.parser = value => new Vector2(value);
     meta!.getter = function (this: Layout) {
-      return this.getOriginDelta(origin).transformAsPoint(this.localToParent());
+      return this.computedSize()
+        .getOriginOffset(origin)
+        .transformAsPoint(this.localToParent());
     };
     meta!.setter = function (
       this: Layout,
