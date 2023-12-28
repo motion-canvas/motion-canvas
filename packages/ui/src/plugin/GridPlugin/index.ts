@@ -12,8 +12,10 @@ export default makeEditorPlugin({
 
       const path = useMemo(() => {
         const path = new Path2D();
-        const width = Math.ceil(state.width / 2 / GRID_SIZE + 2) * GRID_SIZE;
-        const height = Math.ceil(state.height / 2 / GRID_SIZE + 2) * GRID_SIZE;
+        const width =
+          Math.ceil(state.rect.width / 2 / GRID_SIZE + 2) * GRID_SIZE;
+        const height =
+          Math.ceil(state.rect.height / 2 / GRID_SIZE + 2) * GRID_SIZE;
 
         for (let i = -width; i < width; i += GRID_SIZE) {
           path.moveTo(i, -height);

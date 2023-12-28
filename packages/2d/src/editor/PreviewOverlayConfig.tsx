@@ -4,8 +4,8 @@ import {
   OverlayWrapper,
   PluginOverlayConfig,
   useCurrentScene,
-  usePreviewMatrix,
   useViewportContext,
+  useViewportMatrix,
 } from '@motion-canvas/ui';
 import {ComponentChildren} from 'preact';
 import {useInspection} from './Provider';
@@ -14,7 +14,7 @@ function Component({children}: {children?: ComponentChildren}) {
   const state = useViewportContext();
   const scene = useCurrentScene();
   const {nodeKey} = useInspection();
-  const matrix = usePreviewMatrix();
+  const matrix = useViewportMatrix();
 
   return (
     <OverlayWrapper
@@ -24,8 +24,8 @@ function Component({children}: {children?: ComponentChildren}) {
         event.stopPropagation();
 
         const position = new Vector2(
-          event.x - state.size.x,
-          event.y - state.size.y,
+          event.x - state.rect.x,
+          event.y - state.rect.y,
         ).transformAsPoint(matrix.inverse());
 
         nodeKey.value = scene.inspectPosition(position.x, position.y) as string;
@@ -39,10 +39,9 @@ function Component({children}: {children?: ComponentChildren}) {
 function drawHook() {
   const {nodeKey} = useInspection();
   const scene = useCurrentScene();
-  const matrix = usePreviewMatrix();
   nodeKey.value;
 
-  return (ctx: CanvasRenderingContext2D) => {
+  return (ctx: CanvasRenderingContext2D, matrix: DOMMatrix) => {
     if (!isInspectable(scene)) return;
     const element = scene.validateInspection(nodeKey.value);
     if (!element || element !== nodeKey.value) {

@@ -9,6 +9,7 @@ export * from './Input';
 export * from './InputSelect';
 export * from './Label';
 export * from './Pill';
+export * from './ReadOnlyInput';
 export * from './Select';
 export * from './Separator';
 export * from './Slider';

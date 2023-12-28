@@ -2,23 +2,21 @@ import {createContext} from 'preact';
 import {useContext} from 'preact/hooks';
 
 export interface ViewportState {
-  width: number;
-  height: number;
   x: number;
   y: number;
-  size: {x: number; y: number};
+  rect: DOMRectReadOnly;
   zoom: number;
   grid: boolean;
+  resolutionScale: number;
 }
 
 const ViewportContext = createContext<ViewportState>({
-  width: 1920,
-  height: 1080,
   x: 0,
   y: 0,
-  size: {x: 0, y: 0},
+  rect: new DOMRectReadOnly(),
   zoom: 1,
   grid: false,
+  resolutionScale: 1,
 });
 
 export const ViewportProvider = ViewportContext.Provider;

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import {JSX} from 'preact';
 import {useLayoutEffect, useRef, useState} from 'preact/hooks';
 import {useApplication} from '../../contexts';
-import {useSubscribable} from '../../hooks';
+import {useSubscribable, useViewportMatrix} from '../../hooks';
 import {PluginDrawFunction} from '../../plugin';
 import styles from './Viewport.module.scss';
 
@@ -20,6 +20,7 @@ export function OverlayCanvas({
   const {player} = useApplication();
   const [renderCount, setRenderCount] = useState(0);
 
+  const matrix = useViewportMatrix();
   const drawFunctions = drawHooks.map(hook => hook());
 
   useSubscribable(
@@ -34,10 +35,10 @@ export function OverlayCanvas({
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     for (const drawFunction of drawFunctions) {
       ctx.save();
-      drawFunction(ctx);
+      drawFunction(ctx, matrix);
       ctx.restore();
     }
-  }, [drawFunctions, renderCount]);
+  }, [drawFunctions, matrix, renderCount]);
 
   return (
     <canvas

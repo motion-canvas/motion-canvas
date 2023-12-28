@@ -41,10 +41,6 @@
   background-image: url('../../img/grid.svg');
 }
 
-.canvasOutline canvas {
-  outline: 1px solid var(--surface-color);
-}
-
 .overlay {
   position: absolute;
   top: 0;
@@ -82,4 +78,11 @@
   padding: 12px;
   gap: 8px;
   display: flex;
+}
+
+.coordinates {
+  display: none;
+  .viewport:hover & {
+    display: block;
+  }
 }

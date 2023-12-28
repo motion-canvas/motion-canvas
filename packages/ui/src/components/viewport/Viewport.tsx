@@ -1,4 +1,5 @@
 import {RendererState} from '@motion-canvas/core';
+import clsx from 'clsx';
 import {useEffect, useState} from 'preact/hooks';
 import {useApplication} from '../../contexts';
 import {useDuration, useRendererState} from '../../hooks';
@@ -10,8 +11,8 @@ import {
   RenderingProgress,
 } from '../playback';
 import {CurrentTime} from '../playback/CurrentTime';
-import {CustomStage} from './CustomStage';
 import {EditorPreview} from './EditorPreview';
+import {StageView} from './StageView';
 import {Timestamp} from './Timestamp';
 import styles from './Viewport.module.scss';
 
@@ -69,7 +70,10 @@ function RenderingViewport() {
 
   return (
     <div className={styles.root}>
-      <CustomStage stage={renderer.stage} />
+      <StageView
+        stage={renderer.stage}
+        className={clsx(styles.viewport, styles.renderingPreview)}
+      />
       <RenderingProgress />
       <div className={styles.playback}>
         <code

@@ -1,2 +1,2 @@
-export * from './CustomStage';
+export * from './StageView';
 export * from './Viewport';
