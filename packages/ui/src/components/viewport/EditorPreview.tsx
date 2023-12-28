@@ -55,11 +55,10 @@ export function EditorPreview() {
   const state: ViewportState = useMemo(() => {
     const state = {
       grid,
-      size,
-      width: size.width,
-      height: size.height,
+      rect: size,
       ...position,
       zoom,
+      resolutionScale: settings.resolutionScale,
     };
     if (zoomToFit) {
       const {width, height} = settings.size;
@@ -163,22 +162,16 @@ export function EditorPreview() {
         ref={containerRef}
       >
         <PreviewStage
-          className={clsx(
-            settings.background?.alpha() === 1
-              ? styles.canvasOutline
-              : styles.alphaBackground,
-          )}
           style={{
             transform: `translate(${state.x}px, ${state.y}px) scale(${
               state.zoom / settings.resolutionScale
             })`,
-            outlineWidth: `${1 / state.zoom}px`,
           }}
         />
         <OverlayCanvas
           drawHooks={drawHooks}
-          width={state.width}
-          height={state.height}
+          width={state.rect.width}
+          height={state.rect.height}
         />
         <div
           ref={overlayRef}

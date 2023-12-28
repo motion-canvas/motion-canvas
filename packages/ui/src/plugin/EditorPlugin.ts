@@ -39,7 +39,7 @@ export interface PluginTabConfig {
 }
 
 export interface PluginDrawFunction {
-  (ctx: CanvasRenderingContext2D): void;
+  (ctx: CanvasRenderingContext2D, matrix: DOMMatrix): void;
 }
 
 /**
@@ -92,4 +92,8 @@ export interface EditorPlugin {
    * Configuration for custom overlays displayed on top of the preview.
    */
   previewOverlay?: PluginOverlayConfig;
+  /**
+   * Configuration for custom overlays displayed on top of the presentation.
+   */
+  presenterOverlay?: PluginOverlayConfig;
 }
