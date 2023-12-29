@@ -292,6 +292,10 @@ export abstract class GeneratorScene<T>
     return this.size;
   }
 
+  public getRealSize(): Vector2 {
+    return this.size.mul(this.resolutionScale);
+  }
+
   public isAfterTransitionIn(): boolean {
     return this.state === SceneState.AfterTransitionIn;
   }
