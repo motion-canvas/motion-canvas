@@ -29,7 +29,7 @@ export function StageView({
     <div
       className={clsx(
         className,
-        background?.alpha() < 1 && styles.alphaBackground,
+        (background?.alpha() ?? 0) < 1 && styles.alphaBackground,
       )}
       ref={ref}
       {...rest}
