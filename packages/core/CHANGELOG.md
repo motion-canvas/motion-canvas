@@ -1,5 +1,36 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.12.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0-alpha.0) (2023-12-29)
+
+
+### Bug Fixes
+
+* support legacy imports again ([#868](https://github.com/motion-canvas/motion-canvas/issues/868)) ([77c4e2e](https://github.com/motion-canvas/motion-canvas/commit/77c4e2eeb8b0f73bdef1f72e3d81f34c79748929))
+
+
+### Features
+
+* **2d:** nested Txt nodes ([#861](https://github.com/motion-canvas/motion-canvas/issues/861)) ([f2786d0](https://github.com/motion-canvas/motion-canvas/commit/f2786d0cd0d06065ca1e9eb9f6b4c11a74b6c283)), closes [#540](https://github.com/motion-canvas/motion-canvas/issues/540)
+* **2d:** support tweening in applyState ([#859](https://github.com/motion-canvas/motion-canvas/issues/859)) ([b7ed2e2](https://github.com/motion-canvas/motion-canvas/commit/b7ed2e24773227e5b576ff056eb23de9b9ff1676))
+* add audio volume control through arrow keys ([#856](https://github.com/motion-canvas/motion-canvas/issues/856)) ([8b86fd4](https://github.com/motion-canvas/motion-canvas/commit/8b86fd4e70f91a0d5b1150d760427ca355666341))
+* add experimental features ([#876](https://github.com/motion-canvas/motion-canvas/issues/876)) ([498d387](https://github.com/motion-canvas/motion-canvas/commit/498d3871d05d4dcc83453654bec7762d2ab32e7e))
+* **core:** add static properties to Vector2 corresponding to Origins ([#855](https://github.com/motion-canvas/motion-canvas/issues/855)) ([9bbd249](https://github.com/motion-canvas/motion-canvas/commit/9bbd249e1f7864a49ff2da49bc18d9309888f902)), closes [#844](https://github.com/motion-canvas/motion-canvas/issues/844)
+* **core:** allow ordering of scenes during transition ([#832](https://github.com/motion-canvas/motion-canvas/issues/832)) ([7a62b59](https://github.com/motion-canvas/motion-canvas/commit/7a62b59c377dca8bf1f56bb551b47b9a75a6afba)), closes [#369](https://github.com/motion-canvas/motion-canvas/issues/369)
+* **core:** seek to beginning of timeline in disable loop mode ([#823](https://github.com/motion-canvas/motion-canvas/issues/823)) ([3595646](https://github.com/motion-canvas/motion-canvas/commit/359564645575c6f20870f4bf9642e72404717f14)), closes [#822](https://github.com/motion-canvas/motion-canvas/issues/822)
+* improve image error handling ([#847](https://github.com/motion-canvas/motion-canvas/issues/847)) ([db09d53](https://github.com/motion-canvas/motion-canvas/commit/db09d5305a3c0507b035e3cd347eaa65b23d7d2e))
+* introduce editor plugins ([#879](https://github.com/motion-canvas/motion-canvas/issues/879)) ([2b72007](https://github.com/motion-canvas/motion-canvas/commit/2b720074d45fc254dc40b534785b591ae44a3f37))
+* **ui:** small improvements ([#833](https://github.com/motion-canvas/motion-canvas/issues/833)) ([f44400c](https://github.com/motion-canvas/motion-canvas/commit/f44400c458a1d7f49520494f01efb9936f4df83e))
+* **ui:** timeline scrubbing ([#862](https://github.com/motion-canvas/motion-canvas/issues/862)) ([211b9a4](https://github.com/motion-canvas/motion-canvas/commit/211b9a4327720afd1ce0ff93868a501c2fd745aa)), closes [#286](https://github.com/motion-canvas/motion-canvas/issues/286)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

@@ -1,5 +1,39 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.12.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0-alpha.0) (2023-12-29)
+
+
+### Bug Fixes
+
+* **2d:** account for offset in cardinal points ([#883](https://github.com/motion-canvas/motion-canvas/issues/883)) ([24da258](https://github.com/motion-canvas/motion-canvas/commit/24da258f5937087b363eeb9146a9d22747b02e70)), closes [#882](https://github.com/motion-canvas/motion-canvas/issues/882)
+* **2d:** calculate Txt cache bbox from contents ([#836](https://github.com/motion-canvas/motion-canvas/issues/836)) ([33e1a12](https://github.com/motion-canvas/motion-canvas/commit/33e1a1296f21d26e9ed45ae92132825dca17054d)), closes [#465](https://github.com/motion-canvas/motion-canvas/issues/465)
+* **2d:** fix line jitter under certain conditions ([#863](https://github.com/motion-canvas/motion-canvas/issues/863)) ([fb110a2](https://github.com/motion-canvas/motion-canvas/commit/fb110a2f3583fc040bf2c39560934162bd146d9b))
+* **2d:** fix tweening cardinal points ([#829](https://github.com/motion-canvas/motion-canvas/issues/829)) ([cc16737](https://github.com/motion-canvas/motion-canvas/commit/cc16737cd59081582fbb488a880e8d3c11c14918))
+* support legacy imports again ([#868](https://github.com/motion-canvas/motion-canvas/issues/868)) ([77c4e2e](https://github.com/motion-canvas/motion-canvas/commit/77c4e2eeb8b0f73bdef1f72e3d81f34c79748929))
+
+
+### Features
+
+* **2d:** add playbackRate signal to Video component ([#831](https://github.com/motion-canvas/motion-canvas/issues/831)) ([5902b82](https://github.com/motion-canvas/motion-canvas/commit/5902b824b36400876be0ee970e2c6211299faf21)), closes [#711](https://github.com/motion-canvas/motion-canvas/issues/711)
+* **2d:** add querying helpers ([#852](https://github.com/motion-canvas/motion-canvas/issues/852)) ([614de6b](https://github.com/motion-canvas/motion-canvas/commit/614de6bd8542322d1db4b123b875f6fad85cc4eb))
+* **2d:** clamp opacity value between 0 and 1 ([#835](https://github.com/motion-canvas/motion-canvas/issues/835)) ([c54b2f8](https://github.com/motion-canvas/motion-canvas/commit/c54b2f837a8e8b872df3610f4cc6caa94a728500)), closes [#830](https://github.com/motion-canvas/motion-canvas/issues/830)
+* **2d:** nested Txt nodes ([#861](https://github.com/motion-canvas/motion-canvas/issues/861)) ([f2786d0](https://github.com/motion-canvas/motion-canvas/commit/f2786d0cd0d06065ca1e9eb9f6b4c11a74b6c283)), closes [#540](https://github.com/motion-canvas/motion-canvas/issues/540)
+* **2d:** support tweening in applyState ([#859](https://github.com/motion-canvas/motion-canvas/issues/859)) ([b7ed2e2](https://github.com/motion-canvas/motion-canvas/commit/b7ed2e24773227e5b576ff056eb23de9b9ff1676))
+* **2d:** support tweening Line points ([#853](https://github.com/motion-canvas/motion-canvas/issues/853)) ([4bf37d7](https://github.com/motion-canvas/motion-canvas/commit/4bf37d74d2e4bb9d9cc034aff121a32da9a6d146))
+* better children and spawners ([#858](https://github.com/motion-canvas/motion-canvas/issues/858)) ([9b5c23d](https://github.com/motion-canvas/motion-canvas/commit/9b5c23d2076180cf710656c817369a07b253e3ec))
+* improve image error handling ([#847](https://github.com/motion-canvas/motion-canvas/issues/847)) ([db09d53](https://github.com/motion-canvas/motion-canvas/commit/db09d5305a3c0507b035e3cd347eaa65b23d7d2e))
+* introduce editor plugins ([#879](https://github.com/motion-canvas/motion-canvas/issues/879)) ([2b72007](https://github.com/motion-canvas/motion-canvas/commit/2b720074d45fc254dc40b534785b591ae44a3f37))
+* **ui:** add custom presentation overlays ([#884](https://github.com/motion-canvas/motion-canvas/issues/884)) ([4696d3c](https://github.com/motion-canvas/motion-canvas/commit/4696d3c8cb8b68e3475406359f9cf6b875b1c838)), closes [#825](https://github.com/motion-canvas/motion-canvas/issues/825)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
