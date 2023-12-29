@@ -267,9 +267,19 @@ export interface Scene<T = unknown> {
   /**
    * Get the size of this scene.
    *
-   * Usually return `this.project.getSize()`.
+   * @remarks
+   * Usually returns `this.project.getSize()`.
    */
   getSize(): Vector2;
+
+  /**
+   * Get the real size of this scene.
+   *
+   * @remarks
+   * Returns the size of the scene multiplied by the resolution scale.
+   * This is the actual size of the canvas onto which the scene is rendered.
+   */
+  getRealSize(): Vector2;
 
   /**
    * Is this scene in the {@link SceneState.AfterTransitionIn} state?
@@ -304,6 +314,7 @@ export interface Scene<T = unknown> {
   /**
    * Is this scene cached?
    *
+   * @remarks
    * Used only by {@link GeneratorScene}. Seeking through a project that
    * contains at least one uncached scene will log a warning to the console.
    *
