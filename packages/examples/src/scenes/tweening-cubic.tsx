@@ -1,7 +1,5 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {tween, map, easeInOutCubic} from '@motion-canvas/core/lib/tweening';
+import {Circle, makeScene2D} from '@motion-canvas/2d';
+import {createRef, easeInOutCubic, map, tween} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();

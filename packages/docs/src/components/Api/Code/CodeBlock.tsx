@@ -1,10 +1,10 @@
-import React, {ReactNode} from 'react';
+import styles from '@docusaurus/theme-classic/lib/theme/CodeBlock/Content/styles.module.css';
 import {useCodeWordWrap} from '@docusaurus/theme-common/internal';
+import IconExternalLink from '@site/src/Icon/ExternalLink';
+import customStyles from '@site/src/components/Api/Code/styles.module.css';
 import {useTokenStyle} from '@site/src/contexts/codeTheme';
 import clsx from 'clsx';
-import styles from '@docusaurus/theme-classic/lib/theme/CodeBlock/Content/styles.module.css';
-import customStyles from '@site/src/components/Api/Code/styles.module.css';
-import IconExternalLink from '@site/src/Icon/ExternalLink';
+import React, {ReactNode} from 'react';
 
 export default function CodeBlock({
   children,

@@ -1,23 +1,25 @@
 const ts = require('typescript');
 const path = require('path');
 const fs = require('fs');
-const marked = require('marked');
+const {Marked} = require('marked');
+const {markedHighlight} = require('marked-highlight');
+const highlightJs = require('highlight.js');
 
-marked.setOptions({
-  headerIds: false,
-  highlight(code, lang) {
-    const highlightJs = require('highlight.js');
-    const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
-    return highlightJs.highlight(code, {language}).value;
-  },
-});
-marked.use({
-  renderer: {
-    link(href, title, text) {
-      return `<a href='${href}' target='_blank'>${text}</a>`;
+const marked = new Marked(
+  {
+    renderer: {
+      link(href, title, text) {
+        return `<a href='${href}' target='_blank'>${text}</a>`;
+      },
     },
   },
-});
+  markedHighlight({
+    highlight(code, lang) {
+      const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
+      return highlightJs.highlight(code, {language}).value;
+    },
+  }),
+);
 
 const transformerProgram = program => context => sourceFile => {
   const sourceMap = new Map();

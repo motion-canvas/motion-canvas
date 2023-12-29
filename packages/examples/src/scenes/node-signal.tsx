@@ -1,8 +1,5 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Circle, Txt, Line} from '@motion-canvas/2d/lib/components';
-import {createSignal} from '@motion-canvas/core/lib/signals';
-import {Vector2} from '@motion-canvas/core/lib/types';
-import {waitFor} from '@motion-canvas/core/lib/flow';
+import {Circle, Line, Txt, makeScene2D} from '@motion-canvas/2d';
+import {Vector2, createSignal, waitFor} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   // highlight-start

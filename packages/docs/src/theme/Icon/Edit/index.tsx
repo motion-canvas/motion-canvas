@@ -5,9 +5,9 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import clsx from 'clsx';
 import type {Props} from '@theme/Icon/Edit';
+import clsx from 'clsx';
+import React from 'react';
 
 import styles from './styles.module.css';
 

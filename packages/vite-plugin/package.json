@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "A Vite plugin for Motion Canvas projects",
   "main": "lib/index.js",
   "author": "motion-canvas",
@@ -8,8 +8,8 @@
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "scripts": {
-    "dev": "ttsc -w",
-    "build": "ttsc"
+    "dev": "tspc -w",
+    "build": "tspc"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "lib"
   ],
   "peerDependencies": {
-    "vite": "4.x"
+    "vite": "4.x || 5.x"
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
@@ -28,6 +28,7 @@
     "@types/node": "^18.14.0"
   },
   "dependencies": {
+    "fast-glob": "^3.3.1",
     "follow-redirects": "^1.15.2",
     "mime-types": "^2.1.35"
   }

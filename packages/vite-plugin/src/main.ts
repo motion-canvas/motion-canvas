@@ -1,23 +1,25 @@
-import type {Plugin, ResolvedConfig} from 'vite';
-import path from 'path';
+import fg from 'fast-glob';
 import fs from 'fs';
-import {Readable} from 'stream';
 import mime from 'mime-types';
+import * as os from 'os';
+import path from 'path';
+import {Readable} from 'stream';
+import type {Plugin, ResolvedConfig} from 'vite';
+import {openInExplorer} from './openInExplorer';
+import {PLUGIN_OPTIONS, PluginOptions, ProjectData, isPlugin} from './plugins';
 import {
-  motionCanvasCorsProxy,
   MotionCanvasCorsProxyOptions,
+  motionCanvasCorsProxy,
   setupEnvVarsForProxy,
 } from './proxy-middleware';
 import {getVersions} from './versions';
-import {PluginOptions, isPlugin, PLUGIN_OPTIONS, ProjectData} from './plugins';
-import {openInExplorer} from './openInExplorer';
-import * as os from 'os';
 
 const AudioExtensions = new Set(['.mp3', '.wav', '.ogg', '.aac', '.flac']);
 
 export interface MotionCanvasPluginConfig {
   /**
    * The import path of the project file or an array of paths.
+   * Also supports globs.
    *
    * @remarks
    * Each file must contain a default export exposing an instance of the
@@ -117,7 +119,26 @@ export default ({
   const outputPath = path.resolve(output);
   const projects: ProjectData[] = [];
   const projectLookup: Record<string, ProjectData> = {};
-  for (const url of typeof project === 'string' ? [project] : project) {
+
+  function expandFilePaths(filePaths: string[] | string): string[] {
+    const expandedFilePaths = [];
+
+    for (const filePath of typeof filePaths === 'string'
+      ? [filePaths]
+      : filePaths) {
+      if (fg.isDynamicPattern(filePath)) {
+        const matchingFilePaths = fg.sync(filePath, {onlyFiles: true});
+        expandedFilePaths.push(...matchingFilePaths);
+      } else {
+        expandedFilePaths.push(filePath);
+      }
+    }
+
+    return expandedFilePaths;
+  }
+
+  const projectList = expandFilePaths(project);
+  for (const url of projectList) {
     const {name, dir} = path.posix.parse(url);
     const metaFile = `${name}.meta`;
     const metaData = getMeta(path.join(dir, metaFile));
@@ -160,11 +181,12 @@ export default ({
           .map(plugin => plugin[PLUGIN_OPTIONS]),
       );
       await Promise.all(
-        plugins.map(plugin =>
-          plugin.config?.({
-            output: outputPath,
-            projects,
-          }),
+        plugins.map(
+          plugin =>
+            plugin.config?.({
+              output: outputPath,
+              projects,
+            }),
         ),
       );
       viteConfig = resolvedConfig;
@@ -208,7 +230,7 @@ export default ({
           const sceneFile = `${name}`;
 
           return source(
-            `import {ValueDispatcher} from '@motion-canvas/core/lib/events';`,
+            `import {ValueDispatcher} from '@motion-canvas/core';`,
             `import metaFile from './${metaFile}';`,
             `import description from './${sceneFile}';`,
             `description.name = '${name}';`,
@@ -261,8 +283,8 @@ export default ({
 
           return source(
             ...imports,
-            `import {bootstrap} from '@motion-canvas/core/lib/app';`,
-            `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
+            `import {bootstrap} from '@motion-canvas/core';`,
+            `import {MetaFile} from '@motion-canvas/core';`,
             `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
             `const settings = new MetaFile('settings', '${settingsId}');`,
@@ -287,7 +309,7 @@ export default ({
         const params = new URLSearchParams(query);
         if (params.has('img')) {
           return source(
-            `import {loadImage} from '@motion-canvas/core/lib/media';`,
+            `import {loadImage} from '@motion-canvas/core';`,
             `import image from '/@fs/${base}';`,
             `export default loadImage(image);`,
           );
@@ -305,7 +327,7 @@ export default ({
           urls = urls.filter(Boolean);
 
           return source(
-            `import {loadAnimation} from '@motion-canvas/core/lib/media';`,
+            `import {loadAnimation} from '@motion-canvas/core';`,
             ...urls.map(
               (url, index) => `import image${index} from '/@fs/${url}';`,
             ),
@@ -317,9 +339,10 @@ export default ({
       }
 
       if (ext === '.meta') {
-        const sourceFile = viteConfig.command === 'build' ? false : `'${id}'`;
+        const sourceFile =
+          viteConfig.command === 'build' ? false : JSON.stringify(id);
         return source(
-          `import {MetaFile} from '@motion-canvas/core/lib/meta';`,
+          `import {MetaFile} from '@motion-canvas/core';`,
           `let meta;`,
           `if (import.meta.hot) {`,
           `  meta = import.meta.hot.data.meta;`,
@@ -394,6 +417,9 @@ export default ({
         }
 
         if (name === '__open-output-path') {
+          if (!fs.existsSync(outputPath)) {
+            fs.mkdirSync(outputPath, {recursive: true});
+          }
           openInExplorer(outputPath);
           res.end();
           return;

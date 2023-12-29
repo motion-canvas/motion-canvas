@@ -1,7 +1,7 @@
 import {Color, ColorSpace, InterpolationMode, mix} from 'chroma-js';
-import type {Type} from './Type';
-import type {InterpolationFunction} from '../tweening';
 import {Signal, SignalContext, SignalValue} from '../signals';
+import type {InterpolationFunction} from '../tweening';
+import type {Type} from './Type';
 
 export type SerializedColor = string;
 

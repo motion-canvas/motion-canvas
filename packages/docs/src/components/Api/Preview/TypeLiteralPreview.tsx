@@ -1,11 +1,11 @@
 import React from 'react';
 
-import type {JSONOutput} from 'typedoc';
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
-import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
 import Preview from '@site/src/components/Api/Preview';
+import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
 import {useApiFinder} from '@site/src/contexts/api';
+import type {JSONOutput} from 'typedoc';
 
 export default function TypeLiteralPreview({
   reflection,

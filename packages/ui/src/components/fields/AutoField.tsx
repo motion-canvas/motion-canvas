@@ -1,12 +1,11 @@
-import {isType} from '@motion-canvas/core/lib/types/Type';
+import {Color, Spacing, Vector2, isType} from '@motion-canvas/core';
 import {FunctionComponent} from 'preact';
-import {Color, Spacing, Vector2} from '@motion-canvas/core/lib/types';
-import {Vector2Field} from './Vector2Field';
-import {UnknownField} from './UnknownField';
-import {NumberField} from './NumberField';
-import {ColorField} from './ColorField';
-import {SpacingField} from './SpacingField';
 import {ArrayField} from './ArrayField';
+import {ColorField} from './ColorField';
+import {NumberField} from './NumberField';
+import {SpacingField} from './SpacingField';
+import {UnknownField} from './UnknownField';
+import {Vector2Field} from './Vector2Field';
 
 export interface AutoFieldProps {
   value: any;

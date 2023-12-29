@@ -1,53 +1,53 @@
-import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {basicSetup} from 'codemirror';
-import {EditorView, keymap} from '@codemirror/view';
-import {Text, EditorState} from '@codemirror/state';
+import {indentWithTab} from '@codemirror/commands';
 import {javascript} from '@codemirror/lang-javascript';
 import {syntaxHighlighting} from '@codemirror/language';
-import {indentWithTab} from '@codemirror/commands';
+import {EditorState, Text} from '@codemirror/state';
+import {EditorView, keymap} from '@codemirror/view';
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import {useLocation} from '@docusaurus/router';
 import type {Player} from '@motion-canvas/core';
-import {
-  EditorTheme,
-  SyntaxHighlightStyle,
-} from '@site/src/components/Fiddle/themes';
-import CodeBlock from '@theme/CodeBlock';
-import {useSubscribableValue} from '@site/src/utils/useSubscribable';
-import {SkipPrevious} from '@site/src/Icon/SkipPrevious';
-import {SkipNext} from '@site/src/Icon/SkipNext';
-import {PlayArrow} from '@site/src/Icon/PlayArrow';
-import {Pause} from '@site/src/Icon/Pause';
-import IconText from '@site/src/Icon/Text';
-import IconSplit from '@site/src/Icon/Split';
 import IconImage from '@site/src/Icon/Image';
-import {autocomplete} from '@site/src/components/Fiddle/autocomplete';
+import {Pause} from '@site/src/Icon/Pause';
+import {PlayArrow} from '@site/src/Icon/PlayArrow';
+import {SkipNext} from '@site/src/Icon/SkipNext';
+import {SkipPrevious} from '@site/src/Icon/SkipPrevious';
+import IconSplit from '@site/src/Icon/Split';
+import IconText from '@site/src/Icon/Text';
+import Dropdown from '@site/src/components/Dropdown';
 import {
   borrowPlayer,
   disposePlayer,
   tryBorrowPlayer,
   updatePlayer,
 } from '@site/src/components/Fiddle/SharedPlayer';
-import styles from './styles.module.css';
+import {autocomplete} from '@site/src/components/Fiddle/autocomplete';
 import {
-  compileScene,
-  transform,
-  TransformError,
-} from '@site/src/components/Fiddle/transformer';
-import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
-import Dropdown from '@site/src/components/Dropdown';
-import clsx from 'clsx';
+  clearErrors,
+  errorExtension,
+  underlineErrors,
+} from '@site/src/components/Fiddle/errorHighlighting';
 import {
   areImportsFolded,
   findImportRange,
   foldImports,
   folding,
 } from '@site/src/components/Fiddle/folding';
-import {useLocation} from '@docusaurus/router';
-import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import {parseFiddle} from '@site/src/components/Fiddle/parseFiddle';
 import {
-  clearErrors,
-  errorExtension,
-  underlineErrors,
-} from '@site/src/components/Fiddle/errorHighlighting';
+  EditorTheme,
+  SyntaxHighlightStyle,
+} from '@site/src/components/Fiddle/themes';
+import {
+  TransformError,
+  compileScene,
+  transform,
+} from '@site/src/components/Fiddle/transformer';
+import {useSubscribableValue} from '@site/src/utils/useSubscribable';
+import CodeBlock from '@theme/CodeBlock';
+import clsx from 'clsx';
+import {basicSetup} from 'codemirror';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import styles from './styles.module.css';
 
 export interface FiddleProps {
   className?: string;
@@ -281,7 +281,12 @@ export default function Fiddle({
             </button>
           )}
         </div>
-        <div className={styles.section}>
+        <div
+          className={clsx(
+            styles.section,
+            duration === 0 && player && styles.disabled,
+          )}
+        >
           <button
             className={styles.icon}
             onClick={() => player?.requestPreviousFrame()}

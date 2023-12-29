@@ -1,5 +1,5 @@
-import styles from './Controls.module.scss';
 import clsx from 'clsx';
+import styles from './Controls.module.scss';
 
 export interface SelectProps<T> {
   title?: string;

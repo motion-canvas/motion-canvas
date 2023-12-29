@@ -1,8 +1,8 @@
-import React, {useEffect} from 'react';
-import NavbarLink from '@site/src/components/NavbarLink/Link';
-import IconDiscord from '@site/src/Icon/Discord';
-import useStorage from '@site/src/utils/useStorage';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import IconDiscord from '@site/src/Icon/Discord';
+import NavbarLink from '@site/src/components/NavbarLink/Link';
+import useStorage from '@site/src/utils/useStorage';
+import React, {useEffect} from 'react';
 
 export default function DiscordNavbarLink() {
   const {siteConfig} = useDocusaurusContext();

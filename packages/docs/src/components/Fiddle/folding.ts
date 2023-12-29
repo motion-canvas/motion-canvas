@@ -1,10 +1,10 @@
-import {EditorState, Extension} from '@codemirror/state';
 import {
-  foldService,
-  syntaxTree,
   foldEffect,
+  foldService,
   foldState,
+  syntaxTree,
 } from '@codemirror/language';
+import {EditorState, Extension} from '@codemirror/state';
 import {EditorView} from '@codemirror/view';
 
 const FoldOffset = 'import '.length;

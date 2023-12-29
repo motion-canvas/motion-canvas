@@ -1,4 +1,10 @@
+import {RendererState} from '@motion-canvas/core';
+import clsx from 'clsx';
+import {useEffect, useState} from 'preact/hooks';
+import {useApplication} from '../../contexts';
 import {useDuration, useRendererState} from '../../hooks';
+import {useShortcut} from '../../hooks/useShortcut';
+import {formatDuration} from '../../utils';
 import {
   PlaybackControls,
   PlaybackProgress,
@@ -6,14 +12,9 @@ import {
 } from '../playback';
 import {CurrentTime} from '../playback/CurrentTime';
 import {EditorPreview} from './EditorPreview';
-import styles from './Viewport.module.scss';
-import {useApplication} from '../../contexts';
-import {CustomStage} from './CustomStage';
-import {RendererState} from '@motion-canvas/core';
-import {useShortcut} from '../../hooks/useShortcut';
-import {formatDuration} from '../../utils';
-import {useEffect, useState} from 'preact/hooks';
+import {StageView} from './StageView';
 import {Timestamp} from './Timestamp';
+import styles from './Viewport.module.scss';
 
 export function Viewport() {
   const state = useRendererState();
@@ -37,15 +38,18 @@ function EditorViewport() {
           render={time => (
             <Timestamp
               className={styles.time}
-              title="Current Time"
+              title="Current time"
+              frameTitle="Current frame"
               frame={time}
             />
           )}
         />
         <PlaybackControls />
         <Timestamp
+          reverse
           className={styles.duration}
           title="Duration"
+          frameTitle="Duration in frames"
           frame={duration}
         />
       </div>
@@ -66,7 +70,10 @@ function RenderingViewport() {
 
   return (
     <div className={styles.root}>
-      <CustomStage stage={renderer.stage} />
+      <StageView
+        stage={renderer.stage}
+        className={clsx(styles.viewport, styles.renderingPreview)}
+      />
       <RenderingProgress />
       <div className={styles.playback}>
         <code

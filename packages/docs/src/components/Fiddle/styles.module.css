@@ -59,6 +59,11 @@
   padding: 8px;
 }
 
+.section.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .section:first-child {
   flex-basis: 100%;
   justify-content: start;

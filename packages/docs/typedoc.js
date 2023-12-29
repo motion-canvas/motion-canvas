@@ -57,14 +57,14 @@ module.exports = () => ({
         excludeInternal: true,
         excludePrivate: true,
         entryPoints: [
-          '../2d/src/components',
-          '../2d/src/curves',
-          '../2d/src/decorators',
-          '../2d/src/partials',
-          '../2d/src/scenes',
-          '../2d/src/utils',
+          '../2d/src/lib/components',
+          '../2d/src/lib/curves',
+          '../2d/src/lib/decorators',
+          '../2d/src/lib/partials',
+          '../2d/src/lib/scenes',
+          '../2d/src/lib/utils',
         ],
-        tsconfig: '../2d/tsconfig.json',
+        tsconfig: '../2d/src/lib/tsconfig.json',
       },
       '2d',
       core,
@@ -303,6 +303,31 @@ async function parseTypes(options, projectName, externalProject) {
       return item instanceof Reflection;
     },
     toObject(item, obj) {
+      obj.experimental = isExperimental(item);
+
+      if (!obj.experimental && item instanceof DeclarationReflection) {
+        const signatures = [
+          ...(obj.signatures ?? []),
+          obj.setSignature,
+          obj.getSignature,
+          obj.indexSignature,
+        ].filter(item => !!item);
+
+        obj.experimental = signatures.some(signature =>
+          isExperimental(lookup[signature.id]),
+        );
+      }
+
+      return obj;
+    },
+  });
+
+  app.serializer.addSerializer({
+    priority: -Infinity,
+    supports(item) {
+      return item instanceof Reflection;
+    },
+    toObject(item, obj) {
       urlLookup[item.href] = {
         id: item.id,
         projectId: project.id,
@@ -398,4 +423,19 @@ function partsToText(parts) {
       return part.text;
     })
     .join('');
+}
+
+function isExperimental(reflection) {
+  const tags = reflection?.comment?.modifierTags;
+  if (!tags) return false;
+
+  if (typeof tags === 'string') {
+    return tags === '@experimental';
+  }
+
+  if (Array.isArray(tags)) {
+    return tags.some(tag => tag === '@experimental');
+  }
+
+  return tags.has('@experimental');
 }

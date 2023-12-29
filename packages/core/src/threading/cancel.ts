@@ -1,5 +1,5 @@
-import {ThreadGenerator} from './ThreadGenerator';
 import {useThread} from '../utils';
+import {ThreadGenerator} from './ThreadGenerator';
 
 /**
  * Cancel all listed tasks.

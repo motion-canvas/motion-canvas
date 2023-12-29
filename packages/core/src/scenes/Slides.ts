@@ -1,6 +1,6 @@
-import type {Scene} from './Scene';
 import {PlaybackState} from '../app/PlaybackManager';
 import {ValueDispatcher} from '../events';
+import type {Scene} from './Scene';
 
 export interface Slide {
   id: string;

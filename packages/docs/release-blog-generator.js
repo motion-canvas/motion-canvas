@@ -23,7 +23,7 @@ async function gitLog(from, to) {
 
 async function gitTags() {
   const tags = await runBash(
-    `git for-each-ref --sort=taggerdate --format %(refname:short) refs/tags`,
+    `git for-each-ref --sort=taggerdate --format "%(refname:short)" refs/tags`,
   );
   return tags
     .trim()

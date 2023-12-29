@@ -1,11 +1,12 @@
 import styles from './Playback.module.scss';
 
-import {IconButton, IconCheckbox, Input, Select} from '../controls';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
-import {Framerate} from './Framerate';
 import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
+import {useDocumentEvent, usePlayerState} from '../../hooks';
+import {IconButton, IconCheckbox, Input, Select, Slider} from '../controls';
 import {
+  FastForward,
+  FastRewind,
   Pause,
   PhotoCamera,
   PlayArrow,
@@ -15,6 +16,7 @@ import {
   VolumeOff,
   VolumeOn,
 } from '../icons';
+import {Framerate} from './Framerate';
 
 export function PlaybackControls() {
   const {player, renderer, meta, project} = useApplication();
@@ -53,6 +55,12 @@ export function PlaybackControls() {
           case 'm':
             player.toggleAudio();
             break;
+          case 'ArrowUp':
+            player.addAudioVolume(0.1);
+            break;
+          case 'ArrowDown':
+            player.addAudioVolume(-0.1);
+            break;
           case 'l':
             player.toggleLoop();
             break;
@@ -76,19 +84,43 @@ export function PlaybackControls() {
         value={state.speed}
         onChange={speed => player.setSpeed(speed)}
       />
-      <IconCheckbox
-        titleOn="Mute audio [M]"
-        titleOff="Unmute audio [M]"
-        checked={!state.muted}
-        onChange={value => player.toggleAudio(value)}
+      <div className={styles.volumeTrigger}>
+        <IconCheckbox
+          titleOn="Mute audio [M]"
+          titleOff="Unmute audio [M]"
+          checked={!state.muted}
+          onChange={value => player.toggleAudio(value)}
+        >
+          {state.muted ? <VolumeOff /> : <VolumeOn />}
+        </IconCheckbox>
+
+        {!state.muted && (
+          <div className={styles.volumeMargin}>
+            <div className={styles.volume}>
+              <Slider
+                value={state.volume}
+                onChange={volume => {
+                  if (isNaN(volume)) {
+                    volume = 0;
+                  }
+                  player.setAudioVolume(volume);
+                }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      <IconButton
+        title="Start [Shift + Left arrow]"
+        onClick={() => player.requestReset()}
       >
-        {state.muted ? <VolumeOff /> : <VolumeOn />}
-      </IconCheckbox>
+        <SkipPrevious />
+      </IconButton>
       <IconButton
         title="Previous frame [Left arrow]"
         onClick={() => player.requestPreviousFrame()}
       >
-        <SkipPrevious />
+        <FastRewind />
       </IconButton>
       <IconCheckbox
         main
@@ -102,6 +134,12 @@ export function PlaybackControls() {
       <IconButton
         title="Next frame [Right arrow]"
         onClick={() => player.requestNextFrame()}
+      >
+        <FastForward />
+      </IconButton>
+      <IconButton
+        title="End [Shift + Right arrow]"
+        onClick={() => player.requestSeek(Infinity)}
       >
         <SkipNext />
       </IconButton>

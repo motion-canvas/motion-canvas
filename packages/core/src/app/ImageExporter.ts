@@ -1,8 +1,4 @@
-import {CanvasOutputMimeType} from '../types';
-import type {Project} from './Project';
-import type {Exporter} from './Exporter';
-import type {Logger} from './Logger';
-import type {RendererSettings} from './Renderer';
+import {EventDispatcher} from '../events';
 import {
   BoolMetaField,
   EnumMetaField,
@@ -11,8 +7,12 @@ import {
   ValueOf,
 } from '../meta';
 import {clamp} from '../tweening';
+import {CanvasOutputMimeType} from '../types';
+import type {Exporter} from './Exporter';
+import type {Logger} from './Logger';
+import type {Project} from './Project';
+import type {RendererSettings} from './Renderer';
 import {FileTypes} from './presets';
-import {EventDispatcher} from '../events';
 
 const EXPORT_FRAME_LIMIT = 256;
 const EXPORT_RETRY_DELAY = 1000;

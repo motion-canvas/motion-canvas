@@ -1,13 +1,13 @@
 import React from 'react';
 import styles from './styles.module.css';
 
-import CodeBlock from '@theme/CodeBlock';
 import Link from '@docusaurus/Link';
 import YouTubeVideo from '@site/src/components/YouTubeVideo';
+import CodeBlock from '@theme/CodeBlock';
 
 import UI from '@site/static/img/ui.svg';
 
-const CodeSample = `export makeScene(function* (view) {
+const CodeSample = `export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();
   view.add(
     <Circle 

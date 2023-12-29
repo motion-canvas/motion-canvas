@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import {HighlightStyle} from '@codemirror/language';
-import {tags} from '@lezer/highlight';
 import {EditorView} from '@codemirror/view';
+import {tags} from '@lezer/highlight';
 
 export const SyntaxHighlightStyle = HighlightStyle.define([
   {tag: tags.comment, color: 'var(--hl-comment)'},

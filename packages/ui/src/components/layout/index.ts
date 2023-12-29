@@ -1,5 +1,5 @@
-export * from './ElementSwitch';
 export * from './Collapse';
+export * from './ElementSwitch';
 export * from './Header';
-export * from './ResizeableLayout';
 export * from './Navigation';
+export * from './ResizeableLayout';

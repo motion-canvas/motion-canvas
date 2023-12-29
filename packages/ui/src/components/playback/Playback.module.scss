@@ -18,3 +18,24 @@
     width: 100px;
   }
 }
+
+.volumeTrigger {
+  position: relative;
+}
+
+.volumeMargin {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  padding-bottom: 18px;
+  display: none;
+}
+.volume {
+  padding: 12px 0;
+  border-radius: var(--radius);
+  background-color: var(--surface-color);
+}
+.volumeTrigger:hover .volumeMargin {
+  display: block;
+}

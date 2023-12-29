@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../../editor",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  },
+  "references": [{"path": "../lib/tsconfig.json"}],
+  "include": ["**/*"]
+}

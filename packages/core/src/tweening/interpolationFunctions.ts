@@ -1,5 +1,5 @@
-import {useLogger} from '../utils';
 import {Vector2} from '../types';
+import {useLogger} from '../utils';
 
 export interface InterpolationFunction<T, TRest extends any[] = any[]> {
   (from: T, to: T, value: number, ...args: TRest): T;
@@ -137,6 +137,10 @@ export function deepLerp(
 
   // fallback with an immediate jump to the new value
   return to;
+}
+
+export function boolLerp<T>(from: T, to: T, value: number): T {
+  return value < 0.5 ? from : to;
 }
 
 export function map(from: number, to: number, value: number) {

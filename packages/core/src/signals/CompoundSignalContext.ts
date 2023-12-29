@@ -111,4 +111,19 @@ export class CompoundSignalContext<
     }
     return this.owner;
   }
+
+  public override isInitial(): boolean {
+    for (const [, signal] of this.signals) {
+      if (!signal.isInitial()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public override raw() {
+    return Object.fromEntries(
+      this.signals.map(([key, property]) => [key, property.context.raw()]),
+    ) as TSetterValue;
+  }
 }

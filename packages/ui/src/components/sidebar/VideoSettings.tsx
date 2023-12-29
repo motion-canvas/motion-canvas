@@ -1,11 +1,11 @@
-import {useRendererState, useStorage} from '../../hooks';
-import {Button, ButtonSelect, Group, Label} from '../controls';
-import {Pane} from '../tabs';
-import {useApplication} from '../../contexts';
-import {Expandable} from '../fields';
 import {RendererState} from '@motion-canvas/core';
-import {MetaFieldView} from '../meta';
+import {useApplication} from '../../contexts';
+import {useRendererState, useStorage} from '../../hooks';
 import {openOutputPath} from '../../utils';
+import {Button, ButtonSelect, Group, Label, Separator} from '../controls';
+import {Expandable} from '../fields';
+import {MetaFieldView} from '../meta';
+import {Pane} from '../tabs';
 
 export function VideoSettings() {
   const {meta} = useApplication();
@@ -16,27 +16,28 @@ export function VideoSettings() {
       <Expandable title={meta.shared.name} open>
         <MetaFieldView field={meta.shared} />
       </Expandable>
-      <Expandable title={meta.preview.name}>
+      <Expandable title={meta.preview.name} open>
         <MetaFieldView field={meta.preview} />
       </Expandable>
-      <Expandable title={meta.rendering.name}>
+      <Expandable title={meta.rendering.name} open>
         <MetaFieldView field={meta.rendering} />
-      </Expandable>
-      <Group>
-        <Label />
-        <ProcessButton processId={processId} setProcess={setProcess} />
-      </Group>
-      {processId === 0 && (
+        <Separator />
         <Group>
           <Label />
-          <Button
-            title="Reveal the output directory in file explorer"
-            onClick={openOutputPath}
-          >
-            Output Directory
-          </Button>
+          <ProcessButton processId={processId} setProcess={setProcess} />
         </Group>
-      )}
+        {processId === 0 && (
+          <Group>
+            <Label />
+            <Button
+              title="Reveal the output directory in file explorer"
+              onClick={openOutputPath}
+            >
+              Output Directory
+            </Button>
+          </Group>
+        )}
+      </Expandable>
     </Pane>
   );
 }

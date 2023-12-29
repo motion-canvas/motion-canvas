@@ -286,3 +286,35 @@
     }
   }
 }
+
+.slider {
+  display: flex;
+  justify-content: center;
+  height: 120px;
+  width: 24px;
+  cursor: pointer;
+}
+
+.sliderTrack {
+  position: relative;
+  display: flex;
+  align-items: end;
+  width: 2px;
+  border-radius: var(--radius);
+  background-color: var(--background-color-dark);
+}
+
+.sliderProgress {
+  width: 2px;
+  border-radius: var(--radius);
+  background-color: var(--theme);
+}
+
+.sliderThumb {
+  width: 8px;
+  height: 8px;
+  margin-left: -3px;
+  margin-top: -4px;
+  border-radius: 4px;
+  background-color: var(--theme);
+}

@@ -1,23 +1,24 @@
-import {Project} from './Project';
-import {PlaybackManager, PlaybackState} from './PlaybackManager';
-import {AudioManager} from '../media';
-import {clamp} from '../tweening';
-import {Logger} from './Logger';
 import {
   AsyncEventDispatcher,
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
+import {AudioManager} from '../media';
 import {Scene} from '../scenes';
-import {Vector2} from '../types';
-import {PlaybackStatus} from './PlaybackStatus';
-import {Semaphore} from '../utils';
 import {EditableTimeEvents} from '../scenes/timeEvents';
+import {clamp} from '../tweening';
+import {Vector2} from '../types';
+import {Semaphore} from '../utils';
+import {Logger} from './Logger';
+import {PlaybackManager, PlaybackState} from './PlaybackManager';
+import {PlaybackStatus} from './PlaybackStatus';
+import {Project} from './Project';
 
 export interface PlayerState extends Record<string, unknown> {
   paused: boolean;
   loop: boolean;
   muted: boolean;
+  volume: number;
   speed: number;
 }
 
@@ -127,6 +128,7 @@ export class Player {
     this.playerState = new ValueDispatcher<PlayerState>({
       loop: true,
       muted: true,
+      volume: 1,
       speed: 1,
       ...initialState,
       paused: true,
@@ -205,6 +207,24 @@ export class Player {
     }
   }
 
+  /**
+   * Whether the given frame is inside the animation range.
+   *
+   * @param frame - The frame to check.
+   */
+  public isInRange(frame: number): boolean {
+    return frame >= 0 && frame <= this.playback.duration;
+  }
+
+  /**
+   * Whether the given frame is inside the user-defined range.
+   *
+   * @param frame - The frame to check.
+   */
+  public isInUserRange(frame: number): boolean {
+    return frame >= this.startFrame && frame <= this.endFrame;
+  }
+
   public requestSeek(value: number): void {
     this.requestedSeek = this.clampRange(value);
   }
@@ -258,6 +278,20 @@ export class Player {
         muted: !value,
       };
     }
+  }
+
+  public setAudioVolume(value: number): void {
+    const clampedValue = clamp(0, 1, value);
+    if (clampedValue !== this.playerState.current.volume) {
+      this.playerState.current = {
+        ...this.playerState.current,
+        volume: clampedValue,
+      };
+    }
+  }
+
+  public addAudioVolume(value: number): void {
+    this.setAudioVolume(this.playerState.current.volume + value);
   }
 
   public setSpeed(value: number) {
@@ -338,12 +372,15 @@ export class Player {
     }
 
     // Pause if reached the end or the range is 0
+    // Seek to the beginning for non-empty scenes
     if (
       (!state.loop && this.finished && !state.paused && state.seek < 0) ||
       this.endFrame === this.startFrame
     ) {
       this.togglePlayback(false);
       state.paused = true;
+      state.seek =
+        this.endFrame === this.startFrame ? state.seek : this.startFrame;
     }
 
     // Seek to the beginning if looping is enabled
@@ -362,6 +399,7 @@ export class Player {
       this.syncAudio(-3);
     }
     this.audio.setMuted(state.muted);
+    this.audio.setVolume(state.volume);
 
     return state;
   }
@@ -374,7 +412,7 @@ export class Player {
       : PlaybackState.Playing;
 
     // Seek to the given frame
-    if (state.seek >= 0 || !this.isInRange(this.status.frame)) {
+    if (state.seek >= 0 || !this.isInUserRange(this.status.frame)) {
       const seekFrame = state.seek < 0 ? this.status.frame : state.seek;
       const clampedFrame = this.clampRange(seekFrame);
       this.logger.profile('seek time');
@@ -458,12 +496,8 @@ export class Player {
     });
   }
 
-  private clampRange(frame: number): number {
+  public clampRange(frame: number): number {
     return clamp(this.startFrame, this.endFrame, frame);
-  }
-
-  private isInRange(frame: number): boolean {
-    return frame >= this.startFrame && frame <= this.endFrame;
   }
 
   private syncAudio(frameOffset = 0) {

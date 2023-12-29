@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "module": "esnext",
+    "target": "es2020",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "inlineSourceMap": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "composite": true
+  }
+}

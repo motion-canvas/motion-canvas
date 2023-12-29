@@ -1,28 +1,32 @@
 import styles from './Timeline.module.scss';
 
+import {effect, useSignal} from '@preact/signals';
+import clsx from 'clsx';
 import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
+import {
+  TimelineContextProvider,
+  TimelineState,
+  useApplication,
+} from '../../contexts';
 import {
   useDocumentEvent,
   useDuration,
   usePreviewSettings,
+  useReducedMotion,
   useSize,
   useStateChange,
   useStorage,
 } from '../../hooks';
-import {Playhead} from './Playhead';
-import {Timestamps} from './Timestamps';
-import {LabelTrack} from './LabelTrack';
-import {SceneTrack} from './SceneTrack';
-import {RangeSelector} from './RangeSelector';
-import {clamp} from '../../utils';
-import {AudioTrack} from './AudioTrack';
-import {
-  useApplication,
-  TimelineContextProvider,
-  TimelineState,
-} from '../../contexts';
-import clsx from 'clsx';
 import {useShortcut} from '../../hooks/useShortcut';
+import {labelClipDraggingLeftSignal} from '../../signals';
+import {MouseButton, MouseMask, clamp} from '../../utils';
+import {borderHighlight} from '../animations';
+import {AudioTrack} from './AudioTrack';
+import {LabelTrack} from './LabelTrack';
+import {Playhead} from './Playhead';
+import {RangeSelector} from './RangeSelector';
+import {SceneTrack} from './SceneTrack';
+import {Timestamps} from './Timestamps';
 
 const ZOOM_SPEED = 0.1;
 const ZOOM_MIN = 0.5;
@@ -34,11 +38,15 @@ export function Timeline() {
   const {player} = useApplication();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
+  const rangeRef = useRef<HTMLDivElement>();
   const duration = useDuration();
   const {fps} = usePreviewSettings();
   const rect = useSize(containerRef);
   const [offset, setOffset] = useStorage('timeline-offset', 0);
   const [scale, setScale] = useStorage('timeline-scale', 1);
+  const reduceMotion = useReducedMotion();
+  const seeking = useSignal<number | null>(null);
+  const warnedAboutRange = useRef(false);
   const isReady = duration > 0;
 
   useLayoutEffect(() => {
@@ -138,6 +146,40 @@ export function Timeline() {
     containerRef.current.scrollLeft = offset;
   }, [scale]);
 
+  effect(() => {
+    const offset = labelClipDraggingLeftSignal.value;
+    if (offset !== null && playheadRef.current) {
+      playheadRef.current.style.left = `${
+        state.framesToPixels(player.status.secondsToFrames(offset)) +
+        sizes.paddingLeft
+      }px`;
+    }
+  });
+
+  const scrub = (x: number) => {
+    const frame = Math.floor(
+      state.pixelsToFrames(offset - sizes.paddingLeft + x - rect.x),
+    );
+
+    seeking.value = player.clampRange(frame);
+    if (player.onFrameChanged.current !== frame) {
+      player.requestSeek(frame);
+    }
+
+    const isInUserRange = player.isInUserRange(frame);
+    const isOutOfRange = player.isInRange(frame) && !isInUserRange;
+    if (!warnedAboutRange && !reduceMotion && isOutOfRange) {
+      warnedAboutRange.current = true;
+      rangeRef.current?.animate(borderHighlight(), {
+        duration: 200,
+      });
+    }
+
+    if (isInUserRange) {
+      warnedAboutRange.current = false;
+    }
+  };
+
   return (
     <TimelineContextProvider state={state}>
       <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
@@ -187,45 +229,53 @@ export function Timeline() {
             }px`;
           }}
           onPointerDown={event => {
-            if (event.button === 1) {
+            if (event.button === MouseButton.Left) {
+              event.preventDefault();
+              event.currentTarget.setPointerCapture(event.pointerId);
+              playheadRef.current.style.display = 'none';
+              scrub(event.x);
+            } else if (event.button === MouseButton.Middle) {
               event.preventDefault();
               event.currentTarget.setPointerCapture(event.pointerId);
               containerRef.current.style.cursor = 'grabbing';
             }
           }}
           onPointerMove={event => {
-            playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
             if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-              const newOffset = clamp(
-                0,
-                sizes.playableLength,
-                offset - event.movementX,
-              );
-              setOffset(newOffset);
-              containerRef.current.scrollLeft = newOffset;
+              if (event.buttons & MouseMask.Primary) {
+                scrub(event.x);
+              } else if (event.buttons & MouseMask.Auxiliary) {
+                const newOffset = clamp(
+                  0,
+                  sizes.playableLength,
+                  offset - event.movementX,
+                );
+                setOffset(newOffset);
+                containerRef.current.scrollLeft = newOffset;
+              }
+            } else if (labelClipDraggingLeftSignal.value === null) {
+              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
             }
           }}
           onPointerUp={event => {
-            if (event.button === 1) {
+            if (labelClipDraggingLeftSignal.value === null) {
+              playheadRef.current.style.left = `${event.x - rect.x + offset}px`;
+            }
+            if (
+              event.button === MouseButton.Left ||
+              event.button === MouseButton.Middle
+            ) {
+              seeking.value = null;
+              warnedAboutRange.current = false;
               event.currentTarget.releasePointerCapture(event.pointerId);
               containerRef.current.style.cursor = '';
+              playheadRef.current.style.display = '';
             }
           }}
         >
           <div
             className={styles.timeline}
             style={{width: `${sizes.fullLength}px`}}
-            onMouseUp={event => {
-              if (event.button === 0) {
-                player.requestSeek(
-                  Math.floor(
-                    state.pixelsToFrames(
-                      offset - sizes.paddingLeft + event.x - rect.x,
-                    ),
-                  ),
-                );
-              }
-            }}
           >
             <div
               className={styles.timelineContent}
@@ -234,14 +284,14 @@ export function Timeline() {
                 left: `${sizes.paddingLeft}px`,
               }}
             >
-              <RangeSelector />
+              <RangeSelector rangeRef={rangeRef} />
               <Timestamps />
               <div className={styles.trackContainer}>
                 <SceneTrack />
                 <LabelTrack />
                 <AudioTrack />
               </div>
-              <Playhead />
+              <Playhead seeking={seeking} />
             </div>
           </div>
           <div ref={playheadRef} className={styles.playheadPreview} />

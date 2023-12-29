@@ -1,8 +1,8 @@
 import {decorate, threadable} from '../decorators';
-import {Thread} from './Thread';
-import {isThreadGenerator, ThreadGenerator} from './ThreadGenerator';
-import {setTaskName} from './names';
 import {usePlayback} from '../utils';
+import {Thread} from './Thread';
+import {ThreadGenerator, isThreadGenerator} from './ThreadGenerator';
+import {setTaskName} from './names';
 
 /**
  * Check if the given value is a [Promise][promise].

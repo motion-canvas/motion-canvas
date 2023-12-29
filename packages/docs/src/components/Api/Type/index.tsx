@@ -1,21 +1,21 @@
-import React, {useMemo} from 'react';
-import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
-import IntrinsicType from '@site/src/components/Api/Type/IntrinsicType';
-import TupleType from '@site/src/components/Api/Type/TupleType';
 import ArrayType from '@site/src/components/Api/Type/ArrayType';
-import UnionType from '@site/src/components/Api/Type/UnionType';
-import LiteralType from '@site/src/components/Api/Type/LiteralType';
-import PredicateType from '@site/src/components/Api/Type/PredicateType';
-import ReflectionType from '@site/src/components/Api/Type/ReflectionType';
-import IntersectionType from '@site/src/components/Api/Type/IntersectionType';
-import TemplateLiteralType from '@site/src/components/Api/Type/TemplateLiteralType';
-import QueryType from '@site/src/components/Api/Type/QueryType';
 import ConditionalType from '@site/src/components/Api/Type/ConditionalType';
-import InferredType from '@site/src/components/Api/Type/InferredType';
 import IndexedAccessType from '@site/src/components/Api/Type/IndexedAccessType';
-import TypeOperatorType from '@site/src/components/Api/Type/TypeOperatorType';
+import InferredType from '@site/src/components/Api/Type/InferredType';
+import IntersectionType from '@site/src/components/Api/Type/IntersectionType';
+import IntrinsicType from '@site/src/components/Api/Type/IntrinsicType';
+import LiteralType from '@site/src/components/Api/Type/LiteralType';
 import MappedType from '@site/src/components/Api/Type/MappedType';
 import NamedTupleMemberType from '@site/src/components/Api/Type/NamedTupleMemberType';
+import PredicateType from '@site/src/components/Api/Type/PredicateType';
+import QueryType from '@site/src/components/Api/Type/QueryType';
+import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
+import ReflectionType from '@site/src/components/Api/Type/ReflectionType';
+import TemplateLiteralType from '@site/src/components/Api/Type/TemplateLiteralType';
+import TupleType from '@site/src/components/Api/Type/TupleType';
+import TypeOperatorType from '@site/src/components/Api/Type/TypeOperatorType';
+import UnionType from '@site/src/components/Api/Type/UnionType';
+import React, {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export interface CodeTypeProps {

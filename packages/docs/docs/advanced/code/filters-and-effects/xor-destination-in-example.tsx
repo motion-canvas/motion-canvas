@@ -1,4 +1,4 @@
-import {Img, makeScene2D, Node, Circle} from '@motion-canvas/2d';
+import {Circle, Img, Node, makeScene2D} from '@motion-canvas/2d';
 import {createRef, easeInOutSine, linear} from '@motion-canvas/core';
 
 /*

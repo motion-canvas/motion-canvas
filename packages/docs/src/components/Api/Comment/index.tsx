@@ -1,9 +1,10 @@
+import {Collapsible} from '@docusaurus/theme-common';
+import Summary from '@site/src/components/Api/Comment/Summary';
+import ExperimentalWarning from '@site/src/components/ExperimentalWarning';
+import clsx from 'clsx';
 import React, {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
-import Summary from '@site/src/components/Api/Comment/Summary';
-import {Collapsible} from '@docusaurus/theme-common';
 import styles from './styles.module.css';
-import clsx from 'clsx';
 
 export default function Comment({
   comment,
@@ -18,11 +19,21 @@ export default function Comment({
 
   return (
     <>
+      {full && <Experimental comment={comment} />}
       <Summary id={comment?.summaryId} />
       <Summary id={remarks?.contentId} />
       {full && <FullComment comment={comment} />}
     </>
   );
+}
+
+function Experimental({comment}: {comment: JSONOutput.Comment}) {
+  const experimental = useMemo(
+    () => comment?.modifierTags?.includes('@experimental'),
+    [comment],
+  );
+
+  return experimental ? <ExperimentalWarning /> : null;
 }
 
 function FullComment({comment}: {comment: JSONOutput.Comment}) {

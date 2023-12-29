@@ -1,8 +1,8 @@
-import type {Scene} from '../Scene';
-import type {TimeEvents} from './TimeEvents';
-import type {TimeEvent} from './TimeEvent';
-import type {SerializedTimeEvent} from './SerializedTimeEvent';
 import {ValueDispatcher} from '../../events';
+import type {Scene} from '../Scene';
+import type {SerializedTimeEvent} from './SerializedTimeEvent';
+import type {TimeEvent} from './TimeEvent';
+import type {TimeEvents} from './TimeEvents';
 
 /**
  * Manages time events during editing.
@@ -13,8 +13,8 @@ export class EditableTimeEvents implements TimeEvents {
   }
   private readonly events = new ValueDispatcher<TimeEvent[]>([]);
 
-  private registeredEvents: Record<string, TimeEvent> = {};
-  private lookup: Record<string, TimeEvent> = {};
+  private registeredEvents = new Map<string, TimeEvent>();
+  private lookup = new Map<string, TimeEvent>();
   private collisionLookup = new Set<string>();
   private previousReference: SerializedTimeEvent[] = [];
   private didEventsChange = false;
@@ -31,17 +31,19 @@ export class EditableTimeEvents implements TimeEvents {
   }
 
   public set(name: string, offset: number, preserve = true) {
-    if (!this.lookup[name] || this.lookup[name].offset === offset) {
+    let event = this.lookup.get(name);
+    if (!event || event.offset === offset) {
       return;
     }
     this.preserveTiming = preserve;
-    this.lookup[name] = {
-      ...this.lookup[name],
-      targetTime: this.lookup[name].initialTime + offset,
+    event = {
+      ...event,
+      targetTime: event.initialTime + offset,
       offset,
     };
-    this.registeredEvents[name] = this.lookup[name];
-    this.events.current = Object.values(this.registeredEvents);
+    this.lookup.set(name, event);
+    this.registeredEvents.set(name, event);
+    this.events.current = [...this.registeredEvents.values()];
     this.didEventsChange = true;
     this.scene.reload();
   }
@@ -56,58 +58,61 @@ export class EditableTimeEvents implements TimeEvents {
     }
 
     this.collisionLookup.add(name);
-    if (!this.lookup[name]) {
+    let event = this.lookup.get(name);
+    if (!event) {
       this.didEventsChange = true;
-      this.lookup[name] = {
+      event = {
         name,
         initialTime,
         targetTime: initialTime,
         offset: 0,
         stack: new Error().stack,
       };
+      this.lookup.set(name, event);
     } else {
       let changed = false;
-      const event = {...this.lookup[name]};
+      const newEvent = {...event};
 
       const stack = new Error().stack;
-      if (event.stack !== stack) {
-        event.stack = stack;
+      if (newEvent.stack !== stack) {
+        newEvent.stack = stack;
         changed = true;
       }
 
-      if (event.initialTime !== initialTime) {
-        event.initialTime = initialTime;
+      if (newEvent.initialTime !== initialTime) {
+        newEvent.initialTime = initialTime;
         changed = true;
       }
 
-      const offset = Math.max(0, event.targetTime - event.initialTime);
-      if (this.preserveTiming && event.offset !== offset) {
-        event.offset = offset;
+      const offset = Math.max(0, newEvent.targetTime - newEvent.initialTime);
+      if (this.preserveTiming && newEvent.offset !== offset) {
+        newEvent.offset = offset;
         changed = true;
       }
 
-      const target = event.initialTime + event.offset;
-      if (!this.preserveTiming && event.targetTime !== target) {
+      const target = newEvent.initialTime + newEvent.offset;
+      if (!this.preserveTiming && newEvent.targetTime !== target) {
         this.didEventsChange = true;
-        event.targetTime = target;
+        newEvent.targetTime = target;
         changed = true;
       }
 
       if (changed) {
-        this.lookup[name] = event;
+        event = newEvent;
+        this.lookup.set(name, event);
       }
     }
 
-    this.registeredEvents[name] = this.lookup[name];
+    this.registeredEvents.set(name, event);
 
-    return this.lookup[name].offset;
+    return event.offset;
   }
 
   /**
    * Called when the parent scene gets reloaded.
    */
   private handleReload = () => {
-    this.registeredEvents = {};
+    this.registeredEvents.clear();
     this.collisionLookup.clear();
   };
 
@@ -116,14 +121,14 @@ export class EditableTimeEvents implements TimeEvents {
    */
   private handleRecalculated = () => {
     this.preserveTiming = true;
-    this.events.current = Object.values(this.registeredEvents);
+    this.events.current = [...this.registeredEvents.values()];
 
     if (
       this.didEventsChange ||
       (this.previousReference?.length ?? 0) !== this.events.current.length
     ) {
       this.didEventsChange = false;
-      this.previousReference = Object.values(this.registeredEvents).map(
+      this.previousReference = [...this.registeredEvents.values()].map(
         event => ({
           name: event.name,
           targetTime: event.targetTime,
@@ -152,16 +157,16 @@ export class EditableTimeEvents implements TimeEvents {
 
   private load(events: SerializedTimeEvent[]) {
     for (const event of events) {
-      const previous = this.lookup[event.name] ?? {
+      const previous = this.lookup.get(event.name) ?? {
         name: event.name,
         initialTime: 0,
         offset: 0,
       };
 
-      this.lookup[event.name] = {
+      this.lookup.set(event.name, {
         ...previous,
         targetTime: event.targetTime,
-      };
+      });
     }
   }
 }

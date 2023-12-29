@@ -1,5 +1,5 @@
-import {makeScene2D, Circle} from '@motion-canvas/2d';
-import {waitFor, waitUntil, createRef} from '@motion-canvas/core';
+import {Circle, makeScene2D} from '@motion-canvas/2d';
+import {createRef, waitFor, waitUntil} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();

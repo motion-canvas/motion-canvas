@@ -1,9 +1,9 @@
-import {Vector2} from './Vector';
-import {arcLerp, InterpolationFunction, map} from '../tweening';
-import {Type} from './Type';
-import {Spacing} from './Spacing';
 import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
+import {InterpolationFunction, arcLerp, map} from '../tweening';
 import {PossibleMatrix2D} from './Matrix2D';
+import {Spacing} from './Spacing';
+import {Type} from './Type';
+import {Vector2} from './Vector';
 
 export type SerializedBBox = {
   x: number;

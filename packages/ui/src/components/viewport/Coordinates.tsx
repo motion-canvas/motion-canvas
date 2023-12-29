@@ -1,68 +1,35 @@
+import {isInspectable, Vector2} from '@motion-canvas/core';
+import {useCallback} from 'preact/hooks';
 import {useEffect, useState} from 'react';
-import {useCallback, useContext} from 'preact/hooks';
+import {useViewportContext} from '../../contexts';
 import {
   useCurrentScene,
   useDocumentEvent,
-  useSharedSettings,
+  useViewportMatrix,
 } from '../../hooks';
-import {ViewportContext} from './ViewportContext';
-import {isInspectable} from '@motion-canvas/core';
-import styles from '../controls/Controls.module.scss';
+import {ReadOnlyInput} from '../controls';
+import styles from './Viewport.module.scss';
 
 export function Coordinates() {
   const [mousePos, setMousePos] = useState({x: 0, y: 0});
-  const [hover, setHover] = useState(true);
-
-  const state = useContext(ViewportContext);
-  const settings = {
-    ...useSharedSettings(),
-  };
+  const state = useViewportContext();
   const scene = useCurrentScene();
+  const matrix = useViewportMatrix();
 
   useEffect(() => {
     const handleMouseMove = (event: {x: number; y: number}) => {
       if (!isInspectable(scene)) return;
-      const absoluteCoords = {
-        x: event.x - state.size.x,
-        y: event.y - state.size.y,
-      };
 
-      absoluteCoords.x -= state.x + state.width / 2;
-      absoluteCoords.y -= state.y + state.height / 2;
-      absoluteCoords.x /= state.zoom;
-      absoluteCoords.y /= state.zoom;
-      absoluteCoords.x += settings.size.width / 2;
-      absoluteCoords.y += settings.size.height / 2;
+      let point = new Vector2(
+        event.x - state.rect.x,
+        event.y - state.rect.y,
+      ).transformAsPoint(matrix.inverse());
+      point = scene.transformMousePosition(point.x, point.y);
 
-      const point = scene.transformMousePosition(
-        absoluteCoords.x,
-        absoluteCoords.y,
-      );
-
-      point.x = Math.round(point.x);
-      point.y = Math.round(point.y);
-
-      // These coordinates are used purely for bounds detection of the preview window.
-      const boundX = Math.round(
-        ((event.x - state.size.x) / state.width - 0.5) * state.width,
-      );
-      const boundY = Math.round(
-        ((event.y - state.size.y) / state.height - 0.5) * state.height,
-      );
-      if (
-        Math.abs(boundX) > state.width / 2 ||
-        Math.abs(boundY) > state.height / 2
-      ) {
-        setHover?.(false);
-      } else {
-        // Only need to set position coordinates if hovering over the overlay
-        setHover?.(true);
-
-        setMousePos({
-          x: point.x,
-          y: point.y,
-        });
-      }
+      setMousePos({
+        x: Math.round(point.x),
+        y: Math.round(point.y),
+      });
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -70,7 +37,7 @@ export function Coordinates() {
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
-  }, [state]);
+  }, [state, matrix]);
 
   // Below method is used for the copy to clipboard keybind
   useDocumentEvent(
@@ -87,12 +54,8 @@ export function Coordinates() {
   );
 
   return (
-    <>
-      {hover && (
-        <div title={'Coordinates'} className={styles.input}>
-          ({mousePos.x}, {mousePos.y})
-        </div>
-      )}
-    </>
+    <ReadOnlyInput className={styles.coordinates} title={'Coordinates'}>
+      ({mousePos.x}, {mousePos.y})
+    </ReadOnlyInput>
   );
 }

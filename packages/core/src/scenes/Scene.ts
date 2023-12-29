@@ -1,16 +1,18 @@
 import type {Logger, PlaybackStatus} from '../app';
-import type {TimeEvents} from './timeEvents';
-import type {Variables} from './Variables';
 import type {
   SubscribableEvent,
   SubscribableValueEvent,
   ValueDispatcher,
 } from '../events';
+import type {Plugin} from '../plugin';
+import type {SignalValue} from '../signals';
 import type {Vector2} from '../types';
 import type {LifecycleEvents} from './LifecycleEvents';
 import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
 import type {Slides} from './Slides';
+import type {Variables} from './Variables';
+import type {TimeEvents} from './timeEvents';
 
 /**
  * The constructor used when creating new scenes.
@@ -45,6 +47,7 @@ export interface SceneDescription<T = unknown> {
    * The stack trace at the moment of creation.
    */
   stack?: string;
+  plugins?: Plugin[];
   meta: SceneMetadata;
 }
 
@@ -62,6 +65,7 @@ export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   logger: Logger;
   onReplaced: ValueDispatcher<FullSceneDescription<T>>;
   timeEventsClass: new (scene: Scene) => TimeEvents;
+  experimentalFeatures?: boolean;
 }
 
 /**
@@ -209,6 +213,11 @@ export interface Scene<T = unknown> {
   get previous(): Scene | null;
 
   /**
+   * Whether experimental features are enabled.
+   */
+  get experimentalFeatures(): boolean;
+
+  /**
    * Render the scene onto a canvas.
    *
    * @param context - The context to used when rendering.
@@ -258,9 +267,19 @@ export interface Scene<T = unknown> {
   /**
    * Get the size of this scene.
    *
-   * Usually return `this.project.getSize()`.
+   * @remarks
+   * Usually returns `this.project.getSize()`.
    */
   getSize(): Vector2;
+
+  /**
+   * Get the real size of this scene.
+   *
+   * @remarks
+   * Returns the size of the scene multiplied by the resolution scale.
+   * This is the actual size of the canvas onto which the scene is rendered.
+   */
+  getRealSize(): Vector2;
 
   /**
    * Is this scene in the {@link SceneState.AfterTransitionIn} state?
@@ -295,10 +314,16 @@ export interface Scene<T = unknown> {
   /**
    * Is this scene cached?
    *
+   * @remarks
    * Used only by {@link GeneratorScene}. Seeking through a project that
    * contains at least one uncached scene will log a warning to the console.
    *
    * Should always return `true`.
    */
   isCached(): boolean;
+
+  /**
+   * Should this scene be rendered below the previous scene during a transition?
+   */
+  previousOnTop: SignalValue<boolean>;
 }

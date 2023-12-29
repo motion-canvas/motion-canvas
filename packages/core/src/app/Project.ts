@@ -1,7 +1,7 @@
+import type {Plugin} from '../plugin';
 import {FullSceneDescription} from '../scenes';
 import {Logger} from './Logger';
 import type {ProjectMetadata} from './ProjectMetadata';
-import type {Plugin} from '../plugin';
 import {SettingsMetadata} from './SettingsMetadata';
 
 export interface ProjectSettings {
@@ -15,6 +15,12 @@ export interface ProjectSettings {
    */
   audioOffset?: number;
   variables?: Record<string, unknown>;
+  /**
+   * Enable experimental features.
+   *
+   * @experimental
+   */
+  experimentalFeatures?: boolean;
 }
 
 export interface Versions {
@@ -34,6 +40,7 @@ export interface Project {
   audio?: string;
   variables?: Record<string, unknown>;
   versions: Versions;
+  experimentalFeatures: boolean;
 }
 
 export function makeProject(settings: ProjectSettings) {

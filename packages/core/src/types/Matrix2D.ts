@@ -1,6 +1,6 @@
-import {Type, EPSILON} from './Type';
-import {PossibleVector2, Vector2} from './Vector';
 import {DEG2RAD} from '../utils';
+import {EPSILON, Type} from './Type';
+import {PossibleVector2, Vector2} from './Vector';
 
 export type PossibleMatrix2D =
   | Matrix2D

@@ -1,10 +1,17 @@
-import {cloneElement, ComponentChildren, JSX, Ref, VNode} from 'preact';
-import styles from './Tabs.module.scss';
 import clsx from 'clsx';
+import {ComponentChildren, Ref, createContext, type JSX} from 'preact';
+import {useContext} from 'preact/hooks';
+import styles from './Tabs.module.scss';
 
-function isTab(node: VNode): node is VNode<TabProps> {
-  return node.type === Tab;
+interface TabsState {
+  tab: string | null;
+  setTab: (tab: string | null) => void;
 }
+
+const TabsContext = createContext<TabsState>({
+  tab: null,
+  setTab: () => {},
+});
 
 export function Tabs({
   className,
@@ -13,41 +20,28 @@ export function Tabs({
   return <div className={clsx(className, styles.tabs)} {...props} />;
 }
 
-export interface TabGroupProps {
-  children: VNode | VNode[];
-  tab: string | null;
-  setTab: (tab: string | null) => void;
+export interface TabGroupProps extends TabsState {
+  children: ComponentChildren;
 }
 
-export function TabGroup({children, tab, setTab}: TabGroupProps) {
-  const array = Array.isArray(children) ? children : [children];
-  return (
-    <>
-      {array.map(child => {
-        if (isTab(child)) {
-          const active = child.props.tab === tab;
-          return cloneElement(child, {
-            active,
-            onClick: () => setTab(active ? null : child.props.tab),
-          });
-        }
-        return child;
-      })}
-    </>
-  );
+export function TabGroup({children, ...rest}: TabGroupProps) {
+  return <TabsContext.Provider value={rest}>{children}</TabsContext.Provider>;
 }
 
 export interface TabProps extends JSX.HTMLAttributes<HTMLButtonElement> {
   children: ComponentChildren;
   forwardRef?: Ref<HTMLButtonElement>;
-  active?: boolean;
   tab: string;
 }
 
-export function Tab({className, forwardRef, active, ...props}: TabProps) {
+export function Tab({className, tab, forwardRef, ...props}: TabProps) {
+  const {tab: currentTab, setTab} = useContext(TabsContext);
+  const active = tab === currentTab;
+
   return (
     <button
       ref={forwardRef}
+      onClick={() => setTab(active ? null : tab)}
       className={clsx(styles.tab, active && styles.active, className)}
       {...props}
     />

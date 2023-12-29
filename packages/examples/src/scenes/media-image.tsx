@@ -1,7 +1,5 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Img} from '@motion-canvas/2d/lib/components';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+import {Img, makeScene2D} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
 
 import logoSvg from '@motion-canvas/examples/assets/logo.svg';
 

@@ -10,7 +10,7 @@
   content: attr(data-separator) '\a';
 }
 .elements.wrap.left > .element::before {
-  content: '\a'attr(data-separator);
+  content: '\a' attr(data-separator);
 }
 
 .elements.wrap:not(.left)::before {

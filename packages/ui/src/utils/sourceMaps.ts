@@ -1,6 +1,6 @@
+import highlight from 'highlight.js';
 import {SourceMapConsumer} from 'source-map-js';
 import {withLoader} from './withLoader';
-import highlight from 'highlight.js';
 
 const ExternalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const StackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')

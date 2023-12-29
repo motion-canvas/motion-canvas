@@ -1,6 +1,5 @@
-import React from 'react';
-import MDXComponents from '@theme-original/MDXComponents';
 import FiddleCodeBlock from '@site/src/components/Fiddle/FiddleCodeBlock';
+import MDXComponents from '@theme-original/MDXComponents';
 
 export default {
   ...MDXComponents,

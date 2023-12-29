@@ -19,15 +19,13 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - uses: actions/cache@v3
-        id: cache-npm
+      - run: npm ci
+      - uses: actions/cache/save@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
-      - run: npm ci
-        if: steps.cache-npm.outputs.cache-hit != 'true'
   commit:
     name: Commit name
     needs: prepare
@@ -42,7 +40,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -59,7 +57,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -76,7 +74,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -93,7 +91,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -103,6 +101,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -119,7 +118,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -128,6 +127,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -145,7 +145,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -154,6 +154,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -171,7 +172,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -180,6 +181,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist
@@ -197,7 +199,7 @@ jobs:
           cache: npm
       - uses: actions/cache/restore@v3
         with:
-          key: ${{ hashFiles('package-lock.json') }}-node-modules
+          key: ${{ github.run_id }}-node-modules
           path: |
             **/node_modules
             ~/.cache/puppeteer
@@ -206,6 +208,7 @@ jobs:
           key: ${{ github.run_id }}-build
           path: |
             packages/2d/lib
+            packages/2d/editor
             packages/core/lib
             packages/ui/dist
             packages/player/dist

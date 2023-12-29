@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 //@ts-check
-import prompts from 'prompts';
-import minimist from 'minimist';
 import fs from 'fs';
-import path from 'path';
-import {fileURLToPath} from 'node:url';
 import kleur from 'kleur';
+import minimist from 'minimist';
+import {fileURLToPath} from 'node:url';
+import path from 'path';
+import prompts from 'prompts';
 
 const FILES_TO_MODIFY = {
   gitignore: '.gitignore',
@@ -189,10 +189,10 @@ const PLUGINS = {
   const boldManager = kleur.bold(manager);
   if (manager === 'yarn') {
     console.log(`  ${boldManager}`);
-    console.log(`  ${boldManager} serve`);
+    console.log(`  ${boldManager} start`);
   } else {
     console.log(`  ${boldManager} install`);
-    console.log(`  ${boldManager} run serve`);
+    console.log(`  ${boldManager} start`);
   }
   console.log();
 })();

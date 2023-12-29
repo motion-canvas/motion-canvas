@@ -131,6 +131,17 @@ const config = {
         exclude: ['**/api/core/*.md', '**/api/2d/*.md'],
         showLastUpdateAuthor: true,
         docItemComponent: '@site/src/components/DocPage',
+        admonitions: {
+          tag: ':::',
+          keywords: [
+            'note',
+            'tip',
+            'info',
+            'caution',
+            'danger',
+            'experimental',
+          ],
+        },
         editUrl: ({versionDocsDirPath, docPath}) =>
           `https://github.com/motion-canvas/motion-canvas/blob/main/packages/docs/${versionDocsDirPath}/${docPath}`,
       },

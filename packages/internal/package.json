@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.2",
-    "@rollup/plugin-terser": "0.4.2",
-    "@rollup/plugin-typescript": "^11.1.1",
-    "highlight.js": "^11.7.0",
-    "marked": "^4.2.12",
-    "ttypescript": "^1.5.15"
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "highlight.js": "^11.9.0",
+    "marked": "^10.0.0",
+    "marked-highlight": "^2.1.0",
+    "ts-patch": "^3.0.2"
   }
 }

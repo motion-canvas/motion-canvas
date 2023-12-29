@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import {describe, test, expect, beforeAll, afterAll} from 'vitest';
-import {endPlayback, startPlayback, useTime} from '../utils';
-import {waitFor} from '../flow';
-import {threads} from './threads';
-import {join} from './join';
+import {afterAll, beforeAll, describe, expect, test} from 'vitest';
 import {PlaybackManager, PlaybackStatus} from '../app';
+import {waitFor} from '../flow';
+import {endPlayback, startPlayback, useTime} from '../utils';
+import {join} from './join';
+import {threads} from './threads';
 
 describe('join()', () => {
   const playback = new PlaybackManager();

@@ -1,7 +1,7 @@
 import React, {ReactNode} from 'react';
 
-import styles from './styles.module.css';
 import clsx from 'clsx';
+import styles from './styles.module.css';
 
 export enum ListType {
   None,

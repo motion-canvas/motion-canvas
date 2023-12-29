@@ -1,9 +1,9 @@
-import type {MotionCanvasPlayerProps} from '@motion-canvas/player';
-import React, {ComponentProps} from 'react';
-import styles from './styles.module.css';
-import AnimationLink from './AnimationLink';
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import type {MotionCanvasPlayerProps} from '@motion-canvas/player';
 import clsx from 'clsx';
+import React, {ComponentProps} from 'react';
+import AnimationLink from './AnimationLink';
+import styles from './styles.module.css';
 
 if (ExecutionEnvironment.canUseDOM) {
   import('@motion-canvas/player');

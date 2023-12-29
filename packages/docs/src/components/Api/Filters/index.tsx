@@ -1,8 +1,8 @@
+import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
+import clsx from 'clsx';
 import React, {ReactNode} from 'react';
 import Controls from './Controls';
-import clsx from 'clsx';
 import styles from './index.module.css';
-import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
 
 export default function Filters({
   children,

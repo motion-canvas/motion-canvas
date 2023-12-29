@@ -1,11 +1,11 @@
-import React, {useEffect, useMemo} from 'react';
 import {useLocation} from '@docusaurus/router';
-import {ApiLookup, useApiLookup} from '@site/src/contexts/api';
-import Heading from '@theme/Heading';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 import Category from '@site/src/components/Api/Group/Category';
+import {ApiLookup, useApiLookup} from '@site/src/contexts/api';
 import {Filters, matchFilters, useFilters} from '@site/src/contexts/filters';
+import Heading from '@theme/Heading';
+import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs';
+import React, {useEffect, useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export interface FilteredGroup {

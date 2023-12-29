@@ -1,4 +1,4 @@
-import {makeScene2D, Node, Img} from '@motion-canvas/2d';
+import {Img, Node, makeScene2D} from '@motion-canvas/2d';
 import {createRef, linear} from '@motion-canvas/core';
 
 // Image by Marek Piwnicki (https://unsplash.com/photos/_4o-1pr2oqU)

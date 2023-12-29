@@ -1,7 +1,7 @@
+import {ValueDispatcher} from '../../events';
 import type {Scene} from '../Scene';
 import type {TimeEvent} from './TimeEvent';
 import type {TimeEvents} from './TimeEvents';
-import {ValueDispatcher} from '../../events';
 
 /**
  * Manages time events during rendering and presentation.

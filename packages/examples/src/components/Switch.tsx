@@ -1,18 +1,24 @@
-import {Circle, Node, NodeProps, Rect} from '@motion-canvas/2d/lib/components';
-import {easeInOutCubic, tween} from '@motion-canvas/core/lib/tweening';
+import {
+  Circle,
+  Node,
+  NodeProps,
+  Rect,
+  colorSignal,
+  initial,
+  signal,
+} from '@motion-canvas/2d';
 import {
   Color,
   ColorSignal,
   PossibleColor,
-} from '@motion-canvas/core/lib/types/Color';
-import {colorSignal, initial, signal} from '@motion-canvas/2d/lib/decorators';
-import {
-  createSignal,
   SignalValue,
   SimpleSignal,
-} from '@motion-canvas/core/lib/signals';
-import {createRef} from '@motion-canvas/core/lib/utils';
-import {all} from '@motion-canvas/core/lib/flow';
+  all,
+  createRef,
+  createSignal,
+  easeInOutCubic,
+  tween,
+} from '@motion-canvas/core';
 
 export interface SwitchProps extends NodeProps {
   initialState?: SignalValue<boolean>;

@@ -1,15 +1,15 @@
-import {
-  StateEffect,
-  StateField,
-  EditorState,
-  RangeValue,
-  RangeSet,
-} from '@codemirror/state';
 import {syntaxTree} from '@codemirror/language';
 import {
-  EditorView,
+  EditorState,
+  RangeSet,
+  RangeValue,
+  StateEffect,
+  StateField,
+} from '@codemirror/state';
+import {
   Decoration,
   DecorationSet,
+  EditorView,
   Tooltip,
   hoverTooltip,
 } from '@codemirror/view';

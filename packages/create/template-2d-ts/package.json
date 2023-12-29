@@ -1,8 +1,9 @@
 {
-  "name": "konva-starter",
+  "name": "2d-starter",
   "private": true,
   "version": "0.0.0",
   "scripts": {
+    "start": "vite",
     "serve": "vite",
     "build": "tsc && vite build"
   },
@@ -13,7 +14,7 @@
   "devDependencies": {
     "@motion-canvas/ui": "*",
     "@motion-canvas/vite-plugin": "*",
-    "typescript": "^4.9.5",
-    "vite": "^4.1.4"
+    "typescript": "^5.2.2",
+    "vite": "^4.0.0"
   }
 }

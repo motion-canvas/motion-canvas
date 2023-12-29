@@ -1,18 +1,22 @@
 import './index.scss';
 
-import type {Project} from '@motion-canvas/core';
-import {Player, Presenter, Renderer} from '@motion-canvas/core';
+import {
+  Player,
+  Presenter,
+  Renderer,
+  errorToLog,
+  experimentalLog,
+  type Project,
+} from '@motion-canvas/core';
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
-import {Index, ProjectData} from './Index';
-import {
-  InspectionProvider,
-  LoggerProvider,
-  ApplicationProvider,
-} from './contexts';
-import {getItem, setItem} from './utils';
+import {ProjectData, ProjectSelection} from './ProjectSelection';
+import {ApplicationProvider} from './contexts';
 import {ShortcutsProvider} from './contexts/shortcuts';
+import {EditorPlugin} from './plugin';
+import GridPlugin from './plugin/GridPlugin';
 import {projectNameSignal} from './signals';
+import {getItem, setItem} from './utils';
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -20,7 +24,7 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export function editor(project: Project) {
+export async function editor(project: Project) {
   Error.stackTraceLimit = Infinity;
   projectNameSignal.value = project.name;
 
@@ -32,6 +36,29 @@ export function editor(project: Project) {
       fn(stack);
     }
   });
+
+  const promises: Promise<EditorPlugin>[] = [];
+  for (const plugin of project.plugins) {
+    if (plugin.editorPlugin) {
+      if (
+        !project.experimentalFeatures &&
+        !plugin.name.startsWith('@motion-canvas')
+      ) {
+        project.logger.log(
+          experimentalLog(
+            `Plugin "${plugin.name}" tried to register an editor plugin.`,
+          ),
+        );
+        continue;
+      }
+
+      promises.push(
+        import(/* @vite-ignore */ `/@id/${plugin.editorPlugin}`).then(module =>
+          module.default(),
+        ),
+      );
+    }
+  }
 
   const renderer = new Renderer(project);
   project.plugins.forEach(plugin => plugin.renderer?.(renderer));
@@ -91,6 +118,14 @@ export function editor(project: Project) {
   meta.preview.onChanged.subscribe(updatePlayer);
 
   document.title = `${project.name} | Motion Canvas`;
+
+  const plugins: EditorPlugin[] = [GridPlugin()];
+  try {
+    plugins.push(...(await Promise.all(promises)));
+  } catch (error) {
+    project.logger.error(errorToLog(error));
+  }
+
   renderRoot(
     <ApplicationProvider
       application={{
@@ -100,19 +135,29 @@ export function editor(project: Project) {
         project,
         meta,
         settings,
+        plugins,
       }}
     >
       <ShortcutsProvider>
-        <LoggerProvider>
-          <InspectionProvider>
-            <Editor />
-          </InspectionProvider>
-        </LoggerProvider>
+        <Editor />
       </ShortcutsProvider>
     </ApplicationProvider>,
   );
 }
 
 export function index(projects: ProjectData[]) {
-  renderRoot(<Index projects={projects} />);
+  renderRoot(<ProjectSelection projects={projects} />);
 }
+
+export * from './components/animations';
+export * from './components/controls';
+export * from './components/fields';
+export * from './components/icons';
+export * from './components/layout';
+export * from './components/meta';
+export * from './components/tabs';
+export * from './contexts';
+export * from './hooks';
+export * from './plugin';
+export * from './signals';
+export * from './utils';

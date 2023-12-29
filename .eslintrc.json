@@ -28,7 +28,12 @@
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-namespace": "off",
     "tsdoc/syntax": "error",
-    "@typescript-eslint/no-unused-vars": "error",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "ignoreRestSiblings": true
+      }
+    ],
     "@typescript-eslint/naming-convention": [
       "error",
       {
@@ -42,7 +47,7 @@
         }
       },
       {
-        "selector": "variable",
+        "selector": ["variable", "import"],
         "format": ["camelCase", "PascalCase"]
       },
       {

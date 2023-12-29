@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0](https://github.com/motion-canvas/motion-canvas/compare/v3.10.1...v3.11.0) (2023-10-13)
+
+### Bug Fixes
+
+- **2d:** add missing Curve properties to Circle
+  ([#805](https://github.com/motion-canvas/motion-canvas/issues/805))
+  ([38c7900](https://github.com/motion-canvas/motion-canvas/commit/38c79000403d7c3c99dde9e4c825a448d5f55054))
+- **2d:** point arrow heads in correct direction
+  ([#792](https://github.com/motion-canvas/motion-canvas/issues/792))
+  ([52ed52e](https://github.com/motion-canvas/motion-canvas/commit/52ed52e963cc69a066a0353680acaca35b9c937a)),
+  closes [#783](https://github.com/motion-canvas/motion-canvas/issues/783)
+
+### Features
+
+- **2d:** add line counter for CodeBlock
+  ([#802](https://github.com/motion-canvas/motion-canvas/issues/802))
+  ([c3f9676](https://github.com/motion-canvas/motion-canvas/commit/c3f9676b6984731a09a44ab0b1fcfc226975fa08))
+- **2d:** add skew property
+  ([#803](https://github.com/motion-canvas/motion-canvas/issues/803))
+  ([eff7c7b](https://github.com/motion-canvas/motion-canvas/commit/eff7c7be0c013139140b398350242457736d48c7))
+- **2d:** add SVG component
+  ([#763](https://github.com/motion-canvas/motion-canvas/issues/763))
+  ([8eadc11](https://github.com/motion-canvas/motion-canvas/commit/8eadc11937d4201545894f2f5b204d477a3f9094))
+- **2d:** warn about missing image source
+  ([#817](https://github.com/motion-canvas/motion-canvas/issues/817))
+  ([6dcdb5f](https://github.com/motion-canvas/motion-canvas/commit/6dcdb5f3b83d4860b1557e4745972e0af68f92f3))
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 ## [3.10.1](https://github.com/motion-canvas/motion-canvas/compare/v3.10.0...v3.10.1) (2023-07-25)
 
 ### Bug Fixes

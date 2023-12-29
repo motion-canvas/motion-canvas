@@ -1,6 +1,6 @@
-import {Input, InputSelect} from '../controls';
+import type {StringMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import type {StringMetaField} from '@motion-canvas/core/lib/meta';
+import {Input, InputSelect} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface StringMetaFieldViewProps {

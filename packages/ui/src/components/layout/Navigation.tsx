@@ -1,28 +1,40 @@
-import {useInspection, useLogger} from '../../contexts';
-import {useEffect, useRef, useState} from 'preact/hooks';
+import {LogLevel} from '@motion-canvas/core';
+import {useEffect, useMemo, useRef, useState} from 'preact/hooks';
+import {useApplication} from '../../contexts';
 import {useReducedMotion} from '../../hooks';
-import {emphasize, shake} from '../animations';
-import {EditorPanel, BottomPanel, SidebarPanel} from '../../signals';
-import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
+import {PluginTabConfig} from '../../plugin';
+import {BottomPanel, EditorPanel, SidebarPanel} from '../../signals';
+import {shake} from '../animations';
 import {
-  AccountTree,
   Bug,
-  Docs,
+  HourglassBottom,
   MotionCanvas,
   Movie,
+  School,
+  Science,
   Settings,
   Videocam,
-  ViewTimeline,
 } from '../icons';
+import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import styles from './Navigation.module.scss';
 
 export function Navigation() {
-  const {inspectedElement} = useInspection();
-  const inspectorTab = useRef<HTMLButtonElement>();
+  const {project, plugins, logger} = useApplication();
   const reducedMotion = useReducedMotion();
-  const logger = useLogger();
   const badge = useRef<HTMLDivElement>();
   const [errorCount, setErrorCount] = useState(logger.onErrorLogged.current);
+  const tabs = useMemo(() => {
+    const tabs: [string, PluginTabConfig['tabComponent']][] = [];
+
+    for (const plugin of plugins) {
+      for (const tab of plugin.tabs ?? []) {
+        const name = `${plugin.name}-${tab.name}`;
+        tabs.push([name, tab.tabComponent]);
+      }
+    }
+
+    return tabs;
+  }, [plugins]);
 
   useEffect(
     () =>
@@ -37,20 +49,6 @@ export function Navigation() {
     [logger, reducedMotion],
   );
 
-  useEffect(() => {
-    if (
-      inspectedElement &&
-      SidebarPanel.get() !== EditorPanel.Inspector &&
-      !reducedMotion &&
-      inspectorTab.current.getAnimations().length < 2
-    ) {
-      inspectorTab.current.animate(emphasize(), {duration: 400});
-      inspectorTab.current.animate([{color: 'white'}, {color: ''}], {
-        duration: 800,
-      });
-    }
-  }, [inspectedElement, reducedMotion]);
-
   return (
     <Tabs className={styles.root}>
       <TabLink
@@ -60,7 +58,12 @@ export function Navigation() {
       >
         <MotionCanvas />
       </TabLink>
-      <TabGroup tab={SidebarPanel.get()} setTab={SidebarPanel.set}>
+      <TabGroup
+        tab={SidebarPanel.value}
+        setTab={tab => {
+          SidebarPanel.value = tab;
+        }}
+      >
         <Tab
           title="Video Settings"
           id="rendering-tab"
@@ -68,16 +71,12 @@ export function Navigation() {
         >
           <Videocam />
         </Tab>
-        <Tab
-          forwardRef={inspectorTab}
-          title="Inspector"
-          id="inspector-tab"
-          tab={EditorPanel.Inspector}
-        >
-          <AccountTree />
-        </Tab>
+        {/* eslint-disable-next-line @typescript-eslint/naming-convention */}
+        {tabs.map(([name, Component]) => (
+          <Component tab={name} />
+        ))}
         <Tab title="Thread Debugger" id="threads-tab" tab={EditorPanel.Threads}>
-          <ViewTimeline />
+          <HourglassBottom />
         </Tab>
         <Tab
           title={errorCount > 0 ? `Console (${errorCount})` : 'Console'}
@@ -96,15 +95,31 @@ export function Navigation() {
         </Tab>
       </TabGroup>
       <Space />
+      {project.experimentalFeatures && (
+        <TabLink
+          title="Experimental features enabled"
+          id="docs-experimental-link"
+          href="https://motioncanvas.io/docs/experimental/"
+          target="_blank"
+        >
+          <Science />
+          <Badge level={LogLevel.Warn}>!</Badge>
+        </TabLink>
+      )}
       <TabLink
         title="Docs"
         id="docs-external-link"
         href="https://motioncanvas.io/docs/"
         target="_blank"
       >
-        <Docs />
+        <School />
       </TabLink>
-      <TabGroup tab={BottomPanel.get()} setTab={BottomPanel.set}>
+      <TabGroup
+        tab={BottomPanel.value}
+        setTab={tab => {
+          BottomPanel.value = tab;
+        }}
+      >
         <Tab title="Timeline" id="timeline-tab" tab={EditorPanel.Timeline}>
           <Movie />
         </Tab>

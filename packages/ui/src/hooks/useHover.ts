@@ -24,12 +24,12 @@ export function useHover<T extends HTMLElement>(
     () => {
       const node = ref.current;
       if (node) {
-        node.addEventListener('mouseover', handleMouseOverWrapper);
-        node.addEventListener('mouseout', handleMouseOutWrapper);
+        node.addEventListener('mouseenter', handleMouseOverWrapper);
+        node.addEventListener('mouseleave', handleMouseOutWrapper);
 
         return () => {
-          node.removeEventListener('mouseover', handleMouseOverWrapper);
-          node.removeEventListener('mouseout', handleMouseOutWrapper);
+          node.removeEventListener('mouseenter', handleMouseOverWrapper);
+          node.removeEventListener('mouseleave', handleMouseOutWrapper);
         };
       }
     },

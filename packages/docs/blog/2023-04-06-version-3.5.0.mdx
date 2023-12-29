@@ -9,7 +9,8 @@ import Issue from '@site/src/components/Release/Issue';
 import PullRequest from '@site/src/components/Release/PullRequest';
 import Link from '@docusaurus/Link';
 import Fiddle from '@site/src/components/Fiddle';
-import source from '!!raw-loader!@site/blog/2023-04-06-examples.tsx';
+import sourceCubic from '!!raw-loader!@site/blog/2023-04-06-example-cubic.tsx';
+import sourceQuadratic from '!!raw-loader!@site/blog/2023-04-06-example-quadratic.tsx';
 
 <IssueGroup type={'feat'}>
   <Issue user={'ksassnowski'}>
@@ -19,7 +20,9 @@ import source from '!!raw-loader!@site/blog/2023-04-06-examples.tsx';
     </Link>{' '}
     nodes let you easily create splines consisting of only one segment:{' '}
     <PullRequest id={603} />
-    <Fiddle className="margin-top--sm margin-bottom--sm">{source}</Fiddle>
+    <Fiddle className="margin-top--sm margin-bottom--sm">
+      {sourceCubic + '\n' + sourceQuadratic}
+    </Fiddle>
   </Issue>
   <Issue user={'aarthificial'}>
     New{' '}

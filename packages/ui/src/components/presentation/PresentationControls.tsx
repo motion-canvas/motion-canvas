@@ -1,9 +1,9 @@
 import styles from './PresentationControls.module.scss';
 
-import {IconButton} from '../controls';
-import {useDocumentEvent, useSubscribableValue} from '../../hooks';
 import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
+import {useDocumentEvent, useSubscribableValue} from '../../hooks';
+import {IconButton} from '../controls';
 import {
   Close,
   Fullscreen,

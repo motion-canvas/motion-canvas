@@ -10,13 +10,87 @@ export enum LogLevel {
   Silly = 'silly',
 }
 
+/**
+ * Represents an individual log entry.
+ *
+ * @remarks
+ * When displayed in the editor, the log entry will have the following format:
+ * ```
+ *                              inspect node ┐
+ *   ┌ expand more          duration ┐       │
+ *   ▼                               ▼       ▼
+ * ┌────────────────────────────────────────────┐
+ * │ ▶ message                       300 ms (+) │
+ * ├────────────────────────────────────────────┤
+ * │ remarks                                    │
+ * │ object                                     │
+ * │ stacktrace                                 │
+ * └────────────────────────────────────────────┘
+ * ```
+ */
 export interface LogPayload {
+  /**
+   * The log level.
+   */
   level?: LogLevel;
+
+  /**
+   * The main message of the log.
+   *
+   * @remarks
+   * Always visible.
+   */
   message: string;
-  stack?: string;
+
+  /**
+   * Additional information about the log.
+   *
+   * @remarks
+   * Visible only when the log is expanded.
+   */
   remarks?: string;
+
+  /**
+   * An object that will be serialized as JSON and displayed under the message.
+   *
+   * @remarks
+   * Visible only when the log is expanded.
+   */
   object?: any;
+
+  /**
+   * The stack trace of the log.
+   *
+   * @remarks
+   * Visible only when the log is expanded.
+   * The current stack trace can be obtained using `new Error().stack`.
+   * Both Chromium and Firefox stack traces are supported.
+   */
+  stack?: string;
+
+  /**
+   * An optional duration in milliseconds.
+   *
+   * @remarks
+   * Can be used to display any duration related to the log.
+   * The value is always visible next to the message.
+   */
   durationMs?: number;
+
+  /**
+   * An optional key used to inspect a related object.
+   *
+   * @remarks
+   * This will be used together with the {@link scenes.Inspectable} interface to
+   * display additional information about the inspected object.
+   * When specified, the log will have an "inspect" button that will open the
+   * "Properties" tab and select the inspected object.
+   */
+  inspect?: string;
+
+  /**
+   * Any additional information that the log may contain.
+   */
   [K: string]: any;
 }
 

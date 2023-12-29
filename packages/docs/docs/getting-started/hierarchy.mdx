@@ -94,71 +94,163 @@ view.add([
   </div>
 </div>
 
-Just like with DOM, it's possible to add, remove, and rearrange nodes at any
-time. The [`Node`][node] class contains the
+## Modifying the hierarchy
+
+After the hierarchy has been created, it's still possible to add, remove, and
+rearrange nodes at any time. The [`Node`][node] class contains the
 [`children`](/api/2d/components/Node#children) and
 [`parent`](/api/2d/components/Node#parent) properties that can be used to
 traverse the tree. But in order to modify it, it's recommended to use the
 following helper methods:
 
-## `Node.add`
+### `Node.add`
 
 <ApiSnippet url={'/api/2d/components/Node#add'} />
 <hr />
 
-## `Node.insert`
+### `Node.insert`
 
 <ApiSnippet url={'/api/2d/components/Node#insert'} />
 <hr />
 
-## `Node.remove`
+### `Node.remove`
 
 <ApiSnippet url={'/api/2d/components/Node#remove'} />
 <hr />
 
-## `Node.reparent`
+### `Node.reparent`
 
 <ApiSnippet url={'/api/2d/components/Node#reparent'} />
 <hr />
 
-## `Node.moveUp`
+### `Node.moveUp`
 
 <ApiSnippet url={'/api/2d/components/Node#moveUp'} />
 <hr />
 
-## `Node.moveDown`
+### `Node.moveDown`
 
 <ApiSnippet url={'/api/2d/components/Node#moveDown'} />
 <hr />
 
-## `Node.moveToTop`
+### `Node.moveToTop`
 
 <ApiSnippet url={'/api/2d/components/Node#moveToTop'} />
 <hr />
 
-## `Node.moveToBottom`
+### `Node.moveToBottom`
 
 <ApiSnippet url={'/api/2d/components/Node#moveToBottom'} />
 <hr />
 
-## `Node.moveTo`
+### `Node.moveTo`
 
 <ApiSnippet url={'/api/2d/components/Node#moveTo'} />
 <hr />
 
-## `Node.moveAbove`
+### `Node.moveAbove`
 
 <ApiSnippet url={'/api/2d/components/Node#moveAbove'} />
 <hr />
 
-## `Node.moveBelow`
+### `Node.moveBelow`
 
 <ApiSnippet url={'/api/2d/components/Node#moveBelow'} />
 <hr />
 
-## `Node.removeChildren`
+### `Node.removeChildren`
 
 <ApiSnippet url={'/api/2d/components/Node#removeChildren'} />
+<hr />
+
+## Querying the hierarchy
+
+Sometimes it can be useful to traverse the hierarchy and find some specific
+nodes. In this documentation, we'll be referring to this process as _querying_.
+Consider the following animation:
+
+```tsx editor
+import {makeScene2D, Layout, Txt, Circle, Rect, is} from '@motion-canvas/2d';
+import {all} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  view.add(
+    <Layout layout gap={20} alignItems={'center'}>
+      <Txt fill={'white'}>Example</Txt>
+      <Rect fill={'#f3303f'} padding={20} gap={20}>
+        <Txt fill={'white'}>42</Txt>
+        <Circle size={60} fill={'#FFC66D'} />
+        <Txt fill={'white'}>!!!</Txt>
+      </Rect>
+    </Layout>,
+  );
+
+  const texts = view.findAll(is(Txt));
+
+  yield* all(...texts.map(text => text.fill('#FFC66D', 1).back(1)));
+});
+```
+
+It contains multiple text nodes whose color oscillates between white and yellow.
+To achieve that, we used `view.findAll(is(Txt))` to search through all
+descendants of the view node and select only those of type `Txt`. The first
+argument passed to the [`findAll`](/api/2d/components/Node#findAll) method is a
+so-called `predicate`. It's a function that takes a node and returns `true` if
+it's a node we're looking for.
+
+For instance, if we wanted to find all nodes whose scale x is greater than `1`,
+we could write:
+
+```ts
+const wideNodes = view.findAll(node => node.scale.x() > 1);
+```
+
+Knowing this, we could try to find all nodes of type `Txt` as follows:
+
+```ts
+const texts = view.findAll(node => node instanceof Txt);
+```
+
+But Motion Canvas comes with a helpful utility function called
+[`is`](/api/2d/utils#is) that can create this predicate for us:
+
+```ts
+import {is} from '@motion-canvas/2d';
+// ...
+const texts = view.findAll(is(Txt));
+```
+
+These can be used with any JavaScript function that accepts a predicate. The
+`findAll` method has been implemented to traverse all descendants of a node, but
+if we wanted to query only the direct children, we could retrieve the
+[`children`](/api/2d/components/Node#children) array and call the built-in
+`filter` method with our predicate:
+
+```ts
+const textChildren = someParent.children().filter(is(Txt));
+```
+
+There are a few other methods that can be used to query the hierarchy depending
+on your needs:
+
+### `Node.findAll`
+
+<ApiSnippet url={'/api/2d/components/Node#findAll'} />
+<hr />
+
+### `Node.findFirst`
+
+<ApiSnippet url={'/api/2d/components/Node#findFirst'} />
+<hr />
+
+### `Node.findLast`
+
+<ApiSnippet url={'/api/2d/components/Node#findLast'} />
+<hr />
+
+### `Node.findAncestor`
+
+<ApiSnippet url={'/api/2d/components/Node#findAncestor'} />
 <hr />
 
 [node]: /api/2d/components/Node

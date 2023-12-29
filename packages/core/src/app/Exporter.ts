@@ -1,6 +1,6 @@
-import type {RendererResult, RendererSettings} from './Renderer';
-import type {Project} from './Project';
 import type {MetaField} from '../meta';
+import type {Project} from './Project';
+import type {RendererResult, RendererSettings} from './Renderer';
 
 /**
  * The static interface for exporters.

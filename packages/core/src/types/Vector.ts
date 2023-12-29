@@ -1,15 +1,15 @@
-import {arcLerp, InterpolationFunction} from '../tweening';
-import {clamp, map} from '../tweening/interpolationFunctions';
-import {Direction, Origin} from './Origin';
-import {EPSILON, Type} from './Type';
 import {
   CompoundSignal,
   CompoundSignalContext,
   Signal,
   SignalValue,
 } from '../signals';
+import {InterpolationFunction, arcLerp} from '../tweening';
+import {clamp, map} from '../tweening/interpolationFunctions';
 import {DEG2RAD, RAD2DEG} from '../utils';
 import {Matrix2D, PossibleMatrix2D} from './Matrix2D';
+import {Direction, Origin} from './Origin';
+import {EPSILON, Type} from './Type';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -46,6 +46,31 @@ export class Vector2 implements Type {
   public static readonly left = new Vector2(-1, 0);
   public static readonly up = new Vector2(0, 1);
   public static readonly down = new Vector2(0, -1);
+
+  /**
+   * A constant equal to `Vector2(0, -1)`
+   */
+  public static readonly top = new Vector2(0, -1);
+  /**
+   * A constant equal to `Vector2(0, 1)`
+   */
+  public static readonly bottom = new Vector2(0, 1);
+  /**
+   * A constant equal to `Vector2(-1, -1)`
+   */
+  public static readonly topLeft = new Vector2(-1, -1);
+  /**
+   * A constant equal to `Vector2(1, -1)`
+   */
+  public static readonly topRight = new Vector2(1, -1);
+  /**
+   * A constant equal to `Vector2(-1, 1)`
+   */
+  public static readonly bottomLeft = new Vector2(-1, 1);
+  /**
+   * A constant equal to `Vector2(1, 1)`
+   */
+  public static readonly bottomRight = new Vector2(1, 1);
 
   public x = 0;
   public y = 0;

@@ -1,11 +1,11 @@
+import type {View2D} from '@motion-canvas/2d';
 import type {
-  Project,
-  Player as PlayerType,
-  Stage as StageType,
   FullSceneDescription,
+  Player as PlayerType,
+  Project,
+  Stage as StageType,
   ThreadGeneratorFactory,
 } from '@motion-canvas/core';
-import type {View2D} from '@motion-canvas/2d';
 
 let ProjectInstance: Project = null;
 let Description: FullSceneDescription<ThreadGeneratorFactory<View2D>> = null;

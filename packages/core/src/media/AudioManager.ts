@@ -1,7 +1,7 @@
-import {AudioData} from './AudioData';
+import {Logger} from '../app';
 import {ValueDispatcher} from '../events';
 import {useLogger} from '../utils';
-import {Logger} from '../app';
+import {AudioData} from './AudioData';
 
 export class AudioManager {
   public get onDataChanged() {
@@ -39,6 +39,10 @@ export class AudioManager {
 
   public setMuted(isMuted: boolean) {
     this.audioElement.muted = isMuted;
+  }
+
+  public setVolume(volume: number) {
+    this.audioElement.volume = volume;
   }
 
   public setSource(src: string) {

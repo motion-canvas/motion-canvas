@@ -12,7 +12,9 @@ export interface App {
 
 export async function start(): Promise<App> {
   const [browser, server] = await Promise.all([
-    puppeteer.launch(),
+    puppeteer.launch({
+      headless: 'new',
+    }),
     createServer({
       root: Root,
       configFile: path.resolve(Root, '../vite.config.ts'),
@@ -24,6 +26,7 @@ export async function start(): Promise<App> {
 
   const page = await browser.newPage();
   await page.goto('http://localhost:9000');
+  await page.waitForSelector('main');
 
   return {
     page,

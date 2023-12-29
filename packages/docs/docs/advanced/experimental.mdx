@@ -1,0 +1,34 @@
+---
+sidebar_position: 6
+slug: /experimental
+---
+
+# Experimental features
+
+Motion Canvas follows the [semver](https://semver.org/) versioning scheme. Among
+other things, this means that any release with the same major version will be
+backwards compatible. For example, an animation made using `v3.2.0` (In this
+case the major version is `3`) will work just fine with `v3.2.1`, `v3.3.0`,
+`v3.4.0`, and so on.
+
+Experimental features don't follow this rule. They are subject to change at any
+time and may break your animations. They are meant to be used for testing and
+feedback purposes only.
+
+:::experimental
+
+Throughout the documentation, experimental features are marked with a warning
+like this one.
+
+:::
+
+In order to use experimental features, you need to enable them in your project
+configuration:
+
+```ts title="project.ts"
+export default makeProject({
+  // highlight-next-line
+  experimentalFeatures: true,
+  // ...
+});
+```

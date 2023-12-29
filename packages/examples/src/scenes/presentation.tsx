@@ -1,11 +1,14 @@
-import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
-import {Rect, Txt} from '@motion-canvas/2d/lib/components';
-import {beginSlide, createRef} from '@motion-canvas/core/lib/utils';
-import {all, loop} from '@motion-canvas/core/lib/flow';
-import {easeInOutCubic} from '@motion-canvas/core/lib/tweening';
-import {Color} from '@motion-canvas/core/lib/types';
-import {createSignal} from '@motion-canvas/core/lib/signals';
-import {cancel} from '@motion-canvas/core/lib/threading';
+import {Rect, Txt, makeScene2D} from '@motion-canvas/2d';
+import {
+  Color,
+  all,
+  beginSlide,
+  cancel,
+  createRef,
+  createSignal,
+  easeInOutCubic,
+  loop,
+} from '@motion-canvas/core';
 
 const YELLOW = '#FFC66D';
 const RED = '#FF6470';

@@ -1,0 +1,90 @@
+---
+slug: version-3.11.0
+title: Motion Canvas v3.11.0
+description: Nodes can now be skewed.
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+import Fiddle from '@site/src/components/Fiddle';
+import PR from '@site/src/components/Release/PullRequest';
+import sourceSkew from '!!raw-loader!@site/blog/2023-10-14-skew.tsx';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    Nodes can now be <Link to="/api/2d/components/Node#skew">skewed</Link>:
+    <PR id={803} />
+    <Fiddle ratio="3" className="margin-top--sm margin-bottom--sm">
+      {sourceSkew}
+    </Fiddle>
+  </Issue>
+  <Issue user={'levirs565'}>
+    New{' '}
+    <Link to="/api/2d/components/SVG">
+      <code>SVG</code>
+    </Link>{' '}
+    node lets you display and tween SVG graphics.
+    <PR id={763} />
+    <br />
+    <small>
+      (The amount of supported SVG features is still limited, the node was
+      designed mainly to support LaTeX tweening in the future update)
+    </small>
+  </Issue>
+  <Issue user={'SleeklyCoding'} pr={802}>
+    A new <code>lineCount</code> property lets you retrieve the number of lines
+    in a code block.
+  </Issue>
+  <Issue user={'aarthificial'} pr={801}>
+    <Link to="/api/core/transitions#slideTransition">
+      <code>slideTransition</code>
+    </Link>{' '}
+    now allows for diagonal movement defined using{' '}
+    <Link to="/api/core/types/Origin">
+      <code>Origin</code>
+    </Link>
+    .
+  </Issue>
+  <Issue user={'aarthificial'} pr={793}>
+    Any external changes made to the audio file are now picked up and
+    automatically reflected in the editor.
+  </Issue>
+  <Issue user={'aarthificial'} pr={795}>
+    When rendering, an estimated remaining time is displayed in the bottom
+    right.
+  </Issue>
+  <Issue user={'me-nkr'} pr={814}>
+    New playback controls for seeking to the very beginning and end of the
+    animation.
+  </Issue>
+  <Issue user={'alsongarbuja'} pr={808}>
+    When dragging time events, a line indicator is displayed to help precisely
+    align the event with the audio.
+  </Issue>
+  <Issue user={'aarthificial'} pr={794}>
+    Holding <kbd title="Middle mouse button">MMB</kbd> allows you to drag the
+    timeline left and right.
+  </Issue>
+  <Issue user={'aarthificial'} pr={817}>
+    A new error warns about a missing image source.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={819}>
+    Specific event names, such as <code>constructor</code> no longer cause the
+    editor to crash.
+  </Issue>
+  <Issue user={'aarthificial'} pr={805}>
+    Added missing <code>Curve</code> properties to <code>Circle</code>.
+  </Issue>
+  <Issue user={'aarthificial'} pr={792}>
+    Arrow heads now always point in the correct direction.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

@@ -1,9 +1,9 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
-  "types": "types/main.d.ts",
+  "types": "dist/main.d.ts",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
@@ -25,15 +25,16 @@
     "types"
   ],
   "dependencies": {
-    "@motion-canvas/core": "^3.10.0"
+    "@motion-canvas/core": "^3.11.0",
+    "@preact/signals": "^1.2.1",
+    "preact": "^10.19.2"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.5.0",
-    "@preact/signals": "^1.1.3",
-    "clsx": "^1.2.1",
-    "highlight.js": "^11.7.0",
-    "preact": "^10.13.0",
-    "sass": "^1.58.0",
-    "source-map-js": "^1.0.2"
+    "@preact/preset-vite": "^2.7.0",
+    "clsx": "^2.0.0",
+    "highlight.js": "^11.9.0",
+    "sass": "^1.69.5",
+    "source-map-js": "^1.0.2",
+    "vite-plugin-dts": "^3.6.4"
   }
 }

@@ -1,9 +1,9 @@
+import {MetaFile} from '../meta';
+import {Plugin} from '../plugin';
+import DefaultPlugin from '../plugin/DefaultPlugin';
 import {Logger} from './Logger';
 import {Project, ProjectSettings, Versions} from './Project';
 import {ProjectMetadata} from './ProjectMetadata';
-import {Plugin} from '../plugin';
-import DefaultPlugin from '../plugin/DefaultPlugin';
-import {MetaFile} from '../meta';
 import {createSettingsMetadata} from './SettingsMetadata';
 
 /**
@@ -30,11 +30,31 @@ export function bootstrap(
   settingsFile.attach(settings);
 
   const defaultPlugin = DefaultPlugin();
-  plugins = [
-    defaultPlugin,
-    ...(config.plugins ?? []),
-    ...plugins.filter(plugin => plugin.name !== defaultPlugin.name),
-  ];
+  const pluginMap = new Map<string, Plugin>([
+    [defaultPlugin.name, defaultPlugin],
+  ]);
+
+  if (config.plugins) {
+    for (const plugin of config.plugins) {
+      pluginMap.set(plugin.name, plugin);
+    }
+  }
+
+  for (const scene of config.scenes) {
+    if (scene.plugins) {
+      for (const plugin of scene.plugins) {
+        pluginMap.set(plugin.name, plugin);
+      }
+    }
+  }
+
+  for (const plugin of plugins) {
+    pluginMap.set(plugin.name, plugin);
+  }
+
+  // Make sure the default plugin is not overridden.
+  pluginMap.set(defaultPlugin.name, defaultPlugin);
+  plugins = [...pluginMap.values()];
 
   const reducedSettings = plugins.reduce(
     (settings, plugin) => ({
@@ -51,6 +71,7 @@ export function bootstrap(
   project.settings = settings;
   project.meta = new ProjectMetadata(project);
   project.meta.shared.set(settings.defaults.get());
+  project.experimentalFeatures ??= false;
   metaFile.attach(project.meta);
 
   plugins.forEach(plugin => plugin.project?.(project));
