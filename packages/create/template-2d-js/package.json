@@ -14,6 +14,6 @@
   "devDependencies": {
     "@motion-canvas/ui": "*",
     "@motion-canvas/vite-plugin": "*",
-    "vite": "^5.0.0"
+    "vite": "^4.0.0"
   }
 }
