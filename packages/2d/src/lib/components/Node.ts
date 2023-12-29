@@ -1731,5 +1731,4 @@ export class Node implements Promisable<Node> {
   }
 }
 
-/*@__PURE__*/
 Node.prototype.isClass = true;
