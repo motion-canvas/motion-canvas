@@ -22,7 +22,8 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "tsconfig.plugin.json"
   ],
   "dependencies": {
     "@motion-canvas/core": "^3.11.0",

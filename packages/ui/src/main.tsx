@@ -4,7 +4,6 @@ import {
   Player,
   Presenter,
   Renderer,
-  errorToLog,
   experimentalLog,
   type Project,
 } from '@motion-canvas/core';
@@ -13,10 +12,16 @@ import {Editor} from './Editor';
 import {ProjectData, ProjectSelection} from './ProjectSelection';
 import {ApplicationProvider} from './contexts';
 import {ShortcutsProvider} from './contexts/shortcuts';
-import {EditorPlugin} from './plugin';
 import GridPlugin from './plugin/GridPlugin';
 import {projectNameSignal} from './signals';
 import {getItem, setItem} from './utils';
+
+const ExperimentalHooks = [
+  'tabs',
+  'provider',
+  'previewOverlay',
+  'presenterOverlay',
+] as const;
 
 function renderRoot(vnode: ComponentChild) {
   const root = document.createElement('main');
@@ -24,7 +29,7 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export async function editor(project: Project) {
+export function editor(project: Project) {
   Error.stackTraceLimit = Infinity;
   projectNameSignal.value = project.name;
 
@@ -37,26 +42,22 @@ export async function editor(project: Project) {
     }
   });
 
-  const promises: Promise<EditorPlugin>[] = [];
-  for (const plugin of project.plugins) {
-    if (plugin.editorPlugin) {
-      if (
-        !project.experimentalFeatures &&
-        !plugin.name.startsWith('@motion-canvas')
-      ) {
-        project.logger.log(
-          experimentalLog(
-            `Plugin "${plugin.name}" tried to register an editor plugin.`,
-          ),
-        );
+  if (!project.experimentalFeatures) {
+    for (const plugin of project.plugins) {
+      if (plugin.name.startsWith('@motion-canvas')) {
         continue;
       }
 
-      promises.push(
-        import(/* @vite-ignore */ `/@id/${plugin.editorPlugin}`).then(module =>
-          module.default(),
-        ),
-      );
+      const experimental = ExperimentalHooks.filter(key => key in plugin);
+      if (experimental.length > 0) {
+        project.logger.log(
+          experimentalLog(
+            `Plugin "${
+              plugin.name
+            }" uses experimental editor hooks: ${experimental.join(', ')}.`,
+          ),
+        );
+      }
     }
   }
 
@@ -119,12 +120,7 @@ export async function editor(project: Project) {
 
   document.title = `${project.name} | Motion Canvas`;
 
-  const plugins: EditorPlugin[] = [GridPlugin()];
-  try {
-    plugins.push(...(await Promise.all(promises)));
-  } catch (error) {
-    project.logger.error(errorToLog(error));
-  }
+  const plugins = [GridPlugin(), ...project.plugins];
 
   renderRoot(
     <ApplicationProvider
