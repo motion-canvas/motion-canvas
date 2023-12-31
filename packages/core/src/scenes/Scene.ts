@@ -47,7 +47,10 @@ export interface SceneDescription<T = unknown> {
    * The stack trace at the moment of creation.
    */
   stack?: string;
-  plugins?: Plugin[];
+  /**
+   * A list of plugins to include in the project.
+   */
+  plugins?: (Plugin | string)[];
   meta: SceneMetadata;
 }
 

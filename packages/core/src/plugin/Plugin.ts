@@ -11,21 +11,21 @@ import type {
  * Represents a runtime Motion Canvas plugin.
  */
 export interface Plugin {
-  name: string;
-
   /**
-   * A path for importing the editor plugin.
+   * A unique name of the plugin.
    *
    * @remarks
-   * Editor plugins can extend the editor UI. They are loaded only when using
-   * the editor and are ignored completely in a production build.
+   * The name should be unique across the entire ecosystem of Motion Canvas.
+   * If a plugin with the same name has already been registered, this plugin
+   * will be ignored.
    *
-   * The path should lead to a module containing a default export of an editor
-   * plugin.
+   * If you intend to publish your plugin to npm, it is recommended to prefix
+   * this name with the name of your npm package.
    *
-   * @experimental
+   * Other identifiers defined by the plugin, such as a tab id, will be
+   * automatically prefixed with this name and as such don't have to be unique.
    */
-  editorPlugin?: string;
+  name: string;
 
   /**
    * Modify the project settings before the project is initialized.

@@ -1,0 +1,89 @@
+---
+slug: /plugins/runtime
+description: Extend the runtime components like scenes and the player.
+sidebar_position: 1
+---
+
+# Runtime
+
+<div className="row margin-bottom--md">
+  <div className="col col--6">
+
+Runtime plugins allow you to extend the runtime components like scenes and the
+player.
+
+Let's start by creating the entry point - a simple file that exports our plugin.
+For now, we'll put that file in the `src` directory of our Motion Canvas
+project. If you find yourself reusing the plugin across multiple projects, you
+can put it in a separate package.
+
+To define the plugin, we pass a configuration object to the
+[`makePlugin`][make-plugin] helper function and export the result. `name` is the
+only required property. `player` is an optional hook that will receive the
+[`Player`](/api/core/app/Player) instance right after it's created. Take a look
+at the [`Plugin`](/api/core/plugin/Plugin) interface for the full list of
+available hooks.
+
+  </div>
+  <div className="col col--6">
+
+```diff title="Project structure"
+  project/
+  ├── src/
+  │   ├── scenes/
+  │   │   └── example.tsx
+// highlight-next-line
++ │   ├── plugin.ts
+  │   └── project.ts
+  ├── package.json
+  ├── tsconfig.json
+  └── vite.config.ts
+```
+
+  </div>
+</div>
+
+```ts title="src/plugin.ts"
+import {makePlugin} from '@motion-canvas/core';
+
+export default makePlugin({
+  name: 'motion-canvas-plugin-example',
+  player(player) {
+    player.onRecalculated.subscribe(() => {
+      player.requestReset();
+      player.togglePlayback(true);
+    });
+  },
+});
+```
+
+In this example we subscribe to the
+[`onRecalculated`](/api/core/app/Player#onRecalculated) event to play the
+animation from the beginning whenever this event occurs. Recalculation happens
+when we edit the animation either in the editor or in the code.
+
+Now we can import the plugin in our project file. Note that
+[`makePlugin`][make-plugin] returns a function that we need to call to create an
+actual plugin object (This can come in handy when
+[developing a Node.js plugin](/docs/plugins/node#passing-options-to-runtime)):
+
+```ts title="src/project.ts"
+import {makeProject} from '@motion-canvas/core';
+// highlight-next-line
+import myPlugin from './plugin';
+import example from './scenes/example?scene';
+
+export default makeProject({
+  scenes: [example],
+  // highlight-start
+  plugins: [myPlugin()],
+  //                ^^ we need to call the function
+  // highlight-end
+});
+```
+
+That's it! Now we can run the project and see our plugin in action. Check out
+the [`Plugin`][plugin] interface for the full list of available hooks.
+
+[plugin]: /api/core/plugin/Plugin
+[make-plugin]: /api/core/plugin#makePlugin
