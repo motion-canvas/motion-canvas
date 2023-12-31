@@ -128,10 +128,14 @@ async function parsePlugin(
 ): Promise<Plugin | null> {
   if (typeof plugin === 'string') {
     try {
-      plugin = (
-        await import(/* @vite-ignore */ `/@id/${plugin}`)
-      ).default() as Plugin;
+      let url = `/@id/${plugin}`;
+      const version = new URL(import.meta.url).searchParams.get('v');
+      if (version) {
+        url += `?v=${version}`;
+      }
+      plugin = (await import(/* @vite-ignore */ url)).default() as Plugin;
     } catch (e: any) {
+      console.error(e);
       logger.error({
         message: `Failed to load plugin "${plugin}": ${e.message}.`,
         stack: e.stack,
