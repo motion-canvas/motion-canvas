@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.12.0-alpha.1](https://github.com/motion-canvas/motion-canvas/compare/v3.12.0-alpha.0...v3.12.0-alpha.1) (2023-12-31)
+
+
+### Features
+
+* **core:** allow getting real size of scenes ([#889](https://github.com/motion-canvas/motion-canvas/issues/889)) ([a8e9767](https://github.com/motion-canvas/motion-canvas/commit/a8e9767d988504239d11dafad8ec94dc21643e6b))
+
+
+
+
+
 # [3.12.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0-alpha.0) (2023-12-29)
 
 
