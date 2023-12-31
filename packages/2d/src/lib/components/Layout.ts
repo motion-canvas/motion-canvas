@@ -101,6 +101,17 @@ export interface LayoutProps extends NodeProps {
   offsetY?: SignalValue<number>;
   offset?: SignalValue<PossibleVector2>;
   /**
+   * The position of the center of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the center ends
+   * up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   * When {@link NodeProps.offset} is not set, this will be the same as the
+   * {@link NodeProps.position}.
+   */
+  middle?: SignalValue<PossibleVector2>;
+  /**
    * The position of the top edge of this node.
    *
    * @remarks
