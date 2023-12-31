@@ -517,7 +517,6 @@ export default ({
         },
         optimizeDeps: {
           entries: projects.map(project => project.url),
-          exclude: ['preact', 'preact/*', '@preact/signals'],
         },
       };
     },
