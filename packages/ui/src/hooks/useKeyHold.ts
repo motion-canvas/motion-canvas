@@ -14,13 +14,20 @@ export function useKeyHold(key: string) {
         setHeld(false);
       }
     };
+    const handleBlur = () => {
+      setHeld(false);
+    };
 
     document.addEventListener('keydown', handleDown, true);
     document.addEventListener('keyup', handleUp, true);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('contextmenu', handleBlur);
 
     return () => {
       document.removeEventListener('keydown', handleDown, true);
       document.removeEventListener('keyup', handleUp, true);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('contextmenu', handleBlur);
     };
   }, [key]);
 

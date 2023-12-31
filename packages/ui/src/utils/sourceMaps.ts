@@ -92,9 +92,9 @@ export async function resolveStackTrace(
 }
 
 export async function openFileInEditor(entry: StackTraceEntry) {
-  const relative = entry.source.startsWith('/')
-    ? entry.source.slice(1)
-    : entry.source;
+  const relative = entry.file.startsWith('/')
+    ? entry.file.slice(1)
+    : entry.file;
 
   await withLoader(() =>
     fetch(
