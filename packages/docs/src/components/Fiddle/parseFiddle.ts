@@ -9,6 +9,7 @@ const IgnoredComments = [
   'highlight-next-line',
   'highlight-start',
   'highlight-end',
+  'prettier-ignore',
 ];
 
 export function parseFiddle(code: string): CodeSnippet[] {
