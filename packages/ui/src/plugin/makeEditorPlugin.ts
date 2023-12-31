@@ -11,6 +11,8 @@ import type {EditorPlugin} from './EditorPlugin';
  *   name: 'my-custom-plugin',
  * });
  * ```
+ *
+ * @experimental
  */
 export function makeEditorPlugin(
   plugin: EditorPlugin | (() => EditorPlugin),

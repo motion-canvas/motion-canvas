@@ -1,3 +1,4 @@
+import {Plugin} from '@motion-canvas/core';
 import {FunctionComponent} from 'preact';
 
 /**
@@ -71,12 +72,10 @@ export interface PluginOverlayConfig {
  *
  * @remarks
  * Passed to {@link makeEditorPlugin} to create a plugin.
+ *
+ * @experimental
  */
-export interface EditorPlugin {
-  /**
-   * The name of the plugin.
-   */
-  name: string;
+export interface EditorPlugin extends Plugin {
   /**
    * Configuration for custom tabs displayed in the sidebar.
    */

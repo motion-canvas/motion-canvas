@@ -89,6 +89,11 @@ export interface MotionCanvasPluginConfig {
    * to enable it.
    **/
   proxy?: boolean | MotionCanvasCorsProxyOptions;
+
+  /**
+   * Build the project to run in the editor.
+   */
+  buildForEditor?: boolean;
 }
 
 export default ({
@@ -97,6 +102,7 @@ export default ({
   bufferedAssets = /^$/,
   editor = '@motion-canvas/ui',
   proxy,
+  buildForEditor,
 }: MotionCanvasPluginConfig = {}): Plugin => {
   const plugins: PluginOptions[] = [];
   const editorPath = path.dirname(require.resolve(editor));
@@ -252,6 +258,7 @@ export default ({
         }
 
         if (params.has('project')) {
+          const runsInEditor = buildForEditor || viteConfig.command === 'serve';
           const metaFile = `${name}.meta`;
           await createMeta(path.join(dir, metaFile));
 
@@ -283,13 +290,17 @@ export default ({
 
           return source(
             ...imports,
-            `import {bootstrap} from '@motion-canvas/core';`,
+            `import {${
+              runsInEditor ? 'editorBootstrap' : 'bootstrap'
+            }} from '@motion-canvas/core';`,
             `import {MetaFile} from '@motion-canvas/core';`,
             `import metaFile from './${metaFile}';`,
             `import config from './${name}';`,
             `const settings = new MetaFile('settings', '${settingsId}');`,
             `settings.loadData(${JSON.stringify(parsed)});`,
-            `export default bootstrap(`,
+            `export default ${
+              runsInEditor ? 'await editorBootstrap' : 'bootstrap'
+            }(`,
             `  '${name}',`,
             `  ${versions},`,
             `  [${pluginNames.join(', ')}],`,
@@ -488,6 +499,7 @@ export default ({
     config(config) {
       return {
         build: {
+          target: buildForEditor ? 'esnext' : 'modules',
           assetsDir: './',
           rollupOptions: {
             preserveEntrySignatures: 'strict',

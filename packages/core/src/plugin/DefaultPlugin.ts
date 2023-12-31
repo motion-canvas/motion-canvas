@@ -7,7 +7,7 @@ import {makePlugin} from './makePlugin';
  * @internal
  */
 export default makePlugin({
-  name: 'mc-default-plugin',
+  name: '@motion-canvas/core/default',
   exporters() {
     return [ImageExporter];
   },
