@@ -1,5 +1,33 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+
+### Bug Fixes
+
+* **ui:** fix "go to source" ([#895](https://github.com/motion-canvas/motion-canvas/issues/895)) ([ec729de](https://github.com/motion-canvas/motion-canvas/commit/ec729dea0d65bc69aefc0abd601f365af1c4ed68))
+* **ui:** fix transparent background ([#886](https://github.com/motion-canvas/motion-canvas/issues/886)) ([83f652f](https://github.com/motion-canvas/motion-canvas/commit/83f652fdcfa075f5de24186ffdffd1b7db1d8fc9))
+
+
+### Features
+
+* add audio volume control through arrow keys ([#856](https://github.com/motion-canvas/motion-canvas/issues/856)) ([8b86fd4](https://github.com/motion-canvas/motion-canvas/commit/8b86fd4e70f91a0d5b1150d760427ca355666341))
+* add experimental features ([#876](https://github.com/motion-canvas/motion-canvas/issues/876)) ([498d387](https://github.com/motion-canvas/motion-canvas/commit/498d3871d05d4dcc83453654bec7762d2ab32e7e))
+* introduce editor plugins ([#879](https://github.com/motion-canvas/motion-canvas/issues/879)) ([2b72007](https://github.com/motion-canvas/motion-canvas/commit/2b720074d45fc254dc40b534785b591ae44a3f37))
+* **ui:** add custom presentation overlays ([#884](https://github.com/motion-canvas/motion-canvas/issues/884)) ([4696d3c](https://github.com/motion-canvas/motion-canvas/commit/4696d3c8cb8b68e3475406359f9cf6b875b1c838)), closes [#825](https://github.com/motion-canvas/motion-canvas/issues/825)
+* **ui:** add volume slider ([#872](https://github.com/motion-canvas/motion-canvas/issues/872)) ([5ac3069](https://github.com/motion-canvas/motion-canvas/commit/5ac3069f027ee123c212217dcf8d26a78a3aa106))
+* **ui:** small improvements ([#833](https://github.com/motion-canvas/motion-canvas/issues/833)) ([f44400c](https://github.com/motion-canvas/motion-canvas/commit/f44400c458a1d7f49520494f01efb9936f4df83e))
+* **ui:** timeline scrubbing ([#862](https://github.com/motion-canvas/motion-canvas/issues/862)) ([211b9a4](https://github.com/motion-canvas/motion-canvas/commit/211b9a4327720afd1ce0ff93868a501c2fd745aa)), closes [#286](https://github.com/motion-canvas/motion-canvas/issues/286)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

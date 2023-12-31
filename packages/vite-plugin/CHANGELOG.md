@@ -1,5 +1,28 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+
+### Bug Fixes
+
+* exclude preact from optimizations ([#894](https://github.com/motion-canvas/motion-canvas/issues/894)) ([15687cc](https://github.com/motion-canvas/motion-canvas/commit/15687cc975abcf4538a5ce51402d2308057d42e5))
+* **vite-plugin:** create empty output directory if not exist ([#787](https://github.com/motion-canvas/motion-canvas/issues/787)) ([20cceef](https://github.com/motion-canvas/motion-canvas/commit/20cceef8525e809bff9706fcd7082d7e103a085b))
+* **vite-plugin:** handle unusual characters in file names ([#821](https://github.com/motion-canvas/motion-canvas/issues/821)) ([1e57497](https://github.com/motion-canvas/motion-canvas/commit/1e5749785d55a41605a5438eee08672ef01f3914)), closes [#764](https://github.com/motion-canvas/motion-canvas/issues/764)
+
+
+### Features
+
+* **vite-plugin:** support glob for project files ([#834](https://github.com/motion-canvas/motion-canvas/issues/834)) ([67029c4](https://github.com/motion-canvas/motion-canvas/commit/67029c4c2cf756cbe2b7ed59dc55cb895de81d52)), closes [#324](https://github.com/motion-canvas/motion-canvas/issues/324)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
