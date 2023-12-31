@@ -71,7 +71,10 @@ function SceneClip({scene}: SceneClipProps) {
           className={styles.name}
           style={nameStyle}
           title="Go to source"
-          onMouseUp={async event => {
+          onPointerDown={event => {
+            event.stopPropagation();
+          }}
+          onPointerUp={async event => {
             event.stopPropagation();
             if (scene.creationStack) {
               await findAndOpenFirstUserFile(scene.creationStack);
