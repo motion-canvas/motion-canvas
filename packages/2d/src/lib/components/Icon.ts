@@ -54,8 +54,17 @@ export class Icon extends Img {
   @colorSignal()
   public declare color: ColorSignal<this>;
 
+  /**
+   * The init check is only used to supress an error warning about setting the `src` Property.
+   */
+  private init = false;
+
   public constructor(props: IconProps) {
-    super(props);
+    super({
+      ...props,
+      src: null!,
+    });
+    this.init = true;
   }
 
   /**
@@ -82,6 +91,9 @@ export class Icon extends Img {
    * is not used
    */
   protected setSrc() {
+    if (!this.init) {
+      return;
+    }
     useLogger().warn(
       "The Icon Component does not accept setting the `src`. If you need access to `src`, use '<Img/>` instead.",
     );
