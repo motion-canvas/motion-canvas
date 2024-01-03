@@ -60,7 +60,7 @@ export class Latex extends Img {
   public declare readonly tex: SimpleSignal<string, this>;
 
   public constructor(props: LatexProps) {
-    super(props);
+    super({...props, src: null});
   }
 
   protected override image(): HTMLImageElement {

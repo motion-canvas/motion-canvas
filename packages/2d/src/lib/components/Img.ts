@@ -21,7 +21,7 @@ export interface ImgProps extends RectProps {
   /**
    * {@inheritDoc Img.src}
    */
-  src?: SignalValue<string>;
+  src?: SignalValue<string | null>;
   /**
    * {@inheritDoc Img.alpha}
    */
