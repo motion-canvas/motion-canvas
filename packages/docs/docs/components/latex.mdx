@@ -1,0 +1,133 @@
+---
+sidebar_position: 2
+slug: /latex
+---
+
+import AnimationPlayer from '@site/src/components/AnimationPlayer';
+
+# LaTeX
+
+The `Latex` component is used to show mathematical formulas and animate them.
+
+<AnimationPlayer banner name="tex" />
+
+## Defining LaTex
+
+You can set the LaTex formula to show by specifying `tex` property:
+
+```ts
+import {Latex} from '@motion-canvas/2d/lib/components/Latex';
+
+yield view.add(<Latex tex="a^2 + b^2 = c^2" />);
+```
+
+LaTex `tex` property can be an array of strings. The item of the array can be
+called LaTex part. Splitting LaTex into several parts is crucial for tweening.
+
+```ts
+yield view.add(<Latex tex={['a^2', '+', 'b^2', '=', 'c^2']} />);
+```
+
+Specifying LaTex using a string or array of strings will have equal result.
+Below first code and the second code will have equal results.
+
+You can also split Tex into several parts by enclosing part of a string using
+`{{}}`
+
+```ts
+tex('{{a^2}} + {{b^2}} = {{c^2}}');
+//equal to
+tex(['a^2', '+', 'b^2', '=', 'c^2']);
+```
+
+You can also use this syntax in array items like this:
+
+```ts
+tex('{{a}}^2', '+',  '{{b}}^2', '=', '{{c}}^2']);
+//equal to
+tex(['a','^2', '+', 'b', '^2', '=', 'c', '^2']);
+```
+
+## Fill Color
+
+To set the color of the Tex you can set `fill` property to any color you want.
+
+:::note
+
+You must set fill, if not Tex will not appear.
+
+:::
+
+## Font Size
+
+To set the size of Tex you can set `fontSize` property. The size of this
+component will be equal to the size of `Txt` component that has equal
+`fontSize`.
+
+```tsx editor
+import {Rect, Txt, Latex} from '@motion-canvas/2d/lib/components';
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {createRef} from '@motion-canvas/core/lib/utils';
+import {createSignal} from '@motion-canvas/core/lib/signals';
+
+export default makeScene2D(function* (view) {
+  const fontSize = createSignal(48);
+  view.add(
+    <Rect layout direction="column" alignItems="center" gap="25px">
+      <Latex tex="y = mx + c" fill="white" fontSize={fontSize} />
+      <Txt fill="white" fontSize={fontSize}>
+        Normal text
+      </Txt>
+    </Rect>,
+  );
+
+  yield* fontSize(24, 1);
+  yield* fontSize(48, 1);
+});
+```
+
+## Animating LaTex
+
+We can animate LaTex by tweening `tex` property. To enable deletion, insertion
+and transformation animation you must split Tex into several parts. When you do
+not split Tex into several parts, only fade-in and fade-out animation will
+happen.
+
+```tsx editor
+import {Latex} from '@motion-canvas/2d/lib/components';
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {createRef, waitFor} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="1 + 2" fill="white" />);
+
+  yield* waitFor(0.5);
+  yield* tex().tex('2 + 3 + 4', 1);
+});
+```
+
+The Tex part that only exists in source Tex is considered deleted and is
+animated using fade-in. The Tex part that only exists in target tex is
+considered inserted and is animated using fade out. Tex part that coexists in
+source and destination Tex will be transformed from source to target.
+
+```tsx editor
+import {Latex} from '@motion-canvas/2d/lib/components';
+import {makeScene2D} from '@motion-canvas/2d/lib/scenes';
+import {createRef, waitFor} from '@motion-canvas/core/lib/utils';
+
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="{{1}} + {{2}}" fill="white" />);
+
+  yield* waitFor(0.5);
+  yield* tex().tex(['2', '+', '3', '+', '4'], 1);
+});
+```
+
+When any part of the Tex whose numbers in the source and target do not match,
+all the parts of the Tex will be transformed (Number of parts greater than 0).
+In the example above, source has 1 `+` part and target has 2 `+` part, there no
+insertion, instead a `+` part of source is transformed into first and second `+`
+part of the target.
