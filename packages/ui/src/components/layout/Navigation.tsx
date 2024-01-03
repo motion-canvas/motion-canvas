@@ -1,9 +1,8 @@
 import {LogLevel} from '@motion-canvas/core';
-import {useEffect, useMemo, useRef, useState} from 'preact/hooks';
-import {useApplication} from '../../contexts';
+import {useEffect, useRef, useState} from 'preact/hooks';
+import {useApplication, usePanels} from '../../contexts';
 import {useReducedMotion} from '../../hooks';
-import {PluginTabConfig} from '../../plugin';
-import {BottomPanel, EditorPanel, SidebarPanel} from '../../signals';
+import {EditorPanel} from '../../signals';
 import {shake} from '../animations';
 import {
   Bug,
@@ -19,22 +18,11 @@ import {Badge, Space, Tab, TabGroup, TabLink, Tabs} from '../tabs';
 import styles from './Navigation.module.scss';
 
 export function Navigation() {
-  const {project, plugins, logger} = useApplication();
+  const {project, logger} = useApplication();
+  const {tabs, sidebar, bottom} = usePanels();
   const reducedMotion = useReducedMotion();
   const badge = useRef<HTMLDivElement>();
   const [errorCount, setErrorCount] = useState(logger.onErrorLogged.current);
-  const tabs = useMemo(() => {
-    const tabs: [string, PluginTabConfig['tabComponent']][] = [];
-
-    for (const plugin of plugins) {
-      for (const tab of plugin.tabs ?? []) {
-        const name = `${plugin.name}-${tab.name}`;
-        tabs.push([name, tab.tabComponent]);
-      }
-    }
-
-    return tabs;
-  }, [plugins]);
 
   useEffect(
     () =>
@@ -58,12 +46,7 @@ export function Navigation() {
       >
         <MotionCanvas />
       </TabLink>
-      <TabGroup
-        tab={SidebarPanel.value}
-        setTab={tab => {
-          SidebarPanel.value = tab;
-        }}
-      >
+      <TabGroup tab={sidebar.current.value} setTab={tab => sidebar.set(tab)}>
         <Tab
           title="Video Settings"
           id="rendering-tab"
@@ -72,7 +55,7 @@ export function Navigation() {
           <Videocam />
         </Tab>
         {/* eslint-disable-next-line @typescript-eslint/naming-convention */}
-        {tabs.map(([name, Component]) => (
+        {tabs.map(({name, tabComponent: Component}) => (
           <Component tab={name} />
         ))}
         <Tab title="Thread Debugger" id="threads-tab" tab={EditorPanel.Threads}>
@@ -114,12 +97,7 @@ export function Navigation() {
       >
         <School />
       </TabLink>
-      <TabGroup
-        tab={BottomPanel.value}
-        setTab={tab => {
-          BottomPanel.value = tab;
-        }}
-      >
+      <TabGroup tab={bottom.current.value} setTab={tab => bottom.set(tab)}>
         <Tab title="Timeline" id="timeline-tab" tab={EditorPanel.Timeline}>
           <Movie />
         </Tab>

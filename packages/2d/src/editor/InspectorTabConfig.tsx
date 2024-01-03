@@ -9,19 +9,20 @@ import {
   PluginTabConfig,
   PluginTabProps,
   Separator,
-  SidebarPanel,
   Tab,
   emphasize,
   findAndOpenFirstUserFile,
   useApplication,
   useCurrentFrame,
   useCurrentScene,
+  usePanels,
   useReducedMotion,
 } from '@motion-canvas/ui';
 import {useEffect, useMemo, useRef} from 'preact/hooks';
 import {useInspection} from './Provider';
 
 function TabComponent({tab}: PluginTabProps) {
+  const {sidebar} = usePanels();
   const inspectorTab = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
   const {nodeKey} = useInspection();
@@ -31,7 +32,7 @@ function TabComponent({tab}: PluginTabProps) {
     () =>
       logger.onInspected.subscribe(key => {
         nodeKey.value = key;
-        SidebarPanel.value = tab;
+        sidebar.set(tab);
       }),
     [nodeKey, tab],
   );
@@ -39,7 +40,7 @@ function TabComponent({tab}: PluginTabProps) {
   useEffect(() => {
     if (
       nodeKey.value &&
-      SidebarPanel.value !== tab &&
+      sidebar.current.value !== tab &&
       !reducedMotion &&
       inspectorTab.current &&
       inspectorTab.current.getAnimations().length < 2

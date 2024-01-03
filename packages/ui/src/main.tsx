@@ -10,7 +10,7 @@ import {
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {ProjectData, ProjectSelection} from './ProjectSelection';
-import {ApplicationProvider} from './contexts';
+import {ApplicationProvider, PanelsProvider} from './contexts';
 import {ShortcutsProvider} from './contexts/shortcuts';
 import GridPlugin from './plugin/GridPlugin';
 import {projectNameSignal} from './signals';
@@ -134,9 +134,11 @@ export function editor(project: Project) {
         plugins,
       }}
     >
-      <ShortcutsProvider>
-        <Editor />
-      </ShortcutsProvider>
+      <PanelsProvider>
+        <ShortcutsProvider>
+          <Editor />
+        </ShortcutsProvider>
+      </PanelsProvider>
     </ApplicationProvider>,
   );
 }
