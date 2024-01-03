@@ -48,7 +48,7 @@ export interface MotionCanvasPluginConfig {
    * Defines which assets should be buffered before being sent to the browser.
    *
    * @remarks
-   * Streaming larger assets directly from the drive my cause issues with other
+   * Streaming larger assets directly from the drive may cause issues with other
    * applications. For instance, if an audio file is being used in the project,
    * Adobe Audition will perceive it as "being used by another application"
    * and refuse to override it.
