@@ -9,6 +9,7 @@ import {
   useKeyHold,
   usePreviewSettings,
   useSharedSettings,
+  useSize,
 } from '../../hooks';
 import {labelClipDraggingLeftSignal} from '../../signals';
 import {MouseButton} from '../../utils';
@@ -29,7 +30,9 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
   const endFrame = Math.min(player.status.secondsToFrames(range[1]), duration);
   const [start, setStart] = useState(startFrame);
   const [end, setEnd] = useState(endFrame);
+  const rect = useSize(rangeRef);
   const shiftHeld = useKeyHold('Shift');
+  const controlHeld = useKeyHold('Control');
 
   const onDrop = useCallback(() => {
     labelClipDraggingLeftSignal.value = null;
@@ -51,24 +54,22 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
   return (
     <div
       ref={rangeRef}
-      style={{
-        flexDirection: start > end ? 'row-reverse' : 'row',
-        left: `${framesToPercents(Math.ceil(Math.max(0, normalizedStart)))}%`,
-        right: `${
-          100 - framesToPercents(Math.ceil(Math.min(duration, normalizedEnd)))
-        }%`,
-      }}
-      className={clsx(styles.range, shiftHeld && styles.active)}
+      className={clsx(
+        styles.rangeContainer,
+        shiftHeld && controlHeld && styles.active,
+      )}
       onPointerDown={event => {
         if (event.button === MouseButton.Left) {
           event.preventDefault();
           event.stopPropagation();
           event.currentTarget.setPointerCapture(event.pointerId);
+
+          setStart(pixelsToFrames(event.clientX - rect.x));
+          setEnd(pixelsToFrames(event.clientX - rect.x));
         }
       }}
       onPointerMove={event => {
         if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-          setStart(start + pixelsToFrames(event.movementX));
           setEnd(end + pixelsToFrames(event.movementX));
         }
       }}
@@ -78,13 +79,46 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
           onDrop();
         }
       }}
-      onDblClick={() => {
-        meta.shared.range.update(0, Infinity, duration, fps);
-      }}
     >
-      <RangeHandle value={start} setValue={setStart} onDrop={onDrop} />
-      <div class={styles.handleSpacer} />
-      <RangeHandle value={end} setValue={setEnd} onDrop={onDrop} />
+      <div
+        style={{
+          flexDirection: start > end ? 'row-reverse' : 'row',
+          left: `${framesToPercents(Math.ceil(Math.max(0, normalizedStart)))}%`,
+          right: `${
+            100 - framesToPercents(Math.ceil(Math.min(duration, normalizedEnd)))
+          }%`,
+        }}
+        className={clsx(
+          styles.range,
+          shiftHeld && !controlHeld && styles.active,
+        )}
+        onPointerDown={event => {
+          if (event.button === MouseButton.Left) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }
+        }}
+        onPointerMove={event => {
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+            setStart(start + pixelsToFrames(event.movementX));
+            setEnd(end + pixelsToFrames(event.movementX));
+          }
+        }}
+        onPointerUp={event => {
+          if (event.button === MouseButton.Left) {
+            event.currentTarget.releasePointerCapture(event.pointerId);
+            onDrop();
+          }
+        }}
+        onDblClick={() => {
+          meta.shared.range.update(0, Infinity, duration, fps);
+        }}
+      >
+        <RangeHandle value={start} setValue={setStart} onDrop={onDrop} />
+        <div class={styles.handleSpacer} />
+        <RangeHandle value={end} setValue={setEnd} onDrop={onDrop} />
+      </div>
     </div>
   );
 }

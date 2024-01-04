@@ -45,14 +45,6 @@
   width: 100%;
   height: 100%;
   background-color: var(--surface-color);
-
-  &::before {
-    width: 100%;
-    height: 32px;
-    display: block;
-    content: '';
-    background-color: var(--background-color);
-  }
 }
 
 .timestamp {
@@ -280,6 +272,15 @@
 
   .root:hover & {
     opacity: 0.16;
+  }
+}
+
+.rangeContainer {
+  height: 32px;
+  pointer-events: none;
+
+  &.active {
+    pointer-events: auto;
   }
 }
 
