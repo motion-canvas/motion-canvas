@@ -1535,8 +1535,9 @@ export class Node implements Promisable<Node> {
   public hit(position: Vector2): Node | null {
     let hit: Node | null = null;
     const local = position.transformAsPoint(this.localToParent().inverse());
-    for (const child of this.children().reverse()) {
-      hit = child.hit(local);
+    const children = this.children();
+    for (let i = children.length - 1; i >= 0; i--) {
+      hit = children[i].hit(local);
       if (hit) {
         break;
       }
