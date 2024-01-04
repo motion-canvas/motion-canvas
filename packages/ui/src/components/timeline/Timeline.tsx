@@ -1,6 +1,6 @@
 import styles from './Timeline.module.scss';
 
-import {effect, useSignal} from '@preact/signals';
+import {useSignal, useSignalEffect} from '@preact/signals';
 import clsx from 'clsx';
 import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {
@@ -146,7 +146,7 @@ export function Timeline() {
     containerRef.current.scrollLeft = offset;
   }, [scale]);
 
-  effect(() => {
+  useSignalEffect(() => {
     const offset = labelClipDraggingLeftSignal.value;
     if (offset !== null && playheadRef.current) {
       playheadRef.current.style.left = `${

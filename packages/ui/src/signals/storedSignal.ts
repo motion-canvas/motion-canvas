@@ -1,4 +1,4 @@
-import {effect, signal, Signal} from '@preact/signals';
+import {Signal, useSignal, useSignalEffect} from '@preact/signals';
 import {projectNameSignal} from './projectName';
 
 export function storedSignal<T>(
@@ -6,9 +6,9 @@ export function storedSignal<T>(
   id: string,
   parse?: (value: any) => T,
 ): Signal<T> {
-  const stored = signal(value);
+  const stored = useSignal(value);
 
-  effect(() => {
+  useSignalEffect(() => {
     const name = projectNameSignal.value;
     if (name !== null) {
       const storedValue = localStorage.getItem(`${name}-${id}`);
@@ -23,7 +23,7 @@ export function storedSignal<T>(
     }
   });
 
-  effect(() => {
+  useSignalEffect(() => {
     const value = stored.value;
     const name = projectNameSignal.value;
     if (name !== null) {
