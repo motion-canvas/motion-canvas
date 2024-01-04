@@ -116,6 +116,10 @@ export class Txt extends Shape {
     const newSize = this.size();
     leaf.text(oldText ?? DEFAULT);
 
+    if (this.height() === 0) {
+      this.height(newSize.height);
+    }
+
     yield* all(
       this.size(newSize, time, timingFunction),
       leaf.text(value, time, timingFunction, interpolationFunction),
