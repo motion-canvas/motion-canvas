@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.3](https://github.com/motion-canvas/motion-canvas/compare/v3.12.2...v3.12.3) (2024-01-04)
+
+
+### Bug Fixes
+
+* **2d:** prevent src warnings in Icon and Latex ([#899](https://github.com/motion-canvas/motion-canvas/issues/899)) ([5eebab7](https://github.com/motion-canvas/motion-canvas/commit/5eebab71d8061e233872e049e77b847f9fd077a1))
+* **2d:** stop mutating children ([#903](https://github.com/motion-canvas/motion-canvas/issues/903)) ([f9552a8](https://github.com/motion-canvas/motion-canvas/commit/f9552a8658ccde6c7b2466ad40b12cf28c6ec805))
+* **ui:** remember state of custom tabs ([#900](https://github.com/motion-canvas/motion-canvas/issues/900)) ([eac45b8](https://github.com/motion-canvas/motion-canvas/commit/eac45b88ed09fc7cddc3336e46d8697de5775b1f))
+
+
+
+
+
 ## [3.12.2](https://github.com/motion-canvas/motion-canvas/compare/v3.12.1...v3.12.2) (2023-12-31)
 
 
