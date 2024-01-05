@@ -2,7 +2,7 @@ import styles from './Timeline.module.scss';
 
 import {useSignal, useSignalEffect} from '@preact/signals';
 import clsx from 'clsx';
-import {useCallback, useLayoutEffect, useMemo, useRef} from 'preact/hooks';
+import {useLayoutEffect, useMemo, useRef} from 'preact/hooks';
 import {
   TimelineContextProvider,
   TimelineState,
@@ -13,6 +13,7 @@ import {
   useDuration,
   usePreviewSettings,
   useReducedMotion,
+  useSharedSettings,
   useSize,
   useStateChange,
   useStorage,
@@ -35,7 +36,8 @@ const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
   const [hoverRef] = useShortcut<HTMLDivElement>('timeline');
-  const {player} = useApplication();
+  const {player, meta} = useApplication();
+  const {range} = useSharedSettings();
   const containerRef = useRef<HTMLDivElement>();
   const playheadRef = useRef<HTMLDivElement>();
   const rangeRef = useRef<HTMLDivElement>();
@@ -94,6 +96,7 @@ export function Timeline() {
           relativeOffset + sizes.viewLength + TIMESTAMP_SPACING,
         ) / clampedSegmentDensity,
       ) * clampedSegmentDensity;
+    const startPosition = sizes.paddingLeft + rect.x - offset;
 
     return {
       viewLength: sizes.viewLength,
@@ -102,6 +105,8 @@ export function Timeline() {
       lastVisibleFrame,
       density,
       segmentDensity,
+      pointerToFrames: (value: number) =>
+        conversion.pixelsToFrames(value - startPosition),
       ...conversion,
     };
   }, [sizes, conversion, duration, offset]);
@@ -123,24 +128,33 @@ export function Timeline() {
     [duration / fps, rect.width],
   );
 
-  useDocumentEvent(
-    'keydown',
-    useCallback(
-      event => {
-        if (document.activeElement.tagName === 'INPUT') {
-          return;
-        }
-        if (event.key !== 'f') return;
-        const frame = player.onFrameChanged.current;
+  useDocumentEvent('keydown', event => {
+    if (document.activeElement.tagName === 'INPUT') {
+      return;
+    }
+
+    const frame = player.onFrameChanged.current;
+    switch (event.key) {
+      case 'f': {
         const maxOffset = sizes.fullLength - sizes.viewLength;
         const scrollLeft = state.framesToPixels(frame);
         const newOffset = clamp(0, maxOffset, scrollLeft);
         containerRef.current.scrollLeft = newOffset;
         setOffset(newOffset);
-      },
-      [sizes],
-    ),
-  );
+        break;
+      }
+      case 'b': {
+        const end = player.status.secondsToFrames(range[1]);
+        meta.shared.range.update(frame, end, duration, fps);
+        break;
+      }
+      case 'n': {
+        const start = player.status.secondsToFrames(range[0]);
+        meta.shared.range.update(start, frame, duration, fps);
+        break;
+      }
+    }
+  });
 
   useLayoutEffect(() => {
     containerRef.current.scrollLeft = offset;
@@ -157,9 +171,7 @@ export function Timeline() {
   });
 
   const scrub = (x: number) => {
-    const frame = Math.floor(
-      state.pixelsToFrames(offset - sizes.paddingLeft + x - rect.x),
-    );
+    const frame = Math.floor(state.pointerToFrames(x));
 
     seeking.value = player.clampRange(frame);
     if (player.onFrameChanged.current !== frame) {
