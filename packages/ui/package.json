@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "3.12.3",
+  "version": "3.12.4",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
