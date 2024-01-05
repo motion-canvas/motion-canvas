@@ -429,6 +429,7 @@ export class Node implements Promisable<Node> {
     }
   }
   protected getChildren(): Node[] {
+    this.children.context.getter();
     return this.spawnedChildren();
   }
 

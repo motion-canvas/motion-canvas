@@ -35,7 +35,7 @@ const transformerProgram = program => context => sourceFile => {
     if (
       ts.isImportDeclaration(node) &&
       ts.isStringLiteral(node.moduleSpecifier) &&
-      node.importClause.name !== undefined
+      node.importClause?.name !== undefined
     ) {
       /**
        * @type {ts.TypeChecker}

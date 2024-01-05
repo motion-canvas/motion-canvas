@@ -8,6 +8,8 @@ export default defineConfig({
     alias: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       '@motion-canvas/ui': '/src/main.tsx',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      '@motion-canvas/2d/editor': '@motion-canvas/2d/src/editor',
     },
   },
   build: {
