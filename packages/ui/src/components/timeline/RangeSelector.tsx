@@ -9,7 +9,6 @@ import {
   useKeyHold,
   usePreviewSettings,
   useSharedSettings,
-  useSize,
 } from '../../hooks';
 import {labelClipDraggingLeftSignal} from '../../signals';
 import {MouseButton} from '../../utils';
@@ -20,8 +19,8 @@ export interface RangeSelectorProps {
 }
 
 export function RangeSelector({rangeRef}: RangeSelectorProps) {
-  const {pixelsToFrames, framesToPercents} = useTimelineContext();
-
+  const {pixelsToFrames, framesToPercents, pointerToFrames} =
+    useTimelineContext();
   const {player, meta} = useApplication();
   const {range} = useSharedSettings();
   const {fps} = usePreviewSettings();
@@ -30,7 +29,6 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
   const endFrame = Math.min(player.status.secondsToFrames(range[1]), duration);
   const [start, setStart] = useState(startFrame);
   const [end, setEnd] = useState(endFrame);
-  const rect = useSize(rangeRef);
   const shiftHeld = useKeyHold('Shift');
   const controlHeld = useKeyHold('Control');
 
@@ -55,7 +53,7 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
     <div
       ref={rangeRef}
       className={clsx(
-        styles.rangeContainer,
+        styles.rangeTrack,
         shiftHeld && controlHeld && styles.active,
       )}
       onPointerDown={event => {
@@ -64,8 +62,8 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
           event.stopPropagation();
           event.currentTarget.setPointerCapture(event.pointerId);
 
-          setStart(pixelsToFrames(event.clientX - rect.x));
-          setEnd(pixelsToFrames(event.clientX - rect.x));
+          setStart(pointerToFrames(event.clientX));
+          setEnd(pointerToFrames(event.clientX));
         }
       }}
       onPointerMove={event => {

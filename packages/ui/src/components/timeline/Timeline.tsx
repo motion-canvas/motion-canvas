@@ -96,6 +96,7 @@ export function Timeline() {
           relativeOffset + sizes.viewLength + TIMESTAMP_SPACING,
         ) / clampedSegmentDensity,
       ) * clampedSegmentDensity;
+    const startPosition = sizes.paddingLeft + rect.x - offset;
 
     return {
       viewLength: sizes.viewLength,
@@ -104,6 +105,8 @@ export function Timeline() {
       lastVisibleFrame,
       density,
       segmentDensity,
+      pointerToFrames: (value: number) =>
+        conversion.pixelsToFrames(value - startPosition),
       ...conversion,
     };
   }, [sizes, conversion, duration, offset]);
@@ -168,9 +171,7 @@ export function Timeline() {
   });
 
   const scrub = (x: number) => {
-    const frame = Math.floor(
-      state.pixelsToFrames(offset - sizes.paddingLeft + x - rect.x),
-    );
+    const frame = Math.floor(state.pointerToFrames(x));
 
     seeking.value = player.clampRange(frame);
     if (player.onFrameChanged.current !== frame) {

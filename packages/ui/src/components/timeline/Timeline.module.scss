@@ -275,8 +275,9 @@
   }
 }
 
-.rangeContainer {
+.rangeTrack {
   height: 32px;
+  cursor: pointer;
   pointer-events: none;
 
   &.active {
@@ -298,6 +299,10 @@
 
   &.active {
     pointer-events: auto;
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .rangeTrack.active > & {
     border-color: rgba(255, 255, 255, 0.24);
   }
 }
