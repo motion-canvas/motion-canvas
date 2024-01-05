@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.12.4](https://github.com/motion-canvas/motion-canvas/compare/v3.12.3...v3.12.4) (2024-01-05)
+
+
+### Bug Fixes
+
+* **2d:** fix height when tweening text ([#905](https://github.com/motion-canvas/motion-canvas/issues/905)) ([1c6a796](https://github.com/motion-canvas/motion-canvas/commit/1c6a7965be137c1ab69741cdd1e9aaa6df4208c4))
+
+
+
+
+
 ## [3.12.3](https://github.com/motion-canvas/motion-canvas/compare/v3.12.2...v3.12.3) (2024-01-04)
 
 
