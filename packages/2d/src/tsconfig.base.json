@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "..",
     "strict": true,
     "noImplicitOverride": true,
     "module": "esnext",

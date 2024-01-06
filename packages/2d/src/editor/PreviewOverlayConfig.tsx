@@ -13,7 +13,7 @@ import {useInspection} from './Provider';
 function Component({children}: {children?: ComponentChildren}) {
   const state = useViewportContext();
   const scene = useCurrentScene();
-  const {nodeKey} = useInspection();
+  const {selectedKey} = useInspection();
   const matrix = useViewportMatrix();
 
   return (
@@ -28,7 +28,10 @@ function Component({children}: {children?: ComponentChildren}) {
           event.y - state.rect.y,
         ).transformAsPoint(matrix.inverse());
 
-        nodeKey.value = scene.inspectPosition(position.x, position.y) as string;
+        selectedKey.value = scene.inspectPosition(
+          position.x,
+          position.y,
+        ) as string;
       }}
     >
       {children}
@@ -37,18 +40,32 @@ function Component({children}: {children?: ComponentChildren}) {
 }
 
 function drawHook() {
-  const {nodeKey} = useInspection();
-  const scene = useCurrentScene();
-  nodeKey.value;
+  const {selectedKey, hoveredKey, afterRender, scene} = useInspection();
+  selectedKey.value;
+  hoveredKey.value;
+  afterRender.value;
 
   return (ctx: CanvasRenderingContext2D, matrix: DOMMatrix) => {
-    if (!isInspectable(scene)) return;
-    const element = scene.validateInspection(nodeKey.value);
-    if (!element || element !== nodeKey.value) {
-      nodeKey.value = element as string;
+    const currentScene = scene.peek();
+    if (!currentScene) return;
+
+    let node = currentScene.getNode(selectedKey.value);
+    if (!node || node.key !== selectedKey.value) {
+      selectedKey.value = node?.key ?? null;
+    } else {
+      currentScene.drawOverlay(selectedKey.value, matrix, ctx);
+    }
+
+    node = currentScene.getNode(hoveredKey.value);
+    if (!node || node.key !== hoveredKey.value) {
+      hoveredKey.value = node?.key ?? null;
       return;
     }
-    scene.drawOverlay(element, matrix, ctx);
+
+    if (hoveredKey.value !== selectedKey.value) {
+      ctx.globalAlpha = 0.5;
+      currentScene.drawOverlay(hoveredKey.value, matrix, ctx);
+    }
   };
 }
 

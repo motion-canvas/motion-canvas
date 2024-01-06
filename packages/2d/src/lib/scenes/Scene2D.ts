@@ -143,6 +143,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     return this.registeredNodes.get(key) ?? null;
   }
 
+  public *getDetachedNodes() {
+    for (const node of this.registeredNodes.values()) {
+      if (!node.parent() && node !== this.view) yield node;
+    }
+  }
+
   protected recreateView() {
     this.execute(() => {
       const size = this.getSize();

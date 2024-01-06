@@ -9,8 +9,10 @@
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "scripts": {
-    "dev": "tspc -b src -w",
-    "build": "tspc -b src/tsconfig.build.json",
+    "dev": "tspc -p src/lib -w",
+    "build": "npm run build-lib && npm run build-editor",
+    "build-lib": "tspc -p src/lib/tsconfig.build.json",
+    "build-editor": "rollup -c rollup.editor.mjs",
     "bundle": "rollup -c rollup.config.mjs",
     "test": "vitest"
   },
@@ -28,7 +30,10 @@
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
     "@motion-canvas/ui": "^3.12.4",
+    "@preact/signals": "^1.2.1",
     "jsdom": "^22.1.0",
+    "preact": "^10.19.2",
+    "clsx": "^2.0.0",
     "vitest": "^0.34.6"
   },
   "dependencies": {

@@ -7,11 +7,13 @@ import styles from './Collapse.module.scss';
 export interface CollapseProps extends JSX.HTMLAttributes<HTMLDivElement> {
   open: boolean;
   children: ComponentChildren;
+  animated?: boolean;
 }
 
-export function Collapse(props: CollapseProps) {
+export function Collapse({animated = true, ...props}: CollapseProps) {
   const reducedMotion = useReducedMotion();
-  const Component = reducedMotion ? ReducedCollapse : AnimatedCollapse;
+  const Component =
+    !reducedMotion && animated ? AnimatedCollapse : ReducedCollapse;
   return <Component {...props} />;
 }
 

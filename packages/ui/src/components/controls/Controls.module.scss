@@ -255,7 +255,7 @@
     background-color: var(--surface-color-hover);
   }
 
-  svg {
+  &.animated svg {
     transition: rotate var(--duration-normal) var(--timing-ease-in-out);
   }
 

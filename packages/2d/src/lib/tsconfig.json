@@ -1,8 +1,6 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "../../lib",
     "types": ["node"],
     "jsx": "react-jsx",
     "jsxImportSource": "@motion-canvas/2d/src/lib",
