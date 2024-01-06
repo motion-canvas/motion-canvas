@@ -1,7 +1,7 @@
 import {Node} from '@motion-canvas/2d';
 import {useComputed, useSignal, useSignalEffect} from '@preact/signals';
 import {useRef} from 'preact/hooks';
-import {useInspection} from '../Provider';
+import {usePluginState} from '../Provider';
 import {TreeElement} from './TreeElement';
 
 interface NodeElementProps {
@@ -11,7 +11,7 @@ interface NodeElementProps {
 
 export function NodeElement({node, depth = 0}: NodeElementProps) {
   const {selectedKey, hoveredKey, openNodes, selectedChain, afterRender} =
-    useInspection();
+    usePluginState();
   const ref = useRef<HTMLDivElement>(null);
   const open = useSignal(
     selectedChain.peek().has(node.key) || (openNodes.get(node.key) ?? false),

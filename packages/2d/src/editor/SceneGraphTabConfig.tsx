@@ -12,21 +12,21 @@ import {
 
 import {useSignalEffect} from '@preact/signals';
 import {useEffect, useRef} from 'preact/hooks';
-import {useInspection} from './Provider';
+import {usePluginState} from './Provider';
 import {DetachedRoot, ViewRoot} from './tree';
 
 function TabComponent({tab}: PluginTabProps) {
   const {sidebar} = usePanels();
   const inspectorTab = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
-  const {selectedKey} = useInspection();
+  const {selectedKey} = usePluginState();
   const {logger} = useApplication();
 
   useEffect(
     () =>
       logger.onInspected.subscribe(key => {
-        selectedKey.value = key;
         sidebar.set(tab);
+        selectedKey.value = key;
       }),
     [tab],
   );
@@ -59,7 +59,7 @@ function TabComponent({tab}: PluginTabProps) {
 }
 
 function PaneComponent() {
-  const {selectedKey} = useInspection();
+  const {selectedKey} = usePluginState();
 
   return (
     <Pane

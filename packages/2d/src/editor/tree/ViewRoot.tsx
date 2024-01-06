@@ -1,10 +1,10 @@
 import {useSignal, useSignalEffect} from '@preact/signals';
-import {useInspection} from '../Provider';
+import {usePluginState} from '../Provider';
 import {NodeElement} from './NodeElement';
 import {TreeRoot} from './TreeRoot';
 
 export function ViewRoot() {
-  const {scene} = useInspection();
+  const {scene} = usePluginState();
   const view = useSignal(scene.value?.getView());
 
   useSignalEffect(() => {
