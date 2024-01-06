@@ -9,7 +9,7 @@ import {
   capitalize,
   threadable,
 } from '@motion-canvas/core';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {is} from '../utils';
 import {Node} from './Node';
 import {Shape, ShapeProps} from './Shape';
@@ -24,6 +24,7 @@ export interface TxtProps extends ShapeProps {
   text?: SignalValue<string>;
 }
 
+@nodeName('Txt')
 export class Txt extends Shape {
   /**
    * Create a bold text node.

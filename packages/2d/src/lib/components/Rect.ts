@@ -7,7 +7,7 @@ import {
   SpacingSignal,
 } from '@motion-canvas/core';
 import {getRectProfile} from '../curves/getRectProfile';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {spacingSignal} from '../decorators/spacingSignal';
 import {DesiredLength} from '../partials';
 import {drawRoundRect} from '../utils';
@@ -30,6 +30,7 @@ export interface RectProps extends CurveProps {
   cornerSharpness?: SignalValue<number>;
 }
 
+@nodeName('Rect')
 export class Rect extends Curve {
   /**
    * Rounds the corners of this rectangle.

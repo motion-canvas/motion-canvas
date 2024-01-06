@@ -18,7 +18,7 @@ import {
   polygonLength,
   polygonPointsLerp,
 } from '../curves/createCurveProfileLerp';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {arc, drawLine, drawPivot, lineTo, moveTo} from '../utils';
 import lineWithoutPoints from './__logs__/line-without-points.md';
 import {Curve, CurveProps} from './Curve';
@@ -140,6 +140,7 @@ export interface LineProps extends CurveProps {
  * });
  * ```
  */
+@nodeName('Line')
 export class Line extends Curve {
   /**
    * Rotate the points to minimize the overall distance traveled when tweening.

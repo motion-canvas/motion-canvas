@@ -5,7 +5,7 @@ import {
   Vector2Signal,
 } from '@motion-canvas/core';
 import {CurveProfile, LineSegment} from '../curves';
-import {vector2Signal} from '../decorators';
+import {nodeName, vector2Signal} from '../decorators';
 import {arc, drawLine, drawPivot} from '../utils';
 import {Curve, CurveProps} from './Curve';
 
@@ -53,6 +53,7 @@ export interface RayProps extends CurveProps {
  * });
  * ```
  */
+@nodeName('Ray')
 export class Ray extends Curve {
   /**
    * The starting point of the ray.

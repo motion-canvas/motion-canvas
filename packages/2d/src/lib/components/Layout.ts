@@ -28,6 +28,7 @@ import {
   getPropertyMeta,
   initial,
   interpolation,
+  nodeName,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -186,6 +187,7 @@ export interface LayoutProps extends NodeProps {
   clip?: SignalValue<boolean>;
 }
 
+@nodeName('Layout')
 export class Layout extends Node {
   @initial(null)
   @interpolation(boolLerp)

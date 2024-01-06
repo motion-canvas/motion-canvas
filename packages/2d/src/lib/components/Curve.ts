@@ -10,7 +10,7 @@ import {CurveDrawingInfo} from '../curves/CurveDrawingInfo';
 import {CurvePoint} from '../curves/CurvePoint';
 import {CurveProfile} from '../curves/CurveProfile';
 import {getPointAtDistance} from '../curves/getPointAtDistance';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {lineTo, moveTo, resolveCanvasStyle} from '../utils';
 import {Shape, ShapeProps} from './Shape';
@@ -50,6 +50,7 @@ export interface CurveProps extends ShapeProps {
   arrowSize?: SignalValue<number>;
 }
 
+@nodeName('Curve')
 export abstract class Curve extends Shape {
   /**
    * Whether the curve should be closed.

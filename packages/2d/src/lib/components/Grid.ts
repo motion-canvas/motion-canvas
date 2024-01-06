@@ -5,7 +5,7 @@ import {
   Vector2Signal,
   map,
 } from '@motion-canvas/core';
-import {initial, signal, vector2Signal} from '../decorators';
+import {initial, nodeName, signal, vector2Signal} from '../decorators';
 import {Shape, ShapeProps} from './Shape';
 
 export interface GridProps extends ShapeProps {
@@ -52,6 +52,7 @@ export interface GridProps extends ShapeProps {
  * });
  * ```
  */
+@nodeName('Grid')
 export class Grid extends Shape {
   /**
    * The spacing between the grid lines.

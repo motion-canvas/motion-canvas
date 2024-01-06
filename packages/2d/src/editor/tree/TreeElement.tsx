@@ -1,6 +1,6 @@
 import {Collapse, Toggle} from '@motion-canvas/ui';
 import {Signal} from '@preact/signals';
-import clsx from 'clsx';
+import {clsx} from 'clsx';
 import {ComponentChildren, JSX} from 'preact';
 import {Ref} from 'preact/hooks';
 import styles from './index.module.scss';
@@ -8,7 +8,8 @@ import styles from './index.module.scss';
 const DEPTH_VAR = '--depth';
 
 interface TreeElementProps
-  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'label'> {
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'label' | 'icon'> {
+  icon?: ComponentChildren;
   label: ComponentChildren;
   children?: ComponentChildren;
   selected?: boolean;
@@ -23,6 +24,7 @@ export function TreeElement({
   selected,
   depth = 0,
   open,
+  icon,
   forwardRef,
   ...props
 }: TreeElementProps) {
@@ -57,7 +59,7 @@ export function TreeElement({
             }}
           />
         )}
-        <div className={styles.icon} />
+        {icon}
         {label}
       </div>
       {hasChildren && (

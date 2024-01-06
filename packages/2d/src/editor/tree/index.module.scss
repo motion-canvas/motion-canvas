@@ -4,15 +4,6 @@
   border-top: 2px solid var(--background-color);
 }
 
-.icon {
-  width: 20px;
-  height: 20px;
-  align-self: center;
-  background-color: var(--background-color);
-  border-radius: var(--radius);
-  margin-right: 8px;
-}
-
 .label {
   --depth: 0;
 
@@ -34,5 +25,14 @@
 
   &.parent {
     padding-left: calc(var(--depth) * 22px);
+  }
+
+  > svg {
+    width: 20px;
+    height: 20px;
+    align-self: center;
+    background-color: var(--background-color);
+    border-radius: var(--radius);
+    margin-right: 8px;
   }
 }

@@ -1,5 +1,6 @@
 import {PlaybackState, SimpleSignal, lazy} from '@motion-canvas/core';
 import {initial, signal} from '../decorators';
+import {nodeName} from '../decorators/nodeName';
 import {useScene2D} from '../scenes/useScene2D';
 import type {Node} from './Node';
 import {Rect, RectProps} from './Rect';
@@ -8,6 +9,7 @@ export interface View2DProps extends RectProps {
   assetHash: string;
 }
 
+@nodeName('View2D')
 export class View2D extends Rect {
   @lazy(() => {
     const frameID = 'motion-canvas-2d-frame';
