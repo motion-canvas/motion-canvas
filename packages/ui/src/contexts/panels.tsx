@@ -1,7 +1,7 @@
 import {computed, ReadonlySignal} from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useMemo} from 'preact/hooks';
-import {PluginTabConfig} from '../plugin';
+import {PluginInspectorConfig, PluginTabConfig} from '../plugin';
 import {EditorPanel, storedSignal} from '../signals';
 import {useApplication} from './application';
 
@@ -15,6 +15,7 @@ interface Panels {
   sidebar: Panel;
   bottom: Panel;
   tabs: PluginTabConfig[];
+  inspectors: PluginInspectorConfig[];
 }
 
 const PanelsContext = createContext<Panels | null>(null);
@@ -39,6 +40,17 @@ export function PanelsProvider({children}: {children: ComponentChildren}) {
     return tabs;
   }, [plugins]);
 
+  const inspectors = useMemo(() => {
+    const inspectors: PluginInspectorConfig[] = [];
+    for (const plugin of plugins) {
+      for (const inspector of plugin.inspectors ?? []) {
+        inspectors.push(inspector);
+      }
+    }
+
+    return inspectors;
+  }, [plugins]);
+
   const options = useMemo(() => {
     const options = tabs.map(tab => tab.name);
     options.push(...Object.values(EditorPanel));
@@ -54,6 +66,7 @@ export function PanelsProvider({children}: {children: ComponentChildren}) {
         sidebar,
         bottom,
         tabs,
+        inspectors,
       }}
     >
       {children}

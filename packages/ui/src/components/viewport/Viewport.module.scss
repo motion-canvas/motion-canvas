@@ -86,3 +86,19 @@
     display: block;
   }
 }
+
+.inspectorOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px;
+  max-width: 424px;
+  width: 40%;
+}
+
+.inspector {
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+}

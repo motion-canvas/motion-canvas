@@ -1,18 +1,18 @@
 import {Scene2D} from '@motion-canvas/2d';
 import {SceneRenderEvent} from '@motion-canvas/core';
-import {useCurrentScene} from '@motion-canvas/ui';
+import {useApplication, useCurrentScene} from '@motion-canvas/ui';
 import {
   ReadonlySignal,
   Signal,
   computed,
   signal,
-  useSignal,
   useSignalEffect,
 } from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useMemo} from 'preact/hooks';
+import {NodeInspectorKey} from './NodeInspectorConfig';
 
-export interface InspectionState {
+export interface PluginState {
   selectedKey: Signal<string | null>;
   hoveredKey: Signal<string | null>;
   openNodes: Map<string, boolean>;
@@ -21,17 +21,18 @@ export interface InspectionState {
   afterRender: ReadonlySignal<number>;
 }
 
-const InspectionContext = createContext<InspectionState | null>(null);
+const PluginContext = createContext<PluginState | null>(null);
 
-export function useInspection() {
-  return useContext(InspectionContext)!;
+export function usePluginState() {
+  return useContext(PluginContext)!;
 }
 
 export function Provider({children}: {children?: ComponentChildren}) {
+  const {inspection} = useApplication();
   const currentScene = useCurrentScene();
 
   const state = useMemo(() => {
-    const scene = useSignal(currentScene as Scene2D);
+    const scene = signal(currentScene as Scene2D);
     const selectedKey = signal<string | null>(null);
     const afterRender = signal(0);
     const hoveredKey = signal<string | null>(null);
@@ -58,22 +59,39 @@ export function Provider({children}: {children?: ComponentChildren}) {
       openNodes,
       selectedChain,
       scene,
-    } satisfies InspectionState;
+    } satisfies PluginState;
   }, []);
 
   state.scene.value = currentScene as Scene2D;
 
-  useSignalEffect(() =>
-    state.scene.value.onRenderLifecycle.subscribe(([event]) => {
-      if (event === SceneRenderEvent.AfterRender) {
-        state.afterRender.value++;
-      }
-    }),
+  useSignalEffect(
+    () =>
+      state.scene.value?.onRenderLifecycle.subscribe(([event]) => {
+        if (event === SceneRenderEvent.AfterRender) {
+          state.afterRender.value++;
+        }
+      }),
   );
 
+  useSignalEffect(() => {
+    const {key, payload} = inspection.value;
+    if (key === NodeInspectorKey) {
+      state.selectedKey.value = payload as string;
+    }
+  });
+
+  useSignalEffect(() => {
+    const nodeKey = state.selectedKey.value;
+    const {key, payload} = inspection.peek();
+
+    if (key === NodeInspectorKey && !nodeKey) {
+      inspection.value = {key: '', payload: null};
+    } else if (payload !== nodeKey) {
+      inspection.value = {key: NodeInspectorKey, payload: nodeKey};
+    }
+  });
+
   return (
-    <InspectionContext.Provider value={state}>
-      {children}
-    </InspectionContext.Provider>
+    <PluginContext.Provider value={state}>{children}</PluginContext.Provider>
   );
 }

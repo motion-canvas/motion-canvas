@@ -19,6 +19,7 @@ import {ButtonCheckbox} from '../controls/ButtonCheckbox';
 import {Grid as GridIcon, Recenter} from '../icons';
 import {ColorPicker} from './ColorPicker';
 import {Coordinates} from './Coordinates';
+import {Inspector} from './Inspector';
 import {OverlayCanvas} from './OverlayCanvas';
 import {PreviewStage} from './PreviewStage';
 import styles from './Viewport.module.scss';
@@ -46,6 +47,7 @@ export function EditorPreview() {
     y: 0,
   });
 
+  const inspector = useMemo(() => <Inspector />, []);
   const drawHooks = useMemo(
     () =>
       plugins.map(plugin => plugin.previewOverlay?.drawHook).filter(Boolean),
@@ -241,6 +243,7 @@ export function EditorPreview() {
           <ColorPicker />
           {coordinateSetting && <Coordinates />}
         </div>
+        {inspector}
       </div>
     </ViewportProvider>
   );
