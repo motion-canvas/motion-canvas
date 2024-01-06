@@ -34,7 +34,8 @@ export function Label({event, scene}: LabelProps) {
           if (e.button === 0) {
             e.stopPropagation();
             e.currentTarget.setPointerCapture(e.pointerId);
-            labelClipDraggingLeftSignal.value = eventTime;
+            labelClipDraggingLeftSignal.value =
+              event.initialTime + Math.max(0, eventTime);
           } else if (e.button === 1) {
             player.requestSeek(
               scene.firstFrame +
@@ -48,7 +49,8 @@ export function Label({event, scene}: LabelProps) {
             const newTime =
               eventTime +
               player.status.framesToSeconds(pixelsToFrames(e.movementX));
-            labelClipDraggingLeftSignal.value = Math.max(0, newTime);
+            labelClipDraggingLeftSignal.value =
+              event.initialTime + Math.max(0, newTime);
             setEventTime(newTime);
           }
         }}
@@ -57,6 +59,7 @@ export function Label({event, scene}: LabelProps) {
             e.currentTarget.releasePointerCapture(e.pointerId);
             labelClipDraggingLeftSignal.value = null;
             const newFrame = Math.max(0, eventTime);
+            setEventTime(newFrame);
             if (event.offset !== newFrame) {
               scene.timeEvents.set(event.name, newFrame, e.shiftKey);
             }

@@ -1,4 +1,4 @@
-// import './index.css';
+import './index.css';
 
 import {makeEditorPlugin} from '@motion-canvas/ui';
 import {PreviewOverlayConfig} from './PreviewOverlayConfig';
