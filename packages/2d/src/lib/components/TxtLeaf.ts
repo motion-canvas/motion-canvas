@@ -6,7 +6,13 @@ import {
   lazy,
   textLerp,
 } from '@motion-canvas/core';
-import {computed, initial, interpolation, signal} from '../decorators';
+import {
+  computed,
+  initial,
+  interpolation,
+  nodeName,
+  signal,
+} from '../decorators';
 import {Shape, ShapeProps} from './Shape';
 import {Txt} from './Txt';
 import {View2D} from './View2D';
@@ -16,6 +22,7 @@ export interface TxtLeafProps extends ShapeProps {
   text?: SignalValue<string>;
 }
 
+@nodeName('TxtLeaf')
 export class TxtLeaf extends Shape {
   @lazy(() => {
     const formatter = document.createElement('span');

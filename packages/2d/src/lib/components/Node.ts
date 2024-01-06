@@ -27,6 +27,7 @@ import {
   useLogger,
 } from '@motion-canvas/core';
 import {
+  NODE_NAME,
   cloneable,
   colorSignal,
   computed,
@@ -34,6 +35,7 @@ import {
   initial,
   initializeSignals,
   inspectable,
+  nodeName,
   parser,
   signal,
   vector2Signal,
@@ -81,7 +83,12 @@ export interface NodeProps {
   compositeOperation?: SignalValue<GlobalCompositeOperation>;
 }
 
+@nodeName('Node')
 export class Node implements Promisable<Node> {
+  /**
+   * @internal
+   */
+  public declare readonly [NODE_NAME]: string;
   public declare isClass: boolean;
 
   /**

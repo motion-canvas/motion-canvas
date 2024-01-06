@@ -11,7 +11,7 @@ import {
   useLogger,
   viaProxy,
 } from '@motion-canvas/core';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
@@ -65,6 +65,7 @@ export interface ImgProps extends RectProps {
  * });
  * ```
  */
+@nodeName('Img')
 export class Img extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 

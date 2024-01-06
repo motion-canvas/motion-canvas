@@ -6,7 +6,7 @@ import {
   SimpleSignal,
 } from '@motion-canvas/core';
 import {CurveProfile, getCircleProfile} from '../curves';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {Curve, CurveProps} from './Curve';
 
@@ -126,6 +126,7 @@ export interface CircleProps extends CurveProps {
  * });
  * ```
  */
+@nodeName('Circle')
 export class Circle extends Curve {
   /**
    * The starting angle in degrees for the circle sector.

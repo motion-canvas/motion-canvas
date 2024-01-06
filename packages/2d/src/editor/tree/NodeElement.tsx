@@ -1,7 +1,8 @@
-import {Node} from '@motion-canvas/2d';
+import {NODE_NAME, Node} from '@motion-canvas/2d';
 import {useComputed, useSignal, useSignalEffect} from '@preact/signals';
 import {useRef} from 'preact/hooks';
 import {usePluginState} from '../Provider';
+import {IconMap} from '../icons/IconMap';
 import {TreeElement} from './TreeElement';
 
 interface NodeElementProps {
@@ -46,11 +47,14 @@ export function NodeElement({node, depth = 0}: NodeElementProps) {
     }
   });
 
+  const Icon = IconMap[node[NODE_NAME]] ?? IconMap.Node;
+
   return (
     <TreeElement
       forwardRef={ref}
       open={open}
       depth={depth}
+      icon={<Icon />}
       label={node.key}
       selected={selectedKey.value === node.key}
       onClick={event => {

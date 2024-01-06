@@ -10,7 +10,7 @@ import {
   useLogger,
   useThread,
 } from '@motion-canvas/core';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
@@ -44,6 +44,7 @@ export interface VideoProps extends RectProps {
   play?: boolean;
 }
 
+@nodeName('Video')
 export class Video extends Rect {
   private static readonly pool: Record<string, HTMLVideoElement> = {};
 
