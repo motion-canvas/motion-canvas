@@ -73,8 +73,8 @@ export class Img extends Rect {
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
         for (const url of urls) {
-          if (this.pool[url]) {
-            delete this.pool[url];
+          if (Img.pool[url]) {
+            delete Img.pool[url];
           }
         }
       });

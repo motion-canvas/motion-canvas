@@ -10,7 +10,6 @@ import {
 } from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useMemo} from 'preact/hooks';
-import {NodeInspectorKey} from './NodeInspectorConfig';
 
 export interface PluginState {
   selectedKey: Signal<string | null>;
@@ -22,6 +21,8 @@ export interface PluginState {
 }
 
 const PluginContext = createContext<PluginState | null>(null);
+
+export const NodeInspectorKey = '@motion-canvas/2d/node-inspector';
 
 export function usePluginState() {
   return useContext(PluginContext)!;
