@@ -253,3 +253,10 @@ kbd {
 [data-theme='dark'] kbd {
   border: 1px solid var(--ifm-color-emphasis-300);
 }
+
+.blog-img {
+  background-color: var(--ifm-background-surface-color);
+  border-radius: var(--ifm-global-radius);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
