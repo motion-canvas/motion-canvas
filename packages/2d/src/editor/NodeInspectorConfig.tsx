@@ -11,7 +11,7 @@ import {
   useApplication,
 } from '@motion-canvas/ui';
 import {useComputed} from '@preact/signals';
-import {usePluginState} from './Provider';
+import {NodeInspectorKey, usePluginState} from './Provider';
 
 function Component() {
   const {inspection} = useApplication();
@@ -69,8 +69,6 @@ function Component() {
     </Pane>
   );
 }
-
-export const NodeInspectorKey = '@motion-canvas/2d/node-inspector';
 
 export const NodeInspectorConfig: PluginInspectorConfig = {
   key: NodeInspectorKey,
