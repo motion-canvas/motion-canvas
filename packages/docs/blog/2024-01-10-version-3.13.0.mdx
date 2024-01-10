@@ -1,0 +1,49 @@
+---
+slug: version-3.13.0
+title: Motion Canvas v3.13.0
+description: See what's actually going on inside your scenes.
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PullRequest from '../src/components/Release/PullRequest';
+import Link from '@docusaurus/Link';
+import thumbnail from './2024-01-10-version-3.13.0-scene-graph.webp';
+import image from './2024-01-10-version-3.13.0-scene-graph.png';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    A new scene graph tab lets you peek into the contents of the scene.
+    <PullRequest id={909} />
+    <PullRequest id={914} />
+    <a href={image} target="_blank">
+      <img
+        src={thumbnail}
+        width="1280"
+        height="720"
+        alt="Scene Graph Tab"
+        className="blog-img"
+      />
+    </a>
+  </Issue>
+  <Issue user={'jmaen'} pr={907}>
+    Holding <kbd>Shift</kbd> + <kbd>Ctrl</kbd> lets you drag over the timeline
+    to select the range. <kbd>B</kbd> and <kbd>N</kbd> can be used to snap the
+    beginning and end of the range to the playhead.
+  </Issue>
+  <Issue user={'aarthificial'} pr={913} experimental>
+    Editor plugins can now register custom inspectors that display information
+    on the right side of the editor.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={912}>
+    The mouse is tracked correctly when dragging time events.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>
