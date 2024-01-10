@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0-alpha.0) (2024-01-10)
+
+
+### Bug Fixes
+
+* **ui:** correctly drag time events ([#912](https://github.com/motion-canvas/motion-canvas/issues/912)) ([81f6dd6](https://github.com/motion-canvas/motion-canvas/commit/81f6dd6e485be451a50a695a146ed6b69e30bbc2))
+
+
+### Features
+
+* **ui:** add direct range selection & playhead shortcuts ([#907](https://github.com/motion-canvas/motion-canvas/issues/907)) ([39264fc](https://github.com/motion-canvas/motion-canvas/commit/39264fc074da739efddf24ef080f6c5f279f8014))
+* **ui:** custom inspectors ([#913](https://github.com/motion-canvas/motion-canvas/issues/913)) ([6c54424](https://github.com/motion-canvas/motion-canvas/commit/6c544248a2bd733f2d42676a0ed60c93b79ee574))
+* **ui:** scene graph ([#909](https://github.com/motion-canvas/motion-canvas/issues/909)) ([bf85c5b](https://github.com/motion-canvas/motion-canvas/commit/bf85c5b4a339719e79da1b87b1aed4492166ce79))
+
+
+
+
+
 ## [3.12.4](https://github.com/motion-canvas/motion-canvas/compare/v3.12.3...v3.12.4) (2024-01-05)
 
 

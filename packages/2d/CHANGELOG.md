@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0-alpha.0) (2024-01-10)
+
+
+### Bug Fixes
+
+* **2d:** minor fixes ([#915](https://github.com/motion-canvas/motion-canvas/issues/915)) ([63cfc9e](https://github.com/motion-canvas/motion-canvas/commit/63cfc9e033f2c2ac6d6ed2a0d8f615fcf642ab59))
+* **ui:** correctly drag time events ([#912](https://github.com/motion-canvas/motion-canvas/issues/912)) ([81f6dd6](https://github.com/motion-canvas/motion-canvas/commit/81f6dd6e485be451a50a695a146ed6b69e30bbc2))
+
+
+### Features
+
+* **ui:** custom inspectors ([#913](https://github.com/motion-canvas/motion-canvas/issues/913)) ([6c54424](https://github.com/motion-canvas/motion-canvas/commit/6c544248a2bd733f2d42676a0ed60c93b79ee574))
+* **ui:** scene graph ([#909](https://github.com/motion-canvas/motion-canvas/issues/909)) ([bf85c5b](https://github.com/motion-canvas/motion-canvas/commit/bf85c5b4a339719e79da1b87b1aed4492166ce79))
+* **ui:** scene graph icons ([#914](https://github.com/motion-canvas/motion-canvas/issues/914)) ([e92ddef](https://github.com/motion-canvas/motion-canvas/commit/e92ddef34860f5e710ff0f1a310758ec0ca95bcb))
+
+
+
+
+
 ## [3.12.4](https://github.com/motion-canvas/motion-canvas/compare/v3.12.3...v3.12.4) (2024-01-05)
 
 
