@@ -130,7 +130,7 @@
 .numberInput {
   cursor: ew-resize;
 
-  &.active {
+  &:focus {
     cursor: text;
   }
 }

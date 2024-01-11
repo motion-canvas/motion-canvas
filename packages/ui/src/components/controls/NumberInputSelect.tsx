@@ -5,14 +5,13 @@ import {Select, SelectProps} from './Select';
 
 export type NumberInputSelectProps = Omit<
   JSX.HTMLAttributes<HTMLInputElement>,
-  'min' | 'max' | 'step' | 'value' | 'onChange' | 'onChangeCapture'
+  'value' | 'onChange' | 'min' | 'max' | 'step'
 > &
   SelectProps<number> & {
     value: number;
     min?: number;
     max?: number;
     step?: number;
-    onChangeCapture?: (value: number) => void;
   };
 
 export function NumberInputSelect({
@@ -23,11 +22,7 @@ export function NumberInputSelect({
 }: NumberInputSelectProps) {
   return (
     <div className={styles.inputSelect}>
-      <NumberInput
-        value={value}
-        onChange={value => onChange(value)}
-        {...props}
-      />
+      <NumberInput value={value} onChange={onChange} {...props} />
       <Select value={value} options={options} onChange={onChange} />
     </div>
   );

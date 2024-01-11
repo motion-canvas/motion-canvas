@@ -7,31 +7,25 @@ import styles from './Controls.module.scss';
 
 type NumberInputProps = Omit<
   JSX.HTMLAttributes<HTMLInputElement>,
-  'min' | 'max' | 'step' | 'value' | 'onChange' | 'onChangeCapture'
+  'value' | 'onChange' | 'min' | 'max' | 'step'
 > & {
+  value: number;
+  onChange: (value: number) => void;
   min?: number;
   max?: number;
   step?: number;
-  value: number;
-  onChange?: (value: number) => void;
-  onChangeCapture?: (value: number) => void;
 };
 
 export function NumberInput({
+  value,
+  onChange,
   min = -Infinity,
   max = Infinity,
   step = 1,
-  value = 0,
-  onChange,
-  onChangeCapture,
   ...props
 }: NumberInputProps) {
-  const handleChange = onChangeCapture ? onChange : undefined;
-  const handleChangeCapture = onChangeCapture ?? onChange;
-
   const inputRef = useRef<HTMLInputElement>();
   const [currentValue, setCurrentValue] = useState(value);
-  const [active, setActive] = useState(false);
   const [startX, setStartX] = useState(0);
 
   useEffect(() => {
@@ -47,9 +41,7 @@ export function NumberInput({
           return value;
         }
 
-        const newValue = clamp(min, max, value + event.movementX * step);
-        handleChange?.(newValue);
-        return newValue;
+        return clamp(min, max, value + event.movementX * step);
       });
     },
     [min, max, step],
@@ -71,18 +63,12 @@ export function NumberInput({
       max={max}
       step={step}
       value={currentValue}
-      onChangeCapture={event => {
-        const value = parseInt((event.target as HTMLInputElement).value);
-        handleChangeCapture?.(value);
-      }}
-      onChange={event => {
-        const value = parseInt((event.target as HTMLInputElement).value);
-        console.log(value);
-
-        handleChange?.(value);
-      }}
+      onChangeCapture={() => onChange?.(parseInt(inputRef.current.value))}
       onPointerDown={event => {
-        if (!active && event.button === MouseButton.Left) {
+        if (
+          document.activeElement !== inputRef.current &&
+          event.button === MouseButton.Left
+        ) {
           event.preventDefault();
           event.stopPropagation();
           event.currentTarget.setPointerCapture(event.pointerId);
@@ -91,7 +77,10 @@ export function NumberInput({
         }
       }}
       onPointerMove={event => {
-        if (!active && event.currentTarget.hasPointerCapture(event.pointerId)) {
+        if (
+          document.activeElement !== inputRef.current &&
+          event.currentTarget.hasPointerCapture(event.pointerId)
+        ) {
           event.preventDefault();
           event.stopPropagation();
 
@@ -107,19 +96,22 @@ export function NumberInput({
 
           if (document.pointerLockElement === inputRef.current) {
             document.exitPointerLock();
-            handleChangeCapture?.(currentValue);
-          } else if (!active) {
+            onChange?.(currentValue);
+          } else if (document.activeElement !== inputRef.current) {
             inputRef.current.select();
           }
         }
       }}
-      onFocus={() => setActive(true)}
-      onBlur={() => setActive(false)}
-      className={clsx(
-        styles.input,
-        styles.numberInput,
-        active && styles.active,
-      )}
+      onKeyDown={event => {
+        if (event.key === 'Enter') {
+          inputRef.current.blur();
+        }
+        if (event.key === 'Escape') {
+          inputRef.current.value = currentValue.toString();
+          inputRef.current.blur();
+        }
+      }}
+      className={clsx(styles.input, styles.numberInput)}
       {...props}
     />
   );
