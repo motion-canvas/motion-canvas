@@ -47,13 +47,16 @@ export function NumberInput({
     [min, max, step],
   );
 
-  useDocumentEvent('pointerlockchange', () => {
-    if (document.pointerLockElement === inputRef.current) {
-      document.addEventListener('pointermove', handleDrag);
-    } else {
-      document.removeEventListener('pointermove', handleDrag);
-    }
-  });
+  useDocumentEvent(
+    'pointerlockchange',
+    useCallback(() => {
+      if (document.pointerLockElement === inputRef.current) {
+        document.addEventListener('pointermove', handleDrag);
+      } else {
+        document.removeEventListener('pointermove', handleDrag);
+      }
+    }, [handleDrag]),
+  );
 
   return (
     <input
