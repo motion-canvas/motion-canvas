@@ -5,7 +5,7 @@ import {
   usePreviewSettings,
   useSubscribableValue,
 } from '../../hooks';
-import {Input} from '../controls';
+import {NumberInput} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface RangeMetaFieldViewProps {
@@ -24,28 +24,24 @@ export function RangeMetaFieldView({field}: RangeMetaFieldViewProps) {
 
   return (
     <MetaFieldGroup field={field}>
-      <Input
+      <NumberInput
         min={0}
         max={endFrame}
-        type={'number'}
         value={startFrame}
-        onChange={event => {
-          let start = parseInt((event.target as HTMLInputElement).value);
-          if (isNaN(start)) {
+        onChange={start => {
+          if (!start || isNaN(start)) {
             start = 0;
           }
           field.update(start, endFrame, duration, fps);
         }}
       />
-      <Input
+      <NumberInput
         min={startFrame}
         max={duration}
-        type={'number'}
         placeholder="end"
-        value={endFrame >= Infinity ? '' : endFrame}
-        onChange={event => {
-          let end = parseInt((event.target as HTMLInputElement).value);
-          if (isNaN(end)) {
+        value={endFrame >= Infinity ? null : endFrame}
+        onChange={end => {
+          if (!end || isNaN(end)) {
             end = Infinity;
           }
           field.update(startFrame, end, duration, fps);
