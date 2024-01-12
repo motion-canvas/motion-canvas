@@ -127,6 +127,14 @@
   }
 }
 
+.numberInput {
+  cursor: ew-resize;
+
+  &:focus {
+    cursor: text;
+  }
+}
+
 .checkbox {
   width: 16px;
   height: 16px;

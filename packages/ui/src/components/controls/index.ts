@@ -8,6 +8,8 @@ export * from './IconCheckbox';
 export * from './Input';
 export * from './InputSelect';
 export * from './Label';
+export * from './NumberInput';
+export * from './NumberInputSelect';
 export * from './Pill';
 export * from './ReadOnlyInput';
 export * from './Select';
