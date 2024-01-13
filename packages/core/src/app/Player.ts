@@ -96,6 +96,7 @@ export class Player {
   private requestId: number | null = null;
   private renderTime = 0;
   private requestedSeek = -1;
+  private requestedRender = false;
   private requestedRecalculation = true;
   private size: Vector2;
   private resolutionScale: number;
@@ -241,6 +242,10 @@ export class Player {
     this.requestedSeek = 0;
   }
 
+  public requestRender(): void {
+    this.requestedRender = true;
+  }
+
   public toggleLoop(value = !this.playerState.current.loop) {
     if (value !== this.playerState.current.loop) {
       this.playerState.current = {
@@ -347,12 +352,16 @@ export class Player {
     this.request();
   }
 
-  private async prepare(): Promise<PlayerState & {seek: number}> {
+  private async prepare(): Promise<
+    PlayerState & {seek: number; render: boolean}
+  > {
     const state = {
       ...this.playerState.current,
       seek: this.requestedSeek,
+      render: this.requestedRender,
     };
     this.requestedSeek = -1;
+    this.requestedRender = false;
 
     // Recalculate the project if necessary
     if (this.requestedRecalculation) {
@@ -428,7 +437,10 @@ export class Player {
         this.audio.isInRange(this.status.time) &&
         this.audio.getTime() < this.status.time)
     ) {
-      if (state.paused && previousState !== PlaybackState.Paused) {
+      if (
+        state.render ||
+        (state.paused && previousState !== PlaybackState.Paused)
+      ) {
         await this.render.dispatch();
       }
 
