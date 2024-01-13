@@ -28,8 +28,8 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
 
   useEffect(() => {
     stage.configure({resolutionScale, size, background});
-    stage.render(player.playback.currentScene, player.playback.previousScene);
-  }, [resolutionScale, size, background]);
+    player.requestRender();
+  }, [resolutionScale, size, background, player]);
 
   return <StageView stage={stage} {...props} />;
 }
