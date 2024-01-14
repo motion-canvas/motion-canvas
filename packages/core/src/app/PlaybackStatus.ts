@@ -43,4 +43,11 @@ export class PlaybackStatus {
   public get state(): PlaybackState {
     return this.playback.state;
   }
+
+  /**
+   * The time passed since the last frame in seconds.
+   */
+  public get deltaTime(): number {
+    return this.framesToSeconds(1) * this.speed;
+  }
 }

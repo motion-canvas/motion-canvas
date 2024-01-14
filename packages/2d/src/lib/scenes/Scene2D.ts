@@ -36,7 +36,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   public override next(): Promise<void> {
-    this.getView()?.playbackState(this.playback.state);
+    this.getView()
+      ?.playbackState(this.playback.state)
+      .globalTime(this.playback.time);
     return super.next();
   }
 
@@ -45,7 +47,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
-    this.getView().playbackState(this.playback.state);
+    this.getView()
+      .playbackState(this.playback.state)
+      .globalTime(this.playback.time);
     this.getView().render(context);
     this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
     context.restore();

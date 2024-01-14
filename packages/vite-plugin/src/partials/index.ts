@@ -6,3 +6,4 @@ export * from './meta';
 export * from './projects';
 export * from './scenes';
 export * from './settings';
+export * from './webgl';

@@ -2,6 +2,12 @@ import highlight from 'highlight.js';
 import {SourceMapConsumer} from 'source-map-js';
 import {withLoader} from './withLoader';
 
+declare module 'source-map-js' {
+  interface SourceMapConsumer {
+    raw: any;
+  }
+}
+
 const ExternalFileRegex = /^\/(@fs|@id|node_modules)\//;
 const StackTraceRegex = navigator.userAgent.toLowerCase().includes('chrome')
   ? /^ +at(.*) \(?(.*):([0-9]+):([0-9]+)/
@@ -18,7 +24,9 @@ async function getSourceMap(
   }
 
   const response = await fetch(`${file}.map${search}`);
-  const consumer = new SourceMapConsumer(await response.json());
+  const json = await response.json();
+  const consumer = new SourceMapConsumer(json);
+  consumer.raw = json;
   Cache.set(key, consumer);
   return consumer;
 }
@@ -52,6 +60,7 @@ export async function resolveStackTrace(
     const [, functionName, uri, line, column] = match;
     const parsed = new URL(uri);
     const file = parsed.pathname;
+    const directory = file.split('/').slice(0, -1).join('/') + '/';
     const entry: StackTraceEntry = {
       file,
       uri,
@@ -61,13 +70,19 @@ export async function resolveStackTrace(
       functionName: functionName?.trim(),
     };
 
-    if (!ExternalFileRegex.test(file)) {
+    if (!entry.isExternal) {
       try {
         const sourceMap = await getSourceMap(file, parsed.search);
         const position = sourceMap.originalPositionFor(entry);
         if (position.line === null || position.column === null) {
           entry.isExternal = true;
         } else {
+          const source =
+            position.source[0] === '/'
+              ? position.source
+              : directory + position.source;
+
+          entry.file = source;
           entry.line = position.line;
           entry.column = position.column;
           entry.source = position.source;
@@ -81,7 +96,28 @@ export async function resolveStackTrace(
         entry.isExternal = true;
       }
     }
+
     result.push(entry);
+
+    if (entry.sourceMap?.raw?.includeMap) {
+      const includeMap: Record<string, [string, number]> =
+        entry.sourceMap.raw.includeMap;
+      let current = entry;
+      while (current.source in includeMap) {
+        const [path, line] = includeMap[current.source];
+        const file = directory + path;
+        current = {
+          file,
+          uri: file,
+          line,
+          column: 9,
+          isExternal: false,
+          source: path,
+          sourceMap: entry.sourceMap,
+        };
+        result.push(current);
+      }
+    }
   }
 
   if (firstOnly) {
@@ -117,11 +153,12 @@ export function getSourceCodeFrame(entry: StackTraceEntry): string | null {
   const {line, column} = entry;
   const lastLine = line + 2;
   const spacing = lastLine.toString().length;
-  const sourceLines = source.split('\n').slice(line - 1, lastLine);
+  const language = getExtension(entry.source) ?? 'ts';
 
   const code = highlight
-    .highlight('typescript', sourceLines.join('\n'))
-    .value.split('\n');
+    .highlight(source, {language})
+    .value.split('\n')
+    .slice(line - 1, lastLine);
 
   const formatted = code.map(
     (text, index) =>
@@ -136,4 +173,9 @@ export async function findAndOpenFirstUserFile(stack: string) {
   if (entry) {
     await openFileInEditor(entry);
   }
+}
+
+function getExtension(file: string): string | null {
+  const parts = file.split('.');
+  return parts.length > 1 ? parts.pop() : null;
 }

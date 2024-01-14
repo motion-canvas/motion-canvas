@@ -3,6 +3,7 @@ import {
   ColorSignal,
   DependencyContext,
   PossibleColor,
+  PossibleSpacing,
   PossibleVector2,
   Promisable,
   ReferenceReceiver,
@@ -10,8 +11,12 @@ import {
   SignalValue,
   SimpleSignal,
   SimpleVector2Signal,
+  SpacingSignal,
   ThreadGenerator,
   TimingFunction,
+  UNIFORM_DESTINATION_MATRIX,
+  UNIFORM_SOURCE_MATRIX,
+  UNIFORM_TIME,
   Vector2,
   Vector2Signal,
   all,
@@ -42,7 +47,13 @@ import {
   wrapper,
 } from '../decorators';
 import {FiltersSignal, filtersSignal} from '../decorators/filtersSignal';
+import {spacingSignal} from '../decorators/spacingSignal';
 import {Filter} from '../partials';
+import {
+  PossibleShaderConfig,
+  ShaderConfig,
+  parseShader,
+} from '../partials/ShaderConfig';
 import {useScene2D} from '../scenes/useScene2D';
 import {drawLine} from '../utils';
 import type {View2D} from './View2D';
@@ -73,14 +84,41 @@ export interface NodeProps {
 
   opacity?: SignalValue<number>;
   filters?: SignalValue<Filter[]>;
+
   shadowColor?: SignalValue<PossibleColor>;
   shadowBlur?: SignalValue<number>;
   shadowOffsetX?: SignalValue<number>;
   shadowOffsetY?: SignalValue<number>;
   shadowOffset?: SignalValue<PossibleVector2>;
+
   cache?: SignalValue<boolean>;
+  /**
+   * {@inheritDoc Node.cachePadding}
+   */
+  cachePaddingTop?: SignalValue<number>;
+  /**
+   * {@inheritDoc Node.cachePadding}
+   */
+  cachePaddingBottom?: SignalValue<number>;
+  /**
+   * {@inheritDoc Node.cachePadding}
+   */
+  cachePaddingLeft?: SignalValue<number>;
+  /**
+   * {@inheritDoc Node.cachePadding}
+   */
+  cachePaddingRight?: SignalValue<number>;
+  /**
+   * {@inheritDoc Node.cachePadding}
+   */
+  cachePadding?: SignalValue<PossibleSpacing>;
+
   composite?: SignalValue<boolean>;
   compositeOperation?: SignalValue<GlobalCompositeOperation>;
+  /**
+   * @experimental
+   */
+  shaders?: PossibleShaderConfig;
 }
 
 @nodeName('Node')
@@ -314,6 +352,18 @@ export class Node implements Promisable<Node> {
   @signal()
   public declare readonly cache: SimpleSignal<boolean, this>;
 
+  /**
+   * Controls the padding of the cached canvas used by this node.
+   *
+   * @remarks
+   * By default, the size of the cache is determined based on the bounding box
+   * of the node and its children. That includes effects such as stroke or
+   * shadow. This property can be used to expand the cache area further.
+   * Usually used to account for custom effects created by {@link shaders}.
+   */
+  @spacingSignal('cachePadding')
+  public declare readonly cachePadding: SpacingSignal<this>;
+
   @initial(false)
   @signal()
   public declare readonly composite: SimpleSignal<boolean, this>;
@@ -374,6 +424,18 @@ export class Node implements Promisable<Node> {
 
   @vector2Signal('shadowOffset')
   public declare readonly shadowOffset: Vector2Signal<this>;
+
+  /**
+   * @experimental
+   */
+  @initial([])
+  @parser(parseShader)
+  @signal()
+  public declare readonly shaders: Signal<
+    PossibleShaderConfig,
+    ShaderConfig[],
+    this
+  >;
 
   @computed()
   protected hasFilters(): boolean {
@@ -563,7 +625,7 @@ export class Node implements Promisable<Node> {
    * @remarks
    * Certain effects such as blur and shadows ignore the current transformation.
    * This matrix can be used to transform their parameters so that the effect
-   * appears relative to the closes composite root.
+   * appears relative to the closest composite root.
    */
   @computed()
   public compositeToWorld(): DOMMatrix {
@@ -1261,7 +1323,8 @@ export class Node implements Promisable<Node> {
       this.opacity() < 1 ||
       this.compositeOperation() !== 'source-over' ||
       this.hasFilters() ||
-      this.hasShadow()
+      this.hasShadow() ||
+      this.shaders().length > 0
     );
   }
 
@@ -1318,8 +1381,9 @@ export class Node implements Promisable<Node> {
   public cacheBBox(): BBox {
     const cache = this.getCacheBBox();
     const children = this.children();
+    const padding = this.cachePadding();
     if (children.length === 0) {
-      return cache;
+      return cache.addSpacing(padding);
     }
 
     const points: Vector2[] = cache.corners;
@@ -1331,7 +1395,8 @@ export class Node implements Promisable<Node> {
       );
     }
 
-    return BBox.fromPoints(...points);
+    const bbox = BBox.fromPoints(...points);
+    return bbox.addSpacing(padding);
   }
 
   /**
@@ -1384,8 +1449,17 @@ export class Node implements Promisable<Node> {
     );
     const cacheBBox = BBox.fromPoints(
       ...this.cacheBBox().transformCorners(this.localToWorld()),
+    ).pixelPerfect.expand(2);
+
+    return canvasBBox.intersection(cacheBBox);
+  }
+
+  @computed()
+  protected parentWorldSpaceCacheBBox(): BBox {
+    return (
+      this.findAncestor(node => node.requiresCache())?.worldSpaceCacheBBox() ??
+      new BBox(Vector2.zero, useScene2D().getSize())
     );
-    return canvasBBox.intersection(cacheBBox).pixelPerfect;
   }
 
   /**
@@ -1417,6 +1491,122 @@ export class Node implements Promisable<Node> {
       context.shadowOffsetX = offset.x;
       context.shadowOffsetY = offset.y;
     }
+
+    const matrix = this.worldToLocal();
+    context.transform(
+      matrix.a,
+      matrix.b,
+      matrix.c,
+      matrix.d,
+      matrix.e,
+      matrix.f,
+    );
+  }
+
+  protected renderFromSource(
+    context: CanvasRenderingContext2D,
+    source: CanvasImageSource,
+    x: number,
+    y: number,
+  ) {
+    this.setupDrawFromCache(context);
+
+    const compositeOverride = this.compositeOverride();
+    context.drawImage(source, x, y);
+    if (compositeOverride > 0) {
+      context.save();
+      context.globalAlpha *= compositeOverride;
+      context.globalCompositeOperation = 'source-over';
+      context.drawImage(source, x, y);
+      context.restore();
+    }
+  }
+
+  private shaderCanvas(destination: TexImageSource, source: TexImageSource) {
+    const shaders = this.shaders();
+    if (shaders.length === 0) {
+      return null;
+    }
+
+    const scene = useScene2D();
+    const size = scene.getRealSize();
+    const parentCacheRect = this.parentWorldSpaceCacheBBox();
+    const cameraToWorld = new DOMMatrix()
+      .scaleSelf(
+        size.width / parentCacheRect.width,
+        size.height / -parentCacheRect.height,
+      )
+      .translateSelf(
+        parentCacheRect.x / -size.width,
+        parentCacheRect.y / size.height - 1,
+      );
+
+    const cacheRect = this.worldSpaceCacheBBox();
+    const cameraToCache = new DOMMatrix()
+      .scaleSelf(size.width / cacheRect.width, size.height / -cacheRect.height)
+      .translateSelf(cacheRect.x / -size.width, cacheRect.y / size.height - 1)
+      .invertSelf();
+
+    const gl = scene.shaders.getGL();
+    scene.shaders.copyTextures(destination, source);
+    scene.shaders.clear();
+
+    for (const shader of shaders) {
+      const program = scene.shaders.getProgram(shader.fragment);
+      if (!program) {
+        continue;
+      }
+
+      if (shader.uniforms) {
+        for (const [name, uniform] of Object.entries(shader.uniforms)) {
+          const location = gl.getUniformLocation(program, name);
+          if (location === null) {
+            continue;
+          }
+
+          const value = unwrap(uniform);
+          if (typeof value === 'number') {
+            gl.uniform1f(location, value);
+          } else if (value.length === 1) {
+            gl.uniform1f(location, value[0]);
+          } else if (value.length === 2) {
+            gl.uniform2f(location, value[0], value[1]);
+          } else if (value.length === 3) {
+            gl.uniform3f(location, value[0], value[1], value[2]);
+          } else if (value.length === 4) {
+            gl.uniform4f(location, value[0], value[1], value[2], value[3]);
+          }
+        }
+      }
+
+      gl.uniform1f(
+        gl.getUniformLocation(program, UNIFORM_TIME),
+        this.view2D.globalTime(),
+      );
+
+      gl.uniform1i(
+        gl.getUniformLocation(program, UNIFORM_TIME),
+        scene.playback.frame,
+      );
+
+      gl.uniformMatrix4fv(
+        gl.getUniformLocation(program, UNIFORM_SOURCE_MATRIX),
+        false,
+        cameraToCache.toFloat32Array(),
+      );
+
+      gl.uniformMatrix4fv(
+        gl.getUniformLocation(program, UNIFORM_DESTINATION_MATRIX),
+        false,
+        cameraToWorld.toFloat32Array(),
+      );
+
+      shader.setup?.(gl, program);
+      scene.shaders.render();
+      shader.teardown?.(gl, program);
+    }
+
+    return gl.canvas;
   }
 
   /**
@@ -1435,33 +1625,17 @@ export class Node implements Promisable<Node> {
     if (this.requiresCache()) {
       const cacheRect = this.worldSpaceCacheBBox();
       if (cacheRect.width !== 0 && cacheRect.height !== 0) {
-        this.setupDrawFromCache(context);
-        const cacheContext = this.cachedCanvas();
-        const compositeOverride = this.compositeOverride();
-        const matrix = this.worldToLocal();
-        context.transform(
-          matrix.a,
-          matrix.b,
-          matrix.c,
-          matrix.d,
-          matrix.e,
-          matrix.f,
-        );
-        context.drawImage(
-          cacheContext.canvas,
-          cacheRect.position.x,
-          cacheRect.position.y,
-        );
-        if (compositeOverride > 0) {
-          context.save();
-          context.globalAlpha *= compositeOverride;
-          context.globalCompositeOperation = 'source-over';
-          context.drawImage(
-            cacheContext.canvas,
+        const cache = this.cachedCanvas().canvas;
+        const source = this.shaderCanvas(context.canvas, cache);
+        if (source) {
+          this.renderFromSource(context, source, 0, 0);
+        } else {
+          this.renderFromSource(
+            context,
+            cache,
             cacheRect.position.x,
             cacheRect.position.y,
           );
-          context.restore();
         }
       }
     } else {

@@ -30,6 +30,7 @@
   "dependencies": {
     "fast-glob": "^3.3.1",
     "follow-redirects": "^1.15.2",
-    "mime-types": "^2.1.35"
+    "mime-types": "^2.1.35",
+    "source-map": "^0.6.1"
   }
 }
