@@ -1,28 +1,11 @@
-/**
- * This module provides the proxy located at
- * /cors-proxy/...
- *
- * It is needed when accessing remote resources.
- * Trying to access remote resources works while
- * in preview, but will fail when you try to
- * output the image (= "read" the canvas)
- *
- * See https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
- * for reasons
- *
- * Using the proxy circumvents CORS-issues because
- * this way all remote resources are served from the
- * same host as the main app.
- */
-
 import followRedirects from 'follow-redirects';
 import {IncomingMessage, ServerResponse} from 'http';
-import {Connect} from 'vite';
+import {Connect, Plugin} from 'vite';
 
 /**
  * Configuration used by the Proxy plugin
  */
-export interface MotionCanvasCorsProxyOptions {
+export interface CorsProxyPluginConfig {
   /**
    * Set which types of resources are allowed by default.
    *
@@ -45,8 +28,41 @@ export interface MotionCanvasCorsProxyOptions {
   allowListHosts?: string[];
 }
 
-export function setupEnvVarsForProxy(
-  config: MotionCanvasCorsProxyOptions | undefined | boolean,
+/**
+ * This module provides the proxy located at
+ * /cors-proxy/...
+ *
+ * It is needed when accessing remote resources.
+ * Trying to access remote resources works while
+ * in preview, but will fail when you try to
+ * output the image (= "read" the canvas)
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
+ * for reasons
+ *
+ * Using the proxy circumvents CORS-issues because
+ * this way all remote resources are served from the
+ * same host as the main app.
+ */
+export function corsProxyPlugin(
+  config?: CorsProxyPluginConfig | boolean,
+): Plugin {
+  setupEnvVarsForProxy(config);
+  return {
+    name: 'motion-canvas:cors-proxy',
+    configureServer(server) {
+      if (config !== false && config !== undefined) {
+        motionCanvasCorsProxy(
+          server.middlewares,
+          config === true ? {} : config,
+        );
+      }
+    },
+  };
+}
+
+function setupEnvVarsForProxy(
+  config: CorsProxyPluginConfig | undefined | boolean,
 ) {
   // Define Keys for Env Var
   const prefix = 'VITE_MC_PROXY_';
@@ -67,9 +83,9 @@ export function setupEnvVarsForProxy(
   }
 }
 
-export function motionCanvasCorsProxy(
+function motionCanvasCorsProxy(
   middleware: Connect.Server,
-  config: MotionCanvasCorsProxyOptions,
+  config: CorsProxyPluginConfig,
 ) {
   // Set the default config if no config was provided
   config.allowedMimeTypes ??= ['image/*', 'video/*'];
@@ -224,7 +240,7 @@ function isResultOfAllowedResourceType(
 async function tryGetResource(
   res: ServerResponse<IncomingMessage>,
   sourceUrl: URL,
-  config: MotionCanvasCorsProxyOptions,
+  config: CorsProxyPluginConfig,
 ): Promise<void> {
   // Turn this callback into a Promise to avoid additional nesting
   const result: IncomingMessage = await new Promise((res, rej) => {
