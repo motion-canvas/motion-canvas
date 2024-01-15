@@ -48,7 +48,7 @@
     "prettier": "^3.1.0",
     "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "vite": "^5.0.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": "eslint --fix",
