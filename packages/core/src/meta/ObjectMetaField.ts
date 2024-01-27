@@ -72,11 +72,20 @@ class ObjectMetaFieldInternal<
   }
 
   public override serialize(): ValueOf<T> {
-    return this.transform('serialize');
+    return {
+      ...this.transform('serialize'),
+      ...this.customFields,
+    };
   }
 
   public override clone(): this {
-    return new (<any>this.constructor)(this.name, this.transform('clone'));
+    const cloned = new (<any>this.constructor)(
+      this.name,
+      this.transform('clone'),
+    );
+    cloned.customFields = structuredClone(this.customFields);
+
+    return cloned;
   }
 
   protected handleChange = () => {
@@ -91,10 +100,7 @@ class ObjectMetaFieldInternal<
       Array.from(this.fields, ([name, field]) => [name, field[fn]()]),
     ) as TransformationOf<T, TKey>;
 
-    return {
-      ...transformed,
-      ...this.customFields,
-    };
+    return transformed;
   }
 }
 
