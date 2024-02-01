@@ -71,13 +71,6 @@ class ObjectMetaFieldInternal<
     this.handleChange();
   }
 
-  public override get(): ValueOf<T> {
-    return {
-      ...this.value.current,
-      ...this.customFields,
-    };
-  }
-
   public override serialize(): ValueOf<T> {
     return {
       ...this.transform('serialize'),
