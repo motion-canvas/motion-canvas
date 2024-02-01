@@ -90,7 +90,10 @@ class ObjectMetaFieldInternal<
 
   protected handleChange = () => {
     if (this.ignoreChange) return;
-    this.value.current = this.transform('get');
+    this.value.current = {
+      ...this.transform('get'),
+      ...this.customFields,
+    };
   };
 
   protected transform<TKey extends CallableKeys<MetaField<any>>>(
