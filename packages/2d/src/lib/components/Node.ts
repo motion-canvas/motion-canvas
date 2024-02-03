@@ -1567,6 +1567,8 @@ export class Node implements Promisable<Node> {
           const value = unwrap(uniform);
           if (typeof value === 'number') {
             gl.uniform1f(location, value);
+          } else if ('toUniform' in value) {
+            value.toUniform(gl, location);
           } else if (value.length === 1) {
             gl.uniform1f(location, value[0]);
           } else if (value.length === 2) {

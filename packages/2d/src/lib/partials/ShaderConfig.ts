@@ -3,6 +3,7 @@ import {
   SignalValue,
   useLogger,
   useScene,
+  WebGLConvertible,
 } from '@motion-canvas/core';
 import {Node} from '../components';
 
@@ -60,7 +61,7 @@ export interface ShaderConfig {
    * uniform vec3 my_vector;
    * ```
    */
-  uniforms?: Record<string, SignalValue<number | number[]>>;
+  uniforms?: Record<string, SignalValue<number | number[] | WebGLConvertible>>;
 
   /**
    * A custom hook run before the shader is used.
