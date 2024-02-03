@@ -2,7 +2,7 @@ import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 import {InterpolationFunction, arcLerp, map} from '../tweening';
 import {PossibleMatrix2D} from './Matrix2D';
 import {Spacing} from './Spacing';
-import {Type} from './Type';
+import {Type, WebGLConvertible} from './Type';
 import {Vector2} from './Vector';
 
 export type SerializedBBox = {
@@ -25,7 +25,7 @@ export type RectSignal<T> = CompoundSignal<
   T
 >;
 
-export class BBox implements Type {
+export class BBox implements Type, WebGLConvertible {
   public static readonly symbol = Symbol.for('@motion-canvas/core/types/Rect');
 
   public x = 0;
@@ -340,6 +340,13 @@ export class BBox implements Type {
 
   public toString(): string {
     return `BBox(${this.x}, ${this.y}, ${this.width}, ${this.height})`;
+  }
+
+  public toUniform(
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniform4f(location, this.x, this.y, this.width, this.height);
   }
 
   public serialize(): SerializedBBox {

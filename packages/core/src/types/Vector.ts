@@ -9,7 +9,7 @@ import {clamp, map} from '../tweening/interpolationFunctions';
 import {DEG2RAD, RAD2DEG} from '../utils';
 import {Matrix2D, PossibleMatrix2D} from './Matrix2D';
 import {Direction, Origin} from './Origin';
-import {EPSILON, Type} from './Type';
+import {EPSILON, Type, WebGLConvertible} from './Type';
 
 export type SerializedVector2<T = number> = {
   x: T;
@@ -35,7 +35,7 @@ export type SimpleVector2Signal<T> = Signal<PossibleVector2, Vector2, T>;
 /**
  * Represents a two-dimensional vector.
  */
-export class Vector2 implements Type {
+export class Vector2 implements Type, WebGLConvertible {
   public static readonly symbol = Symbol.for(
     '@motion-canvas/core/types/Vector2',
   );
@@ -479,6 +479,13 @@ export class Vector2 implements Type {
 
   public toString() {
     return `Vector2(${this.x}, ${this.y})`;
+  }
+
+  public toUniform(
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniform2f(location, this.x, this.y);
   }
 
   public serialize(): SerializedVector2 {

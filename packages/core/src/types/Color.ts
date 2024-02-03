@@ -1,7 +1,7 @@
 import {Color, ColorSpace, InterpolationMode, mix} from 'chroma-js';
 import {Signal, SignalContext, SignalValue} from '../signals';
 import type {InterpolationFunction} from '../tweening';
-import type {Type} from './Type';
+import type {Type, WebGLConvertible} from './Type';
 
 export type SerializedColor = string;
 
@@ -14,7 +14,7 @@ export type PossibleColor =
 export type ColorSignal<T> = Signal<PossibleColor, Color, T>;
 
 declare module 'chroma-js' {
-  interface Color extends Type {
+  interface Color extends Type, WebGLConvertible {
     serialize(): string;
     lerp(
       to: ColorInterface | string,
@@ -106,6 +106,14 @@ const ExtendedColor: typeof Color = (() => {
 
   Color.prototype.toSymbol = () => {
     return Color.symbol;
+  };
+
+  Color.prototype.toUniform = function (
+    this: Color,
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniform4fv(location, this.gl());
   };
 
   Color.prototype.serialize = function (this: Color): SerializedColor {
