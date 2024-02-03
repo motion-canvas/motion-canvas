@@ -10,6 +10,7 @@ import {
   projectsPlugin,
   scenesPlugin,
   settingsPlugin,
+  webglPlugin,
 } from './partials';
 import {PLUGIN_OPTIONS, PluginOptions, isPlugin} from './plugins';
 import {getProjects} from './utils';
@@ -133,6 +134,7 @@ export default ({
     editorPlugin({editor, projects}),
     projectsPlugin({projects, plugins, buildForEditor}),
     assetsPlugin({bufferedAssets}),
+    webglPlugin(),
     corsProxyPlugin(proxy),
   ];
 };

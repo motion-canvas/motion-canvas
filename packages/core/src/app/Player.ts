@@ -13,6 +13,7 @@ import {Logger} from './Logger';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Project} from './Project';
+import {SharedWebGLContext} from './SharedWebGLContext';
 
 export interface PlayerState extends Record<string, unknown> {
   paused: boolean;
@@ -89,6 +90,7 @@ export class Player {
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
   public readonly logger: Logger;
+  private readonly sharedWebGLContext: SharedWebGLContext;
 
   private readonly lock = new Semaphore();
   private startTime = 0;
@@ -135,6 +137,7 @@ export class Player {
       paused: true,
     });
 
+    this.sharedWebGLContext = new SharedWebGLContext(this.project.logger);
     this.requestedSeek = initialFrame;
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
@@ -160,6 +163,8 @@ export class Player {
         size: this.size,
         resolutionScale: this.resolutionScale,
         timeEventsClass: EditableTimeEvents,
+        sharedWebGLContext: this.sharedWebGLContext,
+        experimentalFeatures: project.experimentalFeatures,
       });
       description.onReplaced?.subscribe(description => {
         scene.reload(description);
@@ -341,6 +346,7 @@ export class Player {
    */
   public deactivate() {
     this.active = false;
+    this.sharedWebGLContext.dispose();
     if (this.requestId !== null) {
       cancelAnimationFrame(this.requestId);
       this.requestId = null;

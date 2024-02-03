@@ -3,10 +3,10 @@ import {decorate, threadable} from '../decorators';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {DependencyContext, SignalValue} from '../signals';
 import {
-  isPromisable,
-  isPromise,
   Thread,
   ThreadGenerator,
+  isPromisable,
+  isPromise,
   threads,
 } from '../threading';
 import {Vector2} from '../types';
@@ -22,10 +22,11 @@ import {
 } from './Scene';
 import {SceneMetadata} from './SceneMetadata';
 import {SceneState} from './SceneState';
+import {Shaders} from './Shaders';
 import {Slides} from './Slides';
 import {Threadable} from './Threadable';
-import {TimeEvents} from './timeEvents';
 import {Variables} from './Variables';
+import {TimeEvents} from './timeEvents';
 
 export interface ThreadGeneratorFactory<T> {
   (view: T): ThreadGenerator;
@@ -44,6 +45,7 @@ export abstract class GeneratorScene<T>
   public readonly logger: Logger;
   public readonly meta: SceneMetadata;
   public readonly timeEvents: TimeEvents;
+  public readonly shaders: Shaders;
   public readonly slides: Slides;
   public readonly variables: Variables;
   public random: Random;
@@ -135,6 +137,7 @@ export abstract class GeneratorScene<T>
     decorate(this.runnerFactory, threadable(this.name));
     this.timeEvents = new description.timeEventsClass(this);
     this.variables = new Variables(this);
+    this.shaders = new Shaders(this, description.sharedWebGLContext);
     this.slides = new Slides(this);
 
     this.random = new Random(this.meta.seed.get());

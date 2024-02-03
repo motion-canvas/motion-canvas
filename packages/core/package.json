@@ -21,7 +21,8 @@
   "files": [
     "lib",
     "tsconfig.project.json",
-    "project.d.ts"
+    "project.d.ts",
+    "shaders"
   ],
   "dependencies": {
     "@types/chroma-js": "^2.1.4",
