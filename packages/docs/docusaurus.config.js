@@ -108,6 +108,7 @@ const config = {
       prism: {
         theme: require('./config/codeTheme'),
         darkTheme: require('./config/codeTheme'),
+        additionalLanguages: ['glsl'],
       },
     }),
   themes: [
