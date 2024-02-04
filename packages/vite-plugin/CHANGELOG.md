@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0-alpha.0) (2024-02-04)
+
+
+### Features
+
+* webgl shaders ([#920](https://github.com/motion-canvas/motion-canvas/issues/920)) ([849216e](https://github.com/motion-canvas/motion-canvas/commit/849216ed34c4d29742c621b43a95ec4d99f8c755))
+
+
+
+
+
 # [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
 
 **Note:** Version bump only for package @motion-canvas/vite-plugin
