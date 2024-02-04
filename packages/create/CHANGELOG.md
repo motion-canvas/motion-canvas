@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
+
+
+### Features
+
+* **create:** include simple animation ([#931](https://github.com/motion-canvas/motion-canvas/issues/931)) ([925f63f](https://github.com/motion-canvas/motion-canvas/commit/925f63f3588922224511b1687ac44ba7b9920d83))
+
+
+
+
+
 # [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
 
 **Note:** Version bump only for package @motion-canvas/create
