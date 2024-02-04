@@ -1,0 +1,39 @@
+---
+slug: version-3.14.0
+title: Motion Canvas v3.14.0
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PR from '../src/components/Release/PullRequest';
+import Fiddle from '@site/src/components/Fiddle';
+import Link from '@docusaurus/Link';
+import sourceShader from '!!raw-loader!@site/blog/2024-02-04-shaders.tsx';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'} experimental>
+    <Link to="/docs/shaders">Shaders</Link> let you create custom visual effects
+    using WebGL.
+    <PR id={929} />
+    <PR id={920} />
+    <Fiddle
+      mode="preview"
+      ratio="3"
+      className="margin-top--sm margin-bottom--sm"
+    >
+      {sourceShader}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'} pr={921}>
+    The node inspector can be toggled on and off.
+  </Issue>
+  <Issue user={'jmaen'} pr={917}>
+    Number inputs can be edited by dragging left and right.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>
