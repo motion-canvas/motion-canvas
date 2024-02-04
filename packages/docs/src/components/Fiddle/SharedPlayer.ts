@@ -72,6 +72,7 @@ export async function borrowPlayer(
       logger: new Logger(),
       plugins: [DefaultPlugin()],
       scenes: [Description],
+      experimentalFeatures: true,
     } as Project;
     ProjectInstance.meta = new ProjectMetadata(ProjectInstance);
     ProjectInstance.meta.shared.size.set(960);
