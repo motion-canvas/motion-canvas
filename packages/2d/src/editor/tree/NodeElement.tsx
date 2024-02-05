@@ -22,7 +22,7 @@ export function NodeElement({node, depth = 0}: NodeElementProps) {
 
   const children = useComputed(() => {
     afterRender.value;
-    return nodeSignal.value.children();
+    return nodeSignal.value.peekChildren();
   });
 
   useSignalEffect(() => {

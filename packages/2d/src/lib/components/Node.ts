@@ -984,6 +984,19 @@ export class Node implements Promisable<Node> {
   }
 
   /**
+   * Get the current children of this node.
+   *
+   * @remarks
+   * Unlike {@link children}, this method does not have any side effects.
+   * It does not register the `children` signal as a dependency, and it does not
+   * spawn any children. It can be used to safely retrieve the current state of
+   * the scene graph for debugging purposes.
+   */
+  public peekChildren(): readonly Node[] {
+    return this.realChildren;
+  }
+
+  /**
    * Find all descendants of this node that match the given predicate.
    *
    * @param predicate - A function that returns true if the node matches.
