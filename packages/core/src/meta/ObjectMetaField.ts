@@ -83,7 +83,7 @@ class ObjectMetaFieldInternal<
       this.name,
       this.transform('clone'),
     );
-    cloned.customFields = structuredClone(this.customFields);
+    cloned.set(structuredClone(this.customFields));
 
     return cloned;
   }
