@@ -51,7 +51,7 @@ editor(project);
         /* language=typescript */
         return `\
 import {index} from '${editor}';
-index(${JSON.stringify(projects)});
+index(${JSON.stringify(projects.list)});
 `;
       }
     },
