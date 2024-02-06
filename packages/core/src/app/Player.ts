@@ -183,9 +183,10 @@ export class Player {
     let recalculate = false;
     this.startTime = settings.range[0];
     this.endTime = settings.range[1];
-    if (this.playback.fps !== settings.fps) {
-      const ratio = settings.fps / this.playback.fps;
-      this.playback.fps = settings.fps;
+    const newFps = Math.max(1, settings.fps);
+    if (this.playback.fps !== newFps) {
+      const ratio = newFps / this.playback.fps;
+      this.playback.fps = newFps;
       frame = Math.floor(frame * ratio);
       recalculate = true;
     }

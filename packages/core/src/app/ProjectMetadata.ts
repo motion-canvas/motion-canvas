@@ -22,11 +22,15 @@ function createProjectMetadata(project: Project) {
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
-      fps: new NumberMetaField('frame rate', 30).setPresets(FrameRates),
+      fps: new NumberMetaField('frame rate', 30)
+        .setPresets(FrameRates)
+        .setRange(1),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
     }),
     rendering: new ObjectMetaField('Rendering', {
-      fps: new NumberMetaField('frame rate', 60).setPresets(FrameRates),
+      fps: new NumberMetaField('frame rate', 60)
+        .setPresets(FrameRates)
+        .setRange(1),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
       colorSpace: new EnumMetaField('color space', ColorSpaces),
       exporter: new ExporterMetaField('exporter', project),
