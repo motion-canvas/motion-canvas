@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* fix project selection screen ([#938](https://github.com/motion-canvas/motion-canvas/issues/938)) ([3b3f287](https://github.com/motion-canvas/motion-canvas/commit/3b3f2871d9884c67f7d46215dd12fc02e27f8054))
+
+
+
+
+
 # [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* **2d:** account for spawners in scene graph ([#935](https://github.com/motion-canvas/motion-canvas/issues/935)) ([ca325f5](https://github.com/motion-canvas/motion-canvas/commit/ca325f5ad0ae987e76106f5e65fef3ed7b3ca08d))
+
+
+
+
+
 # [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
 
 

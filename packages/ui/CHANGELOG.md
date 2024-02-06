@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* limit fps to positive numbers ([#937](https://github.com/motion-canvas/motion-canvas/issues/937)) ([c7c0c67](https://github.com/motion-canvas/motion-canvas/commit/c7c0c6730e1a00e6b23077188bfc2d389e98cff2)), closes [#936](https://github.com/motion-canvas/motion-canvas/issues/936)
+
+
+
+
+
 # [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
 
 
