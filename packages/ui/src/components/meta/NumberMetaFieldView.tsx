@@ -16,13 +16,20 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
       {presets.length ? (
         <NumberInputSelect
           value={value}
+          min={field.getMin()}
+          max={field.getMax()}
           onChange={value => {
             field.set(value);
           }}
           options={presets}
         />
       ) : (
-        <NumberInput value={value} onChange={value => field.set(value)} />
+        <NumberInput
+          value={value}
+          min={field.getMin()}
+          max={field.getMax()}
+          onChange={value => field.set(value)}
+        />
       )}
     </MetaFieldGroup>
   );
