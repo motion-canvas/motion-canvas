@@ -51,7 +51,6 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
 
   return (
     <div
-      ref={rangeRef}
       className={clsx(
         styles.rangeTrack,
         shiftHeld && controlHeld && styles.active,
@@ -79,6 +78,7 @@ export function RangeSelector({rangeRef}: RangeSelectorProps) {
       }}
     >
       <div
+        ref={rangeRef}
         style={{
           flexDirection: start > end ? 'row-reverse' : 'row',
           left: `${framesToPercents(Math.ceil(Math.max(0, normalizedStart)))}%`,

@@ -180,7 +180,7 @@ export function Timeline() {
 
     const isInUserRange = player.isInUserRange(frame);
     const isOutOfRange = player.isInRange(frame) && !isInUserRange;
-    if (!warnedAboutRange && !reduceMotion && isOutOfRange) {
+    if (!warnedAboutRange.current && !reduceMotion && isOutOfRange) {
       warnedAboutRange.current = true;
       rangeRef.current?.animate(borderHighlight(), {
         duration: 200,
