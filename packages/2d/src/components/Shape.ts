@@ -25,6 +25,7 @@ export interface ShapeProps extends LayoutProps {
   lineDash?: SignalValue<number[]>;
   lineDashOffset?: SignalValue<number>;
   antialiased?: SignalValue<boolean>;
+  edgeFade?: SignalValue<number>;
 }
 
 export abstract class Shape extends Layout {
@@ -53,6 +54,9 @@ export abstract class Shape extends Layout {
   @initial(true)
   @signal()
   public declare readonly antialiased: SimpleSignal<boolean, this>;
+  @initial(-1)
+  @signal()
+  public declare readonly edgeFade : SimpleSignal<number, this>;
 
   protected readonly rippleStrength = createSignal<number, this>(0);
 
@@ -93,6 +97,21 @@ export abstract class Shape extends Layout {
     this.drawChildren(context);
   }
 
+  protected drawEdgeFade(context: CanvasRenderingContext2D){
+    if(this.edgeFade() > 0){
+       const offset = this.edgeFade()*2.3;
+       const bbox = this.getCacheBBox().expand(-offset);
+       const path = this.getPath();
+       context.save();
+       context.globalCompositeOperation = 'destination-atop';
+       context.filter = `blur(${this.edgeFade()}px)`;
+       context.fillRect(bbox.x, bbox.y, bbox.width, bbox.height)
+       context.clip(path);
+       context.globalCompositeOperation = 'source-over';
+       context.restore();
+    }
+ }
+
   protected drawShape(context: CanvasRenderingContext2D) {
     const path = this.getPath();
     const hasStroke = this.lineWidth() > 0 && this.stroke() !== null;
@@ -102,9 +121,11 @@ export abstract class Shape extends Layout {
     this.drawRipple(context);
     if (this.strokeFirst()) {
       hasStroke && context.stroke(path);
+      // this.drawEdgeFade(context)
       hasFill && context.fill(path);
     } else {
       hasFill && context.fill(path);
+      // this.drawEdgeFade(context)
       hasStroke && context.stroke(path);
     }
     context.restore();

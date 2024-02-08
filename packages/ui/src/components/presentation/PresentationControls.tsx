@@ -48,55 +48,16 @@ export function PresentationControls({customStage, onKeyPressed} : PresentationC
   //   [KeyBindings.SPACEBAR, KeyBindings.RIGHT_ARROW],
   //   () => presenter.resume())
 
-  // useDocumentEvent(
-  //   'keydown',
-  //   useCallback(
-  //     event => {
-  //       if (document.activeElement.tagName === 'INPUT') {
-  //         return;
-  //       }
-  //       if(PresentationKeybindings.RESUME.includes(event.key)){
-  //         event.preventDefault();
-  //         presenter.resume();
-  //       }
-  //       else if(PresentationKeybindings.PREV_SLIDE.includes(event.key)){
-  //         if (event.shiftKey) {
-  //           presenter.requestFirstSlide();
-  //           return;
-  //         }
-  //         presenter.requestPreviousSlide();
-          
-  //       }
-  //       else if(PresentationKeybindings.NEXT_SLIDE.includes(event.key)){
-  //         event.preventDefault();
-  //         if (event.shiftKey) {
-  //           presenter.requestLastSlide();
-  //           return;
-  //         }
-  //         presenter.requestNextSlide();
-          
-  //       }
-  //       else if(PresentationKeybindings.TOGGLE_FULLSCREEN.includes(event.key)){
-  //         event.preventDefault();
-  //         toggleFullscreen();
-  //       }
-  //       else if(PresentationKeybindings.TOGGLE_PRESENT_MODE.includes(event.key)){
-  //         if(state != PresenterState.Aborting){
-  //           presenter.abort();
-  //         }
-  //         else{
-  //           presenter.present({
-  //             ...meta.getFullRenderingSettings(),
-  //             name: project.name,
-  //             slide: null,
-  //           });
-  //         }
-  //       }
-  //       onKeyPressed(event.key);
-  //     },
-  //     [presenter],
-  //   ),
-  // );
+  useDocumentEvent(
+    'mousedown',
+    useCallback(
+      event => {
+        event.preventDefault();
+        presenter.resume();
+      },
+      [presenter],
+    ),
+  );
 
   return (
     <div className={styles.controls}>
