@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.14.2](https://github.com/motion-canvas/motion-canvas/compare/v3.14.1...v3.14.2) (2024-02-08)
+
+**Note:** Version bump only for package @motion-canvas/2d
+
+
+
+
+
 ## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
 
 
