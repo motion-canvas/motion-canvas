@@ -59,6 +59,7 @@ module.exports = () => ({
         entryPoints: [
           '../2d/src/lib/components',
           '../2d/src/lib/curves',
+          '../2d/src/lib/code',
           '../2d/src/lib/decorators',
           '../2d/src/lib/partials',
           '../2d/src/lib/scenes',
@@ -405,8 +406,11 @@ function partsToMarkdown(parts) {
       if (part.kind === 'inline-tag' && part.tag === '@link') {
         if (part.target instanceof DeclarationReflection) {
           return `[\`${part.text}\`](${part.target.href})`;
-        } else {
+        } else if (part.target) {
           return `[\`${part.text}\`](${part.target})`;
+        } else {
+          console.error(part);
+          throw new Error('Invalid link: ' + part.text);
         }
       }
       return part.text;

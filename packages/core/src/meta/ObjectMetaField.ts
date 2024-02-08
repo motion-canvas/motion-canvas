@@ -18,9 +18,6 @@ type CallableKeys<T> = {
   [K in keyof T]: T[K] extends () => void ? K : never;
 }[keyof T];
 
-/**
- * Represents an object with nested meta-fields.
- */
 class ObjectMetaFieldInternal<
   T extends Record<string, MetaField<any>>,
 > extends MetaField<ValueOf<T>> {
@@ -108,13 +105,13 @@ class ObjectMetaFieldInternal<
 }
 
 /**
- * {@inheritDoc ObjectMetaFieldInternal}
+ * Represents an object with nested meta-fields.
  */
 export type ObjectMetaField<T extends Record<string, MetaField<any>>> =
   ObjectMetaFieldInternal<T> & T;
 
 /**
- * {@inheritDoc ObjectMetaFieldInternal}
+ * Represents an object with nested meta-fields.
  */
 export const ObjectMetaField = ObjectMetaFieldInternal as {
   new <T extends Record<string, MetaField<any>>>(

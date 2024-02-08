@@ -1,5 +1,6 @@
 export * from './Bezier';
 export * from './Circle';
+export * from './Code';
 export * from './CubicBezier';
 export * from './Curve';
 export * from './Grid';

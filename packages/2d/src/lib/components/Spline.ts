@@ -88,7 +88,7 @@ export interface SplineProps extends CurveProps {
  */
 export class Spline extends Curve {
   /**
-   * Determine the smoothness of the spline when using auto-calculated handles.
+   * The smoothness of the spline when using auto-calculated handles.
    *
    * @remarks
    * This property is only applied to knots that don't use explicit handles.
@@ -99,6 +99,13 @@ export class Spline extends Curve {
   @signal()
   public declare readonly smoothness: SimpleSignal<number>;
 
+  /**
+   * The knots of the spline as an array of knots with auto-calculated handles.
+   *
+   * @remarks
+   * You can control the smoothness of the resulting curve
+   * via the {@link smoothness} property.
+   */
   @initial(null)
   @signal()
   public declare readonly points: SimpleSignal<
