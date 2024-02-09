@@ -20,6 +20,7 @@ import {
   codeSignal,
   CodeSignalContext,
   DefaultHighlightStyle,
+  findAllCodeRanges,
   LezerHighlighter,
   lines,
   parseCodeSelection,
@@ -341,6 +342,33 @@ export class Code extends Shape {
       this.highlighter,
       this.dialect,
     ).toSignal();
+  }
+
+  /**
+   * Find all code ranges that match the given pattern.
+   *
+   * @param pattern - Either a string or a regular expression to match.
+   */
+  public findAllRanges(pattern: string | RegExp): CodeRange[] {
+    return findAllCodeRanges(this.parsed(), pattern);
+  }
+
+  /**
+   * Find the first code range that matches the given pattern.
+   *
+   * @param pattern - Either a string or a regular expression to match.
+   */
+  public findFirstRange(pattern: string | RegExp): CodeRange {
+    return findAllCodeRanges(this.parsed(), pattern, 1)[0] ?? [[0, 0], [0, 0]];
+  }
+
+  /**
+   * Find the last code range that matches the given pattern.
+   *
+   * @param pattern - Either a string or a regular expression to match.
+   */
+  public findLastRange(pattern: string | RegExp): CodeRange {
+    return findAllCodeRanges(this.parsed(), pattern).at(-1) ?? [[0, 0], [0, 0]];
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {

@@ -163,3 +163,54 @@ export function inverseCodeRange(ranges: CodeRange[]): CodeRange[] {
     [lastRange[1], [Infinity, Infinity]],
   ];
 }
+
+/**
+ * Find all code ranges that match the given pattern.
+ *
+ * @param code - The code to search in.
+ * @param pattern - Either a string or a regular expression to search for.
+ * @param limit - An optional limit on the number of ranges to find.
+ */
+export function findAllCodeRanges(
+  code: string,
+  pattern: string | RegExp,
+  limit = Infinity,
+): CodeRange[] {
+  if (typeof pattern === 'string') {
+    pattern = new RegExp(pattern, 'g');
+  }
+
+  const matches = code.matchAll(pattern);
+  const ranges: CodeRange[] = [];
+  let index = 0;
+  let line = 0;
+  let column = 0;
+
+  for (const match of matches) {
+    if (match.index === undefined || ranges.length >= limit) {
+      continue;
+    }
+
+    let from: CodePoint = [line, column];
+    while (index <= code.length) {
+      if (index === match.index) {
+        from = [line, column];
+      }
+
+      if (index === match.index + match[0].length) {
+        ranges.push([from, [line, column]]);
+        break;
+      }
+
+      if (code[index] === '\n') {
+        line++;
+        column = 0;
+      } else {
+        column++;
+      }
+      index++;
+    }
+  }
+
+  return ranges;
+}
