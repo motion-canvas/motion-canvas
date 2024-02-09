@@ -6,13 +6,23 @@ import {
   unwrap,
   Vector2,
 } from '@motion-canvas/core';
-import {Code, DrawHooks} from '../components';
+import {Code} from '../components';
 import {CodeFragment, parseCodeFragment} from './CodeFragment';
 import {CodeHighlighter} from './CodeHighlighter';
 import {CodeMetrics} from './CodeMetrics';
 import {CodePoint, CodeRange} from './CodeRange';
 import {CodeScope, isCodeScope} from './CodeScope';
 import {isPointInCodeSelection} from './CodeSelection';
+
+export interface CodeFragmentDrawingInfo {
+  text: string;
+  position: Vector2;
+  characterSize: Vector2;
+  cursor: Vector2;
+  fill: string;
+  time: number;
+  alpha: number;
+}
 
 /**
  * A stateful class for recursively traversing a code scope.
@@ -35,7 +45,9 @@ export class CodeCursor {
   private selection: CodeRange[] = [];
   private selectionProgress: number | null = null;
   private globalProgress: number[] = [];
-  private drawHooks = {} as DrawHooks;
+  private fragmentDrawingInfo: CodeFragmentDrawingInfo[] = [];
+  private fontHeight = 0;
+  private verticalOffset = 0;
 
   public constructor(private readonly node: Code) {}
 
@@ -45,8 +57,12 @@ export class CodeCursor {
    * @param context - The context used to measure and draw the code.
    */
   public setupMeasure(context: CanvasRenderingContext2D) {
+    const metrics = context.measureText('X');
+    this.monoWidth = metrics.width;
+    this.fontHeight =
+      metrics.fontBoundingBoxDescent + metrics.fontBoundingBoxAscent;
+    this.verticalOffset = metrics.fontBoundingBoxAscent;
     this.context = context;
-    this.monoWidth = context.measureText('X').width;
     this.lineHeight = parseFloat(this.node.styles.lineHeight);
     this.cursor = new Vector2();
     this.beforeCursor = new Vector2();
@@ -65,7 +81,7 @@ export class CodeCursor {
     this.highlighter = this.node.highlighter();
     this.selection = this.node.selection();
     this.selectionProgress = this.node.selectionProgress();
-    this.drawHooks = this.node.drawHooks();
+    this.fragmentDrawingInfo = [];
     this.globalProgress = [];
   }
 
@@ -129,7 +145,18 @@ export class CodeCursor {
   public getSize() {
     return {
       x: this.maxWidth * this.monoWidth,
-      y: this.cursor.y * this.lineHeight,
+      y: this.cursor.y * this.lineHeight + this.verticalOffset,
+    };
+  }
+
+  /**
+   * Get the drawing information created by the cursor.
+   */
+  public getDrawingInfo() {
+    return {
+      fragments: this.fragmentDrawingInfo,
+      verticalOffset: this.verticalOffset,
+      fontHeight: this.fontHeight,
     };
   }
 
@@ -216,8 +243,6 @@ export class CodeCursor {
 
     const code = progress < 0.5 ? fragment.before : fragment.after;
 
-    this.context.save();
-    this.context.globalAlpha *= alpha;
     let hasOffset = true;
     let width = 0;
     let stringLength = 0;
@@ -239,8 +264,6 @@ export class CodeCursor {
         selection.after = null;
         continue;
       }
-
-      this.context.save();
 
       const beforeHighlight =
         this.caches &&
@@ -330,24 +353,29 @@ export class CodeCursor {
         );
       }
 
-      this.drawHooks.token(
-        this.context,
-        char,
-        new Vector2(
+      const measure = this.context.measureText(char);
+      this.fragmentDrawingInfo.push({
+        text: char,
+        position: new Vector2(
           (hasOffset ? offset.x + width : width) * this.monoWidth,
           (offset.y + y) * this.lineHeight,
         ),
-        color,
+        cursor: new Vector2(
+          hasOffset ? this.beforeCursor.x + stringLength : stringLength,
+          this.beforeCursor.y + y,
+        ),
+        alpha,
+        characterSize: new Vector2(
+          measure.width / char.length,
+          this.fontHeight,
+        ),
+        fill: color,
         time,
-      );
-      this.context.restore();
+      });
 
       stringLength += char.length;
-      width += Math.round(
-        this.context.measureText(char).width / this.monoWidth,
-      );
+      width += Math.round(measure.width / this.monoWidth);
     }
-    this.context.restore();
   }
 
   private calculateWidth(metrics: CodeMetrics, x = this.cursor.x): number {
