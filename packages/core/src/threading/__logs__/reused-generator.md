@@ -24,18 +24,18 @@ yield* all(task);
 Try to investigate your code looking for `yield` statements whose return value
 is reused in this way. Here's an example of a common mistake:
 
-```ts
-// wrong ✗
+```ts wrong
 // prettier-ignore
 yield* all(
   yield rect().opacity(1, 1), 
-  yield rect().x(200, 1)
+  yield rect().x(200, 1),
 );
+```
 
-// correct ✓
+```ts correct
 // prettier-ignore
 yield* all(
   rect().opacity(1, 1), 
-  rect().x(200, 1)
+  rect().x(200, 1),
 );
 ```
