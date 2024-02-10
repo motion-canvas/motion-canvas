@@ -1,4 +1,5 @@
 import {
+  BBox,
   createSignal,
   ExperimentalError,
   map,
@@ -13,7 +14,9 @@ import {
 } from '@motion-canvas/core';
 import {
   CodeCursor,
+  CodeFragmentDrawingInfo,
   CodeHighlighter,
+  CodePoint,
   CodeRange,
   CodeSelection,
   CodeSignal,
@@ -21,6 +24,7 @@ import {
   CodeSignalContext,
   DefaultHighlightStyle,
   findAllCodeRanges,
+  isPointInCodeSelection,
   LezerHighlighter,
   lines,
   parseCodeSelection,
@@ -86,7 +90,6 @@ export interface CodeProps extends ShapeProps {
    * {@inheritDoc Code.drawHooks}
    */
   drawHooks?: SignalValue<DrawHooks>;
-  children?: never;
 }
 
 /**
@@ -359,7 +362,12 @@ export class Code extends Shape {
    * @param pattern - Either a string or a regular expression to match.
    */
   public findFirstRange(pattern: string | RegExp): CodeRange {
-    return findAllCodeRanges(this.parsed(), pattern, 1)[0] ?? [[0, 0], [0, 0]];
+    return (
+      findAllCodeRanges(this.parsed(), pattern, 1)[0] ?? [
+        [0, 0],
+        [0, 0],
+      ]
+    );
   }
 
   /**
@@ -368,7 +376,123 @@ export class Code extends Shape {
    * @param pattern - Either a string or a regular expression to match.
    */
   public findLastRange(pattern: string | RegExp): CodeRange {
-    return findAllCodeRanges(this.parsed(), pattern).at(-1) ?? [[0, 0], [0, 0]];
+    return (
+      findAllCodeRanges(this.parsed(), pattern).at(-1) ?? [
+        [0, 0],
+        [0, 0],
+      ]
+    );
+  }
+
+  /**
+   * Return the bounding box of the given point (character) in the code.
+   *
+   * @remarks
+   * The returned bound box is in local space of the `Code` node.
+   *
+   * @param point - The point to get the bounding box for.
+   */
+  public getPointBbox(point: CodePoint): BBox {
+    const [line, column] = point;
+    const drawingInfo = this.drawingInfo();
+    let match: CodeFragmentDrawingInfo | undefined;
+    for (const info of drawingInfo.fragments) {
+      if (info.cursor.y < line) {
+        match = info;
+        continue;
+      }
+
+      if (info.cursor.y === line && info.cursor.x < column) {
+        match = info;
+        continue;
+      }
+
+      break;
+    }
+
+    if (!match) return new BBox();
+
+    const size = this.computedSize();
+    return new BBox(
+      match.position
+        .sub(size.scale(0.5))
+        .addX(match.characterSize.x * (column - match.cursor.x)),
+      match.characterSize,
+    );
+  }
+
+  /**
+   * Return bounding boxes of all characters in the selection.
+   *
+   * @remarks
+   * The returned bound boxes are in local space of the `Code` node.
+   * Each line of code has a separate bounding box.
+   *
+   * @param selection - The selection to get the bounding boxes for.
+   */
+  public getSelectionBbox(selection: PossibleCodeSelection): BBox[] {
+    const size = this.computedSize();
+    const range = parseCodeSelection(selection);
+    const drawingInfo = this.drawingInfo();
+    const bboxes: BBox[] = [];
+
+    let current: BBox | null = null;
+    let line = 0;
+    let column = 0;
+    for (const info of drawingInfo.fragments) {
+      if (info.cursor.y !== line) {
+        line = info.cursor.y;
+        if (current) {
+          bboxes.push(current);
+          current = null;
+        }
+      }
+
+      column = info.cursor.x;
+      for (let i = 0; i < info.text.length; i++) {
+        if (isPointInCodeSelection([line, column], range)) {
+          const bbox = new BBox(
+            info.position
+              .sub(size.scale(0.5))
+              .addX(info.characterSize.x * (column - info.cursor.x)),
+            info.characterSize,
+          );
+          if (!current) {
+            current = bbox;
+          } else {
+            current = current.union(bbox);
+          }
+        } else if (current) {
+          bboxes.push(current);
+          current = null;
+        }
+
+        column++;
+      }
+    }
+
+    if (current) {
+      bboxes.push(current);
+    }
+
+    return bboxes;
+  }
+
+  @computed()
+  protected drawingInfo() {
+    this.requestFontUpdate();
+    const context = this.cacheCanvas();
+    const code = this.code();
+
+    context.save();
+    this.applyStyle(context);
+    this.applyText(context);
+    this.cursor.setupDraw(context);
+    this.cursor.drawScope(code);
+    const info = this.cursor.getDrawingInfo();
+    context.restore();
+
+    return info;
   }
 
   protected override desiredSize(): SerializedVector2<DesiredLength> {
@@ -378,7 +502,7 @@ export class Code extends Shape {
 
     context.save();
     this.applyStyle(context);
-    context.font = this.styles.font;
+    this.applyText(context);
     this.cursor.setupMeasure(context);
     this.cursor.measureSize(code);
     const size = this.cursor.getSize();
@@ -390,15 +514,33 @@ export class Code extends Shape {
   protected override draw(context: CanvasRenderingContext2D): void {
     this.requestFontUpdate();
     this.applyStyle(context);
-    const code = this.code();
+    this.applyText(context);
     const size = this.computedSize();
+    const drawingInfo = this.drawingInfo();
 
-    context.translate(-size.width / 2, -size.height / 2);
+    context.save();
+    context.translate(
+      -size.width / 2,
+      -size.height / 2 + drawingInfo.verticalOffset,
+    );
+
+    const drawHooks = this.drawHooks();
+    for (const info of drawingInfo.fragments) {
+      context.save();
+      context.globalAlpha *= info.alpha;
+      drawHooks.token(context, info.text, info.position, info.fill, info.time);
+      context.restore();
+    }
+
+    context.restore();
+
+    this.drawChildren(context);
+  }
+
+  protected override applyText(context: CanvasRenderingContext2D) {
+    super.applyText(context);
     context.font = this.styles.font;
     context.textBaseline = 'top';
-
-    this.cursor.setupDraw(context);
-    this.cursor.drawScope(code);
   }
 
   protected override collectAsyncResources(): void {
