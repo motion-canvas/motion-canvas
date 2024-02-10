@@ -15,6 +15,10 @@ const marked = new Marked(
   },
   markedHighlight({
     highlight(code, lang) {
+      code = code
+        .split('\n')
+        .filter(line => !line.includes('prettier-ignore'))
+        .join('\n');
       const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
       return highlightJs.highlight(code, {language}).value;
     },
