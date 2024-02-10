@@ -92,6 +92,12 @@ export function* threads(
         queue.push(thread);
       } else {
         thread.update(dt);
+        thread.drain(task => {
+          const child = new Thread(task);
+          thread.add(child);
+          newThreads.unshift(child);
+        });
+
         newThreads.unshift(thread);
       }
     }
