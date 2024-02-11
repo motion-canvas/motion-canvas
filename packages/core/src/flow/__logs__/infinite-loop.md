@@ -1,13 +1,14 @@
 Make sure to use `yield` or `spawn()` to execute the loop concurrently in a
 separate thread:
 
-```ts
-// wrong ✗
+```ts wrong
 // prettier-ignore
 yield* loop(() => rect().opacity(0).opacity(1, 1));
-// correct ✓
+```
+
+```ts correct
 yield loop(() => rect().opacity(0).opacity(1, 1));
-// correct ✓
+// or
 spawn(loop(() => rect().opacity(0).opacity(1, 1)));
 ```
 

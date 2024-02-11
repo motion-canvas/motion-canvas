@@ -2,28 +2,27 @@ const ts = require('typescript');
 const path = require('path');
 const fs = require('fs');
 const {Marked} = require('marked');
-const {markedHighlight} = require('marked-highlight');
 const highlightJs = require('highlight.js');
 
-const marked = new Marked(
-  {
-    renderer: {
-      link(href, title, text) {
-        return `<a href='${href}' target='_blank'>${text}</a>`;
-      },
+const marked = new Marked({
+  renderer: {
+    link(href, title, text) {
+      return `<a href='${href}' target='_blank'>${text}</a>`;
     },
-  },
-  markedHighlight({
-    highlight(code, lang) {
+    code(code, info) {
+      const [lang, ...rest] = (info || '').split(/\s+/);
       code = code
         .split('\n')
         .filter(line => !line.includes('prettier-ignore'))
         .join('\n');
       const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
-      return highlightJs.highlight(code, {language}).value;
+      const result = highlightJs.highlight(code, {language});
+      return `<pre class="${rest.join(
+        ' ',
+      )}"><code class="language-${language}">${result.value}</code></pre>`;
     },
-  }),
-);
+  },
+});
 
 const transformerProgram = program => context => sourceFile => {
   const sourceMap = new Map();
