@@ -13,7 +13,7 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());
   const {player} = useApplication();
   const {size, background} = useSharedSettings();
-  const {resolutionScale} = usePreviewSettings();
+  const {resolutionScale, motionBlur} = usePreviewSettings();
 
   useSubscribable(
     player.onRender,
@@ -27,7 +27,7 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   );
 
   useEffect(() => {
-    stage.configure({resolutionScale, size, background});
+    stage.configure({resolutionScale, size, motionBlur, background});
     player.requestRender();
   }, [resolutionScale, size, background, player]);
 

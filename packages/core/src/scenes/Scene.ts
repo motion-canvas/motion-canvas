@@ -1,4 +1,5 @@
 import type {Logger, PlaybackStatus, SharedWebGLContext} from '../app';
+import {MoblurRenderer} from '../app/MoblurRenderer';
 import type {
   SubscribableEvent,
   SubscribableValueEvent,
@@ -231,7 +232,10 @@ export interface Scene<T = unknown> {
    *
    * @param context - The context to used when rendering.
    */
-  render(context: CanvasRenderingContext2D): Promise<void>;
+  render(
+    context: CanvasRenderingContext2D,
+    moblurRenderer?: MoblurRenderer,
+  ): Promise<void>;
 
   /**
    * Reload the scene.

@@ -3,9 +3,11 @@ import {unwrap} from '../signals';
 import type {Color} from '../types';
 import {CanvasColorSpace, Vector2} from '../types';
 import {getContext} from '../utils';
+import {MoblurRenderer} from './MoblurRenderer';
 
 export interface StageSettings {
   size: Vector2;
+  motionBlur: number;
   resolutionScale: number;
   colorSpace: CanvasColorSpace;
   background: Color | string | null;
@@ -21,10 +23,12 @@ export class Stage {
   private resolutionScale = 1;
   private colorSpace: CanvasColorSpace = 'srgb';
   private size = Vector2.zero;
+  private motionBlurSamples = 1;
 
   public readonly finalBuffer: HTMLCanvasElement;
   private readonly currentBuffer: HTMLCanvasElement;
   private readonly previousBuffer: HTMLCanvasElement;
+  private moblurRenderer: MoblurRenderer | null = null;
 
   private context: CanvasRenderingContext2D;
   private currentContext: CanvasRenderingContext2D;
@@ -49,6 +53,7 @@ export class Stage {
     colorSpace = this.colorSpace,
     size = this.size,
     resolutionScale = this.resolutionScale,
+    motionBlur = this.motionBlurSamples,
     background = this.background,
   }: Partial<StageSettings>) {
     if (colorSpace !== this.colorSpace) {
@@ -69,6 +74,22 @@ export class Stage {
       this.resizeCanvas(this.previousContext);
     }
 
+    console.log('Configured');
+
+    console.log('Values', motionBlur, !MoblurRenderer.checkSupport());
+
+    if (motionBlur <= 1 || !MoblurRenderer.checkSupport()) {
+      console.log('Moblur cleared');
+      this.moblurRenderer = null;
+    } else if (this.moblurRenderer) {
+      console.log('Moblur changed');
+      this.moblurRenderer.resize(this.size);
+      this.moblurRenderer.setSamples(motionBlur);
+    } else {
+      console.log('Moblur setup');
+      this.moblurRenderer = new MoblurRenderer(this.size, motionBlur);
+    }
+
     this.background =
       typeof background === 'string'
         ? background
@@ -81,10 +102,16 @@ export class Stage {
       : false;
 
     if (previousScene) {
-      await previousScene.render(this.previousContext);
+      await previousScene.render(
+        this.previousContext,
+        this.moblurRenderer ?? undefined,
+      );
     }
 
-    await currentScene.render(this.currentContext);
+    await currentScene.render(
+      this.currentContext,
+      this.moblurRenderer ?? undefined,
+    );
 
     const size = this.canvasSize;
     this.context.clearRect(0, 0, size.width, size.height);
@@ -104,7 +131,7 @@ export class Stage {
     }
   }
 
-  public resizeCanvas(context: CanvasRenderingContext2D) {
+  public resizeCanvas(context: {canvas: {width: number; height: number}}) {
     const size = this.canvasSize;
     context.canvas.width = size.width;
     context.canvas.height = size.height;

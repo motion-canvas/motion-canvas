@@ -1,4 +1,5 @@
 import {Logger, PlaybackStatus} from '../app';
+import {MoblurRenderer} from '../app/MoblurRenderer';
 import {decorate, threadable} from '../decorators';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {DependencyContext, SignalValue} from '../signals';
@@ -158,14 +159,25 @@ export abstract class GeneratorScene<T>
     // do nothing
   }
 
-  public async render(context: CanvasRenderingContext2D): Promise<void> {
+  public async render(
+    context: CanvasRenderingContext2D,
+    moblurRenderer?: MoblurRenderer,
+  ): Promise<void> {
     let iterations = 0;
     do {
       iterations++;
       await DependencyContext.consumePromises();
       context.save();
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-      this.execute(() => this.draw(context));
+      this.execute(() => {
+        if (moblurRenderer) {
+          moblurRenderer.render(context, bufferContext => {
+            this.draw(bufferContext);
+          });
+        } else {
+          this.draw(context);
+        }
+      });
       context.restore();
     } while (DependencyContext.hasPromises() && iterations < 10);
 
