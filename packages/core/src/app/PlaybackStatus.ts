@@ -44,6 +44,10 @@ export class PlaybackStatus {
     return this.playback.state;
   }
 
+  public get manager(): PlaybackManager {
+    return this.playback;
+  }
+
   /**
    * The time passed since the last frame in seconds.
    */

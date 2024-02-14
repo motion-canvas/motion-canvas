@@ -1,3 +1,4 @@
+import {Scene} from '../scenes';
 import {Vector2} from '../types';
 import * as WebGL from '../utils/webGLHelpers';
 
@@ -183,7 +184,36 @@ export class MoblurRenderer {
   }
 
   private clear(gl: WebGL2RenderingContext) {
+    const canvas = this.computeContext.canvas;
+    const emptyData = new Int32Array(canvas.width * canvas.height * 4);
+
     gl.clear(gl.COLOR_BUFFER_BIT);
+
+    this.bindTexture(gl, this.frameBuffer1);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA32I,
+      canvas.width,
+      canvas.height,
+      0,
+      gl.RGBA_INTEGER,
+      gl.INT,
+      emptyData,
+    );
+
+    this.bindTexture(gl, this.frameBuffer2);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA32I,
+      canvas.width,
+      canvas.height,
+      0,
+      gl.RGBA_INTEGER,
+      gl.INT,
+      emptyData,
+    );
   }
 
   private getAddendTexture(
@@ -213,35 +243,10 @@ export class MoblurRenderer {
 
   public resize(size: Vector2) {
     const gl = this.computeContext;
-    const emptyData = new Float32Array(size.width * size.height * 4);
 
     gl.viewport(0, 0, size.width, size.height);
 
-    this.bindTexture(gl, this.frameBuffer1);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32I,
-      size.width,
-      size.height,
-      0,
-      gl.RGBA_INTEGER,
-      gl.INT,
-      emptyData,
-    );
-
-    this.bindTexture(gl, this.frameBuffer2);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32I,
-      size.width,
-      size.height,
-      0,
-      gl.RGBA_INTEGER,
-      gl.INT,
-      emptyData,
-    );
+    this.clear(gl);
 
     this.computeContext.useProgram(this.sumProgram);
     this.computeContext.uniform1i(this.sumCanvasHeightUniformLoc, size.y);
@@ -256,24 +261,28 @@ export class MoblurRenderer {
     );
   }
 
-  public render(
-    context: CanvasRenderingContext2D,
-    renderCallback: (bufferContext: CanvasRenderingContext2D) => void,
-  ) {
+  public async render(scene: Scene, context: CanvasRenderingContext2D) {
     console.time('Moblur Render');
     const drawCanvas = this.drawContext.canvas;
     const gl = this.computeContext;
+    const currentFrame = scene.currentFrame;
+    const advanceAmt = 1 / this.sampleCount;
+    let total = 0;
 
+    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
     this.clear(gl);
 
     this.bindTexture(gl, this.addendTexture);
     gl.useProgram(this.sumProgram);
 
     for (let i = 0; i < this.sampleCount; i++) {
-      renderCallback(this.drawContext as unknown as CanvasRenderingContext2D);
-      /* ## need to add time logic here ## */
+      await scene.render(
+        this.drawContext as unknown as CanvasRenderingContext2D,
+      );
+      await scene.advanceTime(advanceAmt);
+      total += advanceAmt;
 
-      if (!(i % 2)) {
+      if (i % 2) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer1.frameBuffer);
         gl.uniform1i(this.sumAccUniformLoc, this.frameBuffer2.location);
       } else {
@@ -299,11 +308,22 @@ export class MoblurRenderer {
     gl.useProgram(this.divProgram);
     gl.uniform1i(
       this.divSrcUniformLoc,
-      !(this.sampleCount % 2)
-        ? this.frameBuffer1.location
-        : this.frameBuffer2.location,
+      this.sampleCount % 2
+        ? this.frameBuffer2.location
+        : this.frameBuffer1.location,
     );
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+    console.log(
+      'Start',
+      currentFrame,
+      'Total progress',
+      total,
+      'end result',
+      scene.currentFrame,
+    );
+
+    await scene.seek(currentFrame);
 
     //copy data back to main canvas
     context.drawImage(gl.canvas, 0, 0);

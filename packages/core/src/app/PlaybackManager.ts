@@ -52,6 +52,10 @@ export class PlaybackManager {
   public previousScene: Scene | null = null;
   public state = PlaybackState.Paused;
 
+  public get currentFrame(): number {
+    return this.frame;
+  }
+
   public get currentScene(): Scene {
     if (this.currentSceneReference === null) {
       throw new Error('PlaybackManager has not been properly initialized');
@@ -185,7 +189,11 @@ export class PlaybackManager {
     this.duration = this.frame;
   }
 
-  private async next(): Promise<boolean> {
+  public async advanceTime(amount: number = 1) {
+    await this.next(amount);
+  }
+
+  private async next(amount: number = 1): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
       if (this.currentScene.isFinished()) {
@@ -193,7 +201,8 @@ export class PlaybackManager {
       }
     }
 
-    this.frame += this.speed;
+    //this.frame += amount * (1 / this.speed);
+    this.frame += amount;
 
     if (this.currentScene.isFinished()) {
       return true;

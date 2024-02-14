@@ -1,5 +1,4 @@
 import type {Logger, PlaybackStatus, SharedWebGLContext} from '../app';
-import {MoblurRenderer} from '../app/MoblurRenderer';
 import type {
   SubscribableEvent,
   SubscribableValueEvent,
@@ -168,6 +167,11 @@ export interface Scene<T = unknown> {
   get lastFrame(): number;
 
   /**
+   * The current frame that the scene is on
+   */
+  get currentFrame(): number;
+
+  /**
    * Triggered when the cached data changes.
    *
    * @eventProperty
@@ -232,10 +236,7 @@ export interface Scene<T = unknown> {
    *
    * @param context - The context to used when rendering.
    */
-  render(
-    context: CanvasRenderingContext2D,
-    moblurRenderer?: MoblurRenderer,
-  ): Promise<void>;
+  render(context: CanvasRenderingContext2D): Promise<void>;
 
   /**
    * Reload the scene.
@@ -269,6 +270,16 @@ export interface Scene<T = unknown> {
    * Progress this scene one frame forward.
    */
   next(): Promise<void>;
+
+  /**
+   * Progress this scene forward by the specified amount
+   */
+  advanceTime(amount: number): Promise<void>;
+
+  /**
+   * Sets the scene to the specified frame
+   */
+  seek(frame: number): Promise<void>;
 
   /**
    * Reset this scene to its initial state.

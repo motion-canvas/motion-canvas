@@ -1,5 +1,4 @@
 import {Logger, PlaybackStatus} from '../app';
-import {MoblurRenderer} from '../app/MoblurRenderer';
 import {decorate, threadable} from '../decorators';
 import {EventDispatcher, ValueDispatcher} from '../events';
 import {DependencyContext, SignalValue} from '../signals';
@@ -59,6 +58,10 @@ export abstract class GeneratorScene<T>
 
   public get lastFrame() {
     return this.firstFrame + this.cache.current.duration;
+  }
+
+  public get currentFrame() {
+    return this.playback.frame;
   }
 
   public get onCacheChanged() {
@@ -159,25 +162,14 @@ export abstract class GeneratorScene<T>
     // do nothing
   }
 
-  public async render(
-    context: CanvasRenderingContext2D,
-    moblurRenderer?: MoblurRenderer,
-  ): Promise<void> {
+  public async render(context: CanvasRenderingContext2D): Promise<void> {
     let iterations = 0;
     do {
       iterations++;
       await DependencyContext.consumePromises();
       context.save();
       context.clearRect(0, 0, context.canvas.width, context.canvas.height);
-      this.execute(() => {
-        if (moblurRenderer) {
-          moblurRenderer.render(context, bufferContext => {
-            this.draw(bufferContext);
-          });
-        } else {
-          this.draw(context);
-        }
-      });
+      this.execute(() => this.draw(context));
       context.restore();
     } while (DependencyContext.hasPromises() && iterations < 10);
 
@@ -285,6 +277,14 @@ export abstract class GeneratorScene<T>
     if (result.done) {
       this.state = SceneState.Finished;
     }
+  }
+
+  public async advanceTime(amount: number) {
+    await this.playback.manager.advanceTime(amount);
+  }
+
+  public async seek(frame: number) {
+    await this.playback.manager.seek(frame);
   }
 
   public async reset(previousScene: Scene | null = null) {

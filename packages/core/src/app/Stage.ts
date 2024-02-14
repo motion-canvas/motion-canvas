@@ -81,11 +81,7 @@ export class Stage {
     if (motionBlur <= 1 || !MoblurRenderer.checkSupport()) {
       console.log('Moblur cleared');
       this.moblurRenderer = null;
-    } else if (this.moblurRenderer) {
-      console.log('Moblur changed');
-      this.moblurRenderer.resize(this.size);
-      this.moblurRenderer.setSamples(motionBlur);
-    } else {
+    } else if (!this.moblurRenderer) {
       console.log('Moblur setup');
       this.moblurRenderer = new MoblurRenderer(this.size, motionBlur);
     }
@@ -94,6 +90,20 @@ export class Stage {
       typeof background === 'string'
         ? background
         : background?.serialize() ?? null;
+
+    if (this.moblurRenderer) {
+      console.log('Moblur changed');
+      this.moblurRenderer.resize(this.size);
+      this.moblurRenderer.setSamples(motionBlur);
+    }
+  }
+
+  private async renderScene(scene: Scene, context: CanvasRenderingContext2D) {
+    if (this.moblurRenderer) {
+      await this.moblurRenderer.render(scene, context);
+    } else {
+      await scene.render(context);
+    }
   }
 
   public async render(currentScene: Scene, previousScene: Scene | null) {
@@ -102,16 +112,10 @@ export class Stage {
       : false;
 
     if (previousScene) {
-      await previousScene.render(
-        this.previousContext,
-        this.moblurRenderer ?? undefined,
-      );
+      await this.renderScene(previousScene, this.previousContext);
     }
 
-    await currentScene.render(
-      this.currentContext,
-      this.moblurRenderer ?? undefined,
-    );
+    await this.renderScene(currentScene, this.currentContext);
 
     const size = this.canvasSize;
     this.context.clearRect(0, 0, size.width, size.height);
