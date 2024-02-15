@@ -6,7 +6,7 @@ import {defineConfig} from 'vite';
 export default defineConfig({
   plugins: [
     motionCanvas.default({
-      project: ['@motion-canvas/template/src/project.ts'],
+      project: ['./tests/project.ts'],
     }),
   ],
   test: {
