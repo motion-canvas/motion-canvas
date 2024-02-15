@@ -1,8 +1,10 @@
+const marked = require('../common/marked');
+
 module.exports = () => ({
   name: 'markdown-literals',
-  async load(id) {
+  async transform(code, id) {
     if (id.endsWith('.md')) {
-      return `export default 'Mockup text';`;
+      return `export default ${JSON.stringify(marked.parse(code))};`;
     }
   },
 });
