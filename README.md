@@ -54,26 +54,22 @@ After cloning the repo, run `npm install` in the root of the project to install
 all necessary dependencies. Then run `npx lerna run build` to build all the
 packages.
 
-### Developing Core & 2D
+### Developing Editor
 
-When developing the core, execute both `npm run core:dev` and
-`npm run template:dev`.
+When developing the editor, run the following command:
 
-This will pick up any changes you make to the core package, automatically
-rebuild the `template` project and refresh the page.
+```bash
+npm run template:dev
+```
 
-Similarly, when developing the 2D package, execute `npm run 2d:dev` and
-`npm run template:dev`.
-
-### Developing UI
-
-If you want to develop the UI, first build the template project by running:
-`npm run template:build`. Then execute `npm run ui:dev`.
+It will start a vite server that watches the `core`, `2d`, `ui`, and
+`vite-plugin` packages. The `template` package itself contains a simple Motion
+Canvas project that can be used during development.
 
 ### Developing Player
 
-Like with UI, to develop the player, first build the template:
-`npm run template:build`. Then, start `npm run player:dev`.
+To develop the player, first build the template: `npm run template:build`. Then,
+start `npm run player:dev`.
 
 ## Installing a local version of Motion Canvas in a project
 
@@ -101,6 +97,28 @@ relative path to the package you want to link:
     // ...
   },
 ```
+
+If you're linking the `ui` package, you'll also need to modify `vite.config.ts`
+to allow vite to load external files:
+
+```ts
+import {defineConfig} from 'vite';
+import motionCanvas from '@motion-canvas/vite-plugin';
+
+export default defineConfig({
+  server: {
+    fs: {
+      // let it load external files
+      strict: false,
+    },
+  },
+  plugins: [motionCanvas()],
+});
+```
+
+This is necessary because the editor styles are loaded using the `/@fs/` prefix
+and since the linked `ui` package is outside the project, vite needs permission
+to access it.
 
 Then run `npm install` in to apply the changes and that's it.
 
