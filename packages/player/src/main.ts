@@ -243,6 +243,7 @@ class MotionCanvasPlayer extends HTMLElement {
       await this.stage.render(
         this.player.playback.currentScene,
         this.player.playback.previousScene,
+        this.player.playback,
       );
     }
   };

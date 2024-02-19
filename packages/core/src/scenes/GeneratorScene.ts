@@ -279,14 +279,6 @@ export abstract class GeneratorScene<T>
     }
   }
 
-  public async advanceTime(amount: number) {
-    await this.playback.manager.advanceTime(amount);
-  }
-
-  public async seek(frame: number) {
-    await this.playback.manager.seek(frame);
-  }
-
   public async reset(previousScene: Scene | null = null) {
     this.counters = {};
     this.previousScene = previousScene;

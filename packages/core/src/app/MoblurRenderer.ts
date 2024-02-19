@@ -1,10 +1,10 @@
-import {Scene} from '../scenes';
 import {Vector2} from '../types';
 import * as WebGL from '../utils/webGLHelpers';
 
 import vertexShaderSrc from '../../shaders/basicVertex.glsl?raw';
 import divShaderSrc from '../../shaders/moblur_div.glsl?raw';
 import sumShaderSrc from '../../shaders/moblur_sum.glsl?raw';
+import {PlaybackManager} from './PlaybackManager';
 
 type Texture = {texture: WebGLTexture; readonly location: number};
 type FrameBuffer = {
@@ -40,7 +40,6 @@ export class MoblurRenderer {
     return true;
   }
 
-  private readonly drawContext: OffscreenCanvasRenderingContext2D;
   private readonly computeContext: WebGL2RenderingContext;
   private readonly sumProgram: WebGLProgram;
   private readonly divProgram: WebGLProgram;
@@ -55,18 +54,15 @@ export class MoblurRenderer {
   private sampleCount: number = 1;
 
   public constructor(size: Vector2, samples: number) {
-    const drawBuffer = new OffscreenCanvas(size.x, size.y);
     const computeBuffer = new OffscreenCanvas(size.x, size.y);
-    const drawContext = drawBuffer?.getContext('2d');
     const computeContext = computeBuffer?.getContext('webgl2');
 
-    if (!(drawContext && computeContext)) {
+    if (!computeContext) {
       throw new Error(
         'Error creating MoblurRenderer. Use "MoblurRenderer.checkSupport()" before calling constructor',
       );
     }
 
-    this.drawContext = drawContext;
     this.computeContext = computeContext;
     this.sampleCount = samples;
 
@@ -261,26 +257,34 @@ export class MoblurRenderer {
     );
   }
 
-  public async render(scene: Scene, context: CanvasRenderingContext2D) {
+  public async render(
+    canvasContext: CanvasRenderingContext2D,
+    renderCallback: () => Promise<void>,
+    playback: PlaybackManager,
+  ) {
     console.time('Moblur Render');
-    const drawCanvas = this.drawContext.canvas;
+    const canvas = canvasContext.canvas;
     const gl = this.computeContext;
-    const currentFrame = scene.currentFrame;
-    const advanceAmt = 1 / this.sampleCount;
-    let total = 0;
+    const currentFrame = playback.frame;
+    const previousSpeed = playback.speed;
 
-    context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+    playback.speed = 0.5 * (1 / this.sampleCount);
+    await playback.seek(playback.frame);
+
+    canvasContext.clearRect(
+      0,
+      0,
+      canvasContext.canvas.width,
+      canvasContext.canvas.height,
+    );
     this.clear(gl);
 
     this.bindTexture(gl, this.addendTexture);
     gl.useProgram(this.sumProgram);
 
     for (let i = 0; i < this.sampleCount; i++) {
-      await scene.render(
-        this.drawContext as unknown as CanvasRenderingContext2D,
-      );
-      await scene.advanceTime(advanceAmt);
-      total += advanceAmt;
+      await renderCallback();
+      await playback.advanceTime();
 
       if (i % 2) {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer1.frameBuffer);
@@ -294,12 +298,12 @@ export class MoblurRenderer {
         gl.TEXTURE_2D,
         0,
         gl.RGBA,
-        drawCanvas.width,
-        drawCanvas.height,
+        canvas.width,
+        canvas.height,
         0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
-        drawCanvas,
+        canvasContext.canvas,
       );
       gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
@@ -314,19 +318,11 @@ export class MoblurRenderer {
     );
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-    console.log(
-      'Start',
-      currentFrame,
-      'Total progress',
-      total,
-      'end result',
-      scene.currentFrame,
-    );
-
-    await scene.seek(currentFrame);
+    playback.speed = previousSpeed;
+    await playback.seek(currentFrame);
 
     //copy data back to main canvas
-    context.drawImage(gl.canvas, 0, 0);
+    canvasContext.drawImage(gl.canvas, 0, 0);
     console.timeEnd('Moblur Render');
   }
 }

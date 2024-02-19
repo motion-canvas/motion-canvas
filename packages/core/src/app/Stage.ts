@@ -4,6 +4,7 @@ import type {Color} from '../types';
 import {CanvasColorSpace, Vector2} from '../types';
 import {getContext} from '../utils';
 import {MoblurRenderer} from './MoblurRenderer';
+import {PlaybackManager} from './PlaybackManager';
 
 export interface StageSettings {
   size: Vector2;
@@ -98,24 +99,16 @@ export class Stage {
     }
   }
 
-  private async renderScene(scene: Scene, context: CanvasRenderingContext2D) {
-    if (this.moblurRenderer) {
-      await this.moblurRenderer.render(scene, context);
-    } else {
-      await scene.render(context);
-    }
-  }
-
-  public async render(currentScene: Scene, previousScene: Scene | null) {
+  private async renderFrame(currentScene: Scene, previousScene: Scene | null) {
     const previousOnTop = previousScene
       ? unwrap(currentScene.previousOnTop)
       : false;
 
     if (previousScene) {
-      await this.renderScene(previousScene, this.previousContext);
+      await previousScene.render(this.previousContext);
     }
 
-    await this.renderScene(currentScene, this.currentContext);
+    await currentScene.render(this.currentContext);
 
     const size = this.canvasSize;
     this.context.clearRect(0, 0, size.width, size.height);
@@ -132,6 +125,23 @@ export class Stage {
     this.context.drawImage(this.currentBuffer, 0, 0);
     if (previousOnTop) {
       this.context.drawImage(this.previousBuffer, 0, 0);
+    }
+  }
+
+  public async render(
+    currentScene: Scene,
+    previousScene: Scene | null,
+    playback: PlaybackManager,
+  ) {
+    if (this.moblurRenderer) {
+      const renderCallback = this.renderFrame.bind(
+        this,
+        currentScene,
+        previousScene,
+      );
+      await this.moblurRenderer.render(this.context, renderCallback, playback);
+    } else {
+      await this.renderFrame(currentScene, previousScene);
     }
   }
 

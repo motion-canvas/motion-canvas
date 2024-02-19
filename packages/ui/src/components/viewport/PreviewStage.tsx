@@ -21,6 +21,7 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
       await stage.render(
         player.playback.currentScene,
         player.playback.previousScene,
+        player.playback,
       );
     },
     [],

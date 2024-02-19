@@ -189,11 +189,11 @@ export class PlaybackManager {
     this.duration = this.frame;
   }
 
-  public async advanceTime(amount: number = 1) {
-    await this.next(amount);
+  public async advanceTime() {
+    await this.next();
   }
 
-  private async next(amount: number = 1): Promise<boolean> {
+  private async next(): Promise<boolean> {
     if (this.previousScene) {
       await this.previousScene.next();
       if (this.currentScene.isFinished()) {
@@ -201,8 +201,7 @@ export class PlaybackManager {
       }
     }
 
-    //this.frame += amount * (1 / this.speed);
-    this.frame += amount;
+    this.frame += this.speed;
 
     if (this.currentScene.isFinished()) {
       return true;

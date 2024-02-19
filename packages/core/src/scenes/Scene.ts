@@ -272,16 +272,6 @@ export interface Scene<T = unknown> {
   next(): Promise<void>;
 
   /**
-   * Progress this scene forward by the specified amount
-   */
-  advanceTime(amount: number): Promise<void>;
-
-  /**
-   * Sets the scene to the specified frame
-   */
-  seek(frame: number): Promise<void>;
-
-  /**
    * Reset this scene to its initial state.
    *
    * @param previous - If present, the previous scene.
