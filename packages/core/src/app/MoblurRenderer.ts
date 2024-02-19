@@ -244,6 +244,19 @@ export class MoblurRenderer {
 
     this.clear(gl);
 
+    this.bindTexture(gl, this.addendTexture);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      size.width,
+      size.height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      new Uint8Array(size.width * size.height * 4),
+    );
+
     this.computeContext.useProgram(this.sumProgram);
     this.computeContext.uniform1i(this.sumCanvasHeightUniformLoc, size.y);
   }
@@ -294,13 +307,13 @@ export class MoblurRenderer {
         gl.uniform1i(this.sumAccUniformLoc, this.frameBuffer1.location);
       }
 
-      gl.texImage2D(
+      gl.texSubImage2D(
         gl.TEXTURE_2D,
         0,
-        gl.RGBA,
+        0,
+        0,
         canvas.width,
         canvas.height,
-        0,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
         canvasContext.canvas,
