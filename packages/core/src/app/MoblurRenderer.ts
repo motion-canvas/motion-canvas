@@ -3,15 +3,9 @@ import * as WebGL from '../utils/webGLHelpers';
 
 import vertexShaderSrc from '../../shaders/basicVertex.glsl?raw';
 import divShaderSrc from '../../shaders/moblur_div.glsl?raw';
-import sumShaderSrc from '../../shaders/moblur_sum.glsl?raw';
 import {PlaybackManager} from './PlaybackManager';
 
 type Texture = {texture: WebGLTexture; readonly location: number};
-type FrameBuffer = {
-  frameBuffer: WebGLFramebuffer;
-  texture: WebGLTexture;
-  readonly location: number;
-};
 
 export class MoblurRenderer {
   private static readonly vertexPositions = [
@@ -41,15 +35,7 @@ export class MoblurRenderer {
   }
 
   private readonly computeContext: WebGL2RenderingContext;
-  private readonly sumProgram: WebGLProgram;
-  private readonly divProgram: WebGLProgram;
-  private readonly frameBuffer1: FrameBuffer;
-  private readonly frameBuffer2: FrameBuffer;
-  private readonly addendTexture: Texture;
-  private readonly sumAccUniformLoc: WebGLUniformLocation;
-  private readonly sumAddendUniformLoc: WebGLUniformLocation;
-  private readonly sumCanvasHeightUniformLoc: WebGLUniformLocation;
-  private readonly divSrcUniformLoc: WebGLUniformLocation;
+  private readonly sumTexture: Texture;
   private readonly divSampleCountUniformLoc: WebGLUniformLocation;
   private sampleCount: number = 1;
 
@@ -72,55 +58,29 @@ export class MoblurRenderer {
       gl.VERTEX_SHADER,
       vertexShaderSrc,
     )!;
-    const sumFS = WebGL.compileShader(gl, gl.FRAGMENT_SHADER, sumShaderSrc)!;
     const divFS = WebGL.compileShader(gl, gl.FRAGMENT_SHADER, divShaderSrc)!;
-    this.sumProgram = WebGL.compileProgram(gl, vertexShader, sumFS)!;
-    this.divProgram = WebGL.compileProgram(gl, vertexShader, divFS)!;
-    this.sumAccUniformLoc = gl.getUniformLocation(this.sumProgram, 'accTex')!;
-    this.sumAddendUniformLoc = gl.getUniformLocation(
-      this.sumProgram,
-      'addendTex',
-    )!;
-    this.sumCanvasHeightUniformLoc = gl.getUniformLocation(
-      this.sumProgram,
-      'canvasHeight',
-    )!;
-    this.divSrcUniformLoc = gl.getUniformLocation(this.divProgram, 'srcTex')!;
+    const divProgram = WebGL.compileProgram(gl, vertexShader, divFS)!;
+    const divSrcUniformLoc = gl.getUniformLocation(divProgram, 'srcTex')!;
     this.divSampleCountUniformLoc = gl.getUniformLocation(
-      this.divProgram,
+      divProgram,
       'samples',
     )!;
-    this.frameBuffer1 = this.getFrameBuffer(gl, size, 0);
-    this.frameBuffer2 = this.getFrameBuffer(gl, size, 1);
-    this.addendTexture = this.getAddendTexture(gl, 2);
-    this.setupAllVertexBuffers(gl);
+    this.sumTexture = this.getSumTexture(gl, 2);
+    this.setupVertexBuffer(gl, divProgram);
 
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.useProgram(this.sumProgram);
-    gl.uniform1i(this.sumAddendUniformLoc, this.addendTexture.location);
-    gl.uniform1i(this.sumCanvasHeightUniformLoc, size.y);
-
-    gl.useProgram(this.divProgram);
+    gl.useProgram(divProgram);
+    gl.uniform1i(divSrcUniformLoc, this.sumTexture.location);
     gl.uniform1i(this.divSampleCountUniformLoc, this.sampleCount);
     console.log('Initial samples', this.sampleCount);
   }
 
-  private setVertexPositions(
-    gl: WebGL2RenderingContext,
-    program: WebGLProgram,
-    attrName: string,
-  ) {
-    const attrLoc = gl.getAttribLocation(program, attrName);
-
-    gl.enableVertexAttribArray(attrLoc);
-    gl.vertexAttribPointer(attrLoc, 2, gl.FLOAT, false, 0, 0);
-  }
-
-  private setupAllVertexBuffers(gl: WebGL2RenderingContext) {
+  private setupVertexBuffer(gl: WebGL2RenderingContext, program: WebGLProgram) {
     const positionBuffer = gl.createBuffer();
     const vao = gl.createVertexArray();
+    const attrLoc = gl.getAttribLocation(program, 'a_position');
 
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(
@@ -130,89 +90,11 @@ export class MoblurRenderer {
     );
 
     gl.bindVertexArray(vao);
-    this.setVertexPositions(gl, this.sumProgram, 'a_position');
-    this.setVertexPositions(gl, this.divProgram, 'a_position');
+    gl.enableVertexAttribArray(attrLoc);
+    gl.vertexAttribPointer(attrLoc, 2, gl.FLOAT, false, 0, 0);
   }
 
-  private getFrameBuffer(
-    gl: WebGL2RenderingContext,
-    size: Vector2,
-    textureLocation: number,
-  ): FrameBuffer {
-    const frameBuffer = gl.createFramebuffer();
-    const texture = gl.createTexture();
-    const emptyData = new Int32Array(size.width * size.height * 4);
-
-    if (!(frameBuffer && texture)) {
-      throw new Error(
-        'Could not create WebGL2 framebuffer for motion blur effect',
-      );
-    }
-
-    gl.activeTexture(gl.TEXTURE0 + textureLocation);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32I,
-      size.width,
-      size.height,
-      0,
-      gl.RGBA_INTEGER,
-      gl.INT,
-      emptyData,
-    );
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-    gl.framebufferTexture2D(
-      gl.FRAMEBUFFER,
-      gl.COLOR_ATTACHMENT0,
-      gl.TEXTURE_2D,
-      texture,
-      0,
-    );
-
-    return {frameBuffer, texture, location: textureLocation};
-  }
-
-  private clear(gl: WebGL2RenderingContext) {
-    const canvas = this.computeContext.canvas;
-    const emptyData = new Int32Array(canvas.width * canvas.height * 4);
-
-    gl.clear(gl.COLOR_BUFFER_BIT);
-
-    this.bindTexture(gl, this.frameBuffer1);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32I,
-      canvas.width,
-      canvas.height,
-      0,
-      gl.RGBA_INTEGER,
-      gl.INT,
-      emptyData,
-    );
-
-    this.bindTexture(gl, this.frameBuffer2);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
-      0,
-      gl.RGBA32I,
-      canvas.width,
-      canvas.height,
-      0,
-      gl.RGBA_INTEGER,
-      gl.INT,
-      emptyData,
-    );
-  }
-
-  private getAddendTexture(
+  private getSumTexture(
     gl: WebGL2RenderingContext,
     textureLocation: number,
   ): Texture {
@@ -223,18 +105,13 @@ export class MoblurRenderer {
     }
 
     gl.activeTexture(gl.TEXTURE0 + textureLocation);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.bindTexture(gl.TEXTURE_3D, texture);
+    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
     return {texture, location: textureLocation};
-  }
-
-  private bindTexture(gl: WebGL2RenderingContext, texture: Texture) {
-    gl.activeTexture(gl.TEXTURE0 + texture.location);
-    gl.bindTexture(gl.TEXTURE_2D, texture.texture);
   }
 
   public resize(size: Vector2) {
@@ -242,28 +119,24 @@ export class MoblurRenderer {
 
     gl.viewport(0, 0, size.width, size.height);
 
-    this.clear(gl);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
-    this.bindTexture(gl, this.addendTexture);
-    gl.texImage2D(
-      gl.TEXTURE_2D,
+    gl.texImage3D(
+      gl.TEXTURE_3D,
       0,
       gl.RGBA,
       size.width,
       size.height,
+      this.sampleCount,
       0,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
-      new Uint8Array(size.width * size.height * 4),
+      new Uint8Array(size.width * size.height * 4 * this.sampleCount),
     );
-
-    this.computeContext.useProgram(this.sumProgram);
-    this.computeContext.uniform1i(this.sumCanvasHeightUniformLoc, size.y);
   }
 
   public setSamples(count: number) {
     this.sampleCount = count;
-    this.computeContext.useProgram(this.divProgram);
     this.computeContext.uniform1i(
       this.divSampleCountUniformLoc,
       this.sampleCount,
@@ -290,45 +163,27 @@ export class MoblurRenderer {
       canvasContext.canvas.width,
       canvasContext.canvas.height,
     );
-    this.clear(gl);
-
-    this.bindTexture(gl, this.addendTexture);
-    gl.useProgram(this.sumProgram);
+    gl.clear(gl.COLOR_BUFFER_BIT);
 
     for (let i = 0; i < this.sampleCount; i++) {
       await renderCallback();
       await playback.advanceTime();
 
-      if (i % 2) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer1.frameBuffer);
-        gl.uniform1i(this.sumAccUniformLoc, this.frameBuffer2.location);
-      } else {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, this.frameBuffer2.frameBuffer);
-        gl.uniform1i(this.sumAccUniformLoc, this.frameBuffer1.location);
-      }
-
-      gl.texSubImage2D(
-        gl.TEXTURE_2D,
+      gl.texSubImage3D(
+        gl.TEXTURE_3D,
         0,
         0,
         0,
+        i,
         canvas.width,
         canvas.height,
+        1,
         gl.RGBA,
         gl.UNSIGNED_BYTE,
         canvasContext.canvas,
       );
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
     }
 
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.useProgram(this.divProgram);
-    gl.uniform1i(
-      this.divSrcUniformLoc,
-      this.sampleCount % 2
-        ? this.frameBuffer2.location
-        : this.frameBuffer1.location,
-    );
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
     playback.speed = previousSpeed;
