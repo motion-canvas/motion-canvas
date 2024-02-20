@@ -2,7 +2,7 @@ import {Vector2} from '../types';
 import * as WebGL from '../utils/webGLHelpers';
 
 import vertexShaderSrc from '../../shaders/basicVertex.glsl?raw';
-import divShaderSrc from '../../shaders/moblur_div.glsl?raw';
+import moblurShaderSrc from '../../shaders/moblur.glsl?raw';
 import {PlaybackManager} from './PlaybackManager';
 
 type Texture = {texture: WebGLTexture; readonly location: number};
@@ -36,7 +36,7 @@ export class MoblurRenderer {
 
   private readonly computeContext: WebGL2RenderingContext;
   private readonly sumTexture: Texture;
-  private readonly divSampleCountUniformLoc: WebGLUniformLocation;
+  private readonly sampleCountUniformLoc: WebGLUniformLocation;
   private sampleCount: number = 1;
 
   public constructor(size: Vector2, samples: number) {
@@ -58,22 +58,23 @@ export class MoblurRenderer {
       gl.VERTEX_SHADER,
       vertexShaderSrc,
     )!;
-    const divFS = WebGL.compileShader(gl, gl.FRAGMENT_SHADER, divShaderSrc)!;
-    const divProgram = WebGL.compileProgram(gl, vertexShader, divFS)!;
-    const divSrcUniformLoc = gl.getUniformLocation(divProgram, 'srcTex')!;
-    this.divSampleCountUniformLoc = gl.getUniformLocation(
-      divProgram,
-      'samples',
+    const moblurFS = WebGL.compileShader(
+      gl,
+      gl.FRAGMENT_SHADER,
+      moblurShaderSrc,
     )!;
+    const program = WebGL.compileProgram(gl, vertexShader, moblurFS)!;
+    const divSrcUniformLoc = gl.getUniformLocation(program, 'srcTex')!;
+    this.sampleCountUniformLoc = gl.getUniformLocation(program, 'samples')!;
     this.sumTexture = this.getSumTexture(gl, 2);
-    this.setupVertexBuffer(gl, divProgram);
+    this.setupVertexBuffer(gl, program);
 
     gl.clearColor(0, 0, 0, 0);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    gl.useProgram(divProgram);
+    gl.useProgram(program);
     gl.uniform1i(divSrcUniformLoc, this.sumTexture.location);
-    gl.uniform1i(this.divSampleCountUniformLoc, this.sampleCount);
+    gl.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
     console.log('Initial samples', this.sampleCount);
   }
 
@@ -137,10 +138,7 @@ export class MoblurRenderer {
 
   public setSamples(count: number) {
     this.sampleCount = count;
-    this.computeContext.uniform1i(
-      this.divSampleCountUniformLoc,
-      this.sampleCount,
-    );
+    this.computeContext.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
   }
 
   public async render(
