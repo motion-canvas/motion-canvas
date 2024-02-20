@@ -7,11 +7,15 @@ import {MetaOption} from './MetaOption';
 export class NumberMetaField extends MetaField<any, number> {
   public readonly type = Number;
   protected presets: MetaOption<number>[] = [];
+  protected step: number = 1;
   protected min?: number;
   protected max?: number;
 
   public parse(value: any): number {
     let parsed = parseFloat(value);
+
+    parsed = Math.round(parsed * this.step) / this.step;
+
     if (this.min !== undefined && parsed < this.min) {
       parsed = this.min;
     }
@@ -28,6 +32,11 @@ export class NumberMetaField extends MetaField<any, number> {
 
   public setPresets(options: MetaOption<number>[]): this {
     this.presets = options;
+    return this;
+  }
+
+  public setStep(step: number) {
+    this.step = 1 / step;
     return this;
   }
 

@@ -7,11 +7,17 @@ import {PlaybackManager} from './PlaybackManager';
 
 type Texture = {texture: WebGLTexture; readonly location: number};
 
+/**
+ * Manages generating, storing, and compositing motion blur samples
+ */
 export class MoblurRenderer {
   private static readonly vertexPositions = [
     -1, 1, 1, 1, -1, -1, -1, -1, 1, 1, 1, -1,
   ];
 
+  /**
+   * Checks if the features required to use the MoblurRenderer are supported
+   */
   public static checkSupport(): boolean {
     const canvas = new OffscreenCanvas(10, 10);
 
@@ -40,6 +46,13 @@ export class MoblurRenderer {
   private sampleCount: number = 1;
   private duration: number = 1;
 
+  /**
+   * Creates new MoblurRenderer
+   *
+   * @param size - Size of Canvas
+   * @param samples - Number of motion blur samples to render
+   * @param duration - Shutter speed as percentage of frame time (ex: 0.5 = 180deg shutter)
+   */
   public constructor(size: Vector2, samples: number, duration: number) {
     const computeBuffer = new OffscreenCanvas(size.x, size.y);
     const computeContext = computeBuffer?.getContext('webgl2');
@@ -77,7 +90,6 @@ export class MoblurRenderer {
     gl.useProgram(program);
     gl.uniform1i(divSrcUniformLoc, this.sumTexture.location);
     gl.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
-    console.log('Initial samples', this.sampleCount);
   }
 
   private setupVertexBuffer(gl: WebGL2RenderingContext, program: WebGLProgram) {
@@ -117,6 +129,13 @@ export class MoblurRenderer {
     return {texture, location: textureLocation};
   }
 
+  /**
+   * Configures motion blur settings
+   *
+   * @param size - Size of Canvas
+   * @param samples - Number of motion blur samples to render
+   * @param duration - Shutter speed as percentage of frame time (ex: 0.5 = 180deg shutter)
+   */
   public configure(size: Vector2, samples: number, duration: number) {
     const canvas = this.computeContext.canvas;
     const gl = this.computeContext;
@@ -146,6 +165,13 @@ export class MoblurRenderer {
     );
   }
 
+  /**
+   * Renders motion blur and copies result to the supplied context
+   *
+   * @param canvasContext - Context used to render samples and copy final results to
+   * @param renderCallback - Callback used to render frame to canvas
+   * @param playback - Playback manager for changing scene time
+   */
   public async render(
     canvasContext: CanvasRenderingContext2D,
     renderCallback: () => Promise<void>,

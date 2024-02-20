@@ -19,10 +19,9 @@ function createProjectMetadata(project: Project) {
       background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
       size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
-      motionBlurDuration: new NumberMetaField(
-        'motion blur duration',
-        0.5,
-      ).setRange(0.1),
+      motionBlurDuration: new NumberMetaField('motion blur duration', 0.5)
+        .setStep(0.1)
+        .setRange(0.1),
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
