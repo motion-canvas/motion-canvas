@@ -38,8 +38,9 @@ export class MoblurRenderer {
   private readonly sumTexture: Texture;
   private readonly sampleCountUniformLoc: WebGLUniformLocation;
   private sampleCount: number = 1;
+  private duration: number = 1;
 
-  public constructor(size: Vector2, samples: number) {
+  public constructor(size: Vector2, samples: number, duration: number) {
     const computeBuffer = new OffscreenCanvas(size.x, size.y);
     const computeContext = computeBuffer?.getContext('webgl2');
 
@@ -51,6 +52,7 @@ export class MoblurRenderer {
 
     this.computeContext = computeContext;
     this.sampleCount = samples;
+    this.duration = duration;
 
     const gl = this.computeContext;
     const vertexShader = WebGL.compileShader(
@@ -115,13 +117,21 @@ export class MoblurRenderer {
     return {texture, location: textureLocation};
   }
 
-  public resize(size: Vector2) {
+  public configure(size: Vector2, samples: number, duration: number) {
+    const canvas = this.computeContext.canvas;
     const gl = this.computeContext;
 
+    //update variables
+    this.sampleCount = samples;
+    this.duration = duration;
+    canvas.width = size.x;
+    canvas.height = size.y;
+
+    gl.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
+
+    //clear and resize gl contexts
     gl.viewport(0, 0, size.width, size.height);
-
     gl.clear(gl.COLOR_BUFFER_BIT);
-
     gl.texImage3D(
       gl.TEXTURE_3D,
       0,
@@ -136,23 +146,17 @@ export class MoblurRenderer {
     );
   }
 
-  public setSamples(count: number) {
-    this.sampleCount = count;
-    this.computeContext.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
-  }
-
   public async render(
     canvasContext: CanvasRenderingContext2D,
     renderCallback: () => Promise<void>,
     playback: PlaybackManager,
   ) {
-    console.time('Moblur Render');
     const canvas = canvasContext.canvas;
     const gl = this.computeContext;
     const currentFrame = playback.frame;
     const previousSpeed = playback.speed;
 
-    playback.speed = 0.5 * (1 / this.sampleCount);
+    playback.speed = this.duration * (1 / this.sampleCount);
     await playback.seek(playback.frame);
 
     canvasContext.clearRect(
@@ -189,6 +193,5 @@ export class MoblurRenderer {
 
     //copy data back to main canvas
     canvasContext.drawImage(gl.canvas, 0, 0);
-    console.timeEnd('Moblur Render');
   }
 }

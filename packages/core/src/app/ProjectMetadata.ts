@@ -19,13 +19,17 @@ function createProjectMetadata(project: Project) {
       background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
       size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
+      motionBlurDuration: new NumberMetaField(
+        'motion blur duration',
+        0.5,
+      ).setRange(0.1),
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
       fps: new NumberMetaField('frame rate', 30)
         .setPresets(FrameRates)
         .setRange(1),
-      motionBlur: new NumberMetaField('motion blur samples', 1)
+      motionBlurSamples: new NumberMetaField('motion blur samples', 1)
         .setPresets([
           {value: 1, text: '1'},
           {value: 8, text: '8'},
@@ -38,7 +42,7 @@ function createProjectMetadata(project: Project) {
       fps: new NumberMetaField('frame rate', 60)
         .setPresets(FrameRates)
         .setRange(1),
-      motionBlur: new NumberMetaField('motion blur samples', 1)
+      motionBlurSamples: new NumberMetaField('motion blur samples', 1)
         .setPresets([
           {value: 1, text: '1'},
           {value: 8, text: '8'},
@@ -67,7 +71,8 @@ export class ProjectMetadata extends ObjectMetaField<
 
   public getFullPreviewSettings(): {
     fps: number;
-    motionBlur: number;
+    motionBlurSamples: number;
+    motionBlurDuration: number;
     resolutionScale: number;
     background: Color | null;
     range: [number, number];
@@ -82,7 +87,8 @@ export class ProjectMetadata extends ObjectMetaField<
 
   public getFullRenderingSettings(): {
     fps: number;
-    motionBlur: number;
+    motionBlurSamples: number;
+    motionBlurDuration: number;
     resolutionScale: number;
     colorSpace: CanvasColorSpace;
     background: Color | null;

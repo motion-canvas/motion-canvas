@@ -8,7 +8,8 @@ import {PlaybackManager} from './PlaybackManager';
 
 export interface StageSettings {
   size: Vector2;
-  motionBlur: number;
+  motionBlurSamples: number;
+  motionBlurDuration: number;
   resolutionScale: number;
   colorSpace: CanvasColorSpace;
   background: Color | string | null;
@@ -25,6 +26,7 @@ export class Stage {
   private colorSpace: CanvasColorSpace = 'srgb';
   private size = Vector2.zero;
   private motionBlurSamples = 1;
+  private motionBlurDuration = 1;
 
   public readonly finalBuffer: HTMLCanvasElement;
   private readonly currentBuffer: HTMLCanvasElement;
@@ -54,7 +56,8 @@ export class Stage {
     colorSpace = this.colorSpace,
     size = this.size,
     resolutionScale = this.resolutionScale,
-    motionBlur = this.motionBlurSamples,
+    motionBlurSamples = this.motionBlurSamples,
+    motionBlurDuration = this.motionBlurDuration,
     background = this.background,
   }: Partial<StageSettings>) {
     if (colorSpace !== this.colorSpace) {
@@ -64,6 +67,7 @@ export class Stage {
       this.previousContext = getContext({colorSpace}, this.previousBuffer);
     }
 
+    //Update resolution
     if (
       !size.exactlyEquals(this.size) ||
       resolutionScale !== this.resolutionScale
@@ -75,27 +79,30 @@ export class Stage {
       this.resizeCanvas(this.previousContext);
     }
 
-    console.log('Configured');
-
-    console.log('Values', motionBlur, !MoblurRenderer.checkSupport());
-
-    if (motionBlur <= 1 || !MoblurRenderer.checkSupport()) {
-      console.log('Moblur cleared');
+    //Create motion blur renderer if needed
+    if (motionBlurSamples <= 1 || !MoblurRenderer.checkSupport()) {
       this.moblurRenderer = null;
     } else if (!this.moblurRenderer) {
-      console.log('Moblur setup');
-      this.moblurRenderer = new MoblurRenderer(this.size, motionBlur);
+      this.moblurRenderer = new MoblurRenderer(
+        this.size,
+        motionBlurSamples,
+        motionBlurDuration,
+      );
     }
 
+    //Set background
     this.background =
       typeof background === 'string'
         ? background
         : background?.serialize() ?? null;
 
+    //Update motion blur settings
     if (this.moblurRenderer) {
-      console.log('Moblur changed');
-      this.moblurRenderer.resize(this.size);
-      this.moblurRenderer.setSamples(motionBlur);
+      this.moblurRenderer.configure(
+        this.size,
+        motionBlurSamples,
+        motionBlurDuration,
+      );
     }
   }
 
