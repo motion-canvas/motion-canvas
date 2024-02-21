@@ -42,6 +42,7 @@ export class MoblurRenderer {
 
   private readonly computeContext: WebGL2RenderingContext;
   private readonly sumTexture: Texture;
+  private readonly heightUniformLoc: WebGLUniformLocation;
   private readonly sampleCountUniformLoc: WebGLUniformLocation;
   private sampleCount: number = 1;
   private duration: number = 1;
@@ -80,6 +81,7 @@ export class MoblurRenderer {
     )!;
     const program = WebGL.compileProgram(gl, vertexShader, moblurFS)!;
     const divSrcUniformLoc = gl.getUniformLocation(program, 'srcTex')!;
+    this.heightUniformLoc = gl.getUniformLocation(program, 'canvasHeight')!;
     this.sampleCountUniformLoc = gl.getUniformLocation(program, 'samples')!;
     this.sumTexture = this.getSumTexture(gl, 2);
     this.setupVertexBuffer(gl, program);
@@ -146,6 +148,7 @@ export class MoblurRenderer {
     canvas.width = size.x;
     canvas.height = size.y;
 
+    gl.uniform1i(this.heightUniformLoc, canvas.height);
     gl.uniform1i(this.sampleCountUniformLoc, this.sampleCount);
 
     //clear and resize gl contexts

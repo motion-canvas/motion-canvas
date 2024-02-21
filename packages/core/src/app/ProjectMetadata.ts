@@ -31,7 +31,8 @@ function createProjectMetadata(project: Project) {
       motionBlurSamples: new NumberMetaField('motion blur samples', 1)
         .setPresets([
           {value: 1, text: '1'},
-          {value: 8, text: '8'},
+          {value: 8, text: '3'},
+          {value: 32, text: '8'},
           {value: 32, text: '32'},
         ])
         .setRange(1),
