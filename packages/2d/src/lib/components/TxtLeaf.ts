@@ -139,7 +139,9 @@ export class TxtLeaf extends Shape {
       -size.height / 2,
       bbox.width,
       bbox.height,
-    ).expand([0, this.fontSize() * 0.5 * this.absoluteScale().x]).expand(lineWidth * miterLimitCoefficient);
+    )
+      .expand([0, this.fontSize() * 0.5])
+      .expand(lineWidth * miterLimitCoefficient);
   }
 
   protected override applyFlex() {
