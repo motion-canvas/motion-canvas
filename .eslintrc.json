@@ -16,12 +16,13 @@
     "sourceType": "module"
   },
   "root": true,
-  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-tsdoc", "@stylistic/eslint-plugin"],
   "rules": {
     "require-yield": "off",
     "grouped-accessor-pairs": ["error", "getBeforeSet"],
     "eqeqeq": ["error", "always", {"null": "ignore"}],
     "curly": ["error", "multi-line"],
+    "@stylistic/max-len": ["error", { "code": 80 }],
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/ban-ts-comment": "off",
