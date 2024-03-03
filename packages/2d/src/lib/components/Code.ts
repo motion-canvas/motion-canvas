@@ -2,6 +2,7 @@ import {
   BBox,
   createSignal,
   ExperimentalError,
+  lazy,
   map,
   SerializedVector2,
   Signal,
@@ -157,9 +158,8 @@ export class Code extends Shape {
     ).toSignal();
   }
 
-  public static readonly defaultHighlighter = new LezerHighlighter(
-    DefaultHighlightStyle,
-  );
+  @lazy(() => new LezerHighlighter(DefaultHighlightStyle))
+  public static readonly defaultHighlighter: LezerHighlighter;
 
   /**
    * The dialect to use for highlighting the code.
