@@ -1,5 +1,10 @@
 node_modules
-lib
-dist
-test
+
+/packages/*/dist
+/packages/*/editor
+/packages/*/lib
+/packages/*/static
+/packages/*/build
+/packages/*/output
+
 .idea
