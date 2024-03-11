@@ -76,7 +76,7 @@ export class CodeSignalContext<TOwner>
   private readonly progress = createSignal(0);
 
   public constructor(
-    initial: PossibleCodeScope,
+    initial: SignalValue<PossibleCodeScope>,
     owner: TOwner,
     private readonly highlighter?: SignalValue<CodeHighlighter>,
     private readonly dialect?: SignalValue<string>,

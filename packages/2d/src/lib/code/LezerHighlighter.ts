@@ -8,7 +8,7 @@ import {defaultTokenize} from './CodeTokenizer';
 interface LezerCache {
   tree: Tree;
   code: string;
-  colorLookup: Map<number, string>;
+  colorLookup: Map<string, string>;
 }
 
 export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
@@ -46,7 +46,7 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
       return null;
     }
 
-    const colorLookup = new Map<number, string>();
+    const colorLookup = new Map<string, string>();
     const tree = parser.parse(code);
     highlightTree(tree, this.style, (from, to, classes) => {
       const color = this.classLookup.get(classes);
@@ -126,14 +126,7 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
     return tokens;
   }
 
-  private getNodeId(node: SyntaxNode): number {
-    if (!node.parent) {
-      return -1;
-    }
-
-    // NOTE: They don't want us to know about this property.
-    // We need a way to persistently identify nodes and this seems to work.
-    // Perhaps it could break if the tree is edited? But we don't do that. Yet.
-    return (node as any).index;
+  private getNodeId(node: SyntaxNode): string {
+    return `${node.from}:${node.to}`;
   }
 }
