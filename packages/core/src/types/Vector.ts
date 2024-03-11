@@ -322,6 +322,14 @@ export class Vector2 implements Type, WebGLConvertible {
     return new Vector2(Math.floor(this.x), Math.floor(this.y));
   }
 
+  public get rounded(): Vector2 {
+    return new Vector2(Math.round(this.x), Math.round(this.y));
+  }
+
+  public get ceiled(): Vector2 {
+    return new Vector2(Math.ceil(this.x), Math.ceil(this.y));
+  }
+
   public get perpendicular(): Vector2 {
     return new Vector2(this.y, -this.x);
   }
@@ -346,6 +354,7 @@ export class Vector2 implements Type, WebGLConvertible {
   public get ctg(): number {
     return this.x / this.y;
   }
+
   public constructor();
   public constructor(from: PossibleVector2);
   public constructor(x: number, y: number);
@@ -447,7 +456,7 @@ export class Vector2 implements Type, WebGLConvertible {
   }
 
   /**
-   * Rotates the vector around a point by the provided angle.
+   * Rotate the vector around a point by the provided angle.
    *
    * @param angle - The angle by which to rotate in degrees.
    * @param center - The center of rotation. Defaults to the origin.
@@ -473,12 +482,32 @@ export class Vector2 implements Type, WebGLConvertible {
     return new Vector2(this.x, this.y + value);
   }
 
+  /**
+   * Transform the components of the vector.
+   *
+   * @example
+   * Raise the components to the power of 2.
+   * ```ts
+   * const vector = new Vector2(2, 3);
+   * const result = vector.transform(value => value ** 2);
+   * ```
+   *
+   * @param callback - A callback to apply to each component.
+   */
+  public map(callback: (value: number, index: number) => number) {
+    return new Vector2(callback(this.x, 0), callback(this.y, 1));
+  }
+
   public toSymbol(): symbol {
     return Vector2.symbol;
   }
 
   public toString() {
     return `Vector2(${this.x}, ${this.y})`;
+  }
+
+  public toArray() {
+    return [this.x, this.y];
   }
 
   public toUniform(
@@ -521,5 +550,10 @@ export class Vector2 implements Type, WebGLConvertible {
       Math.abs(this.x - other.x) <= threshold + Number.EPSILON &&
       Math.abs(this.y - other.y) <= threshold + Number.EPSILON
     );
+  }
+
+  public *[Symbol.iterator]() {
+    yield this.x;
+    yield this.y;
   }
 }
