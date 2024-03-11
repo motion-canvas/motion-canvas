@@ -179,9 +179,15 @@ know the size and position of everything rendered by the node. This goes beyond
 its logical size. Things like shadows, strokes, and filters can make the
 rendered area larger. We account for that in the case of built-in effects, but
 for custom shaders you may need to adjust the cache size manually. The
-[`cachePadding`](/api/2d/components/Node#cachePadding) property can be used to
-do exactly that. It specifies the extra space around the node that should be
-included in the cache.
+[`cachePadding`][cachePadding] property can be used to do exactly that. It
+specifies the extra space around the node that should be included in the cache.
+
+### View Caching
+
+By default, the size of the cache is limited to the visible area. This may cause
+certain shaders to behave incorrectly when the node is partially off-screen. To
+fix this, you can increase the [`cachePadding`][cachePadding] of the view
+itself. It will act as a buffer around the visible area.
 
 [globalCompositeOperation]:
   https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
@@ -190,3 +196,4 @@ included in the cache.
 [BBox]: /api/core/types/BBox
 [Spacing]: /api/core/types/Spacing
 [WebGLConvertible]: /api/core/types/WebGLConvertible
+[cachePadding]: /api/2d/components/Node#cachePadding

@@ -963,7 +963,7 @@ export class Node implements Promisable<Node> {
    *
    * @param newParent - The new parent of this node.
    */
-  public reparent(newParent: Node) {
+  public reparent(newParent: Node): this {
     const position = this.absolutePosition();
     const rotation = this.absoluteRotation();
     const scale = this.absoluteScale();
@@ -971,16 +971,20 @@ export class Node implements Promisable<Node> {
     this.absolutePosition(position);
     this.absoluteRotation(rotation);
     this.absoluteScale(scale);
+
+    return this;
   }
 
   /**
    * Remove all children of this node.
    */
-  public removeChildren() {
+  public removeChildren(): this {
     for (const oldChild of this.realChildren) {
       oldChild.parent(null);
     }
     this.setParsedChildren([]);
+
+    return this;
   }
 
   /**
@@ -1456,7 +1460,9 @@ export class Node implements Promisable<Node> {
    */
   @computed()
   protected worldSpaceCacheBBox(): BBox {
-    const viewBBox = BBox.fromSizeCentered(this.view().size());
+    const viewBBox = BBox.fromSizeCentered(this.view().size()).expand(
+      this.view().cachePadding(),
+    );
     const canvasBBox = BBox.fromPoints(
       ...viewBBox.transformCorners(this.view().localToWorld()),
     );
