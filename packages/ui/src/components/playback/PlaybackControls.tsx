@@ -30,10 +30,12 @@ export function PlaybackControls() {
           return;
         }
         switch (event.key) {
+          case '.': // "blank" button on logitech R400 since play button alternates between ESC and F5
           case ' ':
             event.preventDefault();
             player.togglePlayback();
             break;
+          case 'PageUp':
           case 'ArrowLeft':
             event.preventDefault();
             if (event.shiftKey) {
@@ -43,6 +45,7 @@ export function PlaybackControls() {
 
             player.requestPreviousFrame();
             break;
+          case 'PageDown':
           case 'ArrowRight':
             event.preventDefault();
             if (event.shiftKey) {
