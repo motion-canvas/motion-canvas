@@ -120,7 +120,8 @@ export class Spline extends Curve {
       (props.children === undefined ||
         !Array.isArray(props.children) ||
         props.children.length < 2) &&
-      (props.points === undefined || props.points.length < 2) &&
+      (props.points === undefined ||
+        (typeof props.points !== 'function' && props.points.length < 2)) &&
       props.spawner === undefined
     ) {
       useLogger().warn({
