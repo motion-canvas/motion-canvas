@@ -122,6 +122,10 @@ export function getBezierSplineProfile(
     minSin: 1,
   };
 
+  if (knots.length < 2) {
+    return profile;
+  }
+
   // First, we want to calculate the actual handle positions for each knot. We
   // do so using the knot's `auto` value to blend between the user-provided
   // handles and the auto calculated smooth handles.
