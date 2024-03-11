@@ -1,6 +1,7 @@
 import {
   BBox,
   boolLerp,
+  Direction,
   InterpolationFunction,
   modify,
   Origin,
@@ -626,6 +627,38 @@ export class Layout extends Node {
    */
   @originSignal(Origin.BottomRight)
   public declare readonly bottomRight: SimpleVector2Signal<this>;
+
+  /**
+   * Get the cardinal point corresponding to the given origin.
+   *
+   * @param origin - The origin or direction of the point.
+   */
+  public cardinalPoint(origin: Origin | Direction): SimpleVector2Signal<this> {
+    switch (origin) {
+      case Origin.TopLeft:
+        return this.topLeft;
+      case Origin.TopRight:
+        return this.topRight;
+      case Origin.BottomLeft:
+        return this.bottomLeft;
+      case Origin.BottomRight:
+        return this.bottomRight;
+      case Origin.Top:
+      case Direction.Top:
+        return this.top;
+      case Origin.Bottom:
+      case Direction.Bottom:
+        return this.bottom;
+      case Origin.Left:
+      case Direction.Left:
+        return this.left;
+      case Origin.Right:
+      case Direction.Right:
+        return this.right;
+      default:
+        return this.middle;
+    }
+  }
 
   @initial(false)
   @signal()
