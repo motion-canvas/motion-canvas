@@ -146,7 +146,7 @@ export class Code extends Shape {
    * @param dialect - Custom dialect to use.
    */
   public static createSignal(
-    initial: PossibleCodeScope,
+    initial: SignalValue<PossibleCodeScope>,
     highlighter?: SignalValue<CodeHighlighter>,
     dialect?: SignalValue<string>,
   ): CodeSignal<void> {
@@ -338,7 +338,9 @@ export class Code extends Shape {
    *
    * @param initial - The initial code.
    */
-  public createSignal(initial: PossibleCodeScope): CodeSignal<this> {
+  public createSignal(
+    initial: SignalValue<PossibleCodeScope>,
+  ): CodeSignal<this> {
     return new CodeSignalContext<this>(
       initial,
       this,
