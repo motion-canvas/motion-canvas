@@ -191,8 +191,7 @@ export class Node implements Promisable<Node> {
   public declare readonly absolutePosition: SimpleVector2Signal<this>;
 
   protected getAbsolutePosition(): Vector2 {
-    const matrix = this.localToWorld();
-    return new Vector2(matrix.m41, matrix.m42);
+    return new Vector2(this.parentToWorld().transformPoint(this.position()));
   }
 
   protected setAbsolutePosition(value: SignalValue<PossibleVector2>) {
@@ -598,6 +597,18 @@ export class Node implements Promisable<Node> {
   @computed()
   public worldToParent(): DOMMatrix {
     return this.parent()?.worldToLocal() ?? new DOMMatrix();
+  }
+
+  /**
+   * Get the parent-to-world matrix for this node.
+   *
+   * @remarks
+   * This matrix transforms vectors from local space of this node's parent to
+   * world space.
+   */
+  @computed()
+  public parentToWorld(): DOMMatrix {
+    return this.parent()?.localToWorld() ?? new DOMMatrix();
   }
 
   /**
