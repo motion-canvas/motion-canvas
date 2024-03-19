@@ -244,7 +244,7 @@ export default makeScene2D(function* (view) {
 
 This happens because template strings are parsed immediately when our code is
 executed. To work around this, we provide a custom [tag function][tag-function]
-called [`CODE`](/api/2d/code/CODE). It allows the `Code` node to parse the
+called [`CODE`](/api/2d/code#CODE). It allows the `Code` node to parse the
 template string in a custom way and correctly support signals. It's really easy
 to use, simply put the `CODE` tag function before your template string:
 
@@ -298,10 +298,11 @@ view.add(<Code code={klass} />);
 ```
 
 You might have noticed that in these examples we used a specialized type of
-signal created using [`Code.createSignal()`](/api/2d/code/Code#createSignal).
-While the generic [`createSignal()`](/api/core/signals#createSignal) would work
-fine in these simple examples, the specialized signal will shine once we start
-animating our code snippets.
+signal created using
+[`Code.createSignal()`](/api/2d/components/Code#createSignal). While the generic
+[`createSignal()`](/api/core/signals#createSignal) would work fine in these
+simple examples, the specialized signal will shine once we start animating our
+code snippets.
 
 ## Animating Code
 
@@ -344,9 +345,9 @@ between the old and new code snippets. It then animates the changes accordingly.
 ### `append` and `prepend`
 
 For cases where you want to add some code at the beginning or end of the
-snippet, you can use the [`append`](/api/2d/code/CodeSignal#append) and
-[`prepend`](/api/2d/code/CodeSignal#prepend) methods. They can either modify the
-code immediately or animate the changes over time:
+snippet, you can use the [`append`](/api/2d/code/CodeSignalContext#append) and
+[`prepend`](/api/2d/code/CodeSignalContext#prepend) methods. They can either
+modify the code immediately or animate the changes over time:
 
 ```tsx editor
 import {makeScene2D, Code} from '@motion-canvas/2d';
@@ -385,9 +386,9 @@ const three = 3;`;
 ### `insert`, `replace`, and `remove`
 
 For more granular control over the changes, you can use
-[`insert`](/api/2d/code/CodeSignal#insert),
-[`replace`](/api/2d/code/CodeSignal#replace), and
-[`remove`](/api/2d/code/CodeSignal#remove) to modify the code at specific
+[`insert`](/api/2d/code/CodeSignalContext#insert),
+[`replace`](/api/2d/code/CodeSignalContext#replace), and
+[`remove`](/api/2d/code/CodeSignalContext#remove) to modify the code at specific
 points. Check out [Code Ranges](#code-ranges) for more information on how to
 specify points in your code snippets.
 
@@ -433,8 +434,8 @@ function example() {
 
 ### `edit`
 
-The [`edit`](/api/2d/code/CodeSignal#edit) method offers a different way of
-defining code transitions. It's used together with the
+The [`edit`](/api/2d/code/CodeSignalContext#edit) method offers a different way
+of defining code transitions. It's used together with the
 [`replace`](/api/2d/code#insert), [`insert`](/api/2d/code#insert), and
 [`remove`](/api/2d/code#remove) helper functions that are inserted into the
 template string. They let you specify the changes in a more visual way, without
@@ -474,8 +475,8 @@ Notice that all the methods we used above are not invoked on the `Code` node but
 rather on its `code` property. It may seem unnecessarily verbose but there's a
 good reason for it. The `code` property is a specialized code signal, just like
 the ones we create using
-[`Code.createSignal()`](/api/2d/code/Code#createSignal). This means that all the
-animation methods are also available on your own signals:
+[`Code.createSignal()`](/api/2d/components/Code#createSignal). This means that
+all the animation methods are also available on your own signals:
 
 ```tsx editor
 import {makeScene2D, Code, CODE} from '@motion-canvas/2d';
@@ -631,8 +632,8 @@ function example() {
 
 ## Code Selection
 
-The [`selection`](/api/2d/code/CodeSignal#selection) property can be used to
-visually distinguish a part of the code snippet. The selection is specified
+The [`selection`](/api/2d/code/CodeSignalContext#selection) property can be used
+to visually distinguish a part of the code snippet. The selection is specified
 using an individual [`code range`](#code-ranges) or an array of ranges:
 
 ```tsx editor
@@ -672,9 +673,9 @@ function hello() {
 
 ## Querying Positions and Sizes
 
-[`getPointBBox`](/api/2d/code/Code#getPointBBox) and
-[`getSelectionBBox`](/api/2d/code/Code#getSelectionBBox) can be used to retrieve
-the position and size of a specific character or a range of characters,
+[`getPointBBox`](/api/2d/components/Code#getPointBBox) and
+[`getSelectionBBox`](/api/2d/components/Code#getSelectionBBox) can be used to
+retrieve the position and size of a specific character or a range of characters,
 respectively. The returned value is a [`bounding box`](/api/core/types/BBox) in
 the local space of the `Code` node.
 
