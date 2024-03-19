@@ -38,6 +38,9 @@ import {DesiredLength} from '../partials';
 import {useScene2D} from '../scenes';
 import {Shape, ShapeProps} from './Shape';
 
+/**
+ * @experimental
+ */
 export interface DrawTokenHook {
   (
     ctx: CanvasRenderingContext2D,
@@ -50,6 +53,8 @@ export interface DrawTokenHook {
 
 /**
  * Describes custom drawing logic used by the Code node.
+ *
+ * @experimental
  */
 export interface DrawHooks {
   /**
@@ -95,8 +100,6 @@ export interface CodeProps extends ShapeProps {
 
 /**
  * A node for displaying and animating code.
- *
- * @experimental
  *
  * @preview
  * ```tsx editor
@@ -217,6 +220,8 @@ export class Code extends Shape {
    *
    * @remarks
    * Check out {@link DrawHooks} for available render hooks.
+   *
+   * @experimental
    *
    * @example
    * Make the unselected code blurry and transparent:
@@ -394,7 +399,7 @@ export class Code extends Shape {
    *
    * @param point - The point to get the bounding box for.
    */
-  public getPointBbox(point: CodePoint): BBox {
+  public getPointBBox(point: CodePoint): BBox {
     const [line, column] = point;
     const drawingInfo = this.drawingInfo();
     let match: CodeFragmentDrawingInfo | undefined;
@@ -427,12 +432,12 @@ export class Code extends Shape {
    * Return bounding boxes of all characters in the selection.
    *
    * @remarks
-   * The returned bound boxes are in local space of the `Code` node.
+   * The returned bounding boxes are in local space of the `Code` node.
    * Each line of code has a separate bounding box.
    *
    * @param selection - The selection to get the bounding boxes for.
    */
-  public getSelectionBbox(selection: PossibleCodeSelection): BBox[] {
+  public getSelectionBBox(selection: PossibleCodeSelection): BBox[] {
     const size = this.computedSize();
     const range = parseCodeSelection(selection);
     const drawingInfo = this.drawingInfo();
