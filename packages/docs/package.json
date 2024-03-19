@@ -23,6 +23,8 @@
     "@docusaurus/preset-classic": "^2.4.0",
     "@docusaurus/theme-mermaid": "^2.4.0",
     "@docusaurus/theme-search-algolia": "^2.4.0",
+    "@lezer/javascript": "^1.4.13",
+    "@lezer/rust": "^1.0.2",
     "@mdx-js/react": "^1.6.22",
     "@motion-canvas/examples": "*",
     "@motion-canvas/player": "*",
