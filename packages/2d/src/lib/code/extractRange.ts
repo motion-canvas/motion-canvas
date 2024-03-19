@@ -61,9 +61,7 @@ export function extractRange(
         if (fromColumn === currentColumn) {
           index = newFragments.length + 1;
           newFragments.push(resolved.slice(0, i), '');
-        }
-
-        if (char === '\n') {
+        } else if (char === '\n') {
           index = newFragments.length + 1;
           newFragments.push(
             resolved.slice(0, i) + ' '.repeat(fromColumn - currentColumn),
@@ -80,7 +78,14 @@ export function extractRange(
         }
 
         if (char === '\n') {
-          newFragments.push(resolved.slice(i));
+          if (currentColumn < toColumn) {
+            extracted += '\n';
+            if (i + 1 < resolved.length) {
+              newFragments.push(resolved.slice(i + 1));
+            }
+          } else {
+            newFragments.push(resolved.slice(i));
+          }
           found = true;
           break;
         }
