@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0-alpha.0) (2024-03-19)
+
+
+### Features
+
+* **2d:** code bounding box helpers ([#948](https://github.com/motion-canvas/motion-canvas/issues/948)) ([0ffd56f](https://github.com/motion-canvas/motion-canvas/commit/0ffd56f5f8076913e687e5b908311aa7832d8b7b))
+* **core:** add waitTransition ([#983](https://github.com/motion-canvas/motion-canvas/issues/983)) ([27f24e1](https://github.com/motion-canvas/motion-canvas/commit/27f24e1ad9445f165f520138230789dc694f49af))
+* **core:** improve loop function ([#952](https://github.com/motion-canvas/motion-canvas/issues/952)) ([66c18bb](https://github.com/motion-canvas/motion-canvas/commit/66c18bb41617a4fbe9e3be5253b3ced02caf0cae))
+* **core:** improve matrix to opengl conversion ([#984](https://github.com/motion-canvas/motion-canvas/issues/984)) ([2fadc88](https://github.com/motion-canvas/motion-canvas/commit/2fadc880124d4b6af6c8fb4a1d8b9fe7cf14f34a))
+* **core:** improve Vector2 class ([#985](https://github.com/motion-canvas/motion-canvas/issues/985)) ([11ef7ea](https://github.com/motion-canvas/motion-canvas/commit/11ef7ea20c40a5a4cc9b9955d18d9a68146e24ad))
+* **core:** spawn function ([#951](https://github.com/motion-canvas/motion-canvas/issues/951)) ([51d8cf0](https://github.com/motion-canvas/motion-canvas/commit/51d8cf0b64592fe56a0e31b5c3acc155226a9b2e))
+* improve error logs ([#953](https://github.com/motion-canvas/motion-canvas/issues/953)) ([3b528cc](https://github.com/motion-canvas/motion-canvas/commit/3b528cce13a3440c97641d1095ce09e737e89960))
+* new Code node ([#946](https://github.com/motion-canvas/motion-canvas/issues/946)) ([26e55a3](https://github.com/motion-canvas/motion-canvas/commit/26e55a37c416fb1313c8aadf40eed2824b45d330))
+
+
+
+
+
 ## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
 
 

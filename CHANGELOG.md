@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0-alpha.0) (2024-03-19)
+
+
+### Bug Fixes
+
+* **2d:** fix spline warning for reactive points ([#981](https://github.com/motion-canvas/motion-canvas/issues/981)) ([d426508](https://github.com/motion-canvas/motion-canvas/commit/d42650876b8be8e79a5bfd35519d937679610dcc)), closes [#979](https://github.com/motion-canvas/motion-canvas/issues/979)
+* **2d:** respect offset in absolute positions ([#987](https://github.com/motion-canvas/motion-canvas/issues/987)) ([491080d](https://github.com/motion-canvas/motion-canvas/commit/491080d3d05bd8ae97374577c7013471c1e4b787))
+* account for italic fonts in cache ([#968](https://github.com/motion-canvas/motion-canvas/issues/968)) ([abb0906](https://github.com/motion-canvas/motion-canvas/commit/abb090695c4257d9877d0cb11954093c49149ddc)), closes [#934](https://github.com/motion-canvas/motion-canvas/issues/934)
+* **docs:** fix typo in quickstart.mdx ([#974](https://github.com/motion-canvas/motion-canvas/issues/974)) ([978ab83](https://github.com/motion-canvas/motion-canvas/commit/978ab83df172f3c5165d4738969a4e74efef77b5))
+
+
+### Features
+
+* **2d:** add withDefaults helper ([#982](https://github.com/motion-canvas/motion-canvas/issues/982)) ([6bd072a](https://github.com/motion-canvas/motion-canvas/commit/6bd072ad22751930161969a15f568d93fedee67b))
+* **2d:** code bounding box helpers ([#948](https://github.com/motion-canvas/motion-canvas/issues/948)) ([0ffd56f](https://github.com/motion-canvas/motion-canvas/commit/0ffd56f5f8076913e687e5b908311aa7832d8b7b))
+* **2d:** code range helpers ([#947](https://github.com/motion-canvas/motion-canvas/issues/947)) ([044c9ac](https://github.com/motion-canvas/motion-canvas/commit/044c9acd6ee7e4e337fb4d51286126f583a8da6f))
+* **2d:** improve Code node ([#989](https://github.com/motion-canvas/motion-canvas/issues/989)) ([6e7aaf0](https://github.com/motion-canvas/motion-canvas/commit/6e7aaf0a28ade6ab6eeeb537c1c06ab38c4858cb))
+* **2d:** make Polygon extend Curve ([#961](https://github.com/motion-canvas/motion-canvas/issues/961)) ([739c9fc](https://github.com/motion-canvas/motion-canvas/commit/739c9fccbc101f8b2eed680a11c00f317fdc4dd3))
+* **2d:** respect view's cache padding ([#986](https://github.com/motion-canvas/motion-canvas/issues/986)) ([6b2dab3](https://github.com/motion-canvas/motion-canvas/commit/6b2dab3ef53fb62cd49c4ba794f75cd7f733351a))
+* **2d:** retain reactivity in code transitions ([#990](https://github.com/motion-canvas/motion-canvas/issues/990)) ([7ccc1c3](https://github.com/motion-canvas/motion-canvas/commit/7ccc1c375ea5cd3591d136e6bbbe9a6b8c51ba65))
+* **2d:** support letter spacing in Code ([#955](https://github.com/motion-canvas/motion-canvas/issues/955)) ([2a87c37](https://github.com/motion-canvas/motion-canvas/commit/2a87c37c832de86c4b524b33fd68806627daec8b))
+* **2d:** universal getter for cardinal points ([#988](https://github.com/motion-canvas/motion-canvas/issues/988)) ([f7e53ec](https://github.com/motion-canvas/motion-canvas/commit/f7e53ecbb3acc3659a8259b8d4d6b8b36fd820a8))
+* **core:** add waitTransition ([#983](https://github.com/motion-canvas/motion-canvas/issues/983)) ([27f24e1](https://github.com/motion-canvas/motion-canvas/commit/27f24e1ad9445f165f520138230789dc694f49af))
+* **core:** improve loop function ([#952](https://github.com/motion-canvas/motion-canvas/issues/952)) ([66c18bb](https://github.com/motion-canvas/motion-canvas/commit/66c18bb41617a4fbe9e3be5253b3ced02caf0cae))
+* **core:** improve matrix to opengl conversion ([#984](https://github.com/motion-canvas/motion-canvas/issues/984)) ([2fadc88](https://github.com/motion-canvas/motion-canvas/commit/2fadc880124d4b6af6c8fb4a1d8b9fe7cf14f34a))
+* **core:** improve Vector2 class ([#985](https://github.com/motion-canvas/motion-canvas/issues/985)) ([11ef7ea](https://github.com/motion-canvas/motion-canvas/commit/11ef7ea20c40a5a4cc9b9955d18d9a68146e24ad))
+* **core:** spawn function ([#951](https://github.com/motion-canvas/motion-canvas/issues/951)) ([51d8cf0](https://github.com/motion-canvas/motion-canvas/commit/51d8cf0b64592fe56a0e31b5c3acc155226a9b2e))
+* expose parts of player to outside of shadow root ([#956](https://github.com/motion-canvas/motion-canvas/issues/956)) ([c996d39](https://github.com/motion-canvas/motion-canvas/commit/c996d394dda9ba8c6a32f0360bf09e722ec15b0e)), closes [#950](https://github.com/motion-canvas/motion-canvas/issues/950)
+* improve error logs ([#953](https://github.com/motion-canvas/motion-canvas/issues/953)) ([3b528cc](https://github.com/motion-canvas/motion-canvas/commit/3b528cce13a3440c97641d1095ce09e737e89960))
+* new Code node ([#946](https://github.com/motion-canvas/motion-canvas/issues/946)) ([26e55a3](https://github.com/motion-canvas/motion-canvas/commit/26e55a37c416fb1313c8aadf40eed2824b45d330))
+* **ui:** support for PowerPoint shortcuts in presentation mode ([#993](https://github.com/motion-canvas/motion-canvas/issues/993)) ([570f729](https://github.com/motion-canvas/motion-canvas/commit/570f729f172d3831e20a1dfb7cd07b5d7cb2d27f))
+
+
+
+
+
 ## [3.14.2](https://github.com/motion-canvas/motion-canvas/compare/v3.14.1...v3.14.2) (2024-02-08)
 
 

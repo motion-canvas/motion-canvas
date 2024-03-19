@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0-alpha.0) (2024-03-19)
+
+
+### Features
+
+* improve error logs ([#953](https://github.com/motion-canvas/motion-canvas/issues/953)) ([3b528cc](https://github.com/motion-canvas/motion-canvas/commit/3b528cce13a3440c97641d1095ce09e737e89960))
+* **ui:** support for PowerPoint shortcuts in presentation mode ([#993](https://github.com/motion-canvas/motion-canvas/issues/993)) ([570f729](https://github.com/motion-canvas/motion-canvas/commit/570f729f172d3831e20a1dfb7cd07b5d7cb2d27f))
+
+
+
+
+
 ## [3.14.2](https://github.com/motion-canvas/motion-canvas/compare/v3.14.1...v3.14.2) (2024-02-08)
 
 
