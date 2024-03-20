@@ -53,9 +53,8 @@ export interface CodeHighlighter<T = unknown> {
    * highlighted.
    *
    * @param code - The code to prepare.
-   * @param dialect - The language in which the code is written.
    */
-  prepare(code: string, dialect: string): T;
+  prepare(code: string): T;
 
   /**
    * Highlights the code at the given index.
@@ -69,7 +68,6 @@ export interface CodeHighlighter<T = unknown> {
    * Tokenize the code.
    *
    * @param code - The code to tokenize.
-   * @param dialect - The language in which the code is written.
    */
-  tokenize(code: string, dialect: string): string[];
+  tokenize(code: string): string[];
 }
