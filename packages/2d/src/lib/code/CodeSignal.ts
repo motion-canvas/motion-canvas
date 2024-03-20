@@ -27,14 +27,15 @@ import {defaultTokenize} from './CodeTokenizer';
 import {extractRange} from './extractRange';
 
 interface CodeModifier<TOwner> {
-  (code: string): TOwner;
-  (code: string, duration: number): ThreadGenerator;
+  (code: CodeTag): TOwner;
+  (code: CodeTag, duration: number): ThreadGenerator;
   (duration?: number): TagGenerator;
 }
 
 interface CodeInsert<TOwner> {
-  (point: CodePoint, code: string): TOwner;
-  (point: CodePoint, code: string, duration: number): ThreadGenerator;
+  (point: CodePoint, code: CodeTag): TOwner;
+  (point: CodePoint, code: CodeTag, duration: number): ThreadGenerator;
+  (point: CodePoint, duration?: number): TagGenerator;
 }
 
 interface CodeRemove<TOwner> {
@@ -43,8 +44,9 @@ interface CodeRemove<TOwner> {
 }
 
 interface CodeReplace<TOwner> {
-  (range: CodeRange, code: string): TOwner;
-  (range: CodeRange, code: string, duration: number): ThreadGenerator;
+  (range: CodeRange, code: CodeTag): TOwner;
+  (range: CodeRange, code: CodeTag, duration: number): ThreadGenerator;
+  (range: CodeRange, duration?: number): TagGenerator;
 }
 
 type TagGenerator = (
@@ -76,7 +78,7 @@ export class CodeSignalContext<TOwner>
   private readonly progress = createSignal(0);
 
   public constructor(
-    initial: PossibleCodeScope,
+    initial: SignalValue<PossibleCodeScope>,
     owner: TOwner,
     private readonly highlighter?: SignalValue<CodeHighlighter>,
     private readonly dialect?: SignalValue<string>,
@@ -138,14 +140,14 @@ export class CodeSignalContext<TOwner>
       this.editTween(CODE(strings, ...tags), duration);
   }
 
-  public append(code: string): TOwner;
-  public append(code: string, duration: number): ThreadGenerator;
+  public append(code: CodeTag): TOwner;
+  public append(code: CodeTag, duration: number): ThreadGenerator;
   public append(duration?: number): TagGenerator;
   public append(
-    first: string | number = 0.6,
+    first: CodeTag | number = 0.6,
     duration?: number,
   ): TOwner | ThreadGenerator | TagGenerator {
-    if (typeof first === 'string') {
+    if (typeof first !== 'undefined' && typeof first !== 'number') {
       if (duration === undefined) {
         const current = this.get();
         return this.set({
@@ -159,17 +161,17 @@ export class CodeSignalContext<TOwner>
 
     const savedDuration = first;
     return (strings, ...tags) =>
-      this.append(resolveCodeTag(CODE(strings, ...tags), true), savedDuration);
+      this.append(CODE(strings, ...tags), savedDuration);
   }
 
-  public prepend(code: string): TOwner;
-  public prepend(code: string, duration: number): ThreadGenerator;
+  public prepend(code: CodeTag): TOwner;
+  public prepend(code: CodeTag, duration: number): ThreadGenerator;
   public prepend(duration?: number): TagGenerator;
   public prepend(
-    first: string | number = 0.6,
+    first: CodeTag | number = 0.6,
     duration?: number,
   ): TOwner | ThreadGenerator | TagGenerator {
-    if (typeof first === 'string') {
+    if (typeof first !== 'undefined' && typeof first !== 'number') {
       if (duration === undefined) {
         const current = this.get();
         return this.set({
@@ -183,21 +185,22 @@ export class CodeSignalContext<TOwner>
 
     const savedDuration = first;
     return (strings, ...tags) =>
-      this.prepend(resolveCodeTag(CODE(strings, ...tags), true), savedDuration);
+      this.prepend(CODE(strings, ...tags), savedDuration);
   }
 
-  public insert(point: CodePoint, code: string): TOwner;
+  public insert(point: CodePoint, code: CodeTag): TOwner;
   public insert(
     point: CodePoint,
-    code: string,
+    code: CodeTag,
     duration: number,
   ): ThreadGenerator;
+  public insert(point: CodePoint, duration?: number): TagGenerator;
   public insert(
     point: CodePoint,
-    code: string,
+    first: CodeTag | number = 0.6,
     duration?: number,
-  ): TOwner | ThreadGenerator {
-    return this.replace([point, point], code, duration!);
+  ): TOwner | ThreadGenerator | TagGenerator {
+    return this.replace([point, point], first as CodeTag, duration as number);
   }
 
   public remove(range: CodeRange): TOwner;
@@ -206,37 +209,45 @@ export class CodeSignalContext<TOwner>
     return this.replace(range, '', duration!);
   }
 
-  public replace(range: CodeRange, code: string): TOwner;
+  public replace(range: CodeRange, code: CodeTag): TOwner;
   public replace(
     range: CodeRange,
-    code: string,
+    code: CodeTag,
     duration: number,
   ): ThreadGenerator;
+  public replace(range: CodeRange, duration?: number): TagGenerator;
   public replace(
     range: CodeRange,
-    code: string,
+    first: CodeTag | number = 0.6,
     duration?: number,
-  ): TOwner | ThreadGenerator {
-    if (duration === undefined) {
-      const current = this.get();
-      const [fragments, index] = extractRange(range, current.fragments);
-      fragments[index] = code;
-      return this.set({
-        progress: current.progress,
-        fragments,
-      });
-    } else {
-      return this.replaceTween(range, code, duration);
+  ): TOwner | ThreadGenerator | TagGenerator {
+    if (typeof first !== 'undefined' && typeof first !== 'number') {
+      if (duration === undefined) {
+        const current = this.get();
+        const [fragments, index] = extractRange(range, current.fragments);
+        fragments[index] = first;
+        return this.set({
+          progress: current.progress,
+          fragments,
+        });
+      } else {
+        return this.replaceTween(range, first, duration);
+      }
     }
+
+    const savedDuration = first;
+    return (strings, ...tags) =>
+      this.replaceTween(range, CODE(strings, ...tags), savedDuration);
   }
 
-  private *replaceTween(range: CodeRange, code: string, duration: number) {
+  private *replaceTween(range: CodeRange, code: CodeTag, duration: number) {
     let current = this.get();
     const [fragments, index] = extractRange(range, current.fragments);
     const progress = createSignal(0);
+    const resolved = resolveCodeTag(code, true);
     const scope = {
       progress,
-      fragments: [replace(fragments[index] as string, code)],
+      fragments: [replace(fragments[index] as string, resolved)],
     };
     fragments[index] = scope;
     this.set({
@@ -272,12 +283,13 @@ export class CodeSignalContext<TOwner>
     });
   }
 
-  private *appendTween(value: string, duration: number) {
+  private *appendTween(value: CodeTag, duration: number) {
     let current = this.get();
     const progress = createSignal(0);
+    const resolved = resolveCodeTag(value, true);
     const scope = {
       progress,
-      fragments: [insert(value)],
+      fragments: [insert(resolved)],
     };
     this.set({
       progress: current.progress,
@@ -294,12 +306,13 @@ export class CodeSignalContext<TOwner>
     progress.context.dispose();
   }
 
-  private *prependTween(value: string, duration: number) {
+  private *prependTween(value: CodeTag, duration: number) {
     let current = this.get();
     const progress = createSignal(0);
+    const resolved = resolveCodeTag(value, true);
     const scope = {
       progress,
-      fragments: [insert(value)],
+      fragments: [insert(resolved)],
     };
     this.set({
       progress: current.progress,

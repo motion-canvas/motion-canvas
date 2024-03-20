@@ -1,8 +1,4 @@
-import {
-  CodeMetrics,
-  isCodeMetrics,
-  measureString,
-} from './CodeMetrics';
+import {CodeMetrics, isCodeMetrics, measureString} from './CodeMetrics';
 
 export interface CodeFragment {
   before: CodeMetrics;

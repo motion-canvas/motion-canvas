@@ -189,13 +189,15 @@ export default function Fiddle({
     });
     foldImports(editorView.current);
 
-    tryBorrowPlayer(setPlayer, previewRef.current, parsedRatio, setError).then(
+    tryBorrowPlayer(
+      setPlayer,
+      previewRef.current,
+      parsedRatio,
+      setError,
       async borrowed => {
-        if (borrowed) {
-          const success = await update(snippets[snippetId].state.doc, false);
-          if (success && mode !== 'code') {
-            borrowed.togglePlayback(true);
-          }
+        const success = await update(snippets[snippetId].state.doc, false);
+        if (success && mode !== 'code') {
+          borrowed.togglePlayback(true);
         }
       },
     );

@@ -193,7 +193,10 @@ export class CodeCursor {
         const mirrored = Math.abs(progress - 0.5) * 2;
         alpha = clampRemap(1, 1 - timingOffset, 1, 0, mirrored);
 
-        const scale = progress < 0.5 ? 4 : -4;
+        const isBigger =
+          fragment.after.newRows > fragment.before.newRows ? 1 : -1;
+        const isBefore = progress < 0.5 ? 1 : -1;
+        const scale = isBigger * isBefore * 4;
         offsetY = map(
           Math.abs(fragment.after.newRows - fragment.before.newRows) / scale,
           0,
@@ -307,7 +310,10 @@ export class CodeCursor {
           }
 
           skipAhead++;
-        } while (skipAhead < highlight.skipAhead);
+        } while (
+          skipAhead < highlight.skipAhead &&
+          code.content.charAt(i + skipAhead) !== '\n'
+        );
 
         if (skipAhead > 1) {
           char = code.content.slice(i, i + skipAhead);

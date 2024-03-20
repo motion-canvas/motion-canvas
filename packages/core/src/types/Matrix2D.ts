@@ -695,7 +695,17 @@ export class Matrix2D implements Type, WebGLConvertible {
     gl: WebGL2RenderingContext,
     location: WebGLUniformLocation,
   ): void {
-    gl.uniformMatrix3x2fv(location, false, this.values);
+    gl.uniformMatrix3fv(location, false, [
+      this.values[0],
+      this.values[1],
+      0,
+      this.values[2],
+      this.values[3],
+      0,
+      this.values[4],
+      this.values[5],
+      1,
+    ]);
   }
 
   public equals(other: Matrix2D, threshold: number = EPSILON): boolean {

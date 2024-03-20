@@ -1,7 +1,8 @@
 import {
   BBox,
   createSignal,
-  ExperimentalError,
+  experimentalLog,
+  lazy,
   map,
   SerializedVector2,
   Signal,
@@ -10,6 +11,8 @@ import {
   ThreadGenerator,
   TimingFunction,
   unwrap,
+  useLogger,
+  useScene,
   Vector2,
 } from '@motion-canvas/core';
 import {
@@ -34,9 +37,11 @@ import {
 } from '../code';
 import {computed, initial, nodeName, parser, signal} from '../decorators';
 import {DesiredLength} from '../partials';
-import {useScene2D} from '../scenes';
 import {Shape, ShapeProps} from './Shape';
 
+/**
+ * @experimental
+ */
 export interface DrawTokenHook {
   (
     ctx: CanvasRenderingContext2D,
@@ -49,6 +54,8 @@ export interface DrawTokenHook {
 
 /**
  * Describes custom drawing logic used by the Code node.
+ *
+ * @experimental
  */
 export interface DrawHooks {
   /**
@@ -95,16 +102,12 @@ export interface CodeProps extends ShapeProps {
 /**
  * A node for displaying and animating code.
  *
- * @experimental
- *
  * @preview
  * ```tsx editor
- * import {parser} from '@lezer/javascript';
- * import {Code, LezerHighlighter, makeScene2D} from '@motion-canvas/2d';
+ * import {Code, makeScene2D} from '@motion-canvas/2d';
  * import {createRef} from '@motion-canvas/core';
  *
  * export default makeScene2D(function* (view) {
- *   LezerHighlighter.registerParser(parser);
  *   const code = createRef<Code>();
  *
  *   view.add(
@@ -145,7 +148,7 @@ export class Code extends Shape {
    * @param dialect - Custom dialect to use.
    */
   public static createSignal(
-    initial: PossibleCodeScope,
+    initial: SignalValue<PossibleCodeScope>,
     highlighter?: SignalValue<CodeHighlighter>,
     dialect?: SignalValue<string>,
   ): CodeSignal<void> {
@@ -157,9 +160,8 @@ export class Code extends Shape {
     ).toSignal();
   }
 
-  public static readonly defaultHighlighter = new LezerHighlighter(
-    DefaultHighlightStyle,
-  );
+  @lazy(() => new LezerHighlighter(DefaultHighlightStyle))
+  public static readonly defaultHighlighter: LezerHighlighter;
 
   /**
    * The dialect to use for highlighting the code.
@@ -218,6 +220,8 @@ export class Code extends Shape {
    * @remarks
    * Check out {@link DrawHooks} for available render hooks.
    *
+   * @experimental
+   *
    * @example
    * Make the unselected code blurry and transparent:
    * ```tsx
@@ -245,6 +249,20 @@ export class Code extends Shape {
   })
   @signal()
   public declare readonly drawHooks: SimpleSignal<DrawHooks, this>;
+
+  protected setDrawHooks(value: DrawHooks) {
+    if (
+      !useScene().experimentalFeatures &&
+      value !== this.drawHooks.context.getInitial()
+    ) {
+      useLogger().log({
+        ...experimentalLog(`Code uses experimental draw hooks.`),
+        inspect: this.key,
+      });
+    } else {
+      this.drawHooks.context.setter(value);
+    }
+  }
 
   /**
    * The currently selected code range.
@@ -328,9 +346,6 @@ export class Code extends Shape {
       fontFamily: 'monospace',
       ...props,
     });
-    if (!useScene2D().experimentalFeatures) {
-      throw new ExperimentalError('The Code node is an experimental feature');
-    }
   }
 
   /**
@@ -338,7 +353,9 @@ export class Code extends Shape {
    *
    * @param initial - The initial code.
    */
-  public createSignal(initial: PossibleCodeScope): CodeSignal<this> {
+  public createSignal(
+    initial: SignalValue<PossibleCodeScope>,
+  ): CodeSignal<this> {
     return new CodeSignalContext<this>(
       initial,
       this,
@@ -392,7 +409,7 @@ export class Code extends Shape {
    *
    * @param point - The point to get the bounding box for.
    */
-  public getPointBbox(point: CodePoint): BBox {
+  public getPointBBox(point: CodePoint): BBox {
     const [line, column] = point;
     const drawingInfo = this.drawingInfo();
     let match: CodeFragmentDrawingInfo | undefined;
@@ -425,12 +442,12 @@ export class Code extends Shape {
    * Return bounding boxes of all characters in the selection.
    *
    * @remarks
-   * The returned bound boxes are in local space of the `Code` node.
+   * The returned bounding boxes are in local space of the `Code` node.
    * Each line of code has a separate bounding box.
    *
    * @param selection - The selection to get the bounding boxes for.
    */
-  public getSelectionBbox(selection: PossibleCodeSelection): BBox[] {
+  public getSelectionBBox(selection: PossibleCodeSelection): BBox[] {
     const size = this.computedSize();
     const range = parseCodeSelection(selection);
     const drawingInfo = this.drawingInfo();

@@ -134,12 +134,9 @@ export class TxtLeaf extends Shape {
     // We take the default value of the miterLimit as 10.
     const miterLimitCoefficient = this.lineJoin() === 'miter' ? 0.5 * 10 : 0.5;
 
-    return new BBox(
-      -size.width / 2,
-      -size.height / 2,
-      bbox.width,
-      bbox.height,
-    ).expand(lineWidth * miterLimitCoefficient);
+    return new BBox(-size.width / 2, -size.height / 2, bbox.width, bbox.height)
+      .expand([0, this.fontSize() * 0.5])
+      .expand(lineWidth * miterLimitCoefficient);
   }
 
   protected override applyFlex() {
