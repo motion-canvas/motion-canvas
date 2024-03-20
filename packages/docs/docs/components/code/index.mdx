@@ -55,7 +55,7 @@ up in our project configuration file.
 
 First, install the grammar for your language. You can check out this
 non-exhaustive [list of available grammars](/docs/grammars). For this tutorial,
-we'll install the `javascript` grammar:
+you should install the `javascript` grammar:
 
 ```bash
 npm i @lezer/javascript
@@ -148,9 +148,9 @@ Notice two things here:
   );
   ```
 
-Template strings allow us to easily include variables in our code snippets with
-`${}` syntax. In the example below, `${name}` will be replaced with the value of
-the `name` variable (which is `number` in this case):
+Template strings allow you to easily include variables in your code snippets
+with `${}` syntax. In the example below, `${name}` will be replaced with the
+value of the `name` variable (which is `number` in this case):
 
 ```tsx
 // highlight-next-line
@@ -194,9 +194,8 @@ function example() {
 ## Using Signals
 
 If you try to use signals inside the `${}` syntax, you'll notice that they don't
-work as expected. Invoking a signal inside a template string will use its
-current value and then never update the snippet again, even if the signal
-changes:
+work as expected. Invoking a signal inside a template string uses its current
+value and then never updates the snippet again, even if the signal changes:
 
 ```tsx editor mode=code
 import {makeScene2D, Code} from '@motion-canvas/2d';
@@ -214,7 +213,7 @@ export default makeScene2D(function* (view) {
 
   yield* waitFor(1);
   nameSignal('newValue');
-  // The code snippet will still display "number" instead of "newValue".
+  // The code snippet still displays "number" instead of "newValue".
   yield* waitFor(1);
 });
 ```
@@ -243,7 +242,7 @@ export default makeScene2D(function* (view) {
 ```
 
 This happens because template strings are parsed immediately when our code is
-executed. To work around this, we provide a custom [tag function][tag-function]
+executed. To work around this, you can use a custom [tag function][tag-function]
 called [`CODE`](/api/2d/code#CODE). It allows the `Code` node to parse the
 template string in a custom way and correctly support signals. It's really easy
 to use, simply put the `CODE` tag function before your template string:
@@ -471,10 +470,10 @@ ${remove(`  return 7;
 
 ### Signals
 
-Notice that all the methods we used above are not invoked on the `Code` node but
+Notice that all the methods used above are not invoked on the `Code` node but
 rather on its `code` property. It may seem unnecessarily verbose but there's a
-good reason for it. The `code` property is a specialized code signal, just like
-the ones we create using
+good reason for it: the `code` property is a specialized code signal, just like
+the ones created by
 [`Code.createSignal()`](/api/2d/components/Code#createSignal). This means that
 all the animation methods are also available on your own signals:
 
