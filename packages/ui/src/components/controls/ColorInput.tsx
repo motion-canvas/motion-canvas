@@ -1,6 +1,5 @@
 import {Color} from '@motion-canvas/core';
 import {valid} from 'chroma-js';
-import clsx from 'clsx';
 import {useRef, useState} from 'preact/hooks';
 import {useReducedMotion} from '../../hooks';
 import {useClickOutside} from '../../hooks/useClickOutside';
@@ -28,7 +27,7 @@ export function ColorInput({value, onChange}: ColorInputProps) {
 
   return (
     <>
-      <div className={clsx(styles.color)}>
+      <div className={styles.color}>
         <Input
           onChange={event => {
             const input = event.target as HTMLInputElement;
@@ -54,10 +53,13 @@ export function ColorInput({value, onChange}: ColorInputProps) {
             event.preventDefault();
           }}
           onClick={event => {
-            const rect = event.currentTarget.getBoundingClientRect();
+            const buttonRect = event.currentTarget.getBoundingClientRect();
+            const paneRect = document
+              .getElementById('settings-pane')
+              .getBoundingClientRect();
             setPosition({
-              x: rect.x + 54,
-              y: rect.y - 4,
+              x: paneRect.right + 2 + 12, // 2px seperator, 12px padding
+              y: buttonRect.y,
             });
           }}
         >
