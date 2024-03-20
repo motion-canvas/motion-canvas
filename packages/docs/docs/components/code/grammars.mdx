@@ -1,0 +1,29 @@
+---
+sidebar_position: 1
+slug: /grammars
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import GRAMMARS from './grammars.json';
+
+# Grammars
+
+Here are some of the available grammars for Lezer together with their
+corresponding npm packages. If you know of a grammar that is not listed here,
+feel free to submit a pull request that adds it [to this file][edit].
+
+Learn [how to configure a grammar](/docs/code#parsing-and-highlighting).
+
+<>
+  {GRAMMARS.map(g => (
+    <>
+      <h4>
+        <a href={g.url}>{g.name}</a>
+      </h4>
+      <CodeBlock language="bash">npm i {g.package}</CodeBlock>
+    </>
+  ))}
+</>
+
+[edit]:
+  https://github.com/motion-canvas/motion-canvas/blob/main/packages/docs/docs/components/code/grammars.json
