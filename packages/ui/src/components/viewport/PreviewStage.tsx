@@ -12,8 +12,8 @@ import {StageView} from './StageView';
 export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());
   const {player} = useApplication();
-  const {size, background} = useSharedSettings();
-  const {resolutionScale} = usePreviewSettings();
+  const {size, background, motionBlurDuration} = useSharedSettings();
+  const {resolutionScale, motionBlurSamples} = usePreviewSettings();
 
   useSubscribable(
     player.onRender,
@@ -21,15 +21,29 @@ export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
       await stage.render(
         player.playback.currentScene,
         player.playback.previousScene,
+        player.playback,
       );
     },
     [],
   );
 
   useEffect(() => {
-    stage.configure({resolutionScale, size, background});
+    stage.configure({
+      resolutionScale,
+      size,
+      motionBlurSamples,
+      motionBlurDuration,
+      background,
+    });
     player.requestRender();
-  }, [resolutionScale, size, background, player]);
+  }, [
+    resolutionScale,
+    size,
+    motionBlurSamples,
+    motionBlurDuration,
+    background,
+    player,
+  ]);
 
   return <StageView stage={stage} {...props} />;
 }

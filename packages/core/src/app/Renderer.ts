@@ -159,6 +159,7 @@ export class Renderer {
       await this.stage.render(
         this.playback.currentScene!,
         this.playback.previousScene,
+        this.playback,
       );
 
       if (import.meta.hot) {
@@ -276,6 +277,7 @@ export class Renderer {
     await this.stage.render(
       this.playback.currentScene!,
       this.playback.previousScene,
+      this.playback,
     );
 
     const sceneFrame =

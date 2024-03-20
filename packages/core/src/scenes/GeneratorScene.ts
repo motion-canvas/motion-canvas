@@ -60,6 +60,10 @@ export abstract class GeneratorScene<T>
     return this.firstFrame + this.cache.current.duration;
   }
 
+  public get currentFrame() {
+    return this.playback.frame;
+  }
+
   public get onCacheChanged() {
     return this.cache.subscribable;
   }

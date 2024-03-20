@@ -66,7 +66,7 @@ export function NumberInput({
       max={max}
       step={step}
       value={currentValue}
-      onChangeCapture={() => onChange?.(parseInt(inputRef.current.value))}
+      onChangeCapture={() => onChange?.(parseFloat(inputRef.current.value))}
       onPointerDown={event => {
         if (
           document.activeElement !== inputRef.current &&

@@ -152,6 +152,7 @@ export async function borrowPlayer(
       await StageInstance.render(
         PlayerInstance.playback.currentScene,
         PlayerInstance.playback.previousScene,
+        PlayerInstance.playback,
       );
     });
     PlayerInstance.onRecalculated.subscribe(() => {

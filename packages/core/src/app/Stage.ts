@@ -3,9 +3,13 @@ import {unwrap} from '../signals';
 import type {Color} from '../types';
 import {CanvasColorSpace, Vector2} from '../types';
 import {getContext} from '../utils';
+import {MoblurRenderer} from './MoblurRenderer';
+import {PlaybackManager} from './PlaybackManager';
 
 export interface StageSettings {
   size: Vector2;
+  motionBlurSamples: number;
+  motionBlurDuration: number;
   resolutionScale: number;
   colorSpace: CanvasColorSpace;
   background: Color | string | null;
@@ -21,10 +25,13 @@ export class Stage {
   private resolutionScale = 1;
   private colorSpace: CanvasColorSpace = 'srgb';
   private size = Vector2.zero;
+  private motionBlurSamples = 1;
+  private motionBlurDuration = 1;
 
   public readonly finalBuffer: HTMLCanvasElement;
   private readonly currentBuffer: HTMLCanvasElement;
   private readonly previousBuffer: HTMLCanvasElement;
+  private moblurRenderer: MoblurRenderer | null = null;
 
   private context: CanvasRenderingContext2D;
   private currentContext: CanvasRenderingContext2D;
@@ -49,6 +56,8 @@ export class Stage {
     colorSpace = this.colorSpace,
     size = this.size,
     resolutionScale = this.resolutionScale,
+    motionBlurSamples = this.motionBlurSamples,
+    motionBlurDuration = this.motionBlurDuration,
     background = this.background,
   }: Partial<StageSettings>) {
     if (colorSpace !== this.colorSpace) {
@@ -58,6 +67,7 @@ export class Stage {
       this.previousContext = getContext({colorSpace}, this.previousBuffer);
     }
 
+    //Update resolution
     if (
       !size.exactlyEquals(this.size) ||
       resolutionScale !== this.resolutionScale
@@ -69,13 +79,34 @@ export class Stage {
       this.resizeCanvas(this.previousContext);
     }
 
+    //Create motion blur renderer if needed
+    if (motionBlurSamples <= 1 || !MoblurRenderer.checkSupport()) {
+      this.moblurRenderer = null;
+    } else if (!this.moblurRenderer) {
+      this.moblurRenderer = new MoblurRenderer(
+        this.size,
+        motionBlurSamples,
+        motionBlurDuration,
+      );
+    }
+
+    //Set background
     this.background =
       typeof background === 'string'
         ? background
         : background?.serialize() ?? null;
+
+    //Update motion blur settings
+    if (this.moblurRenderer) {
+      this.moblurRenderer.configure(
+        this.size,
+        motionBlurSamples,
+        motionBlurDuration,
+      );
+    }
   }
 
-  public async render(currentScene: Scene, previousScene: Scene | null) {
+  private async renderFrame(currentScene: Scene, previousScene: Scene | null) {
     const previousOnTop = previousScene
       ? unwrap(currentScene.previousOnTop)
       : false;
@@ -104,7 +135,24 @@ export class Stage {
     }
   }
 
-  public resizeCanvas(context: CanvasRenderingContext2D) {
+  public async render(
+    currentScene: Scene,
+    previousScene: Scene | null,
+    playback: PlaybackManager,
+  ) {
+    if (this.moblurRenderer) {
+      const renderCallback = this.renderFrame.bind(
+        this,
+        currentScene,
+        previousScene,
+      );
+      await this.moblurRenderer.render(this.context, renderCallback, playback);
+    } else {
+      await this.renderFrame(currentScene, previousScene);
+    }
+  }
+
+  public resizeCanvas(context: {canvas: {width: number; height: number}}) {
     const size = this.canvasSize;
     context.canvas.width = size.width;
     context.canvas.height = size.height;

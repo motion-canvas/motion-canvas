@@ -236,6 +236,7 @@ export class Presenter {
     await this.stage.render(
       this.playback.currentScene,
       this.playback.previousScene,
+      this.playback,
     );
 
     if (!this.abortController?.signal.aborted) {

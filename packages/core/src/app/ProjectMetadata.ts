@@ -19,17 +19,37 @@ function createProjectMetadata(project: Project) {
       background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
       size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
+      motionBlurDuration: new NumberMetaField('motion blur duration', 0.5)
+        .setStep(0.1)
+        .setRange(0.1),
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
       fps: new NumberMetaField('frame rate', 30)
         .setPresets(FrameRates)
         .setRange(1),
+      motionBlurSamples: new NumberMetaField('motion blur samples', 1)
+        .setPresets([
+          {value: 1, text: '1'},
+          {value: 8, text: '3'},
+          {value: 32, text: '8'},
+          {value: 32, text: '32'},
+        ])
+        .setRange(1),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
     }),
     rendering: new ObjectMetaField('Rendering', {
       fps: new NumberMetaField('frame rate', 60)
         .setPresets(FrameRates)
+        .setRange(1),
+      motionBlurSamples: new NumberMetaField('motion blur samples', 1)
+        .setPresets([
+          {value: 1, text: '1'},
+          {value: 8, text: '8'},
+          {value: 16, text: '16'},
+          {value: 32, text: '32'},
+          {value: 64, text: '64'},
+        ])
         .setRange(1),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
       colorSpace: new EnumMetaField('color space', ColorSpaces),
@@ -51,6 +71,8 @@ export class ProjectMetadata extends ObjectMetaField<
 
   public getFullPreviewSettings(): {
     fps: number;
+    motionBlurSamples: number;
+    motionBlurDuration: number;
     resolutionScale: number;
     background: Color | null;
     range: [number, number];
@@ -65,6 +87,8 @@ export class ProjectMetadata extends ObjectMetaField<
 
   public getFullRenderingSettings(): {
     fps: number;
+    motionBlurSamples: number;
+    motionBlurDuration: number;
     resolutionScale: number;
     colorSpace: CanvasColorSpace;
     background: Color | null;

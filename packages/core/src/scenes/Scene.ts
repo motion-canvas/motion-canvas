@@ -167,6 +167,11 @@ export interface Scene<T = unknown> {
   get lastFrame(): number;
 
   /**
+   * The current frame that the scene is on
+   */
+  get currentFrame(): number;
+
+  /**
    * Triggered when the cached data changes.
    *
    * @eventProperty
