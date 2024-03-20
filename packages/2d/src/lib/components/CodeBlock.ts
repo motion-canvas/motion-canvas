@@ -47,6 +47,9 @@ export interface CodeModification {
   to: Code;
 }
 
+/**
+ * @deprecated Use {@link Code} instead.
+ */
 @nodeName('CodeBlock')
 export class CodeBlock extends Shape {
   private static initialized = createComputedAsync(
