@@ -50,8 +50,8 @@ the code.
 First things first, if you just copy any of the snippets in this tutorial you'll
 notice that the displayed code has a uniform color. The default highlighter uses
 [`Lezer`](https://lezer.codemirror.net/) to parse and highlighting the code but
-to do that it needs the grammar for the language you're using. We can set that
-up in our project configuration file.
+to do that it needs the grammar for the language you're using. You can set that
+up in your project configuration file.
 
 First, install the grammar for your language. You can check out this
 non-exhaustive [list of available grammars](/docs/grammars). For this tutorial,
@@ -80,7 +80,7 @@ export default makeProject({
 });
 ```
 
-This will set up `@lezer/javascript` as the default parser for all your code
+This sets `@lezer/javascript` up as the default parser for all your code
 snippets. If you want to use more than one language, check out the
 [Multiple Languages](#multiple-languages) section.
 
@@ -149,8 +149,8 @@ Notice two things here:
   ```
 
 Template strings allow you to easily include variables in your code snippets
-with `${}` syntax. In the example below, `${name}` will be replaced with the
-value of the `name` variable (which is `number` in this case):
+with `${}` syntax. In the example below, `${name}` is replaced with the value of
+the `name` variable (which is `number` in this case):
 
 ```tsx
 // highlight-next-line
@@ -170,8 +170,8 @@ function example() {
 );
 ```
 
-Any valid JavaScript expression can be used inside the `${}` syntax and the
-result will be included in the code snippet:
+Any valid JavaScript expression inside the `${}` syntax will be included in the
+code snippet:
 
 ```tsx
 // highlight-next-line
@@ -296,12 +296,11 @@ view.add(<Code code={klass} />);
 // }
 ```
 
-You might have noticed that in these examples we used a specialized type of
-signal created using
-[`Code.createSignal()`](/api/2d/components/Code#createSignal). While the generic
-[`createSignal()`](/api/core/signals#createSignal) would work fine in these
-simple examples, the specialized signal will shine once we start animating our
-code snippets.
+You might have noticed that these examples used a specialized type of signal
+created using [`Code.createSignal()`](/api/2d/components/Code#createSignal).
+While the generic [`createSignal()`](/api/core/signals#createSignal) would work
+fine in these simple examples, the specialized signal will shine once you start
+animating your code snippets.
 
 ## Animating Code
 
@@ -678,8 +677,8 @@ retrieve the position and size of a specific character or a range of characters,
 respectively. The returned value is a [`bounding box`](/api/core/types/BBox) in
 the local space of the `Code` node.
 
-In the following example, we use `getSelectionBbox` to draw a rectangle around
-the word `log`:
+The following example uses `getSelectionBBox` to draw a rectangle around the
+word `log`:
 
 ```tsx editor
 import {Code, Rect, makeScene2D} from '@motion-canvas/2d';
@@ -706,8 +705,8 @@ function hello() {
     const range = code().findFirstRange('log');
     const bboxes = code().getSelectionBBox(range);
     // "getSelectionBBox" returns an array of bboxes,
-    // one for each line in the range. We'll just use
-    // the first one for this example.
+    // one for each line in the range. You can just
+    // use the first one for this example.
     const first = bboxes[0];
     return first.expand([4, 8]);
   });
