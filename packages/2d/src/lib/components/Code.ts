@@ -1,7 +1,7 @@
 import {
   BBox,
   createSignal,
-  ExperimentalError,
+  experimentalLog,
   lazy,
   map,
   SerializedVector2,
@@ -11,6 +11,8 @@ import {
   ThreadGenerator,
   TimingFunction,
   unwrap,
+  useLogger,
+  useScene,
   Vector2,
 } from '@motion-canvas/core';
 import {
@@ -35,7 +37,6 @@ import {
 } from '../code';
 import {computed, initial, nodeName, parser, signal} from '../decorators';
 import {DesiredLength} from '../partials';
-import {useScene2D} from '../scenes';
 import {Shape, ShapeProps} from './Shape';
 
 /**
@@ -249,6 +250,20 @@ export class Code extends Shape {
   @signal()
   public declare readonly drawHooks: SimpleSignal<DrawHooks, this>;
 
+  protected setDrawHooks(value: DrawHooks) {
+    if (
+      !useScene().experimentalFeatures &&
+      value !== this.drawHooks.context.getInitial()
+    ) {
+      useLogger().log({
+        ...experimentalLog(`Code uses experimental draw hooks.`),
+        inspect: this.key,
+      });
+    } else {
+      this.drawHooks.context.setter(value);
+    }
+  }
+
   /**
    * The currently selected code range.
    *
@@ -331,9 +346,6 @@ export class Code extends Shape {
       fontFamily: 'monospace',
       ...props,
     });
-    if (!useScene2D().experimentalFeatures) {
-      throw new ExperimentalError('The Code node is an experimental feature');
-    }
   }
 
   /**
