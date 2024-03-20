@@ -28,7 +28,7 @@ export function ColorInput({value, onChange}: ColorInputProps) {
 
   return (
     <>
-      <div className={clsx(styles.input, styles.color)}>
+      <div className={clsx(styles.color)}>
         <Input
           onChange={event => {
             const input = event.target as HTMLInputElement;
@@ -48,8 +48,11 @@ export function ColorInput({value, onChange}: ColorInputProps) {
           type="text"
           value={value?.serialize() ?? ''}
         />
-        <ColorPreview
-          color={value?.hex() ?? '#00000000'}
+        <div
+          className={styles.button}
+          onPointerDown={event => {
+            event.preventDefault();
+          }}
           onClick={event => {
             const rect = event.currentTarget.getBoundingClientRect();
             setPosition({
@@ -57,7 +60,9 @@ export function ColorInput({value, onChange}: ColorInputProps) {
               y: rect.y - 4,
             });
           }}
-        />
+        >
+          <ColorPreview color={value?.hex() ?? '#00000000'} />
+        </div>
       </div>
       {position && (
         <ColorPicker

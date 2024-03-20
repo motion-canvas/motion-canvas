@@ -194,18 +194,21 @@
 
 .color {
   display: flex;
-  padding-left: 0;
-  align-items: center;
+  flex-grow: 1;
+  flex-shrink: 1;
 
   .input {
     width: 0;
-    margin: 0 8px 0 0;
-    padding-left: 8px;
-    appearance: none;
-    background-color: transparent;
-    &:hover {
-      background-color: transparent;
-    }
+    border-radius: var(--radius) 0 0 var(--radius);
+    border-right: 1px solid var(--surface-color);
+  }
+
+  .button {
+    width: 0;
+    flex-grow: 0;
+    flex-basis: 0;
+    padding: 0 12px;
+    border-radius: 0 var(--radius) var(--radius) 0;
   }
 }
 
@@ -277,7 +280,6 @@
   background-color: rgba(0, 0, 0, 0.16);
   background-image: url('../../img/grid.svg');
   overflow: hidden;
-  cursor: pointer;
 
   div {
     width: 16px;
