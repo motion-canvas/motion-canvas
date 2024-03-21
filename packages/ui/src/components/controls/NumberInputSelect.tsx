@@ -5,13 +5,14 @@ import {Select, SelectProps} from './Select';
 
 export type NumberInputSelectProps = Omit<
   JSX.HTMLAttributes<HTMLInputElement>,
-  'value' | 'onChange' | 'min' | 'max' | 'step'
+  'value' | 'onChange' | 'min' | 'max' | 'step' | 'label'
 > &
   SelectProps<number> & {
     value: number;
     min?: number;
     max?: number;
     step?: number;
+    label?: string;
   };
 
 export function NumberInputSelect({
