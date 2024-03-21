@@ -8,7 +8,7 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
+      fontFamily={'JetBrains Mono, monospace'}
       offsetX={-1}
       x={-400}
       code={'const number = 7;'}
