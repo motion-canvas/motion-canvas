@@ -164,6 +164,7 @@ export class Renderer {
       if (import.meta.hot) {
         import.meta.hot.send('motion-canvas:export', {
           frame,
+          name: frame.toString().padStart(6, '0'),
           data: this.stage.finalBuffer.toDataURL('image/png'),
           mimeType: 'image/png',
           subDirectories: ['still', this.project.name],

@@ -110,13 +110,14 @@ export class ImageExporter implements Exporter {
       this.frameLookup.add(frame);
       import.meta.hot!.send('motion-canvas:export', {
         frame,
-        sceneFrame,
         data: canvas.toDataURL(this.fileType, this.quality),
         mimeType: this.fileType,
         subDirectories: this.groupByScene
           ? [this.projectName, sceneName]
           : [this.projectName],
-        groupByScene: this.groupByScene,
+        name: (this.groupByScene ? sceneFrame : frame)
+          .toString()
+          .padStart(6, '0'),
       });
     }
   }

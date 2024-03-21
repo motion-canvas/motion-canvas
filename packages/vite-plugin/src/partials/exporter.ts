@@ -28,13 +28,7 @@ export function exporterPlugin({outputPath}: ExporterPluginConfig): Plugin {
 
       server.ws.on(
         'motion-canvas:export',
-        async (
-          {data, frame, sceneFrame, subDirectories, mimeType, groupByScene},
-          client,
-        ) => {
-          const name = (groupByScene ? sceneFrame : frame)
-            .toString()
-            .padStart(6, '0');
+        async ({data, frame, name, subDirectories, mimeType}, client) => {
           const extension = mime.extension(mimeType);
           const outputFilePath = path.join(
             outputPath,
@@ -48,12 +42,19 @@ export function exporterPlugin({outputPath}: ExporterPluginConfig): Plugin {
           }
 
           const base64Data = data.slice(data.indexOf(',') + 1);
-          await fs.promises.writeFile(outputFilePath, base64Data, {
-            encoding: 'base64',
-          });
+          await writeBase64(outputFilePath, base64Data);
           client.send('motion-canvas:export-ack', {frame});
         },
       );
     },
   };
+}
+
+function writeBase64(filePath: string, base64: string) {
+  return new Promise((resolve, reject) => {
+    fs.createWriteStream(filePath)
+      .on('finish', resolve)
+      .on('error', reject)
+      .end(Buffer.from(base64, 'base64'));
+  });
 }
