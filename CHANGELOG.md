@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
+
+
+### Bug Fixes
+
+* optimize saving frames to disk ([#1007](https://github.com/motion-canvas/motion-canvas/issues/1007)) ([d79af91](https://github.com/motion-canvas/motion-canvas/commit/d79af91a4caa5bcf3ca98ec3a4b6d892c29c7fd9))
+* **ui:** fix color picker ([#1008](https://github.com/motion-canvas/motion-canvas/issues/1008)) ([dfc2dae](https://github.com/motion-canvas/motion-canvas/commit/dfc2dae047339cc3796b8ee3594ad14de60aba5a))
+
+
+
+
+
 # [3.15.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0) (2024-03-21)
 
 
