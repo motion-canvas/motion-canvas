@@ -1,6 +1,5 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import {parser as javascript} from '@lezer/javascript';
-import {parser as rust} from '@lezer/rust';
 import type {View2D} from '@motion-canvas/2d';
 import type {
   FullSceneDescription,
@@ -120,11 +119,14 @@ export async function borrowPlayer(
       ValueDispatcher,
       DefaultPlugin,
     } = await import(/* webpackIgnore: true */ '@motion-canvas/core');
-    const {makeScene2D, LezerHighlighter} = await import(
+    const {makeScene2D, Code, LezerHighlighter} = await import(
       /* webpackIgnore: true */ '@motion-canvas/2d'
     );
-    LezerHighlighter.registerParser(javascript);
-    LezerHighlighter.registerParser(rust, 'rs');
+    Code.defaultHighlighter = new LezerHighlighter(
+      javascript.configure({
+        dialect: 'jsx ts',
+      }),
+    );
 
     Description = makeScene2D(function* () {
       yield;

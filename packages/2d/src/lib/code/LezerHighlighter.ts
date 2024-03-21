@@ -1,9 +1,8 @@
 import {HighlightStyle} from '@codemirror/language';
 import {Parser, SyntaxNode, Tree} from '@lezer/common';
 import {highlightTree} from '@lezer/highlight';
-import {useLogger} from '@motion-canvas/core';
 import {CodeHighlighter, HighlightResult} from './CodeHighlighter';
-import {defaultTokenize} from './CodeTokenizer';
+import {DefaultHighlightStyle} from './DefaultHighlightStyle';
 
 interface LezerCache {
   tree: Tree;
@@ -12,15 +11,13 @@ interface LezerCache {
 }
 
 export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
-  private static readonly parserMap = new Map<string, Parser>();
   private static classRegex = /\.(\S+).*color:([^;]+)/;
   private readonly classLookup = new Map<string, string>();
 
-  public static registerParser(parser: Parser, dialect = ''): void {
-    this.parserMap.set(dialect, parser);
-  }
-
-  public constructor(private readonly style: HighlightStyle) {
+  public constructor(
+    private readonly parser: Parser,
+    private readonly style: HighlightStyle = DefaultHighlightStyle,
+  ) {
     for (const rule of this.style.module?.getRules().split('\n') ?? []) {
       const match = rule.match(LezerHighlighter.classRegex);
       if (!match) {
@@ -37,17 +34,9 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
     return true;
   }
 
-  public prepare(code: string, dialect: string): LezerCache | null {
-    const parser = LezerHighlighter.parserMap.get(dialect);
-    if (!parser) {
-      if (dialect !== '') {
-        useLogger().warn(`No parser found for dialect: ${dialect}`);
-      }
-      return null;
-    }
-
+  public prepare(code: string): LezerCache | null {
     const colorLookup = new Map<string, string>();
-    const tree = parser.parse(code);
+    const tree = this.parser.parse(code);
     highlightTree(tree, this.style, (from, to, classes) => {
       const color = this.classLookup.get(classes);
       if (!color) {
@@ -97,16 +86,8 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
     };
   }
 
-  public tokenize(code: string, dialect: string): string[] {
-    const parser = LezerHighlighter.parserMap.get(dialect);
-    if (!parser) {
-      if (dialect !== '') {
-        useLogger().warn(`No parser found for dialect: ${dialect}`);
-      }
-      return defaultTokenize(code);
-    }
-
-    const tree = parser.parse(code);
+  public tokenize(code: string): string[] {
+    const tree = this.parser.parse(code);
     const cursor = tree.cursor();
     const tokens: string[] = [];
     let current = 0;
