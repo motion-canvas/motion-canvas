@@ -124,7 +124,7 @@ export async function borrowPlayer(
     );
     Code.defaultHighlighter = new LezerHighlighter(
       javascript.configure({
-        dialect: 'tsx',
+        dialect: 'jsx ts',
       }),
     );
 

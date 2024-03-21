@@ -84,6 +84,24 @@ Now all `Code` nodes in your project will use `@lezer/javascript` to parse and
 highlight the snippets. If you want to use more than one language, check out the
 [Multiple Languages](#multiple-languages) section.
 
+:::info
+
+Note that, by default, the JavaScript parser doesn't support JSX or TypeScript.
+You can enable support for these via [dialects][dialects]. The dialects
+available for a given parser are usually listed in the documentation of the
+grammar package.
+
+```ts
+Code.defaultHighlighter = new LezerHighlighter(
+  parser.configure({
+    // Provide a space-separated list of dialects to enable:
+    dialect: 'jsx ts',
+  }),
+);
+```
+
+:::
+
 ## Defining Code
 
 The code to display is set via the [`code`](/api/2d/components/Code#code)
@@ -760,7 +778,7 @@ override the default highlighter set in the project configuration file:
 import {Code, LezerHighlighter} from '@motion-canvas/2d';
 import {parser} from '@lezer/rust';
 
-const Rust = new LezerHighlighter(parser);
+const RustHighlighter = new LezerHighlighter(parser);
 
 // ...
 
@@ -780,7 +798,7 @@ function hello() {
 view.add(
   <Code
     // this node uses the Rust parser
-    highlighter={Rust}
+    highlighter={RustHighlighter}
     offsetX={1}
     x={400}
     code={`
@@ -800,10 +818,10 @@ quickly extend any node with your own defaults:
 import {Code, LezerHighlighter, withDefaults} from '@motion-canvas/2d';
 import {parser} from '@lezer/rust';
 
-const Rust = new LezerHighlighter(parser);
+const RustHighlighter = new LezerHighlighter(parser);
 
 export const RustCode = withDefaults(Code, {
-  highlighter: Rust,
+  highlighter: RustHighlighter,
 });
 ```
 
@@ -832,3 +850,4 @@ to fix this, we recommend you use Firefox for rendering.
 
 [tag-function]:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
+[dialects]: https://lezer.codemirror.net/docs/guide/#dialects
