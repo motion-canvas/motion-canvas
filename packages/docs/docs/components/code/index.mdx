@@ -16,7 +16,7 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
+      fontFamily={'JetBrains Mono, monospace'}
       offsetX={-1}
       x={-400}
       code={'const number = 7;'}
@@ -112,9 +112,9 @@ import {makeScene2D, Code} from '@motion-canvas/2d';
 
 export default makeScene2D(function* (view) {
   view.add(
+    // prettier-ignore
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       code={'const number = 7;'}
     />,
   );
@@ -129,7 +129,6 @@ character `` ` ``):
 view.add(
   <Code
     fontSize={28}
-    fontFamily={'JetBrains Mono'}
     // highlight-start
     code={`\
 function example() {
@@ -155,7 +154,6 @@ Notice two things here:
   view.add(
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       // highlight-start
       code={`function example() {
     const number = 7;
@@ -177,7 +175,6 @@ const name = 'number';
 view.add(
   <Code
     fontSize={28}
-    fontFamily={'JetBrains Mono'}
     code={`\
 function example() {
   // highlight-next-line
@@ -198,7 +195,6 @@ const isRed = true;
 view.add(
   <Code
     fontSize={28}
-    fontFamily={'JetBrains Mono'}
     code={`\
 function example() {
   // highlight-next-line
@@ -222,9 +218,9 @@ import {waitFor} from '@motion-canvas/core';
 export default makeScene2D(function* (view) {
   const nameSignal = Code.createSignal('number');
   view.add(
+    // prettier-ignore
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       code={`const ${nameSignal()} = 7;`}
     />,
   );
@@ -246,9 +242,9 @@ import {waitFor} from '@motion-canvas/core';
 export default makeScene2D(function* (view) {
   const nameSignal = Code.createSignal('number');
   view.add(
+    // prettier-ignore
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       code={`const ${nameSignal} = 7;`}
     />,
   );
@@ -274,7 +270,6 @@ export default makeScene2D(function* (view) {
   view.add(
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       // Note the CODE tag function here:
       code={CODE`const ${nameSignal} = 7;`}
     />,
@@ -341,7 +336,6 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={`\
@@ -373,10 +367,10 @@ export default makeScene2D(function* (view) {
   const code = createRef<Code>();
 
   view.add(
+    // prettier-ignore
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
     />,
@@ -419,7 +413,6 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={`\
@@ -465,10 +458,10 @@ export default makeScene2D(function* (view) {
   const code = createRef<Code>();
 
   view.add(
+    // prettier-ignore
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
     />,
@@ -505,7 +498,6 @@ export default makeScene2D(function* (view) {
   view.add(
     <Code
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={CODE`\
@@ -536,13 +528,13 @@ export default makeScene2D(function* (view) {
   const code = createRef<Code>();
 
   view.add(
-    <Code
-      ref={code}
-      fontSize={28}
-      fontFamily={'JetBrains Mono'}
-      offsetX={-1}
-      x={-400}
-      code={'// example'}
+    // prettier-ignore
+    <Code 
+      ref={code} 
+      fontSize={28} 
+      offsetX={-1} 
+      x={-400} 
+      code={'// example'} 
     />,
   );
 
@@ -625,7 +617,6 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={`\
@@ -663,7 +654,6 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={`\
@@ -709,7 +699,6 @@ export default makeScene2D(function* (view) {
     <Code
       ref={code}
       fontSize={28}
-      fontFamily={'JetBrains Mono'}
       offsetX={-1}
       x={-400}
       code={`\
