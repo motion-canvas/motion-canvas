@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/2d",
-  "version": "3.15.0-alpha.0",
+  "version": "3.15.0-alpha.1",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
@@ -29,7 +29,7 @@
   ],
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
-    "@motion-canvas/ui": "^3.15.0-alpha.0",
+    "@motion-canvas/ui": "^3.15.0-alpha.1",
     "@preact/signals": "^1.2.1",
     "clsx": "^2.0.0",
     "jsdom": "^22.1.0",

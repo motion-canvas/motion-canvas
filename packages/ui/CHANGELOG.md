@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2024-03-21)
+
+
+### Features
+
+* **ui:** add color picker popover to color input ([#962](https://github.com/motion-canvas/motion-canvas/issues/962)) ([f3db0c2](https://github.com/motion-canvas/motion-canvas/commit/f3db0c20505b3644c93f5a0f2198307225b55ce0))
+
+
+
+
+
 # [3.15.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0-alpha.0) (2024-03-19)
 
 
