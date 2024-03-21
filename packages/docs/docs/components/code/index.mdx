@@ -61,18 +61,18 @@ you should install the `javascript` grammar:
 npm i @lezer/javascript
 ```
 
-Then, in your project configuration, import the grammar and register it via
-`LezerHighlighter`:
+Then, in your project configuration, instantiate a new `LezerHighlighter` using
+the imported grammar, and set it as the default highlighter:
 
 ```ts title="src/project.ts"
 import {makeProject} from '@motion-canvas/core';
 import example from './scenes/example?scene';
 
 // highlight-start
-import {LezerHighlighter} from '@motion-canvas/2d';
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
 import {parser} from '@lezer/javascript';
 
-LezerHighlighter.registerParser(parser);
+Code.defaultHighlighter = new LezerHighlighter(parser);
 // highlight-end
 
 export default makeProject({
@@ -80,9 +80,27 @@ export default makeProject({
 });
 ```
 
-This sets `@lezer/javascript` up as the default parser for all your code
-snippets. If you want to use more than one language, check out the
+Now all `Code` nodes in your project will use `@lezer/javascript` to parse and
+highlight the snippets. If you want to use more than one language, check out the
 [Multiple Languages](#multiple-languages) section.
+
+:::info
+
+Note that, by default, the JavaScript parser doesn't support JSX or TypeScript.
+You can enable support for these via [dialects][dialects]. The dialects
+available for a given parser are usually listed in the documentation of the
+grammar package.
+
+```ts
+Code.defaultHighlighter = new LezerHighlighter(
+  parser.configure({
+    // Provide a space-separated list of dialects to enable:
+    dialect: 'jsx ts',
+  }),
+);
+```
+
+:::
 
 ## Defining Code
 
@@ -130,9 +148,9 @@ Notice two things here:
   or tabs at the beginning of each line would be included in the snippet.
 
 - The backslash character (`\`) at the very beginning is used to escape the
-  first newline character. This lets us start the snippet on a new line without
-  actually including an empty line at the start of the snippet. Without the
-  slash, the equivalent code would have to be written as:
+  first newline character. This lets the snippet start on a new line without
+  actually including an empty line at the beginning. Without the slash, the
+  equivalent code would have to be written as:
   ```tsx
   view.add(
     <Code
@@ -149,8 +167,8 @@ Notice two things here:
   ```
 
 Template strings allow you to easily include variables in your code snippets
-with `${}` syntax. In the example below, `${name}` is replaced with the value of
-the `name` variable (which is `number` in this case):
+with the `${}` syntax. In the example below, `${name}` is replaced with the
+value of the `name` variable (which is `number` in this case):
 
 ```tsx
 // highlight-next-line
@@ -724,59 +742,103 @@ function hello() {
 });
 ```
 
-## Multiple Languages
+## Custom Themes
 
-You can register parsers for multiple different languages by giving them a
-unique name during registration:
+`LezerHighlighter` uses CodeMirror's
+[`HighlightStyle`](https://codemirror.net/examples/styling/) to assign colors to
+specific code tokens. By default, the
+[`DefaultHighlightStyle`](/api/2d/code#DefaultHighlightStyle) is used. You can
+specify your own style by passing it as the second argument to the
+`LezerHighlighter` constructor:
 
 ```ts
-import {LezerHighlighter} from '@motion-canvas/2d';
-import {parser as jsParser} from '@lezer/javascript';
-// highlight-next-line
-import {parser as rsParser} from '@lezer/rust';
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
+import {HighlightStyle} from '@codemirror/language';
+import {tags} from '@lezer/highlight';
+import {parser} from '@lezer/javascript';
 
-LezerHighlighter.registerParser(jsParser);
-// highlight-next-line
-LezerHighlighter.registerParser(rsParser, 'rs');
+const MyStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: 'red'},
+  {tag: tags.function(tags.variableName), color: 'yellow'},
+  {tag: tags.number, color: 'blue'},
+  {tag: tags.string, color: 'green'},
+  // ...
+]);
+
+Code.defaultHighlighter = new LezerHighlighter(parser, MyStyle);
 ```
 
-This name can then be passed to the [`dialect`](/api/2d/components/Code#dialect)
-property of a specific `Code` node to use a different parser:
+## Multiple Languages
 
-```tsx editor mode=code
-import {makeScene2D, Code} from '@motion-canvas/2d';
+You can configure highlighters on a per-node basis using the
+[`highlighter`](/api/2d/components/Code#highlighter) property. This will
+override the default highlighter set in the project configuration file:
 
-export default makeScene2D(function* (view) {
-  // Font properties configured for the view are
-  // inherited by all text nodes, including Code:
-  view.fontSize(28).fontFamily('JetBrains Mono');
+```tsx
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
+import {parser} from '@lezer/rust';
 
-  view.add(
-    <>
-      <Code
-        // this node uses the default parser (javascript)
-        offsetX={-1}
-        x={-400}
-        code={`
+const RustHighlighter = new LezerHighlighter(parser);
+
+// ...
+
+view.add(
+  <Code
+    // this node uses the default parser
+    offsetX={-1}
+    x={-400}
+    code={`
 function hello() {
   console.log('Hello!');
 }
 `}
-      />
-      <Code
-        // this node uses the "rs" parser (rust)
-        dialect={'rs'}
-        offsetX={1}
-        x={400}
-        code={`
+  />,
+);
+
+view.add(
+  <Code
+    // this node uses the Rust parser
+    highlighter={RustHighlighter}
+    offsetX={1}
+    x={400}
+    code={`
 fn hello() {
   println!("Hello!");
 }
 `}
-      />
-    </>,
-  );
+  />,
+);
+```
+
+It can be useful to create a custom component for the languages you often use.
+You can use the [`withDefaults`](/api/2d/utils#withDefaults) helper function to
+quickly extend any node with your own defaults:
+
+```ts title="src/nodes/RustCode.ts"
+import {Code, LezerHighlighter, withDefaults} from '@motion-canvas/2d';
+import {parser} from '@lezer/rust';
+
+const RustHighlighter = new LezerHighlighter(parser);
+
+export const RustCode = withDefaults(Code, {
+  highlighter: RustHighlighter,
 });
+```
+
+```tsx title="src/scenes/example.tsx"
+import {RustCode} from '../nodes/RustCode';
+
+// ...
+
+view.add(
+  <RustCode
+    code={`
+fn hello() {
+  println!("Hello!");
+}
+`}
+  />,
+);
 ```
 
 ## Rendering
@@ -788,3 +850,4 @@ to fix this, we recommend you use Firefox for rendering.
 
 [tag-function]:
   https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
+[dialects]: https://lezer.codemirror.net/docs/guide/#dialects

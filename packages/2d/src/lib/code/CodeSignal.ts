@@ -80,13 +80,11 @@ export class CodeSignalContext<TOwner>
   public constructor(
     initial: SignalValue<PossibleCodeScope>,
     owner: TOwner,
-    private readonly highlighter?: SignalValue<CodeHighlighter>,
-    private readonly dialect?: SignalValue<string>,
+    private readonly highlighter?: SignalValue<CodeHighlighter | null>,
   ) {
     super(initial, deepLerp, owner);
     if (owner instanceof Code) {
       this.highlighter ??= owner.highlighter;
-      this.dialect ??= owner.dialect;
     }
     Object.defineProperty(this.invokable, 'edit', {
       value: this.edit.bind(this),
@@ -115,15 +113,14 @@ export class CodeSignalContext<TOwner>
   ): ThreadGenerator {
     let tokenize = defaultTokenize;
     const highlighter = unwrap(this.highlighter);
-    const dialect = unwrap(this.dialect);
-    if (highlighter && dialect) {
+    if (highlighter) {
       yield (async () => {
         do {
           await DependencyContext.consumePromises();
           highlighter.initialize();
         } while (DependencyContext.hasPromises());
       })();
-      tokenize = (input: string) => highlighter.tokenize(input, dialect);
+      tokenize = (input: string) => highlighter.tokenize(input);
     }
 
     this.progress(0);
