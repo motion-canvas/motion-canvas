@@ -4,6 +4,7 @@ import {useRef, useState} from 'preact/hooks';
 import {useReducedMotion} from '../../hooks';
 import {useClickOutside} from '../../hooks/useClickOutside';
 import {shake} from '../animations';
+import tabsStyles from '../tabs/Tabs.module.scss';
 import {ColorPicker} from './ColorPicker';
 import {ColorPreview} from './ColorPreview';
 import styles from './Controls.module.scss';
@@ -54,8 +55,8 @@ export function ColorInput({value, onChange}: ColorInputProps) {
           }}
           onClick={event => {
             const buttonRect = event.currentTarget.getBoundingClientRect();
-            const paneRect = document
-              .getElementById('settings-pane')
+            const paneRect = event.currentTarget
+              .closest(`.${tabsStyles.pane}`)
               .getBoundingClientRect();
             setPosition({
               x: paneRect.right + 2 + 12, // 2px seperator, 12px padding
