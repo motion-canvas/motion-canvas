@@ -31,3 +31,28 @@ will often produce no discernible difference.
 
 When enabled, each scene will be rendered into a separate image sequence located
 in a subdirectory called the same as the scene.
+
+### Worker count
+
+_Default: `4`_<br/> The number of concurrent workers used for exporting images.
+Setting it to zero disables web workers entirely.
+
+### Concurrent limit
+
+_Default: `256`_<br/> The maximum number of frames being sent to the server at
+the same time.
+
+The image exporter does not wait for the frame to be stored on the disk before
+moving on to the next one. This speeds up the process significantly (See
+[pipelining][pipelining]). However, in cases where storing cannot keep up with
+rendering, the number of frames queued in memory will grow continuously. This
+setting defines a hard limit of queued frames, after which the exporter will
+wait for the disk to catch up.
+
+If the rendering process crashes with an "out of memory" error, try decreasing
+this value.
+
+The default value (`256`) is the maximum number of simultaneous websocket
+connections allowed by most browsers.
+
+[pipelining]: https://en.wikipedia.org/wiki/Protocol_pipelining

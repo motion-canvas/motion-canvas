@@ -1,62 +1,19 @@
-import {EventDispatcher} from '../events';
-import {
-  BoolMetaField,
-  EnumMetaField,
-  NumberMetaField,
-  ObjectMetaField,
-  ValueOf,
-} from '../meta';
-import {clamp} from '../tweening';
-import {CanvasOutputMimeType} from '../types';
-import type {Exporter} from './Exporter';
-import type {Logger} from './Logger';
-import type {Project} from './Project';
-import type {RendererSettings} from './Renderer';
-import {FileTypes} from './presets';
-
-const EXPORT_FRAME_LIMIT = 256;
-const EXPORT_RETRY_DELAY = 1000;
-
-type ImageExporterOptions = ValueOf<ReturnType<typeof ImageExporter.meta>>;
+import type {Exporter, Logger, RendererSettings} from '../../app';
+import {EventDispatcher} from '../../events';
+import {clamp} from '../../tweening';
+import {CanvasOutputMimeType} from '../../types';
+import {EXPORT_RETRY_DELAY, ImageExporterOptions} from './ImageExporter';
 
 interface ServerResponse {
   frame: number;
 }
 
 /**
- * Image sequence exporter.
+ * Image sequence exporter running on the main thread.
  *
  * @internal
  */
-export class ImageExporter implements Exporter {
-  public static readonly id = '@motion-canvas/core/image-sequence';
-  public static readonly displayName = 'Image sequence';
-
-  public static meta() {
-    const meta = new ObjectMetaField(this.name, {
-      fileType: new EnumMetaField('file type', FileTypes),
-      quality: new NumberMetaField('quality', 100)
-        .setRange(0, 100)
-        .describe('A number between 0 and 100 indicating the image quality.'),
-      groupByScene: new BoolMetaField('group by scene', false).describe(
-        'Group exported images by scene. When checked, separates the sequence into subdirectories for each scene in the project.',
-      ),
-    });
-
-    meta.fileType.onChanged.subscribe(value => {
-      meta.quality.disable(value === 'image/png');
-    });
-
-    return meta;
-  }
-
-  public static async create(
-    project: Project,
-    settings: RendererSettings,
-  ): Promise<ImageExporter> {
-    return new ImageExporter(project.logger, settings);
-  }
-
+export class SingleThreadedExporter implements Exporter {
   private static readonly response = new EventDispatcher<ServerResponse>();
 
   static {
@@ -72,6 +29,7 @@ export class ImageExporter implements Exporter {
   private readonly quality: number;
   private readonly fileType: CanvasOutputMimeType;
   private readonly groupByScene: boolean;
+  private readonly concurrentLimit: number;
 
   public constructor(
     private readonly logger: Logger,
@@ -82,10 +40,11 @@ export class ImageExporter implements Exporter {
     this.quality = clamp(0, 1, options.quality / 100);
     this.fileType = options.fileType;
     this.groupByScene = options.groupByScene;
+    this.concurrentLimit = options.concurrentLimit;
   }
 
   public async start() {
-    ImageExporter.response.subscribe(this.handleResponse);
+    SingleThreadedExporter.response.subscribe(this.handleResponse);
   }
 
   public async handleFrame(
@@ -100,7 +59,7 @@ export class ImageExporter implements Exporter {
       return;
     }
     if (import.meta.hot) {
-      while (this.frameLookup.size > EXPORT_FRAME_LIMIT) {
+      while (this.frameLookup.size > this.concurrentLimit) {
         await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
         if (signal.aborted) {
           return;
@@ -126,7 +85,7 @@ export class ImageExporter implements Exporter {
     while (this.frameLookup.size > 0) {
       await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
     }
-    ImageExporter.response.unsubscribe(this.handleResponse);
+    SingleThreadedExporter.response.unsubscribe(this.handleResponse);
   }
 
   private handleResponse = ({frame}: ServerResponse) => {

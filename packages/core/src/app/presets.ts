@@ -17,6 +17,7 @@ export const FileTypes: MetaOption<CanvasOutputMimeType>[] = [
   {value: 'image/png', text: 'png'},
   {value: 'image/jpeg', text: 'jpeg'},
   {value: 'image/webp', text: 'webp'},
+  {value: 'image/bmp', text: 'bmp'},
 ];
 
 export const FrameRates: MetaOption<number>[] = [
