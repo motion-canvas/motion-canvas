@@ -95,6 +95,28 @@ export function editor(project: Project) {
   });
 
   const meta = project.meta;
+
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+
+  const startInPresenter = urlParams.has('present');
+  const startInRenderer = urlParams.has('render');
+
+  if (startInPresenter) {
+    presenter.present({
+      ...meta.getFullRenderingSettings(),
+      name: project.name,
+      slide: null,
+    });
+  }
+
+  if (startInRenderer) {
+    renderer.render({
+      ...meta.getFullRenderingSettings(),
+      name: project.name,
+    });
+  }
+
   const playerKey = `${project.name}/player`;
   const frameKey = `${project.name}/frame`;
   const player = new Player(
