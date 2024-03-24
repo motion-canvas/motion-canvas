@@ -1,4 +1,4 @@
-import {ImageExporter} from '../app';
+import {ImageExporter} from './image';
 import {makePlugin} from './makePlugin';
 
 /**
