@@ -123,11 +123,10 @@ export class Presenter {
   /**
    * Abort the ongoing presentation process.
    */
-  public async abort() {
+  public abort() {
     if (this.state.current === PresenterState.Initial) return;
     this.abortController?.abort();
     this.state.current = PresenterState.Aborting;
-    await this.playback.reset();
   }
 
   /**
