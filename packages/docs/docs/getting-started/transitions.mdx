@@ -129,7 +129,7 @@ export function* slideTransition(
   direction: Direction = Direction.Top,
   duration = 0.6,
 ): ThreadGenerator {
-  const size = useScene().getSize();
+  const size = useScene().getRealSize();
   const position = size.getOriginOffset(direction).scale(2);
   const previousPosition = Vector2.createSignal();
   const currentPosition = Vector2.createSignal(position);

@@ -13,7 +13,7 @@ import {useTransition} from './useTransition';
  * @param duration - The duration of the transition.
  */
 export function* zoomInTransition(area: BBox, duration = 0.6): ThreadGenerator {
-  const scale = useScene().getSize().div(area.size);
+  const scale = useScene().getRealSize().div(area.size);
 
   const currentPosition = Vector2.createSignal(area.position);
   const currentScale = Vector2.createSignal(Vector2.one.div(scale));
