@@ -153,6 +153,7 @@ export class PlaybackManager {
     this.previousScene = null;
     this.currentScene = this.scenes.current[0];
     this.frame = 0;
+    this.finished = false;
     await this.currentScene.reset();
   }
 
