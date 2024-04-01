@@ -1,4 +1,5 @@
 export * from './Bezier';
+export * from './Camera';
 export * from './Circle';
 export * from './Code';
 export * from './CubicBezier';

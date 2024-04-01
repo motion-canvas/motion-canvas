@@ -10,7 +10,8 @@ import {
   Vector2,
   useLogger,
 } from '@motion-canvas/core';
-import {Node, View2D} from '../components';
+import {Camera, Node, View2D} from '../components';
+import {is} from '../utils';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
@@ -111,7 +112,29 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     const node = this.getNode(element);
     if (node) {
       this.execute(() => {
-        node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+        const cameras = this.getView().findAll(is(Camera));
+        const matrices = [];
+        for (const camera of cameras) {
+          const scene = camera.scene();
+          if (!scene) continue;
+
+          if (scene === node || scene.findFirst(n => n === node)) {
+            matrices.push(
+              camera.localToParent().inverse().multiply(camera.parentToWorld()),
+            );
+          }
+        }
+
+        if (matrices.length > 0) {
+          for (const m of matrices) {
+            node.drawOverlay(
+              context,
+              matrix.multiply(m).multiply(node.localToParent()),
+            );
+          }
+        } else {
+          node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+        }
       });
     }
   }
