@@ -87,8 +87,8 @@ won't have any visible effect on the scene until you start animating it.
 
 ### Moving the camera
 
-There are two ways of moving the camera. To move the camera relative to its
-current position, you can use the `shift` method.
+There are two ways of moving the camera. You can either directly use the
+camera's `position` signal like you would for any other component.
 
 ```tsx editor
 import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
@@ -104,15 +104,15 @@ export default makeScene2D(function* (view) {
     </Camera>,
   );
 
-  yield* camera().shift([-100, -30], 1);
-  yield* camera().shift([200, 0], 1);
-  yield* camera().shift([-100, 30], 1);
+  yield* camera().position([-100, -30], 1);
+  yield* camera().position([100, -30], 1);
+  yield* camera().position(0, 1);
 });
 ```
 
-To center the camera on a specific position or object, you can use the
-`centerOn` method. If you directly pass an object to `centerOn`, the camera will
-center on the object's position.
+Alternatively, you can center the camera on a specific position or object with
+the `centerOn` method. If you directly pass an object to `centerOn`, the camera
+will center on the object's position.
 
 ```tsx editor
 import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
@@ -232,48 +232,12 @@ Note that this uses the camera's current position as the center of rotation.
 
 ### Resetting the camera
 
-You can use the `resetPosition`, `resetZoom`, and `resetRotation` methods to
-reset the camera's position, zoom level, and rotation, respectively. To reset
-all properties at once, you can use the `reset` method.
+To reset the camera's position, zoom level, and rotation to their default
+values, you can use the `reset` method.
 
 ```tsx
-// Reset only the camera's position
-camera().resetPosition(1);
-
-// Reset only the camera's zoom
-camera().resetZoom(1);
-
-// Reset only the camera's rotation
-camera().resetRotation(1);
-
-// Reset all camera properties
+// Resets the camera's position to [0, 0], zoom to 1, and rotation to 0.
 camera().reset(1);
-```
-
-One important detail to keep in mind is that the `reset*` methods will reset the
-camera's properties to the values the camera was _initialized with_. This means
-that if you set the camera's `rotation` to 30 when mounting it, calling
-`resetRotation` will reset the rotation to 30, not 0.
-
-```tsx editor
-import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
-import {createRef} from '@motion-canvas/core';
-
-export default makeScene2D(function* (view) {
-  const camera = createRef<Camera>();
-
-  view.add(
-    <Camera ref={camera} rotation={30}>
-      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
-      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
-    </Camera>,
-  );
-
-  yield* camera().rotation(-30, 1.5);
-  // This will reset the rotation to 30, not 0, because
-  // the camera's initial rotation was set to 30.
-  yield* camera().resetRotation(1);
-});
 ```
 
 ### Moving along a path
