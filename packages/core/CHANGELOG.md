@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
+
+
+### Bug Fixes
+
+* **2d:** fix transition scaling ([#1017](https://github.com/motion-canvas/motion-canvas/issues/1017)) ([bccf8a9](https://github.com/motion-canvas/motion-canvas/commit/bccf8a9ab157c56e7599b4bb508c612137983ca3))
+* **core:** reset playback state on presentation abort ([#1016](https://github.com/motion-canvas/motion-canvas/issues/1016)) ([511231b](https://github.com/motion-canvas/motion-canvas/commit/511231b9f6c34da3b4fc938024613bcf1d281920))
+
+
+
+
+
 ## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
 
 
