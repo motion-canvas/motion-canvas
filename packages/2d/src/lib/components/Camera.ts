@@ -308,7 +308,7 @@ export class Camera extends Node {
     timing: TimingFunction = easeInOutCubic,
   ) {
     yield* tween(duration, value => {
-      const t = timing(value);
+      const t = 1 - timing(value);
       const {position, normal} = curve.getPointAtPercentage(t);
       const point = position.transformAsPoint(curve.localToWorld());
       const angle = normal.flipped.perpendicular.degrees;
