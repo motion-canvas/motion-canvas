@@ -113,23 +113,28 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     if (node) {
       this.execute(() => {
         const cameras = this.getView().findAll(is(Camera));
-        const matrices = [];
+        const parentCameras = [];
         for (const camera of cameras) {
           const scene = camera.scene();
           if (!scene) continue;
 
           if (scene === node || scene.findFirst(n => n === node)) {
-            matrices.push(
-              camera.localToParent().inverse().multiply(camera.parentToWorld()),
-            );
+            parentCameras.push(camera);
           }
         }
 
-        if (matrices.length > 0) {
-          for (const m of matrices) {
+        if (parentCameras.length > 0) {
+          for (const camera of parentCameras) {
+            const cameraParentToWorld = camera.parentToWorld();
+            const cameraLocalToParent = camera.localToParent().inverse();
+            const nodeLocalToWorld = node.localToWorld();
+
             node.drawOverlay(
               context,
-              matrix.multiply(m).multiply(node.localToParent()),
+              matrix
+                .multiply(cameraParentToWorld)
+                .multiply(cameraLocalToParent)
+                .multiply(nodeLocalToWorld),
             );
           }
         } else {
