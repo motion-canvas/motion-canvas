@@ -20,7 +20,7 @@ export function measureString(
   let lastWidth = firstWidth;
   let maxWidth = firstWidth;
 
-  for (let i = 1; i < lines.length - 1; i++) {
+  for (let i = 1; i < lines.length; i++) {
     const line = lines[i];
     const width = Math.round(context.measureText(line).width / monoWidth);
     if (width > maxWidth) {
