@@ -1559,7 +1559,8 @@ export class Node implements Promisable<Node> {
     }
 
     const scene = useScene2D();
-    const size = scene.getRealSize();
+    const size = scene.getSize();
+    const realSize = scene.getRealSize();
     const parentCacheRect = this.parentWorldSpaceCacheBBox();
     const cameraToWorld = new DOMMatrix()
       .scaleSelf(
@@ -1573,8 +1574,14 @@ export class Node implements Promisable<Node> {
 
     const cacheRect = this.worldSpaceCacheBBox();
     const cameraToCache = new DOMMatrix()
-      .scaleSelf(size.width / cacheRect.width, size.height / -cacheRect.height)
-      .translateSelf(cacheRect.x / -size.width, cacheRect.y / size.height - 1)
+      .scaleSelf(
+        realSize.width / cacheRect.width,
+        realSize.height / -cacheRect.height,
+      )
+      .translateSelf(
+        cacheRect.x / -realSize.width,
+        cacheRect.y / realSize.height - 1,
+      )
       .invertSelf();
 
     const gl = scene.shaders.getGL();
