@@ -2,7 +2,7 @@ import type {Stage} from '@motion-canvas/core';
 import clsx from 'clsx';
 import {JSX} from 'preact';
 import {MutableRef, useLayoutEffect, useRef} from 'preact/hooks';
-import {useSharedSettings} from '../../hooks';
+import {usePreviewSettings} from '../../hooks';
 import styles from './Viewport.module.scss';
 
 export interface StageViewProps extends JSX.HTMLAttributes<HTMLDivElement> {
@@ -17,7 +17,7 @@ export function StageView({
   ...rest
 }: StageViewProps) {
   const localRef = useRef<HTMLDivElement>();
-  const {background} = useSharedSettings();
+  const {background} = usePreviewSettings();
   const ref = forwardRef ?? localRef;
 
   useLayoutEffect(() => {

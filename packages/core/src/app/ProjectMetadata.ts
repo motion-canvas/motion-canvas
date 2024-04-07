@@ -16,18 +16,19 @@ function createProjectMetadata(project: Project) {
   const meta = {
     version: new MetaField('version', 1),
     shared: new ObjectMetaField('General', {
-      background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
       size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
+      background: new ColorMetaField('background', null),
       fps: new NumberMetaField('frame rate', 30)
         .setPresets(FrameRates)
         .setRange(1),
       resolutionScale: new EnumMetaField('scale', Scales, 1),
     }),
     rendering: new ObjectMetaField('Rendering', {
+      background: new ColorMetaField('background', null),
       fps: new NumberMetaField('frame rate', 60)
         .setPresets(FrameRates)
         .setRange(1),
