@@ -1,11 +1,15 @@
 import {
-  CompoundSignal,
-  CompoundSignalContext,
   Signal,
   SignalValue,
+  Vector2CompoundSignalContext,
+  Vector2Signal,
 } from '../signals';
-import {InterpolationFunction, arcLerp} from '../tweening';
-import {clamp, map} from '../tweening/interpolationFunctions';
+import {arcLerp} from '../tweening';
+import {
+  InterpolationFunction,
+  clamp,
+  map,
+} from '../tweening/interpolationFunctions';
 import {DEG2RAD, RAD2DEG} from '../utils';
 import {Matrix2D, PossibleMatrix2D} from './Matrix2D';
 import {Direction, Origin} from './Origin';
@@ -22,13 +26,6 @@ export type PossibleVector2<T = number> =
   | T
   | [T, T]
   | undefined;
-
-export type Vector2Signal<T> = CompoundSignal<
-  PossibleVector2,
-  Vector2,
-  'x' | 'y',
-  T
->;
 
 export type SimpleVector2Signal<T> = Signal<PossibleVector2, Vector2, T>;
 
@@ -79,8 +76,8 @@ export class Vector2 implements Type, WebGLConvertible {
     initial?: SignalValue<PossibleVector2>,
     interpolation: InterpolationFunction<Vector2> = Vector2.lerp,
     owner?: any,
-  ): Vector2Signal<void> {
-    return new CompoundSignalContext(
+  ): Vector2Signal<PossibleVector2, Vector2, 'x' | 'y', void> {
+    return new Vector2CompoundSignalContext(
       ['x', 'y'],
       (value: PossibleVector2) => new Vector2(value),
       initial,

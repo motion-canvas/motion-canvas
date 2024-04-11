@@ -1,7 +1,18 @@
-import {PossibleVector2, Signal, Vector2} from '@motion-canvas/core';
+import {
+  deepLerp,
+  map,
+  modify,
+  PossibleVector2,
+  Signal,
+  SignalContext,
+  useLogger,
+  Vector2,
+  Vector2CompoundSignalContext,
+} from '@motion-canvas/core';
 import type {Length} from '../partials';
-import {compound} from './compound';
-import {wrapper} from './signal';
+import {makeSignalExtensions} from '../utils/makeSignalExtensions';
+import {addInitializer} from './initializers';
+import {getPropertyMetaOrCreate, wrapper} from './signal';
 
 export type Vector2LengthSignal<TOwner> = Signal<
   PossibleVector2<Length>,
@@ -16,7 +27,7 @@ export function vector2Signal(
   prefix?: string | Record<string, string>,
 ): PropertyDecorator {
   return (target, key) => {
-    compound(
+    compoundV2S(
       typeof prefix === 'object'
         ? prefix
         : {
@@ -25,5 +36,42 @@ export function vector2Signal(
           },
     )(target, key);
     wrapper(Vector2)(target, key);
+  };
+}
+
+function compoundV2S(entries: Record<string, string>): PropertyDecorator {
+  return (target, key) => {
+    const meta = getPropertyMetaOrCreate<any>(target, key);
+    meta.compound = true;
+    meta.compoundEntries = Object.entries(entries);
+
+    addInitializer(target, (instance: any) => {
+      if (!meta.parser) {
+        useLogger().error(`Missing parser decorator for "${key.toString()}"`);
+        return;
+      }
+
+      const initial = meta.default;
+      const parser = meta.parser.bind(instance);
+      const signalContext = new Vector2CompoundSignalContext(
+        meta.compoundEntries.map(([key, property]) => {
+          const signal = new SignalContext(
+            modify(initial, value => parser(value)[key]),
+            <any>map,
+            instance,
+            undefined,
+            makeSignalExtensions(undefined, instance, property),
+          ).toSignal();
+          return [key, signal];
+        }),
+        parser,
+        initial,
+        meta.interpolationFunction ?? deepLerp,
+        instance,
+        makeSignalExtensions(meta, instance, <string>key),
+      );
+
+      instance[key] = signalContext.toSignal();
+    });
   };
 }
