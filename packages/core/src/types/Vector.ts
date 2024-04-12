@@ -76,7 +76,7 @@ export class Vector2 implements Type, WebGLConvertible {
     initial?: SignalValue<PossibleVector2>,
     interpolation: InterpolationFunction<Vector2> = Vector2.lerp,
     owner?: any,
-  ): Vector2Signal<PossibleVector2, Vector2, 'x' | 'y', void> {
+  ): Vector2Signal<void> {
     return new Vector2CompoundSignalContext(
       ['x', 'y'],
       (value: PossibleVector2) => new Vector2(value),
