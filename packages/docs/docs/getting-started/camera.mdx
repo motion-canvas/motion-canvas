@@ -1,0 +1,479 @@
+---
+sidebar_position: 12
+slug: /camera
+---
+
+# Camera
+
+Motion Canvas ships with a simple orthographic camera that allows you to pan,
+zoom, and rotate the viewport of the scene without having to transform the
+individual objects in your scene.
+
+```tsx editor mode=preview
+import {Camera, Circle, makeScene2D, Rect} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+  const rect = createRef<Rect>();
+  const circle = createRef<Circle>();
+
+  view.add(
+    <>
+      <Camera ref={camera}>
+        <Rect
+          ref={rect}
+          fill={'lightseagreen'}
+          size={100}
+          position={[100, -50]}
+        />
+        <Circle
+          ref={circle}
+          fill={'hotpink'}
+          size={120}
+          position={[-100, 50]}
+        />
+      </Camera>
+    </>,
+  );
+
+  yield* all(
+    camera().centerOn(rect(), 3),
+    camera().rotation(180, 3),
+    camera().zoom(1.8, 3),
+  );
+  yield* camera().centerOn(circle(), 2);
+  yield* camera().reset(1);
+});
+```
+
+## Basic usage
+
+The quickest way to get started is to wrap your scene in a [`Camera`][camera]
+component and grab a reference to it.
+
+```tsx
+// highlight-start
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+//highlight-end
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  // highlight-start
+  const camera = createRef<Camera>();
+  //highlight-end
+
+  view.add(
+    // highlight-start
+    <Camera ref={camera}>
+      //highlight-end
+      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
+      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
+      // highlight-start
+    </Camera>,
+    //highlight-end
+  );
+});
+```
+
+You can then use the camera reference to manipulate the camera in your scene.
+
+:::info
+
+By default, the [`Camera`][camera] component is completely pass-through. It
+won't have any visible effect on the scene until you start animating it.
+
+:::
+
+### Moving the camera
+
+There are two ways of moving the camera. You can either directly use the
+camera's `position` signal like you would for any other component.
+
+```tsx editor
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+
+  view.add(
+    <Camera ref={camera}>
+      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
+      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
+    </Camera>,
+  );
+
+  yield* camera().position([-100, -30], 1);
+  yield* camera().position([100, -30], 1);
+  yield* camera().position(0, 1);
+});
+```
+
+Alternatively, you can center the camera on a specific position or object with
+the `centerOn` method. If you directly pass an object to `centerOn`, the camera
+will center on the object's position.
+
+```tsx editor
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+  const rect = createRef<Rect>();
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Camera ref={camera}>
+      <Rect
+        ref={rect}
+        size={100}
+        fill={'lightseagreen'}
+        position={[-100, -30]}
+      />
+      <Circle ref={circle} size={80} fill={'hotpink'} position={[100, 30]} />
+    </Camera>,
+  );
+
+  yield* camera().centerOn(rect(), 1);
+  yield* camera().centerOn(circle(), 1);
+});
+```
+
+You can also directly pass a position to `centerOn`. In this case, the camera
+will center on the specified position **in world space**.
+
+```tsx editor
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+
+  view.add(
+    <Camera ref={camera}>
+      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
+      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
+    </Camera>,
+  );
+
+  yield* camera().centerOn([-200, 50], 1);
+  yield* camera().centerOn([150, -30], 1.5);
+  yield* camera().centerOn(0, 1);
+});
+```
+
+### Zooming
+
+To zoom the camera in or out, you can use the `zoom` method.
+
+```tsx editor
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+
+  view.add(
+    <Camera ref={camera}>
+      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
+      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
+    </Camera>,
+  );
+
+  yield* camera().zoom(2, 1);
+  yield* camera().zoom(0.5, 1.5);
+  yield* camera().zoom(1, 1);
+});
+```
+
+:::danger
+
+You should not manipulate the `scale` property of the camera directly. This is
+because the `Camera` component does some additional work internally to make sure
+that animating the zoom level of the camera works properly when combined with
+other camera animations.
+
+:::
+
+You can also use the `to` method to fluently chain multiple animations.
+
+```diff
+- yield* camera().zoom(2, 1);
+- yield* camera().zoom(0.5, 1.5);
+- yield* camera().zoom(1, 1);
++ yield* camera().zoom(2, 1).to(0.5, 1.5).to(1, 1);
+```
+
+### Rotating the camera
+
+Since [`Camera`][camera] is a regular component, you can change its rotation the
+same way you would with any other component by using the `rotation` signal.
+
+```tsx editor
+import {makeScene2D, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+
+  view.add(
+    <Camera ref={camera}>
+      <Rect size={100} fill={'lightseagreen'} position={[-100, -30]} />
+      <Circle size={80} fill={'hotpink'} position={[100, 30]} />
+    </Camera>,
+  );
+
+  yield* camera().rotation(50, 1).to(-120, 2).to(0, 1);
+});
+```
+
+Note that this uses the camera's current position as the center of rotation.
+
+### Resetting the camera
+
+To reset the camera's position, zoom level, and rotation to their default
+values, you can use the `reset` method.
+
+```tsx
+// Resets the camera's position to [0, 0], zoom to 1, and rotation to 0.
+camera().reset(1);
+```
+
+### Moving along a path
+
+You can make the camera follow a path by using the `followCurve` method. This
+method accepts any object that extends the `Curve` class. Many of the shapes
+that come with Motion Canvas, such as `Rect`, `Circle`, `Polygon`, and `Spline`
+extend the `Curve` class and can be used as paths.
+
+The following example shows the camera following the path defined by a
+[quadratic Bézier curve][quad-bezier]. Note that the path doesn't have to be
+visible or even be part of the scene. This is only done here for demonstration
+purposes.
+
+```tsx editor
+import {makeScene2D, Camera, QuadBezier} from '@motion-canvas/2d';
+import {createRef, linear} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera = createRef<Camera>();
+  const path = createRef<QuadBezier>();
+
+  view.add(
+    <Camera ref={camera}>
+      <QuadBezier
+        ref={path}
+        lineWidth={6}
+        stroke={'lightseagreen'}
+        p0={[-200, 0]}
+        p1={[0, 200]}
+        p2={[200, 0]}
+      />
+    </Camera>,
+  );
+
+  yield* camera().followCurve(path(), 2.5, linear);
+});
+```
+
+## Using multiple cameras in a scene
+
+Motion Canvas also provides a way to render the same scene to multiple cameras.
+This can be useful for creating split-screen views or for rendering the same
+scene from different perspectives.
+
+Rendering the same scene to multiple cameras requires a slightly different
+setup.
+
+First, instead of adding the scene we want to render directly to the view, we
+instead store it in a variable.
+
+```tsx
+const scene = (
+  <Node>
+    <Rect size={70} fill={'lightseagreen'} position={[-100, -30]} />
+    <Circle size={50} fill={'hotpink'} position={[100, 30]} />
+  </Node>
+);
+```
+
+Next, for each camera we want to show, we add a `Camera.Stage` component to the
+view and pass the scene to the `scene` prop.
+
+```tsx
+const scene = /* ... */
+
+const camera1 = createRef<Camera>();
+const camera2 = createRef<Camera>();
+
+view.add(
+  <>
+    <Camera.Stage
+      cameraRef={camera1}
+      size={[300, 200]}
+      position={[-180, 0]}
+      scene={scene}
+    />
+    <Camera.Stage
+      cameraRef={camera2}
+      size={[300, 200]}
+      position={[180, 0]}
+      scene={scene}
+    />
+  </>,
+);
+```
+
+The `cameraRef` prop provides a reference to the stage's camera. You can then
+use these references to manipulate each camera independently.
+
+:::danger
+
+`Camera.Stage` requires a single top-level node as its `scene` prop. A common
+source of errors is using a fragment (`<></>`) when defining the scene.
+
+The following scene will cause an error when passed to `Camera.Stage`:
+
+```tsx
+const scene = (
+  <>
+    <Circle />
+    <Rect />
+  </>
+);
+```
+
+Instead, wrap the scene in a single node like this:
+
+```tsx
+const scene = (
+  <Node>
+    <Circle />
+    <Rect />
+  </Node>
+);
+```
+
+:::
+
+:::tip
+
+Unlike the `Camera` component, `Camera.Stage` requires an explicit size to be
+set. The stage will automatically clip the scene to the specified size.
+
+:::
+
+```tsx editor
+import {makeScene2D, Node, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera1 = createRef<Camera>();
+  const camera2 = createRef<Camera>();
+  const rect = createRef<Rect>();
+  const circle = createRef<Circle>();
+
+  const scene = (
+    <Node>
+      <Rect
+        ref={rect}
+        size={70}
+        fill={'lightseagreen'}
+        position={[-100, -30]}
+      />
+      <Circle ref={circle} size={50} fill={'hotpink'} position={[100, 30]} />
+    </Node>
+  );
+
+  view.add(
+    <>
+      <Camera.Stage
+        cameraRef={camera1}
+        scene={scene}
+        size={[300, 200]}
+        position={[-180, 0]}
+        fill={'#ccc'}
+        radius={10}
+        smoothCorners
+      />
+      <Camera.Stage
+        cameraRef={camera2}
+        scene={scene}
+        size={[300, 200]}
+        position={[180, 0]}
+        fill={'#ccc'}
+        radius={10}
+        smoothCorners
+      />
+    </>,
+  );
+
+  yield* all(camera1().centerOn(rect(), 1), camera2().centerOn(circle(), 1));
+  yield* all(camera1().centerOn(circle(), 1), camera2().centerOn(rect(), 1));
+  yield* all(camera1().zoom(1.5, 1), camera2().zoom(0.5, 1));
+  yield* all(camera1().reset(1), camera2().reset(1));
+});
+```
+
+The benefit of doing this compared to simply rendering the same scene twice is
+that any changes made to the scene will be reflected in both cameras.
+
+```tsx editor
+import {makeScene2D, Node, Camera, Rect, Circle} from '@motion-canvas/2d';
+import {all, createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const camera1 = createRef<Camera>();
+  const camera2 = createRef<Camera>();
+  const rect = createRef<Rect>();
+  const circle = createRef<Circle>();
+
+  const scene = (
+    <Node>
+      <Rect
+        ref={rect}
+        size={70}
+        fill={'lightseagreen'}
+        position={[-100, -30]}
+      />
+      <Circle ref={circle} size={50} fill={'hotpink'} position={[100, 30]} />
+    </Node>
+  );
+
+  view.add(
+    <>
+      <Camera.Stage
+        cameraRef={camera1}
+        scene={scene}
+        size={[300, 200]}
+        position={[-180, 0]}
+        fill={'#ccc'}
+        radius={10}
+        smoothCorners
+      />
+      <Camera.Stage
+        cameraRef={camera2}
+        scene={scene}
+        size={[300, 200]}
+        position={[180, 0]}
+        fill={'#ccc'}
+        radius={10}
+        smoothCorners
+      />
+    </>,
+  );
+
+  yield* all(
+    camera1().centerOn(rect(), 1),
+    camera2().centerOn(circle(), 1),
+    rect().fill('lightcoral', 1),
+    circle().fill('steelblue', 1),
+  );
+  yield* all(camera1().reset(1), camera2().reset(1));
+  yield* all(rect().fill('lightseagreen', 1), circle().fill('hotpink', 1));
+});
+```
+
+[camera]: /api/2d/components/Camera
+[quad-bezier]: /docs/bezier-curves
