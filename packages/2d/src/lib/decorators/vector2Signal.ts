@@ -27,7 +27,7 @@ export function vector2Signal(
   prefix?: string | Record<string, string>,
 ): PropertyDecorator {
   return (target, key) => {
-    compoundV2S(
+    compoundVector2Signal(
       typeof prefix === 'object'
         ? prefix
         : {
@@ -39,7 +39,9 @@ export function vector2Signal(
   };
 }
 
-function compoundV2S(entries: Record<string, string>): PropertyDecorator {
+function compoundVector2Signal(
+  entries: Record<string, string>,
+): PropertyDecorator {
   return (target, key) => {
     const meta = getPropertyMetaOrCreate<any>(target, key);
     meta.compound = true;
@@ -62,7 +64,7 @@ function compoundV2S(entries: Record<string, string>): PropertyDecorator {
             undefined,
             makeSignalExtensions(undefined, instance, property),
           ).toSignal();
-          return [key, signal];
+          return [<keyof Vector2>key, signal];
         }),
         parser,
         initial,
