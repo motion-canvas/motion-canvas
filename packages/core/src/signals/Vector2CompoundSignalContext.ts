@@ -2,12 +2,67 @@ import {InterpolationFunction, TimingFunction} from '../tweening';
 import {PossibleVector2, Vector2} from '../types';
 import {CompoundSignal, CompoundSignalContext} from './CompoundSignalContext';
 import {Signal} from './SignalContext';
-import {SignalExtensions, SignalValue} from './types';
+import {SignalExtensions, SignalGenerator, SignalValue} from './types';
 
 export type Vector2Signal<
   TOwner = void,
   TContext = Vector2CompoundSignalContext<TOwner>,
-> = CompoundSignal<PossibleVector2, Vector2, 'x' | 'y', TOwner, TContext>;
+> = CompoundSignal<PossibleVector2, Vector2, 'x' | 'y', TOwner, TContext> & {
+  edit(
+    callback: (current: Vector2) => SignalValue<PossibleVector2>,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  scale(
+    value: number,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  mul(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  div(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  add(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  sub(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  dot(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  cross(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+  mod(
+    possibleVector: PossibleVector2,
+    duration?: number,
+    timingFunction?: TimingFunction,
+    interpolationFunction?: InterpolationFunction<Vector2>,
+  ): Vector2 | TOwner | SignalGenerator<PossibleVector2, Vector2>;
+};
 
 export class Vector2CompoundSignalContext<
   TOwner = void,
@@ -57,6 +112,10 @@ export class Vector2CompoundSignalContext<
     Object.defineProperty(this.invokable, 'mod', {
       value: this.mod.bind(this),
     });
+  }
+
+  public override toSignal(): Vector2Signal<TOwner> {
+    return this.invokable;
   }
 
   public edit(
