@@ -164,6 +164,35 @@ export function easeInOutCirc(value: number, from = 0, to = 1) {
   return map(from, to, value);
 }
 
+function cubicBezier(
+  n0: number,
+  n1: number,
+  n2: number,
+  n3: number,
+  t: number,
+): number {
+  return (
+    Math.pow(1 - t, 3) * n0 +
+    3 * Math.pow(1 - t, 2) * t * n1 +
+    3 * (1 - t) * Math.pow(t, 2) * n2 +
+    Math.pow(t, 3) * n3
+  );
+}
+
+export function createLinearBezierCurve(
+  p1x: number,
+  p1y: number,
+  p2x: number,
+  p2y: number,
+): TimingFunction {
+  return (value: number, from = 0, to = 1) => {
+    cubicBezier(1, p1x, p2x, 1, value);
+    value = cubicBezier(0, p1y, p2y, 1, value);
+
+    return map(from, to, value);
+  };
+}
+
 // Back
 export function createEaseInBack(s = 1.70158): TimingFunction {
   return (value: number, from = 0, to = 1) => {
