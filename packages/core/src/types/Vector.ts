@@ -1,8 +1,8 @@
 import {
   Signal,
   SignalValue,
-  Vector2CompoundSignalContext,
   Vector2Signal,
+  Vector2SignalContext,
 } from '../signals';
 import {arcLerp} from '../tweening';
 import {
@@ -77,7 +77,7 @@ export class Vector2 implements Type, WebGLConvertible {
     interpolation: InterpolationFunction<Vector2> = Vector2.lerp,
     owner?: any,
   ): Vector2Signal<void> {
-    return new Vector2CompoundSignalContext(
+    return new Vector2SignalContext(
       ['x', 'y'],
       (value: PossibleVector2) => new Vector2(value),
       initial,
