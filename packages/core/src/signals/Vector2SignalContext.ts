@@ -59,10 +59,6 @@ export class Vector2SignalContext<TOwner = void>
       value: this.edit.bind(this),
     });
 
-    // Object.defineProperty(this.invokable, 'scale', {
-    //   value: this.scale.bind(this),
-    // });
-
     Object.defineProperty(this.invokable, 'mul', {
       value: this.mul.bind(this),
     });
@@ -101,7 +97,7 @@ export class Vector2SignalContext<TOwner = void>
   ): TOwner;
   public edit(
     callback: (current: Vector2) => SignalValue<PossibleVector2>,
-    duration: number, // IDK: ?
+    duration: number,
     timingFunction?: TimingFunction,
     interpolationFunction?: InterpolationFunction<Vector2>,
   ): SignalGenerator<PossibleVector2, Vector2>;
