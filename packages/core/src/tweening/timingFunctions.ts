@@ -1,4 +1,6 @@
+import {BezierMath, newBezierMath} from '../utils/bezierMath';
 import {map, remap} from './interpolationFunctions';
+
 export interface TimingFunction {
   (value: number, from?: number, to?: number): number;
 }
@@ -162,12 +164,20 @@ export function easeInOutCirc(value: number, from = 0, to = 1) {
 
   return map(from, to, value);
 }
+
 // TODO: use CubicBezierSegment and it's math to implement cubic bezier timing function from poc_and_test/test_bezier.js
-//
-// export function createCubicBezier(value: number, x1: number, y1: number, x2: number, y2: number): TimingFunction {
-//   let cubicBezier = new CubicBezierSegment(new Vector2(0, 0), new Vector2(x1, y1), new Vector2(x2, y2), new Vector2(1, 1));
-//   cubicBezier.eval(value)
-// }
+
+export function createCubicBezier(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): TimingFunction {
+  const bezier: BezierMath = newBezierMath(x1, y1, x2, y2);
+  return (value: number, from = 0, to = 1) => {
+    return map(from, to, bezier.solve(value));
+  };
+}
 
 // Back
 export function createEaseInBack(s = 1.70158): TimingFunction {

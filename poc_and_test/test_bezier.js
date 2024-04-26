@@ -73,17 +73,19 @@ function generateTest(n, x1, y1, x2, y2) {
   let x = [];
   let y = [];
   let steps = [];
-  let derivatives_y = [];
-
+  let newtons = [];
   let end = [];
-  end.push(stepNewton(2, 0, x1, x2, 1));
+
   for (let i = 0; i <= n; i++) {
     let step = i / n;
     console.log(step);
+
     steps.push(step);
 
-    end.push(cubicBezier(stepNewton(step, 0, x1, x2, 1), 0, y1, y2, 1));
+    let newton = stepNewton(step, 0, x1, x2, 1);
 
+    end.push(cubicBezier(newton, 0, y1, y2, 1));
+    newtons.push(newton);
     x.push(cubicBezier(step, 0, x1, x2, 1));
     y.push(cubicBezier(step, 0, y1, y2, 1));
   }
@@ -93,6 +95,7 @@ function generateTest(n, x1, y1, x2, y2) {
   console.log('miejsce zerowe ' + stepNewton(1, 0, y1, y2, 1));
   console.log('y : [' + end + '],');
   console.log('x : [' + steps + '],');
+  console.log(newtons);
 }
 
 generateTest(100, 1, -0.5, 0, 1.6);

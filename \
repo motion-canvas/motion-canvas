@@ -1,0 +1,96 @@
+interface BezierMath {
+  cubicBezier(t: number): number;
+
+}
+
+class BezierMathImpl implements BezierMath {
+
+  ax: number;
+  bx: number;
+  cx: number;
+
+  ay: number;
+  by: number;
+  cy: number;
+
+  newtonIterations: number;
+  approximation: number;
+  constructor(x1: number, y1: number, x2: number, y2: number, newtonIterations: number, approximation: number) {
+    this.approximation = approximation;
+    this.newtonIterations = newtonIterations;
+
+    this.cx = 3 * x1;
+    this.bx = 3 * (x2 - x1) - this.cx;
+    this.ax = 1 - this.cx - this.bx;
+
+    this.cy = 3 * y1;
+    this.by = 3 * (y2 - y1) - this.cy;
+    this.ay = 1 - this.cy - this.by;
+  }
+
+
+  cubicBezier(t: number) {
+    return ((this.ax * t + this.bx) * t + this.cx) * t;
+  }
+
+  bezierDerivative(t: number, n1: number, n2: number): number {
+    let cn: number = 3 * n1;
+    let bn: number = 3 * (n2 - n1) - cn;
+    let an: number = 1 - cn - bn;
+
+    return ((3 * an * t) + (2 * bn)) * t + cn
+  }
+  new(x1: number, y1: number, x2: number, y2: number): BezierMath {
+
+    return BezierMatHIMpl(x1, y1, x2, y2, 10, 0.0001);
+
+  }
+export function solve_newton_x(x0: number, x1: number, x2: number): number {
+  //newton's method
+  let result = x0;
+  for (let i = 0; i < NEWTON; i++) {
+    let sample = cubicBezier(result, x1, x2);
+    if (Math.abs(sample - x0) < EPSILON) {
+      console.log('RETURNING RESULT: ' + result + ' sample: ' + sample);
+      return result;
+    }
+    let derivative = bezierDerivative(result, x1, x2)
+    if (Math.abs(derivative) < 0.00001) {
+      console.log('newtone failed');
+      break;
+    }
+    result -= (sample - x0) / derivative;
+  }
+  //use standard [backup method]
+  // Bisection: something like binary search
+  let low = 0.0;
+  let high = 1.0;
+  let t = x0;
+  if (t < low) {
+    return low;
+  }
+  if (t > high) {
+    return high;
+  }
+
+
+  while (low < high) {
+    // sample is a true value of a point on a quadratic curve
+    let sample = cubicBezier(x0, x1, x2)
+    // sample - x0 = check if result if close enough
+    if (Math.abs(sample - x0) < EPSILON) {
+      return t;
+    }
+    //
+    if (x0 > sample) {
+      low = t;
+    } else {
+      high = t;
+    }
+    t = (high - low) / 2 + low;
+  }
+  return t;
+}
+
+
+};
