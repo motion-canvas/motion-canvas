@@ -86,7 +86,7 @@ export interface LayoutProps extends NodeProps {
   alignSelf?: SignalValue<FlexItems>;
   rowGap?: SignalValue<Length>;
   columnGap?: SignalValue<Length>;
-  gap?: SignalValue<Length>;
+  gap?: SignalValue<PossibleVector2<Length>>;
 
   fontFamily?: SignalValue<string>;
   fontSize?: SignalValue<number>;
