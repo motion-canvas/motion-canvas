@@ -29,5 +29,5 @@ import {ThreadGenerator} from './ThreadGenerator';
 export function spawn(
   task: ThreadGenerator | (() => ThreadGenerator),
 ): ThreadGenerator {
-  return useThread().spawn(task);
+  return useThread().root.spawn(task);
 }

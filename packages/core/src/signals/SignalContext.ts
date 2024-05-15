@@ -120,13 +120,13 @@ export class SignalContext<
     }
 
     this.current = value;
-    this.markDirty();
     this.clearDependencies();
 
     if (!isReactive(value)) {
       this.last = this.parse(value);
     }
 
+    this.markDirty();
     return this.owner;
   }
 

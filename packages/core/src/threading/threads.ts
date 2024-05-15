@@ -102,7 +102,14 @@ export function* threads(
       }
     }
 
-    threads = newThreads.filter(thread => !thread.canceled);
+    threads = [];
+    for (const thread of newThreads) {
+      if (!thread.canceled) {
+        threads.push(thread);
+        thread.runDeferred();
+      }
+    }
+
     if (threads.length > 0) yield;
   }
 }

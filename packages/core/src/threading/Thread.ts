@@ -1,3 +1,4 @@
+import {EventDispatcher} from '../events';
 import {noop} from '../flow';
 import {createSignal} from '../signals';
 import {endThread, startThread, useLogger} from '../utils';
@@ -15,6 +16,11 @@ import {getTaskName, setTaskName} from './names';
  * If a parent finishes execution, all of its child threads are terminated.
  */
 export class Thread {
+  public get onDeferred() {
+    return this.deferred.subscribable;
+  }
+  private deferred = new EventDispatcher<void>();
+
   public children: Thread[] = [];
   /**
    * The next value to be passed to the wrapped generator.
@@ -51,6 +57,10 @@ export class Thread {
 
   public get paused(): boolean {
     return this.isPaused || (this.parent?.paused ?? false);
+  }
+
+  public get root(): Thread {
+    return this.parent?.root ?? this;
   }
 
   public parent: Thread | null = null;
@@ -134,6 +144,7 @@ export class Thread {
   }
 
   public cancel() {
+    this.deferred.clear();
     this.runner.return();
     this.isCanceled = true;
     this.parent = null;
@@ -142,5 +153,11 @@ export class Thread {
 
   public pause(value: boolean) {
     this.isPaused = value;
+  }
+
+  public runDeferred() {
+    startThread(this);
+    this.deferred.dispatch();
+    endThread(this);
   }
 }
