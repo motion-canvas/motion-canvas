@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
+
+
+### Bug Fixes
+
+* **2d:** fix Code size calculation ([#1025](https://github.com/motion-canvas/motion-canvas/issues/1025)) ([696fbad](https://github.com/motion-canvas/motion-canvas/commit/696fbade129af50f23b0a65ca0ba0f625c3ca9f1)), closes [#1024](https://github.com/motion-canvas/motion-canvas/issues/1024)
+* **2d:** fix layout gap prop type ([#1039](https://github.com/motion-canvas/motion-canvas/issues/1039)) ([944b48f](https://github.com/motion-canvas/motion-canvas/commit/944b48fff891c2cbbcc89ccb141ec197ecda4752)), closes [#1032](https://github.com/motion-canvas/motion-canvas/issues/1032)
+* **2d:** fix shader destination uv ([#1026](https://github.com/motion-canvas/motion-canvas/issues/1026)) ([b591c41](https://github.com/motion-canvas/motion-canvas/commit/b591c4103e7fe83773ed9a6e43fbe3f00404bea0)), closes [#1013](https://github.com/motion-canvas/motion-canvas/issues/1013)
+* **core:** handle invalid time event values ([#1044](https://github.com/motion-canvas/motion-canvas/issues/1044)) ([4638a36](https://github.com/motion-canvas/motion-canvas/commit/4638a36c14714ada201d91ddfaff05c39455595f)), closes [#1036](https://github.com/motion-canvas/motion-canvas/issues/1036)
+
+
+### Features
+
+* **2d:** access vertex data of Polygons ([#1045](https://github.com/motion-canvas/motion-canvas/issues/1045)) ([6bfc25f](https://github.com/motion-canvas/motion-canvas/commit/6bfc25f84523e6640572bec38b3f5b5ff1e211c3)), closes [#1041](https://github.com/motion-canvas/motion-canvas/issues/1041)
+* **2d:** add camera node ([#1019](https://github.com/motion-canvas/motion-canvas/issues/1019)) ([4ca346b](https://github.com/motion-canvas/motion-canvas/commit/4ca346bcb80e8aba1d83ba407a483d60eb942c6c))
+* **docs:** add Code node documentation ([#1023](https://github.com/motion-canvas/motion-canvas/issues/1023)) ([faa9508](https://github.com/motion-canvas/motion-canvas/commit/faa95089161f820ac8231d85f766666fe84898ad))
+* mathematical operations for vector signals ([#1030](https://github.com/motion-canvas/motion-canvas/issues/1030)) ([c5b02d1](https://github.com/motion-canvas/motion-canvas/commit/c5b02d18c984c5def49e723d733f9c03c69d45d1)), closes [#967](https://github.com/motion-canvas/motion-canvas/issues/967)
+* signal effects ([#1043](https://github.com/motion-canvas/motion-canvas/issues/1043)) ([00fa967](https://github.com/motion-canvas/motion-canvas/commit/00fa96772a36ac8c2f1431073aeb78571becb6f7)), closes [#945](https://github.com/motion-canvas/motion-canvas/issues/945)
+
+
+
+
+
 ## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
 
 
