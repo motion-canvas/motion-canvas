@@ -9,10 +9,10 @@ Effects let you observe changes to signals and react to them. Unlike signals,
 effects are not lazy:
 
 - [`createEffect()`](/api/core/signals#createEffect) runs the callback
-  immediately after any of its dependencies changes.
+immediately after any of its dependencies changes.
 - [`createDeferredEffect()`](/api/core/signals#createDeferredEffect) runs the
-  callback at the end of each frame during which any of its dependencies
-  changed.
+callback at the end of each frame during which any of its dependencies
+changed.
 
 They are useful for side effects, such as modifying the node hierarchy or
 spawning background animations in response to a change in some signals.
@@ -22,10 +22,9 @@ When it comes to modifying the properties of nodes, prefer to use
 
 ## Overview
 
-Effects are created using either
-[`createEffect()`](/api/core/signals#createEffect) or
-[`createDeferredEffect()`](/api/core/signals#createDeferredEffect) functions.
-The first argument specifies the callback to invoke:
+Effects are created using the [`createEffect()`](/api/core/signals#createEffect)
+and [`createDeferredEffect()`](/api/core/signals#createDeferredEffect)
+functions. The first argument specifies the callback to invoke:
 
 ```ts
 import {createSignal, createEffect} from '@motion-canvas/core';
@@ -73,24 +72,24 @@ radius(4);
 // area recalculated!
 ```
 
-This time the `area` signal is invoked inside an effect, instead of being called
-directly. Now whenever the `radius` signal changes, the effect is triggered,
-which recalculates the `area` signal instantly.
+This time, the `area` signal is invoked inside an effect, instead of being
+called directly. Now, whenever the `radius` signal changes, the effect is
+triggered which recalculates the `area` signal instantly.
 
-This is a compromise. On one hand, you can now react to changes immediately,
+This is a compromise. On one hand, you can now react to changes immediately
 without having to invoke the signal each frame. On the other hand, all
-dependencies of the effect are no longer lazy. Normally, this shouldn't be a
+dependencies of the effect are no longer lazy. Normally this shouldn't be a
 problem, but if the dependencies of the effect change often and are expensive to
-calculate, this may affect the seeking performance.
+calculate, this may affect seeking performance.
 
 ### Deferred effects
 
 If your effect references multiple dependencies that change often, you can use
 [`createDeferredEffect()`](/api/core/signals#createDeferredEffect) to defer them
-until the end of the current frame. This way, the effect is only executed once
+until the end of the current frame. This way, the effect is only executed once,
 even if multiple dependencies change. The downside is that the side effects
 caused by the deferred effect are not immediately visible. They will become
-available after the current generator step is finished, but before the rendering
+visible after the current generator step is finished, but before the rendering
 starts.
 
 ```ts
@@ -126,8 +125,8 @@ console.log(deferredValue); // 5
 ## Complex example
 
 The following example demonstrates how to use effects to automatically update
-the node hierarchy so that the amount of circles displayed matches the value of
-the `count` signal:
+the node hierarchy, so the amount of circles displayed matches the value of the
+`count` signal:
 
 ```tsx editor
 import {Circle, Layout, makeScene2D} from '@motion-canvas/2d';
