@@ -12,7 +12,7 @@ import {
   settingsPlugin,
   webglPlugin,
 } from './partials';
-import {PLUGIN_OPTIONS, PluginOptions, isPlugin} from './plugins';
+import {PLUGIN_OPTIONS, PluginConfig, PluginOptions, isPlugin} from './plugins';
 import {getProjects} from './utils';
 
 export interface MotionCanvasPluginConfig {
@@ -104,8 +104,10 @@ export default ({
   buildForEditor,
 }: MotionCanvasPluginConfig = {}): Plugin[] => {
   const plugins: PluginOptions[] = [];
-  const outputPath = path.resolve(output);
-  const projects = getProjects(project);
+  let config: PluginConfig = {
+    output: path.resolve(output),
+    projects: getProjects(project),
+  };
 
   return [
     {
@@ -116,23 +118,21 @@ export default ({
             .filter(isPlugin)
             .map(plugin => plugin[PLUGIN_OPTIONS]),
         );
-        await Promise.all(
-          plugins.map(
-            plugin =>
-              plugin.config?.({
-                output: outputPath,
-                projects: projects.list,
-              }),
-          ),
-        );
+
+        for (const plugin of plugins) {
+          const newConfig = await plugin.config?.(config);
+          if (newConfig) {
+            config = {...config, ...newConfig};
+          }
+        }
       },
     },
     metaPlugin(),
     settingsPlugin(),
     scenesPlugin(),
-    exporterPlugin({outputPath}),
-    editorPlugin({editor, projects}),
-    projectsPlugin({projects, plugins, buildForEditor}),
+    exporterPlugin({outputPath: config.output}),
+    editorPlugin({editor, projects: config.projects}),
+    projectsPlugin({projects: config.projects, plugins, buildForEditor}),
     assetsPlugin({bufferedAssets}),
     webglPlugin(),
     corsProxyPlugin(proxy),
