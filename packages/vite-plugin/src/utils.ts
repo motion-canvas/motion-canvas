@@ -3,11 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import {ProjectData} from './plugins';
 
-export interface Projects {
-  list: ProjectData[];
-  lookup: Map<string, ProjectData>;
-}
-
 export async function createMeta(metaPath: string) {
   if (!fs.existsSync(metaPath)) {
     await fs.promises.writeFile(
@@ -18,10 +13,8 @@ export async function createMeta(metaPath: string) {
   }
 }
 
-export function getProjects(project: string | string[]): Projects {
+export function getProjects(project: string | string[]): ProjectData[] {
   const list: ProjectData[] = [];
-  const lookup = new Map<string, ProjectData>();
-
   const projectList = expandFilePaths(project);
   for (const url of projectList) {
     const {name, dir} = path.posix.parse(url);
@@ -29,10 +22,9 @@ export function getProjects(project: string | string[]): Projects {
     const metaData = getMeta(path.join(dir, metaFile));
     const data = {name: metaData?.name ?? name, fileName: name, url};
     list.push(data);
-    lookup.set(data.name, data);
   }
 
-  return {list, lookup};
+  return list;
 }
 
 function expandFilePaths(filePaths: string[] | string): string[] {
