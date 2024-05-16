@@ -9,10 +9,10 @@ Effects let you observe changes to signals and react to them. Unlike signals,
 effects are not lazy:
 
 - [`createEffect()`](/api/core/signals#createEffect) runs the callback
-immediately after any of its dependencies changes.
+  immediately after any of its dependencies changes.
 - [`createDeferredEffect()`](/api/core/signals#createDeferredEffect) runs the
-callback at the end of each frame during which any of its dependencies
-changed.
+  callback at the end of each frame during which any of its dependencies
+  changed.
 
 They are useful for side effects, such as modifying the node hierarchy or
 spawning background animations in response to a change in some signals.
