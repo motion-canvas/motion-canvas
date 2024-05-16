@@ -5,6 +5,16 @@ slug: /spawners
 
 # Spawners
 
+:::caution
+
+Spawners are implemented using signals which makes them unpredictable due to
+signals' lazy evaluation. You may want to consider using
+[effects](/docs/effects#complex-example) instead.
+
+In future versions, spawners will be reimplemented using effects.
+
+:::
+
 Sometimes we want the children of a given node to be reactive. In other words,
 we want them to change according to some external state. Consider the following
 example:

@@ -1,0 +1,173 @@
+---
+sidebar_position: 7
+slug: /effects
+---
+
+# Effects
+
+Effects let you observe changes to signals and react to them. Unlike signals,
+effects are not lazy:
+
+- [`createEffect()`](/api/core/signals#createEffect) runs the callback
+  immediately after any of its dependencies changes.
+- [`createDeferredEffect()`](/api/core/signals#createDeferredEffect) runs the
+  callback at the end of each frame during which any of its dependencies
+  changed.
+
+They are useful for side effects, such as modifying the node hierarchy or
+spawning background animations in response to a change in some signals.
+
+When it comes to modifying the properties of nodes, prefer to use
+[signals](/docs/signals).
+
+## Overview
+
+Effects are created using the [`createEffect()`](/api/core/signals#createEffect)
+and [`createDeferredEffect()`](/api/core/signals#createDeferredEffect)
+functions. The first argument specifies the callback to invoke:
+
+```ts
+import {createSignal, createEffect} from '@motion-canvas/core';
+
+const signal = createSignal(0);
+createEffect(() => {
+  console.log('Signal changed: ', signal());
+});
+```
+
+After creation, effects can be disposed of using the returned function:
+
+```ts
+const unsubscribe = createEffect(() => {
+  console.log('Signal changed: ', signal());
+});
+
+// do something
+
+unsubscribe();
+```
+
+## Explanation
+
+To understand the difference between signals and effects, consider this modified
+example from the [signals](/docs/signals#explanation) section:
+
+```ts
+const radius = createSignal(1);
+const area = createSignal(() => {
+  console.log('area recalculated!');
+  return Math.PI * radius() * radius();
+});
+
+createEffect(() => {
+  area();
+});
+// area recalculated!
+
+radius(2);
+// area recalculated!
+radius(3);
+// area recalculated!
+radius(4);
+// area recalculated!
+```
+
+This time, the `area` signal is invoked inside an effect, instead of being
+called directly. Now, whenever the `radius` signal changes, the effect is
+triggered which recalculates the `area` signal instantly.
+
+This is a compromise. On one hand, you can now react to changes immediately
+without having to invoke the signal each frame. On the other hand, all
+dependencies of the effect are no longer lazy. Normally this shouldn't be a
+problem, but if the dependencies of the effect change often and are expensive to
+calculate, this may affect seeking performance.
+
+### Deferred effects
+
+If your effect references multiple dependencies that change often, you can use
+[`createDeferredEffect()`](/api/core/signals#createDeferredEffect) to defer them
+until the end of the current frame. This way, the effect is only executed once,
+even if multiple dependencies change. The downside is that the side effects
+caused by the deferred effect are not immediately visible. They will become
+visible after the current generator step is finished, but before the rendering
+starts.
+
+```ts
+const a = createSignal(1);
+const b = createSignal(2);
+
+let value = 0;
+createEffect(() => {
+  console.log('effect invoked');
+  value = a() + b();
+});
+// effect invoked
+
+let deferredValue = 0;
+createDeferredEffect(() => {
+  console.log('deferred effect invoked');
+  deferredValue = a() + b();
+});
+// deferred effect invoked
+
+a(2);
+// effect invoked
+b(3);
+// effect invoked
+
+console.log(value); // 5 - effect's value is updated immediately.
+console.log(deferredValue); // 3 - deferred effect's value is not yet ready.
+
+yield; // deferred effect invoked
+console.log(deferredValue); // 5
+```
+
+## Complex example
+
+The following example demonstrates how to use effects to automatically update
+the node hierarchy, so the amount of circles displayed matches the value of the
+`count` signal:
+
+```tsx editor
+import {Circle, Layout, makeScene2D} from '@motion-canvas/2d';
+import {
+  createEffect,
+  createRef,
+  createSignal,
+  spawn,
+  waitFor,
+} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const count = createSignal(0);
+  const container = createRef<Layout>();
+
+  view.add(<Layout alignItems={'center'} ref={container} layout />);
+
+  const circles: Circle[] = [];
+  createEffect(() => {
+    const targetCount = Math.round(count());
+    let i = circles.length;
+    // add any missing circles
+    for (; i < targetCount; i++) {
+      const circle = (<Circle fill={'white'} />) as Circle;
+      circles.push(circle);
+      container().add(circle);
+      spawn(circle.size(80, 0.3));
+    }
+    // remove any extra circles
+    for (; i > targetCount; i--) {
+      const circle = circles.pop()!;
+      spawn(circle.size(0, 0.3).do(() => circle.remove()));
+    }
+  });
+
+  count(1);
+  yield* waitFor(1);
+  count(6);
+  yield* waitFor(1);
+  count(4);
+  yield* count(0, 2);
+  yield* waitFor(1);
+});
+```

@@ -66,7 +66,7 @@ export const EditorTheme = EditorView.theme({
   },
   '& .cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection':
     {
-      backgroundColor: 'var(--ifm-code-selection-color)',
+      backgroundColor: 'var(--ifm-code-selection-color) !important',
     },
   '.cm-activeLine': {
     backgroundColor: 'var(--ifm-code-active-color)',
