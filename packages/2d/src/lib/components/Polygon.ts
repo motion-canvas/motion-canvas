@@ -72,6 +72,28 @@ export interface PolygonProps extends CurveProps {
  *     />
  *   );
  * });
+ *
+ * // snippet Accessing vertex data
+ * import {Circle, Polygon, makeScene2D} from '@motion-canvas/2d';
+ * import {createRef, range} from '@motion-canvas/core';
+ *
+ * export default makeScene2D(function* (view) {
+ *   const polygon = createRef<Polygon>();
+ *   view.add(
+ *     <Polygon ref={polygon} sides={3} lineWidth={4} stroke={'white'} size={160}>
+ *       {range(6).map(index => (
+ *         <Circle
+ *           fill={'white'}
+ *           size={20}
+ *           position={() => polygon().vertex(index)}
+ *           opacity={() => polygon().vertexCompletion(index)}
+ *         />
+ *       ))}
+ *     </Polygon>,
+ *   );
+ *
+ *   yield* polygon().sides(6, 2).wait(0.5).back(2);
+ * });
  * ```
  */
 export class Polygon extends Curve {
@@ -116,6 +138,48 @@ export class Polygon extends Curve {
 
   public constructor(props: PolygonProps) {
     super(props);
+  }
+
+  /**
+   * Get the position of the nth vertex in the local space of this polygon.
+   *
+   * @param index - The index of the vertex.
+   */
+  public vertex(index: number): Vector2 {
+    const size = this.computedSize().scale(0.5);
+    const theta = (index * 2 * Math.PI) / this.sides();
+    const direction = Vector2.fromRadians(theta).perpendicular;
+    return direction.mul(size);
+  }
+
+  /**
+   * Get the completion of the nth vertex.
+   *
+   * @remarks
+   * The completion is a value between `0` and `1` that describes how the given
+   * vertex partakes in the polygon.
+   *
+   * For integer values of {@link sides}, the completion is simply `1` for
+   * each index making up the polygon and `0` for any other index. If `sides`
+   * includes a fraction, the last index of the polygon will have a completion
+   * equal to said fraction.
+   *
+   * Check out the {@link Polygon | Accessing vertex data} example for a
+   * demonstration.
+   *
+   * @param index - The index of the vertex.
+   */
+  public vertexCompletion(index: number): number {
+    const sides = this.sides();
+    if (index < 0 || index > sides) {
+      return 0;
+    }
+
+    if (index < sides - 1) {
+      return 1;
+    }
+
+    return sides - index;
   }
 
   @computed()
