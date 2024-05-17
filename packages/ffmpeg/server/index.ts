@@ -7,7 +7,7 @@ export default (): Plugin => {
     name: 'motion-canvas/ffmpeg',
     [PLUGIN_OPTIONS]: {
       entryPoint: '@motion-canvas/ffmpeg/lib/client',
-      async config(value) {
+      async configResolved(value) {
         config = value;
       },
     },

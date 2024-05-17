@@ -4,6 +4,8 @@ import {
   Player,
   Presenter,
   Renderer,
+  RendererResult,
+  RendererSettings,
   experimentalLog,
   type Project,
 } from '@motion-canvas/core';
@@ -29,19 +31,8 @@ function renderRoot(vnode: ComponentChild) {
   render(vnode, root);
 }
 
-export function editor(project: Project) {
+function setupProject(project: Project) {
   Error.stackTraceLimit = Infinity;
-  projectNameSignal.value = project.name;
-
-  project.logger.onLogged.subscribe(log => {
-    const {level, message, stack, object, durationMs, ...rest} = log;
-    const fn = console[level as 'error'] ?? console.log;
-    fn(message, ...[object, durationMs, rest].filter(part => !!part));
-    if (stack) {
-      fn(stack);
-    }
-  });
-
   if (!project.experimentalFeatures) {
     for (const plugin of project.plugins) {
       if (plugin.name.startsWith('@motion-canvas')) {
@@ -60,6 +51,21 @@ export function editor(project: Project) {
       }
     }
   }
+}
+
+export function editor(project: Project) {
+  setupProject(project);
+
+  project.logger.onLogged.subscribe(log => {
+    const {level, message, stack, object, durationMs, ...rest} = log;
+    const fn = console[level as 'error'] ?? console.log;
+    fn(message, ...[object, durationMs, rest].filter(part => !!part));
+    if (stack) {
+      fn(stack);
+    }
+  });
+
+  projectNameSignal.value = project.name;
 
   const renderer = new Renderer(project);
   project.plugins.forEach(plugin => plugin.renderer?.(renderer));
@@ -163,6 +169,75 @@ export function editor(project: Project) {
       </PanelsProvider>
     </ApplicationProvider>,
   );
+}
+
+export function headless(
+  project: Project,
+  settings: Partial<RendererSettings> = {},
+) {
+  setupProject(project);
+
+  project.logger.onLogged.subscribe(log => {
+    console.log(log);
+    window.dispatchEvent(new CustomEvent('log', {detail: log}));
+  });
+
+  const renderer = new Renderer(project);
+  project.plugins.forEach(plugin => plugin.renderer?.(renderer));
+
+  renderer.onFinished.subscribe(result => {
+    let stringResult: string;
+    if (result === RendererResult.Success) {
+      stringResult = 'success';
+    } else if (result === RendererResult.Aborted) {
+      stringResult = 'aborted';
+    } else {
+      stringResult = 'error';
+    }
+    window.dispatchEvent(new CustomEvent('renderend', {detail: stringResult}));
+  });
+
+  renderer.onFrameChanged.subscribe(frame => {
+    window.dispatchEvent(
+      new CustomEvent('render', {
+        detail: {
+          frame,
+          //@ts-ignore
+          total: renderer.playback.duration,
+        },
+      }),
+    );
+  });
+
+  const metaSettings = project.meta.getFullRenderingSettings();
+  let exporterName = metaSettings.exporter.name;
+  let exporterOptions = metaSettings.exporter.options;
+  if (settings.exporter) {
+    if (
+      (!settings.exporter.name || settings.exporter.name === exporterName) &&
+      settings.exporter.options &&
+      exporterOptions &&
+      typeof settings.exporter.options === 'object' &&
+      typeof exporterOptions === 'object'
+    ) {
+      exporterOptions = {...exporterOptions, ...settings.exporter.options};
+    } else {
+      exporterName = settings.exporter.name ?? exporterName;
+      exporterOptions = settings.exporter.options;
+    }
+  }
+
+  renderer.render({
+    ...project.meta.getFullRenderingSettings(),
+    ...settings,
+    exporter: {
+      name: exporterName,
+      options: exporterOptions,
+    },
+    name: project.name,
+  });
+
+  window.dispatchEvent(new Event('renderstart'));
 }
 
 export function index(projects: ProjectData[]) {

@@ -23,6 +23,10 @@ export interface ProjectData {
  */
 export interface PluginConfig {
   /**
+   * The editor path.
+   */
+  editor: string;
+  /**
    * The projects configured in the Vite plugin.
    */
   projects: ProjectData[];
@@ -48,7 +52,7 @@ export interface PluginOptions {
    * It should be a valid module specifier from which the plugin will be
    * imported. The module should contain a default export of a runtime plugin.
    */
-  entryPoint: string;
+  entryPoint?: string;
 
   /**
    * The configuration hook of the plugin.
@@ -61,6 +65,17 @@ export interface PluginOptions {
    * @param config - The configuration passed to the plugin.
    */
   config?(config: PluginConfig): Promise<Partial<PluginConfig> | void>;
+
+  /**
+   * The resolved configuration hook of the plugin.
+   *
+   * @remarks
+   * Invoked after the config has been modified by {@link config} hooks.
+   * At this point, the config is no longer a subject to change.
+   *
+   * @param config - The resolved configuration.
+   */
+  configResolved?(config: PluginConfig): Promise<void>;
 
   /**
    * Get custom configuration that will be passed to the runtime plugin.

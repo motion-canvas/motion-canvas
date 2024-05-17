@@ -105,6 +105,7 @@ export default ({
 }: MotionCanvasPluginConfig = {}): Plugin[] => {
   const plugins: PluginOptions[] = [];
   let config: PluginConfig = {
+    editor,
     output: path.resolve(output),
     projects: getProjects(project),
   };
@@ -125,13 +126,17 @@ export default ({
             config = {...config, ...newConfig};
           }
         }
+
+        await Promise.all(
+          plugins.map(plugin => plugin.configResolved?.(config)),
+        );
       },
     },
     metaPlugin(),
     settingsPlugin(),
     scenesPlugin(),
-    exporterPlugin({outputPath: config.output}),
-    editorPlugin({editor, projects: config.projects}),
+    exporterPlugin(),
+    editorPlugin(),
     projectsPlugin({projects: config.projects, plugins, buildForEditor}),
     assetsPlugin({bufferedAssets}),
     webglPlugin(),
