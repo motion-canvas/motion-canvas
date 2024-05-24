@@ -165,8 +165,6 @@ export function easeInOutCirc(value: number, from = 0, to = 1) {
   return map(from, to, value);
 }
 
-// TODO: use CubicBezierSegment and it's math to implement cubic bezier timing function from poc_and_test/test_bezier.js
-
 export function createCubicBezier(
   x1: number,
   y1: number,

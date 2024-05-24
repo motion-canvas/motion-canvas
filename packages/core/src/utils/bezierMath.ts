@@ -57,7 +57,6 @@ class BezierMathImpl implements BezierMath {
   }
 
   private solveNewtonX(value: number): number {
-    //newton's method
     let result = value;
     for (let i = 0; i < this.getNewtonIterations(); i++) {
       const sample = this.cubicBezierX(result);
@@ -72,8 +71,6 @@ class BezierMathImpl implements BezierMath {
       }
       result -= (sample - value) / derivative;
     }
-    //use standard [backup method]
-    // Bisection: something like binary search
     let low = 0.0;
     let high = 1.0;
     let t = value;
@@ -85,13 +82,10 @@ class BezierMathImpl implements BezierMath {
     }
 
     while (low < high) {
-      // sample is a true value of a point on a quadratic curve
       const sample = this.cubicBezierX(value);
-      // sample - value = check if result if close enough
       if (Math.abs(sample - value) < this.getApproximation()) {
         return t;
       }
-      //
       if (value > sample) {
         low = t;
       } else {
