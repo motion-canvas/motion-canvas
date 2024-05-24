@@ -34,7 +34,20 @@ import {getPropertyMetaOrCreate} from './signal';
  * @param entries - A record mapping the property in the compound object to the
  *                  corresponding property on the owner node.
  */
-export function compound(entries: Record<string, string>): PropertyDecorator {
+export function compound<
+  TSetterValue,
+  TValue extends TSetterValue,
+  TKeys extends keyof TValue = keyof TValue,
+  TOwner = void,
+>(
+  entries: Record<string, string>,
+  klass: typeof CompoundSignalContext<
+    TSetterValue,
+    TValue,
+    TKeys,
+    TOwner
+  > = CompoundSignalContext,
+): PropertyDecorator {
   return (target, key) => {
     const meta = getPropertyMetaOrCreate<any>(target, key);
     meta.compound = true;
@@ -48,7 +61,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
 
       const initial = meta.default;
       const parser = meta.parser.bind(instance);
-      const signalContext = new CompoundSignalContext(
+      const signalContext = new klass(
         meta.compoundEntries.map(([key, property]) => {
           const signal = new SignalContext(
             modify(initial, value => parser(value)[key]),
@@ -57,7 +70,7 @@ export function compound(entries: Record<string, string>): PropertyDecorator {
             undefined,
             makeSignalExtensions(undefined, instance, property),
           ).toSignal();
-          return [key, signal];
+          return [key as TKeys, signal];
         }),
         parser,
         initial,

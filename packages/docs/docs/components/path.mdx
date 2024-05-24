@@ -30,17 +30,47 @@ export default makeScene2D(function* (view) {
 });
 ```
 
-This component allows us to draw and animate SVG path.
+The `Path` node allows us to draw and animate SVG paths.
 
-## Defining Path
+:::tip
 
-You can define path to display by setting `data` property of Path component.
+`Path` nodes are great for displaying precalculated SVG paths, but the format
+can be confusing. If you want to have more intuitive control of the path, and
+control each point within Motion Canvas, we recommend checking out the
+[`Spline`][spline] component.
 
-## Animating Path
+:::
 
-### Morphing Between Two Path
+## Defining paths
 
-To morph between two path you can tween `data` property.
+We can specify the path to be displayed by setting the `data` property of the
+`Path` node:
+
+```tsx editor
+import {makeScene2D, Path} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const path = createRef<Path>();
+
+  view.add(
+    <Path
+      ref={path}
+      lineWidth={4}
+      stroke={'#e13238'}
+      data="M301.113,12.011L576.715,584.766L25.508,584.766L301.113,12.011z"
+      position={[-100, -100]}
+      scale={0.25}
+    />,
+  );
+});
+```
+
+## Animating paths
+
+### Morphing between multiple paths
+
+The `data` property can be tweened, creating a morph effect:
 
 ```tsx editor
 import {makeScene2D, Path} from '@motion-canvas/2d';
@@ -67,10 +97,11 @@ export default makeScene2D(function* (view) {
 });
 ```
 
-### Animating objects along a spline
+### Animating objects along a path
 
-Like Spline and Bezier, you can also make other components follow this component
-path. You can use the `getPointAtPercentage` to get point along this path.
+Like all nodes extending the [`Curve`][/api/2d/components/Curve] class, the
+`Path` node has a `getPointAtPercentage` method that can be used to animate an
+object along it:
 
 ```tsx editor
 import {makeScene2D, Path, Rect} from '@motion-canvas/2d';

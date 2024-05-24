@@ -1,4 +1,9 @@
-import {PossibleVector2, Signal, Vector2} from '@motion-canvas/core';
+import {
+  PossibleVector2,
+  Signal,
+  Vector2,
+  Vector2SignalContext,
+} from '@motion-canvas/core';
 import type {Length} from '../partials';
 import {compound} from './compound';
 import {wrapper} from './signal';
@@ -23,6 +28,7 @@ export function vector2Signal(
             x: prefix ? `${prefix}X` : 'x',
             y: prefix ? `${prefix}Y` : 'y',
           },
+      Vector2SignalContext,
     )(target, key);
     wrapper(Vector2)(target, key);
   };

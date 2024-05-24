@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "../lib/server",
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "strict": true,
+    "module": "CommonJS",
+    "target": "es2020",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["."]
+}

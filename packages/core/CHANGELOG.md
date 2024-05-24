@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
+
+
+### Bug Fixes
+
+* **core:** handle invalid time event values ([#1044](https://github.com/motion-canvas/motion-canvas/issues/1044)) ([4638a36](https://github.com/motion-canvas/motion-canvas/commit/4638a36c14714ada201d91ddfaff05c39455595f)), closes [#1036](https://github.com/motion-canvas/motion-canvas/issues/1036)
+
+
+### Features
+
+* mathematical operations for vector signals ([#1030](https://github.com/motion-canvas/motion-canvas/issues/1030)) ([c5b02d1](https://github.com/motion-canvas/motion-canvas/commit/c5b02d18c984c5def49e723d733f9c03c69d45d1)), closes [#967](https://github.com/motion-canvas/motion-canvas/issues/967)
+* signal effects ([#1043](https://github.com/motion-canvas/motion-canvas/issues/1043)) ([00fa967](https://github.com/motion-canvas/motion-canvas/commit/00fa96772a36ac8c2f1431073aeb78571becb6f7)), closes [#945](https://github.com/motion-canvas/motion-canvas/issues/945)
+
+
+
+
+
 ## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
 
 

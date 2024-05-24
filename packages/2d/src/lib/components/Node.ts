@@ -1488,7 +1488,7 @@ export class Node implements Promisable<Node> {
   protected parentWorldSpaceCacheBBox(): BBox {
     return (
       this.findAncestor(node => node.requiresCache())?.worldSpaceCacheBBox() ??
-      new BBox(Vector2.zero, useScene2D().getSize())
+      new BBox(Vector2.zero, useScene2D().getRealSize())
     );
   }
 

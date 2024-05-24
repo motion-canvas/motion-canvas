@@ -55,11 +55,12 @@ export interface PluginOptions {
    *
    * @remarks
    * Invoked during `configResolved` hook of Vite, contains the Motion Canvas
-   * specific configuration.
+   * specific configuration. Returned value will be merged with the current
+   * configuration.
    *
    * @param config - The configuration passed to the plugin.
    */
-  config?(config: PluginConfig): Promise<void>;
+  config?(config: PluginConfig): Promise<Partial<PluginConfig> | void>;
 
   /**
    * Get custom configuration that will be passed to the runtime plugin.

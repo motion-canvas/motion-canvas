@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "../lib/client",
+    "inlineSourceMap": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "strict": true,
+    "module": "esnext",
+    "target": "es2020",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["."]
+}

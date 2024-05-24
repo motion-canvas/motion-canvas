@@ -1,6 +1,7 @@
 import markdown from '@motion-canvas/internal/vite/markdown-literals';
 import preact from '@preact/preset-vite';
 import {defineConfig} from 'vite';
+import ffmpeg from '../ffmpeg/server';
 import motionCanvas from '../vite-plugin/src/main';
 
 export default defineConfig({
@@ -32,6 +33,7 @@ export default defineConfig({
     motionCanvas({
       buildForEditor: true,
     }),
+    ffmpeg(),
   ],
   build: {
     minify: false,
