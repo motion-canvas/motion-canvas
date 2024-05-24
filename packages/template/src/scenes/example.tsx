@@ -3,11 +3,10 @@ import {
   all,
   createRef,
   easeInExpo,
+  easeInOutExpo,
   waitFor,
   waitUntil,
 } from '@motion-canvas/core';
-
-import {createCubicBezier} from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   const rect = createRef<Rect>();
@@ -17,9 +16,7 @@ export default makeScene2D(function* (view) {
   );
 
   yield* waitUntil('rect');
-  yield* rect()
-    .scale(2, 3, createCubicBezier(0.25, -1.04, 0, 2))
-    .to(1, 0.6, easeInExpo);
+  yield* rect().scale(2, 1, easeInOutExpo).to(1, 0.6, easeInExpo);
   rect().fill('#ffa56d');
   yield* all(rect().ripple(1));
   yield* waitFor(0.3);
