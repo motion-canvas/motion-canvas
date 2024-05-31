@@ -1,16 +1,18 @@
 import fs from 'fs';
 import mime from 'mime-types';
 import path from 'path';
-import {Plugin} from 'vite';
 import {openInExplorer} from '../openInExplorer';
+import {PLUGIN_OPTIONS, Plugin} from '../plugins';
 
-interface ExporterPluginConfig {
-  outputPath: string;
-}
-
-export function exporterPlugin({outputPath}: ExporterPluginConfig): Plugin {
+export function exporterPlugin(): Plugin {
+  let outputPath: string;
   return {
     name: 'motion-canvas:exporter',
+    [PLUGIN_OPTIONS]: {
+      async configResolved(value) {
+        outputPath = value.output;
+      },
+    },
 
     configureServer(server) {
       server.middlewares.use((req, res, next) => {

@@ -3,7 +3,7 @@ import type {Scene} from '../scenes';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
 import {clampRemap} from '../tweening';
 import {Vector2} from '../types';
-import {Semaphore} from '../utils';
+import {Semaphore, errorToLog} from '../utils';
 import type {Exporter} from './Exporter';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {PlaybackStatus} from './PlaybackStatus';
@@ -20,6 +20,7 @@ export interface RendererSettings extends StageSettings {
     name: string;
     options: unknown;
   };
+  variables?: Record<string, unknown>;
 }
 
 export enum RendererState {
@@ -107,7 +108,7 @@ export class Renderer {
       this.abortController = new AbortController();
       result = await this.run(settings, this.abortController.signal);
     } catch (e: any) {
-      this.project.logger.error(e);
+      this.project.logger.error(errorToLog(e));
       result = RendererResult.Error;
       if (this.exporter) {
         try {
@@ -268,7 +269,10 @@ export class Renderer {
         resolutionScale: settings.resolutionScale,
       });
       scene.meta.set(description.meta.get());
-      scene.variables.updateSignals(this.project.variables ?? {});
+      scene.variables.updateSignals({
+        ...(this.project.variables ?? {}),
+        ...(settings.variables ?? {}),
+      });
     }
   }
 

@@ -1,48 +1,52 @@
 import fs from 'fs';
 import path from 'path';
-import {Plugin} from 'vite';
-import {ProjectData} from '../plugins';
+import {PLUGIN_OPTIONS, Plugin, ProjectData} from '../plugins';
 
-interface EditorPluginConfig {
-  editor: string;
-  projects: ProjectData[];
-}
-
-export function editorPlugin({editor, projects}: EditorPluginConfig): Plugin {
-  const editorPath = path.dirname(require.resolve(editor));
-  const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
-  const htmlParts = editorFile
-    .toString()
-    .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
-    .split('{{source}}');
-  const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
+export function editorPlugin(): Plugin {
   const resolvedEditorId = '\0virtual:editor';
 
+  let editor: string;
+  let createHtml: (src: string) => string;
+  let projects: ProjectData[];
   const lookup = new Map<string, ProjectData>();
-  for (const project of projects) {
-    lookup.set(project.name, project);
-  }
 
   return {
     name: 'motion-canvas:editor',
+
+    [PLUGIN_OPTIONS]: {
+      async configResolved(value) {
+        editor = value.editor;
+        const editorPath = path.dirname(require.resolve(editor));
+        const editorFile = fs.readFileSync(
+          path.resolve(editorPath, 'editor.html'),
+        );
+        const htmlParts = editorFile
+          .toString()
+          .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
+          .split('{{source}}');
+        createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
+
+        projects = value.projects;
+        for (const project of projects) {
+          lookup.set(project.name, project);
+        }
+      },
+    },
 
     async load(id) {
       const [, query] = id.split('?');
 
       if (id.startsWith(resolvedEditorId)) {
-        if (projects.length === 1) {
-          /* language=typescript */
-          return `\
-import {editor} from '${editor}';
-import project from '${projects[0].url}?project';
-editor(project);
+        const params = new URLSearchParams(query);
+        const name = params.get('project');
+        if (name && lookup.has(name)) {
+          if (params.has('headless')) {
+            return `\
+import {headless} from '${editor}';
+import project from '${lookup.get(name)!.url}?project';
+headless(project, ${params.get('headless')});
 `;
-        }
-
-        if (query) {
-          const params = new URLSearchParams(query);
-          const name = params.get('project');
-          if (name && lookup.has(name)) {
+          } else {
             /* language=typescript */
             return `\
 import {editor} from '${editor}';
@@ -64,16 +68,18 @@ index(${JSON.stringify(projects)});
       server.middlewares.use((req, res, next) => {
         if (req.url) {
           const url = new URL(req.url, `http://${req.headers.host}`);
-          if (url.pathname === '/') {
-            res.setHeader('Content-Type', 'text/html');
-            res.end(createHtml('/@id/__x00__virtual:editor'));
-            return;
-          }
-
-          const name = url.pathname.slice(1);
+          const name =
+            url.pathname === '/' ? projects[0].name : url.pathname.slice(1);
           if (name && lookup.has(name)) {
+            const params = new URLSearchParams(url.search);
+            const editorParams = new URLSearchParams();
+
+            if (params.has('headless')) {
+              editorParams.set('headless', params.get('headless')!);
+            }
+            editorParams.set('project', name);
             res.setHeader('Content-Type', 'text/html');
-            res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
+            res.end(createHtml(`/@id/__x00__virtual:editor?${editorParams}`));
             return;
           }
         }
