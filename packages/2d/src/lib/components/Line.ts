@@ -208,14 +208,14 @@ export class Line extends Curve {
 
     const desiredLength = points.length + count;
     const arcLength = polygonLength(points);
-    let density = count / arcLength;
+    let density = arcLength === 0 ? 0 : count / arcLength;
 
     let i = 0;
     while (points.length < desiredLength) {
       const pointsLeft = desiredLength - points.length;
 
       if (i + 1 >= points.length) {
-        density = pointsLeft / arcLength;
+        density = arcLength === 0 ? 0 : pointsLeft / arcLength;
         i = 0;
         continue;
       }
@@ -223,7 +223,11 @@ export class Line extends Curve {
       const a = points[i];
       const b = points[i + 1];
       const length = a.sub(b).magnitude;
-      const pointCount = Math.min(Math.round(length * density), pointsLeft) + 1;
+      let pointCount = Math.min(Math.round(length * density), pointsLeft) + 1;
+
+      if (arcLength === 0) {
+        pointCount = 2;
+      }
 
       for (let j = 1; j < pointCount; j++) {
         points.splice(++i, 0, Vector2.lerp(a, b, j / pointCount));
