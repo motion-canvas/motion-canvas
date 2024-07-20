@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "inlineSourceMap": true,
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
+    "skipLibCheck": true,
+    "strict": true,
+    "module": "NodeNext",
+    "target": "es2020",
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src"]
+}
