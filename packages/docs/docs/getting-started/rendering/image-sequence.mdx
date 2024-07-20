@@ -31,3 +31,63 @@ will often produce no discernible difference.
 
 When enabled, each scene will be rendered into a separate image sequence located
 in a subdirectory called the same as the scene.
+
+### Export strategy
+
+_Default: `toDataUrl`_<br/> The strategy used to export the frames. Different
+strategies may perform better depending on the complexity of your animation and
+the browser.
+
+#### Chrome
+
+On Chrome, the `toDataUrl` strategy is the fastest, but it if the animation is
+complex enough, the browser may starve the websocket responsible for saving
+frames on the disk, causing them to aggregate in memory. You can tell that this
+happens if the rendering process goes smoothly at first, until it hits the
+[I/O queue limit](#i-o-queue-limit), at which point it will start to freeze and
+stutter to let the websocket catch up. If that happens, consider switching to
+the `toBlob (Web Worker)` strategy. It will handle the websocket connection in a
+dedicated web worker which will not be starved by the main thread. While the
+`toBlob` operation is slower on Chrome, the overall performance in this case may
+be better.
+
+#### Firefox
+
+On Firefox, we recommend to use the `toBlob` strategy which is the fastest. When
+tested on [our example videos](https://github.com/motion-canvas/examples), the
+`toBlob` strategy on Firefox was 2-3 times faster than `toDataUrl` on Chrome.
+Even if you're using Chrome for development, consider switching to Firefox for
+the final export.
+
+### I/O queue limit
+
+_Default: `256`_<br/> The maximum number of frames being sent to the server at
+the same time.
+
+The image exporter does not wait for the frame to be stored on the disk before
+moving on to the next one. This speeds up the process significantly (See
+[pipelining][pipelining]). However, in cases where storing cannot keep up with
+rendering, the number of frames queued in memory will grow continuously. This
+setting defines a hard limit of queued frames, after which the exporter will
+wait for the disk to catch up.
+
+If the rendering process crashes with an "out of memory" error, try decreasing
+this value.
+
+The default value (`256`) is the maximum number of simultaneous websocket
+connections allowed by most browsers.
+
+### Blob queue limit
+
+_Default: `64`_<br/> The maximum number of `toBlob` operations allowed at the
+same time.
+
+Browsers don't limit the number of times `toBlob` can be called, but each new
+call slows down the ones already in progress. There exists a tipping point where
+the performance starts to degrade. For example, exporting 10 frames, 5 at a time
+is faster than exporting them one by one, but exporting all 10 at the same time
+may actually be slower. You can use this limit to find what works best for your
+animation.
+
+[pipelining]: https://en.wikipedia.org/wiki/Protocol_pipelining
+[examples]: https://github.com/motion-canvas/examples

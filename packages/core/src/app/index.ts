@@ -5,7 +5,6 @@
  */
 
 export * from './Exporter';
-export * from './ImageExporter';
 export * from './Logger';
 export * from './PlaybackManager';
 export * from './PlaybackStatus';
