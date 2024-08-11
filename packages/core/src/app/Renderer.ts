@@ -1,5 +1,5 @@
 import {EventDispatcher, ValueDispatcher} from '../events';
-import type {Scene} from '../scenes';
+import type {Scene, Sound} from '../scenes';
 import {ReadOnlyTimeEvents} from '../scenes/timeEvents';
 import {clampRemap} from '../tweening';
 import {Vector2} from '../types';
@@ -207,6 +207,7 @@ export class Renderer {
     await this.reloadScenes(settings);
     await this.playback.recalculate();
     if (signal.aborted) return RendererResult.Aborted;
+    await this.provideSounds();
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
 
@@ -270,6 +271,15 @@ export class Renderer {
       scene.meta.set(description.meta.get());
       scene.variables.updateSignals(this.project.variables ?? {});
     }
+  }
+
+  private async provideSounds() {
+    const sounds: Sound[] = [];
+    for (let i = 0; i < this.project.scenes.length; i++) {
+      const scene = this.playback.onScenesRecalculated.current[i];
+      sounds.push(...(<Sound[]>(<any>scene.sounds).sounds));
+    }
+    await this.exporter!.provideSounds?.(sounds);
   }
 
   private async exportFrame(signal: AbortSignal) {

@@ -1,4 +1,5 @@
 import type {MetaField} from '../meta';
+import type {Sound} from '../scenes';
 import type {Project} from './Project';
 import type {RendererResult, RendererSettings} from './Renderer';
 
@@ -54,6 +55,14 @@ export interface Exporter {
    * settings provided by the user.
    */
   configuration?(): Promise<RendererSettings | void>;
+
+  /**
+   * Provide the sounds to be played in the animation.
+   *
+   * @remarks
+   * Called after the rendering has been set up, right before `start()` is called.
+   */
+  provideSounds?(sounds: Sound[]): Promise<void>;
 
   /**
    * Begin the rendering process.
