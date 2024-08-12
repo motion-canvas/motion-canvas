@@ -1479,9 +1479,9 @@ export class Node implements Promisable<Node> {
     );
     const cacheBBox = BBox.fromPoints(
       ...this.cacheBBox().transformCorners(this.localToWorld()),
-    ).pixelPerfect.expand(2);
+    );
 
-    return canvasBBox.intersection(cacheBBox);
+    return canvasBBox.intersection(cacheBBox).pixelPerfect.expand(2);
   }
 
   @computed()
