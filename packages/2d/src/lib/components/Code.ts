@@ -300,6 +300,7 @@ export class Code extends Shape {
   public constructor(props: CodeProps) {
     super({
       fontFamily: 'monospace',
+      highlighter: Code.defaultHighlighter,
       ...props,
     });
   }
