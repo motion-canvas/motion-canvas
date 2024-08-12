@@ -1,3 +1,4 @@
+import {Plugin} from '@motion-canvas/core';
 import {FunctionComponent} from 'preact';
 
 /**
@@ -38,6 +39,25 @@ export interface PluginTabConfig {
   paneComponent: FunctionComponent<PluginTabProps>;
 }
 
+/**
+ * Configuration for a custom inspector in the editor.
+ */
+export interface PluginInspectorConfig {
+  /**
+   * A unique key representing the payload this inspector can handle.
+   *
+   * @remarks
+   * This key will be matched against {@link Inspection.key} to determine if the
+   * inspector should be displayed.
+   */
+  key: string;
+
+  /**
+   * The component displayed in the inspector.
+   */
+  component: FunctionComponent;
+}
+
 export interface PluginDrawFunction {
   (ctx: CanvasRenderingContext2D, matrix: DOMMatrix): void;
 }
@@ -71,12 +91,10 @@ export interface PluginOverlayConfig {
  *
  * @remarks
  * Passed to {@link makeEditorPlugin} to create a plugin.
+ *
+ * @experimental
  */
-export interface EditorPlugin {
-  /**
-   * The name of the plugin.
-   */
-  name: string;
+export interface EditorPlugin extends Plugin {
   /**
    * Configuration for custom tabs displayed in the sidebar.
    */
@@ -96,4 +114,8 @@ export interface EditorPlugin {
    * Configuration for custom overlays displayed on top of the presentation.
    */
   presenterOverlay?: PluginOverlayConfig;
+  /**
+   * Configuration for custom inspectors displayed on the right.
+   */
+  inspectors?: PluginInspectorConfig[];
 }

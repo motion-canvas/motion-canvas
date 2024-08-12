@@ -66,7 +66,7 @@ export function* threads(
   while (threads.length > 0) {
     const newThreads = [];
     const queue = [...threads];
-    const dt = playback.framesToSeconds(1) * playback.speed;
+    const dt = playback.deltaTime;
 
     while (queue.length > 0) {
       const thread = queue.pop();
@@ -92,11 +92,24 @@ export function* threads(
         queue.push(thread);
       } else {
         thread.update(dt);
+        thread.drain(task => {
+          const child = new Thread(task);
+          thread.add(child);
+          newThreads.unshift(child);
+        });
+
         newThreads.unshift(thread);
       }
     }
 
-    threads = newThreads.filter(thread => !thread.canceled);
+    threads = [];
+    for (const thread of newThreads) {
+      if (!thread.canceled) {
+        threads.push(thread);
+        thread.runDeferred();
+      }
+    }
+
     if (threads.length > 0) yield;
   }
 }

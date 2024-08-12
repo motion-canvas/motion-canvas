@@ -1,6 +1,6 @@
 import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 import {InterpolationFunction, map} from '../tweening';
-import {Type} from './Type';
+import {Type, WebGLConvertible} from './Type';
 
 export type SerializedSpacing = {
   top: number;
@@ -24,7 +24,7 @@ export type SpacingSignal<T> = CompoundSignal<
   T
 >;
 
-export class Spacing implements Type {
+export class Spacing implements Type, WebGLConvertible {
   public static readonly symbol = Symbol.for(
     '@motion-canvas/core/types/Spacing',
   );
@@ -128,6 +128,13 @@ export class Spacing implements Type {
 
   public toString() {
     return `Spacing(${this.top}, ${this.right}, ${this.bottom}, ${this.left})`;
+  }
+
+  public toUniform(
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniform4f(location, this.top, this.right, this.bottom, this.left);
   }
 
   public serialize(): SerializedSpacing {

@@ -6,11 +6,17 @@ import type {
   Renderer,
   SettingsMetadata,
 } from '@motion-canvas/core';
+import {Signal, useSignal} from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useRef} from 'preact/hooks';
 import {useSubscribable} from '../hooks';
 import {EditorPlugin} from '../plugin';
 import {LoggerManager} from '../utils';
+
+export interface Inspection {
+  key: string;
+  payload: unknown;
+}
 
 interface Application {
   project: Project;
@@ -21,6 +27,7 @@ interface Application {
   settings: SettingsMetadata;
   plugins: EditorPlugin[];
   logger: LoggerManager;
+  inspection: Signal<Inspection>;
 }
 
 const ApplicationContext = createContext<Application | null>(null);
@@ -33,9 +40,10 @@ export function ApplicationProvider({
   application,
   children,
 }: {
-  application: Omit<Application, 'logger'>;
+  application: Omit<Application, 'logger' | 'inspection'>;
   children: ComponentChildren;
 }) {
+  const inspection = useSignal<Inspection>({key: '', payload: null});
   const manager = useRef<LoggerManager | null>(null);
   manager.current ??= new LoggerManager(application.project.logger);
   useSubscribable(
@@ -49,6 +57,7 @@ export function ApplicationProvider({
       value={{
         ...application,
         logger: manager.current,
+        inspection,
       }}
     >
       {application.plugins.reduce((children, plugin) => {

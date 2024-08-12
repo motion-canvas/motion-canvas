@@ -108,6 +108,18 @@ const config = {
       prism: {
         theme: require('./config/codeTheme'),
         darkTheme: require('./config/codeTheme'),
+        additionalLanguages: ['glsl'],
+        magicComments: [
+          {
+            className: 'theme-code-block-highlighted-line',
+            line: 'highlight-next-line',
+            block: {start: 'highlight-start', end: 'highlight-end'},
+          },
+          {
+            className: 'prettier-ignore',
+            line: 'prettier-ignore',
+          },
+        ],
       },
     }),
   themes: [

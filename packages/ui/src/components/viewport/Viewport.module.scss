@@ -86,3 +86,61 @@
     display: block;
   }
 }
+
+.inspectorOverlay {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  right: -424px;
+  bottom: 0;
+  padding: 12px;
+  max-width: 424px;
+  width: 40%;
+  transition: right var(--duration-normal) var(--timing-ease-in-out);
+
+  &.open {
+    right: 0;
+  }
+}
+
+.inspector {
+  pointer-events: auto;
+  height: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.inspectorHeader {
+  margin-right: auto;
+
+  svg {
+    rotate: 180deg;
+  }
+}
+
+.inspectorButton {
+  position: absolute;
+  top: 12px;
+  right: -28px;
+  padding: 16px 28px 16px 4px;
+  background-color: var(--surface-color);
+  border-radius: 50%;
+  transition-property: right, top, padding;
+  transition-duration: var(--duration-normal);
+  transition-timing-function: var(--timing-ease-in-out);
+
+  svg {
+    transition: rotate var(--duration-normal) var(--timing-ease-in-out);
+    rotate: 180deg;
+  }
+
+  &.open {
+    right: 24px;
+    top: 20px;
+    padding: 8px;
+
+    svg {
+      rotate: 0deg;
+    }
+  }
+}

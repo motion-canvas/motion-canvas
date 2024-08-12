@@ -11,7 +11,7 @@ import {
   useLogger,
   viaProxy,
 } from '@motion-canvas/core';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {drawImage} from '../utils';
 import {Rect, RectProps} from './Rect';
@@ -21,7 +21,7 @@ export interface ImgProps extends RectProps {
   /**
    * {@inheritDoc Img.src}
    */
-  src?: SignalValue<string>;
+  src?: SignalValue<string | null>;
   /**
    * {@inheritDoc Img.alpha}
    */
@@ -65,6 +65,7 @@ export interface ImgProps extends RectProps {
  * });
  * ```
  */
+@nodeName('Img')
 export class Img extends Rect {
   private static pool: Record<string, HTMLImageElement> = {};
 
@@ -72,8 +73,8 @@ export class Img extends Rect {
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
         for (const url of urls) {
-          if (this.pool[url]) {
-            delete this.pool[url];
+          if (Img.pool[url]) {
+            delete Img.pool[url];
           }
         }
       });

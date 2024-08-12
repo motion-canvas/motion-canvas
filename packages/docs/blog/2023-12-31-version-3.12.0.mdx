@@ -1,0 +1,172 @@
+---
+slug: version-3.12.0
+title: Motion Canvas v3.12.0
+description: Bit of a hefty update.
+authors: aarthificial
+---
+
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import Link from '@docusaurus/Link';
+import IconScience from '@site/src/Icon/Science';
+import Fiddle from '@site/src/components/Fiddle';
+import CodeBlock from '@theme/CodeBlock';
+import PR from '@site/src/components/Release/PullRequest';
+import sourceTxt from '!!raw-loader!@site/blog/2023-12-31-txt.tsx';
+import sourceSpawner from '!!raw-loader!@site/blog/2023-12-31-spawner.tsx';
+import sourceLine from '!!raw-loader!@site/blog/2023-12-31-line.tsx';
+import sourceGlob from '!!raw-loader!@site/blog/2023-12-31-glob.tsx';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    The points of a{' '}
+    <Link to="/api/2d/components/Line">
+      <code>Line</code>
+    </Link>{' '}
+    can now be tweened.
+    <PR id={853} />
+    <Fiddle
+      mode="preview"
+      ratio="3"
+      className="margin-top--sm margin-bottom--sm"
+    >
+      {sourceLine}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'}>
+    <Link to="/api/2d/components/Txt">
+      <code>Txt</code>
+    </Link>{' '}
+    nodes can now be nested inside each other.
+    <PR id={861} />
+    <Fiddle mode="code" ratio="3" className="margin-top--sm margin-bottom--sm">
+      {sourceTxt}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'} pr={852}>
+    New{' '}
+    <Link to="/docs/hierarchy#querying-the-hierarchy">querying helpers</Link>{' '}
+    let you find nodes in the scene.
+  </Issue>
+  <Issue user={'rmhartog'} pr={832}>
+    Transitions can now control which scene{' '}
+    <Link to="/api/core/transitions/#useTransition-useTransition-previousOnTop">
+      is drawn on top
+    </Link>
+    .
+  </Issue>
+  <Issue user={'rmhartog'} pr={831}>
+    A new{' '}
+    <Link to="/api/2d/components/Video#playbackRate">
+      <code>Video.playbackRate</code>
+    </Link>{' '}
+    property lets you control the speed of a video.
+  </Issue>
+  <Issue user={'aarthificial'} pr={876}>
+    This version introduces the concept of experimental features. Marked with{' '}
+    <Link to="/docs/experimental" title="Experimental feature">
+      <IconScience className="experimental" />
+    </Link>
+    , these features are meant mostly for testing and gathering feedback. Find out
+    more about them <Link to="/docs/experimental">
+      in this dedicated section
+    </Link>.
+  </Issue>
+  <Issue user={'aarthificial'} pr={879} pr={884} experimental>
+    New <Link to="/docs/plugins/editor">Editor Plugins</Link> allow you to
+    extend the editor's interface. With them, you can define custom tabs in the
+    sidebar and draw overlays on top of the animation preview or the presenter.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    The timeline can now be scrubbed by holding down <kbd>LMB</kbd> and dragging
+    left or right.
+    <PR id={862} />
+    <br />
+    <small>
+      For complex animation, dragging to the left may lag a bit since the entire
+      generator must be re-run each time.
+    </small>
+  </Issue>
+  <Issue user={'jmaen'} pr={872}>
+    Hovering over the audio icon now reveals a volume slider that lets you
+    adjust the volume.
+  </Issue>
+  <Issue user={'Vija02'} pr={856}>
+    The <kbd>ArrowUp</kbd> and <kbd>ArrowDown</kbd> keys allow you to control
+    the volume.
+  </Issue>
+  <Issue user={'aarthificial'} pr={862}>
+    The animation range is no longer editable by default. Just like with the
+    audio track, hold <kbd>SHIFT</kbd> before dragging to edit it.
+  </Issue>
+  <Issue user={'Vaibhavi-Sita'} pr={823}>
+    When looping is disabled, the editor will seek back to the start of the
+    animation and stop there instead of pausing at the end.
+  </Issue>
+  <Issue user={'CactusPuppy'} pr={855}>
+    <Link to="/api/core/types/Vector2#topLeft">
+      <code>Vector2</code>
+    </Link>{' '}
+    now includes static properties representing each type of origin.
+  </Issue>
+  <Issue user={'aarthificial'} pr={859}>
+    <Link to="/api/2d/components/Node#applyState">
+      <code>applyState</code>
+    </Link>{' '}
+    can now be used to tween to the new state and not just immediately apply it.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    The spawner has been deprecated in favor of the children property.
+    <PR id={858} />
+    <CodeBlock language={'tsx'} className="margin-top--sm margin-bottom--sm">
+      {sourceSpawner}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'rmhartog'}>
+    Project configuration now supports glob patterns
+    <PR id={834} />
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {sourceGlob}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'rmhartog'} pr={835}>
+    Opacity is clamped between <code>0</code> and <code>1</code>.
+  </Issue>
+  <Issue user={'aarthificial'} pr={847}>
+    Errors that occur when loading an image are now properly reported in the
+    editor.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={891}>
+    Added a missing <code>middle</code> property to the <code>LayoutProps</code>{' '}
+    interface.
+  </Issue>
+  <Issue user={'aarthificial'} pr={883}>
+    Cardinal points now correctly account for the Node's offset.
+  </Issue>
+  <Issue user={'aarthificial'} pr={895}>
+    "Go to source" actions should work again.
+  </Issue>
+  <Issue user={'shaikan'} pr={821}>
+    Unusual characters in file names are now properly handled.
+  </Issue>
+  <Issue user={'SleeklyCoding'} pr={787}>
+    When opening the output directory, it will be automatically created if it
+    doesn't exist.
+  </Issue>
+  <Issue user={'aarthificial'} pr={863}>
+    Fixed line jitter under certain conditions.
+  </Issue>
+  <Issue user={'rmhartog'} pr={836}>
+    Correctly calculate bounding boxes of Txt nodes.
+  </Issue>
+  <Issue user={'aarthificial'} pr={829}>
+    Fixed tweening cardinal points.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

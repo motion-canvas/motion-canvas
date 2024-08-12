@@ -16,7 +16,7 @@ export function* zoomOutTransition(
   area: BBox,
   duration = 0.6,
 ): ThreadGenerator {
-  const scale = useScene().getSize().div(area.size);
+  const scale = useScene().getRealSize().div(area.size);
 
   const currentPosition = Vector2.createSignal(
     area.position.flipped.mul(scale),

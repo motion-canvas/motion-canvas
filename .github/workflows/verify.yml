@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 18
           cache: npm
-      - run: npm ci
+      - run: PUPPETEER_PRODUCT=firefox npm ci
       - uses: actions/cache/save@v3
         with:
           key: ${{ github.run_id }}-node-modules
@@ -187,6 +187,11 @@ jobs:
             packages/player/dist
             packages/vite-plugin/lib
       - run: npm run e2e:test
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: image-diffs
+          path: packages/e2e/src/__image_snapshots__/__diff_output__
   docs:
     name: Documentation
     needs: build

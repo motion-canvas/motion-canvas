@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ui",
-  "version": "3.11.0",
+  "version": "3.16.0",
   "description": "A visual editor for Motion Canvas",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
@@ -22,10 +22,11 @@
   },
   "files": [
     "dist",
-    "types"
+    "types",
+    "tsconfig.plugin.json"
   ],
   "dependencies": {
-    "@motion-canvas/core": "^3.11.0",
+    "@motion-canvas/core": "^3.16.0",
     "@preact/signals": "^1.2.1",
     "preact": "^10.19.2"
   },

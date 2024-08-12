@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/core",
-  "version": "3.11.0",
+  "version": "3.16.0",
   "description": "Web-based tool for creating animations programmatically",
   "main": "lib/index.js",
   "author": "motion-canvas",
@@ -21,11 +21,12 @@
   "files": [
     "lib",
     "tsconfig.project.json",
-    "project.d.ts"
+    "project.d.ts",
+    "shaders"
   ],
   "dependencies": {
-    "@types/chroma-js": "^2.1.4",
-    "chroma-js": "^2.4.2"
+    "@types/chroma-js": "2.4.4",
+    "chroma-js": "2.4.2"
   },
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",

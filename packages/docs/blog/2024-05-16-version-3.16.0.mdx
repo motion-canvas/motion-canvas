@@ -1,0 +1,82 @@
+---
+slug: version-3.16.0
+title: Motion Canvas v3.16.0
+description: Lights, Camera, Effects!
+authors: aarthificial
+---
+
+import Link from '@docusaurus/Link';
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PR from '@site/src/components/Release/PullRequest';
+import Fiddle from '@site/src/components/Fiddle';
+import CodeBlock from '@theme/CodeBlock';
+import sourceCamera from '!!raw-loader!@site/blog/2024-05-16-camera';
+import sourceEffects from '!!raw-loader!@site/blog/2024-05-16-effects';
+import sourceVectors from '!!raw-loader!@site/blog/2024-05-16-vectors';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'ksassnowski'}>
+    A brand-new{' '}
+    <Link to="/docs/camera">
+      <code>Camera</code>
+    </Link>{' '}
+    node with helper methods for zooming and focusing on elements:
+    <PR id={1019} />
+    <Fiddle
+      mode="preview"
+      ratio="3"
+      className="margin-top--sm margin-bottom--sm"
+    >
+      {sourceCamera}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New <Link to="/docs/effects">effects</Link> can be used to react to changes
+    in signals:
+    <PR id={1043} />
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {sourceEffects}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'mancopp'}>
+    All vector operations can now be used with vector signals for a more concise
+    code:
+    <PR id={1030} />
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {sourceVectors}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'aarthificial'} pr={1045}>
+    <Link to="/api/2d/components/Polygon#vertex">
+      <code>Polygon.vertex()</code>
+    </Link>{' '}
+    and{' '}
+    <Link to="/api/2d/components/Polygon#vertexCompletion">
+      <code>Polygon.vertexCompletion()</code>
+    </Link>{' '}
+    can be used to retrieve information about the vertices of a polygon.
+  </Issue>
+  <Issue user={'mancopp'} pr={1023}>
+    New example for the Code node.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={1044}>
+    Handle invalid values for time events.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1026}>
+    Fix the destination uv in shaders.
+  </Issue>
+  <Issue user={'Josephine19001'} pr={1039}>
+    Fix the type of the layout gap property.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1025}>
+    Fix Code size calculation.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

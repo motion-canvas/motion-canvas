@@ -27,7 +27,7 @@ import {
   parse,
   ready,
 } from 'code-fns';
-import {computed, initial, parser, signal} from '../decorators';
+import {computed, initial, nodeName, parser, signal} from '../decorators';
 import {DesiredLength} from '../partials';
 import {Shape, ShapeProps} from './Shape';
 
@@ -47,6 +47,10 @@ export interface CodeModification {
   to: Code;
 }
 
+/**
+ * @deprecated Use {@link Code} instead.
+ */
+@nodeName('CodeBlock')
 export class CodeBlock extends Shape {
   private static initialized = createComputedAsync(
     () => ready().then(() => true),

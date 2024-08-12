@@ -14,18 +14,16 @@ export async function start(): Promise<App> {
   const [browser, server] = await Promise.all([
     puppeteer.launch({
       headless: 'new',
+      product: 'firefox',
     }),
     createServer({
       root: Root,
       configFile: path.resolve(Root, '../vite.config.ts'),
-      server: {
-        port: 9000,
-      },
     }).then(server => server.listen()),
   ]);
 
   const page = await browser.newPage();
-  await page.goto('http://localhost:9000');
+  await page.goto(`http://localhost:${server.config.server.port}`);
   await page.waitForSelector('main');
 
   return {

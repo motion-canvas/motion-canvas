@@ -8,7 +8,7 @@ import {
   map,
   threadable,
 } from '@motion-canvas/core';
-import {computed, initial, signal} from '../decorators';
+import {computed, initial, nodeName, signal} from '../decorators';
 import {
   CanvasStyleSignal,
   canvasStyleSignal,
@@ -29,6 +29,7 @@ export interface ShapeProps extends LayoutProps {
   antialiased?: SignalValue<boolean>;
 }
 
+@nodeName('Shape')
 export abstract class Shape extends Layout {
   @canvasStyleSignal()
   public declare readonly fill: CanvasStyleSignal<this>;

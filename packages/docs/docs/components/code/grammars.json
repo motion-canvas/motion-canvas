@@ -1,0 +1,82 @@
+[
+  {
+    "name": "C++",
+    "url": "https://github.com/lezer-parser/cpp",
+    "package": "@lezer/cpp"
+  },
+  {
+    "name": "CSS",
+    "url": "https://github.com/lezer-parser/css",
+    "package": "@lezer/css"
+  },
+  {
+    "name": "Clojure",
+    "url": "https://github.com/lezer-parser/clojure",
+    "package": "@lezer/clojure"
+  },
+  {
+    "name": "Go",
+    "url": "https://github.com/lezer-parser/go",
+    "package": "@lezer/go"
+  },
+  {
+    "name": "HTML",
+    "url": "https://github.com/lezer-parser/html",
+    "package": "@lezer/html"
+  },
+  {
+    "name": "Java",
+    "url": "https://github.com/lezer-parser/java",
+    "package": "@lezer/java"
+  },
+  {
+    "name": "JavaScript",
+    "url": "https://github.com/lezer-parser/javascript",
+    "package": "@lezer/javascript"
+  },
+  {
+    "name": "Julia",
+    "url": "https://github.com/lezer-parser/julia",
+    "package": "@lezer/julia"
+  },
+  {
+    "name": "JSON",
+    "url": "https://github.com/lezer-parser/json",
+    "package": "@lezer/json"
+  },
+  {
+    "name": "Markdown",
+    "url": "https://github.com/lezer-parser/markdown",
+    "package": "@lezer/markdown"
+  },
+  {
+    "name": "PHP",
+    "url": "https://github.com/lezer-parser/php",
+    "package": "@lezer/php"
+  },
+  {
+    "name": "Python",
+    "url": "https://github.com/lezer-parser/python",
+    "package": "@lezer/python"
+  },
+  {
+    "name": "Rust",
+    "url": "https://github.com/lezer-parser/rust",
+    "package": "@lezer/rust"
+  },
+  {
+    "name": "Sass",
+    "url": "https://github.com/lezer-parser/sass",
+    "package": "@lezer/sass"
+  },
+  {
+    "name": "XML",
+    "url": "https://github.com/lezer-parser/xml",
+    "package": "@lezer/xml"
+  },
+  {
+    "name": "YAML",
+    "url": "https://github.com/lezer-parser/yaml",
+    "package": "@lezer/yaml"
+  }
+]

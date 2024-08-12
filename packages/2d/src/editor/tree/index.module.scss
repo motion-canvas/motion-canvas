@@ -1,0 +1,38 @@
+.root {
+  margin-top: -1px;
+  padding: 3px 0 4px;
+  border-top: 2px solid var(--background-color);
+}
+
+.label {
+  --depth: 0;
+
+  padding: 4px 0 4px calc(var(--depth) * 22px + 24px);
+  border-radius: var(--radius);
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+
+  &:hover {
+    background-color: var(--surface-color-hover);
+  }
+
+  &.active {
+    --surface-color-hover: none;
+    background-color: var(--theme-overlay);
+    color: var(--theme);
+  }
+
+  &.parent {
+    padding-left: calc(var(--depth) * 22px);
+  }
+
+  > svg {
+    width: 20px;
+    height: 20px;
+    align-self: center;
+    background-color: var(--background-color);
+    border-radius: var(--radius);
+    margin-right: 8px;
+  }
+}

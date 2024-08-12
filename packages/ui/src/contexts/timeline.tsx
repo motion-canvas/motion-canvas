@@ -31,13 +31,17 @@ export interface TimelineState {
    */
   framesToPercents: (value: number) => number;
   /**
-   * Convert frames pixels
+   * Convert frames to pixels.
    */
   framesToPixels: (value: number) => number;
   /**
    * Convert pixels to frames.
    */
   pixelsToFrames: (value: number) => number;
+  /**
+   * Convert current pointer position to frames.
+   */
+  pointerToFrames: (value: number) => number;
 }
 
 const TimelineContext = createContext<TimelineState>({
@@ -50,6 +54,7 @@ const TimelineContext = createContext<TimelineState>({
   framesToPercents: value => value,
   framesToPixels: value => value,
   pixelsToFrames: value => value,
+  pointerToFrames: value => value,
 });
 
 export function TimelineContextProvider({

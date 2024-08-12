@@ -1,5 +1,85 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [3.15.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0) (2024-03-21)
+
+
+### Features
+
+* expose parts of player to outside of shadow root ([#956](https://github.com/motion-canvas/motion-canvas/issues/956)) ([c996d39](https://github.com/motion-canvas/motion-canvas/commit/c996d394dda9ba8c6a32f0360bf09e722ec15b0e)), closes [#950](https://github.com/motion-canvas/motion-canvas/issues/950)
+
+
+
+
+
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+## [3.12.1](https://github.com/motion-canvas/motion-canvas/compare/v3.12.0...v3.12.1) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/player
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

@@ -22,7 +22,7 @@ export class ExporterMetaField extends MetaField<{
   }
   private readonly fields: ValueDispatcher<MetaField<any>[]>;
 
-  public get options() {
+  public get options(): MetaField<any> | undefined {
     return this.optionFields[this.current];
   }
 
@@ -45,12 +45,12 @@ export class ExporterMetaField extends MetaField<{
         value: exporter.id,
         text: exporter.displayName,
       })),
-      exporters[current].id,
+      exporters[current]?.id,
     );
 
     super(name, {
       name: exporterField.get(),
-      options: optionFields[current].get(),
+      options: optionFields[current]?.get(),
     });
 
     this.exporters = exporters;
@@ -58,19 +58,23 @@ export class ExporterMetaField extends MetaField<{
     this.exporterField.onChanged.subscribe(this.handleChange, false);
     this.exporterField.disable(optionFields.length < 2).space();
     this.optionFields = optionFields;
-    this.optionFields[current].onChanged.subscribe(this.handleChange, false);
-    this.fields = new ValueDispatcher([this.exporterField, this.options]);
+    this.fields = new ValueDispatcher([this.exporterField as MetaField<any>]);
+
+    if (this.options) {
+      this.options.onChanged.subscribe(this.handleChange, false);
+      this.fields.current = [this.exporterField, this.options];
+    }
   }
 
   public set(value: {name: string; options: any}) {
     this.exporterField.set(value.name);
-    this.options.set(value.options);
+    this.options?.set(value.options ?? {});
   }
 
   public serialize(): {name: string; options: any} {
     return {
       name: this.exporterField.serialize(),
-      options: this.options.serialize(),
+      options: this.options?.serialize() ?? null,
     };
   }
 
@@ -86,15 +90,17 @@ export class ExporterMetaField extends MetaField<{
     );
 
     if (this.current !== index) {
-      this.options.onChanged.unsubscribe(this.handleChange);
+      this.options?.onChanged.unsubscribe(this.handleChange);
       this.current = index;
-      this.options.onChanged.subscribe(this.handleChange, false);
-      this.fields.current = [this.exporterField, this.options];
+      this.options?.onChanged.subscribe(this.handleChange, false);
+      this.fields.current = this.options
+        ? [this.exporterField, this.options]
+        : [this.exporterField];
     }
 
     this.value.current = {
       name: this.exporterField.get(),
-      options: this.options.get(),
+      options: this.options?.get() ?? null,
     };
   };
 }

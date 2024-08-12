@@ -1,20 +1,19 @@
-import fg from 'fast-glob';
-import fs from 'fs';
-import mime from 'mime-types';
-import * as os from 'os';
 import path from 'path';
-import {Readable} from 'stream';
-import type {Plugin, ResolvedConfig} from 'vite';
-import {openInExplorer} from './openInExplorer';
-import {PLUGIN_OPTIONS, PluginOptions, ProjectData, isPlugin} from './plugins';
+import type {Plugin} from 'vite';
 import {
-  MotionCanvasCorsProxyOptions,
-  motionCanvasCorsProxy,
-  setupEnvVarsForProxy,
-} from './proxy-middleware';
-import {getVersions} from './versions';
-
-const AudioExtensions = new Set(['.mp3', '.wav', '.ogg', '.aac', '.flac']);
+  CorsProxyPluginConfig,
+  assetsPlugin,
+  corsProxyPlugin,
+  editorPlugin,
+  exporterPlugin,
+  metaPlugin,
+  projectsPlugin,
+  scenesPlugin,
+  settingsPlugin,
+  webglPlugin,
+} from './partials';
+import {PLUGIN_OPTIONS, PluginConfig, PluginOptions, isPlugin} from './plugins';
+import {getProjects} from './utils';
 
 export interface MotionCanvasPluginConfig {
   /**
@@ -48,7 +47,7 @@ export interface MotionCanvasPluginConfig {
    * Defines which assets should be buffered before being sent to the browser.
    *
    * @remarks
-   * Streaming larger assets directly from the drive my cause issues with other
+   * Streaming larger assets directly from the drive may cause issues with other
    * applications. For instance, if an audio file is being used in the project,
    * Adobe Audition will perceive it as "being used by another application"
    * and refuse to override it.
@@ -88,7 +87,12 @@ export interface MotionCanvasPluginConfig {
    * You can either pass `true` and a config object
    * to enable it.
    **/
-  proxy?: boolean | MotionCanvasCorsProxyOptions;
+  proxy?: boolean | CorsProxyPluginConfig;
+
+  /**
+   * Build the project to run in the editor.
+   */
+  buildForEditor?: boolean;
 }
 
 export default ({
@@ -97,416 +101,40 @@ export default ({
   bufferedAssets = /^$/,
   editor = '@motion-canvas/ui',
   proxy,
-}: MotionCanvasPluginConfig = {}): Plugin => {
+  buildForEditor,
+}: MotionCanvasPluginConfig = {}): Plugin[] => {
   const plugins: PluginOptions[] = [];
-  const editorPath = path.dirname(require.resolve(editor));
-  const editorFile = fs.readFileSync(path.resolve(editorPath, 'editor.html'));
-  const htmlParts = editorFile
-    .toString()
-    .replace('{{style}}', `/@fs/${path.resolve(editorPath, 'style.css')}`)
-    .split('{{source}}');
-  const createHtml = (src: string) => htmlParts[0] + src + htmlParts[1];
-  const versions = JSON.stringify(getVersions());
-
-  const resolvedEditorId = '\0virtual:editor';
-
-  const settingsId = '\0settings';
-  const settingsPath = path.resolve(
-    os.homedir(),
-    '.motion-canvas/settings.json',
-  );
-  const timeStamps: Record<string, number> = {};
-  const outputPath = path.resolve(output);
-  const projects: ProjectData[] = [];
-  const projectLookup: Record<string, ProjectData> = {};
-
-  function expandFilePaths(filePaths: string[] | string): string[] {
-    const expandedFilePaths = [];
-
-    for (const filePath of typeof filePaths === 'string'
-      ? [filePaths]
-      : filePaths) {
-      if (fg.isDynamicPattern(filePath)) {
-        const matchingFilePaths = fg.sync(filePath, {onlyFiles: true});
-        expandedFilePaths.push(...matchingFilePaths);
-      } else {
-        expandedFilePaths.push(filePath);
-      }
-    }
-
-    return expandedFilePaths;
-  }
-
-  const projectList = expandFilePaths(project);
-  for (const url of projectList) {
-    const {name, dir} = path.posix.parse(url);
-    const metaFile = `${name}.meta`;
-    const metaData = getMeta(path.join(dir, metaFile));
-    const data = {name: metaData?.name ?? name, fileName: name, url};
-    projects.push(data);
-    projectLookup[name] = data;
-  }
-
-  let viteConfig: ResolvedConfig;
-
-  function source(...lines: string[]) {
-    return lines.join('\n');
-  }
-
-  function getMeta(metaPath: string) {
-    if (fs.existsSync(metaPath)) {
-      return JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-    }
-  }
-
-  async function createMeta(metaPath: string) {
-    if (!fs.existsSync(metaPath)) {
-      await fs.promises.writeFile(
-        metaPath,
-        JSON.stringify({version: 0}, undefined, 2),
-        'utf8',
-      );
-    }
-  }
-
-  // Initialize the Proxy Module
-  setupEnvVarsForProxy(proxy);
-
-  return {
-    name: 'motion-canvas',
-    async configResolved(resolvedConfig) {
-      plugins.push(
-        ...resolvedConfig.plugins
-          .filter(isPlugin)
-          .map(plugin => plugin[PLUGIN_OPTIONS]),
-      );
-      await Promise.all(
-        plugins.map(
-          plugin =>
-            plugin.config?.({
-              output: outputPath,
-              projects,
-            }),
-        ),
-      );
-      viteConfig = resolvedConfig;
-    },
-    async load(id) {
-      const [base, query] = id.split('?');
-      const {name, dir} = path.posix.parse(base);
-
-      if (id.startsWith(resolvedEditorId)) {
-        if (projects.length === 1) {
-          return source(
-            `import {editor} from '${editor}';`,
-            `import project from '${projects[0].url}?project';`,
-            `editor(project);`,
-          );
-        }
-
-        if (query) {
-          const params = new URLSearchParams(query);
-          const name = params.get('project');
-          if (name && name in projectLookup) {
-            return source(
-              `import {editor} from '${editor}';`,
-              `import project from '${projectLookup[name].url}?project';`,
-              `editor(project);`,
-            );
-          }
-        }
-
-        return source(
-          `import {index} from '${editor}';`,
-          `index(${JSON.stringify(projects)});`,
-        );
-      }
-
-      if (query) {
-        const params = new URLSearchParams(query);
-        if (params.has('scene')) {
-          const metaFile = `${name}.meta`;
-          await createMeta(path.join(dir, metaFile));
-          const sceneFile = `${name}`;
-
-          return source(
-            `import {ValueDispatcher} from '@motion-canvas/core';`,
-            `import metaFile from './${metaFile}';`,
-            `import description from './${sceneFile}';`,
-            `description.name = '${name}';`,
-            `metaFile.attach(description.meta);`,
-            `if (import.meta.hot) {`,
-            `  description.onReplaced = import.meta.hot.data.onReplaced;`,
-            `}`,
-            `description.onReplaced ??= new ValueDispatcher(description.config);`,
-            `if (import.meta.hot) {`,
-            `  import.meta.hot.accept();`,
-            `  if (import.meta.hot.data.onReplaced) {`,
-            `    description.onReplaced.current = description;`,
-            `  } else {`,
-            `    import.meta.hot.data.onReplaced = description.onReplaced;`,
-            `  }`,
-            `}`,
-            `export default description;`,
-          );
-        }
-
-        if (params.has('project')) {
-          const metaFile = `${name}.meta`;
-          await createMeta(path.join(dir, metaFile));
-
-          const imports: string[] = [];
-          const pluginNames: string[] = [];
-          let index = 0;
-          for (const plugin of plugins) {
-            if (plugin.entryPoint) {
-              const pluginName = `plugin${index}`;
-              let options = (await plugin.runtimeConfig?.()) ?? '';
-              if (typeof options !== 'string') {
-                options = JSON.stringify(options);
-              }
-
-              imports.push(`import ${pluginName} from '${plugin.entryPoint}'`);
-              pluginNames.push(`${pluginName}(${options})`);
-              index++;
-            }
-          }
-
-          let parsed = {};
-          try {
-            parsed = JSON.parse(
-              await fs.promises.readFile(settingsPath, 'utf8'),
-            );
-          } catch (_) {
-            // Ignore an invalid settings file
-          }
-
-          return source(
-            ...imports,
-            `import {bootstrap} from '@motion-canvas/core';`,
-            `import {MetaFile} from '@motion-canvas/core';`,
-            `import metaFile from './${metaFile}';`,
-            `import config from './${name}';`,
-            `const settings = new MetaFile('settings', '${settingsId}');`,
-            `settings.loadData(${JSON.stringify(parsed)});`,
-            `export default bootstrap(`,
-            `  '${name}',`,
-            `  ${versions},`,
-            `  [${pluginNames.join(', ')}],`,
-            `  config,`,
-            `  metaFile,`,
-            `  settings,`,
-            `);`,
-          );
-        }
-      }
-    },
-    async transform(code, id) {
-      const [base, query] = id.split('?');
-      const {name, dir, ext} = path.posix.parse(base);
-
-      if (query) {
-        const params = new URLSearchParams(query);
-        if (params.has('img')) {
-          return source(
-            `import {loadImage} from '@motion-canvas/core';`,
-            `import image from '/@fs/${base}';`,
-            `export default loadImage(image);`,
-          );
-        }
-
-        if (params.has('anim')) {
-          const nameRegex = /\D*(\d+)\./;
-          let urls: string[] = [];
-          for (const file of await fs.promises.readdir(dir)) {
-            const match = nameRegex.exec(file);
-            if (!match) continue;
-            const index = parseInt(match[1]);
-            urls[index] = path.posix.join(dir, file);
-          }
-          urls = urls.filter(Boolean);
-
-          return source(
-            `import {loadAnimation} from '@motion-canvas/core';`,
-            ...urls.map(
-              (url, index) => `import image${index} from '/@fs/${url}';`,
-            ),
-            `export default loadAnimation([${urls
-              .map((_, index) => `image${index}`)
-              .join(', ')}]);`,
-          );
-        }
-      }
-
-      if (ext === '.meta') {
-        const sourceFile =
-          viteConfig.command === 'build' ? false : JSON.stringify(id);
-        return source(
-          `import {MetaFile} from '@motion-canvas/core';`,
-          `let meta;`,
-          `if (import.meta.hot) {`,
-          `  meta = import.meta.hot.data.meta;`,
-          `}`,
-          `meta ??= new MetaFile('${name}', ${sourceFile});`,
-          `if (import.meta.hot) {`,
-          `  import.meta.hot.accept();`,
-          `  import.meta.hot.data.meta = meta;`,
-          `}`,
-          `meta.loadData(${code});`,
-          `export default meta;`,
-        );
-      }
-
-      if (AudioExtensions.has(ext)) {
-        return source(
-          code,
-          `if (import.meta.hot) {`,
-          `  import.meta.hot.accept();`,
-          `}`,
-        );
-      }
-    },
-    handleHotUpdate(ctx) {
-      const now = Date.now();
-      const urls = [];
-      const modules = [];
-
-      for (const module of ctx.modules) {
-        if (
-          module.file !== null &&
-          timeStamps[module.file] &&
-          timeStamps[module.file] + 1000 > now
-        ) {
-          continue;
-        }
-
-        urls.push(module.url);
-        modules.push(module);
-      }
-
-      if (urls.length > 0) {
-        ctx.server.ws.send('motion-canvas:assets', {urls});
-      }
-
-      return modules;
-    },
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (req.url && bufferedAssets && bufferedAssets.test(req.url)) {
-          const file = fs.readFileSync(
-            path.resolve(viteConfig.root, req.url.slice(1)),
-          );
-          Readable.from(file).pipe(res);
-          return;
-        }
-
-        const url = req.url
-          ? new URL(req.url, `http://${req.headers.host}`)
-          : undefined;
-        if (url?.pathname === '/') {
-          res.setHeader('Content-Type', 'text/html');
-          res.end(createHtml('/@id/__x00__virtual:editor'));
-          return;
-        }
-
-        const name = url?.pathname?.slice(1);
-        if (name && name in projectLookup) {
-          res.setHeader('Content-Type', 'text/html');
-          res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
-          return;
-        }
-
-        if (name === '__open-output-path') {
-          if (!fs.existsSync(outputPath)) {
-            fs.mkdirSync(outputPath, {recursive: true});
-          }
-          openInExplorer(outputPath);
-          res.end();
-          return;
-        }
-
-        next();
-      });
-
-      // if proxy is unset (undefined), or set to false,
-      // it will not register its middleware — as a result, no
-      // proxy is started.
-      if (proxy !== false && proxy !== undefined) {
-        motionCanvasCorsProxy(server.middlewares, proxy === true ? {} : proxy);
-      }
-
-      server.ws.on('motion-canvas:meta', async ({source, data}, client) => {
-        if (source === settingsId) {
-          const outputDirectory = path.dirname(settingsPath);
-          if (!fs.existsSync(outputDirectory)) {
-            fs.mkdirSync(outputDirectory, {recursive: true});
-          }
-          await fs.promises.writeFile(
-            settingsPath,
-            JSON.stringify(data, undefined, 2),
-            'utf8',
-          );
-        } else {
-          timeStamps[source] = Date.now();
-          await fs.promises.writeFile(
-            source,
-            JSON.stringify(data, undefined, 2),
-            'utf8',
-          );
-        }
-        client.send('motion-canvas:meta-ack', {source});
-      });
-      server.ws.on(
-        'motion-canvas:export',
-        async (
-          {data, frame, sceneFrame, subDirectories, mimeType, groupByScene},
-          client,
-        ) => {
-          const name = (groupByScene ? sceneFrame : frame)
-            .toString()
-            .padStart(6, '0');
-          const extension = mime.extension(mimeType);
-          const outputFilePath = path.join(
-            outputPath,
-            ...subDirectories,
-            `${name}.${extension}`,
-          );
-          const outputDirectory = path.dirname(outputFilePath);
-
-          if (!fs.existsSync(outputDirectory)) {
-            fs.mkdirSync(outputDirectory, {recursive: true});
-          }
-
-          const base64Data = data.slice(data.indexOf(',') + 1);
-          await fs.promises.writeFile(outputFilePath, base64Data, {
-            encoding: 'base64',
-          });
-          client.send('motion-canvas:export-ack', {frame});
-        },
-      );
-    },
-    config(config) {
-      return {
-        build: {
-          assetsDir: './',
-          rollupOptions: {
-            preserveEntrySignatures: 'strict',
-            input: Object.fromEntries(
-              projects.map(project => [project.name, project.url + '?project']),
-            ),
-          },
-        },
-        server: {
-          port: config?.server?.port ?? 9000,
-        },
-        esbuild: {
-          jsx: 'automatic',
-          jsxImportSource: '@motion-canvas/2d/lib',
-        },
-        optimizeDeps: {
-          entries: projects.map(project => project.url),
-        },
-      };
-    },
+  let config: PluginConfig = {
+    output: path.resolve(output),
+    projects: getProjects(project),
   };
+
+  return [
+    {
+      name: 'motion-canvas',
+      async configResolved(resolvedConfig) {
+        plugins.push(
+          ...resolvedConfig.plugins
+            .filter(isPlugin)
+            .map(plugin => plugin[PLUGIN_OPTIONS]),
+        );
+
+        for (const plugin of plugins) {
+          const newConfig = await plugin.config?.(config);
+          if (newConfig) {
+            config = {...config, ...newConfig};
+          }
+        }
+      },
+    },
+    metaPlugin(),
+    settingsPlugin(),
+    scenesPlugin(),
+    exporterPlugin({outputPath: config.output}),
+    editorPlugin({editor, projects: config.projects}),
+    projectsPlugin({projects: config.projects, plugins, buildForEditor}),
+    assetsPlugin({bufferedAssets}),
+    webglPlugin(),
+    corsProxyPlugin(proxy),
+  ];
 };

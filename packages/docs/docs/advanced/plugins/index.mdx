@@ -1,0 +1,36 @@
+---
+sidebar_position: 8
+slug: /plugins
+---
+
+import DocCardList from '@theme/DocCardList';
+import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+
+# Authoring plugins
+
+Plugins are a way to extend the functionality of Motion Canvas.
+
+Motion Canvas consists of two parts running in separate environments: a
+[Vite](https://vitejs.dev/) development server running on Node.js and an editor
+running in the browser. Browser-related code can be split further into two
+parts:
+
+- Runtime - all the logic necessary to play the animation, such as the `Player`
+  instance, Scene definitions (including the actual source code of your
+  animation), etc.
+- Editor - the interface that lets you preview the animation, edit the settings,
+  etc.
+
+Depending on your needs, you can extend any of these parts with a plugin:
+
+<DocCardList items={useCurrentSidebarCategory().items} />
+
+# Plugin examples
+
+You can take a look at our [FFmpeg plugin][ffmpeg-plugin] for an example of a
+fully-fledged plugin. It's runtime portion provides the editor with a Video
+[exporter](/api/core/app/Exporter) that sends the rendered frames over to
+Node.js. The server portion then uses FFmpeg to convert the frames into a video.
+
+[ffmpeg-plugin]:
+  https://github.com/motion-canvas/exporters/tree/main/packages/ffmpeg

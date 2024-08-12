@@ -6,7 +6,13 @@ import {
   lazy,
   textLerp,
 } from '@motion-canvas/core';
-import {computed, initial, interpolation, signal} from '../decorators';
+import {
+  computed,
+  initial,
+  interpolation,
+  nodeName,
+  signal,
+} from '../decorators';
 import {Shape, ShapeProps} from './Shape';
 import {Txt} from './Txt';
 import {View2D} from './View2D';
@@ -16,6 +22,7 @@ export interface TxtLeafProps extends ShapeProps {
   text?: SignalValue<string>;
 }
 
+@nodeName('TxtLeaf')
 export class TxtLeaf extends Shape {
   @lazy(() => {
     const formatter = document.createElement('span');
@@ -58,9 +65,11 @@ export class TxtLeaf extends Shape {
     this.applyStyle(context);
     this.applyText(context);
     context.font = this.styles.font;
+    context.textBaseline = 'bottom';
     if ('letterSpacing' in context) {
       context.letterSpacing = `${this.letterSpacing()}px`;
     }
+    const fontOffset = context.measureText('').fontBoundingBoxAscent;
 
     const parentRect = this.element.getBoundingClientRect();
     const {width, height} = this.size();
@@ -76,7 +85,7 @@ export class TxtLeaf extends Shape {
       const rangeRect = range.getBoundingClientRect();
 
       const x = width / -2 + rangeRect.left - parentRect.left;
-      const y = height / -2 + rangeRect.top - parentRect.top;
+      const y = height / -2 + rangeRect.top - parentRect.top + fontOffset;
 
       if (lineRect.y === y) {
         lineRect.width += rangeRect.width;
@@ -99,9 +108,7 @@ export class TxtLeaf extends Shape {
     text: string,
     box: BBox,
   ) {
-    const y = box.y + box.height / 2;
-    context.save();
-    context.textBaseline = 'middle';
+    const y = box.y;
     text = text.replace(/\s+/g, ' ');
 
     if (this.lineWidth() <= 0) {
@@ -113,8 +120,6 @@ export class TxtLeaf extends Shape {
       context.fillText(text, box.x, y);
       context.strokeText(text, box.x, y);
     }
-
-    context.restore();
   }
 
   protected override getCacheBBox(): BBox {
@@ -127,12 +132,9 @@ export class TxtLeaf extends Shape {
     // We take the default value of the miterLimit as 10.
     const miterLimitCoefficient = this.lineJoin() === 'miter' ? 0.5 * 10 : 0.5;
 
-    return new BBox(
-      -size.width / 2,
-      -size.height / 2,
-      bbox.width,
-      bbox.height,
-    ).expand(lineWidth * miterLimitCoefficient);
+    return new BBox(-size.width / 2, -size.height / 2, bbox.width, bbox.height)
+      .expand([0, this.fontSize() * 0.5])
+      .expand(lineWidth * miterLimitCoefficient);
   }
 
   protected override applyFlex() {

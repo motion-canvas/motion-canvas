@@ -1,8 +1,8 @@
 import {CompoundSignal, CompoundSignalContext, SignalValue} from '../signals';
 import {InterpolationFunction, arcLerp, map} from '../tweening';
 import {PossibleMatrix2D} from './Matrix2D';
-import {Spacing} from './Spacing';
-import {Type} from './Type';
+import {PossibleSpacing, Spacing} from './Spacing';
+import {Type, WebGLConvertible} from './Type';
 import {Vector2} from './Vector';
 
 export type SerializedBBox = {
@@ -25,7 +25,7 @@ export type RectSignal<T> = CompoundSignal<
   T
 >;
 
-export class BBox implements Type {
+export class BBox implements Type, WebGLConvertible {
   public static readonly symbol = Symbol.for('@motion-canvas/core/types/Rect');
 
   public x = 0;
@@ -284,16 +284,13 @@ export class BBox implements Type {
     return this.corners.map(corner => corner.transformAsPoint(matrix));
   }
 
-  public expand(amount: number) {
-    return new BBox(
-      this.x - amount,
-      this.y - amount,
-      this.width + amount * 2,
-      this.height + amount * 2,
-    );
-  }
-
-  public addSpacing(spacing: Spacing) {
+  /**
+   * Expand the bounding box to accommodate the given spacing.
+   *
+   * @param value - The value to expand the bounding box by.
+   */
+  public expand(value: PossibleSpacing) {
+    const spacing = new Spacing(value);
     const result = new BBox(this);
     result.left -= spacing.left;
     result.top -= spacing.top;
@@ -301,6 +298,15 @@ export class BBox implements Type {
     result.bottom += spacing.bottom;
 
     return result;
+  }
+
+  /**
+   * {@inheritDoc expand}
+   *
+   * @deprecated Use {@link expand} instead.
+   */
+  public addSpacing(value: PossibleSpacing) {
+    return this.expand(value);
   }
 
   public includes(point: Vector2): boolean {
@@ -334,12 +340,30 @@ export class BBox implements Type {
     return bbox;
   }
 
+  public union(other: BBox): BBox {
+    const bbox = new BBox();
+
+    bbox.left = Math.min(this.left, other.left);
+    bbox.top = Math.min(this.top, other.top);
+    bbox.right = Math.max(this.right, other.right);
+    bbox.bottom = Math.max(this.bottom, other.bottom);
+
+    return bbox;
+  }
+
   public toSymbol(): symbol {
     return BBox.symbol;
   }
 
   public toString(): string {
     return `BBox(${this.x}, ${this.y}, ${this.width}, ${this.height})`;
+  }
+
+  public toUniform(
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniform4f(location, this.x, this.y, this.width, this.height);
   }
 
   public serialize(): SerializedBBox {

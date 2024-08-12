@@ -15,5 +15,6 @@ export * from './Project';
 export * from './ProjectMetadata';
 export * from './Renderer';
 export * from './SettingsMetadata';
+export * from './SharedWebGLContext';
 export * from './Stage';
 export * from './bootstrap';

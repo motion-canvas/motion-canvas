@@ -10,7 +10,8 @@ import {
   Vector2,
   useLogger,
 } from '@motion-canvas/core';
-import {Node, View2D} from '../components';
+import {Camera, Node, View2D} from '../components';
+import {is} from '../utils';
 
 export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   private view: View2D | null = null;
@@ -36,7 +37,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   }
 
   public override next(): Promise<void> {
-    this.getView()?.playbackState(this.playback.state);
+    this.getView()
+      ?.playbackState(this.playback.state)
+      .globalTime(this.playback.time);
     return super.next();
   }
 
@@ -45,7 +48,9 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     this.renderLifecycle.dispatch([SceneRenderEvent.BeforeRender, context]);
     context.save();
     this.renderLifecycle.dispatch([SceneRenderEvent.BeginRender, context]);
-    this.getView().playbackState(this.playback.state);
+    this.getView()
+      .playbackState(this.playback.state)
+      .globalTime(this.playback.time);
     this.getView().render(context);
     this.renderLifecycle.dispatch([SceneRenderEvent.FinishRender, context]);
     context.restore();
@@ -107,7 +112,34 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
     const node = this.getNode(element);
     if (node) {
       this.execute(() => {
-        node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+        const cameras = this.getView().findAll(is(Camera));
+        const parentCameras = [];
+        for (const camera of cameras) {
+          const scene = camera.scene();
+          if (!scene) continue;
+
+          if (scene === node || scene.findFirst(n => n === node)) {
+            parentCameras.push(camera);
+          }
+        }
+
+        if (parentCameras.length > 0) {
+          for (const camera of parentCameras) {
+            const cameraParentToWorld = camera.parentToWorld();
+            const cameraLocalToParent = camera.localToParent().inverse();
+            const nodeLocalToWorld = node.localToWorld();
+
+            node.drawOverlay(
+              context,
+              matrix
+                .multiply(cameraParentToWorld)
+                .multiply(cameraLocalToParent)
+                .multiply(nodeLocalToWorld),
+            );
+          }
+        } else {
+          node.drawOverlay(context, matrix.multiply(node.localToWorld()));
+        }
       });
     }
   }
@@ -141,6 +173,12 @@ export class Scene2D extends GeneratorScene<View2D> implements Inspectable {
   public getNode(key: any): Node | null {
     if (typeof key !== 'string') return null;
     return this.registeredNodes.get(key) ?? null;
+  }
+
+  public *getDetachedNodes() {
+    for (const node of this.registeredNodes.values()) {
+      if (!node.parent() && node !== this.view) yield node;
+    }
   }
 
   protected recreateView() {

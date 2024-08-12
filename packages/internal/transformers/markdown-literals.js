@@ -1,25 +1,7 @@
 const ts = require('typescript');
 const path = require('path');
 const fs = require('fs');
-const {Marked} = require('marked');
-const {markedHighlight} = require('marked-highlight');
-const highlightJs = require('highlight.js');
-
-const marked = new Marked(
-  {
-    renderer: {
-      link(href, title, text) {
-        return `<a href='${href}' target='_blank'>${text}</a>`;
-      },
-    },
-  },
-  markedHighlight({
-    highlight(code, lang) {
-      const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
-      return highlightJs.highlight(code, {language}).value;
-    },
-  }),
-);
+const marked = require('../common/marked');
 
 const transformerProgram = program => context => sourceFile => {
   const sourceMap = new Map();
@@ -35,7 +17,7 @@ const transformerProgram = program => context => sourceFile => {
     if (
       ts.isImportDeclaration(node) &&
       ts.isStringLiteral(node.moduleSpecifier) &&
-      node.importClause.name !== undefined
+      node.importClause?.name !== undefined
     ) {
       /**
        * @type {ts.TypeChecker}

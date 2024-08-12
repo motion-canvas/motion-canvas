@@ -1,5 +1,120 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [3.15.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0) (2024-03-21)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.14.2](https://github.com/motion-canvas/motion-canvas/compare/v3.14.1...v3.14.2) (2024-02-08)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
+
+
+### Features
+
+* **create:** include simple animation ([#931](https://github.com/motion-canvas/motion-canvas/issues/931)) ([925f63f](https://github.com/motion-canvas/motion-canvas/commit/925f63f3588922224511b1687ac44ba7b9920d83))
+
+
+
+
+
+# [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.12.4](https://github.com/motion-canvas/motion-canvas/compare/v3.12.3...v3.12.4) (2024-01-05)
+
+
+### Reverts
+
+* ci(release): 3.12.4 [skip ci] ([#908](https://github.com/motion-canvas/motion-canvas/issues/908)) ([86c5170](https://github.com/motion-canvas/motion-canvas/commit/86c517067c7225f827aa05b47e2397e0d90fe622))
+
+
+
+
+
+## [3.12.3](https://github.com/motion-canvas/motion-canvas/compare/v3.12.2...v3.12.3) (2024-01-04)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.12.2](https://github.com/motion-canvas/motion-canvas/compare/v3.12.1...v3.12.2) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+## [3.12.1](https://github.com/motion-canvas/motion-canvas/compare/v3.12.0...v3.12.1) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/create
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

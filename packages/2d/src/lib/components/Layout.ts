@@ -1,6 +1,7 @@
 import {
   BBox,
   boolLerp,
+  Direction,
   InterpolationFunction,
   modify,
   Origin,
@@ -28,6 +29,7 @@ import {
   getPropertyMeta,
   initial,
   interpolation,
+  nodeName,
   signal,
   Vector2LengthSignal,
   vector2Signal,
@@ -84,7 +86,7 @@ export interface LayoutProps extends NodeProps {
   alignSelf?: SignalValue<FlexItems>;
   rowGap?: SignalValue<Length>;
   columnGap?: SignalValue<Length>;
-  gap?: SignalValue<Length>;
+  gap?: SignalValue<PossibleVector2<Length>>;
 
   fontFamily?: SignalValue<string>;
   fontSize?: SignalValue<number>;
@@ -100,6 +102,17 @@ export interface LayoutProps extends NodeProps {
   offsetX?: SignalValue<number>;
   offsetY?: SignalValue<number>;
   offset?: SignalValue<PossibleVector2>;
+  /**
+   * The position of the center of this node.
+   *
+   * @remarks
+   * This shortcut property will set the node's position so that the center ends
+   * up in the given place.
+   * If present, overrides the {@link NodeProps.position} property.
+   * When {@link offset} is not set, this will be the same as the
+   * {@link NodeProps.position}.
+   */
+  middle?: SignalValue<PossibleVector2>;
   /**
    * The position of the top edge of this node.
    *
@@ -175,6 +188,7 @@ export interface LayoutProps extends NodeProps {
   clip?: SignalValue<boolean>;
 }
 
+@nodeName('Layout')
 export class Layout extends Node {
   @initial(null)
   @interpolation(boolLerp)
@@ -613,6 +627,38 @@ export class Layout extends Node {
    */
   @originSignal(Origin.BottomRight)
   public declare readonly bottomRight: SimpleVector2Signal<this>;
+
+  /**
+   * Get the cardinal point corresponding to the given origin.
+   *
+   * @param origin - The origin or direction of the point.
+   */
+  public cardinalPoint(origin: Origin | Direction): SimpleVector2Signal<this> {
+    switch (origin) {
+      case Origin.TopLeft:
+        return this.topLeft;
+      case Origin.TopRight:
+        return this.topRight;
+      case Origin.BottomLeft:
+        return this.bottomLeft;
+      case Origin.BottomRight:
+        return this.bottomRight;
+      case Origin.Top:
+      case Direction.Top:
+        return this.top;
+      case Origin.Bottom:
+      case Direction.Bottom:
+        return this.bottom;
+      case Origin.Left:
+      case Direction.Left:
+        return this.left;
+      case Origin.Right:
+      case Direction.Right:
+        return this.right;
+      default:
+        return this.middle;
+    }
+  }
 
   @initial(false)
   @signal()

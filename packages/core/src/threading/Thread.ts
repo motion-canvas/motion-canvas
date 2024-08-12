@@ -1,7 +1,10 @@
+import {EventDispatcher} from '../events';
+import {noop} from '../flow';
 import {createSignal} from '../signals';
-import {endThread, startThread} from '../utils';
-import {ThreadGenerator} from './ThreadGenerator';
-import {setTaskName} from './names';
+import {endThread, startThread, useLogger} from '../utils';
+import {ThreadGenerator, isThreadGenerator} from './ThreadGenerator';
+import reusedGenerator from './__logs__/reused-generator.md';
+import {getTaskName, setTaskName} from './names';
 
 /**
  * A class representing an individual thread.
@@ -13,6 +16,11 @@ import {setTaskName} from './names';
  * If a parent finishes execution, all of its child threads are terminated.
  */
 export class Thread {
+  public get onDeferred() {
+    return this.deferred.subscribable;
+  }
+  private deferred = new EventDispatcher<void>();
+
   public children: Thread[] = [];
   /**
    * The next value to be passed to the wrapped generator.
@@ -51,17 +59,33 @@ export class Thread {
     return this.isPaused || (this.parent?.paused ?? false);
   }
 
+  public get root(): Thread {
+    return this.parent?.root ?? this;
+  }
+
   public parent: Thread | null = null;
   private isCanceled = false;
   private isPaused = false;
   private fixedTime = 0;
+  private queue: ThreadGenerator[] = [];
 
   public constructor(
     /**
      * The generator wrapped by this thread.
      */
-    public readonly runner: ThreadGenerator,
-  ) {}
+    public readonly runner: ThreadGenerator & {task?: Thread},
+  ) {
+    if (this.runner.task) {
+      useLogger().error({
+        message: `The generator "${getTaskName(
+          this.runner,
+        )}" is already being executed by another thread.`,
+        remarks: reusedGenerator,
+      });
+      this.runner = noop();
+    }
+    this.runner.task = this;
+  }
 
   /**
    * Progress the wrapped generator once.
@@ -94,8 +118,17 @@ export class Thread {
     this.children = this.children.filter(child => !child.canceled);
   }
 
+  public spawn(
+    child: ThreadGenerator | (() => ThreadGenerator),
+  ): ThreadGenerator {
+    if (!isThreadGenerator(child)) {
+      child = child();
+    }
+    this.queue.push(child);
+    return child;
+  }
+
   public add(child: Thread) {
-    child.cancel();
     child.parent = this;
     child.isCanceled = false;
     child.time(this.time());
@@ -105,12 +138,26 @@ export class Thread {
     setTaskName(child.runner, `unknown ${this.children.length}`);
   }
 
+  public drain(callback: (task: ThreadGenerator) => void) {
+    this.queue.forEach(callback);
+    this.queue = [];
+  }
+
   public cancel() {
+    this.deferred.clear();
+    this.runner.return();
     this.isCanceled = true;
     this.parent = null;
+    this.drain(task => task.return());
   }
 
   public pause(value: boolean) {
     this.isPaused = value;
+  }
+
+  public runDeferred() {
+    startThread(this);
+    this.deferred.dispatch();
+    endThread(this);
   }
 }

@@ -1,5 +1,5 @@
 import {DEG2RAD} from '../utils';
-import {EPSILON, Type} from './Type';
+import {EPSILON, Type, WebGLConvertible} from './Type';
 import {PossibleVector2, Vector2} from './Vector';
 
 export type PossibleMatrix2D =
@@ -30,7 +30,7 @@ export type PossibleMatrix2D =
  *   - (rA)^-1 = r^-1 A^-1, r != 0 does not hold for a Matrix2D
  *   - r(AB) = (rA)B = A(rB) does not hold for a Matrix2D
  */
-export class Matrix2D implements Type {
+export class Matrix2D implements Type, WebGLConvertible {
   public static readonly symbol = Symbol.for(
     '@motion-canvas/core/types/Matrix2D',
   );
@@ -689,6 +689,23 @@ export class Matrix2D implements Type {
 
   public toSymbol(): symbol {
     return Matrix2D.symbol;
+  }
+
+  public toUniform(
+    gl: WebGL2RenderingContext,
+    location: WebGLUniformLocation,
+  ): void {
+    gl.uniformMatrix3fv(location, false, [
+      this.values[0],
+      this.values[1],
+      0,
+      this.values[2],
+      this.values[3],
+      0,
+      this.values[4],
+      this.values[5],
+      1,
+    ]);
   }
 
   public equals(other: Matrix2D, threshold: number = EPSILON): boolean {

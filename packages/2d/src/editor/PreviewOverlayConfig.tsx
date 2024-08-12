@@ -1,26 +1,24 @@
-import {isInspectable, Vector2} from '@motion-canvas/core';
+import {Vector2} from '@motion-canvas/core';
 import {
   MouseButton,
   OverlayWrapper,
   PluginOverlayConfig,
-  useCurrentScene,
   useViewportContext,
   useViewportMatrix,
 } from '@motion-canvas/ui';
 import {ComponentChildren} from 'preact';
-import {useInspection} from './Provider';
+import {usePluginState} from './Provider';
 
 function Component({children}: {children?: ComponentChildren}) {
   const state = useViewportContext();
-  const scene = useCurrentScene();
-  const {nodeKey} = useInspection();
+  const {scene, selectedKey} = usePluginState();
   const matrix = useViewportMatrix();
 
   return (
     <OverlayWrapper
       onPointerDown={event => {
         if (event.button !== MouseButton.Left || event.shiftKey) return;
-        if (!isInspectable(scene)) return;
+        if (!scene.value) return;
         event.stopPropagation();
 
         const position = new Vector2(
@@ -28,7 +26,10 @@ function Component({children}: {children?: ComponentChildren}) {
           event.y - state.rect.y,
         ).transformAsPoint(matrix.inverse());
 
-        nodeKey.value = scene.inspectPosition(position.x, position.y) as string;
+        selectedKey.value = scene.value.inspectPosition(
+          position.x,
+          position.y,
+        ) as string;
       }}
     >
       {children}
@@ -37,18 +38,25 @@ function Component({children}: {children?: ComponentChildren}) {
 }
 
 function drawHook() {
-  const {nodeKey} = useInspection();
-  const scene = useCurrentScene();
-  nodeKey.value;
+  const {selectedKey, hoveredKey, afterRender, scene} = usePluginState();
+  selectedKey.value;
+  hoveredKey.value;
+  afterRender.value;
 
   return (ctx: CanvasRenderingContext2D, matrix: DOMMatrix) => {
-    if (!isInspectable(scene)) return;
-    const element = scene.validateInspection(nodeKey.value);
-    if (!element || element !== nodeKey.value) {
-      nodeKey.value = element as string;
-      return;
+    const currentScene = scene.peek();
+    if (!currentScene) return;
+
+    let node = currentScene.getNode(selectedKey.value);
+    if (node) {
+      currentScene.drawOverlay(node.key, matrix, ctx);
     }
-    scene.drawOverlay(element, matrix, ctx);
+
+    node = currentScene.getNode(hoveredKey.value);
+    if (node && hoveredKey.value !== selectedKey.value) {
+      ctx.globalAlpha = 0.5;
+      currentScene.drawOverlay(hoveredKey.value, matrix, ctx);
+    }
   };
 }
 

@@ -157,6 +157,10 @@ export class EditableTimeEvents implements TimeEvents {
 
   private load(events: SerializedTimeEvent[]) {
     for (const event of events) {
+      if (typeof event.name !== 'string') {
+        continue;
+      }
+
       const previous = this.lookup.get(event.name) ?? {
         name: event.name,
         initialTime: 0,
@@ -165,7 +169,7 @@ export class EditableTimeEvents implements TimeEvents {
 
       this.lookup.set(event.name, {
         ...previous,
-        targetTime: event.targetTime,
+        targetTime: event.targetTime ?? 0,
       });
     }
   }

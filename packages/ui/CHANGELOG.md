@@ -1,5 +1,166 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+
+
+
+
+## [3.15.2](https://github.com/motion-canvas/motion-canvas/compare/v3.15.1...v3.15.2) (2024-04-02)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+
+
+
+
+## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
+
+
+### Bug Fixes
+
+* **ui:** fix color picker ([#1008](https://github.com/motion-canvas/motion-canvas/issues/1008)) ([dfc2dae](https://github.com/motion-canvas/motion-canvas/commit/dfc2dae047339cc3796b8ee3594ad14de60aba5a))
+
+
+
+
+
+# [3.15.0](https://github.com/motion-canvas/motion-canvas/compare/v3.14.2...v3.15.0) (2024-03-21)
+
+
+### Features
+
+* improve error logs ([#953](https://github.com/motion-canvas/motion-canvas/issues/953)) ([3b528cc](https://github.com/motion-canvas/motion-canvas/commit/3b528cce13a3440c97641d1095ce09e737e89960))
+* **ui:** add color picker popover to color input ([#962](https://github.com/motion-canvas/motion-canvas/issues/962)) ([5ed7669](https://github.com/motion-canvas/motion-canvas/commit/5ed76691411da5672bc9c0c7b8ef2ff4c42b60cc))
+* **ui:** support for PowerPoint shortcuts in presentation mode ([#993](https://github.com/motion-canvas/motion-canvas/issues/993)) ([570f729](https://github.com/motion-canvas/motion-canvas/commit/570f729f172d3831e20a1dfb7cd07b5d7cb2d27f))
+
+
+
+
+
+## [3.14.2](https://github.com/motion-canvas/motion-canvas/compare/v3.14.1...v3.14.2) (2024-02-08)
+
+
+### Bug Fixes
+
+* **ui:** fix out of range warning ([#939](https://github.com/motion-canvas/motion-canvas/issues/939)) ([c9f466f](https://github.com/motion-canvas/motion-canvas/commit/c9f466f20ff1a3e2cb77aa5575823947ef9beeee))
+
+
+
+
+
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* limit fps to positive numbers ([#937](https://github.com/motion-canvas/motion-canvas/issues/937)) ([c7c0c67](https://github.com/motion-canvas/motion-canvas/commit/c7c0c6730e1a00e6b23077188bfc2d389e98cff2)), closes [#936](https://github.com/motion-canvas/motion-canvas/issues/936)
+
+
+
+
+
+# [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
+
+
+### Bug Fixes
+
+* correctly await re-renders ([#918](https://github.com/motion-canvas/motion-canvas/issues/918)) ([873a9a3](https://github.com/motion-canvas/motion-canvas/commit/873a9a3eed2676de4cc7f31fbd5ea58817a80aff))
+
+
+### Features
+
+* **ui:** add number input dragging ([#917](https://github.com/motion-canvas/motion-canvas/issues/917)) ([1b5c232](https://github.com/motion-canvas/motion-canvas/commit/1b5c23260c3015608f202a103b4c0aebd1860e36)), closes [#799](https://github.com/motion-canvas/motion-canvas/issues/799)
+* **ui:** make inspector toggleable ([#921](https://github.com/motion-canvas/motion-canvas/issues/921)) ([a365951](https://github.com/motion-canvas/motion-canvas/commit/a365951e69c01cac1ea23d173034ad83f988c8eb))
+* webgl shaders ([#920](https://github.com/motion-canvas/motion-canvas/issues/920)) ([849216e](https://github.com/motion-canvas/motion-canvas/commit/849216ed34c4d29742c621b43a95ec4d99f8c755))
+
+
+
+
+
+# [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
+
+
+### Bug Fixes
+
+* **ui:** correctly drag time events ([#912](https://github.com/motion-canvas/motion-canvas/issues/912)) ([81f6dd6](https://github.com/motion-canvas/motion-canvas/commit/81f6dd6e485be451a50a695a146ed6b69e30bbc2))
+
+
+### Features
+
+* **ui:** add direct range selection & playhead shortcuts ([#907](https://github.com/motion-canvas/motion-canvas/issues/907)) ([39264fc](https://github.com/motion-canvas/motion-canvas/commit/39264fc074da739efddf24ef080f6c5f279f8014))
+* **ui:** custom inspectors ([#913](https://github.com/motion-canvas/motion-canvas/issues/913)) ([6c54424](https://github.com/motion-canvas/motion-canvas/commit/6c544248a2bd733f2d42676a0ed60c93b79ee574))
+* **ui:** scene graph ([#909](https://github.com/motion-canvas/motion-canvas/issues/909)) ([bf85c5b](https://github.com/motion-canvas/motion-canvas/commit/bf85c5b4a339719e79da1b87b1aed4492166ce79))
+
+
+
+
+
+## [3.12.4](https://github.com/motion-canvas/motion-canvas/compare/v3.12.3...v3.12.4) (2024-01-05)
+
+
+### Bug Fixes
+
+* **ui:** use signals correctly ([#906](https://github.com/motion-canvas/motion-canvas/issues/906)) ([f67d691](https://github.com/motion-canvas/motion-canvas/commit/f67d691b5f2f6358120e9582a1839ef3d49c77b8))
+
+
+### Reverts
+
+* ci(release): 3.12.4 [skip ci] ([#908](https://github.com/motion-canvas/motion-canvas/issues/908)) ([86c5170](https://github.com/motion-canvas/motion-canvas/commit/86c517067c7225f827aa05b47e2397e0d90fe622))
+
+
+
+
+
+## [3.12.3](https://github.com/motion-canvas/motion-canvas/compare/v3.12.2...v3.12.3) (2024-01-04)
+
+
+### Bug Fixes
+
+* **ui:** remember state of custom tabs ([#900](https://github.com/motion-canvas/motion-canvas/issues/900)) ([eac45b8](https://github.com/motion-canvas/motion-canvas/commit/eac45b88ed09fc7cddc3336e46d8697de5775b1f))
+
+
+
+
+
+## [3.12.1](https://github.com/motion-canvas/motion-canvas/compare/v3.12.0...v3.12.1) (2023-12-31)
+
+**Note:** Version bump only for package @motion-canvas/ui
+
+
+
+
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+
+### Bug Fixes
+
+* **ui:** fix "go to source" ([#895](https://github.com/motion-canvas/motion-canvas/issues/895)) ([ec729de](https://github.com/motion-canvas/motion-canvas/commit/ec729dea0d65bc69aefc0abd601f365af1c4ed68))
+* **ui:** fix transparent background ([#886](https://github.com/motion-canvas/motion-canvas/issues/886)) ([83f652f](https://github.com/motion-canvas/motion-canvas/commit/83f652fdcfa075f5de24186ffdffd1b7db1d8fc9))
+
+
+### Features
+
+* add audio volume control through arrow keys ([#856](https://github.com/motion-canvas/motion-canvas/issues/856)) ([8b86fd4](https://github.com/motion-canvas/motion-canvas/commit/8b86fd4e70f91a0d5b1150d760427ca355666341))
+* add experimental features ([#876](https://github.com/motion-canvas/motion-canvas/issues/876)) ([498d387](https://github.com/motion-canvas/motion-canvas/commit/498d3871d05d4dcc83453654bec7762d2ab32e7e))
+* introduce editor plugins ([#879](https://github.com/motion-canvas/motion-canvas/issues/879)) ([2b72007](https://github.com/motion-canvas/motion-canvas/commit/2b720074d45fc254dc40b534785b591ae44a3f37))
+* **ui:** add custom presentation overlays ([#884](https://github.com/motion-canvas/motion-canvas/issues/884)) ([4696d3c](https://github.com/motion-canvas/motion-canvas/commit/4696d3c8cb8b68e3475406359f9cf6b875b1c838)), closes [#825](https://github.com/motion-canvas/motion-canvas/issues/825)
+* **ui:** add volume slider ([#872](https://github.com/motion-canvas/motion-canvas/issues/872)) ([5ac3069](https://github.com/motion-canvas/motion-canvas/commit/5ac3069f027ee123c212217dcf8d26a78a3aa106))
+* **ui:** small improvements ([#833](https://github.com/motion-canvas/motion-canvas/issues/833)) ([f44400c](https://github.com/motion-canvas/motion-canvas/commit/f44400c458a1d7f49520494f01efb9936f4df83e))
+* **ui:** timeline scrubbing ([#862](https://github.com/motion-canvas/motion-canvas/issues/862)) ([211b9a4](https://github.com/motion-canvas/motion-canvas/commit/211b9a4327720afd1ce0ff93868a501c2fd745aa)), closes [#286](https://github.com/motion-canvas/motion-canvas/issues/286)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

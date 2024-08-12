@@ -1,26 +1,42 @@
 import {setTaskName, ThreadGenerator} from '../threading';
-
 /**
- * Turn the given generator function into a threadable generator.
+ * Turn the given generator function into a task.
+ *
+ * @remarks
+ * If you want to immediately run the generator in its own thread, you can use
+ * {@link threading.spawn} instead. This function is useful when you want to
+ * pass the created task to other flow functions.
  *
  * @example
  * ```ts
- * yield run(function* () {
- *   // do things
- * });
+ * yield* all(
+ *   run(function* () {
+ *     // do things
+ *   }),
+ *   rect.opacity(1, 1),
+ * );
  * ```
  *
  * @param runner - A generator function or a factory that creates the generator.
  */
+
 export function run(runner: () => ThreadGenerator): ThreadGenerator;
 /**
- * Turn the given generator function into a threadable generator.
+ * Turn the given generator function into a task.
+ *
+ * @remarks
+ * If you want to immediately run the generator in its own thread, you can use
+ * {@link threading.spawn} instead. This function is useful when you want to
+ * pass the created task to other flow functions.
  *
  * @example
  * ```ts
- * yield run(function* () {
- *   // do things
- * });
+ * yield* all(
+ *   run(function* () {
+ *     // do things
+ *   }),
+ *   rect.opacity(1, 1),
+ * );
  * ```
  *
  * @param runner - A generator function or a factory that creates the generator.

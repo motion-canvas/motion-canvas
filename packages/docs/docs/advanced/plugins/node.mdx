@@ -1,0 +1,162 @@
+---
+slug: /plugins/node
+description: Extend Vite and the Node.js server.
+sidebar_position: 3
+---
+
+# Node.js
+
+<div className="row margin-bottom--md">
+  <div className="col col--6">
+
+Motion Canvas builds on top of the Vite plugin system. To create a plugin that
+runs on Node.js, you just create a [Vite plugin][vite-plugin] and import it in
+your `vite.config.ts` file. On top of that, `@motion-canvas/vite-plugin`
+provides a symbol that lets you define motion-canvas-specific options.
+
+Let's start by creating a file for our plugin. This time we'll put it in the
+root directory of our project because Vite plugins are not part of the runtime
+source code.
+
+We use the Vite [`configureServer`][vite-configure-server] hook to add a custom
+endpoint. Meanwhile, the `entryPoint` option lets us specify the path to our
+runtime plugin:
+
+  </div>
+  <div className="col col--6">
+
+```diff title="Project structure"
+  project/
+  ├── src/
+  │   ├── scenes/
+  │   │   └── example.tsx
+  │   ├── plugin.ts
+  │   └── project.ts
+  ├── package.json
+  ├── tsconfig.json
+// highlight-next-line
++ ├── myVitePlugin.ts
+  └── vite.config.ts
+```
+
+  </div>
+</div>
+
+```ts title="myVitePlugin.ts"
+import {Plugin, PLUGIN_OPTIONS} from '@motion-canvas/vite-plugin';
+
+export default function myVitePlugin(): Plugin {
+  return {
+    name: 'vite-plugin-motion-canvas-example',
+
+    // extend the dev server using Vite plugin hooks:
+    configureServer(server) {
+      server.middlewares.use('/my-plugin', (req, res) => {
+        res.end('Hello from my plugin!');
+      });
+    },
+
+    // extend Motion Canvas:
+    [PLUGIN_OPTIONS]: {
+      entryPoint: './plugin.ts',
+    },
+  };
+}
+```
+
+Here's how we would import such plugin in our `vite.config.ts` file:
+
+```ts title="vite.config.ts"
+import {defineConfig} from 'vite';
+import motionCanvas from '@motion-canvas/vite-plugin';
+// highlight-next-line
+import myVitePlugin from './myVitePlugin';
+
+export default defineConfig({
+  plugins: [
+    motionCanvas(),
+    // highlight-next-line
+    myVitePlugin(),
+  ],
+});
+```
+
+Also, since we defined the entry point in the Node.js plugin, we no longer need
+to import the runtime plugin in our project file:
+
+```diff title="src/project.ts"
+  import {makeProject} from '@motion-canvas/core';
+- import myPlugin from './plugin';
+  import example from './scenes/example?scene';
+
+  export default makeProject({
+    scenes: [example],
+-   plugins: [myPlugin()],
+  });
+```
+
+:::tip
+
+Notice that we defined the entry point as `'./plugin.ts'`. Because it's a
+relative path, it will be resolved relative to the project file. Once you turn
+your plugin into a separate package, you can use a package name instead.
+
+:::
+
+You can verify that the plugin is working by running the project and visiting
+[http://localhost:9000/my-plugin](http://localhost:9000/my-plugin).
+
+### Passing options to Runtime
+
+A Node.js plugin has the ability to pass options to the runtime plugin. We can
+do that using the `runtimeConfig` property:
+
+```ts title="myVitePlugin.ts"
+import {Plugin, PLUGIN_OPTIONS} from '@motion-canvas/vite-plugin';
+
+export default function myVitePlugin(): Plugin {
+  return {
+    name: 'vite-plugin-motion-canvas-example',
+    // ...
+    [PLUGIN_OPTIONS]: {
+      entryPoint: './plugin.ts',
+      // highlight-start
+      runtimeConfig: () => ({
+        foo: 'bar',
+      }),
+      // highlight-end
+    },
+  };
+}
+```
+
+We can then update the runtime plugin to receive these options:
+
+```ts title="src/plugin.ts"
+import {makePlugin} from '@motion-canvas/core';
+
+// highlight-start
+interface MyPluginOptions {
+  foo: string;
+}
+// highlight-end
+
+export default makePlugin((options?: MyPluginOptions) => {
+  // highlight-next-line
+  console.log(options?.foo); // 'bar'
+
+  return {
+    name: 'motion-canvas-plugin-example',
+    player(player) {
+      player.onRecalculated.subscribe(() => {
+        player.requestReset();
+        player.togglePlayback(true);
+      });
+    },
+  };
+});
+```
+
+[vite-plugin]: https://vitejs.dev/guide/api-plugin.html#authoring-a-plugin
+[vite-configure-server]:
+  https://vitejs.dev/guide/api-plugin.html#configureserver

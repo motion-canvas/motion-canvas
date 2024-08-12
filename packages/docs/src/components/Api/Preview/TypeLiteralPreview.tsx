@@ -14,7 +14,13 @@ export default function TypeLiteralPreview({
 }) {
   const find = useApiFinder();
   if (reflection.signatures) {
-    return <SignaturePreview reflection={reflection.signatures[0]} />;
+    let signature = reflection.signatures[0];
+    if (!signature?.kind) {
+      signature = find(signature);
+    }
+    if (signature) {
+      return <SignaturePreview reflection={signature} />;
+    }
   }
   if (reflection.children) {
     return (

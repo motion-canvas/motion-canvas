@@ -1,6 +1,6 @@
 import {Vector2MetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import {Input} from '../controls';
+import {NumberInput} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface Vector2MetaFieldViewProps {
@@ -12,22 +12,8 @@ export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
 
   return (
     <MetaFieldGroup field={field}>
-      <Input
-        type="number"
-        value={value.x}
-        onChange={event => {
-          const x = parseInt((event.target as HTMLInputElement).value);
-          field.set([x, value.y]);
-        }}
-      />
-      <Input
-        type="number"
-        value={value.y}
-        onChange={event => {
-          const y = parseInt((event.target as HTMLInputElement).value);
-          field.set([value.x, y]);
-        }}
-      />
+      <NumberInput value={value.x} onChange={x => field.set([x, value.y])} />
+      <NumberInput value={value.y} onChange={y => field.set([value.x, y])} />
     </MetaFieldGroup>
   );
 }

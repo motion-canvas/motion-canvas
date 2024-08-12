@@ -1,6 +1,6 @@
 import type {NumberMetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import {Input, InputSelect} from '../controls';
+import {NumberInput, NumberInputSelect} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
 export interface NumberMetaFieldViewProps {
@@ -14,21 +14,21 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
   return (
     <MetaFieldGroup field={field}>
       {presets.length ? (
-        <InputSelect
-          type="number"
+        <NumberInputSelect
           value={value}
+          min={field.getMin()}
+          max={field.getMax()}
           onChange={value => {
             field.set(value);
           }}
           options={presets}
         />
       ) : (
-        <Input
-          type="number"
+        <NumberInput
           value={value}
-          onChange={event => {
-            field.set((event.target as HTMLInputElement).value);
-          }}
+          min={field.getMin()}
+          max={field.getMax()}
+          onChange={value => field.set(value)}
         />
       )}
     </MetaFieldGroup>

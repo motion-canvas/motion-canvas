@@ -1,5 +1,99 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
+
+
+### Bug Fixes
+
+* optimize saving frames to disk ([#1007](https://github.com/motion-canvas/motion-canvas/issues/1007)) ([d79af91](https://github.com/motion-canvas/motion-canvas/commit/d79af91a4caa5bcf3ca98ec3a4b6d892c29c7fd9))
+
+
+
+
+
+## [3.14.1](https://github.com/motion-canvas/motion-canvas/compare/v3.14.0...v3.14.1) (2024-02-06)
+
+
+### Bug Fixes
+
+* fix project selection screen ([#938](https://github.com/motion-canvas/motion-canvas/issues/938)) ([3b3f287](https://github.com/motion-canvas/motion-canvas/commit/3b3f2871d9884c67f7d46215dd12fc02e27f8054))
+
+
+
+
+
+# [3.14.0](https://github.com/motion-canvas/motion-canvas/compare/v3.13.0...v3.14.0) (2024-02-04)
+
+
+### Features
+
+* webgl shaders ([#920](https://github.com/motion-canvas/motion-canvas/issues/920)) ([849216e](https://github.com/motion-canvas/motion-canvas/commit/849216ed34c4d29742c621b43a95ec4d99f8c755))
+
+
+
+
+
+# [3.13.0](https://github.com/motion-canvas/motion-canvas/compare/v3.12.4...v3.13.0) (2024-01-10)
+
+**Note:** Version bump only for package @motion-canvas/vite-plugin
+
+
+
+
+
+## [3.12.3](https://github.com/motion-canvas/motion-canvas/compare/v3.12.2...v3.12.3) (2024-01-04)
+
+**Note:** Version bump only for package @motion-canvas/vite-plugin
+
+
+
+
+
+## [3.12.2](https://github.com/motion-canvas/motion-canvas/compare/v3.12.1...v3.12.2) (2023-12-31)
+
+
+### Bug Fixes
+
+* fix dependency bundling again ([#898](https://github.com/motion-canvas/motion-canvas/issues/898)) ([d6e0f48](https://github.com/motion-canvas/motion-canvas/commit/d6e0f48e67cf6baee710b8d5b185e620e67ceda5))
+
+
+
+
+
+## [3.12.1](https://github.com/motion-canvas/motion-canvas/compare/v3.12.0...v3.12.1) (2023-12-31)
+
+
+### Bug Fixes
+
+* fix dependency bundling ([#897](https://github.com/motion-canvas/motion-canvas/issues/897)) ([5376012](https://github.com/motion-canvas/motion-canvas/commit/5376012cd02b8bca5abc2d3cf5a724662244c449))
+
+
+
+
+
+# [3.12.0](https://github.com/motion-canvas/motion-canvas/compare/v3.11.0...v3.12.0) (2023-12-31)
+
+
+### Bug Fixes
+
+* exclude preact from optimizations ([#894](https://github.com/motion-canvas/motion-canvas/issues/894)) ([15687cc](https://github.com/motion-canvas/motion-canvas/commit/15687cc975abcf4538a5ce51402d2308057d42e5))
+* **vite-plugin:** create empty output directory if not exist ([#787](https://github.com/motion-canvas/motion-canvas/issues/787)) ([20cceef](https://github.com/motion-canvas/motion-canvas/commit/20cceef8525e809bff9706fcd7082d7e103a085b))
+* **vite-plugin:** handle unusual characters in file names ([#821](https://github.com/motion-canvas/motion-canvas/issues/821)) ([1e57497](https://github.com/motion-canvas/motion-canvas/commit/1e5749785d55a41605a5438eee08672ef01f3914)), closes [#764](https://github.com/motion-canvas/motion-canvas/issues/764)
+
+
+### Features
+
+* **vite-plugin:** support glob for project files ([#834](https://github.com/motion-canvas/motion-canvas/issues/834)) ([67029c4](https://github.com/motion-canvas/motion-canvas/commit/67029c4c2cf756cbe2b7ed59dc55cb895de81d52)), closes [#324](https://github.com/motion-canvas/motion-canvas/issues/324)
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 

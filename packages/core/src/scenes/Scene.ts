@@ -1,4 +1,4 @@
-import type {Logger, PlaybackStatus} from '../app';
+import type {Logger, PlaybackStatus, SharedWebGLContext} from '../app';
 import type {
   SubscribableEvent,
   SubscribableValueEvent,
@@ -10,6 +10,7 @@ import type {Vector2} from '../types';
 import type {LifecycleEvents} from './LifecycleEvents';
 import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
+import type {Shaders} from './Shaders';
 import type {Slides} from './Slides';
 import type {Variables} from './Variables';
 import type {TimeEvents} from './timeEvents';
@@ -47,7 +48,10 @@ export interface SceneDescription<T = unknown> {
    * The stack trace at the moment of creation.
    */
   stack?: string;
-  plugins?: Plugin[];
+  /**
+   * A list of plugins to include in the project.
+   */
+  plugins?: (Plugin | string)[];
   meta: SceneMetadata;
 }
 
@@ -65,6 +69,7 @@ export interface FullSceneDescription<T = unknown> extends SceneDescription<T> {
   logger: Logger;
   onReplaced: ValueDispatcher<FullSceneDescription<T>>;
   timeEventsClass: new (scene: Scene) => TimeEvents;
+  sharedWebGLContext: SharedWebGLContext;
   experimentalFeatures?: boolean;
 }
 
@@ -140,6 +145,10 @@ export interface Scene<T = unknown> {
    */
   readonly playback: PlaybackStatus;
   readonly timeEvents: TimeEvents;
+  /**
+   * @experimental
+   */
+  readonly shaders: Shaders;
   readonly slides: Slides;
   readonly logger: Logger;
   readonly variables: Variables;

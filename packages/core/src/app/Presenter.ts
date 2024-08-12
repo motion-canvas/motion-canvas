@@ -7,6 +7,7 @@ import type {Logger} from './Logger';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {PlaybackStatus} from './PlaybackStatus';
 import type {Project} from './Project';
+import {SharedWebGLContext} from './SharedWebGLContext';
 import {Stage, StageSettings} from './Stage';
 
 export interface PresenterSettings extends StageSettings {
@@ -64,6 +65,7 @@ export class Presenter {
   public readonly playback: PlaybackManager;
   private readonly status: PlaybackStatus;
   private readonly logger: Logger;
+  private readonly sharedWebGLContext: SharedWebGLContext;
   private abortController: AbortController | null = null;
   private renderTime = 0;
   private requestId: number | null = null;
@@ -78,6 +80,7 @@ export class Presenter {
     this.logger = project.logger;
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
+    this.sharedWebGLContext = new SharedWebGLContext(this.logger);
     const scenes: Scene[] = [];
     for (const description of project.scenes) {
       const scene = new description.klass({
@@ -88,6 +91,8 @@ export class Presenter {
         size: new Vector2(1920, 1080),
         resolutionScale: 1,
         timeEventsClass: ReadOnlyTimeEvents,
+        sharedWebGLContext: this.sharedWebGLContext,
+        experimentalFeatures: project.experimentalFeatures,
       });
       scenes.push(scene);
     }
@@ -110,6 +115,7 @@ export class Presenter {
       this.project.logger.error(e);
     }
 
+    this.sharedWebGLContext.dispose();
     this.state.current = PresenterState.Initial;
     this.lock.release();
   }

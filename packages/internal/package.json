@@ -9,7 +9,7 @@
     "@rollup/plugin-typescript": "^11.1.5",
     "highlight.js": "^11.9.0",
     "marked": "^10.0.0",
-    "marked-highlight": "^2.1.0",
+    "rollup-plugin-postcss": "^4.0.2",
     "ts-patch": "^3.0.2"
   }
 }

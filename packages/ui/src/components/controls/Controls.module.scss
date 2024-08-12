@@ -17,12 +17,8 @@
 }
 
 .iconButton {
-  -webkit-appearance: none;
   display: block;
   cursor: pointer;
-  border: 0;
-  background: transparent;
-  padding: 0;
   margin: 0;
   color: rgba(255, 255, 255, 0.54);
 
@@ -127,6 +123,25 @@
   }
 }
 
+.numberInput {
+  cursor: ew-resize;
+
+  &:focus {
+    cursor: text;
+  }
+}
+
+.numberInputLabel {
+  position: relative;
+
+  div {
+    position: absolute;
+    left: 8px;
+    bottom: 0;
+    font-family: var(--font-family-mono);
+  }
+}
+
 .checkbox {
   width: 16px;
   height: 16px;
@@ -161,23 +176,6 @@
   -moz-appearance: textfield;
 }
 
-.color {
-  display: flex;
-  padding-left: 0;
-  align-items: center;
-
-  input {
-    width: 0;
-    margin: 0 8px 0 0;
-    padding-left: 8px;
-    appearance: none;
-    background-color: transparent;
-    &:hover {
-      background-color: transparent;
-    }
-  }
-}
-
 .select {
   background-image: url('../../img/dropdown-light.svg');
   background-repeat: no-repeat;
@@ -191,6 +189,85 @@
   &.main {
     background-color: var(--theme);
     background-image: url('../../img/dropdown.svg');
+  }
+}
+
+.color {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 1;
+
+  .input {
+    width: 0;
+    border-radius: var(--radius) 0 0 var(--radius);
+    border-right: 1px solid var(--surface-color);
+  }
+
+  .button {
+    width: 0;
+    flex-grow: 0;
+    flex-basis: 0;
+    padding: 0 12px;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+}
+
+.colorPicker {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  z-index: 9999;
+  padding: 16px;
+  border-radius: var(--radius);
+  background-color: var(--surface-color);
+
+  .saturation {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: var(--radius);
+    background-image: linear-gradient(transparent, black),
+      linear-gradient(to right, white, transparent);
+    cursor: pointer;
+
+    .slider {
+      border: 2px solid white;
+    }
+  }
+
+  .hue {
+    position: relative;
+    width: 200px;
+    height: 24px;
+    margin-top: 8px;
+    border-radius: var(--radius);
+    background-image: linear-gradient(
+      to right,
+      #ff0000,
+      #ffff00,
+      #00ff00,
+      #00ffff,
+      #0000ff,
+      #ff00ff,
+      #ff0000
+    );
+    cursor: pointer;
+
+    .slider {
+      border: 2px solid var(--background-color-dark);
+    }
+  }
+
+  .slider {
+    position: absolute;
+    z-index: 2;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .input {
+    margin-top: 8px;
   }
 }
 
@@ -255,7 +332,7 @@
     background-color: var(--surface-color-hover);
   }
 
-  svg {
+  &.animated svg {
     transition: rotate var(--duration-normal) var(--timing-ease-in-out);
   }
 

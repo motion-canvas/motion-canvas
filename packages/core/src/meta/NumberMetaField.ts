@@ -36,4 +36,12 @@ export class NumberMetaField extends MetaField<any, number> {
     this.max = max;
     return this;
   }
+
+  public getMin(): number {
+    return this.min ?? -Infinity;
+  }
+
+  public getMax(): number {
+    return this.max ?? Infinity;
+  }
 }

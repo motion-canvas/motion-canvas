@@ -1,0 +1,842 @@
+---
+sidebar_position: 1
+slug: /code
+---
+
+# Code
+
+```tsx editor mode=preview
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {all, createRef, DEFAULT, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      fontFamily={'JetBrains Mono, monospace'}
+      offsetX={-1}
+      x={-400}
+      code={'const number = 7;'}
+    />,
+  );
+
+  yield* waitFor(0.6);
+  yield* all(
+    code().code.replace(code().findFirstRange('number'), 'variable', 0.6),
+    code().code.prepend(0.6)`function example() {\n  `,
+    code().code.append(0.6)`\n}`,
+  );
+
+  yield* waitFor(0.6);
+  yield* code().selection(code().findFirstRange('variable'), 0.6);
+
+  yield* waitFor(0.6);
+  yield* all(
+    code().code('const number = 7;', 0.6),
+    code().selection(DEFAULT, 0.6),
+  );
+});
+```
+
+The [`Code`](/api/2d/components/Code) node is used for displaying code snippets.
+It supports syntax highlighting and a handful of different methods for animating
+the code.
+
+## Parsing and Highlighting
+
+First things first, if you just copy any of the snippets in this tutorial you'll
+notice that the displayed code has a uniform color. The default highlighter uses
+[`Lezer`](https://lezer.codemirror.net/) to parse and highlight the code but to
+do that it needs the grammar for the language you're using. You can set that up
+in your project configuration file.
+
+First, install the grammar for your language. You can check out this
+non-exhaustive [list of available grammars](/docs/grammars). For this tutorial,
+you should install the `javascript` grammar:
+
+```bash
+npm i @lezer/javascript
+```
+
+Then, in your project configuration, instantiate a new `LezerHighlighter` using
+the imported grammar, and set it as the default highlighter:
+
+```ts title="src/project.ts"
+import {makeProject} from '@motion-canvas/core';
+import example from './scenes/example?scene';
+
+// highlight-start
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
+import {parser} from '@lezer/javascript';
+
+Code.defaultHighlighter = new LezerHighlighter(parser);
+// highlight-end
+
+export default makeProject({
+  scenes: [example],
+});
+```
+
+Now all `Code` nodes in your project will use `@lezer/javascript` to parse and
+highlight the snippets. If you want to use more than one language, check out the
+[Multiple Languages](#multiple-languages) section.
+
+:::info
+
+Note that, by default, the JavaScript parser doesn't support JSX or TypeScript.
+You can enable support for these via [dialects][dialects]. The dialects
+available for a given parser are usually listed in the documentation of the
+grammar package.
+
+```ts
+Code.defaultHighlighter = new LezerHighlighter(
+  parser.configure({
+    // Provide a space-separated list of dialects to enable:
+    dialect: 'jsx ts',
+  }),
+);
+```
+
+:::
+
+## Defining Code
+
+The code to display is set via the [`code`](/api/2d/components/Code#code)
+property. In the simplest case, you can just use a string:
+
+```tsx editor
+import {makeScene2D, Code} from '@motion-canvas/2d';
+
+export default makeScene2D(function* (view) {
+  view.add(
+    // prettier-ignore
+    <Code
+      fontSize={28}
+      code={'const number = 7;'}
+    />,
+  );
+});
+```
+
+However, usually code snippets contain multiple lines of code. It's much more
+convenient to use a template string for this (denoted using the backtick
+character `` ` ``):
+
+```tsx
+view.add(
+  <Code
+    fontSize={28}
+    // highlight-start
+    code={`\
+function example() {
+  const number = 7;
+}
+`}
+    // highlight-end
+  />,
+);
+```
+
+Notice two things here:
+
+- The code snippet ignores the indentation of the template string itself. The
+  template string preserves all whitespace characters, so any additional spaces
+  or tabs at the beginning of each line would be included in the snippet.
+
+- The backslash character (`\`) at the very beginning is used to escape the
+  first newline character. This lets the snippet start on a new line without
+  actually including an empty line at the beginning. Without the slash, the
+  equivalent code would have to be written as:
+  ```tsx
+  view.add(
+    <Code
+      fontSize={28}
+      // highlight-start
+      code={`function example() {
+    const number = 7;
+  }
+  `}
+      // highlight-end
+    />,
+  );
+  ```
+
+Template strings allow you to easily include variables in your code snippets
+with the `${}` syntax. In the example below, `${name}` is replaced with the
+value of the `name` variable (which is `number` in this case):
+
+```tsx
+// highlight-next-line
+const name = 'number';
+
+view.add(
+  <Code
+    fontSize={28}
+    code={`\
+function example() {
+  // highlight-next-line
+  const ${name} = 7;
+}
+`}
+  />,
+);
+```
+
+Any valid JavaScript expression inside the `${}` syntax will be included in the
+code snippet:
+
+```tsx
+// highlight-next-line
+const isRed = true;
+
+view.add(
+  <Code
+    fontSize={28}
+    code={`\
+function example() {
+  // highlight-next-line
+  const color = '${isRed ? 'red' : 'blue'}';
+}
+`}
+  />,
+);
+```
+
+## Using Signals
+
+If you try to use signals inside the `${}` syntax, you'll notice that they don't
+work as expected. Invoking a signal inside a template string uses its current
+value and then never updates the snippet again, even if the signal changes:
+
+```tsx editor mode=code
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const nameSignal = Code.createSignal('number');
+  view.add(
+    // prettier-ignore
+    <Code
+      fontSize={28}
+      code={`const ${nameSignal()} = 7;`}
+    />,
+  );
+
+  yield* waitFor(1);
+  nameSignal('newValue');
+  // The code snippet still displays "number" instead of "newValue".
+  yield* waitFor(1);
+});
+```
+
+Trying to pass the signal without invoking it is even worse. Since each signal
+is a function, it will be stringified and included in the snippet:
+
+```tsx editor
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const nameSignal = Code.createSignal('number');
+  view.add(
+    // prettier-ignore
+    <Code
+      fontSize={28}
+      code={`const ${nameSignal} = 7;`}
+    />,
+  );
+
+  yield* waitFor(1);
+  nameSignal('newValue');
+  yield* waitFor(1);
+});
+```
+
+This happens because template strings are parsed immediately when our code is
+executed. To work around this, you can use a custom [tag function][tag-function]
+called [`CODE`](/api/2d/code#CODE). It allows the `Code` node to parse the
+template string in a custom way and correctly support signals. It's really easy
+to use, simply put the `CODE` tag function before your template string:
+
+```tsx editor
+import {makeScene2D, Code, CODE} from '@motion-canvas/2d';
+import {waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const nameSignal = Code.createSignal('number');
+  view.add(
+    <Code
+      fontSize={28}
+      // Note the CODE tag function here:
+      code={CODE`const ${nameSignal} = 7;`}
+    />,
+  );
+
+  yield* waitFor(1);
+  nameSignal('newValue');
+  // Now the code snippet is updated accordingly.
+  yield* waitFor(1);
+});
+```
+
+The value returned by `CODE` can itself be nested in other template strings:
+
+```tsx
+const implementation = CODE`\
+    console.log('Hello!');
+    return 7;`;
+
+const method = CODE`\
+  greet() {
+${implementation}
+  }`;
+
+const klass = CODE`\
+class Example {
+${method}
+}
+`;
+
+view.add(<Code code={klass} />);
+// class Example {
+//   greet() {
+//     console.log('Hello!');
+//     return 7;
+//   }
+// }
+```
+
+You might have noticed that these examples used a specialized type of signal
+created using [`Code.createSignal()`](/api/2d/components/Code#createSignal).
+While the generic [`createSignal()`](/api/core/signals#createSignal) would work
+fine in these simple examples, the specialized signal will shine once you start
+animating your code snippets.
+
+## Animating Code
+
+The `Code` node comes with a few different techniques for animating the code
+depending on the level of control you need.
+
+### Diffing
+
+The default method for animating code is diffing. It's used whenever you tween
+the `code` property:
+
+```tsx editor
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {createRef} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={`\
+function example() {
+  const number = 9;
+}`}
+    />,
+  );
+
+  yield* code().code('const nine = 9;', 0.6).wait(0.6).back(0.6).wait(0.6);
+});
+```
+
+This method uses the patience diff algorithm to determine the differences
+between the old and new code snippets. It then animates the changes accordingly.
+
+### `append` and `prepend`
+
+For cases where you want to add some code at the beginning or end of the
+snippet, you can use the [`append`](/api/2d/code/CodeSignalContext#append) and
+[`prepend`](/api/2d/code/CodeSignalContext#prepend) methods. They can either
+modify the code immediately or animate the changes over time:
+
+```tsx editor
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    // prettier-ignore
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+    />,
+  );
+
+  // append immediately
+  code().code.append(`const one = 1;`);
+
+  // animate using the signal signature
+  yield* code().code.append('\nconst two = 2;', 0.6);
+
+  // animate using the template tag signature
+  yield* code().code.append(0.6)`
+const three = 3;`;
+
+  // prepend works analogically
+  yield* code().code.prepend('// example\n', 0.6);
+
+  yield* waitFor(0.6);
+});
+```
+
+### `insert`, `replace`, and `remove`
+
+For more granular control over the changes, you can use
+[`insert`](/api/2d/code/CodeSignalContext#insert),
+[`replace`](/api/2d/code/CodeSignalContext#replace), and
+[`remove`](/api/2d/code/CodeSignalContext#remove) to modify the code at specific
+points. Check out [Code Ranges](#code-ranges) for more information on how to
+specify points in your code snippets.
+
+```tsx editor
+import {makeScene2D, Code, word, lines} from '@motion-canvas/2d';
+import {all, createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={`\
+function example() {
+  console.log('Hello!');
+}`}
+    />,
+  );
+
+  // insert code at line 2, column 0
+  yield* code().code.insert([2, 0], '  return 7;\n', 0.6);
+
+  // replace the word "Hello!" with "Goodbye!"
+  yield* code().code.replace(word(1, 15, 6), 'Goodbye!', 0.6);
+
+  // remove line 2
+  yield* code().code.remove(lines(2), 0.6);
+
+  // animate multiple changes at the same time
+  yield* all(
+    code().code.replace(word(0, 9, 7), 'greet', 0.6),
+    code().code.replace(word(1, 15, 8), 'Hello!', 0.6),
+  );
+
+  yield* waitFor(0.6);
+});
+```
+
+### `edit`
+
+The [`edit`](/api/2d/code/CodeSignalContext#edit) method offers a different way
+of defining code transitions. It's used together with the
+[`replace`](/api/2d/code#insert), [`insert`](/api/2d/code#insert), and
+[`remove`](/api/2d/code#remove) helper functions that are inserted into the
+template string. They let you specify the changes in a more visual way, without
+having to know the exact positions in the code:
+
+```tsx editor
+import {makeScene2D, Code, replace, insert, remove} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    // prettier-ignore
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+    />,
+  );
+
+  yield* code().code.edit(0.6)`\
+function example() {
+  ${insert(`// This is a comment
+  `)}console.log("${replace('Hello!', 'Goodbye!')}");
+${remove(`  return 7;
+`)}}`;
+
+  yield* waitFor(0.6);
+});
+```
+
+### Signals
+
+Notice that all the methods used above are not invoked on the `Code` node but
+rather on its `code` property. It may seem unnecessarily verbose but there's a
+good reason for it: the `code` property is a specialized code signal, just like
+the ones created by
+[`Code.createSignal()`](/api/2d/components/Code#createSignal). This means that
+all the animation methods are also available on your own signals:
+
+```tsx editor
+import {makeScene2D, Code, CODE} from '@motion-canvas/2d';
+import {all, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const message = Code.createSignal(`Hello, world!`);
+  const body = Code.createSignal(CODE`console.log('${message}');`);
+
+  view.add(
+    <Code
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={CODE`\
+function hello() {
+  ${body}
+}`}
+    />,
+  );
+
+  yield* waitFor(0.3);
+  // prettier-ignore
+  yield* all(
+    message('Goodbye, world!', 0.6),
+    body.append(0.6)`\n  return 7;`,
+  );
+  yield* waitFor(0.3);
+});
+```
+
+Code signals can also be nested in the template strings passed to the animation
+methods:
+
+```tsx editor mode=code
+import {makeScene2D, Code, CODE} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    // prettier-ignore
+    <Code 
+      ref={code} 
+      fontSize={28} 
+      offsetX={-1} 
+      x={-400} 
+      code={'// example'} 
+    />,
+  );
+
+  const body = Code.createSignal(CODE`console.log('Hello!');`);
+  yield* waitFor(0.3);
+  // Notice how the CODE tag is not used here because
+  // "append" already supports nested signals:
+  yield* code().code.append(0.6)`
+function hello() {
+  ${body}
+}`;
+
+  // The "body" signal remains reactive after the append animation:
+  yield* body(`console.log('Goodbye!');`, 0.6);
+  yield* waitFor(0.3);
+});
+```
+
+## Code Ranges
+
+A [`CodeRange`](/api/2d/code#CodeRange) is used to specify a continuous span of
+characters using line and column numbers. It can be used for editing the code,
+visually selecting a part of it, or querying the positions and sizes of
+characters.
+
+Code ranges have the following structure:
+
+```js
+// prettier-ignore
+[[startLine, startColumn], [endLine, endColumn]];
+```
+
+For example, to select the first three characters of the second line, you would
+use the following range:
+
+```js
+// prettier-ignore
+[[1, 0], [1, 3]];
+```
+
+Keep in mind that both lines and columns are zero-based. Additionally, you
+should think of columns as being located on the left side of the characters,
+meaning that if you want to include the character at column `n` you should use
+`n + 1` as the end column.
+
+For convenience, the [`word`](/api/2d/code#word) and
+[`lines`](/api/2d/code#lines) helper functions are provided to create some of
+the common types of ranges:
+
+```ts
+// a range starting at line 1, column 3,
+// spanning 3 characters:
+word(1, 3, 3);
+
+// a range starting at line 1, column 3,
+// spanning until the end of the line:
+word(1, 3);
+
+// a range containing lines from 1 to 3 (inclusive):
+lines(1, 3);
+
+// a range containing line 2
+lines(2);
+```
+
+Once you create a `Code` node, you can use its
+[`findFirstRange`](/api/2d/components/Code#findFirstRange),
+[`findAllRanges`](/api/2d/components/Code#findAllRanges), and
+[`findLastRange`](/api/2d/components/Code#findLastRange) methods to find the
+ranges that contain a specific string or match the given regular expression:
+
+```tsx editor mode=code
+import {makeScene2D, Code} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={`\
+function example() {
+  console.log('Hello!');
+}`}
+    />,
+  );
+
+  yield* code().code.replace(
+    // find the range of "example" and replace it with "greet"
+    code().findFirstRange('example'),
+    'greet',
+    0.6,
+  );
+
+  yield* waitFor(0.6);
+});
+```
+
+## Code Selection
+
+The [`selection`](/api/2d/code/CodeSignalContext#selection) property can be used
+to visually distinguish a part of the code snippet. The selection is specified
+using an individual [`code range`](#code-ranges) or an array of ranges:
+
+```tsx editor
+import {makeScene2D, Code, lines} from '@motion-canvas/2d';
+import {createRef, DEFAULT, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={`\
+function hello() {
+  console.log('Hello');
+}`}
+    />,
+  );
+
+  // select all instances of "hello" (case-insensitive)
+  yield* code().selection(code().findAllRanges(/hello/gi), 0.6);
+  yield* waitFor(0.3);
+
+  // select line 1
+  yield* code().selection(lines(1), 0.6);
+  yield* waitFor(0.3);
+
+  // reset the selection
+  yield* code().selection(DEFAULT, 0.6);
+  yield* waitFor(0.3);
+});
+```
+
+## Querying Positions and Sizes
+
+[`getPointBBox`](/api/2d/components/Code#getPointBBox) and
+[`getSelectionBBox`](/api/2d/components/Code#getSelectionBBox) can be used to
+retrieve the position and size of a specific character or a range of characters,
+respectively. The returned value is a [`bounding box`](/api/core/types/BBox) in
+the local space of the `Code` node.
+
+The following example uses `getSelectionBBox` to draw a rectangle around the
+word `log`:
+
+```tsx editor
+import {Code, Rect, makeScene2D} from '@motion-canvas/2d';
+import {createRef, createSignal} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const code = createRef<Code>();
+
+  view.add(
+    <Code
+      ref={code}
+      fontSize={28}
+      offsetX={-1}
+      x={-400}
+      code={`\
+function hello() {
+  console.log('Hello');
+}`}
+    />,
+  );
+
+  const range = createSignal(() => {
+    const range = code().findFirstRange('log');
+    const bboxes = code().getSelectionBBox(range);
+    // "getSelectionBBox" returns an array of bboxes,
+    // one for each line in the range. You can just
+    // use the first one for this example.
+    const first = bboxes[0];
+    return first.expand([4, 8]);
+  });
+
+  code().add(
+    <Rect
+      offset={-1}
+      position={range().position}
+      size={range().size}
+      lineWidth={4}
+      stroke={'white'}
+      radius={8}
+    />,
+  );
+});
+```
+
+## Custom Themes
+
+`LezerHighlighter` uses CodeMirror's
+[`HighlightStyle`](https://codemirror.net/examples/styling/) to assign colors to
+specific code tokens. By default, the
+[`DefaultHighlightStyle`](/api/2d/code#DefaultHighlightStyle) is used. You can
+specify your own style by passing it as the second argument to the
+`LezerHighlighter` constructor:
+
+```ts
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
+import {HighlightStyle} from '@codemirror/language';
+import {tags} from '@lezer/highlight';
+import {parser} from '@lezer/javascript';
+
+const MyStyle = HighlightStyle.define([
+  {tag: tags.keyword, color: 'red'},
+  {tag: tags.function(tags.variableName), color: 'yellow'},
+  {tag: tags.number, color: 'blue'},
+  {tag: tags.string, color: 'green'},
+  // ...
+]);
+
+Code.defaultHighlighter = new LezerHighlighter(parser, MyStyle);
+```
+
+## Multiple Languages
+
+You can configure highlighters on a per-node basis using the
+[`highlighter`](/api/2d/components/Code#highlighter) property. This will
+override the default highlighter set in the project configuration file:
+
+```tsx
+import {Code, LezerHighlighter} from '@motion-canvas/2d';
+import {parser} from '@lezer/rust';
+
+const RustHighlighter = new LezerHighlighter(parser);
+
+// ...
+
+view.add(
+  <Code
+    // this node uses the default parser
+    offsetX={-1}
+    x={-400}
+    code={`
+function hello() {
+  console.log('Hello!');
+}
+`}
+  />,
+);
+
+view.add(
+  <Code
+    // this node uses the Rust parser
+    highlighter={RustHighlighter}
+    offsetX={1}
+    x={400}
+    code={`
+fn hello() {
+  println!("Hello!");
+}
+`}
+  />,
+);
+```
+
+It can be useful to create a custom component for the languages you often use.
+You can use the [`withDefaults`](/api/2d/utils#withDefaults) helper function to
+quickly extend any node with your own defaults:
+
+```ts title="src/nodes/RustCode.ts"
+import {Code, LezerHighlighter, withDefaults} from '@motion-canvas/2d';
+import {parser} from '@lezer/rust';
+
+const RustHighlighter = new LezerHighlighter(parser);
+
+export const RustCode = withDefaults(Code, {
+  highlighter: RustHighlighter,
+});
+```
+
+```tsx title="src/scenes/example.tsx"
+import {RustCode} from '../nodes/RustCode';
+
+// ...
+
+view.add(
+  <RustCode
+    code={`
+fn hello() {
+  println!("Hello!");
+}
+`}
+  />,
+);
+```
+
+## Rendering
+
+If you're using a Chromium-based browser, you might notice that the code
+animations jitter a bit. This happens because the canvas snaps the rendered text
+to the nearest pixel which prevents it from moving smoothly. Until we find a way
+to fix this, we recommend you use Firefox for rendering.
+
+[tag-function]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates
+[dialects]: https://lezer.codemirror.net/docs/guide/#dialects

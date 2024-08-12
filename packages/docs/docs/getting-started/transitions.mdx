@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 11
 slug: /transitions
 ---
 
@@ -90,6 +90,11 @@ All available transitions are listed below:
 <ApiSnippet url={'/api/core/transitions#fadeTransition'} />
 <hr />
 
+### `waitTransition`
+
+<ApiSnippet url={'/api/core/transitions#waitTransition'} />
+<hr />
+
 ## Custom transitions
 
 You can use the [`useTransition`](/api/core/transitions#useTransition) function
@@ -124,7 +129,7 @@ export function* slideTransition(
   direction: Direction = Direction.Top,
   duration = 0.6,
 ): ThreadGenerator {
-  const size = useScene().getSize();
+  const size = useScene().getRealSize();
   const position = size.getOriginOffset(direction).scale(2);
   const previousPosition = Vector2.createSignal();
   const currentPosition = Vector2.createSignal(position);

@@ -1,0 +1,170 @@
+---
+slug: version-3.15.0
+title: Motion Canvas v3.15.0
+description: Code has never been more animated.
+authors: aarthificial
+---
+
+import Link from '@docusaurus/Link';
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PR from '@site/src/components/Release/PullRequest';
+import Fiddle from '@site/src/components/Fiddle';
+import CodeBlock from '@theme/CodeBlock';
+import sourceCode from '!!raw-loader!@site/blog/2024-03-21-code';
+import sourceDefaults from '!!raw-loader!@site/blog/2024-03-21-defaults';
+import sourceLoop from '!!raw-loader!@site/blog/2024-03-21-loop';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'aarthificial'}>
+    A brand-new{' '}
+    <Link to="/docs/code">
+      <code>Code</code>
+    </Link>{' '}
+    node with dedicated code signals, customizable syntax highlighting, and more
+    expressive animation system (Including automatic diff-based transitions).
+    <PR id={946} />
+    <Fiddle mode="preview" className="margin-top--sm margin-bottom--sm">
+      {sourceCode}
+    </Fiddle>
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New{' '}
+    <Link to="/api/2d/utils#withDefaults">
+      <code>withDefaults</code>
+    </Link>{' '}
+    helper function lets you quickly extend nodes with your own defaults.
+    <PR id={982} />
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {sourceDefaults}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'aarthificial'}>
+    When using{' '}
+    <Link to="/api/core/flow#loop">
+      <code>loop</code>
+    </Link>
+    , the iteration count can be omitted to create an infinite loop:
+    <PR id={952} />
+    <CodeBlock language={'ts'} className="margin-top--sm margin-bottom--sm">
+      {sourceLoop}
+    </CodeBlock>
+  </Issue>
+  <Issue user={'aarthificial'} pr={951}>
+    New{' '}
+    <Link to="/api/core/threading#spawn">
+      <code>spawn</code>
+    </Link>{' '}
+    function lets you run animations in the background, from any place, without
+    needing to <code>yield</code> them.
+  </Issue>
+  <Issue user={'aarthificial'} pr={961}>
+    <Link to="/api/2d/components/Polygon">
+      <code>Polygon</code>
+    </Link>{' '}
+    now extends
+    <Link to="/api/2d/components/Curve">
+      <code>Curve</code>
+    </Link> giving it access to all curve-related properties like <Link to="/api/2d/components/Polygon#startArrow">
+      <code>startArrow</code>
+    </Link> and <Link to="/api/2d/components/Polygon#radius">
+      <code>radius</code>
+    </Link>.
+  </Issue>
+  <Issue user={'jmaen'} pr={962}>
+    Color fields in the editor now come with a visual color picker.
+  </Issue>
+  <Issue user={'aarthificial'}>
+    New{' '}
+    <Link to="/api/core/types/Vector2">
+      <code>Vector2</code>
+    </Link>{' '}
+    methods: <PR id={985} />
+    <ul>
+      <li>
+        <Link to="/api/core/types/Vector2#rounded">
+          <code>rounded</code>
+        </Link>
+      </li>
+      <li>
+        <Link to="/api/core/types/Vector2#ceiled">
+          <code>ceiled</code>
+        </Link>
+      </li>
+      <li>
+        <Link to="/api/core/types/Vector2#map">
+          <code>map</code>
+        </Link>
+      </li>
+      <li>
+        <Link to="/api/core/types/Vector2#toArray">
+          <code>toArray</code>
+        </Link>
+      </li>
+    </ul>
+  </Issue>
+  <Issue user={'aarthificial'} pr={988}>
+    New{' '}
+    <Link to="/api/2d/components/Layout#cardinalPoint">
+      <code>cardinalPoint</code>
+    </Link>{' '}
+    method lets you map
+    <Link to="/api/core/types/Origin">
+      <code>Origin</code>
+    </Link>s and <Link to="/api/core/types/Direction">
+      <code>Direction</code>
+    </Link>s to their corresponding cardinal points of the node.
+  </Issue>
+  <Issue user={'aarthificial'} pr={983}>
+    New{' '}
+    <Link to="/api/core/transitions#waitTransition">
+      <code>waitTransition</code>
+    </Link>{' '}
+    lets you animate transitions using nodes.
+  </Issue>
+  <Issue user={'aarthificial'} pr={984} experimental>
+    When passed to OpenGL,{' '}
+    <Link to="/api/core/types/Matrix2D">
+      <code>Matrix2D</code>
+    </Link>{' '}
+    is now converted to a 3x3 square matrix (as opposed to a 3x2 matrix)
+  </Issue>
+  <Issue user={'aarthificial'} pr={986}>
+    The view's{' '}
+    <Link to="/api/2d/components/Node#cachePadding">
+      <code>cachePadding</code>
+    </Link>{' '}
+    is now respected when calculating the cache size of individual nodes.
+  </Issue>
+  <Issue user={'Niikelion'} pr={993}>
+    Presentation Mode now supports PowerPoint shortcuts (Page Up, Page Down,
+    etc.)
+  </Issue>
+  <Issue user={'nvborisenko'} pr={956}>
+    Parts of the motion-canvas-player shadow root are now exposed using{' '}
+    <code>part</code> and can be customized with CSS.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1001}>
+    Fiddles on this website now play automatically when scrolled into view.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'CactusPuppy'} pr={968}>
+    Account for italic fonts in cache.
+  </Issue>
+  <Issue user={'rogerpinho'} pr={974}>
+    Fix typo in the Quickstart Guide.
+  </Issue>
+  <Issue user={'aarthificial'} pr={987}>
+    Properly handle <code>offset</code> when retrieving the absolute position of
+    a node.
+  </Issue>
+  <Issue user={'aarthificial'} pr={981}>
+    Fix the spline warning for reactive points.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>

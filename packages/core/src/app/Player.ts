@@ -13,6 +13,7 @@ import {Logger} from './Logger';
 import {PlaybackManager, PlaybackState} from './PlaybackManager';
 import {PlaybackStatus} from './PlaybackStatus';
 import {Project} from './Project';
+import {SharedWebGLContext} from './SharedWebGLContext';
 
 export interface PlayerState extends Record<string, unknown> {
   paused: boolean;
@@ -89,6 +90,7 @@ export class Player {
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
   public readonly logger: Logger;
+  private readonly sharedWebGLContext: SharedWebGLContext;
 
   private readonly lock = new Semaphore();
   private startTime = 0;
@@ -96,6 +98,7 @@ export class Player {
   private requestId: number | null = null;
   private renderTime = 0;
   private requestedSeek = -1;
+  private requestedRender = false;
   private requestedRecalculation = true;
   private size: Vector2;
   private resolutionScale: number;
@@ -134,6 +137,7 @@ export class Player {
       paused: true,
     });
 
+    this.sharedWebGLContext = new SharedWebGLContext(this.project.logger);
     this.requestedSeek = initialFrame;
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
@@ -159,6 +163,8 @@ export class Player {
         size: this.size,
         resolutionScale: this.resolutionScale,
         timeEventsClass: EditableTimeEvents,
+        sharedWebGLContext: this.sharedWebGLContext,
+        experimentalFeatures: project.experimentalFeatures,
       });
       description.onReplaced?.subscribe(description => {
         scene.reload(description);
@@ -177,9 +183,10 @@ export class Player {
     let recalculate = false;
     this.startTime = settings.range[0];
     this.endTime = settings.range[1];
-    if (this.playback.fps !== settings.fps) {
-      const ratio = settings.fps / this.playback.fps;
-      this.playback.fps = settings.fps;
+    const newFps = Math.max(1, settings.fps);
+    if (this.playback.fps !== newFps) {
+      const ratio = newFps / this.playback.fps;
+      this.playback.fps = newFps;
       frame = Math.floor(frame * ratio);
       recalculate = true;
     }
@@ -239,6 +246,10 @@ export class Player {
 
   public requestReset(): void {
     this.requestedSeek = 0;
+  }
+
+  public requestRender(): void {
+    this.requestedRender = true;
   }
 
   public toggleLoop(value = !this.playerState.current.loop) {
@@ -336,6 +347,7 @@ export class Player {
    */
   public deactivate() {
     this.active = false;
+    this.sharedWebGLContext.dispose();
     if (this.requestId !== null) {
       cancelAnimationFrame(this.requestId);
       this.requestId = null;
@@ -347,12 +359,16 @@ export class Player {
     this.request();
   }
 
-  private async prepare(): Promise<PlayerState & {seek: number}> {
+  private async prepare(): Promise<
+    PlayerState & {seek: number; render: boolean}
+  > {
     const state = {
       ...this.playerState.current,
       seek: this.requestedSeek,
+      render: this.requestedRender,
     };
     this.requestedSeek = -1;
+    this.requestedRender = false;
 
     // Recalculate the project if necessary
     if (this.requestedRecalculation) {
@@ -428,7 +444,10 @@ export class Player {
         this.audio.isInRange(this.status.time) &&
         this.audio.getTime() < this.status.time)
     ) {
-      if (state.paused && previousState !== PlaybackState.Paused) {
+      if (
+        state.render ||
+        (state.paused && previousState !== PlaybackState.Paused)
+      ) {
         await this.render.dispatch();
       }
 

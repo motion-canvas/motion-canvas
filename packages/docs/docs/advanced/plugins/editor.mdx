@@ -1,0 +1,130 @@
+---
+slug: /plugins/editor
+description: Extend the editor interface with Preact.
+sidebar_position: 2
+---
+
+import ExperimentalWarning from '@site/src/components/ExperimentalWarning';
+
+# Editor
+
+Editor plugins are an extension of runtime plugins that include additional hooks
+for extending the editor interface itself.
+
+<ExperimentalWarning />
+
+Let's update our plugin's entry point to export an editor plugin. The main
+difference is that we're now using the `makeEditorPlugin` function imported from
+`@motion-canvas/ui` to define it:
+
+```ts title="src/plugin.ts"
+import {makeEditorPlugin} from '@motion-canvas/ui';
+import {CustomTabConfig} from './CustomTabConfig';
+
+export default makeEditorPlugin({
+  name: 'editor-test',
+  tabs: [CustomTabConfig],
+});
+```
+
+This gives us access to some additional hooks that we can use to extend the
+interface. In the example above, we use `tabs` to declare an array of custom
+tabs that will be added to the left sidebar.
+
+The tab configuration is imported from a new file called `CustomTabConfig.tsx`
+that we have yet to create. Let's take a look at how it may look like:
+
+```tsx title="src/CustomTabConfig.tsx"
+/* @jsxImportSource preact */
+
+import {
+  Pane,
+  PhotoCamera,
+  PluginTabConfig,
+  PluginTabProps,
+  Separator,
+  Tab,
+} from '@motion-canvas/ui';
+
+function TabComponent({tab}: PluginTabProps) {
+  return (
+    <Tab title="My Tab" id="custom-tab" tab={tab}>
+      <PhotoCamera />
+    </Tab>
+  );
+}
+
+function PaneComponent() {
+  return (
+    <Pane title="My Pane" id="custom-pane">
+      <Separator size={1} />
+      Hello <strong>World</strong>!
+    </Pane>
+  );
+}
+
+export const CustomTabConfig: PluginTabConfig = {
+  name: 'inspector',
+  tabComponent: TabComponent,
+  paneComponent: PaneComponent,
+};
+```
+
+First of all, the editor is built on top of [Preact](https://preactjs.com/).
+Just like Motion Canvas, Preact uses JSX to define components. This means that
+in `tsx` files extending the editor, we need to let TypeScript know that it
+should import the `jsx` factory function from `preact` and not
+`@motion-canvas/2d`. This can be done in multiple different ways. In this simple
+example, we'll just use a comment at the top of the file:
+
+```tsx
+/* @jsxImportSource preact */
+```
+
+Next, we define a component for the tab itself. This component will be rendered
+in the navigation bar on the left. We use the `Tab` component from
+`@motion-canvas/ui` to stay consistent with the rest of the editor. We also
+borrow the `PhotoCamera` icon and put it inside:
+
+```tsx
+function TabComponent({tab}: PluginTabProps) {
+  return (
+    <Tab title="My Tab" id="custom-tab" tab={tab}>
+      <PhotoCamera />
+    </Tab>
+  );
+}
+```
+
+Similarly, we define a component for the pane that will be rendered when the tab
+is selected:
+
+```tsx
+function PaneComponent() {
+  return (
+    <Pane title="My Pane" id="custom-pane">
+      <Separator size={1} />
+      Hello <strong>World</strong>!
+    </Pane>
+  );
+}
+```
+
+Lastly, we export the configuration object:
+
+```tsx
+export const CustomTabConfig: PluginTabConfig = {
+  name: 'inspector',
+  tabComponent: TabComponent,
+  paneComponent: PaneComponent,
+};
+```
+
+Editor plugins are still experimental and the API is not yet properly documented
+but if you want to play around with some other available hooks you can take a
+look at [this editor plugin][example-plugin] provided by the `@motion-canvas/2d`
+package. It's responsible for displaying the inspector tab and drawing an
+overlay on top of the preview when clicking on different nodes.
+
+[example-plugin]:
+  https://github.com/motion-canvas/motion-canvas/blob/main/packages/2d/src/editor/index.ts

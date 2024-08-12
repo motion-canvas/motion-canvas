@@ -1,0 +1,199 @@
+---
+sidebar_position: 5
+slug: /shaders
+---
+
+import ExperimentalWarning from '@site/src/components/ExperimentalWarning';
+
+# Shaders
+
+Shaders allow you to apply custom effects to any node using WebGL.
+
+<ExperimentalWarning />
+
+Shaders can be specified using the [`shaders`](/api/2d/components/Node#shaders)
+property. In the simplest case, the value should be a string containing the GLSL
+code for the fragment shader:
+
+```tsx
+// highlight-next-line
+import myShader from './myShader.glsl';
+
+//...
+
+view.add(
+  <Circle
+    size={200}
+    fill="lightseagreen"
+    // highlight-next-line
+    shaders={myShader}
+  />,
+);
+```
+
+Below is an example of a simple shader that inverts the colors of the node:
+
+```glsl title="myShader.glsl"
+#version 300 es
+precision highp float;
+
+#include "@motion-canvas/core/shaders/common.glsl"
+
+void main() {
+    outColor = texture(sourceTexture, sourceUV);
+    outColor.rgb = 1.0 - outColor.rgb;
+}
+```
+
+## GLSL Preprocessor
+
+Motion Canvas comes with a simple GLSL preprocessor that lets you include files
+using the `#include` directive:
+
+```glsl
+#include "path-to-file"
+```
+
+The path is resolved using the same rules as `import` statements in JavaScript.
+It can point to a relative file:
+
+```glsl
+#include "../utils/math.glsl"
+```
+
+Or to a file from another package:
+
+```glsl
+#include "@motion-canvas/core/shaders/common.glsl"
+```
+
+For convenience, a GLSL file can be imported only once per shader. Each
+subsequent import of the same file will be ignored so `#ifdef` guards are not
+necessary.
+
+## Default uniforms
+
+The following uniforms are available in all shaders:
+
+```glsl
+in vec2 screenUV;
+in vec2 sourceUV;
+in vec2 destinationUV;
+
+out vec4 outColor;
+
+uniform float time;
+uniform float deltaTime;
+uniform float framerate;
+uniform int frame;
+uniform vec2 resolution;
+uniform sampler2D sourceTexture;
+uniform sampler2D destinationTexture;
+uniform mat4 sourceMatrix;
+uniform mat4 destinationMatrix;
+```
+
+They can be included using the following directive:
+
+```glsl
+#include "@motion-canvas/core/shaders/common.glsl"
+```
+
+## Source and Destination
+
+Shaders in Motion Canvas follow the same idea as
+[`globalCompositeOperation`][globalCompositeOperation] in 2D canvas. The
+`sourceTexture` contains the node being rendered, and the `destinationTexture`
+contains what has already been rendered to the screen. These two can be sampled
+using `sourceUV` and `destinationUV` respectively, and then combined in various
+ways to produce the desired result.
+
+## Custom uniforms
+
+You can pass custom uniforms to the shader by replacing the shader string with a
+configuration object:
+
+```tsx
+// highlight-next-line
+import myShader from './myShader.glsl';
+
+//...
+
+view.add(
+  <Circle
+    size={200}
+    fill="lightseagreen"
+    // highlight-next-line
+    shaders={{
+      fragment: myShader,
+      uniforms: {
+        myFloat: 0.5,
+        myVec2: new Vector2(2, 5),
+        myColor: new Color('blue'),
+      },
+    }}
+  />,
+);
+```
+
+The `uniforms` property is an object where the keys are the names of the
+uniforms and the values are what's passed to the shader.
+
+The type of the uniform is inferred from the value:
+
+| TypeScript                         | GLSL    |
+| ---------------------------------- | ------- |
+| `number`                           | `float` |
+| `[number, number]`                 | `vec2`  |
+| `[number, number, number]`         | `vec3`  |
+| `[number, number, number, number]` | `vec4`  |
+| [`Color`][Color]                   | `vec4`  |
+| [`Vector2`][Vector2]               | `vec2`  |
+| [`BBox`][BBox]                     | `vec4`  |
+| [`Spacing`][Spacing]               | `vec4`  |
+
+With that in mind, the uniforms from the above example will be available in the
+shader as:
+
+```glsl title="myShader.glsl"
+uniform float myFloat;
+uniform vec2 myVec2;
+uniform vec4 myColor;
+```
+
+It's also possible to create custom classes that can be passed as uniforms by
+implementing the [`WebGLConvertible`][WebGLConvertible] interface.
+
+## Caching
+
+When a node is cached, its contents are first rendered to a separate canvas and
+then transferred to the screen (You can read more about it in the
+[Filters and Effects](/docs/filters-and-effects#cached-nodes) section) When a
+shader is applied to a descendant of a cached node, the `destinationTexture`
+will only contain the things drawn in the context of that cached node and
+nothing else. This is analogous to how composite operations work.
+
+Any node with a shader is automatically cached - this lets us figure out the
+contents of the `sourceTexture` before shaders are run. Caching requires us to
+know the size and position of everything rendered by the node. This goes beyond
+its logical size. Things like shadows, strokes, and filters can make the
+rendered area larger. We account for that in the case of built-in effects, but
+for custom shaders you may need to adjust the cache size manually. The
+[`cachePadding`][cachePadding] property can be used to do exactly that. It
+specifies the extra space around the node that should be included in the cache.
+
+### View Caching
+
+By default, the size of the cache is limited to the visible area. This may cause
+certain shaders to behave incorrectly when the node is partially off-screen. To
+fix this, you can increase the [`cachePadding`][cachePadding] of the view
+itself. It will act as a buffer around the visible area.
+
+[globalCompositeOperation]:
+  https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+[Color]: https://gka.github.io/chroma.js/#color
+[Vector2]: /api/core/types/Vector2
+[BBox]: /api/core/types/BBox
+[Spacing]: /api/core/types/Spacing
+[WebGLConvertible]: /api/core/types/WebGLConvertible
+[cachePadding]: /api/2d/components/Node#cachePadding

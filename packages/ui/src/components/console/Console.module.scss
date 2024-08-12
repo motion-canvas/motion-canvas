@@ -30,8 +30,8 @@ $colors: (
 }
 
 .log {
-  border-left: 4px solid transparent;
-  background-color: var(--background-color-dark);
+  border-left: 2px solid transparent;
+  background-color: var(--background-color);
   border-radius: var(--radius);
   padding: 8px;
   overflow: hidden;
@@ -72,7 +72,7 @@ $colors: (
   overflow-x: auto;
   margin-top: 8px;
 
-  --scrollbar-background: var(--background-color-dark);
+  --scrollbar-background: var(--background-color);
 }
 
 .section {
@@ -83,7 +83,6 @@ $colors: (
   }
 
   code {
-    background-color: var(--surface-color);
     padding: 2px 0;
     border-radius: var(--radius);
   }
@@ -97,6 +96,17 @@ $colors: (
 
     code {
       padding: 0;
+    }
+
+    &:global(.wrong) code:before {
+      color: #ff5257;
+      font-weight: bold;
+      content: '✗ WRONG\A';
+    }
+    &:global(.correct) code::before {
+      color: #00a86b;
+      font-weight: bold;
+      content: '✓ CORRECT\A';
     }
   }
 

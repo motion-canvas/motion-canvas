@@ -1,0 +1,34 @@
+{
+  "name": "@motion-canvas/ffmpeg",
+  "version": "1.1.0",
+  "description": "An FFmpeg video exporter for Motion Canvas",
+  "main": "lib/server/index.js",
+  "author": "motion-canvas",
+  "homepage": "https://motioncanvas.io/",
+  "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run client:build && npm run server:build",
+    "client:build": "tsc --project client/tsconfig.json",
+    "client:dev": "tsc -w --project client/tsconfig.json",
+    "server:build": "tsc --project server/tsconfig.json",
+    "server:dev": "tsc -w --project server/tsconfig.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/motion-canvas/motion-canvas.git"
+  },
+  "files": [
+    "lib"
+  ],
+  "devDependencies": {
+    "@types/fluent-ffmpeg": "^2.1.21"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.0.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "@motion-canvas/core": "^3.16.0",
+    "@motion-canvas/vite-plugin": "^3.15.1"
+  }
+}

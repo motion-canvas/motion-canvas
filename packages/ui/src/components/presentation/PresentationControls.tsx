@@ -36,6 +36,7 @@ export function PresentationControls() {
             event.preventDefault();
             presenter.resume();
             break;
+          case 'PageUp':
           case 'ArrowLeft':
             event.preventDefault();
             if (event.shiftKey) {
@@ -44,6 +45,7 @@ export function PresentationControls() {
             }
             presenter.requestPreviousSlide();
             break;
+          case 'PageDown':
           case 'ArrowRight':
             event.preventDefault();
             if (event.shiftKey) {

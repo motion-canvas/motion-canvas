@@ -2,8 +2,8 @@
   "version": 1,
   "timeEvents": [
     {
-      "name": "circle",
-      "targetTime": 3
+      "name": "rect",
+      "targetTime": 0.6792665726375177
     }
   ],
   "seed": 3073416149

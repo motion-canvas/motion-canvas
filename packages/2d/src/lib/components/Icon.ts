@@ -55,7 +55,10 @@ export class Icon extends Img {
   public declare color: ColorSignal<this>;
 
   public constructor(props: IconProps) {
-    super(props);
+    super({
+      ...props,
+      src: null,
+    });
   }
 
   /**
@@ -81,7 +84,10 @@ export class Icon extends Img {
    * overrides `Image.src` setter to warn the user that the value
    * is not used
    */
-  protected setSrc() {
+  protected setSrc(src: string | null) {
+    if (src === null) {
+      return;
+    }
     useLogger().warn(
       "The Icon Component does not accept setting the `src`. If you need access to `src`, use '<Img/>` instead.",
     );

@@ -45,14 +45,6 @@
   width: 100%;
   height: 100%;
   background-color: var(--surface-color);
-
-  &::before {
-    width: 100%;
-    height: 32px;
-    display: block;
-    content: '';
-    background-color: var(--background-color);
-  }
 }
 
 .timestamp {
@@ -283,6 +275,16 @@
   }
 }
 
+.rangeTrack {
+  height: 32px;
+  cursor: pointer;
+  pointer-events: none;
+
+  &.active {
+    pointer-events: auto;
+  }
+}
+
 .range {
   border-radius: var(--radius);
   cursor: move;
@@ -297,6 +299,10 @@
 
   &.active {
     pointer-events: auto;
+    border-color: rgba(255, 255, 255, 0.24);
+  }
+
+  .rangeTrack.active > & {
     border-color: rgba(255, 255, 255, 0.24);
   }
 }
