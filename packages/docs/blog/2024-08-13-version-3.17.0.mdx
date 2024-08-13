@@ -1,0 +1,64 @@
+---
+slug: version-3.17.0
+title: Motion Canvas v3.17.0
+description: The Latex node now supports tweening
+authors: aarthificial
+---
+
+import Link from '@docusaurus/Link';
+import IssueGroup from '@site/src/components/Release/IssueGroup';
+import Issue from '@site/src/components/Release/Issue';
+import PR from '@site/src/components/Release/PullRequest';
+import Fiddle from '@site/src/components/Fiddle';
+import sourceLatex from '!!raw-loader!@site/blog/2024-08-13-latex';
+
+<IssueGroup type={'feat'}>
+  <Issue user={'levirs565'}>
+    The{' '}
+    <Link to="/api/2d/components/Latex">
+      <code>Latex</code>
+    </Link>{' '}
+    node now supports tweening:
+    <PR id={800} />
+    <Fiddle
+      mode="preview"
+      ratio="3"
+      className="margin-top--sm margin-bottom--sm"
+    >
+      {sourceLatex}
+    </Fiddle>
+  </Issue>
+  <Issue user={'squigglesdev'} pr={631}>
+    <code>?render</code> and <code>?present</code> url parameters can be used to
+    immediately start rendering or presenting when opening the editor.
+  </Issue>
+</IssueGroup>
+<IssueGroup type={'fix'}>
+  <Issue user={'aarthificial'} pr={1085}>
+    <Link to="/api/2d/components/Txt">
+      <code>Txt</code>
+    </Link>{' '}
+    nodes properly support tweening emojis.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1084}>
+    Fix stack overflow caused by restoring a{' '}
+    <Link to="/api/2d/components/Code">
+      <code>Code</code>
+    </Link>{' '}
+    node
+  </Issue>
+  <Issue user={'aarthificial'} pr={1083}>
+    Prevent invalid cache sizes.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1075}>
+    Fix line tweening.
+  </Issue>
+  <Issue user={'aarthificial'} pr={1061}>
+    Fix text alignment.
+  </Issue>
+</IssueGroup>
+
+<small>
+  Check out <Link to="/docs/updating">the Update Guide</Link> for information on
+  how to update your existing projects.
+</small>
