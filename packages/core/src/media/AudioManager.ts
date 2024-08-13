@@ -15,6 +15,8 @@ export class AudioManager {
   private error = false;
   private abortController: AbortController | null = null;
   private offset = 0;
+  private start?: number;
+  private duration?: number;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -25,6 +27,19 @@ export class AudioManager {
       });
     }
   }
+
+  private audioContext?: AudioContext;
+  private sourceNode?: MediaElementAudioSourceNode;
+
+  public setFilter(filter: (ctx: AudioContext, src: AudioNode) => AudioNode) {
+    this.audioContext ??= new AudioContext();
+    this.sourceNode ??= this.audioContext.createMediaElementSource(
+      this.audioElement,
+    );
+    const filtered = filter(this.audioContext, this.sourceNode);
+    filtered.connect(this.audioContext.destination);
+  }
+
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);
   }
@@ -33,8 +48,26 @@ export class AudioManager {
     this.audioElement.currentTime = this.toRelativeTime(value);
   }
 
+  public setTrim(start?: number, end?: number) {
+    this.start = start;
+    if (end !== undefined) {
+      this.duration = end - (start ?? 0);
+    } else {
+      this.duration = undefined;
+    }
+  }
+
   public setOffset(value: number) {
     this.offset = value;
+  }
+
+  public setPlaybackRate(value: number, pitchShift: boolean = false) {
+    this.audioElement.playbackRate = value;
+    this.audioElement.preservesPitch = !pitchShift;
+  }
+
+  public getOffset(): number {
+    return this.offset;
   }
 
   public setMuted(isMuted: boolean) {
@@ -57,16 +90,31 @@ export class AudioManager {
     });
   }
 
+  public getSource() {
+    return this.source;
+  }
+
   public isInRange(time: number) {
-    return time >= this.offset && time < this.audioElement.duration;
+    return (
+      time >= this.offset &&
+      time <
+        this.offset +
+          (this.duration ??
+            this.audioElement.duration * this.audioElement.playbackRate)
+    );
   }
 
   public toRelativeTime(time: number) {
-    return Math.max(0, time - this.offset);
+    return (
+      Math.max(0, time - this.offset + (this.start ?? 0)) *
+      this.audioElement.playbackRate
+    );
   }
 
   public toAbsoluteTime(time: number) {
-    return time + this.offset;
+    return (
+      time / this.audioElement.playbackRate + this.offset - (this.start ?? 0)
+    );
   }
 
   public isReady() {
@@ -84,7 +132,7 @@ export class AudioManager {
     if (this.source && this.audioElement.paused !== isPaused) {
       if (isPaused) {
         this.audioElement.pause();
-      } else {
+      } else if (this.audioElement.currentTime < this.audioElement.duration) {
         try {
           await this.audioElement.play();
           this.error = false;
