@@ -161,7 +161,7 @@ export class Latex extends SVGNode {
     }
     if (oldNodes.length > 0) {
       useLogger().error({
-        message: 'Matching between Latex SVG and a tex part failed',
+        message: 'Matching between Latex SVG and tex parts failed',
         inspect: this.key,
       });
     }

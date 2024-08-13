@@ -103,3 +103,43 @@ If a given tex part occurs multiple times in the source and target formula, but
 the number of occurrences does not match, the part will duplicated or merged.
 You can see this in action in the example above. The formula starts with only
 one plus sign (`+`), but ends with two.
+
+## Common pitfalls
+
+### Escaping slashes
+
+The backslash character (`\`) is used as an escape character in JavaScript. In
+order to use it as part of a LaTex formula, you need to escape it by doubling
+it:
+
+```tsx
+node().tex('{{\\frac{1}{2}}}');
+```
+
+Note that this does not apply inside JSX string attributes:
+
+```tsx
+// No escape needed:
+<Latex tex="{{\frac{1}{2}}" />
+// Escape necessary:
+<Latex tex={'{{\frac{1}{2}}'} />
+```
+
+### Missing spaces
+
+As of right now, tex parts are put together by joining them with no separator.
+This may break your formula if it depends on a space between two parts. For
+example, the following formula will break:
+
+```tsx
+<Latex tex={['\\Delta', 'y']} />
+```
+
+The node will attempt to parse it as `\\Deltay` instead of the correct
+`\\Delta y`. To prevent it, you should wrap the `y` part in curly brackets:
+
+```tsx
+<Latex tex={['\\Delta', '{y}']} />
+```
+
+This will be parsed as `\\Delta{y}` which is correct.
