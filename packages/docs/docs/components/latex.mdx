@@ -1,0 +1,145 @@
+---
+sidebar_position: 2
+slug: /latex
+---
+
+# Latex
+
+```tsx editor mode=preview
+import {Latex, makeScene2D} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="{{y=}}{{a}}{{x^2}}" fill="white" />);
+
+  yield* waitFor(0.2);
+  yield* tex().tex('{{y=}}{{a}}{{x^2}} + {{bx}}', 1);
+  yield* waitFor(0.2);
+  yield* tex().tex(
+    '{{y=}}{{\\left(}}{{a}}{{x^2}} + {{bx}}{{\\over 1}}{{\\right)}}',
+    1,
+  );
+  yield* waitFor(0.2);
+  yield* tex().tex('{{y=}}{{a}}{{x^2}}', 1);
+});
+```
+
+The [`Latex`](/api/2d/components/Latex) component is used to show mathematical
+formulas and animate them.
+
+## Defining LaTex
+
+You can specify the LaTex formula to show using the `tex` property. Similarly to
+the [`Txt`](/api/2d/components/Txt) node, you can control the color and size of
+the text using the `fill` and `fontSize` properties respectively.
+
+:::caution
+
+Make sure to always set some `fill` color otherwise nothing will be shown!
+
+:::
+
+```tsx editor
+import {Latex, makeScene2D} from '@motion-canvas/2d';
+
+export default makeScene2D(function* (view) {
+  view.add(
+    <Latex
+      // Try editing the formula below:
+      tex="a^2 + b^2 = c^2"
+      fill="white"
+      fontSize={32}
+    />,
+  );
+});
+```
+
+## Animating LaTex
+
+We can animate LaTex by tweening the `tex` property. To enable deletion,
+insertion and transformation animation you must split the formula into several
+parts. You can do this by providing an array of strings:
+
+```tsx
+<Latex tex={['a^2', '+', 'b^2', '=', 'c^2']} />
+```
+
+Or by using the curly bracket (`{{}}`) syntax:
+
+```tsx
+<Latex tex="{{a^2}} + {{b^2}} = {{c^2}}" />
+// equivalent to
+<Latex tex={['a^2', '+', 'b^2', '=', 'c^2']} />
+```
+
+You can also mix both:
+
+```tsx
+<Latex tex={['{{a}}^2', '+',  '{{b}}^2', '=', '{{c}}^2']} />
+// equivalent to
+<Latex tex={['a','^2', '+', 'b', '^2', '=', 'c', '^2']} />
+```
+
+A tex part that only exists in the source formula is considered deleted and gets
+faded out. Analogically, a part that only exists in the target formula is faded
+in. Tex parts that exist in both the source and destination formulas will be
+tweened:
+
+```tsx editor
+import {Latex, makeScene2D} from '@motion-canvas/2d';
+import {createRef, waitFor} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const tex = createRef<Latex>();
+  view.add(<Latex ref={tex} tex="{{1}} + {{2}}" fill="white" />);
+
+  yield* waitFor(0.5);
+  yield* tex().tex(['2', '+', '3', '+', '4'], 1);
+});
+```
+
+If a given tex part occurs multiple times in the source and target formula, but
+the number of occurrences does not match, the part will duplicated or merged.
+You can see this in action in the example above. The formula starts with only
+one plus sign (`+`), but ends with two.
+
+## Common pitfalls
+
+### Escaping slashes
+
+The backslash character (`\`) is used as an escape character in JavaScript. In
+order to use it as part of a LaTex formula, you need to escape it by doubling
+it:
+
+```tsx
+node().tex('{{\\frac{1}{2}}}');
+```
+
+Note that this does not apply inside JSX string attributes:
+
+```tsx
+// No escape needed:
+<Latex tex="{{\frac{1}{2}}" />
+// Escape necessary:
+<Latex tex={'{{\frac{1}{2}}'} />
+```
+
+### Missing spaces
+
+As of right now, tex parts are put together by joining them with no separator.
+This may break your formula if it depends on a space between two parts. For
+example, the following formula will break:
+
+```tsx
+<Latex tex={['\\Delta', 'y']} />
+```
+
+The node will attempt to parse it as `\\Deltay` instead of the correct
+`\\Delta y`. To prevent it, you should wrap the `y` part in curly brackets:
+
+```tsx
+<Latex tex={['\\Delta', '{y}']} />
+```
+
+This will be parsed as `\\Delta{y}` which is correct.
