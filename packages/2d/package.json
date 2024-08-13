@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/2d",
-  "version": "3.16.0",
+  "version": "3.17.0",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
@@ -29,7 +29,7 @@
   ],
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
-    "@motion-canvas/ui": "^3.16.0",
+    "@motion-canvas/ui": "^3.17.0",
     "@preact/signals": "^1.2.1",
     "clsx": "^2.0.0",
     "jsdom": "^22.1.0",
@@ -40,7 +40,7 @@
     "@codemirror/language": "^6.10.1",
     "@lezer/common": "^1.2.1",
     "@lezer/highlight": "^1.2.0",
-    "@motion-canvas/core": "^3.16.0",
+    "@motion-canvas/core": "^3.17.0",
     "code-fns": "^0.8.2",
     "mathjax-full": "^3.2.2",
     "parse-svg-path": "^0.1.2"

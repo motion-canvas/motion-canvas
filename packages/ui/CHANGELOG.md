@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/motion-canvas/motion-canvas/compare/v3.16.0...v3.17.0) (2024-08-13)
+
+
+### Features
+
+* **ui:** add render and present url params ([#631](https://github.com/motion-canvas/motion-canvas/issues/631)) ([8209843](https://github.com/motion-canvas/motion-canvas/commit/82098435b4f74601e7991da3ac48015b4dbe58ee))
+
+
+
+
+
 # [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
 
 **Note:** Version bump only for package @motion-canvas/ui

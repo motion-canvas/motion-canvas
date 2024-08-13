@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/motion-canvas/motion-canvas/compare/v3.16.0...v3.17.0) (2024-08-13)
+
+
+### Features
+
+* **vite-plugin:** let plugins override config ([#1054](https://github.com/motion-canvas/motion-canvas/issues/1054)) ([9b01eb5](https://github.com/motion-canvas/motion-canvas/commit/9b01eb58b746dd2b4019db2af32f5f3ec1f7b761))
+
+
+
+
+
 ## [3.15.1](https://github.com/motion-canvas/motion-canvas/compare/v3.15.0...v3.15.1) (2024-03-21)
 
 

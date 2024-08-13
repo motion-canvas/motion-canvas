@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/motion-canvas/motion-canvas/compare/v3.16.0...v3.17.0) (2024-08-13)
+
+
+### Bug Fixes
+
+* **2d:** fix line tweening ([#1075](https://github.com/motion-canvas/motion-canvas/issues/1075)) ([5c707c1](https://github.com/motion-canvas/motion-canvas/commit/5c707c1adcf3cc23015c90299b35a1bb56ec90f8)), closes [#1070](https://github.com/motion-canvas/motion-canvas/issues/1070)
+* **2d:** fix stack overflow for Code ([#1084](https://github.com/motion-canvas/motion-canvas/issues/1084)) ([0275101](https://github.com/motion-canvas/motion-canvas/commit/0275101dbca825dd726abcdad300625b3638adac)), closes [#1056](https://github.com/motion-canvas/motion-canvas/issues/1056)
+* **2d:** fix text alignment ([#1061](https://github.com/motion-canvas/motion-canvas/issues/1061)) ([dd066c6](https://github.com/motion-canvas/motion-canvas/commit/dd066c6d6f0536029dea3a3e7e1b03821d7b409e))
+* **2d:** prevent invalid cache sizes ([#1083](https://github.com/motion-canvas/motion-canvas/issues/1083)) ([19c26cf](https://github.com/motion-canvas/motion-canvas/commit/19c26cf0f2d25073c18133ed952b3195ee1d42b0)), closes [#1033](https://github.com/motion-canvas/motion-canvas/issues/1033)
+
+
+### Features
+
+* **2d:** use SVG component in Latex and support tweening ([#800](https://github.com/motion-canvas/motion-canvas/issues/800)) ([92a5659](https://github.com/motion-canvas/motion-canvas/commit/92a56590f740242e044e9e7a3e4af074af981d75))
+
+
+
+
+
 # [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
 
 

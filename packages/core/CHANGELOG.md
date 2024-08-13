@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0](https://github.com/motion-canvas/motion-canvas/compare/v3.16.0...v3.17.0) (2024-08-13)
+
+
+### Bug Fixes
+
+* **2d:** support tweening emojis ([#1085](https://github.com/motion-canvas/motion-canvas/issues/1085)) ([4a01a3a](https://github.com/motion-canvas/motion-canvas/commit/4a01a3abfbccd4e460e3bd6cdb82a4bb75a17967)), closes [#1066](https://github.com/motion-canvas/motion-canvas/issues/1066)
+* **core:** force valid chroma-js version ([#1086](https://github.com/motion-canvas/motion-canvas/issues/1086)) ([6edcce3](https://github.com/motion-canvas/motion-canvas/commit/6edcce37237d2d15c99ed208886d3221a0e14892))
+
+
+
+
+
 # [3.16.0](https://github.com/motion-canvas/motion-canvas/compare/v3.15.2...v3.16.0) (2024-05-16)
 
 
