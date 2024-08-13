@@ -32,7 +32,7 @@ export interface Plugin {
    *
    * @param settings - The project settings.
    */
-  settings?(settings: ProjectSettings): ProjectSettings | void;
+  settings?(settings: ProjectSettings): Partial<ProjectSettings> | void;
 
   /**
    * Receive the project instance right after it is initialized.
