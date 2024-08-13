@@ -156,17 +156,21 @@ export async function borrowPlayer(
         PlayerInstance.playback.previousScene,
       );
     });
-    PlayerInstance.onRecalculated.subscribe(() => {
-      if (StageInstance.finalBuffer.parentElement !== CurrentParent) {
-        CurrentParent?.append(StageInstance.finalBuffer);
-        CurrentSetter(PlayerInstance);
-      }
-    });
 
     ProjectInstance.logger.onLogged.subscribe(payload => {
       if (payload.level === 'error') {
         ErrorHandler?.(`Runtime error: ${payload.message}`);
       }
+    });
+
+    await new Promise<void>(resolve => {
+      PlayerInstance.onRecalculated.subscribe(() => {
+        if (StageInstance.finalBuffer.parentElement !== CurrentParent) {
+          CurrentParent?.append(StageInstance.finalBuffer);
+          CurrentSetter(PlayerInstance);
+          resolve();
+        }
+      });
     });
   }
 
