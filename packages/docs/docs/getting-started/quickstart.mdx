@@ -123,7 +123,12 @@ export default makeProject({
 
 When creating a project, we need to provide it with an array of scenes to
 display. In this case, we use only one scene imported from
-`src/scenes/example.tsx`.
+`src/scenes/example.tsx?scene`.
+
+Note the `?scene` at the end - it's required to transform the imported module
+into a proper scene. Among other things, it makes it possible to dynamically
+refresh the preview whenever you modify the scene. The editor will not work
+without it.
 
 A scene is a set of elements displayed on the screen and an animation that
 governs them. The most basic scene looks as follows:
