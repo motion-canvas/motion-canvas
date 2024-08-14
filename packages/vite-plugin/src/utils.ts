@@ -20,7 +20,13 @@ export function getProjects(project: string | string[]): ProjectData[] {
     const {name, dir} = path.posix.parse(url);
     const metaFile = `${name}.meta`;
     const metaData = getMeta(path.join(dir, metaFile));
-    const data = {name: metaData?.name ?? name, fileName: name, url};
+    const filePath = [...dir.split('/').slice(2), name].join('/');
+    const data = {
+      name: metaData?.name ?? filePath,
+      fileName: name,
+      url,
+      filePath,
+    };
     list.push(data);
   }
 

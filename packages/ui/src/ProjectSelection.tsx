@@ -5,6 +5,7 @@ export interface ProjectData {
   name: string;
   fileName: string;
   url: string;
+  filePath: string;
 }
 
 export interface ProjectSelectionProps {
@@ -17,7 +18,7 @@ export function ProjectSelection({projects}: ProjectSelectionProps) {
       <Header className={styles.header}>Projects</Header>
       <div className={styles.list}>
         {projects.map(project => (
-          <a className={styles.element} href={`./${project.fileName}`}>
+          <a className={styles.element} href={`./${project.filePath}`}>
             <div className={styles.title}>{project.name}</div>
             <div className={styles.subtitle}>{project.url}</div>
           </a>

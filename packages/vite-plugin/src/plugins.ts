@@ -13,6 +13,10 @@ export interface ProjectData {
    */
   fileName: string;
   /**
+   * The path to the file containing the project
+   */
+  filePath: string;
+  /**
    * The path to the project relative to the Vite configuration file.
    */
   url: string;

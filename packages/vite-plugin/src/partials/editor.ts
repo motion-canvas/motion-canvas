@@ -20,15 +20,24 @@ export function editorPlugin({editor, projects}: EditorPluginConfig): Plugin {
 
   const lookup = new Map<string, ProjectData>();
   for (const project of projects) {
-    lookup.set(project.name, project);
+    lookup.set(project.filePath, project);
   }
+
+  let query: string;
 
   return {
     name: 'motion-canvas:editor',
 
-    async load(id) {
-      const [, query] = id.split('?');
+    async resolveId(source) {
+      if (source.startsWith(resolvedEditorId)) {
+        const [id, projectQuery] = source.split('?');
+        query = projectQuery;
+        return id;
+      }
+      return null;
+    },
 
+    async load(id) {
       if (id.startsWith(resolvedEditorId)) {
         if (projects.length === 1) {
           /* language=typescript */
