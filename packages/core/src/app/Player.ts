@@ -386,7 +386,8 @@ export class Player {
           const scene = this.playback.onScenesRecalculated.current[i];
           sounds.push(...(<Sound[]>(<any>scene.sounds).sounds));
         }
-        this.audioPool.setupPools(sounds, this.status.time);
+        this.audioPool.setupPools(sounds);
+        this.audioPool.setTime(this.status.time);
 
         this.recalculated.dispatch();
       } catch (e) {
@@ -419,7 +420,7 @@ export class Player {
     }
 
     // Pause / play sounds.
-    this.audioPool.prepare(this.status.time);
+    this.audioPool.prepare(this.status.time, 1 / this.status.fps);
     await this.audioPool.setPaused(
       state.paused || this.finished,
       this.status.time,
@@ -542,7 +543,7 @@ export class Player {
     const time = this.status.framesToSeconds(this.playback.frame + frameOffset);
     this.audio.setTime(time);
 
-    this.audioPool.prepare(time);
+    this.audioPool.prepare(time, 1 / this.status.fps);
     this.audioPool.setTime(time);
   }
 }

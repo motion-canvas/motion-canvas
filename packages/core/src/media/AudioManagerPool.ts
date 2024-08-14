@@ -11,7 +11,7 @@ export class AudioManagerPool {
 
   public constructor(private readonly logger: Logger) {}
 
-  public setupPools(sounds: Sound[], time: number) {
+  public setupPools(sounds: Sound[]) {
     this.pools = [];
 
     for (const sound of sounds) {
@@ -40,8 +40,6 @@ export class AudioManagerPool {
         this.pools.push({am, sounds: [sound], gain});
       }
     }
-    this.prepare(time);
-    this.setTime(time);
   }
 
   public setMuted(muted: boolean) {
@@ -64,13 +62,21 @@ export class AudioManagerPool {
     );
   }
 
-  public prepare(time: number) {
+  public prepare(time: number, delta: number) {
     for (const pool of this.pools) {
       const latest = pool.sounds.find(s => s.offset <= time);
       if (latest !== undefined && pool.am.getOffset() !== latest.offset) {
         pool.am.setOffset(latest.offset);
         pool.am.setTrim(latest.start, latest.end);
-        pool.am.setTime(time);
+
+        if (time < latest.offset + delta) {
+          // if a sound started between last frame and this frame,
+          // start playback from the start.
+          // this prevents the starts of sounds from being cut off.
+          pool.am.setTime(latest.offset);
+        } else {
+          pool.am.setTime(time);
+        }
 
         pool.gain.gain.value = Math.pow(10, (latest.gain ?? 0) / 10);
         pool.am.setPlaybackRate(
