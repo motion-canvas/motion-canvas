@@ -88,8 +88,7 @@ export class Latex extends SVGNode {
         prev.push(...current.split(/{{(.*?)}}/));
         return prev;
       }, [])
-      .map(sub => sub.trim())
-      .filter(sub => sub.length > 0);
+      .filter(sub => sub.trim().length > 0);
   })
   @signal()
   public declare readonly tex: Signal<string[] | string, string[], this>;
@@ -124,7 +123,7 @@ export class Latex extends SVGNode {
   }
 
   protected override parseSVG(svg: string): SVGDocument {
-    const subTexs = this.svgSubTexMap[svg]!;
+    const subTexs = this.svgSubTexMap[svg]!.map(sub => sub.trim());
     const key = `[${subTexs.join(',')}]::${JSON.stringify(this.options())}`;
     const cached = Latex.texNodesPool[key];
     if (cached && (cached.size.x > 0 || cached.size.y > 0)) {
@@ -137,6 +136,10 @@ export class Latex extends SVGNode {
     for (const sub of subTexs) {
       const subSvg = this.subTexToSVG(sub);
       const subNodes = SVGNode.parseSVGData(subSvg).nodes;
+
+      if (subNodes.length === 0) {
+        continue;
+      }
 
       const firstId = this.getNodeCharacterId(subNodes[0]);
       const spliceIndex = oldNodes.findIndex(
