@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1](https://github.com/motion-canvas/motion-canvas/compare/v3.17.0...v3.17.1) (2024-08-17)
+
+
+### Bug Fixes
+
+* **2d:** handle empty LaTeX parts ([#1092](https://github.com/motion-canvas/motion-canvas/issues/1092)) ([2ccc1f1](https://github.com/motion-canvas/motion-canvas/commit/2ccc1f1fc7e20e622673a1dba5611d3baddd42e6))
+
+
+
+
+
 # [3.17.0](https://github.com/motion-canvas/motion-canvas/compare/v3.16.0...v3.17.0) (2024-08-13)
 
 
