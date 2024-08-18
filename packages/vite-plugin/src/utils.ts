@@ -16,13 +16,13 @@ export async function createMeta(metaPath: string) {
 export function getProjects(project: string | string[]): ProjectData[] {
   const list: ProjectData[] = [];
   const projectList = expandFilePaths(project);
-  for (const url of projectList) {
-    const {name, dir} = path.posix.parse(url);
+  for (const filePath of projectList) {
+    const {name, dir} = path.posix.parse(filePath);
     const metaFile = `${name}.meta`;
     const metaData = getMeta(path.join(dir, metaFile));
-    const filePath = [...dir.split('/').slice(2), name].join('/');
+    const url = [path.relative('.', dir), name].join('/');
     const data = {
-      name: metaData?.name ?? filePath,
+      name: metaData?.name ?? url,
       fileName: name,
       url,
       filePath,

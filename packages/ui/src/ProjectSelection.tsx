@@ -18,9 +18,9 @@ export function ProjectSelection({projects}: ProjectSelectionProps) {
       <Header className={styles.header}>Projects</Header>
       <div className={styles.list}>
         {projects.map(project => (
-          <a className={styles.element} href={`./${project.filePath}`}>
+          <a className={styles.element} href={`./${project.url}`}>
             <div className={styles.title}>{project.name}</div>
-            <div className={styles.subtitle}>{project.url}</div>
+            <div className={styles.subtitle}>{project.filePath}</div>
           </a>
         ))}
       </div>
