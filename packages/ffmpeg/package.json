@@ -6,7 +6,7 @@
   "author": "motion-canvas",
   "homepage": "https://motioncanvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
-  "license": "MIT",
+  "license": "GPLv3",
   "scripts": {
     "build": "npm run client:build && npm run server:build",
     "client:build": "tsc --project client/tsconfig.json",
