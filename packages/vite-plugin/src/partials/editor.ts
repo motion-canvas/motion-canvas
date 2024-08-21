@@ -20,7 +20,7 @@ export function editorPlugin({editor, projects}: EditorPluginConfig): Plugin {
 
   const lookup = new Map<string, ProjectData>();
   for (const project of projects) {
-    lookup.set(project.name, project);
+    lookup.set(project.url, project);
   }
 
   return {
@@ -34,7 +34,7 @@ export function editorPlugin({editor, projects}: EditorPluginConfig): Plugin {
           /* language=typescript */
           return `\
 import {editor} from '${editor}';
-import project from '${projects[0].url}?project';
+import project from '${projects[0].filePath}?project';
 editor(project);
 `;
         }
@@ -46,7 +46,7 @@ editor(project);
             /* language=typescript */
             return `\
 import {editor} from '${editor}';
-import project from '${lookup.get(name)!.url}?project';
+import project from '${lookup.get(name)!.filePath}?project';
 editor(project);
 `;
           }
@@ -73,7 +73,13 @@ index(${JSON.stringify(projects)});
           const name = url.pathname.slice(1);
           if (name && lookup.has(name)) {
             res.setHeader('Content-Type', 'text/html');
-            res.end(createHtml(`/@id/__x00__virtual:editor?project=${name}`));
+            res.end(
+              createHtml(
+                `/@id/__x00__virtual:editor?project=${encodeURIComponent(
+                  name,
+                )}`,
+              ),
+            );
             return;
           }
         }

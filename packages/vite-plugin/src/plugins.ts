@@ -13,7 +13,11 @@ export interface ProjectData {
    */
   fileName: string;
   /**
-   * The path to the project relative to the Vite configuration file.
+   * The path to the project file relative to the Vite configuration file.
+   */
+  filePath: string;
+  /**
+   * The path to access the project relative to the Host Name.
    */
   url: string;
 }

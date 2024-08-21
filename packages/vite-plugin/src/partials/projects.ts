@@ -83,7 +83,10 @@ import {MetaFile} from '@motion-canvas/core';
           rollupOptions: {
             preserveEntrySignatures: 'strict',
             input: Object.fromEntries(
-              projects.map(project => [project.name, project.url + '?project']),
+              projects.map(project => [
+                project.name,
+                project.filePath + '?project',
+              ]),
             ),
           },
         },
@@ -95,7 +98,7 @@ import {MetaFile} from '@motion-canvas/core';
           jsxImportSource: '@motion-canvas/2d/lib',
         },
         optimizeDeps: {
-          entries: projects.map(project => project.url),
+          entries: projects.map(project => project.filePath),
           exclude: ['preact', 'preact/*', '@preact/signals'],
         },
       };
