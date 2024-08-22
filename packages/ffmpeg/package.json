@@ -25,10 +25,9 @@
     "@types/fluent-ffmpeg": "^2.1.21"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@ffprobe-installer/ffprobe": "^2.0.0",
     "@motion-canvas/core": "^3.17.0",
     "@motion-canvas/vite-plugin": "^3.17.0",
-    "fluent-ffmpeg": "^2.1.2"
+    "ffmpeg-ffprobe-static": "^6.1.1-rc.5",
+    "fluent-ffmpeg": "^2.1.3"
   }
 }

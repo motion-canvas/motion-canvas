@@ -77,6 +77,7 @@ export interface Exporter {
    * @param sceneFrame - The frame number within the scene.
    * @param sceneName - The name of the scene with which the frame is associated.
    * @param signal - An abort signal triggered if the user aborts the rendering.
+   * @param context - A 2D rendering context for the canvas.
    */
   handleFrame(
     canvas: HTMLCanvasElement,
@@ -84,6 +85,7 @@ export interface Exporter {
     sceneFrame: number,
     sceneName: string,
     signal: AbortSignal,
+    context: CanvasRenderingContext2D,
   ): Promise<void>;
 
   /**
