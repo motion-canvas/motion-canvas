@@ -82,13 +82,13 @@ export class FFmpegExporterClient implements Exporter {
 
   private concurrentFrames = 0;
   private error: unknown = false;
+  private sounds: Sound[] = [];
 
   public constructor(
     private readonly project: Project,
     private readonly settings: RendererSettings,
   ) {}
 
-  private sounds: Sound[] = [];
   public async provideSounds(sounds: Sound[]): Promise<void> {
     this.sounds = sounds;
   }

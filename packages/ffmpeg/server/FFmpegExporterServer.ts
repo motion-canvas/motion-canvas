@@ -34,7 +34,9 @@ function formatFilters(filters: AudioVideoFilter[]): string {
       } else if (f.options.constructor === Array) {
         options = f.options;
       } else {
-        options = Object.entries(f.options).map(([k, v]) => `${k}=${v}`);
+        options = Object.entries(f.options)
+          .filter(([, v]) => v !== undefined)
+          .map(([k, v]) => `${k}=${v}`);
       }
       return `${f.filter}=${options.join(':')}`;
     })
@@ -111,6 +113,10 @@ export class FFmpegExporterServer {
       this.command.input(sound.audio.slice(1));
 
       const filters: AudioVideoFilter[] = [];
+      filters.push({
+        filter: 'aresample',
+        options: '48000',
+      });
 
       if (sound.start || sound.end !== undefined) {
         filters.push({

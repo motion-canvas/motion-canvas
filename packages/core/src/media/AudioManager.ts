@@ -1,5 +1,6 @@
 import {Logger} from '../app';
 import {ValueDispatcher} from '../events';
+import {Sound} from '../scenes';
 import {useLogger} from '../utils';
 import {AudioData} from './AudioData';
 
@@ -17,6 +18,7 @@ export class AudioManager {
   private offset = 0;
   private start?: number;
   private duration?: number;
+  private gainNode?: GainNode;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -28,16 +30,33 @@ export class AudioManager {
     }
   }
 
-  private audioContext?: AudioContext;
-  private sourceNode?: MediaElementAudioSourceNode;
+  public setSound(sound: Sound) {
+    this.setOffset(sound.offset);
+    this.setTrim(sound.start, sound.end);
+    this.setSource(sound.audio);
 
-  public setFilter(filter: (ctx: AudioContext, src: AudioNode) => AudioNode) {
-    this.audioContext ??= new AudioContext();
-    this.sourceNode ??= this.audioContext.createMediaElementSource(
-      this.audioElement,
+    if (this.gainNode === undefined) {
+      const sourceNode = this.context.createMediaElementSource(
+        this.audioElement,
+      );
+      this.gainNode = this.context.createGain();
+      sourceNode.connect(this.gainNode);
+      this.gainNode.connect(this.context.destination);
+    }
+
+    this.gainNode.gain.value = Math.pow(10, (sound.gain ?? 0) / 10);
+    this.setPlaybackRate(
+      Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1),
+      true,
     );
-    const filtered = filter(this.audioContext, this.sourceNode);
-    filtered.connect(this.audioContext.destination);
+  }
+
+  public async loadMetadata() {
+    if (this.audioElement.readyState < 1) {
+      await new Promise(resolve =>
+        this.audioElement.addEventListener('loadedmetadata', resolve),
+      );
+    }
   }
 
   public getTime() {
@@ -66,10 +85,6 @@ export class AudioManager {
     this.audioElement.preservesPitch = !pitchShift;
   }
 
-  public getOffset(): number {
-    return this.offset;
-  }
-
   public setMuted(isMuted: boolean) {
     this.audioElement.muted = isMuted;
   }
@@ -88,10 +103,6 @@ export class AudioManager {
         this.logger.error(e);
       }
     });
-  }
-
-  public getSource() {
-    return this.source;
   }
 
   public isInRange(time: number) {

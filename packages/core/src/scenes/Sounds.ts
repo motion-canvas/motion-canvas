@@ -52,6 +52,8 @@ export class SoundBuilder {
 
   /**
    * Pitch shift the played sound.
+   *
+   * @remarks
    * This also affects the duration of the sound.
    *
    * @param cents - The pitch shift in cents.
@@ -63,6 +65,8 @@ export class SoundBuilder {
 
   /**
    * Change the playback rate of the sound.
+   *
+   * @remarks
    * This also affects the percieved pitch of the sound.
    *
    * @param rate - The new playback rate.
@@ -75,7 +79,7 @@ export class SoundBuilder {
   /**
    * Play the configured sound at the current frame.
    *
-   * @param offset - An offset in seconds from the current frame.
+   * @param offset - An offset in seconds from the current frame. Defaults to 0.
    */
   public play(offset?: number) {
     useScene().sounds.add(this.settings, offset);
@@ -100,6 +104,10 @@ export class Sounds {
   public add(settings: SoundSettings, offset?: number) {
     const playbackTime = this.scene.playback.time + (offset ?? 0);
     this.sounds.push({offset: playbackTime, ...settings});
+  }
+
+  public getSounds(): readonly Sound[] {
+    return this.sounds;
   }
 
   public handleReset = () => {

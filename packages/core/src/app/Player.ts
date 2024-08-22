@@ -382,11 +382,10 @@ export class Player {
         this.duration.current = this.playback.frame;
 
         const sounds: Sound[] = [];
-        for (let i = 0; i < this.project.scenes.length; i++) {
-          const scene = this.playback.onScenesRecalculated.current[i];
-          sounds.push(...(<Sound[]>(<any>scene.sounds).sounds));
+        for (const scene of this.playback.onScenesRecalculated.current) {
+          sounds.push(...scene.sounds.getSounds());
         }
-        this.audioPool.setupPools(sounds);
+        await this.audioPool.setupPool(sounds);
         this.audioPool.setTime(this.status.time);
 
         this.recalculated.dispatch();

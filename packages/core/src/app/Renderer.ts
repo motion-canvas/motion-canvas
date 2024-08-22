@@ -207,7 +207,7 @@ export class Renderer {
     await this.reloadScenes(settings);
     await this.playback.recalculate();
     if (signal.aborted) return RendererResult.Aborted;
-    await this.provideSounds();
+    await this.collectSounds();
     await this.playback.reset();
     if (signal.aborted) return RendererResult.Aborted;
 
@@ -273,11 +273,10 @@ export class Renderer {
     }
   }
 
-  private async provideSounds() {
+  private async collectSounds() {
     const sounds: Sound[] = [];
-    for (let i = 0; i < this.project.scenes.length; i++) {
-      const scene = this.playback.onScenesRecalculated.current[i];
-      sounds.push(...(<Sound[]>(<any>scene.sounds).sounds));
+    for (const scene of this.playback.onScenesRecalculated.current) {
+      sounds.push(...scene.sounds.getSounds());
     }
     await this.exporter!.provideSounds?.(sounds);
   }

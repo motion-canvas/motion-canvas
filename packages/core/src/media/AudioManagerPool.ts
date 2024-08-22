@@ -3,87 +3,72 @@ import {Sound} from '../scenes';
 import {AudioManager} from './AudioManager';
 
 export class AudioManagerPool {
-  private pools: {
-    am: AudioManager;
+  private pool: {
+    manager: AudioManager;
+    current?: Sound;
     sounds: Sound[];
-    gain: GainNode;
   }[] = [];
 
   public constructor(private readonly logger: Logger) {}
 
-  public setupPools(sounds: Sound[]) {
-    this.pools = [];
+  public async setupPool(sounds: Sound[]) {
+    this.pool = [];
 
     for (const sound of sounds) {
-      const pool = this.pools.find(
-        pool =>
-          !pool.am.isInRange(sound.offset) &&
-          pool.am.getSource() === sound.audio,
+      let group = this.pool.find(
+        group => !group.manager.isInRange(sound.offset),
       );
-      if (pool !== undefined) {
-        pool.am.setOffset(sound.offset);
-        pool.am.setTrim(sound.start, sound.end);
-        pool.sounds.unshift(sound);
+
+      if (group !== undefined) {
+        group.sounds.unshift(sound);
       } else {
-        const am = new AudioManager(this.logger);
-        am.setOffset(sound.offset);
-        am.setTrim(sound.start, sound.end);
-        am.setSource(sound.audio);
-
-        let gain = undefined as unknown as GainNode;
-        am.setFilter((ctx, src) => {
-          gain = ctx.createGain();
-          src.connect(gain);
-          return gain;
-        });
-
-        this.pools.push({am, sounds: [sound], gain});
+        group = {manager: new AudioManager(this.logger), sounds: [sound]};
+        this.pool.push(group);
       }
+
+      group.manager.setSound(sound);
+      await group.manager.loadMetadata();
     }
   }
 
   public setMuted(muted: boolean) {
-    this.pools.forEach(pool => pool.am.setMuted(muted));
+    this.pool.forEach(group => group.manager.setMuted(muted));
   }
 
   public setVolume(volume: number) {
-    this.pools.forEach(pool => pool.am.setVolume(volume));
+    this.pool.forEach(group => group.manager.setVolume(volume));
   }
 
   public setTime(time: number) {
-    this.pools.forEach(pool => pool.am.setTime(time));
+    this.pool.forEach(group => group.manager.setTime(time));
   }
 
   public async setPaused(paused: boolean, time: number) {
     await Promise.all(
-      this.pools.map(pool =>
-        pool.am.setPaused(paused || !pool.am.isInRange(time)),
+      this.pool.map(group =>
+        group.manager.setPaused(paused || !group.manager.isInRange(time)),
       ),
     );
   }
 
   public prepare(time: number, delta: number) {
-    for (const pool of this.pools) {
-      const latest = pool.sounds.find(s => s.offset <= time);
-      if (latest !== undefined && pool.am.getOffset() !== latest.offset) {
-        pool.am.setOffset(latest.offset);
-        pool.am.setTrim(latest.start, latest.end);
+    for (const group of this.pool) {
+      const latest = group.sounds.find(sound => sound.offset <= time);
+
+      if (latest !== undefined && group.current !== latest) {
+        group.manager.setSound(latest);
 
         if (time < latest.offset + delta) {
           // if a sound started between last frame and this frame,
           // start playback from the start.
           // this prevents the starts of sounds from being cut off.
-          pool.am.setTime(latest.offset);
+          group.manager.setTime(latest.offset);
         } else {
-          pool.am.setTime(time);
+          group.manager.setTime(time);
         }
-
-        pool.gain.gain.value = Math.pow(10, (latest.gain ?? 0) / 10);
-        pool.am.setPlaybackRate(
-          Math.pow(2, (latest.detune ?? 0) / 1200) * (latest.playbackRate ?? 1),
-          true,
-        );
       }
+
+      group.current = latest;
     }
   }
 }
