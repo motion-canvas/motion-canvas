@@ -42,7 +42,7 @@
     "@typescript-eslint/parser": "^6.11.0",
     "eslint": "^8.54.0",
     "eslint-plugin-tsdoc": "^0.2.17",
-    "husky": "^8.0.3",
+    "husky": "^9.1.5",
     "lerna": "^8.1.8",
     "lint-staged": "^15.1.0",
     "prettier": "^3.1.0",
