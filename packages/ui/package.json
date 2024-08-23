@@ -36,6 +36,6 @@
     "highlight.js": "^11.9.0",
     "sass": "^1.69.5",
     "source-map-js": "^1.0.2",
-    "vite-plugin-dts": "^3.6.4"
+    "vite-plugin-dts": "^4.0.3"
   }
 }

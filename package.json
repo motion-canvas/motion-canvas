@@ -44,9 +44,9 @@
     "eslint-plugin-tsdoc": "^0.2.17",
     "husky": "^9.1.5",
     "lerna": "^8.1.8",
-    "lint-staged": "^15.1.0",
-    "prettier": "^3.1.0",
-    "prettier-plugin-organize-imports": "^3.2.4",
+    "lint-staged": "^15.2.9",
+    "prettier": "^3.3.3",
+    "prettier-plugin-organize-imports": "^4.0.0",
     "typescript": "^5.2.2",
     "vite": "^4.5.0"
   },
