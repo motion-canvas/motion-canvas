@@ -268,7 +268,7 @@ async function tryGetResource(
   });
 
   if (!result.statusCode || result.statusCode >= 300) {
-    throw 'Unexpected Status: ' + result.statusCode ?? 'NO_STATUS';
+    throw 'Unexpected Status: ' + (result.statusCode ?? 'NO_STATUS');
   }
 
   const contentType = result.headers['content-type'];
