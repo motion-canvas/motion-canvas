@@ -10,6 +10,6 @@
     "highlight.js": "^11.9.0",
     "marked": "^10.0.0",
     "rollup-plugin-postcss": "^4.0.2",
-    "ts-patch": "^3.0.2"
+    "ts-patch": "^3.2.1"
   }
 }
