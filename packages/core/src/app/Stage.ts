@@ -72,7 +72,7 @@ export class Stage {
     this.background =
       typeof background === 'string'
         ? background
-        : background?.serialize() ?? null;
+        : (background?.serialize() ?? null);
   }
 
   public async render(currentScene: Scene, previousScene: Scene | null) {

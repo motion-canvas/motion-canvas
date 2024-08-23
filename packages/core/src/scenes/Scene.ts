@@ -85,9 +85,8 @@ export interface SceneDescriptionReload<T = unknown> {
   stack?: string;
 }
 
-export type DescriptionOf<TScene> = TScene extends Scene<infer TConfig>
-  ? SceneDescription<TConfig>
-  : never;
+export type DescriptionOf<TScene> =
+  TScene extends Scene<infer TConfig> ? SceneDescription<TConfig> : never;
 
 /**
  * Describes cached information about the timing of a scene.
