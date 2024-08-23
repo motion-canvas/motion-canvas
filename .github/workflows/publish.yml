@@ -24,13 +24,13 @@ jobs:
       NPM_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
       GH_TOKEN: ${{secrets.PUBLISH_TOKEN}}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{secrets.PUBLISH_TOKEN}}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           registry-url: 'https://registry.npmjs.org'
           cache: npm
       - run: git config --global user.email "129169430+motion-canvas-bot@users.noreply.github.com"

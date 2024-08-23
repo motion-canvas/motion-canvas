@@ -1,5 +1,5 @@
 import * as path from 'path';
-import puppeteer, {Page} from 'puppeteer';
+import {Page, firefox} from 'playwright';
 import {fileURLToPath} from 'url';
 import {createServer} from 'vite';
 
@@ -12,9 +12,8 @@ export interface App {
 
 export async function start(): Promise<App> {
   const [browser, server] = await Promise.all([
-    puppeteer.launch({
-      headless: 'new',
-      product: 'firefox',
+    firefox.launch({
+      headless: true,
     }),
     createServer({
       root: Root,
