@@ -12,6 +12,7 @@ module.exports = {
         'docs',
         'e2e',
         'examples',
+        'ffmpeg',
         'legacy',
         'player',
         'ui',

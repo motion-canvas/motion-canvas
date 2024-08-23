@@ -287,6 +287,7 @@ export class Renderer {
       sceneFrame,
       this.playback.currentScene.name,
       signal,
+      this.stage.context,
     );
   }
 }

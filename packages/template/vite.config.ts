@@ -16,6 +16,10 @@ export default defineConfig({
         replacement: '@motion-canvas/2d/src/editor',
       },
       {
+        find: '@motion-canvas/ffmpeg/lib/client',
+        replacement: '@motion-canvas/ffmpeg/client',
+      },
+      {
         find: /@motion-canvas\/2d(\/lib)?/,
         replacement: '@motion-canvas/2d/src/lib',
       },

@@ -28,6 +28,11 @@ type FFmpegExporterOptions = ValueOf<
   ReturnType<typeof FFmpegExporterClient.meta>
 >;
 
+type InvokeStrategy = 'ws' | 'octet-stream';
+
+const EXPORT_FRAME_LIMIT = 256;
+const EXPORT_RETRY_DELAY = 1000;
+
 /**
  * FFmpeg video exporter.
  *
@@ -74,6 +79,9 @@ export class FFmpegExporterClient implements Exporter {
     }
   }
 
+  private concurrentFrames = 0;
+  private error: unknown = false;
+
   public constructor(
     private readonly project: Project,
     private readonly settings: RendererSettings,
@@ -90,13 +98,43 @@ export class FFmpegExporterClient implements Exporter {
     });
   }
 
-  public async handleFrame(canvas: HTMLCanvasElement): Promise<void> {
-    await this.invoke('handleFrame', {
-      data: canvas.toDataURL('image/png'),
-    });
+  public async handleFrame(
+    canvas: HTMLCanvasElement,
+    _frame: number,
+    _sceneFrame: number,
+    _sceneName: string,
+    _signal: AbortSignal,
+    context: CanvasRenderingContext2D,
+  ): Promise<void> {
+    while (this.concurrentFrames >= EXPORT_FRAME_LIMIT) {
+      await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
+    }
+
+    if (this.error) {
+      throw this.error;
+    }
+
+    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    this.concurrentFrames++;
+    this.invoke('handleFrame', data, 'octet-stream')
+      .then(() => {
+        this.concurrentFrames--;
+      })
+      .catch(error => {
+        this.error = error;
+        this.concurrentFrames--;
+      });
   }
 
   public async stop(result: RendererResult): Promise<void> {
+    while (this.concurrentFrames >= EXPORT_FRAME_LIMIT) {
+      await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
+    }
+
+    if (this.error) {
+      throw this.error;
+    }
+
     await this.invoke('end', result);
   }
 
@@ -106,10 +144,12 @@ export class FFmpegExporterClient implements Exporter {
    * @param method - The method name to execute on the server.
    * @param data - The data that will be passed as an argument to the method.
    *               Should be serializable.
+   * @param strategy - How the data should be sent to the server.
    */
   private invoke<TResponse = unknown, TData = unknown>(
     method: string,
     data: TData,
+    strategy: InvokeStrategy = 'ws',
   ): Promise<TResponse> {
     if (import.meta.hot) {
       return new Promise((resolve, reject) => {
@@ -130,7 +170,19 @@ export class FFmpegExporterClient implements Exporter {
           }
         };
         FFmpegExporterClient.response.subscribe(handle);
-        import.meta.hot!.send('motion-canvas/ffmpeg', {method, data});
+        switch (strategy) {
+          case 'ws':
+            import.meta.hot!.send('motion-canvas/ffmpeg', {method, data});
+            break;
+          case 'octet-stream':
+            fetch(`/ffmpeg/${method}`, {
+              method: 'POST',
+              body: data as ArrayBuffer,
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              headers: {'Content-Type': 'application/octet-stream'},
+            }).catch(reject);
+            break;
+        }
       });
     } else {
       throw new Error('FFmpegExporter can only be used locally.');

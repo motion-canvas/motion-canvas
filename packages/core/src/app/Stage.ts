@@ -26,7 +26,7 @@ export class Stage {
   private readonly currentBuffer: HTMLCanvasElement;
   private readonly previousBuffer: HTMLCanvasElement;
 
-  private context: CanvasRenderingContext2D;
+  public context: CanvasRenderingContext2D;
   private currentContext: CanvasRenderingContext2D;
   private previousContext: CanvasRenderingContext2D;
 
@@ -40,7 +40,10 @@ export class Stage {
     this.previousBuffer = document.createElement('canvas');
 
     const colorSpace = this.colorSpace;
-    this.context = getContext({colorSpace}, this.finalBuffer);
+    this.context = getContext(
+      {colorSpace, willReadFrequently: true},
+      this.finalBuffer,
+    );
     this.currentContext = getContext({colorSpace}, this.currentBuffer);
     this.previousContext = getContext({colorSpace}, this.previousBuffer);
   }

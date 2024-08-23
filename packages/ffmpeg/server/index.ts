@@ -12,7 +12,7 @@ export default (): Plugin => {
       },
     },
     configureServer(server) {
-      new FFmpegBridge(server.ws, config);
+      new FFmpegBridge(server, config);
     },
   };
 };

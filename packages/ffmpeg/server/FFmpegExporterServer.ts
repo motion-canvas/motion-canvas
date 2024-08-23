@@ -1,14 +1,14 @@
-import {path as ffmpegPath} from '@ffmpeg-installer/ffmpeg';
-import {path as ffprobePath} from '@ffprobe-installer/ffprobe';
 import type {RendererResult, RendererSettings} from '@motion-canvas/core';
 import type {PluginConfig} from '@motion-canvas/vite-plugin';
+import {ffmpegPath, ffprobePath} from 'ffmpeg-ffprobe-static';
 import ffmpeg from 'fluent-ffmpeg';
 import * as fs from 'fs';
 import * as path from 'path';
+import {Readable} from 'stream';
 import {ImageStream} from './ImageStream';
 
-ffmpeg.setFfmpegPath(ffmpegPath);
-ffmpeg.setFfprobePath(ffprobePath);
+ffmpeg.setFfmpegPath(ffmpegPath!);
+ffmpeg.setFfprobePath(ffprobePath!);
 
 export interface FFmpegExporterSettings extends RendererSettings {
   audio?: string;
@@ -29,13 +29,18 @@ export class FFmpegExporterServer {
     settings: FFmpegExporterSettings,
     private readonly config: PluginConfig,
   ) {
-    this.stream = new ImageStream();
+    const size = {
+      x: Math.round(settings.size.x * settings.resolutionScale),
+      y: Math.round(settings.size.y * settings.resolutionScale),
+    };
+    this.stream = new ImageStream(size);
     this.command = ffmpeg();
 
     // Input image sequence
     this.command
       .input(this.stream)
-      .inputFormat('image2pipe')
+      .inputFormat('rawvideo')
+      .inputOptions(['-pix_fmt rgba', '-s:v', `${size.x}x${size.y}`])
       .inputFps(settings.fps);
 
     // Input audio file
@@ -47,10 +52,6 @@ export class FFmpegExporterServer {
     }
 
     // Output settings
-    const size = {
-      x: Math.round(settings.size.x * settings.resolutionScale),
-      y: Math.round(settings.size.y * settings.resolutionScale),
-    };
     this.command
       .output(path.join(this.config.output, `${settings.name}.mp4`))
       .outputOptions(['-pix_fmt yuv420p', '-shortest'])
@@ -72,9 +73,8 @@ export class FFmpegExporterServer {
     this.command.run();
   }
 
-  public async handleFrame({data}: {data: string}) {
-    const base64Data = data.slice(data.indexOf(',') + 1);
-    this.stream.pushImage(Buffer.from(base64Data, 'base64'));
+  public async handleFrame(req: Readable) {
+    await this.stream.pushImage(req);
   }
 
   public async end(result: RendererResult) {

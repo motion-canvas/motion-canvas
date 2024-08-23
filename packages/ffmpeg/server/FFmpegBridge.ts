@@ -1,5 +1,6 @@
 import {PluginConfig} from '@motion-canvas/vite-plugin';
-import type {WebSocketServer} from 'vite';
+import {ServerResponse} from 'node:http';
+import {Connect, ViteDevServer} from 'vite';
 import {
   FFmpegExporterServer,
   FFmpegExporterSettings,
@@ -21,11 +22,23 @@ export class FFmpegBridge {
   private process: FFmpegExporterServer | null = null;
 
   public constructor(
-    private readonly ws: WebSocketServer,
+    private readonly server: ViteDevServer,
     private readonly config: PluginConfig,
   ) {
-    ws.on('motion-canvas/ffmpeg', this.handleMessage);
+    server.ws.on('motion-canvas/ffmpeg', this.handleMessage);
+    server.middlewares.use('/ffmpeg', this.handleRequest);
   }
+
+  private handleRequest = async (
+    req: Connect.IncomingMessage,
+    res: ServerResponse,
+  ) => {
+    res.end();
+    await this.handleMessage({
+      method: req.url!.slice(1),
+      data: req,
+    });
+  };
 
   private handleMessage = async ({method, data}: BrowserRequest) => {
     if (method === 'start') {
@@ -63,7 +76,7 @@ export class FFmpegBridge {
   };
 
   private respondSuccess(method: string, data: any = {}) {
-    this.ws.send('motion-canvas/ffmpeg-ack', {
+    this.server.ws.send('motion-canvas/ffmpeg-ack', {
       status: 'success',
       method,
       data,
@@ -71,7 +84,7 @@ export class FFmpegBridge {
   }
 
   private respondError(method: string, message = 'Unknown error.') {
-    this.ws.send('motion-canvas/ffmpeg-ack', {
+    this.server.ws.send('motion-canvas/ffmpeg-ack', {
       status: 'error',
       method,
       message,

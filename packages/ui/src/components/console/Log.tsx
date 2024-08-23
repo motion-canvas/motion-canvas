@@ -21,11 +21,19 @@ export function Log({payload}: LogProps) {
   const [open, setOpen] = useState(payload.level === LogLevel.Error);
   const [entries, setEntries] = useState<StackTraceEntry[] | null>(null);
   const duration = useFormattedNumber(payload.durationMs, 2);
-  const object = useMemo(
-    () =>
-      payload.object ? JSON.stringify(payload.object, undefined, 2) : null,
-    [payload],
-  );
+  const object = useMemo(() => {
+    if (!payload.object) {
+      return null;
+    }
+
+    if (typeof payload.object === 'object' && 'byteLength' in payload.object) {
+      return `${payload.object.prototype?.name ?? 'ArrayLike'}[${
+        payload.object.byteLength
+      }]`;
+    }
+
+    return JSON.stringify(payload.object, undefined, 2);
+  }, [payload]);
   const userEntry = useMemo(() => {
     return entries?.find(entry => !entry.isExternal) ?? null;
   }, [entries]);
