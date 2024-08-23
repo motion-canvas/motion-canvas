@@ -65,13 +65,12 @@ export function Provider({children}: {children?: ComponentChildren}) {
 
   state.scene.value = currentScene as Scene2D;
 
-  useSignalEffect(
-    () =>
-      state.scene.value?.onRenderLifecycle.subscribe(([event]) => {
-        if (event === SceneRenderEvent.AfterRender) {
-          state.afterRender.value++;
-        }
-      }),
+  useSignalEffect(() =>
+    state.scene.value?.onRenderLifecycle.subscribe(([event]) => {
+      if (event === SceneRenderEvent.AfterRender) {
+        state.afterRender.value++;
+      }
+    }),
   );
 
   useSignalEffect(() => {

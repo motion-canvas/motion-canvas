@@ -8,3 +8,5 @@ node_modules
 /packages/*/output
 
 .idea
+.nx/cache
+.nx/workspace-data

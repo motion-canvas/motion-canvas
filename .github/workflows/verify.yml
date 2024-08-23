@@ -8,185 +8,81 @@ env:
   HUSKY: 0
 
 jobs:
-  prepare:
-    name: Prepare
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-      - run: PUPPETEER_PRODUCT=firefox npm ci
-      - uses: actions/cache/save@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
   commit:
     name: Commit name
-    needs: prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
+      - run: npm ci
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
   lint:
     name: Lint
-    needs: prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
-      - run: npm run eslint
+      - run: npm ci
+      - run: npx eslint "**/*.ts?(x)"
   prettier:
     name: Code style
-    needs: prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
+      - run: npm ci
       - run: npm run prettier
   build:
     name: Build
-    needs: prepare
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
+      - run: npm ci
       - run: npx lerna run build
-      - uses: actions/cache/save@v3
-        with:
-          key: ${{ github.run_id }}-build
-          path: |
-            packages/2d/lib
-            packages/2d/editor
-            packages/core/lib
-            packages/ui/dist
-            packages/player/dist
-            packages/vite-plugin/lib
+      - run: npm run examples:build
   tests:
     name: Unit tests
-    needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-build
-          path: |
-            packages/2d/lib
-            packages/2d/editor
-            packages/core/lib
-            packages/ui/dist
-            packages/player/dist
-            packages/vite-plugin/lib
+      - run: npm ci
+      - run: npx lerna run build
       - run: npx lerna run test
-  examples:
-    name: Examples
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-build
-          path: |
-            packages/2d/lib
-            packages/2d/editor
-            packages/core/lib
-            packages/ui/dist
-            packages/player/dist
-            packages/vite-plugin/lib
-      - run: npm run examples:build
   e2e:
     name: E2E
-    needs: build
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.46.1-jammy
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-build
-          path: |
-            packages/2d/lib
-            packages/2d/editor
-            packages/core/lib
-            packages/ui/dist
-            packages/player/dist
-            packages/vite-plugin/lib
+      - run: npm ci
+      - run: npx lerna run build
       - run: npm run e2e:test
+        env:
+          HOME: /root
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
@@ -194,30 +90,15 @@ jobs:
           path: packages/e2e/src/__image_snapshots__/__diff_output__
   docs:
     name: Documentation
-    needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-node-modules
-          path: |
-            **/node_modules
-            ~/.cache/puppeteer
-      - uses: actions/cache/restore@v3
-        with:
-          key: ${{ github.run_id }}-build
-          path: |
-            packages/2d/lib
-            packages/2d/editor
-            packages/core/lib
-            packages/ui/dist
-            packages/player/dist
-            packages/vite-plugin/lib
+      - run: npm ci
+      - run: npx lerna run build
       - run: npx lerna run bundle
       - run: npm run docs:build
         env:
