@@ -255,32 +255,32 @@ export class Layout extends Node {
     return this.gap.y;
   }
 
-  @defaultStyle('font-family')
+  @defaultStyle('Roboto')
   @signal()
   public declare readonly fontFamily: SimpleSignal<string, this>;
-  @defaultStyle('font-size', parseFloat)
+  @defaultStyle(48)
   @signal()
   public declare readonly fontSize: SimpleSignal<number, this>;
-  @defaultStyle('font-style')
+  @defaultStyle('normal')
   @signal()
   public declare readonly fontStyle: SimpleSignal<string, this>;
-  @defaultStyle('font-weight', parseInt)
+  @defaultStyle(500)
   @signal()
   public declare readonly fontWeight: SimpleSignal<number, this>;
-  @defaultStyle('line-height', parseFloat)
+  @defaultStyle('120%')
   @signal()
   public declare readonly lineHeight: SimpleSignal<Length, this>;
-  @defaultStyle('letter-spacing', i => (i === 'normal' ? 0 : parseFloat(i)))
+  @defaultStyle(0)
   @signal()
   public declare readonly letterSpacing: SimpleSignal<number, this>;
 
-  @defaultStyle('white-space', i => (i === 'pre' ? 'pre' : i === 'normal'))
+  @defaultStyle(false)
   @signal()
   public declare readonly textWrap: SimpleSignal<TextWrap, this>;
-  @initial('inherit')
+  @initial('ltr')
   @signal()
   public declare readonly textDirection: SimpleSignal<CanvasDirection, this>;
-  @defaultStyle('text-align')
+  @defaultStyle('start')
   @signal()
   public declare readonly textAlign: SimpleSignal<CanvasTextAlign, this>;
 
@@ -993,44 +993,25 @@ export class Layout extends Node {
 
   @computed()
   protected applyFont() {
-    this.element.style.fontFamily = this.fontFamily.isInitial()
-      ? ''
-      : this.fontFamily();
-    this.element.style.fontSize = this.fontSize.isInitial()
-      ? ''
-      : `${this.fontSize()}px`;
-    this.element.style.fontStyle = this.fontStyle.isInitial()
-      ? ''
-      : this.fontStyle();
-    if (this.lineHeight.isInitial()) {
-      this.element.style.lineHeight = '';
-    } else {
-      const lineHeight = this.lineHeight();
-      this.element.style.lineHeight =
-        typeof lineHeight === 'string'
-          ? (parseFloat(lineHeight as string) / 100).toString()
-          : `${lineHeight}px`;
-    }
-    this.element.style.fontWeight = this.fontWeight.isInitial()
-      ? ''
-      : this.fontWeight().toString();
-    this.element.style.letterSpacing = this.letterSpacing.isInitial()
-      ? ''
-      : `${this.letterSpacing()}px`;
+    this.element.style.fontFamily = this.fontFamily();
+    this.element.style.fontSize = `${this.fontSize()}px`;
+    this.element.style.fontStyle = this.fontStyle();
 
-    this.element.style.textAlign = this.textAlign.isInitial()
-      ? ''
-      : this.textAlign();
+    const lineHeight = this.lineHeight();
+    this.element.style.lineHeight =
+      typeof lineHeight === 'number'
+        ? `${lineHeight}px`
+        : (parseFloat(lineHeight as string) / 100).toString();
 
-    if (this.textWrap.isInitial()) {
-      this.element.style.whiteSpace = '';
+    this.element.style.fontWeight = this.fontWeight().toString();
+    this.element.style.letterSpacing = `${this.letterSpacing()}px`;
+    this.element.style.textAlign = this.textAlign();
+
+    const wrap = this.textWrap();
+    if (typeof wrap === 'boolean') {
+      this.element.style.whiteSpace = wrap ? 'normal' : 'nowrap';
     } else {
-      const wrap = this.textWrap();
-      if (typeof wrap === 'boolean') {
-        this.element.style.whiteSpace = wrap ? 'normal' : 'nowrap';
-      } else {
-        this.element.style.whiteSpace = wrap;
-      }
+      this.element.style.whiteSpace = wrap;
     }
   }
 
