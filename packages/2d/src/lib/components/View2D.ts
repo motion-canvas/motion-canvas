@@ -43,11 +43,6 @@ export class View2D extends Rect {
   public constructor(props: View2DProps) {
     super({
       composite: true,
-      fontFamily: 'Roboto',
-      fontSize: 48,
-      lineHeight: '120%',
-      textWrap: false,
-      fontStyle: 'normal',
       ...props,
     });
     this.view2D = this;
