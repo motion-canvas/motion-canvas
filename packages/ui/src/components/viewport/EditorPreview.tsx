@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import {ComponentChildren} from 'preact';
-import {useCallback, useMemo, useRef} from 'preact/hooks';
+import {useMemo, useRef} from 'preact/hooks';
 import {ViewportProvider, ViewportState, useApplication} from '../../contexts';
 import {VIEWPORT_SHORTCUTS, useShortcuts} from '../../contexts/shortcuts';
 import {
-  useDrag,
   usePreviewSettings,
   useSharedSettings,
   useSize,
@@ -33,6 +32,7 @@ export function EditorPreview() {
   );
   const containerRef = useRef<HTMLDivElement>();
   const overlayRef = useRef<HTMLDivElement>();
+  const isDragging = useRef(false);
   const size = useSize(containerRef);
   const settings = {
     ...useSharedSettings(),
@@ -77,22 +77,6 @@ export function EditorPreview() {
 
     return state;
   }, [grid, zoomToFit, zoom, position, settings, size]);
-
-  const [handleDrag, isDragging] = useDrag(
-    useCallback(
-      (x, y) => {
-        setZoomToFit(false);
-        setZoom(state.zoom);
-        setPosition({
-          x: state.x + x,
-          y: state.y + y,
-        });
-      },
-      [state],
-    ),
-    undefined,
-    null,
-  );
 
   useSubscribable(
     player.onRecalculated,
@@ -158,16 +142,33 @@ export function EditorPreview() {
           onContextMenu={event => {
             event.preventDefault();
           }}
-          onMouseDown={event => {
+          onPointerDown={event => {
             if (
               event.button === MouseButton.Middle ||
               (event.button === MouseButton.Left && event.shiftKey)
             ) {
-              handleDrag(event);
+              isDragging.current = true;
+              event.preventDefault();
+              event.stopPropagation();
+              event.currentTarget.setPointerCapture(event.pointerId);
             }
           }}
+          onPointerMove={event => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              setZoomToFit(false);
+              setZoom(state.zoom);
+              setPosition({
+                x: state.x + event.movementX,
+                y: state.y + event.movementY,
+              });
+            }
+          }}
+          onPointerUp={event => {
+            isDragging.current = false;
+            event.currentTarget.releasePointerCapture(event.pointerId);
+          }}
           onWheel={event => {
-            if (isDragging) return;
+            if (isDragging.current) return;
             const rect = containerRef.current.getBoundingClientRect();
             const pointer = {
               x: event.x - rect.x - rect.width / 2,
