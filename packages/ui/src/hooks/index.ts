@@ -1,6 +1,4 @@
 export * from './useCurrentFrame';
-export * from './useDocumentEvent';
-export * from './useDrag';
 export * from './useDuration';
 export * from './useFormattedNumber';
 export * from './usePlayerState';

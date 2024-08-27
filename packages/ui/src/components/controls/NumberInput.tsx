@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import type {JSX} from 'preact';
-import {useCallback, useEffect, useRef, useState} from 'preact/hooks';
-import {useDocumentEvent} from '../../hooks';
+import {useEffect, useRef, useState} from 'preact/hooks';
 import {MouseButton, clamp} from '../../utils';
 import styles from './Controls.module.scss';
 
@@ -35,32 +34,6 @@ export function NumberInput({
   useEffect(() => {
     setCurrentValue(value);
   }, [value]);
-
-  const handleDrag = useCallback(
-    (event: MouseEvent) => {
-      setCurrentValue(value => {
-        // ignore very large jumps in movement, as they often result from
-        // mouse acceleration issues
-        if (Math.abs(event.movementX) > 100) {
-          return value;
-        }
-
-        return clamp(min, max, value + event.movementX * step);
-      });
-    },
-    [min, max, step],
-  );
-
-  useDocumentEvent(
-    'pointerlockchange',
-    useCallback(() => {
-      if (document.pointerLockElement === inputRef.current) {
-        document.addEventListener('pointermove', handleDrag);
-      } else {
-        document.removeEventListener('pointermove', handleDrag);
-      }
-    }, [handleDrag]),
-  );
 
   return (
     <>
@@ -96,6 +69,16 @@ export function NumberInput({
             if (Math.abs(startX - event.clientX) > 5) {
               inputRef.current.requestPointerLock();
             }
+          } else if (document.pointerLockElement === inputRef.current) {
+            setCurrentValue(value => {
+              // ignore very large jumps in movement, as they often result
+              // from mouse acceleration issues
+              if (Math.abs(event.movementX) > 100) {
+                return value;
+              }
+
+              return clamp(min, max, value + event.movementX * step);
+            });
           }
         }}
         onPointerUp={event => {
