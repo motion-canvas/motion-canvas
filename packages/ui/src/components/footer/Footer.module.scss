@@ -19,6 +19,12 @@
   overflow: hidden;
 }
 
+.action {
+  color: var(--theme);
+  font-weight: bold;
+  margin-left: 4px;
+}
+
 .shortcut {
   display: flex;
 
@@ -34,7 +40,7 @@
     margin-right: 4px;
     padding: 0 4px;
   }
-  .action {
+  .description {
     white-space: nowrap;
   }
 }

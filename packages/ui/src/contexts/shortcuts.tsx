@@ -1,17 +1,24 @@
 import {Signal, useSignal} from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {Ref, useContext, useEffect, useRef} from 'preact/hooks';
+import {MouseButton} from '../utils';
 
-export type Shortcut = {
+export interface Action {
+  name: string;
+  update: (event: PointerEvent) => void;
+  finish: (value: boolean) => void;
+}
+
+export interface Shortcut {
   key: string;
   modifiers: {
     shift?: boolean;
     ctrl?: boolean;
     alt?: boolean;
   };
-  display: string;
+  display: string | false;
   description: string;
-};
+}
 
 export type ShortcutConfig<T extends string> = {
   context: string;
@@ -22,8 +29,10 @@ export type ShortcutMap<T extends string> = {
   [Key in T]?: Shortcut;
 };
 
+export type ShortcutCallback = () => Promise<Action | void> | Action | void;
+
 export type ShortcutCallbacks<T extends string> = {
-  [Key in T]?: () => void;
+  [Key in T]?: ShortcutCallback;
 };
 
 function makeShortcuts<T extends string>(
@@ -185,9 +194,10 @@ interface ModifierState {
 }
 
 type ConfigMap = Map<string, ShortcutMap<string>>;
-type CallbackMap = Map<string, Set<(key: string) => boolean>>;
+type CallbackMap = Map<string, Set<(key: string) => Promise<Action | boolean>>>;
 
 interface ShortcutsContextValue {
+  action: Signal<Action | null>;
   global: Signal<string | null>;
   surface: Signal<string | null>;
   modifiers: Signal<ModifierState>;
@@ -206,6 +216,7 @@ export function ShortcutsProvider({
 }) {
   const global = useSignal<string | null>(null);
   const surface = useSignal<string | null>(null);
+  const action = useSignal<Action | null>(null);
   const modifiers = useSignal<ModifierState>({
     shift: false,
     ctrl: false,
@@ -228,7 +239,15 @@ export function ShortcutsProvider({
   const configsRef = useRef(configMap);
   configsRef.current = configMap;
 
-  function evaluate(event: KeyboardEvent, context: string) {
+  const updateModifiers = (event: MouseEvent | KeyboardEvent) => {
+    modifiers.value = {
+      shift: event.shiftKey,
+      ctrl: event.ctrlKey,
+      alt: event.altKey,
+    };
+  };
+
+  async function evaluate(event: KeyboardEvent, context: string) {
     const config = configsRef.current.get(context)!;
     const callbackSet = callbacks.current.get(context);
 
@@ -244,7 +263,11 @@ export function ShortcutsProvider({
         event.stopPropagation();
 
         for (const callback of callbackSet) {
-          if (callback(key)) {
+          const result = await callback(key);
+          if (typeof result === 'object') {
+            action.value = result;
+          }
+          if (result) {
             break;
           }
         }
@@ -254,42 +277,83 @@ export function ShortcutsProvider({
     }
   }
 
+  const evaluateAll = async (event: KeyboardEvent) => {
+    updateModifiers(event);
+
+    if (action.value) {
+      if (event.key === 'Escape') {
+        action.value.finish(false);
+        action.value = null;
+      } else if (event.key === 'Enter') {
+        action.value.finish(true);
+        action.value = null;
+      }
+      return;
+    }
+
+    if (document.activeElement.tagName === 'INPUT') {
+      return;
+    }
+    if (surface.value && (await evaluate(event, surface.value))) {
+      return;
+    }
+    if (global.value && (await evaluate(event, global.value))) {
+      return;
+    }
+  };
+
   useEffect(() => {
-    const updateModifiers = (event: MouseEvent | KeyboardEvent) => {
-      modifiers.value = {
-        shift: event.shiftKey,
-        ctrl: event.ctrlKey,
-        alt: event.altKey,
-      };
+    let keyDownLock = false;
+    const keyDown = (event: KeyboardEvent) => {
+      if (keyDownLock) {
+        return;
+      }
+      keyDownLock = true;
+      evaluateAll(event).finally(() => {
+        keyDownLock = false;
+      });
     };
 
-    const keyDown = (event: KeyboardEvent) => {
+    const pointerMove = (event: PointerEvent) => {
       updateModifiers(event);
+      if (action.value) {
+        document.body.setPointerCapture(event.pointerId);
+        action.value.update(event);
+      }
+    };
 
-      if (document.activeElement.tagName === 'INPUT') {
-        return;
-      }
-      if (surface.value && evaluate(event, surface.value)) {
-        return;
-      }
-      if (global.value && evaluate(event, global.value)) {
-        return;
+    const pointerUp = (event: PointerEvent) => {
+      const isPrimary = event.button === MouseButton.Left;
+      const isSecondary = event.button === MouseButton.Right;
+      if (action.value && (isPrimary || isSecondary)) {
+        document.body.releasePointerCapture(event.pointerId);
+        action.value.finish(isPrimary);
+        action.value = null;
       }
     };
 
     window.addEventListener('keydown', keyDown, true);
-    window.addEventListener('pointermove', updateModifiers, true);
+    window.addEventListener('pointermove', pointerMove, true);
+    window.addEventListener('pointerup', pointerUp, true);
     window.addEventListener('keyup', updateModifiers, true);
     return () => {
       window.removeEventListener('keydown', keyDown, true);
-      window.removeEventListener('pointermove', updateModifiers, true);
+      window.removeEventListener('pointermove', pointerMove, true);
+      window.removeEventListener('pointerup', pointerUp, true);
       window.removeEventListener('keyup', updateModifiers, true);
     };
   }, []);
 
   return (
     <ShortcutsContext.Provider
-      value={{modifiers, callbacks, surface, global, configs: configsRef}}
+      value={{
+        action,
+        modifiers,
+        callbacks,
+        surface,
+        global,
+        configs: configsRef,
+      }}
     >
       {children}
     </ShortcutsContext.Provider>
@@ -338,7 +402,7 @@ export function useSurfaceShortcuts<T extends HTMLElement>(
 export function useShortcut<T extends string>(
   config: ShortcutConfig<T>,
   name: T,
-  handler: () => void,
+  handler: ShortcutCallback,
 ) {
   return useShortcuts<T>(config, {[name]: handler} as ShortcutCallbacks<T>);
 }
@@ -358,10 +422,15 @@ export function useShortcuts<T extends string>(
       callbacks.current.set(config.context, callbackSet);
     }
 
-    const handler = (key: T) => {
+    const handler = async (key: T) => {
       const callback = handlersRef.current[key];
-      callback?.();
-      return !!callback;
+      if (callback) {
+        const result = await callback();
+        if (typeof result === 'object') {
+          return result;
+        }
+      }
+      return true;
     };
 
     callbackSet.add(handler);
