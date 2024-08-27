@@ -1,8 +1,11 @@
 import styles from './PresentationControls.module.scss';
 
-import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
-import {useDocumentEvent, useSubscribableValue} from '../../hooks';
+import {
+  GLOBAL_PRESENTER_SHORTCUTS,
+  useShortcuts,
+} from '../../contexts/shortcuts';
+import {useSubscribableValue} from '../../hooks';
 import {IconButton} from '../controls';
 import {
   Close,
@@ -24,45 +27,14 @@ export function PresentationControls() {
     }
   };
 
-  useDocumentEvent(
-    'keydown',
-    useCallback(
-      event => {
-        if (document.activeElement.tagName === 'INPUT') {
-          return;
-        }
-        switch (event.key) {
-          case ' ':
-            event.preventDefault();
-            presenter.resume();
-            break;
-          case 'PageUp':
-          case 'ArrowLeft':
-            event.preventDefault();
-            if (event.shiftKey) {
-              presenter.requestFirstSlide();
-              return;
-            }
-            presenter.requestPreviousSlide();
-            break;
-          case 'PageDown':
-          case 'ArrowRight':
-            event.preventDefault();
-            if (event.shiftKey) {
-              presenter.requestLastSlide();
-              return;
-            }
-            presenter.requestNextSlide();
-            break;
-          case 'f':
-            event.preventDefault();
-            toggleFullscreen();
-            break;
-        }
-      },
-      [presenter],
-    ),
-  );
+  useShortcuts(GLOBAL_PRESENTER_SHORTCUTS, {
+    togglePlayback: () => presenter.resume(),
+    firstSlide: () => presenter.requestFirstSlide(),
+    lastSlide: () => presenter.requestLastSlide(),
+    previousSlide: () => presenter.requestPreviousSlide(),
+    nextSlide: () => presenter.requestNextSlide(),
+    toggleFullscreen,
+  });
 
   return (
     <div className={styles.controls}>

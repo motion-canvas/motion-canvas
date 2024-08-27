@@ -2,8 +2,11 @@ import {RendererState} from '@motion-canvas/core';
 import clsx from 'clsx';
 import {useEffect, useState} from 'preact/hooks';
 import {useApplication} from '../../contexts';
+import {
+  VIEWPORT_SHORTCUTS,
+  useSurfaceShortcuts,
+} from '../../contexts/shortcuts';
 import {useDuration, useRendererState} from '../../hooks';
-import {useShortcut} from '../../hooks/useShortcut';
 import {formatDuration} from '../../utils';
 import {
   PlaybackControls,
@@ -26,11 +29,11 @@ export function Viewport() {
 }
 
 function EditorViewport() {
-  const [hoverRef] = useShortcut<HTMLDivElement>('viewport');
+  const shortcutRef = useSurfaceShortcuts<HTMLDivElement>(VIEWPORT_SHORTCUTS);
   const duration = useDuration();
 
   return (
-    <div ref={hoverRef} className={styles.root}>
+    <div ref={shortcutRef} className={styles.root}>
       <EditorPreview />
       <PlaybackProgress />
       <div className={styles.playback}>

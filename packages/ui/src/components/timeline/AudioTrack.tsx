@@ -3,7 +3,8 @@ import styles from './Timeline.module.scss';
 import clsx from 'clsx';
 import {useLayoutEffect, useMemo, useRef, useState} from 'preact/hooks';
 import {useApplication, useTimelineContext} from '../../contexts';
-import {useKeyHold, useSharedSettings, useSubscribableValue} from '../../hooks';
+import {useModifiers} from '../../contexts/shortcuts';
+import {useSharedSettings, useSubscribableValue} from '../../hooks';
 import {MouseButton} from '../../utils';
 
 const HEIGHT = 48;
@@ -12,7 +13,7 @@ export function AudioTrack() {
   const ref = useRef<HTMLCanvasElement>();
   const {player, meta} = useApplication();
   const {audioOffset} = useSharedSettings();
-  const shiftHeld = useKeyHold('Shift');
+  const modifiers = useModifiers();
   const [editingOffset, setEditingOffset] = useState(0);
   const context = useMemo(() => ref.current?.getContext('2d'), [ref.current]);
   const {
@@ -93,7 +94,7 @@ export function AudioTrack() {
       ref={ref}
       className={clsx(
         styles.audioTrack,
-        shiftHeld && styles.active,
+        modifiers.value.shift && styles.active,
         audioData && styles.show,
       )}
       style={style}

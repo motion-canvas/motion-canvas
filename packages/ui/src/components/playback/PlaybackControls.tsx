@@ -1,8 +1,8 @@
 import styles from './Playback.module.scss';
 
-import {useCallback} from 'preact/hooks';
 import {useApplication} from '../../contexts';
-import {useDocumentEvent, usePlayerState} from '../../hooks';
+import {GLOBAL_EDITOR_SHORTCUTS, useShortcuts} from '../../contexts/shortcuts';
+import {usePlayerState} from '../../hooks';
 import {IconButton, IconCheckbox, Input, Select, Slider} from '../controls';
 import {
   FastForward,
@@ -22,53 +22,17 @@ export function PlaybackControls() {
   const {player, renderer, meta, project} = useApplication();
   const state = usePlayerState();
 
-  useDocumentEvent(
-    'keydown',
-    useCallback(
-      event => {
-        if (document.activeElement.tagName === 'INPUT') {
-          return;
-        }
-        switch (event.key) {
-          case ' ':
-            event.preventDefault();
-            player.togglePlayback();
-            break;
-          case 'ArrowLeft':
-            event.preventDefault();
-            if (event.shiftKey) {
-              player.requestReset();
-              return;
-            }
-
-            player.requestPreviousFrame();
-            break;
-          case 'ArrowRight':
-            event.preventDefault();
-            if (event.shiftKey) {
-              player.requestSeek(Infinity);
-              return;
-            }
-
-            player.requestNextFrame();
-            break;
-          case 'm':
-            player.toggleAudio();
-            break;
-          case 'ArrowUp':
-            player.addAudioVolume(0.1);
-            break;
-          case 'ArrowDown':
-            player.addAudioVolume(-0.1);
-            break;
-          case 'l':
-            player.toggleLoop();
-            break;
-        }
-      },
-      [player],
-    ),
-  );
+  useShortcuts(GLOBAL_EDITOR_SHORTCUTS, {
+    togglePlayback: () => player.togglePlayback(),
+    previousFrame: () => player.requestPreviousFrame(),
+    nextFrame: () => player.requestNextFrame(),
+    firstFrame: () => player.requestReset(),
+    lastFrame: () => player.requestSeek(Infinity),
+    toggleAudio: () => player.toggleAudio(),
+    toggleLoop: () => player.toggleLoop(),
+    volumeUp: () => player.addAudioVolume(0.1),
+    volumeDown: () => player.addAudioVolume(-0.1),
+  });
 
   return (
     <div className={styles.controls}>
