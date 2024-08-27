@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import {ComponentChildren} from 'preact';
 import {useCallback, useMemo, useRef} from 'preact/hooks';
 import {ViewportProvider, ViewportState, useApplication} from '../../contexts';
+import {VIEWPORT_SHORTCUTS, useShortcuts} from '../../contexts/shortcuts';
 import {
-  useDocumentEvent,
   useDrag,
   usePreviewSettings,
   useSharedSettings,
@@ -100,41 +100,18 @@ export function EditorPreview() {
     [],
   );
 
-  useDocumentEvent(
-    'keydown',
-    useCallback(
-      event => {
-        if (document.activeElement.tagName === 'INPUT') {
-          return;
-        }
-        switch (event.key) {
-          case '0': {
-            setZoomToFit(true);
-            break;
-          }
-          case '=':
-            setZoomToFit(false);
-            setZoom(state.zoom * (1 + ZOOM_SPEED));
-            break;
-          case '-':
-            setZoomToFit(false);
-            setZoom(state.zoom * (1 - ZOOM_SPEED));
-            break;
-          case "'":
-            setGrid(!grid);
-            break;
-          case 'ArrowUp':
-            // TODO Support hierarchy traversal.
-            break;
-          case 'ArrowDown': {
-            // TODO Support hierarchy traversal.
-            break;
-          }
-        }
-      },
-      [state.zoom, grid],
-    ),
-  );
+  useShortcuts(VIEWPORT_SHORTCUTS, {
+    zoomFit: () => setZoomToFit(true),
+    zoomIn: () => {
+      setZoomToFit(false);
+      setZoom(state.zoom * (1 + ZOOM_SPEED));
+    },
+    zoomOut: () => {
+      setZoomToFit(false);
+      setZoom(state.zoom * (1 - ZOOM_SPEED));
+    },
+    toggleGrid: () => setGrid(!grid),
+  });
 
   const zoomOptions = [
     {value: 0, text: 'Zoom to fit'},

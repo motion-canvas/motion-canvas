@@ -9,7 +9,11 @@ import {
   useApplication,
 } from '../../contexts';
 import {
-  useDocumentEvent,
+  TIMELINE_SHORTCUTS,
+  useShortcuts,
+  useSurfaceShortcuts,
+} from '../../contexts/shortcuts';
+import {
   useDuration,
   usePreviewSettings,
   useReducedMotion,
@@ -18,7 +22,6 @@ import {
   useStateChange,
   useStorage,
 } from '../../hooks';
-import {useShortcut} from '../../hooks/useShortcut';
 import {labelClipDraggingLeftSignal} from '../../signals';
 import {MouseButton, MouseMask, clamp} from '../../utils';
 import {borderHighlight} from '../animations';
@@ -35,7 +38,7 @@ const TIMESTAMP_SPACING = 32;
 const MAX_FRAME_SIZE = 128;
 
 export function Timeline() {
-  const [hoverRef] = useShortcut<HTMLDivElement>('timeline');
+  const shortcutRef = useSurfaceShortcuts<HTMLDivElement>(TIMELINE_SHORTCUTS);
   const {player, meta} = useApplication();
   const {range} = useSharedSettings();
   const containerRef = useRef<HTMLDivElement>();
@@ -128,32 +131,25 @@ export function Timeline() {
     [duration / fps, rect.width],
   );
 
-  useDocumentEvent('keydown', event => {
-    if (document.activeElement.tagName === 'INPUT') {
-      return;
-    }
-
-    const frame = player.onFrameChanged.current;
-    switch (event.key) {
-      case 'f': {
-        const maxOffset = sizes.fullLength - sizes.viewLength;
-        const scrollLeft = state.framesToPixels(frame);
-        const newOffset = clamp(0, maxOffset, scrollLeft);
-        containerRef.current.scrollLeft = newOffset;
-        setOffset(newOffset);
-        break;
-      }
-      case 'b': {
-        const end = player.status.secondsToFrames(range[1]);
-        meta.shared.range.update(frame, end, duration, fps);
-        break;
-      }
-      case 'n': {
-        const start = player.status.secondsToFrames(range[0]);
-        meta.shared.range.update(start, frame, duration, fps);
-        break;
-      }
-    }
+  useShortcuts(TIMELINE_SHORTCUTS, {
+    focusPlayhead: () => {
+      const frame = player.onFrameChanged.current;
+      const maxOffset = sizes.fullLength - sizes.viewLength;
+      const scrollLeft = state.framesToPixels(frame);
+      const newOffset = clamp(0, maxOffset, scrollLeft);
+      containerRef.current.scrollLeft = newOffset;
+      setOffset(newOffset);
+    },
+    moveRangeStart: () => {
+      const frame = player.onFrameChanged.current;
+      const end = player.status.secondsToFrames(range[1]);
+      meta.shared.range.update(frame, end, duration, fps);
+    },
+    moveRangeEnd: () => {
+      const frame = player.onFrameChanged.current;
+      const start = player.status.secondsToFrames(range[0]);
+      meta.shared.range.update(start, frame, duration, fps);
+    },
   });
 
   useLayoutEffect(() => {
@@ -194,7 +190,10 @@ export function Timeline() {
 
   return (
     <TimelineContextProvider state={state}>
-      <div ref={hoverRef} className={clsx(styles.root, isReady && styles.show)}>
+      <div
+        ref={shortcutRef}
+        className={clsx(styles.root, isReady && styles.show)}
+      >
         <div
           className={styles.timelineWrapper}
           ref={containerRef}

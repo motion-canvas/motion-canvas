@@ -3,7 +3,6 @@ export * from './useDocumentEvent';
 export * from './useDrag';
 export * from './useDuration';
 export * from './useFormattedNumber';
-export * from './useKeyHold';
 export * from './usePlayerState';
 export * from './usePlayerTime';
 export * from './usePresenterState';
