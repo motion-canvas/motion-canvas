@@ -8,32 +8,33 @@ import {
   useApplication,
   usePanels,
   useReducedMotion,
+  useSurfaceShortcuts,
 } from '@motion-canvas/ui';
-
 import {useSignalEffect} from '@preact/signals';
 import {useEffect, useRef} from 'preact/hooks';
 import {usePluginState} from './Provider';
-import {DetachedRoot, ViewRoot} from './tree';
+import {SCENE_GRAPH_SHORTCUTS} from './shortcuts';
+import {DetachedRoot, useKeyboardNavigation, ViewRoot} from './tree';
 
 function TabComponent({tab}: PluginTabProps) {
   const {sidebar} = usePanels();
   const inspectorTab = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
-  const {selectedKey} = usePluginState();
+  const {selectedNode, selectNode} = usePluginState();
   const {logger} = useApplication();
 
   useEffect(
     () =>
       logger.onInspected.subscribe(key => {
         sidebar.set(tab);
-        selectedKey.value = key;
+        selectNode(key);
       }),
     [tab],
   );
 
   useSignalEffect(() => {
     if (
-      selectedKey.value &&
+      selectedNode.value &&
       sidebar.current.peek() !== tab &&
       !reducedMotion &&
       inspectorTab.current &&
@@ -59,14 +60,18 @@ function TabComponent({tab}: PluginTabProps) {
 }
 
 function PaneComponent() {
-  const {selectedKey} = usePluginState();
+  const ref = useSurfaceShortcuts<HTMLDivElement>(SCENE_GRAPH_SHORTCUTS);
+  const {selectNode} = usePluginState();
+
+  useKeyboardNavigation();
 
   return (
     <Pane
+      forwardRef={ref}
       title="Scene Graph"
       id="scene-graph-pane"
       onClick={() => {
-        selectedKey.value = null;
+        selectNode(null);
       }}
     >
       <ViewRoot />

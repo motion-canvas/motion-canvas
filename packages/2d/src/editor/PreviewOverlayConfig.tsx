@@ -11,7 +11,7 @@ import {usePluginState} from './Provider';
 
 function Component({children}: {children?: ComponentChildren}) {
   const state = useViewportContext();
-  const {scene, selectedKey} = usePluginState();
+  const {scene, selectNode} = usePluginState();
   const matrix = useViewportMatrix();
 
   return (
@@ -26,10 +26,9 @@ function Component({children}: {children?: ComponentChildren}) {
           event.y - state.rect.y,
         ).transformAsPoint(matrix.inverse());
 
-        selectedKey.value = scene.value.inspectPosition(
-          position.x,
-          position.y,
-        ) as string;
+        selectNode(
+          scene.value.inspectPosition(position.x, position.y) as string,
+        );
       }}
     >
       {children}
@@ -38,8 +37,8 @@ function Component({children}: {children?: ComponentChildren}) {
 }
 
 function drawHook() {
-  const {selectedKey, hoveredKey, afterRender, scene} = usePluginState();
-  selectedKey.value;
+  const {selectedNode, hoveredKey, afterRender, scene} = usePluginState();
+  selectedNode.value;
   hoveredKey.value;
   afterRender.value;
 
@@ -47,13 +46,13 @@ function drawHook() {
     const currentScene = scene.peek();
     if (!currentScene) return;
 
-    let node = currentScene.getNode(selectedKey.value);
+    let node = selectedNode.value;
     if (node) {
       currentScene.drawOverlay(node.key, matrix, ctx);
     }
 
     node = currentScene.getNode(hoveredKey.value);
-    if (node && hoveredKey.value !== selectedKey.value) {
+    if (node && hoveredKey.value !== selectedNode.value?.key) {
       ctx.globalAlpha = 0.5;
       currentScene.drawOverlay(hoveredKey.value, matrix, ctx);
     }

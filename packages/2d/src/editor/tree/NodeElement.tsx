@@ -1,6 +1,6 @@
 import {NODE_NAME, Node} from '@motion-canvas/2d';
 import {useComputed, useSignal, useSignalEffect} from '@preact/signals';
-import {useRef} from 'preact/hooks';
+import {useEffect, useRef} from 'preact/hooks';
 import {usePluginState} from '../Provider';
 import {IconMap} from '../icons/IconMap';
 import {TreeElement} from './TreeElement';
@@ -11,14 +11,26 @@ interface NodeElementProps {
 }
 
 export function NodeElement({node, depth = 0}: NodeElementProps) {
-  const {selectedKey, hoveredKey, openNodes, selectedChain, afterRender} =
-    usePluginState();
+  const {
+    selectedNode,
+    visibleNodes,
+    selectNode,
+    hoveredKey,
+    openNodes,
+    afterRender,
+  } = usePluginState();
   const ref = useRef<HTMLDivElement>(null);
-  const open = useSignal(
-    selectedChain.peek().has(node.key) || (openNodes.get(node.key) ?? false),
-  );
   const nodeSignal = useSignal(node);
   nodeSignal.value = node;
+
+  const open = useComputed(() => openNodes.has(nodeSignal.value.key));
+
+  useEffect(() => {
+    visibleNodes.add(node.key);
+    return () => {
+      visibleNodes.delete(node.key);
+    };
+  }, [node.key]);
 
   const children = useComputed(() => {
     afterRender.value;
@@ -26,23 +38,7 @@ export function NodeElement({node, depth = 0}: NodeElementProps) {
   });
 
   useSignalEffect(() => {
-    open.value = openNodes.get(nodeSignal.value.key) ?? false;
-  });
-
-  useSignalEffect(() => {
-    const chain = selectedChain.value;
-    if (chain.has(nodeSignal.value.key)) {
-      open.value = true;
-    }
-  });
-
-  useSignalEffect(() => {
-    openNodes.set(nodeSignal.value.key, open.value);
-  });
-
-  useSignalEffect(() => {
-    const key = selectedKey.value;
-    if (node.key === key) {
+    if (node.key === selectedNode.value?.key) {
       ref.current?.scrollIntoView({block: 'nearest', behavior: 'instant'});
     }
   });
@@ -52,19 +48,22 @@ export function NodeElement({node, depth = 0}: NodeElementProps) {
   return (
     <TreeElement
       forwardRef={ref}
-      open={open}
+      open={open.value}
+      hasChildren={children.value.length > 0}
+      onToggle={value => openNodes.toggle(node.key, value)}
       depth={depth}
       icon={<Icon />}
       label={node.key}
-      selected={selectedKey.value === node.key}
+      selected={selectedNode.value === node}
       onClick={event => {
-        selectedKey.value = node.key;
+        selectNode(node.key);
         event.stopPropagation();
       }}
       onPointerEnter={() => (hoveredKey.value = node.key)}
       onPointerLeave={() => (hoveredKey.value = null)}
     >
-      {children.value.length > 0 &&
+      {open.value &&
+        children.value.length > 0 &&
         children.value.map(child => (
           <NodeElement node={child} depth={depth + 1} />
         ))}

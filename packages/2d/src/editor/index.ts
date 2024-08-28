@@ -5,6 +5,7 @@ import {NodeInspectorConfig} from './NodeInspectorConfig';
 import {PreviewOverlayConfig} from './PreviewOverlayConfig';
 import {Provider} from './Provider';
 import {SceneGraphTabConfig} from './SceneGraphTabConfig';
+import {SCENE_GRAPH_SHORTCUTS} from './shortcuts';
 
 export default makeEditorPlugin(() => {
   return {
@@ -13,5 +14,6 @@ export default makeEditorPlugin(() => {
     previewOverlay: PreviewOverlayConfig,
     tabs: [SceneGraphTabConfig],
     inspectors: [NodeInspectorConfig],
+    shortcuts: [SCENE_GRAPH_SHORTCUTS],
   };
 });

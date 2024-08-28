@@ -2,6 +2,7 @@ import {Signal, useSignal} from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {Ref, useContext, useEffect, useRef} from 'preact/hooks';
 import {MouseButton} from '../utils';
+import {useApplication} from './application';
 
 export interface Action {
   name: string;
@@ -35,7 +36,7 @@ export type ShortcutCallbacks<T extends string> = {
   [Key in T]?: ShortcutCallback;
 };
 
-function makeShortcuts<T extends string>(
+export function makeShortcuts<T extends string>(
   context: string,
   shortcuts: ShortcutMap<T>,
 ): ShortcutConfig<T> {
@@ -207,13 +208,8 @@ interface ShortcutsContextValue {
 
 const ShortcutsContext = createContext<ShortcutsContextValue>(null);
 
-export function ShortcutsProvider({
-  configs,
-  children,
-}: {
-  children: ComponentChildren;
-  configs: ShortcutConfig<string>[];
-}) {
+export function ShortcutsProvider({children}: {children: ComponentChildren}) {
+  const {plugins} = useApplication();
   const global = useSignal<string | null>(null);
   const surface = useSignal<string | null>(null);
   const action = useSignal<Action | null>(null);
@@ -224,7 +220,13 @@ export function ShortcutsProvider({
   });
   const callbacks = useRef<CallbackMap>(new Map());
   const configMap: ConfigMap = new Map();
-  for (const config of configs) {
+  for (const config of [
+    GLOBAL_EDITOR_SHORTCUTS,
+    GLOBAL_PRESENTER_SHORTCUTS,
+    TIMELINE_SHORTCUTS,
+    VIEWPORT_SHORTCUTS,
+    ...plugins.flatMap(plugin => plugin.shortcuts ?? []),
+  ]) {
     const shortcutMap = configMap.get(config.context) ?? {};
     for (const [key, shortcut] of Object.entries(config.shortcuts)) {
       if (key in shortcutMap) {
