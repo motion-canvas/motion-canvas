@@ -4,13 +4,11 @@ import type {
   Sound,
 } from '@motion-canvas/core';
 import type {PluginConfig} from '@motion-canvas/vite-plugin';
-import {exec} from 'child_process';
 import {ffmpegPath, ffprobePath} from 'ffmpeg-ffprobe-static';
 import type {AudioVideoFilter, FilterSpecification} from 'fluent-ffmpeg';
 import ffmpeg from 'fluent-ffmpeg';
 import * as fs from 'fs';
 import * as path from 'path';
-import {promisify} from 'util';
 import {Readable} from 'stream';
 import {ImageStream} from './ImageStream';
 
@@ -23,6 +21,7 @@ export interface FFmpegExporterSettings extends RendererSettings {
   sounds: Sound[];
   fastStart: boolean;
   includeAudio: boolean;
+  audioSampleRate: number;
 }
 
 function formatFilters(filters: AudioVideoFilter[]): string {
@@ -93,37 +92,22 @@ export class FFmpegExporterServer {
     const filterSpec: FilterSpecification[] = [];
     const streams: string[] = [];
 
-    const sampleRates: Map<string, number> = new Map();
-    const getRate = async (file: string) => {
-      const rate = sampleRates.get(file);
-      if (rate !== undefined) {
-        return rate;
-      } else {
-        const cmd = `${ffprobePath} -v error -show_entries stream=sample_rate -of default=nw=1:nk=1 ${file.slice(
-          1,
-        )}`;
-        const rate = parseInt((await promisify(exec)(cmd)).stdout);
-        sampleRates.set(file, rate);
-        return rate;
-      }
-    };
-
     for (let i = 0; i < sounds.length; i++) {
       const sound = sounds[i];
       this.command.input(sound.audio.slice(1));
 
       const filters: AudioVideoFilter[] = [];
-      filters.push({
-        filter: 'aresample',
-        options: '48000',
-      });
-
       if (sound.start || sound.end !== undefined) {
         filters.push({
           filter: 'atrim',
           options: {start: sound.start, end: sound.end},
         });
       }
+
+      filters.push({
+        filter: 'aresample',
+        options: settings.audioSampleRate.toString(),
+      });
 
       if (sound.gain) {
         filters.push({
@@ -135,10 +119,14 @@ export class FFmpegExporterServer {
       const playback =
         Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1);
       if (playback !== 1) {
-        const rate = Math.round((await getRate(sound.audio)) * playback);
+        const rate = Math.round(settings.audioSampleRate * playback);
         filters.push({
           filter: 'asetrate',
           options: {r: rate},
+        });
+        filters.push({
+          filter: 'aresample',
+          options: settings.audioSampleRate.toString(),
         });
       }
 

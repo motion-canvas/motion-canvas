@@ -9,6 +9,7 @@ import type {
 import {
   BoolMetaField,
   EventDispatcher,
+  NumberMetaField,
   ObjectMetaField,
   ValueOf,
 } from '@motion-canvas/core';
@@ -62,6 +63,7 @@ export class FFmpegExporterClient implements Exporter {
       includeAudio: new BoolMetaField('include audio', true).disable(
         !project.audio,
       ),
+      audioSampleRate: new NumberMetaField('audio sample rate', 48000),
     });
   }
 
