@@ -50,7 +50,6 @@ function formatFilters(filters: AudioVideoFilter[]): string {
  */
 export class FFmpegExporterServer {
   private readonly stream: ImageStream;
-  private readonly construction: Promise<void>;
   private readonly command: ffmpeg.FfmpegCommand;
   private readonly promise: Promise<void>;
 
@@ -63,19 +62,8 @@ export class FFmpegExporterServer {
       y: Math.round(settings.size.y * settings.resolutionScale),
     };
     this.stream = new ImageStream(size);
-
     this.command = ffmpeg();
-    this.promise = new Promise<void>((resolve, reject) => {
-      this.command.on('end', resolve).on('error', reject);
-    });
 
-    this.construction = this.constructCommand(settings, size);
-  }
-
-  private async constructCommand(
-    settings: FFmpegExporterSettings,
-    size: {x: number; y: number},
-  ): Promise<void> {
     // Input image sequence
     this.command
       .input(this.stream)
@@ -184,13 +172,16 @@ export class FFmpegExporterServer {
     if (settings.fastStart) {
       this.command.outputOptions(['-movflags +faststart']);
     }
+
+    this.promise = new Promise<void>((resolve, reject) => {
+      this.command.on('end', resolve).on('error', reject);
+    });
   }
 
   public async start() {
     if (!fs.existsSync(this.config.output)) {
       await fs.promises.mkdir(this.config.output, {recursive: true});
     }
-    await this.construction;
     this.command.run();
   }
 

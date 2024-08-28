@@ -51,14 +51,6 @@ export class AudioManager {
     );
   }
 
-  public async loadMetadata() {
-    if (this.audioElement.readyState < 1) {
-      await new Promise(resolve =>
-        this.audioElement.addEventListener('loadedmetadata', resolve),
-      );
-    }
-  }
-
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);
   }
