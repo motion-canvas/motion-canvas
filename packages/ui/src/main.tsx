@@ -10,14 +10,11 @@ import {
 import {ComponentChild, render} from 'preact';
 import {Editor} from './Editor';
 import {ProjectData, ProjectSelection} from './ProjectSelection';
-import {ApplicationProvider, PanelsProvider} from './contexts';
 import {
-  GLOBAL_EDITOR_SHORTCUTS,
-  GLOBAL_PRESENTER_SHORTCUTS,
+  ApplicationProvider,
+  PanelsProvider,
   ShortcutsProvider,
-  TIMELINE_SHORTCUTS,
-  VIEWPORT_SHORTCUTS,
-} from './contexts/shortcuts';
+} from './contexts';
 import GridPlugin from './plugin/GridPlugin';
 import {projectNameSignal} from './signals';
 import {getItem, setItem} from './utils';
@@ -27,6 +24,8 @@ const ExperimentalHooks = [
   'provider',
   'previewOverlay',
   'presenterOverlay',
+  'inspectors',
+  'shortcuts',
 ] as const;
 
 function renderRoot(vnode: ComponentChild) {
@@ -163,14 +162,7 @@ export function editor(project: Project) {
       }}
     >
       <PanelsProvider>
-        <ShortcutsProvider
-          configs={[
-            GLOBAL_EDITOR_SHORTCUTS,
-            GLOBAL_PRESENTER_SHORTCUTS,
-            TIMELINE_SHORTCUTS,
-            VIEWPORT_SHORTCUTS,
-          ]}
-        >
+        <ShortcutsProvider>
           <Editor />
         </ShortcutsProvider>
       </PanelsProvider>

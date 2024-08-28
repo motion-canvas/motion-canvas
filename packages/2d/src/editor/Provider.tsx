@@ -1,4 +1,4 @@
-import {Scene2D} from '@motion-canvas/2d';
+import {Node, Scene2D} from '@motion-canvas/2d';
 import {SceneRenderEvent} from '@motion-canvas/core';
 import {useApplication, useCurrentScene} from '@motion-canvas/ui';
 import {
@@ -10,13 +10,16 @@ import {
 } from '@preact/signals';
 import {ComponentChildren, createContext} from 'preact';
 import {useContext, useMemo} from 'preact/hooks';
+import {SignalSet} from './utils';
 
 export interface PluginState {
-  selectedKey: Signal<string | null>;
+  selectedNode: ReadonlySignal<Node | null>;
   hoveredKey: Signal<string | null>;
-  openNodes: Map<string, boolean>;
+  selectNode: (nodeKey: string | null) => void;
+  openNodes: SignalSet<string>;
+  openDetached: Signal<boolean>;
+  visibleNodes: Set<string>;
   scene: ReadonlySignal<Scene2D | null>;
-  selectedChain: ReadonlySignal<Set<string>>;
   afterRender: ReadonlySignal<number>;
 }
 
@@ -33,32 +36,38 @@ export function Provider({children}: {children?: ComponentChildren}) {
   const currentScene = useCurrentScene();
 
   const state = useMemo(() => {
-    const scene = signal(currentScene as Scene2D);
-    const selectedKey = signal<string | null>(null);
     const afterRender = signal(0);
-    const hoveredKey = signal<string | null>(null);
-    const openNodes = new Map<string, boolean>();
-    const selectedChain = computed(() => {
-      const chain = new Set<string>();
-      const key = selectedKey.value;
-      const selectedNode = scene.value?.getNode(key);
-      if (selectedNode) {
-        let node = selectedNode.parent() ?? null;
-        while (node) {
-          chain.add(node.key);
-          node = node.parent();
-        }
+    const openDetached = signal(false);
+    const visibleNodes = new Set<string>();
+    const scene = signal(currentScene as Scene2D);
+    const selectedNode = computed(() => {
+      afterRender.value;
+      const {key, payload} = inspection.value;
+      if (key === NodeInspectorKey) {
+        return scene.value?.getNode(payload as string) ?? null;
       }
-
-      return chain;
+      return null;
     });
+    const hoveredKey = signal<string | null>(null);
+    const openNodes = new SignalSet<string>();
+    const selectNode = (nodeKey: string | null) => {
+      const {key, payload} = inspection.peek();
+
+      if (key === NodeInspectorKey && !nodeKey) {
+        inspection.value = {key: '', payload: null};
+      } else if (payload !== nodeKey) {
+        inspection.value = {key: NodeInspectorKey, payload: nodeKey};
+      }
+    };
 
     return {
-      selectedKey,
+      selectedNode,
+      selectNode,
       hoveredKey,
       afterRender,
       openNodes,
-      selectedChain,
+      openDetached,
+      visibleNodes,
       scene,
     } satisfies PluginState;
   }, []);
@@ -73,21 +82,24 @@ export function Provider({children}: {children?: ComponentChildren}) {
     }),
   );
 
+  // Expand all nodes necessary to reveal the selected one:
   useSignalEffect(() => {
-    const {key, payload} = inspection.value;
-    if (key === NodeInspectorKey) {
-      state.selectedKey.value = payload as string;
-    }
-  });
+    const selectedNode = state.selectedNode.value;
 
-  useSignalEffect(() => {
-    const nodeKey = state.selectedKey.value;
-    const {key, payload} = inspection.peek();
+    if (selectedNode && !state.visibleNodes.has(selectedNode.key ?? '')) {
+      let node = selectedNode.parent() ?? null;
+      if (!node && selectedNode !== selectedNode.view()) {
+        state.openDetached.value = true;
+      }
 
-    if (key === NodeInspectorKey && !nodeKey) {
-      inspection.value = {key: '', payload: null};
-    } else if (payload !== nodeKey) {
-      inspection.value = {key: NodeInspectorKey, payload: nodeKey};
+      while (node) {
+        state.openNodes.add(node.key);
+        const parent = node.parent();
+        if (!parent && node !== node.view()) {
+          state.openDetached.value = true;
+        }
+        node = parent;
+      }
     }
   });
 
