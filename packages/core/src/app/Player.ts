@@ -386,7 +386,6 @@ export class Player {
           sounds.push(...scene.sounds.getSounds());
         }
         await this.audioPool.setupPool(sounds);
-        this.audioPool.setTime(this.status.time);
 
         this.recalculated.dispatch();
       } catch (e) {
@@ -420,10 +419,7 @@ export class Player {
 
     // Pause / play sounds.
     this.audioPool.prepare(this.status.time, 1 / this.status.fps);
-    await this.audioPool.setPaused(
-      state.paused || this.finished,
-      this.status.time,
-    );
+    await this.audioPool.setPaused(state.paused || this.finished);
     this.audioPool.setMuted(state.muted);
     this.audioPool.setVolume(state.volume);
 
