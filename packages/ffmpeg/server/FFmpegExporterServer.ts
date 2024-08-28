@@ -18,7 +18,10 @@ ffmpeg.setFfprobePath(ffprobePath!);
 export interface FFmpegExporterSettings extends RendererSettings {
   audio?: string;
   audioOffset?: number;
+
   sounds: Sound[];
+  duration: number;
+
   fastStart: boolean;
   includeAudio: boolean;
   audioSampleRate: number;
@@ -71,7 +74,7 @@ export class FFmpegExporterServer {
 
   private async constructCommand(
     settings: FFmpegExporterSettings,
-    size: {x: number, y: number},
+    size: {x: number; y: number},
   ): Promise<void> {
     // Input image sequence
     this.command
@@ -172,7 +175,10 @@ export class FFmpegExporterServer {
     // Output settings
     this.command
       .output(path.join(this.config.output, `${settings.name}.mp4`))
-      .outputOptions(['-pix_fmt yuv420p'])
+      .outputOptions([
+        '-pix_fmt yuv420p',
+        `-t ${settings.duration / settings.fps}`,
+      ])
       .outputFps(settings.fps)
       .size(`${size.x}x${size.y}`);
     if (settings.fastStart) {

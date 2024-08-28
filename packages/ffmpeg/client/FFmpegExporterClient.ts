@@ -84,18 +84,13 @@ export class FFmpegExporterClient implements Exporter {
 
   private concurrentFrames = 0;
   private error: unknown = false;
-  private sounds: Sound[] = [];
 
   public constructor(
     private readonly project: Project,
     private readonly settings: RendererSettings,
   ) {}
 
-  public async provideSounds(sounds: Sound[]): Promise<void> {
-    this.sounds = sounds;
-  }
-
-  public async start(): Promise<void> {
+  public async start(sounds: Sound[], duration: number): Promise<void> {
     const options = this.settings.exporter.options as FFmpegExporterOptions;
     await this.invoke('start', {
       ...this.settings,
@@ -103,7 +98,8 @@ export class FFmpegExporterClient implements Exporter {
       audio: this.project.audio,
       audioOffset:
         this.project.meta.shared.audioOffset.get() - this.settings.range[0],
-      sounds: this.sounds,
+      sounds,
+      duration,
     });
   }
 
