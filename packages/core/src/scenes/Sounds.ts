@@ -18,7 +18,7 @@ export class SoundBuilder {
   private settings: SoundSettings;
 
   /**
-   * Begin configuring a sound to be played back.
+   * {@inheritDoc sound}
    */
   public constructor(audio: string | SoundBuilder) {
     if (audio instanceof SoundBuilder) {
@@ -87,7 +87,7 @@ export class SoundBuilder {
 }
 
 /**
- * {@inheritDoc SoundBuilder."constructor"}
+ * Begin configuring a sound to be played back.
  */
 export function sound(audio: string | SoundBuilder) {
   return new SoundBuilder(audio);
