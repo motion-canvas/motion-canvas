@@ -117,8 +117,11 @@ export class Txt extends Shape {
     const newSize = this.size();
     leaf.text(oldText ?? DEFAULT);
 
-    if (this.height() === 0) {
+    const oldHeight = this.height();
+    if (oldHeight === 0) {
       this.height(newSize.height);
+    } else if (newSize.height === 0) {
+      newSize.height = oldHeight;
     }
 
     yield* all(
