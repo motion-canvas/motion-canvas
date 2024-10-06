@@ -123,6 +123,13 @@ export class Video extends Rect {
     }
   }
 
+  /**
+   * {@inheritDoc Curve.completion}
+   */
+  public curveCompletion(): number {
+    return super.completion();
+  }
+
   public isPlaying(): boolean {
     return this.playing();
   }
@@ -148,6 +155,13 @@ export class Video extends Rect {
     return custom;
   }
 
+  /**
+   * The completion of this video in the range from 0 to 1.
+   *
+   * @remarks
+   * To get the percentage of the stroke that's currently visible, use
+   * {@link Video.curveCompletion} instead.
+   */
   @computed()
   public override completion(): number {
     return this.clampTime(this.time()) / this.video().duration;
