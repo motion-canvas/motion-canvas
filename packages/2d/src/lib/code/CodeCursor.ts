@@ -31,6 +31,7 @@ export interface CodeFragmentDrawingInfo {
  */
 export class CodeCursor {
   public cursor = new Vector2();
+  public tweenCursor = new Vector2();
   public beforeCursor = new Vector2();
   public afterCursor = new Vector2();
   public beforeIndex = 0;
@@ -65,6 +66,7 @@ export class CodeCursor {
     this.context = context;
     this.lineHeight = parseFloat(this.node.styles.lineHeight);
     this.cursor = new Vector2();
+    this.tweenCursor = new Vector2();
     this.beforeCursor = new Vector2();
     this.afterCursor = new Vector2();
     this.beforeIndex = 0;
@@ -204,7 +206,13 @@ export class CodeCursor {
         );
       }
 
-      this.drawToken(fragment, scope, this.cursor.addY(offsetY), alpha);
+      this.drawToken(
+        fragment,
+        scope,
+        this.cursor.addY(offsetY),
+        this.tweenCursor,
+        alpha,
+      );
 
       this.beforeCursor.x = this.calculateWidth(
         fragment.before,
@@ -229,6 +237,10 @@ export class CodeCursor {
       const beforeEnd = this.calculateWidth(fragment.before);
       const afterEnd = this.calculateWidth(fragment.after);
       this.cursor.x = map(beforeEnd, afterEnd, progress);
+
+      this.tweenCursor.y +=
+        progress > 0.5 ? fragment.after.newRows : fragment.before.newRows;
+      this.tweenCursor.x = progress > 0.5 ? afterEnd : beforeEnd;
     }
   }
 
@@ -236,6 +248,7 @@ export class CodeCursor {
     fragment: CodeFragment,
     scope: CodeScope,
     offset: SerializedVector2,
+    tweenCursor: SerializedVector2,
     alpha: number,
   ) {
     const progress = unwrap(scope.progress);
@@ -367,8 +380,8 @@ export class CodeCursor {
           (offset.y + y) * this.lineHeight,
         ),
         cursor: new Vector2(
-          hasOffset ? this.beforeCursor.x + stringLength : stringLength,
-          this.beforeCursor.y + y,
+          hasOffset ? tweenCursor.x + stringLength : stringLength,
+          tweenCursor.y + y,
         ),
         alpha,
         characterSize: new Vector2(
