@@ -13,5 +13,6 @@ export * from './SceneMetadata';
 export * from './SceneState';
 export * from './Shaders';
 export * from './Slides';
+export * from './Sounds';
 export * from './Threadable';
 export * from './Variables';
