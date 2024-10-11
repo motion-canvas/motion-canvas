@@ -87,11 +87,23 @@ export class FFmpegExporterServer {
       const sound = sounds[i];
       this.command.input(sound.audio.slice(1));
 
+      const playback =
+        Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1);
+
+      let trimmed = sound.start ?? 0;
+      if (sound.offset < 0) {
+        trimmed -= sound.offset * playback;
+      }
+
+      if (trimmed !== 0) {
+        this.command.inputOptions(`-ss ${trimmed}`);
+      }
+
       const filters: AudioVideoFilter[] = [];
-      if (sound.start || sound.end !== undefined) {
+      if (sound.end !== undefined) {
         filters.push({
           filter: 'atrim',
-          options: {start: sound.start, end: sound.end},
+          options: {end: sound.end - trimmed},
         });
       }
 
@@ -107,8 +119,6 @@ export class FFmpegExporterServer {
         });
       }
 
-      const playback =
-        Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1);
       if (playback !== 1) {
         const rate = Math.round(settings.audioSampleRate * playback);
         filters.push({
@@ -121,12 +131,7 @@ export class FFmpegExporterServer {
         });
       }
 
-      if (sound.offset < 0) {
-        filters.push({
-          filter: 'atrim',
-          options: {start: -sound.offset},
-        });
-      } else if (sound.offset > 0) {
+      if (sound.offset > 0) {
         const delay = Math.round(sound.offset * 1000);
         filters.push({
           filter: 'adelay',
