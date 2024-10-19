@@ -161,6 +161,11 @@ export interface Scene<T = unknown> {
   get firstFrame(): number;
 
   /**
+   * Scene transition duration in frames.
+   */
+  get transitionDuration(): number;
+
+  /**
    * The frame at which this scene ends.
    */
   get lastFrame(): number;

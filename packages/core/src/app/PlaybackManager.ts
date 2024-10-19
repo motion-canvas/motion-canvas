@@ -224,7 +224,9 @@ export class PlaybackManager {
     let lastScene = this.scenes.current[0];
     for (const scene of this.scenes.current) {
       if (!scene.isCached() || scene.lastFrame > frame) {
-        return scene;
+        return frame > scene.firstFrame + scene.transitionDuration
+          ? scene
+          : lastScene;
       }
       lastScene = scene;
     }
