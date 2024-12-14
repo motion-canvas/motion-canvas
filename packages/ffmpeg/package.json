@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/ffmpeg",
-  "version": "3.17.0",
+  "version": "3.17.2",
   "description": "An FFmpeg video exporter for Motion Canvas",
   "main": "lib/server/index.js",
   "author": "motion-canvas",
@@ -25,8 +25,8 @@
     "@types/fluent-ffmpeg": "^2.1.21"
   },
   "dependencies": {
-    "@motion-canvas/core": "^3.17.0",
-    "@motion-canvas/vite-plugin": "^3.17.0",
+    "@motion-canvas/core": "^3.17.2",
+    "@motion-canvas/vite-plugin": "^3.17.2",
     "ffmpeg-ffprobe-static": "^6.1.1-rc.5",
     "fluent-ffmpeg": "^2.1.3"
   }

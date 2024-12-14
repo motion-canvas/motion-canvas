@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/core",
-  "version": "3.17.0",
+  "version": "3.17.2",
   "description": "Web-based tool for creating animations programmatically",
   "main": "lib/index.js",
   "author": "motion-canvas",
