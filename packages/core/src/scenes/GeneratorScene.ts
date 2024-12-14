@@ -56,6 +56,10 @@ export abstract class GeneratorScene<T>
     return this.cache.current.firstFrame;
   }
 
+  public get transitionDuration() {
+    return this.cache.current.transitionDuration;
+  }
+
   public get lastFrame() {
     return this.firstFrame + this.cache.current.duration;
   }
