@@ -1,9 +1,11 @@
+// Custom order makes rollup arrange the ObjectMetaField correctly
+export * from './meta';
+
 export * from './app';
 export * from './decorators';
 export * from './events';
 export * from './flow';
 export * from './media';
-export * from './meta';
 export * from './plugin';
 export {default as DefaultPlugin} from './plugin/DefaultPlugin';
 export * from './scenes';
