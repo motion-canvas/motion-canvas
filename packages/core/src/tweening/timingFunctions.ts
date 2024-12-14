@@ -1,3 +1,4 @@
+import {BezierMath, newBezierMath} from '../utils/bezierMath';
 import {map, remap} from './interpolationFunctions';
 
 export interface TimingFunction {
@@ -162,6 +163,18 @@ export function easeInOutCirc(value: number, from = 0, to = 1) {
       : (Math.sqrt(1 - Math.pow(-2 * value + 2, 2)) + 1) / 2;
 
   return map(from, to, value);
+}
+
+export function createCubicBezier(
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): TimingFunction {
+  const bezier: BezierMath = newBezierMath(x1, y1, x2, y2);
+  return (value: number, from = 0, to = 1) => {
+    return map(from, to, bezier.solve(value));
+  };
 }
 
 // Back
