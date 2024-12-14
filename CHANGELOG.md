@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.2](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.17.2) (2024-12-14)
+
+
+### Bug Fixes
+
+* **core:** fix incorrect rollup ordering ([4743b92](https://github.com/motion-canvas/motion-canvas/commit/4743b92d10eed301b473434cc5cdde27882607bb))
+* **vite-plugin, ui:** project file path on selection ([#1090](https://github.com/motion-canvas/motion-canvas/issues/1090)) ([f15b375](https://github.com/motion-canvas/motion-canvas/commit/f15b3753d47bcca8cd2d3f213f5624cf5e54142d))
+
+
+
+
+
 ## [3.17.1](https://github.com/motion-canvas/motion-canvas/compare/v3.17.0...v3.17.1) (2024-08-17)
 
 
