@@ -63,6 +63,7 @@ separate generator and delegate our scene function to it:
 
 ```tsx
 import {ThreadGenerator} from '@motion-canvas/core';
+import { makeScene2D,Circle } from '@motion-canvas/2d';
 
 export default makeScene2D(function* (view) {
   const circle = createRef<Circle>();
