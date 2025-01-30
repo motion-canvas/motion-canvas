@@ -21,11 +21,10 @@
     "resolutionScale": 1,
     "colorSpace": "srgb",
     "exporter": {
-      "name": "@motion-canvas/core/image-sequence",
+      "name": "@motion-canvas/ffmpeg",
       "options": {
-        "fileType": "image/png",
-        "quality": 100,
-        "groupByScene": false
+        "fastStart": true,
+        "includeAudio": true
       }
     }
   }
