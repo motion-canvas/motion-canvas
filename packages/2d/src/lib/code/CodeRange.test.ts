@@ -1,6 +1,7 @@
 import {describe, expect, test} from 'vitest';
 import {
   consolidateCodeRanges,
+  findAllCodeRanges,
   inverseCodeRange,
   isPointInCodeRange,
   pointToPoint,
@@ -69,6 +70,44 @@ describe('CodeRange', () => {
   test('should invert empty ranges', () => {
     expect(inverseCodeRange([])).toEqual([
       pointToPoint(0, 0, Infinity, Infinity),
+    ]);
+  });
+
+  test('should treat pattern as an exact match when passing a string to findAllCodeRanges', () => {
+    const code = [
+      `const fn = () => {`,
+      `  const x = 10;`,
+      `  return x;`,
+      `};`,
+      `const fn2 = () => {`,
+      `  // NO OP`,
+      `};`,
+    ].join('\n');
+
+    expect(findAllCodeRanges(code, '()')).toEqual([
+      pointToPoint(0, 11, 0, 13),
+      pointToPoint(4, 12, 4, 14),
+    ]);
+  });
+
+  test('should treat pattern as a regular expression (with special characters) when passing a RegExp to findAllCodeRanges', () => {
+    const code = [
+      `const fn = () => {`,
+      `  const x = 10;`,
+      `  return x;`,
+      `};`,
+      `const fn2 = () => {`,
+      `  // NO OP`,
+      `};`,
+    ].join('\n');
+
+    expect(findAllCodeRanges(code, new RegExp('\\(\\)'))).toEqual([
+      pointToPoint(0, 11, 0, 13),
+      pointToPoint(4, 12, 4, 14),
+    ]);
+    expect(findAllCodeRanges(code, /\(\)/)).toEqual([
+      pointToPoint(0, 11, 0, 13),
+      pointToPoint(4, 12, 4, 14),
     ]);
   });
 });

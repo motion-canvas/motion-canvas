@@ -1,3 +1,5 @@
+import escapeRegExpString from 'escape-string-regexp';
+
 export type CodePoint = [number, number];
 
 function isCodePoint(value: unknown): value is CodePoint {
@@ -169,6 +171,8 @@ export function inverseCodeRange(ranges: CodeRange[]): CodeRange[] {
  *
  * @param code - The code to search in.
  * @param pattern - Either a string or a regular expression to search for.
+ *                  When a string is passed, it looks for **exact matches**.
+ *                  When a RegExp object is passed, it will match against it.
  * @param limit - An optional limit on the number of ranges to find.
  */
 export function findAllCodeRanges(
@@ -177,6 +181,8 @@ export function findAllCodeRanges(
   limit = Infinity,
 ): CodeRange[] {
   if (typeof pattern === 'string') {
+    pattern = new RegExp(escapeRegExpString(pattern), 'g');
+  } else {
     pattern = new RegExp(pattern, 'g');
   }
 

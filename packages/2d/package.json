@@ -42,6 +42,7 @@
     "@lezer/highlight": "^1.2.0",
     "@motion-canvas/core": "^3.17.2",
     "code-fns": "^0.8.2",
+    "escape-string-regexp": "^5.0.0",
     "mathjax-full": "^3.2.2",
     "parse-svg-path": "^0.1.2"
   }
