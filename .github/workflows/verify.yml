@@ -83,7 +83,7 @@ jobs:
       - run: npm run e2e:test
         env:
           HOME: /root
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: image-diffs
