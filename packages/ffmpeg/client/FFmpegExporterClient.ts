@@ -4,10 +4,12 @@ import type {
   Project,
   RendererResult,
   RendererSettings,
+  Sound,
 } from '@motion-canvas/core';
 import {
   BoolMetaField,
   EventDispatcher,
+  NumberMetaField,
   ObjectMetaField,
   ValueOf,
 } from '@motion-canvas/core';
@@ -61,6 +63,7 @@ export class FFmpegExporterClient implements Exporter {
       includeAudio: new BoolMetaField('include audio', true).disable(
         !project.audio,
       ),
+      audioSampleRate: new NumberMetaField('audio sample rate', 48000),
     });
   }
 
@@ -87,7 +90,7 @@ export class FFmpegExporterClient implements Exporter {
     private readonly settings: RendererSettings,
   ) {}
 
-  public async start(): Promise<void> {
+  public async start(sounds: Sound[], duration: number): Promise<void> {
     const options = this.settings.exporter.options as FFmpegExporterOptions;
     await this.invoke('start', {
       ...this.settings,
@@ -95,6 +98,8 @@ export class FFmpegExporterClient implements Exporter {
       audio: this.project.audio,
       audioOffset:
         this.project.meta.shared.audioOffset.get() - this.settings.range[0],
+      sounds,
+      duration,
     });
   }
 

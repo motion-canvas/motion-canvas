@@ -12,6 +12,7 @@ import type {Random} from './Random';
 import type {SceneMetadata} from './SceneMetadata';
 import type {Shaders} from './Shaders';
 import type {Slides} from './Slides';
+import type {Sounds} from './Sounds';
 import type {Variables} from './Variables';
 import type {TimeEvents} from './timeEvents';
 
@@ -149,6 +150,7 @@ export interface Scene<T = unknown> {
    */
   readonly shaders: Shaders;
   readonly slides: Slides;
+  readonly sounds: Sounds;
   readonly logger: Logger;
   readonly variables: Variables;
   readonly random: Random;

@@ -3,8 +3,8 @@ import {
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
-import {AudioManager} from '../media';
-import {Scene} from '../scenes';
+import {AudioManager, AudioManagerPool} from '../media';
+import {Scene, Sound} from '../scenes';
 import {EditableTimeEvents} from '../scenes/timeEvents';
 import {clamp} from '../tweening';
 import {Vector2} from '../types';
@@ -89,6 +89,7 @@ export class Player {
   public readonly playback: PlaybackManager;
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
+  public readonly audioPool: AudioManagerPool;
   public readonly logger: Logger;
   private readonly sharedWebGLContext: SharedWebGLContext;
 
@@ -143,6 +144,7 @@ export class Player {
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
     this.audio = new AudioManager(this.logger);
+    this.audioPool = new AudioManagerPool(this.logger);
     this.size = settings.size ?? new Vector2(1920, 1080);
     this.resolutionScale = settings.resolutionScale ?? 1;
     this.startTime = settings.range?.[0] ?? 0;
@@ -378,6 +380,13 @@ export class Player {
       try {
         await this.playback.recalculate();
         this.duration.current = this.playback.frame;
+
+        const sounds: Sound[] = [];
+        for (const scene of this.playback.onScenesRecalculated.current) {
+          sounds.push(...scene.sounds.getSounds());
+        }
+        await this.audioPool.setupPool(sounds);
+
         this.recalculated.dispatch();
       } catch (e) {
         this.requestSeek(state.seek);
@@ -407,6 +416,12 @@ export class Player {
     ) {
       state.seek = this.startFrame;
     }
+
+    // Pause / play sounds.
+    this.audioPool.prepare(this.status.time, 1 / this.status.fps);
+    await this.audioPool.setPaused(state.paused || this.finished);
+    this.audioPool.setMuted(state.muted);
+    this.audioPool.setVolume(state.volume);
 
     // Pause / play audio.
     const audioPaused =
@@ -520,8 +535,10 @@ export class Player {
   }
 
   private syncAudio(frameOffset = 0) {
-    this.audio.setTime(
-      this.status.framesToSeconds(this.playback.frame + frameOffset),
-    );
+    const time = this.status.framesToSeconds(this.playback.frame + frameOffset);
+    this.audio.setTime(time);
+
+    this.audioPool.prepare(time, 1 / this.status.fps);
+    this.audioPool.setTime(time);
   }
 }

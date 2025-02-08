@@ -1,5 +1,6 @@
 import {Logger} from '../app';
 import {ValueDispatcher} from '../events';
+import {Sound} from '../scenes';
 import {useLogger} from '../utils';
 import {AudioData} from './AudioData';
 
@@ -15,6 +16,9 @@ export class AudioManager {
   private error = false;
   private abortController: AbortController | null = null;
   private offset = 0;
+  private start?: number;
+  private duration?: number;
+  private gainNode?: GainNode;
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -25,6 +29,28 @@ export class AudioManager {
       });
     }
   }
+
+  public setSound(sound: Sound) {
+    this.setOffset(sound.offset);
+    this.setTrim(sound.start, sound.end);
+    this.setSource(sound.audio);
+
+    if (this.gainNode === undefined) {
+      const sourceNode = this.context.createMediaElementSource(
+        this.audioElement,
+      );
+      this.gainNode = this.context.createGain();
+      sourceNode.connect(this.gainNode);
+      this.gainNode.connect(this.context.destination);
+    }
+
+    this.gainNode.gain.value = Math.pow(10, (sound.gain ?? 0) / 10);
+    this.setPlaybackRate(
+      Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1),
+      true,
+    );
+  }
+
   public getTime() {
     return this.toAbsoluteTime(this.audioElement.currentTime);
   }
@@ -33,8 +59,22 @@ export class AudioManager {
     this.audioElement.currentTime = this.toRelativeTime(value);
   }
 
+  public setTrim(start?: number, end?: number) {
+    this.start = start;
+    if (end !== undefined) {
+      this.duration = end - (start ?? 0);
+    } else {
+      this.duration = undefined;
+    }
+  }
+
   public setOffset(value: number) {
     this.offset = value;
+  }
+
+  public setPlaybackRate(value: number, pitchShift: boolean = false) {
+    this.audioElement.playbackRate = value;
+    this.audioElement.preservesPitch = !pitchShift;
   }
 
   public setMuted(isMuted: boolean) {
@@ -58,18 +98,26 @@ export class AudioManager {
   }
 
   public isInRange(time: number) {
-    const audioRangeStart = this.offset;
-    const audioRangeEnd = this.audioElement.duration + this.offset;
-
-    return audioRangeStart <= time && time <= audioRangeEnd;
+    return (
+      time >= this.offset &&
+      time <
+        this.offset +
+          (this.duration ??
+            this.audioElement.duration * this.audioElement.playbackRate)
+    );
   }
 
   public toRelativeTime(time: number) {
-    return Math.max(0, time - this.offset);
+    return (
+      Math.max(0, time - this.offset + (this.start ?? 0)) *
+      this.audioElement.playbackRate
+    );
   }
 
   public toAbsoluteTime(time: number) {
-    return time + this.offset;
+    return (
+      time / this.audioElement.playbackRate + this.offset - (this.start ?? 0)
+    );
   }
 
   public isReady() {
@@ -87,7 +135,7 @@ export class AudioManager {
     if (this.source && this.audioElement.paused !== isPaused) {
       if (isPaused) {
         this.audioElement.pause();
-      } else {
+      } else if (this.audioElement.currentTime < this.audioElement.duration) {
         try {
           await this.audioElement.play();
           this.error = false;
