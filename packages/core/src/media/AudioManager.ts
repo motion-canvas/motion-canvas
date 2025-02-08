@@ -58,7 +58,10 @@ export class AudioManager {
   }
 
   public isInRange(time: number) {
-    return time >= this.offset && time < this.audioElement.duration;
+    const audioRangeStart = this.offset;
+    const audioRangeEnd = this.audioElement.duration + this.offset;
+
+    return audioRangeStart <= time && time <= audioRangeEnd;
   }
 
   public toRelativeTime(time: number) {
