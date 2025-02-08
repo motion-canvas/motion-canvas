@@ -503,7 +503,7 @@ export class Vector2 implements Type, WebGLConvertible {
     return `Vector2(${this.x}, ${this.y})`;
   }
 
-  public toArray() {
+  public toArray(): [number, number] {
     return [this.x, this.y];
   }
 
