@@ -111,9 +111,13 @@ export function AudioClip({
   ]);
 
   useLayoutEffect(() => {
-    contextRef.current ??= ref.current?.getContext('2d');
+    if (!waveformVisible || !ref.current) return;
+    if (!contextRef.current || contextRef.current?.canvas !== ref.current) {
+      contextRef.current = ref.current?.getContext('2d');
+    }
+
     const context = contextRef.current;
-    if (!context || !waveformVisible) return;
+    if (!context) return;
     context.clearRect(0, 0, viewLength, HEIGHT * 2);
     context.beginPath();
     context.moveTo(0, HEIGHT);
