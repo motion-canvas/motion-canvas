@@ -169,7 +169,7 @@
 
 .labelTrack {
   position: relative;
-  height: 32px;
+  height: 40px;
   padding: 4px 0;
 }
 
@@ -246,6 +246,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  z-index: 1;
 
   &::before {
     display: block;
@@ -331,20 +332,47 @@
 
 .audioTrack {
   position: relative;
-  width: 100%;
-  margin: 24px 0;
-  opacity: 0;
-  transition: opacity var(--duration-normal);
-  pointer-events: none;
+  height: calc(96px + 32px * 2);
+  padding: 32px 0;
+}
+
+.audioClip {
+  position: absolute;
+
+  &.hoverable {
+    border-radius: var(--radius);
+    outline: 2px solid var(--surface-color-hover);
+    outline-offset: -2px;
+
+    &:hover {
+      z-index: 1;
+      outline-color: var(--surface-color-light);
+      background-color: #242424aa;
+
+      .audioCanvas {
+        filter: brightness(0.54);
+      }
+
+      .audioLabel {
+        background-color: var(--surface-color-light);
+      }
+    }
+  }
+}
+
+.audioCanvas {
+  position: absolute;
+  top: 0;
+  bottom: 0;
   filter: brightness(0.27);
+}
 
-  &.show {
-    opacity: 1;
-  }
-
-  &.active {
-    pointer-events: auto;
-    cursor: move;
-    filter: brightness(0.32);
-  }
+.audioLabel {
+  position: absolute;
+  bottom: 100%;
+  cursor: default;
+  border-radius: 12px 12px 12px 0;
+  translate: 0 2px;
+  padding: 0 8px;
+  background-color: var(--surface-color-hover);
 }

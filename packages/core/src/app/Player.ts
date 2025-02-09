@@ -143,8 +143,8 @@ export class Player {
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
-    this.audio = new AudioManager(this.logger);
     this.audioPool = new AudioManagerPool(this.logger);
+    this.audio = this.audioPool.spawn();
     this.size = settings.size ?? new Vector2(1920, 1080);
     this.resolutionScale = settings.resolutionScale ?? 1;
     this.startTime = settings.range?.[0] ?? 0;
@@ -266,6 +266,9 @@ export class Player {
   public togglePlayback(
     value: boolean = this.playerState.current.paused,
   ): void {
+    // Ensure the AudioContext is resumed by user interaction.
+    this.audioPool.resume();
+
     if (value === this.playerState.current.paused) {
       this.playerState.current = {
         ...this.playerState.current,

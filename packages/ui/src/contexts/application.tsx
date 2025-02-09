@@ -1,4 +1,5 @@
-import type {
+import {
+  AudioDataPool,
   Player,
   Presenter,
   Project,
@@ -27,6 +28,7 @@ interface Application {
   settings: SettingsMetadata;
   plugins: EditorPlugin[];
   logger: LoggerManager;
+  audioDataManager: AudioDataPool;
   inspection: Signal<Inspection>;
 }
 

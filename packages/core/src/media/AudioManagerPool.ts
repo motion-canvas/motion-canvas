@@ -3,6 +3,8 @@ import {Sound} from '../scenes';
 import {AudioManager} from './AudioManager';
 
 export class AudioManagerPool {
+  private readonly context = new AudioContext();
+
   private pool: AudioManager[] = [];
   private managers: Map<Sound, AudioManager> = new Map();
   private sounds: Sound[] = [];
@@ -49,7 +51,7 @@ export class AudioManagerPool {
         if (manager) continue;
 
         // sound is starting
-        manager = this.pool.pop() ?? new AudioManager(this.logger);
+        manager = this.pool.pop() ?? this.spawn();
         manager.setSound(sound);
         manager.setMuted(this.muted);
         manager.setVolume(this.volume);
@@ -65,6 +67,16 @@ export class AudioManagerPool {
         this.pool.push(manager);
         this.managers.delete(sound);
       }
+    }
+  }
+
+  public spawn() {
+    return new AudioManager(this.logger, this.context);
+  }
+
+  public resume() {
+    if (this.context.state === 'suspended') {
+      this.context.resume();
     }
   }
 }

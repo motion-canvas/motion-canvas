@@ -1,3 +1,4 @@
+import {ValueDispatcher} from '../events';
 import {useScene} from '../utils';
 import type {Scene} from './Scene';
 
@@ -94,27 +95,32 @@ export function sound(audio: string | SoundBuilder) {
 }
 
 export class Sounds {
-  private sounds: Sound[] = [];
+  public get onChanged() {
+    return this.sounds.subscribable;
+  }
+  private readonly sounds = new ValueDispatcher<Sound[]>([]);
+  private registeredSounds: Sound[] = [];
 
   public constructor(private readonly scene: Scene) {
-    this.scene.onReset.subscribe(this.handleReset);
-    this.scene.onReset.subscribe(this.handleReload);
+    this.scene.onReset.subscribe(this.reset);
+    this.scene.onReloaded.subscribe(this.reset);
+    this.scene.onRecalculated.subscribe(this.handleRecalculated);
   }
 
   public add(settings: SoundSettings, offset?: number) {
     const playbackTime = this.scene.playback.time + (offset ?? 0);
-    this.sounds.push({offset: playbackTime, ...settings});
+    this.registeredSounds.push({offset: playbackTime, ...settings});
   }
 
   public getSounds(): readonly Sound[] {
-    return this.sounds;
+    return this.registeredSounds;
   }
 
-  public handleReset = () => {
-    this.sounds = [];
+  private handleRecalculated = () => {
+    this.sounds.current = [...this.registeredSounds];
   };
 
-  public handleReload = () => {
-    this.sounds = [];
+  private reset = () => {
+    this.registeredSounds = [];
   };
 }
