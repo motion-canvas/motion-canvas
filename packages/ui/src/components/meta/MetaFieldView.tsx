@@ -39,6 +39,8 @@ export function MetaFieldView({field}: MetaFieldViewProps) {
   const Field: FiledView = TYPE_MAP.get(field.type) ?? UnknownMetaFieldView;
   const disabled = useSubscribableValue(field.onDisabled);
 
+  console.log(field);
+
   return disabled ? (
     <></>
   ) : (
