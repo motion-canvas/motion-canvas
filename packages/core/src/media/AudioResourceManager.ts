@@ -2,9 +2,9 @@ import {Logger} from '../app';
 import {ValueDispatcher} from '../events';
 import {AudioData, EMPTY_AUDIO_DATA} from './AudioData';
 
-export class AudioDataPool {
+export class AudioResourceManager {
   private readonly context = new AudioContext();
-  private readonly lookup = new Map<string, AudioDataManager>();
+  private readonly lookup = new Map<string, AudioResource>();
 
   public constructor(private readonly logger: Logger) {
     if (import.meta.hot) {
@@ -17,14 +17,14 @@ export class AudioDataPool {
     }
   }
 
-  public getDuration(source: string): number {
-    return this.getData(source).onData.current.duration;
+  public peekDuration(source: string): number {
+    return this.get(source).onData.current.duration;
   }
 
-  public getData(source: string): AudioDataManager {
+  public get(source: string): AudioResource {
     let manager = this.lookup.get(source);
     if (!manager) {
-      manager = new AudioDataManager(this.logger, source, this.context);
+      manager = new AudioResource(this.logger, source, this.context);
       this.lookup.set(source, manager);
     }
 
@@ -32,7 +32,7 @@ export class AudioDataPool {
   }
 }
 
-export class AudioDataManager {
+export class AudioResource {
   public get onData() {
     return this.data.subscribable;
   }

@@ -3,7 +3,7 @@ import {
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
-import {AudioDataPool, AudioManager, AudioManagerPool} from '../media';
+import {AudioManager, AudioManagerPool, AudioResourceManager} from '../media';
 import {Scene, Sound} from '../scenes';
 import {EditableTimeEvents} from '../scenes/timeEvents';
 import {clamp} from '../tweening';
@@ -90,7 +90,7 @@ export class Player {
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
   public readonly audioPool: AudioManagerPool;
-  public readonly audioDataPool: AudioDataPool;
+  public readonly audioResources: AudioResourceManager;
   public readonly logger: Logger;
   private readonly sharedWebGLContext: SharedWebGLContext;
 
@@ -144,8 +144,8 @@ export class Player {
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
-    this.audioDataPool = new AudioDataPool(this.logger);
-    this.audioPool = new AudioManagerPool(this.logger, this.audioDataPool);
+    this.audioResources = new AudioResourceManager(this.logger);
+    this.audioPool = new AudioManagerPool(this.logger, this.audioResources);
     this.audio = this.audioPool.spawn();
     this.size = settings.size ?? new Vector2(1920, 1080);
     this.resolutionScale = settings.resolutionScale ?? 1;

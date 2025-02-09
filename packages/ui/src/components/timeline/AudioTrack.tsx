@@ -58,7 +58,7 @@ export function AudioClip({
 }: AudioClipProps) {
   const {player} = useApplication();
   const audioData = useSubscribableValue(
-    player.audioDataPool.getData(audio).onData,
+    player.audioResources.get(audio).onData,
   );
 
   const ref = useRef<HTMLCanvasElement>();

@@ -1,7 +1,7 @@
 import {Logger} from '../app';
 import {Sound} from '../scenes';
-import {AudioDataPool} from './AudioDataPool';
 import {AudioManager} from './AudioManager';
+import {AudioResourceManager} from './AudioResourceManager';
 
 export class AudioManagerPool {
   private readonly context = new AudioContext();
@@ -16,7 +16,7 @@ export class AudioManagerPool {
 
   public constructor(
     private readonly logger: Logger,
-    private readonly audioDataPool: AudioDataPool,
+    private readonly audioResources: AudioResourceManager,
   ) {}
 
   public async setupPool(sounds: Sound[]) {
@@ -55,7 +55,7 @@ export class AudioManagerPool {
   }
 
   private isInRange(sound: Sound, time: number) {
-    const duration = this.audioDataPool.getDuration(sound.audio);
+    const duration = this.audioResources.peekDuration(sound.audio);
     const audioStart = sound.start ?? 0;
     const audioEnd = Math.min(duration, sound.end ?? Infinity);
     const audioDuration = (audioEnd - audioStart) / sound.realPlaybackRate;
