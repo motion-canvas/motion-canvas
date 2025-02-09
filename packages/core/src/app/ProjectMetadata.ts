@@ -18,7 +18,9 @@ function createProjectMetadata(project: Project) {
     shared: new ObjectMetaField('General', {
       background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
-      size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
+      size: new Vector2MetaField('resolution', new Vector2(1920, 1080), {
+        min: [1, 1],
+      }),
       audioOffset: new NumberMetaField('audio offset', 0),
     }),
     preview: new ObjectMetaField('Preview', {
