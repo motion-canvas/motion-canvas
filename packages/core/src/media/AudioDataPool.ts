@@ -17,6 +17,10 @@ export class AudioDataPool {
     }
   }
 
+  public getDuration(source: string): number {
+    return this.getData(source).onData.current.duration;
+  }
+
   public getData(source: string): AudioDataManager {
     let manager = this.lookup.get(source);
     if (!manager) {

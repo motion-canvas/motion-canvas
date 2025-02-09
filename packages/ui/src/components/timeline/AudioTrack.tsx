@@ -44,6 +44,7 @@ interface AudioClipProps {
   offset: number;
   start?: number;
   end?: number;
+  realPlaybackRate?: number;
   disabled?: boolean;
 }
 
@@ -52,11 +53,12 @@ export function AudioClip({
   offset,
   start = 0,
   end = Infinity,
+  realPlaybackRate = 1,
   disabled,
 }: AudioClipProps) {
-  const {audioDataManager} = useApplication();
+  const {player} = useApplication();
   const audioData = useSubscribableValue(
-    audioDataManager.getData(audio).onData,
+    player.audioDataPool.getData(audio).onData,
   );
 
   const ref = useRef<HTMLCanvasElement>();
@@ -78,7 +80,8 @@ export function AudioClip({
     clipDuration,
     waveformVisible,
   } = useMemo(() => {
-    const endOffset = Math.min(audioData.duration, end) - start;
+    const endOffset =
+      (Math.min(audioData.duration, end) - start) / realPlaybackRate;
 
     const clipStart = offset;
     const clipEnd = offset + endOffset;
@@ -122,8 +125,9 @@ export function AudioClip({
     context.beginPath();
     context.moveTo(0, HEIGHT);
 
-    const relativeStartTime = waveformStart - offset + start;
-    const relativeEndTime = waveformEnd - offset + start;
+    const relativeStartTime =
+      (waveformStart - offset) * realPlaybackRate + start;
+    const relativeEndTime = (waveformEnd - offset) * realPlaybackRate + start;
 
     const startSample = relativeStartTime * audioData.sampleRate;
     const endSample = relativeEndTime * audioData.sampleRate;

@@ -1,5 +1,6 @@
 import {Logger} from '../app';
 import {Sound} from '../scenes';
+import {AudioDataPool} from './AudioDataPool';
 import {AudioManager} from './AudioManager';
 
 export class AudioManagerPool {
@@ -13,10 +14,19 @@ export class AudioManagerPool {
   private volume: number = 1;
   private paused: boolean = true;
 
-  public constructor(private readonly logger: Logger) {}
+  public constructor(
+    private readonly logger: Logger,
+    private readonly audioDataPool: AudioDataPool,
+  ) {}
 
   public async setupPool(sounds: Sound[]) {
+    for (const manager of this.pool) {
+      manager.dispose();
+    }
     this.pool = [];
+    for (const manager of this.managers.values()) {
+      manager.dispose();
+    }
     this.managers.clear();
     this.sounds = sounds;
   }
@@ -44,9 +54,18 @@ export class AudioManagerPool {
     );
   }
 
-  public prepare(time: number, delta: number) {
+  private isInRange(sound: Sound, time: number) {
+    const duration = this.audioDataPool.getDuration(sound.audio);
+    const audioStart = sound.start ?? 0;
+    const audioEnd = Math.min(duration, sound.end ?? Infinity);
+    const audioDuration = (audioEnd - audioStart) / sound.realPlaybackRate;
+
+    return time >= sound.offset && time < sound.offset + audioDuration;
+  }
+
+  public prepare(time: number) {
     for (const sound of this.sounds) {
-      if (sound.offset >= time && sound.offset < time + delta) {
+      if (this.isInRange(sound, time)) {
         let manager = this.managers.get(sound);
         if (manager) continue;
 
@@ -60,7 +79,7 @@ export class AudioManagerPool {
         this.managers.set(sound, manager);
       } else {
         const manager = this.managers.get(sound);
-        if (!manager || manager.isInRange(time)) continue;
+        if (!manager) continue;
 
         // sound has ended
         manager.setPaused(true);

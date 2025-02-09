@@ -3,7 +3,7 @@ import {
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
-import {AudioManager, AudioManagerPool} from '../media';
+import {AudioDataPool, AudioManager, AudioManagerPool} from '../media';
 import {Scene, Sound} from '../scenes';
 import {EditableTimeEvents} from '../scenes/timeEvents';
 import {clamp} from '../tweening';
@@ -90,6 +90,7 @@ export class Player {
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
   public readonly audioPool: AudioManagerPool;
+  public readonly audioDataPool: AudioDataPool;
   public readonly logger: Logger;
   private readonly sharedWebGLContext: SharedWebGLContext;
 
@@ -143,7 +144,8 @@ export class Player {
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
-    this.audioPool = new AudioManagerPool(this.logger);
+    this.audioDataPool = new AudioDataPool(this.logger);
+    this.audioPool = new AudioManagerPool(this.logger, this.audioDataPool);
     this.audio = this.audioPool.spawn();
     this.size = settings.size ?? new Vector2(1920, 1080);
     this.resolutionScale = settings.resolutionScale ?? 1;
@@ -421,7 +423,7 @@ export class Player {
     }
 
     // Pause / play sounds.
-    this.audioPool.prepare(this.status.time, 1 / this.status.fps);
+    this.audioPool.prepare(this.status.time);
     await this.audioPool.setPaused(state.paused || this.finished);
     this.audioPool.setMuted(state.muted);
     this.audioPool.setVolume(state.volume);
@@ -541,7 +543,7 @@ export class Player {
     const time = this.status.framesToSeconds(this.playback.frame + frameOffset);
     this.audio.setTime(time);
 
-    this.audioPool.prepare(time, 1 / this.status.fps);
+    this.audioPool.prepare(time);
     this.audioPool.setTime(time);
   }
 }

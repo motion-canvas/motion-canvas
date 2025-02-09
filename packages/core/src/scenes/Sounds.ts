@@ -13,6 +13,7 @@ export interface SoundSettings {
 
 export interface Sound extends SoundSettings {
   offset: number;
+  realPlaybackRate: number;
 }
 
 export class SoundBuilder {
@@ -68,12 +69,12 @@ export class SoundBuilder {
    * Change the playback rate of the sound.
    *
    * @remarks
-   * This also affects the percieved pitch of the sound.
+   * This also affects the perceived pitch of the sound.
    *
-   * @param rate - The new playback rate.
+   * @param rate - The new playback rate. Must be greater than 0.
    */
   public playbackRate(rate: number): this {
-    this.settings.playbackRate = rate;
+    this.settings.playbackRate = rate > 0 ? rate : 1;
     return this;
   }
 
@@ -109,7 +110,14 @@ export class Sounds {
 
   public add(settings: SoundSettings, offset?: number) {
     const playbackTime = this.scene.playback.time + (offset ?? 0);
-    this.registeredSounds.push({offset: playbackTime, ...settings});
+
+    this.registeredSounds.push({
+      offset: playbackTime,
+      realPlaybackRate:
+        Math.pow(2, (settings.detune ?? 0) / 1200) *
+        (settings.playbackRate ?? 1),
+      ...settings,
+    });
   }
 
   public getSounds(): readonly Sound[] {

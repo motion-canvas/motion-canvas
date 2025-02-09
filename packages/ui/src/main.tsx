@@ -1,7 +1,6 @@
 import './index.scss';
 
 import {
-  AudioDataPool,
   Player,
   Presenter,
   Renderer,
@@ -149,12 +148,10 @@ export function editor(project: Project) {
   document.title = `${project.name} | Motion Canvas`;
 
   const plugins = [GridPlugin(), ...project.plugins];
-  const audioDataManager = new AudioDataPool(project.logger);
 
   renderRoot(
     <ApplicationProvider
       application={{
-        audioDataManager,
         player,
         renderer,
         presenter,

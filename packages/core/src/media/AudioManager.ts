@@ -16,10 +16,6 @@ export class AudioManager {
     private readonly logger: Logger,
     private readonly context: AudioContext,
   ) {
-    this.audioElement.addEventListener('error', () => {
-      this.logger.error(`Failed to load audio: ${this.source}`);
-    });
-
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
         if (this.source && urls.includes(this.source)) {
@@ -44,10 +40,7 @@ export class AudioManager {
     }
 
     this.gainNode.gain.value = Math.pow(10, (sound.gain ?? 0) / 10);
-    this.setPlaybackRate(
-      Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1),
-      true,
-    );
+    this.setPlaybackRate(sound.realPlaybackRate, true);
   }
 
   public getTime() {
@@ -105,14 +98,14 @@ export class AudioManager {
 
   public toRelativeTime(time: number) {
     return (
-      Math.max(0, time - this.offset + (this.start ?? 0)) *
-      this.audioElement.playbackRate
+      Math.max(0, time - this.offset) * this.audioElement.playbackRate +
+      (this.start ?? 0)
     );
   }
 
   public toAbsoluteTime(time: number) {
     return (
-      time / this.audioElement.playbackRate + this.offset - (this.start ?? 0)
+      (time - (this.start ?? 0)) / this.audioElement.playbackRate + this.offset
     );
   }
 
