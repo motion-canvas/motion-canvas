@@ -10,10 +10,43 @@ export interface Vector2MetaFieldViewProps {
 export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
   const value = useSubscribableValue(field.onChanged);
 
+  const [minX, minY] = field.getMin();
+  const [maxX, maxY] = field.getMax();
+
+  const onXChanged = (x: number) => {
+    if (isNaN(x)) {
+      // No op when NaN is passed
+      field.set(value);
+      return;
+    }
+
+    field.set([x, value.y]);
+  };
+
+  const onYChanged = (y: number) => {
+    if (isNaN(y)) {
+      // No op when NaN is passed
+      field.set(value);
+      return;
+    }
+
+    field.set([value.x, y]);
+  };
+
   return (
     <MetaFieldGroup field={field}>
-      <NumberInput value={value.x} onChange={x => field.set([x, value.y])} />
-      <NumberInput value={value.y} onChange={y => field.set([value.x, y])} />
+      <NumberInput
+        min={minX}
+        max={maxX}
+        value={value.x}
+        onChange={onXChanged}
+      />
+      <NumberInput
+        min={minY}
+        max={maxY}
+        value={value.y}
+        onChange={onYChanged}
+      />
     </MetaFieldGroup>
   );
 }
