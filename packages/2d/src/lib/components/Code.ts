@@ -323,7 +323,9 @@ export class Code extends Shape {
   /**
    * Find all code ranges that match the given pattern.
    *
-   * @param pattern - Either a string or a regular expression to match.
+   * @param pattern - Either a string or a regular expression to search for.
+   *                  When a string is passed, it looks for **exact matches**.
+   *                  When a RegExp object is passed, it will match against it.
    */
   public findAllRanges(pattern: string | RegExp): CodeRange[] {
     return findAllCodeRanges(this.parsed(), pattern);
@@ -332,7 +334,9 @@ export class Code extends Shape {
   /**
    * Find the first code range that matches the given pattern.
    *
-   * @param pattern - Either a string or a regular expression to match.
+   * @param pattern - Either a string or a regular expression to search for.
+   *                  When a string is passed, it looks for **exact matches**.
+   *                  When a RegExp object is passed, it will match against it.
    */
   public findFirstRange(pattern: string | RegExp): CodeRange {
     return (
@@ -346,7 +350,9 @@ export class Code extends Shape {
   /**
    * Find the last code range that matches the given pattern.
    *
-   * @param pattern - Either a string or a regular expression to match.
+   * @param pattern - Either a string or a regular expression to search for.
+   *                  When a string is passed, it looks for **exact matches**.
+   *                  When a RegExp object is passed, it will match against it.
    */
   public findLastRange(pattern: string | RegExp): CodeRange {
     return (
