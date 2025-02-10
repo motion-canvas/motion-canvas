@@ -1,33 +1,6 @@
+import {clamp} from '../tweening';
 import {PossibleVector2, Vector2} from '../types';
 import {MetaField} from './MetaField';
-
-export type Vector2MetaFieldConstructorParameters = {
-  /**
-   * A 2D tuple representing the minimum value
-   * (inclusive) for each element of the the vector.
-   *
-   * Defaults to [-Infinity, -Infinity].
-   *
-   * This constitutes an invariant of the vector
-   * and attempts to change its value will be
-   * validated against it, which will trigger
-   * an exception if validation fails.
-   */
-  min?: [number, number];
-
-  /**
-   * A 2D tuple representing the maximum value
-   * (inclusive) for each element of the the vector.
-   *
-   * Defaults to [Infinity, Infinity].
-   *
-   * This constitutes an invariant of the vector
-   * and attempts to change its value will be
-   * validated against it, which will trigger
-   * an exception if validation fails.
-   */
-  max?: [number, number];
-};
 
 /**
  * Represents a two-dimensional vector stored in a meta file.
@@ -35,35 +8,94 @@ export type Vector2MetaFieldConstructorParameters = {
 export class Vector2MetaField extends MetaField<PossibleVector2, Vector2> {
   public readonly type = Vector2.symbol;
 
-  public readonly min;
-  public readonly max;
-
   public constructor(
-    name: string,
-    initial: Vector2,
-    {max: argMax, min: argMin}: Vector2MetaFieldConstructorParameters = {},
+    public readonly name: string,
+    public readonly initial: Vector2,
   ) {
-    const min = argMin ?? [-Infinity, -Infinity];
-    const max = argMax ?? [Infinity, Infinity];
-
-    Vector2MetaField.validateBoundsParameters(min, max);
-
-    Vector2MetaField.validateAgainstBounds(min, max, initial);
-
     super(name, initial);
 
-    this.min = min;
-    this.max = max;
+    this.lowerBounds = [-Infinity, -Infinity];
+    this.upperBounds = [Infinity, Infinity];
   }
 
   public override parse(value: PossibleVector2): Vector2 {
-    Vector2MetaField.validateAgainstBounds(this.min, this.max, value);
-
-    return new Vector2(value);
+    return Vector2MetaField.coerceAgainstBounds(
+      this.lowerBounds,
+      this.upperBounds,
+      value,
+    );
   }
 
   public override serialize(): PossibleVector2 {
     return this.value.current.serialize();
+  }
+
+  public min(lowerBounds: [number, number]): Vector2MetaField {
+    Vector2MetaField.validateBoundsParameters(lowerBounds, this.upperBounds);
+
+    this.lowerBounds = lowerBounds;
+
+    // When changing the upper bounds
+    // we need to re-set the value
+    // so that it conforms to the updated bounds
+    this.set(
+      Vector2MetaField.coerceAgainstBounds(
+        this.lowerBounds,
+        this.upperBounds,
+        this.get(),
+      ),
+    );
+
+    return this;
+  }
+
+  public max(upperBounds: [number, number]): Vector2MetaField {
+    Vector2MetaField.validateBoundsParameters(this.lowerBounds, upperBounds);
+
+    this.upperBounds = upperBounds;
+
+    // When changing the upper bounds
+    // we need to re-set the value
+    // so that it conforms to the updated bounds
+    this.set(
+      Vector2MetaField.coerceAgainstBounds(
+        this.lowerBounds,
+        this.upperBounds,
+        this.get(),
+      ),
+    );
+
+    return this;
+  }
+
+  /**
+   * A 2D tuple representing the minimum value
+   * (inclusive) for each element of the the vector.
+   *
+   * Defaults to [-Infinity, -Infinity].
+   */
+  public getMin(): [number, number] {
+    return this.lowerBounds;
+  }
+
+  /**
+   * A 2D tuple representing the maximum value
+   * (inclusive) for each element of the the vector.
+   *
+   * Defaults to [Infinity, Infinity].
+   */
+  public getMax(): [number, number] {
+    return this.upperBounds;
+  }
+
+  public override clone(): this {
+    const vectorClone = new Vector2(this.get().x, this.get().y);
+
+    // I'm not entirely sure what's going on here type-wise
+    // that it complains about the return type
+    return new Vector2MetaField(this.name, vectorClone)
+      .min(this.getMin())
+      .max(this.getMax()) as MetaField<PossibleVector2, Vector2> as any;
   }
 
   private static validateBoundsParameters(
@@ -85,27 +117,27 @@ export class Vector2MetaField extends MetaField<PossibleVector2, Vector2> {
     }
   }
 
-  private static validateAgainstBounds(
+  private static coerceAgainstBounds(
     min: [number, number],
     max: [number, number],
     value: PossibleVector2,
-  ): void {
+  ): Vector2 {
     const vector = new Vector2(value);
 
     const [minX, minY] = min;
     const [maxX, maxY] = max;
-    const [x, y] = [vector.x, vector.y];
+    const [originalX, originalY] = [vector.x, vector.y];
 
-    if (x < minX || y < minY || x > maxX || y > maxY) {
-      const message = [
-        `Vector2MetaField invariant violation!`,
-        `You're trying to construct/set this field to a value that is out of bounds!`,
-        `Value -> [${x}, ${y}]`,
-        `Min -> [${minX}, ${minY}]`,
-        `Max -> [${maxX}, ${maxY}]`,
-      ].join('\n');
+    const coercedX = clamp(minX, maxX, originalX);
+    const coercedY = clamp(minY, maxY, originalY);
 
-      throw new Error(message);
-    }
+    vector.x = coercedX;
+    vector.y = coercedY;
+
+    return vector;
   }
+
+  private lowerBounds: [number, number];
+
+  private upperBounds: [number, number];
 }
