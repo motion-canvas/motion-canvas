@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type {JSX} from 'preact';
-import {useEffect, useRef, useState} from 'preact/hooks';
+import {useRef, useState} from 'preact/hooks';
 import {MouseButton, clamp} from '../../utils';
 import styles from './Controls.module.scss';
 
@@ -28,12 +28,9 @@ export function NumberInput({
   ...props
 }: NumberInputProps) {
   const inputRef = useRef<HTMLInputElement>();
-  const [currentValue, setCurrentValue] = useState(value);
+  const [editedValue, setEditedValue] = useState<null | number>(null);
   const [startX, setStartX] = useState(0);
-
-  useEffect(() => {
-    setCurrentValue(value);
-  }, [value]);
+  const currentValue = editedValue ?? value;
 
   return (
     <>
@@ -56,6 +53,7 @@ export function NumberInput({
             event.currentTarget.setPointerCapture(event.pointerId);
 
             setStartX(event.clientX);
+            setEditedValue(value);
           }
         }}
         onPointerMove={event => {
@@ -69,16 +67,15 @@ export function NumberInput({
             if (Math.abs(startX - event.clientX) > 5) {
               inputRef.current.requestPointerLock();
             }
-          } else if (document.pointerLockElement === inputRef.current) {
-            setCurrentValue(value => {
-              // ignore very large jumps in movement, as they often result
-              // from mouse acceleration issues
-              if (Math.abs(event.movementX) > 100) {
-                return value;
-              }
-
-              return clamp(min, max, value + event.movementX * step);
-            });
+          } else if (
+            document.pointerLockElement === inputRef.current &&
+            // ignore very large jumps in movement, as they often result
+            // from mouse acceleration issues
+            Math.abs(event.movementX) < 100
+          ) {
+            setEditedValue(
+              clamp(min, max, currentValue + event.movementX * step),
+            );
           }
         }}
         onPointerUp={event => {
@@ -88,10 +85,12 @@ export function NumberInput({
 
             if (document.pointerLockElement === inputRef.current) {
               document.exitPointerLock();
-              onChange?.(currentValue);
+              onChange?.(editedValue);
             } else if (document.activeElement !== inputRef.current) {
               inputRef.current.select();
             }
+
+            setEditedValue(null);
           }
         }}
         onKeyDown={event => {
@@ -99,7 +98,7 @@ export function NumberInput({
             inputRef.current.blur();
           }
           if (event.key === 'Escape') {
-            inputRef.current.value = currentValue.toString();
+            inputRef.current.value = value.toFixed(decimalPlaces);
             inputRef.current.blur();
           }
         }}

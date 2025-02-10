@@ -10,6 +10,8 @@ export interface NumberMetaFieldViewProps {
 export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
   const value = useSubscribableValue(field.onChanged);
   const presets = field.getPresets();
+  const precision = field.getPrecision();
+  const step = field.getStep();
 
   return (
     <MetaFieldGroup field={field}>
@@ -26,6 +28,8 @@ export function NumberMetaFieldView({field}: NumberMetaFieldViewProps) {
       ) : (
         <NumberInput
           value={value}
+          decimalPlaces={precision}
+          step={step}
           min={field.getMin()}
           max={field.getMax()}
           onChange={value => field.set(value)}
