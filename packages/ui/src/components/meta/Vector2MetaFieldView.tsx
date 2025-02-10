@@ -1,6 +1,5 @@
 import {Vector2MetaField} from '@motion-canvas/core';
 import {useSubscribableValue} from '../../hooks';
-import {clamp} from '../../utils';
 import {NumberInput} from '../controls';
 import {MetaFieldGroup} from './MetaFieldGroup';
 
@@ -11,8 +10,8 @@ export interface Vector2MetaFieldViewProps {
 export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
   const value = useSubscribableValue(field.onChanged);
 
-  const [minX, minY] = field.min;
-  const [maxX, maxY] = field.max;
+  const [minX, minY] = field.getMin();
+  const [maxX, maxY] = field.getMax();
 
   const onXChanged = (x: number) => {
     if (isNaN(x)) {
@@ -21,9 +20,7 @@ export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
       return;
     }
 
-    const newX = clamp(minX, maxX, x);
-
-    field.set([newX, value.y]);
+    field.set([x, value.y]);
   };
 
   const onYChanged = (y: number) => {
@@ -33,9 +30,7 @@ export function Vector2MetaFieldView({field}: Vector2MetaFieldViewProps) {
       return;
     }
 
-    const newY = clamp(minY, maxY, y);
-
-    field.set([value.x, newY]);
+    field.set([value.x, y]);
   };
 
   return (
