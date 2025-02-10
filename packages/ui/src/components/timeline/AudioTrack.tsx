@@ -110,6 +110,7 @@ export function AudioClip({
     firstVisibleTime,
     lastVisibleTime,
     secondsToPixels,
+    realPlaybackRate,
     offset,
   ]);
 
@@ -166,6 +167,7 @@ export function AudioClip({
     viewLength,
     start,
     audioData,
+    realPlaybackRate,
   ]);
 
   const [wrapperStyle, canvasStyle] = useMemo(
