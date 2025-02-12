@@ -19,7 +19,9 @@ function createProjectMetadata(project: Project) {
       background: new ColorMetaField('background', null),
       range: new RangeMetaField('range', [0, Infinity]),
       size: new Vector2MetaField('resolution', new Vector2(1920, 1080)),
-      audioOffset: new NumberMetaField('audio offset', 0),
+      audioOffset: new NumberMetaField('audio offset', 0)
+        .setPrecision(4)
+        .setStep(0.1),
     }),
     preview: new ObjectMetaField('Preview', {
       fps: new NumberMetaField('frame rate', 30)

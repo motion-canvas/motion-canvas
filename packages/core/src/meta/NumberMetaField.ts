@@ -1,3 +1,4 @@
+import {clamp} from '../tweening';
 import {MetaField} from './MetaField';
 import {MetaOption} from './MetaOption';
 
@@ -7,19 +8,18 @@ import {MetaOption} from './MetaOption';
 export class NumberMetaField extends MetaField<any, number> {
   public readonly type = Number;
   protected presets: MetaOption<number>[] = [];
-  protected min?: number;
-  protected max?: number;
+  protected min = -Infinity;
+  protected max = Infinity;
+  protected precision = 0;
+  protected step = 1;
 
   public parse(value: any): number {
     let parsed = parseFloat(value);
-    if (this.min !== undefined && parsed < this.min) {
-      parsed = this.min;
-    }
-    if (this.max !== undefined && parsed > this.max) {
-      parsed = this.max;
+    if (isNaN(parsed)) {
+      parsed = this.initial;
     }
 
-    return parsed;
+    return clamp(this.min, this.max, parsed);
   }
 
   public getPresets() {
@@ -32,8 +32,8 @@ export class NumberMetaField extends MetaField<any, number> {
   }
 
   public setRange(min?: number, max?: number): this {
-    this.min = min;
-    this.max = max;
+    this.min = min ?? -Infinity;
+    this.max = max ?? Infinity;
     return this;
   }
 
@@ -43,5 +43,23 @@ export class NumberMetaField extends MetaField<any, number> {
 
   public getMax(): number {
     return this.max ?? Infinity;
+  }
+
+  public setPrecision(precision: number): this {
+    this.precision = clamp(0, 100, precision);
+    return this;
+  }
+
+  public getPrecision(): number {
+    return this.precision;
+  }
+
+  public setStep(step: number): this {
+    this.step = step;
+    return this;
+  }
+
+  public getStep(): number {
+    return this.step;
   }
 }
