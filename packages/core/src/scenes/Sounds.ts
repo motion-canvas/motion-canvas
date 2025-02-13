@@ -1,3 +1,4 @@
+import {ValueDispatcher} from '../events';
 import {useScene} from '../utils';
 import type {Scene} from './Scene';
 
@@ -12,6 +13,7 @@ export interface SoundSettings {
 
 export interface Sound extends SoundSettings {
   offset: number;
+  realPlaybackRate: number;
 }
 
 export class SoundBuilder {
@@ -67,12 +69,12 @@ export class SoundBuilder {
    * Change the playback rate of the sound.
    *
    * @remarks
-   * This also affects the percieved pitch of the sound.
+   * This also affects the perceived pitch of the sound.
    *
-   * @param rate - The new playback rate.
+   * @param rate - The new playback rate. Must be greater than 0.
    */
   public playbackRate(rate: number): this {
-    this.settings.playbackRate = rate;
+    this.settings.playbackRate = rate > 0 ? rate : 1;
     return this;
   }
 
@@ -94,27 +96,39 @@ export function sound(audio: string | SoundBuilder) {
 }
 
 export class Sounds {
-  private sounds: Sound[] = [];
+  public get onChanged() {
+    return this.sounds.subscribable;
+  }
+  private readonly sounds = new ValueDispatcher<Sound[]>([]);
+  private registeredSounds: Sound[] = [];
 
   public constructor(private readonly scene: Scene) {
-    this.scene.onReset.subscribe(this.handleReset);
-    this.scene.onReset.subscribe(this.handleReload);
+    this.scene.onReset.subscribe(this.reset);
+    this.scene.onReloaded.subscribe(this.reset);
+    this.scene.onRecalculated.subscribe(this.handleRecalculated);
   }
 
   public add(settings: SoundSettings, offset?: number) {
     const playbackTime = this.scene.playback.time + (offset ?? 0);
-    this.sounds.push({offset: playbackTime, ...settings});
+
+    this.registeredSounds.push({
+      offset: playbackTime,
+      realPlaybackRate:
+        Math.pow(2, (settings.detune ?? 0) / 1200) *
+        (settings.playbackRate ?? 1),
+      ...settings,
+    });
   }
 
   public getSounds(): readonly Sound[] {
-    return this.sounds;
+    return this.registeredSounds;
   }
 
-  public handleReset = () => {
-    this.sounds = [];
+  private handleRecalculated = () => {
+    this.sounds.current = [...this.registeredSounds];
   };
 
-  public handleReload = () => {
-    this.sounds = [];
+  private reset = () => {
+    this.registeredSounds = [];
   };
 }

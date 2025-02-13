@@ -16,4 +16,16 @@ export interface AudioData {
    * Samples per seconds.
    */
   sampleRate: number;
+  /**
+   * The duration of the audio in seconds.
+   */
+  duration: number;
 }
+
+export const EMPTY_AUDIO_DATA: AudioData = {
+  peaks: [],
+  length: 0,
+  absoluteMax: 0,
+  sampleRate: 0,
+  duration: 0,
+};

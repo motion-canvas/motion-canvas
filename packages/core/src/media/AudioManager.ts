@@ -1,26 +1,21 @@
 import {Logger} from '../app';
-import {ValueDispatcher} from '../events';
 import {Sound} from '../scenes';
 import {useLogger} from '../utils';
-import {AudioData} from './AudioData';
 
 export class AudioManager {
-  public get onDataChanged() {
-    return this.data.subscribable;
-  }
-  private readonly data = new ValueDispatcher<AudioData | null>(null);
-
-  private readonly context = new AudioContext();
   private readonly audioElement: HTMLAudioElement = new Audio();
   private source: string | null = null;
   private error = false;
-  private abortController: AbortController | null = null;
   private offset = 0;
   private start?: number;
   private duration?: number;
   private gainNode?: GainNode;
+  private sourceNode?: MediaElementAudioSourceNode;
 
-  public constructor(private readonly logger: Logger) {
+  public constructor(
+    private readonly logger: Logger,
+    private readonly context: AudioContext,
+  ) {
     if (import.meta.hot) {
       import.meta.hot.on('motion-canvas:assets', ({urls}) => {
         if (this.source && urls.includes(this.source)) {
@@ -36,19 +31,16 @@ export class AudioManager {
     this.setSource(sound.audio);
 
     if (this.gainNode === undefined) {
-      const sourceNode = this.context.createMediaElementSource(
+      this.sourceNode = this.context.createMediaElementSource(
         this.audioElement,
       );
       this.gainNode = this.context.createGain();
-      sourceNode.connect(this.gainNode);
+      this.sourceNode.connect(this.gainNode);
       this.gainNode.connect(this.context.destination);
     }
 
     this.gainNode.gain.value = Math.pow(10, (sound.gain ?? 0) / 10);
-    this.setPlaybackRate(
-      Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1),
-      true,
-    );
+    this.setPlaybackRate(sound.realPlaybackRate, true);
   }
 
   public getTime() {
@@ -85,16 +77,13 @@ export class AudioManager {
     this.audioElement.volume = volume;
   }
 
+  public getSource() {
+    return this.source;
+  }
+
   public setSource(src: string) {
     this.source = src;
     this.audioElement.src = src;
-    this.abortController?.abort();
-    this.abortController = new AbortController();
-    this.loadData(this.abortController.signal).catch(e => {
-      if (e.name !== 'AbortError') {
-        this.logger.error(e);
-      }
-    });
   }
 
   public isInRange(time: number) {
@@ -109,14 +98,14 @@ export class AudioManager {
 
   public toRelativeTime(time: number) {
     return (
-      Math.max(0, time - this.offset + (this.start ?? 0)) *
-      this.audioElement.playbackRate
+      Math.max(0, time - this.offset) * this.audioElement.playbackRate +
+      (this.start ?? 0)
     );
   }
 
   public toAbsoluteTime(time: number) {
     return (
-      time / this.audioElement.playbackRate + this.offset - (this.start ?? 0)
+      (time - (this.start ?? 0)) / this.audioElement.playbackRate + this.offset
     );
   }
 
@@ -152,78 +141,14 @@ export class AudioManager {
     return false;
   }
 
-  private async loadData(signal: AbortSignal) {
-    this.data.current = null;
-    if (!this.source) {
-      return;
-    }
+  public dispose() {
+    this.audioElement.pause();
+    this.audioElement.src = '';
+    this.audioElement.load();
+    this.gainNode?.disconnect();
+    this.sourceNode?.disconnect();
 
-    const response = await fetch(this.source, {signal});
-    const rawBuffer = await response.arrayBuffer();
-    if (signal.aborted) return;
-    let audioBuffer: AudioBuffer;
-    try {
-      audioBuffer = await this.decodeAudioData(rawBuffer);
-    } catch (e) {
-      return;
-    }
-    if (signal.aborted) return;
-
-    const sampleSize = 256;
-    const samples = ~~(audioBuffer.length / sampleSize);
-
-    const peaks = [];
-    let absoluteMax = 0;
-    for (
-      let channelId = 0;
-      channelId < audioBuffer.numberOfChannels;
-      channelId++
-    ) {
-      const channel = audioBuffer.getChannelData(channelId);
-      for (let i = 0; i < samples; i++) {
-        const start = ~~(i * sampleSize);
-        const end = ~~(start + sampleSize);
-
-        let min = channel[start];
-        let max = min;
-
-        for (let j = start; j < end; j++) {
-          const value = channel[j];
-          if (value > max) {
-            max = value;
-          }
-          if (value < min) {
-            min = value;
-          }
-        }
-
-        if (channelId === 0 || max > peaks[i * 2]) {
-          peaks[i * 2] = max;
-        }
-        if (channelId === 0 || min < peaks[i * 2 + 1]) {
-          peaks[i * 2 + 1] = min;
-        }
-
-        if (max > absoluteMax) {
-          absoluteMax = max;
-        }
-        if (Math.abs(min) > absoluteMax) {
-          absoluteMax = Math.abs(min);
-        }
-      }
-    }
-
-    this.data.current = {
-      peaks,
-      absoluteMax,
-      length: samples,
-      sampleRate: (audioBuffer.sampleRate / sampleSize) * 2,
-    };
-  }
-
-  private decodeAudioData(buffer: ArrayBuffer): Promise<AudioBuffer> {
-    return new Promise<AudioBuffer>((resolve, reject) =>
-      this.context.decodeAudioData(buffer, resolve, reject).catch(reject),
-    );
+    this.sourceNode = undefined;
+    this.gainNode = undefined;
   }
 }

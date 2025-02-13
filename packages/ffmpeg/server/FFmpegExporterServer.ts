@@ -76,6 +76,7 @@ export class FFmpegExporterServer {
     if (settings.audio && settings.includeAudio) {
       sounds.push({
         audio: settings.audio,
+        realPlaybackRate: 1,
         offset: settings.audioOffset ?? 0,
       });
     }
@@ -87,12 +88,9 @@ export class FFmpegExporterServer {
       const sound = sounds[i];
       this.command.input(sound.audio.slice(1));
 
-      const playback =
-        Math.pow(2, (sound.detune ?? 0) / 1200) * (sound.playbackRate ?? 1);
-
       let trimmed = sound.start ?? 0;
       if (sound.offset < 0) {
-        trimmed -= sound.offset * playback;
+        trimmed -= sound.offset * sound.realPlaybackRate;
       }
 
       if (trimmed !== 0) {
@@ -119,8 +117,10 @@ export class FFmpegExporterServer {
         });
       }
 
-      if (playback !== 1) {
-        const rate = Math.round(settings.audioSampleRate * playback);
+      if (sound.realPlaybackRate !== 1) {
+        const rate = Math.round(
+          settings.audioSampleRate * sound.realPlaybackRate,
+        );
         filters.push({
           filter: 'asetrate',
           options: {r: rate},
@@ -187,6 +187,7 @@ export class FFmpegExporterServer {
     if (!fs.existsSync(this.config.output)) {
       await fs.promises.mkdir(this.config.output, {recursive: true});
     }
+    this.command.on('stderr', console.error);
     this.command.run();
   }
 

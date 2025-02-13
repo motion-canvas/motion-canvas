@@ -3,7 +3,7 @@ import {
   EventDispatcher,
   ValueDispatcher,
 } from '../events';
-import {AudioManager, AudioManagerPool} from '../media';
+import {AudioManager, AudioManagerPool, AudioResourceManager} from '../media';
 import {Scene, Sound} from '../scenes';
 import {EditableTimeEvents} from '../scenes/timeEvents';
 import {clamp} from '../tweening';
@@ -90,6 +90,7 @@ export class Player {
   public readonly status: PlaybackStatus;
   public readonly audio: AudioManager;
   public readonly audioPool: AudioManagerPool;
+  public readonly audioResources: AudioResourceManager;
   public readonly logger: Logger;
   private readonly sharedWebGLContext: SharedWebGLContext;
 
@@ -143,8 +144,9 @@ export class Player {
     this.logger = this.project.logger;
     this.playback = new PlaybackManager();
     this.status = new PlaybackStatus(this.playback);
-    this.audio = new AudioManager(this.logger);
-    this.audioPool = new AudioManagerPool(this.logger);
+    this.audioResources = new AudioResourceManager(this.logger);
+    this.audioPool = new AudioManagerPool(this.logger, this.audioResources);
+    this.audio = this.audioPool.spawn();
     this.size = settings.size ?? new Vector2(1920, 1080);
     this.resolutionScale = settings.resolutionScale ?? 1;
     this.startTime = settings.range?.[0] ?? 0;
@@ -266,6 +268,9 @@ export class Player {
   public togglePlayback(
     value: boolean = this.playerState.current.paused,
   ): void {
+    // Ensure the AudioContext is resumed by user interaction.
+    this.audioPool.resume();
+
     if (value === this.playerState.current.paused) {
       this.playerState.current = {
         ...this.playerState.current,
@@ -418,7 +423,7 @@ export class Player {
     }
 
     // Pause / play sounds.
-    this.audioPool.prepare(this.status.time, 1 / this.status.fps);
+    this.audioPool.prepare(this.status.time);
     await this.audioPool.setPaused(state.paused || this.finished);
     this.audioPool.setMuted(state.muted);
     this.audioPool.setVolume(state.volume);
@@ -538,7 +543,7 @@ export class Player {
     const time = this.status.framesToSeconds(this.playback.frame + frameOffset);
     this.audio.setTime(time);
 
-    this.audioPool.prepare(time, 1 / this.status.fps);
+    this.audioPool.prepare(time);
     this.audioPool.setTime(time);
   }
 }
