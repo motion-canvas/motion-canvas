@@ -358,6 +358,19 @@
       }
     }
   }
+
+  &.editable {
+    cursor: move;
+    z-index: 1;
+
+    .audioCanvas {
+      filter: brightness(0.32);
+    }
+
+    &:hover .audioCanvas {
+      filter: brightness(0.36);
+    }
+  }
 }
 
 .audioCanvas {

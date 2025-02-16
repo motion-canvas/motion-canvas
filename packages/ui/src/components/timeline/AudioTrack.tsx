@@ -1,22 +1,19 @@
-import styles from './Timeline.module.scss';
-
 import type {Scene} from '@motion-canvas/core';
 import clsx from 'clsx';
-import {useLayoutEffect, useMemo, useRef} from 'preact/hooks';
-import {useApplication, useTimelineContext} from '../../contexts';
+import type {JSX} from 'preact';
+import {useLayoutEffect, useMemo, useRef, useState} from 'preact/hooks';
+import {useApplication, useModifiers, useTimelineContext} from '../../contexts';
 import {useScenes, useSharedSettings, useSubscribableValue} from '../../hooks';
+import {MouseButton} from '../../utils';
+import styles from './Timeline.module.scss';
 
 const HEIGHT = 48;
 
 export function AudioTrack() {
-  const {player} = useApplication();
-  const {audioOffset} = useSharedSettings();
   const scenes = useScenes();
-  const source = player.audio.getSource();
-
   return (
     <div className={styles.audioTrack}>
-      {source && <AudioClip audio={source} offset={audioOffset} disabled />}
+      <MainAudioClip />
       {scenes.map(scene => (
         <AudioGroup scene={scene} />
       ))}
@@ -33,19 +30,69 @@ export function AudioGroup({scene}: AudioGroupProps) {
   return (
     <>
       {sounds.map(sound => (
-        <AudioClip {...sound} />
+        <AudioClip hoverable {...sound} />
       ))}
     </>
   );
 }
 
-interface AudioClipProps {
+function MainAudioClip() {
+  const {player, meta} = useApplication();
+  const source = player.audio.getSource();
+  const {audioOffset} = useSharedSettings();
+  const modifiers = useModifiers();
+  const [editingOffset, setEditingOffset] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const {pixelsToSeconds} = useTimelineContext();
+  const fullOffset = audioOffset + editingOffset;
+
+  useLayoutEffect(() => {
+    setEditingOffset(0);
+  }, [audioOffset]);
+
+  const active = modifiers.value.shift;
+
+  return (
+    source && (
+      <AudioClip
+        editable={active || isEditing}
+        audio={source}
+        offset={fullOffset}
+        disabled
+        onPointerDown={e => {
+          if (active && e.button === MouseButton.Left) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.currentTarget.setPointerCapture(e.pointerId);
+            setIsEditing(true);
+          }
+        }}
+        onPointerMove={e => {
+          if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+            setEditingOffset(editingOffset + pixelsToSeconds(e.movementX));
+          }
+        }}
+        onPointerUp={e => {
+          if (e.button === MouseButton.Left) {
+            e.currentTarget.releasePointerCapture(e.pointerId);
+            meta.shared.audioOffset.set(fullOffset);
+            setEditingOffset(0);
+            setIsEditing(false);
+          }
+        }}
+      />
+    )
+  );
+}
+
+interface AudioClipProps extends JSX.HTMLAttributes<HTMLDivElement> {
   audio: string;
   offset: number;
   start?: number;
   end?: number;
   realPlaybackRate?: number;
-  disabled?: boolean;
+  hoverable?: boolean;
+  editable?: boolean;
 }
 
 export function AudioClip({
@@ -54,7 +101,10 @@ export function AudioClip({
   start = 0,
   end = Infinity,
   realPlaybackRate = 1,
-  disabled,
+  hoverable,
+  editable,
+  className,
+  ...props
 }: AudioClipProps) {
   const {player} = useApplication();
   const audioData = useSubscribableValue(
@@ -186,10 +236,16 @@ export function AudioClip({
 
   return (
     <div
-      className={clsx(styles.audioClip, !disabled && styles.hoverable)}
+      className={clsx(
+        styles.audioClip,
+        hoverable && styles.hoverable,
+        editable && styles.editable,
+        className,
+      )}
       style={wrapperStyle}
+      {...props}
     >
-      {!disabled && waveformWidth > 8 && (
+      {hoverable && waveformWidth > 8 && (
         <div className={styles.audioLabel}>{audio}</div>
       )}
       {waveformVisible && waveformWidth > 8 && (
