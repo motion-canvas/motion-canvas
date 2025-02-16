@@ -3,7 +3,7 @@ import {InterpolationFunction, arcLerp, map} from '../tweening';
 import {PossibleMatrix2D} from './Matrix2D';
 import {PossibleSpacing, Spacing} from './Spacing';
 import {Type, WebGLConvertible} from './Type';
-import {Vector2} from './Vector';
+import {PossibleVector2, Vector2} from './Vector';
 
 export type SerializedBBox = {
   x: number;
@@ -282,6 +282,21 @@ export class BBox implements Type, WebGLConvertible {
 
   public transformCorners(matrix: PossibleMatrix2D) {
     return this.corners.map(corner => corner.transformAsPoint(matrix));
+  }
+
+  /**
+   * Translate the bounding box by the given vector.
+   *
+   * @param vector - The vector to translate the bounding box by.
+   */
+  public translate(vector: PossibleVector2): BBox {
+    const translation = new Vector2(vector);
+    return new BBox(
+      this.x + translation.x,
+      this.y + translation.y,
+      this.width,
+      this.height,
+    );
   }
 
   /**
