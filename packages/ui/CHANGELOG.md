@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.18.0-alpha.0) (2025-02-16)
+
+
+### Bug Fixes
+
+* fix audio offset field ([#1160](https://github.com/motion-canvas/motion-canvas/issues/1160)) ([16ebb07](https://github.com/motion-canvas/motion-canvas/commit/16ebb07f949bab04b4174445cba72b869fbeb538))
+* **vite-plugin, ui:** project file path on selection ([#1090](https://github.com/motion-canvas/motion-canvas/issues/1090)) ([f15b375](https://github.com/motion-canvas/motion-canvas/commit/f15b3753d47bcca8cd2d3f213f5624cf5e54142d))
+
+
+### Features
+
+* **ffmpeg:** skip encoding when extracting frames ([#1095](https://github.com/motion-canvas/motion-canvas/issues/1095)) ([8b0d274](https://github.com/motion-canvas/motion-canvas/commit/8b0d27499c664272271ccc3fd45cbd4561768ea7))
+* keyboard navigation for scene graph ([#1101](https://github.com/motion-canvas/motion-canvas/issues/1101)) ([e5bd5f7](https://github.com/motion-canvas/motion-canvas/commit/e5bd5f7157d7081346a64328ef80bf10996ba530))
+* sound waveforms ([#1158](https://github.com/motion-canvas/motion-canvas/issues/1158)) ([158125a](https://github.com/motion-canvas/motion-canvas/commit/158125afa5642e342cd8c16173a698f13fe24651))
+* **ui:** add modal actions ([#1100](https://github.com/motion-canvas/motion-canvas/issues/1100)) ([4e49e09](https://github.com/motion-canvas/motion-canvas/commit/4e49e09ba4fef4a8ea87b2421d73171a5551d0df))
+
+
+
+
+
 ## [3.17.2](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.17.2) (2024-12-14)
 
 

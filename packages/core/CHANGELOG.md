@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.18.0-alpha.0) (2025-02-16)
+
+
+### Bug Fixes
+
+* **core:** always show both scenes when seeking mid-transition ([#1128](https://github.com/motion-canvas/motion-canvas/issues/1128)) ([13c9de8](https://github.com/motion-canvas/motion-canvas/commit/13c9de85280cc1b893a178b9d6eecd8d639fd7bb))
+* **core:** fix AudioManager.isInRange logic ([#1156](https://github.com/motion-canvas/motion-canvas/issues/1156)) ([8601578](https://github.com/motion-canvas/motion-canvas/commit/8601578283729c3df6006b34121571a9b2ddcf5a))
+* **core:** fix incorrect rollup ordering ([6b6f444](https://github.com/motion-canvas/motion-canvas/commit/6b6f4444dc6504436fd7892ef3675a6255674108))
+* explicitly type Vector2.toArray() to return a tuple ([#1107](https://github.com/motion-canvas/motion-canvas/issues/1107)) ([3c069ce](https://github.com/motion-canvas/motion-canvas/commit/3c069ce8087e96e747e42e8d996b0cf6237b8da7))
+* fix audio offset field ([#1160](https://github.com/motion-canvas/motion-canvas/issues/1160)) ([16ebb07](https://github.com/motion-canvas/motion-canvas/commit/16ebb07f949bab04b4174445cba72b869fbeb538))
+
+
+### Features
+
+* **core:** add BBox.translate ([#1164](https://github.com/motion-canvas/motion-canvas/issues/1164)) ([194e981](https://github.com/motion-canvas/motion-canvas/commit/194e9814967a8bb2779a1bf8668c03b035f02cb1))
+* **ffmpeg:** skip encoding when extracting frames ([#1095](https://github.com/motion-canvas/motion-canvas/issues/1095)) ([8b0d274](https://github.com/motion-canvas/motion-canvas/commit/8b0d27499c664272271ccc3fd45cbd4561768ea7))
+* programmable sounds ([#1082](https://github.com/motion-canvas/motion-canvas/issues/1082)) ([a40d50b](https://github.com/motion-canvas/motion-canvas/commit/a40d50b87f5a2940e81d2fd0af4acb6d19202260))
+* sound waveforms ([#1158](https://github.com/motion-canvas/motion-canvas/issues/1158)) ([158125a](https://github.com/motion-canvas/motion-canvas/commit/158125afa5642e342cd8c16173a698f13fe24651))
+
+
+
+
+
 ## [3.17.2](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.17.2) (2024-12-14)
 
 

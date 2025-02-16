@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.18.0-alpha.0) (2025-02-16)
+
+
+### Bug Fixes
+
+* **2d:** account for code transitions in bboxes ([#1116](https://github.com/motion-canvas/motion-canvas/issues/1116)) ([447c89c](https://github.com/motion-canvas/motion-canvas/commit/447c89c105d00f1cb63a8e8abdded3b9c61c7571)), closes [#1106](https://github.com/motion-canvas/motion-canvas/issues/1106)
+* **2d:** add curve completion for videos ([#1117](https://github.com/motion-canvas/motion-canvas/issues/1117)) ([445bda0](https://github.com/motion-canvas/motion-canvas/commit/445bda03a7c98652cfc0aca22d37c42e724db75c)), closes [#1110](https://github.com/motion-canvas/motion-canvas/issues/1110)
+* **2d:** fix text height when tweening ([#1118](https://github.com/motion-canvas/motion-canvas/issues/1118)) ([dc4f71b](https://github.com/motion-canvas/motion-canvas/commit/dc4f71bd2557e4728a336d578d440a1d790df820)), closes [#1114](https://github.com/motion-canvas/motion-canvas/issues/1114)
+* fix text wrap ([#1163](https://github.com/motion-canvas/motion-canvas/issues/1163)) ([29f678e](https://github.com/motion-canvas/motion-canvas/commit/29f678ec38c414be62dd8de1f81ba04ff69abd15))
+
+
+### Features
+
+* **2d:** modifies  to match exact strings when passed a plain string ([#1153](https://github.com/motion-canvas/motion-canvas/issues/1153)) ([2eb64a4](https://github.com/motion-canvas/motion-canvas/commit/2eb64a4ac36a34c0f80757e9964895640bc75ae1))
+* **2d:** switch to signal-based inheritance ([#1097](https://github.com/motion-canvas/motion-canvas/issues/1097)) ([11e2e52](https://github.com/motion-canvas/motion-canvas/commit/11e2e52e851a997f8e7060e9445135aedc45c28f))
+* keyboard navigation for scene graph ([#1101](https://github.com/motion-canvas/motion-canvas/issues/1101)) ([e5bd5f7](https://github.com/motion-canvas/motion-canvas/commit/e5bd5f7157d7081346a64328ef80bf10996ba530))
+
+
+
+
+
 ## [3.17.2](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.17.2) (2024-12-14)
 
 **Note:** Version bump only for package @motion-canvas/2d

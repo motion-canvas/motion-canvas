@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0-alpha.0](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.18.0-alpha.0) (2025-02-16)
+
+
+### Bug Fixes
+
+* **2d:** account for code transitions in bboxes ([#1116](https://github.com/motion-canvas/motion-canvas/issues/1116)) ([447c89c](https://github.com/motion-canvas/motion-canvas/commit/447c89c105d00f1cb63a8e8abdded3b9c61c7571)), closes [#1106](https://github.com/motion-canvas/motion-canvas/issues/1106)
+* **2d:** add curve completion for videos ([#1117](https://github.com/motion-canvas/motion-canvas/issues/1117)) ([445bda0](https://github.com/motion-canvas/motion-canvas/commit/445bda03a7c98652cfc0aca22d37c42e724db75c)), closes [#1110](https://github.com/motion-canvas/motion-canvas/issues/1110)
+* **2d:** fix text height when tweening ([#1118](https://github.com/motion-canvas/motion-canvas/issues/1118)) ([dc4f71b](https://github.com/motion-canvas/motion-canvas/commit/dc4f71bd2557e4728a336d578d440a1d790df820)), closes [#1114](https://github.com/motion-canvas/motion-canvas/issues/1114)
+* **core:** always show both scenes when seeking mid-transition ([#1128](https://github.com/motion-canvas/motion-canvas/issues/1128)) ([13c9de8](https://github.com/motion-canvas/motion-canvas/commit/13c9de85280cc1b893a178b9d6eecd8d639fd7bb))
+* **core:** fix AudioManager.isInRange logic ([#1156](https://github.com/motion-canvas/motion-canvas/issues/1156)) ([8601578](https://github.com/motion-canvas/motion-canvas/commit/8601578283729c3df6006b34121571a9b2ddcf5a))
+* **core:** fix incorrect rollup ordering ([6b6f444](https://github.com/motion-canvas/motion-canvas/commit/6b6f4444dc6504436fd7892ef3675a6255674108))
+* explicitly type Vector2.toArray() to return a tuple ([#1107](https://github.com/motion-canvas/motion-canvas/issues/1107)) ([3c069ce](https://github.com/motion-canvas/motion-canvas/commit/3c069ce8087e96e747e42e8d996b0cf6237b8da7))
+* fix audio offset field ([#1160](https://github.com/motion-canvas/motion-canvas/issues/1160)) ([16ebb07](https://github.com/motion-canvas/motion-canvas/commit/16ebb07f949bab04b4174445cba72b869fbeb538))
+* fix text wrap ([#1163](https://github.com/motion-canvas/motion-canvas/issues/1163)) ([29f678e](https://github.com/motion-canvas/motion-canvas/commit/29f678ec38c414be62dd8de1f81ba04ff69abd15))
+* **vite-plugin, ui:** project file path on selection ([#1090](https://github.com/motion-canvas/motion-canvas/issues/1090)) ([f15b375](https://github.com/motion-canvas/motion-canvas/commit/f15b3753d47bcca8cd2d3f213f5624cf5e54142d))
+
+
+### Features
+
+* **2d:** modifies  to match exact strings when passed a plain string ([#1153](https://github.com/motion-canvas/motion-canvas/issues/1153)) ([2eb64a4](https://github.com/motion-canvas/motion-canvas/commit/2eb64a4ac36a34c0f80757e9964895640bc75ae1))
+* **2d:** switch to signal-based inheritance ([#1097](https://github.com/motion-canvas/motion-canvas/issues/1097)) ([11e2e52](https://github.com/motion-canvas/motion-canvas/commit/11e2e52e851a997f8e7060e9445135aedc45c28f))
+* **core:** add BBox.translate ([#1164](https://github.com/motion-canvas/motion-canvas/issues/1164)) ([194e981](https://github.com/motion-canvas/motion-canvas/commit/194e9814967a8bb2779a1bf8668c03b035f02cb1))
+* **ffmpeg:** skip encoding when extracting frames ([#1095](https://github.com/motion-canvas/motion-canvas/issues/1095)) ([8b0d274](https://github.com/motion-canvas/motion-canvas/commit/8b0d27499c664272271ccc3fd45cbd4561768ea7))
+* keyboard navigation for scene graph ([#1101](https://github.com/motion-canvas/motion-canvas/issues/1101)) ([e5bd5f7](https://github.com/motion-canvas/motion-canvas/commit/e5bd5f7157d7081346a64328ef80bf10996ba530))
+* programmable sounds ([#1082](https://github.com/motion-canvas/motion-canvas/issues/1082)) ([a40d50b](https://github.com/motion-canvas/motion-canvas/commit/a40d50b87f5a2940e81d2fd0af4acb6d19202260))
+* sound waveforms ([#1158](https://github.com/motion-canvas/motion-canvas/issues/1158)) ([158125a](https://github.com/motion-canvas/motion-canvas/commit/158125afa5642e342cd8c16173a698f13fe24651))
+* **ui:** add modal actions ([#1100](https://github.com/motion-canvas/motion-canvas/issues/1100)) ([4e49e09](https://github.com/motion-canvas/motion-canvas/commit/4e49e09ba4fef4a8ea87b2421d73171a5551d0df))
+
+
+
+
+
 ## [3.17.2](https://github.com/motion-canvas/motion-canvas/compare/v3.17.1...v3.17.2) (2024-12-14)
 
 
