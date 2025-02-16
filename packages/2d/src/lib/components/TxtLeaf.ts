@@ -75,7 +75,7 @@ export class TxtLeaf extends Shape {
     const {width, height} = this.size();
     const range = document.createRange();
     let line = '';
-    const lineRect = new BBox();
+    let lineRect: BBox | null = null;
     for (const childNode of this.element.childNodes) {
       if (!childNode.textContent) {
         continue;
@@ -86,6 +86,12 @@ export class TxtLeaf extends Shape {
 
       const x = width / -2 + rangeRect.left - parentRect.left;
       const y = height / -2 + rangeRect.top - parentRect.top + fontOffset;
+
+      if (!lineRect) {
+        lineRect = new BBox(x, y, rangeRect.width, rangeRect.height);
+        line = childNode.textContent;
+        continue;
+      }
 
       if (lineRect.y === y) {
         lineRect.width += rangeRect.width;
@@ -100,7 +106,9 @@ export class TxtLeaf extends Shape {
       }
     }
 
-    this.drawText(context, line, lineRect);
+    if (lineRect) {
+      this.drawText(context, line, lineRect);
+    }
   }
 
   protected drawText(
@@ -109,7 +117,9 @@ export class TxtLeaf extends Shape {
     box: BBox,
   ) {
     const y = box.y;
-    text = text.replace(/\s+/g, ' ');
+    if (this.styles.whiteSpace !== 'pre') {
+      text = text.replace(/\s+/g, ' ');
+    }
 
     if (this.lineWidth() <= 0) {
       context.fillText(text, box.x, y);
