@@ -1,7 +1,10 @@
 import {isInspectable, Vector2} from '@motion-canvas/core';
 import {useEffect, useState} from 'react';
-import {useViewportContext} from '../../contexts';
-import {useShortcut, VIEWPORT_SHORTCUTS} from '../../contexts/shortcuts';
+import {
+  useShortcut,
+  useViewportContext,
+  VIEWPORT_SHORTCUTS,
+} from '../../contexts';
 import {useCurrentScene, useViewportMatrix} from '../../hooks';
 import {ReadOnlyInput} from '../controls';
 import styles from './Viewport.module.scss';

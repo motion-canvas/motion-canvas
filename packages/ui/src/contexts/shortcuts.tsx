@@ -431,8 +431,9 @@ export function useShortcuts<T extends string>(
         if (typeof result === 'object') {
           return result;
         }
+        return true;
       }
-      return true;
+      return false;
     };
 
     callbackSet.add(handler);
