@@ -41,7 +41,10 @@ export function bootstrap(
   } as Project;
 
   project.meta = new ProjectMetadata(project);
-  project.meta.shared.set(settings.defaults.get());
+  const {background, ...sharedDefaults} = settings.defaults.get();
+  project.meta.shared.set(sharedDefaults);
+  project.meta.preview.set({background});
+  project.meta.rendering.set({background});
   project.experimentalFeatures ??= false;
   metaFile.attach(project.meta);
 
