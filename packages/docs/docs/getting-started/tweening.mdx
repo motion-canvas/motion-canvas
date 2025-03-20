@@ -145,7 +145,7 @@ section that the following tween:
 ```ts
 yield *
   tween(2, value => {
-    circle().color(
+    circle().fill(
       Color.lerp(
         new Color('#e6a700'),
         new Color('#e13238'),
@@ -158,7 +158,7 @@ yield *
 Can be written as:
 
 ```ts
-yield * circle().color('#e13238', 2);
+yield * circle().fill('#e13238', 2);
 ```
 
 Here, we use a [`SignalTween`](/api/core/signals/SignalTween) signature that
@@ -170,7 +170,7 @@ We can chain multiple tweens together by calling the `to()` method on the
 returned object:
 
 ```ts
-yield * circle().color('#e13238', 2).to('#e6a700', 2);
+yield * circle().fill('#e13238', 2).to('#e6a700', 2);
 ```
 
 By default, property tweens use `easeInOutCubic` as the timing function. We can
@@ -178,7 +178,7 @@ override that by providing a third argument:
 
 ```ts
 yield *
-  circle().color(
+  circle().fill(
     '#e13238',
     2,
     // highlight-next-line
