@@ -32,9 +32,6 @@ type FFmpegExporterOptions = ValueOf<
 
 type InvokeStrategy = 'ws' | 'octet-stream';
 
-const EXPORT_FRAME_LIMIT = 256;
-const EXPORT_RETRY_DELAY = 1000;
-
 /**
  * FFmpeg video exporter.
  *
@@ -82,6 +79,7 @@ export class FFmpegExporterClient implements Exporter {
     }
   }
 
+  private currentFramePromise: Promise<void> = Promise.resolve();
   private concurrentFrames = 0;
   private error: unknown = false;
 
@@ -111,30 +109,34 @@ export class FFmpegExporterClient implements Exporter {
     _signal: AbortSignal,
     context: CanvasRenderingContext2D,
   ): Promise<void> {
-    while (this.concurrentFrames >= EXPORT_FRAME_LIMIT) {
-      await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
-    }
-
-    if (this.error) {
-      throw this.error;
-    }
-
     const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-    this.concurrentFrames++;
-    this.invoke('handleFrame', data, 'octet-stream')
-      .then(() => {
-        this.concurrentFrames--;
-      })
-      .catch(error => {
+
+    const previousFramePromise = this.currentFramePromise;
+
+    const framePromise = (async () => {
+      await previousFramePromise; // Wait for the previous frame to finish
+      if (this.error) {
+        throw this.error; // If an error has occurred, throw it
+      }
+      try {
+        this.concurrentFrames++;
+        await this.invoke('handleFrame', data, 'octet-stream');
+      } catch (error) {
         this.error = error;
+        throw error;
+      } finally {
         this.concurrentFrames--;
-      });
+      }
+    })();
+
+    this.currentFramePromise = framePromise;
+    return framePromise;
   }
 
   public async stop(result: RendererResult): Promise<void> {
-    while (this.concurrentFrames >= EXPORT_FRAME_LIMIT) {
-      await new Promise(resolve => setTimeout(resolve, EXPORT_RETRY_DELAY));
-    }
+    await this.currentFramePromise;
+
+    this.currentFramePromise = Promise.resolve();
 
     if (this.error) {
       throw this.error;
