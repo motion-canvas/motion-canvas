@@ -1,5 +1,5 @@
 import {HighlightStyle} from '@codemirror/language';
-import {Parser, SyntaxNode, Tree} from '@lezer/common';
+import {Parser, Tree} from '@lezer/common';
 import {highlightTree} from '@lezer/highlight';
 import {CodeHighlighter, HighlightResult} from './CodeHighlighter';
 import {DefaultHighlightStyle} from './DefaultHighlightStyle';
@@ -7,17 +7,20 @@ import {DefaultHighlightStyle} from './DefaultHighlightStyle';
 interface LezerCache {
   tree: Tree;
   code: string;
-  colorLookup: Map<string, string>;
+  codeColors: Uint8Array;
 }
 
 export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
   private static classRegex = /\.(\S+).*color:([^;]+)/;
-  private readonly classLookup = new Map<string, string>();
+  private readonly classToId = new Map<string, number>();
+  private readonly idToColor = new Map<number, string | null>();
 
   public constructor(
     private readonly parser: Parser,
     private readonly style: HighlightStyle = DefaultHighlightStyle,
   ) {
+    let classCount = 1; // Keep color 0 for "unknown color"
+    this.idToColor.set(0, null);
     for (const rule of this.style.module?.getRules().split('\n') ?? []) {
       const match = rule.match(LezerHighlighter.classRegex);
       if (!match) {
@@ -26,7 +29,19 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
 
       const className = match[1];
       const color = match[2].trim();
-      this.classLookup.set(className, color);
+      const classId = this.classToId.get(className) || false;
+      if (classId !== false) {
+        if (this.idToColor.get(classId) !== color) {
+          throw new Error(`Conflicting color information for ${className}`);
+        }
+      } else {
+        this.classToId.set(className, classCount);
+        this.idToColor.set(classCount, color);
+        classCount += 1;
+      }
+    }
+    if (classCount > 255) {
+      throw new Error('Too many classes');
     }
   }
 
@@ -35,53 +50,60 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
   }
 
   public prepare(code: string): LezerCache | null {
-    const colorLookup = new Map<string, string>();
+    const codeColors = new Uint8Array(code.length);
     const tree = this.parser.parse(code);
     highlightTree(tree, this.style, (from, to, classes) => {
-      const color = this.classLookup.get(classes);
-      if (!color) {
+      let color: number | false = false;
+      for (const cls of classes.split(' ')) {
+        const clsId = this.classToId.get(cls) || false;
+        if (clsId !== false) {
+          color = clsId;
+        }
+      }
+      if (color === false) {
         return;
       }
 
-      const cursor = tree.cursorAt(from, 1);
-      do {
-        const id = this.getNodeId(cursor.node);
-        colorLookup.set(id, color);
-      } while (cursor.next() && cursor.to <= to);
+      for (let i = from; i < to; i++) {
+        codeColors[i] = color;
+      }
     });
 
     return {
       tree,
       code,
-      colorLookup,
+      codeColors,
     };
   }
 
   public highlight(index: number, cache: LezerCache | null): HighlightResult {
-    if (!cache) {
+    if (!cache || index > cache.codeColors.length) {
       return {
         color: null,
         skipAhead: 0,
       };
     }
 
-    const node = cache.tree.resolveInner(index, 1);
-    const id = this.getNodeId(node);
-    const color = cache.colorLookup.get(id);
-    if (color) {
-      return {
-        color,
-        skipAhead: node.to - index,
-      };
+    const classId = cache.codeColors[index];
+
+    if (!this.idToColor.has(classId)) {
+      throw new Error(
+        `Couldn't get color for code index ${index} ${cache.codeColors.length}`,
+      );
     }
 
-    let skipAhead = 0;
-    if (!node.firstChild) {
-      skipAhead = node.to - index;
+    const color = this.idToColor.get(classId) || null;
+
+    let skipAhead = 1;
+    while (
+      index + skipAhead < cache.codeColors.length &&
+      cache.codeColors[index + skipAhead] === classId
+    ) {
+      skipAhead += 1;
     }
 
     return {
-      color: null,
+      color,
       skipAhead,
     };
   }
@@ -90,24 +112,11 @@ export class LezerHighlighter implements CodeHighlighter<LezerCache | null> {
     const tree = this.parser.parse(code);
     const cursor = tree.cursor();
     const tokens: string[] = [];
-    let current = 0;
 
     do {
-      if (!cursor.node.firstChild) {
-        if (cursor.from > current) {
-          tokens.push(code.slice(current, cursor.from));
-        }
-        if (cursor.from < cursor.to) {
-          tokens.push(code.slice(cursor.from, cursor.to));
-        }
-        current = cursor.to;
-      }
+      tokens.push(code.slice(cursor.node.from, cursor.node.to));
     } while (cursor.next());
 
     return tokens;
-  }
-
-  private getNodeId(node: SyntaxNode): string {
-    return `${node.from}:${node.to}`;
   }
 }
