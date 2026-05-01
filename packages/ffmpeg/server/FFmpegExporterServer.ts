@@ -25,6 +25,10 @@ export interface FFmpegExporterSettings extends RendererSettings {
   fastStart: boolean;
   includeAudio: boolean;
   audioSampleRate: number;
+  splitByScene: boolean;
+  highQuality: boolean;
+
+  sceneName?: string;
 }
 
 function formatFilters(filters: AudioVideoFilter[]): string {
@@ -48,7 +52,7 @@ function formatFilters(filters: AudioVideoFilter[]): string {
 /**
  * The server-side implementation of the FFmpeg video exporter.
  */
-export class FFmpegExporterServer {
+export class FFmpegSceneExporter {
   private readonly stream: ImageStream;
   private readonly command: ffmpeg.FfmpegCommand;
   private readonly promise: Promise<void>;
@@ -71,8 +75,20 @@ export class FFmpegExporterServer {
       .inputOptions(['-pix_fmt rgba', '-s:v', `${size.x}x${size.y}`])
       .inputFps(settings.fps);
 
+    const splitByScene = settings.sceneName !== undefined;
     // Input audio
-    const sounds = [...settings.sounds];
+    const sounds = [
+      ...settings.sounds
+        .filter(
+          sound => !splitByScene || sound.sceneName === settings.sceneName,
+        )
+        .map(sound => {
+          if (splitByScene && sound.sceneFirstFrame !== undefined) {
+            sound.offset -= sound.sceneFirstFrame / settings.fps;
+          }
+          return sound;
+        }),
+    ];
     if (settings.audio && settings.includeAudio) {
       sounds.push({
         audio: settings.audio,
@@ -165,17 +181,22 @@ export class FFmpegExporterServer {
       this.command.outputOptions(['-map 0:v', '-map [a]']);
     }
 
+    const extension = settings.highQuality ? 'mkv' : 'mp4';
     // Output settings
     this.command
-      .output(path.join(this.config.output, `${settings.name}.mp4`))
+      .output(path.join(this.config.output, `${settings.name}.${extension}`))
       .outputOptions([
         '-pix_fmt yuv420p',
         `-t ${settings.duration / settings.fps}`,
+        `-c:v libx264`,
       ])
       .outputFps(settings.fps)
       .size(`${size.x}x${size.y}`);
-    if (settings.fastStart) {
+    if (settings.fastStart && !settings.highQuality) {
       this.command.outputOptions(['-movflags +faststart']);
+    }
+    if (settings.highQuality) {
+      this.command.outputOptions(['-c:a flac', '-preset slower', '-crf 12']);
     }
 
     this.promise = new Promise<void>((resolve, reject) => {
@@ -191,11 +212,11 @@ export class FFmpegExporterServer {
     this.command.run();
   }
 
-  public async handleFrame(req: Readable) {
-    await this.stream.pushImage(req);
+  public async handleFrame(data: Readable) {
+    await this.stream.pushImage(data);
   }
 
-  public async end(result: RendererResult) {
+  public async end(result?: RendererResult) {
     this.stream.pushImage(null);
     if (result === 1) {
       try {
@@ -207,5 +228,46 @@ export class FFmpegExporterServer {
     } else {
       await this.promise;
     }
+  }
+}
+
+/**
+ * The server-side implementation of the FFmpeg video exporter.
+ */
+export class FFmpegExporterServer {
+  private sceneExporter?: FFmpegSceneExporter;
+  private currentSceneName?: string;
+
+  public constructor(
+    private readonly settings: FFmpegExporterSettings,
+    private readonly config: PluginConfig,
+  ) {}
+
+  public async start() {}
+
+  public async reportScene(data: any) {
+    const sceneName: string = this.settings.splitByScene
+      ? data.sceneName
+      : 'project';
+    if (this.currentSceneName === sceneName) return;
+    this.currentSceneName = sceneName;
+    if (this.sceneExporter !== undefined) await this.sceneExporter.end();
+    this.sceneExporter = new FFmpegSceneExporter(
+      {
+        ...this.settings,
+        sceneName: this.settings.splitByScene ? sceneName : undefined,
+        name: sceneName,
+      },
+      this.config,
+    );
+    this.sceneExporter.start();
+  }
+
+  public async handleFrame(data: Readable) {
+    return await this.sceneExporter!.handleFrame(data);
+  }
+
+  public async end(result: RendererResult) {
+    return await this.sceneExporter!.end(result);
   }
 }

@@ -6,6 +6,7 @@
     "strict": true,
     "module": "esnext",
     "target": "es2020",
+    "lib": ["es2020", "dom", "es2022.intl"],
     "allowJs": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,

@@ -14,6 +14,8 @@ export interface SoundSettings {
 export interface Sound extends SoundSettings {
   offset: number;
   realPlaybackRate: number;
+  sceneName?: string;
+  sceneFirstFrame?: number;
 }
 
 export class SoundBuilder {
@@ -117,6 +119,8 @@ export class Sounds {
         Math.pow(2, (settings.detune ?? 0) / 1200) *
         (settings.playbackRate ?? 1),
       ...settings,
+      sceneName: this.scene.name,
+      sceneFirstFrame: this.scene.firstFrame,
     });
   }
 

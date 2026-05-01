@@ -64,6 +64,8 @@ export class FFmpegExporterClient implements Exporter {
         !project.audio,
       ),
       audioSampleRate: new NumberMetaField('audio sample rate', 48000),
+      splitByScene: new BoolMetaField('split by scene', true),
+      highQuality: new BoolMetaField('high quality (larger)', false),
     });
   }
 
@@ -107,7 +109,7 @@ export class FFmpegExporterClient implements Exporter {
     canvas: HTMLCanvasElement,
     _frame: number,
     _sceneFrame: number,
-    _sceneName: string,
+    sceneName: string,
     _signal: AbortSignal,
     context: CanvasRenderingContext2D,
   ): Promise<void> {
@@ -121,7 +123,8 @@ export class FFmpegExporterClient implements Exporter {
 
     const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
     this.concurrentFrames++;
-    this.invoke('handleFrame', data, 'octet-stream')
+    await this.invoke('reportScene', {sceneName: sceneName});
+    await this.invoke('handleFrame', data, 'octet-stream')
       .then(() => {
         this.concurrentFrames--;
       })
