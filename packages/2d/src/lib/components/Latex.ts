@@ -9,13 +9,48 @@ import {
   useLogger,
   Vector2,
 } from '@motion-canvas/core';
-import {liteAdaptor} from 'mathjax-full/js/adaptors/liteAdaptor';
-import {RegisterHTMLHandler} from 'mathjax-full/js/handlers/html';
-import {TeX} from 'mathjax-full/js/input/tex';
-import {AllPackages} from 'mathjax-full/js/input/tex/AllPackages';
-import {mathjax} from 'mathjax-full/js/mathjax';
-import {SVG} from 'mathjax-full/js/output/svg';
-import {OptionList} from 'mathjax-full/js/util/Options';
+import {liteAdaptor} from '@mathjax/src/mjs/adaptors/liteAdaptor.js';
+import {RegisterHTMLHandler} from '@mathjax/src/mjs/handlers/html.js';
+import {TeX} from '@mathjax/src/mjs/input/tex.js';
+import {mathjax} from '@mathjax/src/mjs/mathjax.js';
+import {SVG} from '@mathjax/src/mjs/output/svg.js';
+import {OptionList} from '@mathjax/src/mjs/util/Options.js';
+import {MathJaxScholaFont} from '@mathjax/mathjax-schola-font/mjs/svg.js';
+// MathJax v4 dropped the AllPackages convenience module; register every TeX
+// extension by side-effect-importing its Configuration.
+import '@mathjax/src/mjs/input/tex/base/BaseConfiguration.js';
+import '@mathjax/src/mjs/input/tex/action/ActionConfiguration.js';
+import '@mathjax/src/mjs/input/tex/ams/AmsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/amscd/AmsCdConfiguration.js';
+import '@mathjax/src/mjs/input/tex/bbox/BboxConfiguration.js';
+import '@mathjax/src/mjs/input/tex/boldsymbol/BoldsymbolConfiguration.js';
+import '@mathjax/src/mjs/input/tex/braket/BraketConfiguration.js';
+import '@mathjax/src/mjs/input/tex/bussproofs/BussproofsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/cancel/CancelConfiguration.js';
+import '@mathjax/src/mjs/input/tex/cases/CasesConfiguration.js';
+import '@mathjax/src/mjs/input/tex/centernot/CenternotConfiguration.js';
+import '@mathjax/src/mjs/input/tex/color/ColorConfiguration.js';
+import '@mathjax/src/mjs/input/tex/colorv2/ColorV2Configuration.js';
+import '@mathjax/src/mjs/input/tex/colortbl/ColortblConfiguration.js';
+import '@mathjax/src/mjs/input/tex/configmacros/ConfigMacrosConfiguration.js';
+import '@mathjax/src/mjs/input/tex/empheq/EmpheqConfiguration.js';
+import '@mathjax/src/mjs/input/tex/enclose/EncloseConfiguration.js';
+import '@mathjax/src/mjs/input/tex/extpfeil/ExtpfeilConfiguration.js';
+import '@mathjax/src/mjs/input/tex/gensymb/GensymbConfiguration.js';
+import '@mathjax/src/mjs/input/tex/html/HtmlConfiguration.js';
+import '@mathjax/src/mjs/input/tex/mathtools/MathtoolsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/mhchem/MhchemConfiguration.js';
+import '@mathjax/src/mjs/input/tex/newcommand/NewcommandConfiguration.js';
+import '@mathjax/src/mjs/input/tex/noerrors/NoErrorsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/noundefined/NoUndefinedConfiguration.js';
+import '@mathjax/src/mjs/input/tex/physics/PhysicsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/setoptions/SetOptionsConfiguration.js';
+import '@mathjax/src/mjs/input/tex/tagformat/TagFormatConfiguration.js';
+import '@mathjax/src/mjs/input/tex/textcomp/TextcompConfiguration.js';
+import '@mathjax/src/mjs/input/tex/textmacros/TextMacrosConfiguration.js';
+import '@mathjax/src/mjs/input/tex/upgreek/UpgreekConfiguration.js';
+import '@mathjax/src/mjs/input/tex/unicode/UnicodeConfiguration.js';
+import '@mathjax/src/mjs/input/tex/verb/VerbConfiguration.js';
 import {computed, initial, parser, signal} from '../decorators';
 import {Node} from './Node';
 import {
@@ -26,6 +61,39 @@ import {
   SVGShapeData,
 } from './SVG';
 
+const AllPackages = [
+  'base',
+  'action',
+  'ams',
+  'amscd',
+  'bbox',
+  'boldsymbol',
+  'braket',
+  'bussproofs',
+  'cancel',
+  'cases',
+  'centernot',
+  'color',
+  'colortbl',
+  'empheq',
+  'enclose',
+  'extpfeil',
+  'gensymb',
+  'html',
+  'mathtools',
+  'mhchem',
+  'newcommand',
+  'noerrors',
+  'noundefined',
+  'upgreek',
+  'unicode',
+  'verb',
+  'configmacros',
+  'tagformat',
+  'textcomp',
+  'textmacros',
+];
+
 const Adaptor = liteAdaptor();
 RegisterHTMLHandler(Adaptor);
 
@@ -33,7 +101,7 @@ const JaxDocument = mathjax.document('', {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   InputJax: new TeX({packages: AllPackages}),
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  OutputJax: new SVG({fontCache: 'local'}),
+  OutputJax: new SVG({fontCache: 'local', fontData: MathJaxScholaFont}),
 });
 
 export interface LatexProps extends Omit<SVGProps, 'svg'> {

@@ -47,6 +47,7 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "prettier-plugin-organize-imports": "^4.0.0",
+    "rollup": "^4.60.2",
     "typescript": "^5.2.2",
     "vite": "^4.5.0"
   },
