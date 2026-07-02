@@ -13,5 +13,5 @@ property to `null`:
 <Img src={null} />
 ```
 
-[Learn more](https://motioncanvas.io/docs/media#images) about working with
+[Learn more](https://motion-canvas.io/docs/media#images) about working with
 images.

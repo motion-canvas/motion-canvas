@@ -184,7 +184,7 @@ The <code>src</code> property was set to:
 ...which resolved to the following url:
 <pre><code>${src}</code></pre>
 Make sure that source is correct and that the image exists.<br/>
-<a target='_blank' href='https://motioncanvas.io/docs/media#images'>Learn more</a>
+<a target='_blank' href='https://motion-canvas.io/docs/media#images'>Learn more</a>
 about working with images.`,
                 inspect: this.key,
               }),

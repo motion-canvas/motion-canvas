@@ -47,7 +47,7 @@ export interface ProjectSettings {
   /**
    * An url for the audio track to play alongside the animation.
    *
-   * @see https://motioncanvas.io/docs/media#audio
+   * @see https://motion-canvas.io/docs/media#audio
    */
   audio?: string;
 
@@ -59,14 +59,14 @@ export interface ProjectSettings {
   /**
    * Default values for project variables.
    *
-   * @see https://motioncanvas.io/docs/project-variables
+   * @see https://motion-canvas.io/docs/project-variables
    */
   variables?: Record<string, unknown>;
 
   /**
    * Enable experimental features.
    *
-   * @see https://motioncanvas.io/docs/experimental
+   * @see https://motion-canvas.io/docs/experimental
    *
    * @experimental
    */

@@ -82,7 +82,7 @@ export function Navigation() {
         <TabLink
           title="Experimental features enabled"
           id="docs-experimental-link"
-          href="https://motioncanvas.io/docs/experimental/"
+          href="https://motion-canvas.io/docs/experimental/"
           target="_blank"
         >
           <Science />
@@ -92,7 +92,7 @@ export function Navigation() {
       <TabLink
         title="Docs"
         id="docs-external-link"
-        href="https://motioncanvas.io/docs/"
+        href="https://motion-canvas.io/docs/"
         target="_blank"
       >
         <School />

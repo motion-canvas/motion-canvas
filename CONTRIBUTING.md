@@ -112,7 +112,7 @@ This Contribution Guide was partially inspired by [React][react] and
 [Angular][angular].
 
 [semver]: https://semver.org/
-[discord]: https://chat.motioncanvas.io
+[discord]: https://chat.motion-canvas.io
 [semantic-release]:
   https://semantic-release.gitbook.io/semantic-release/support/faq#can-i-set-the-initial-release-version-of-my-package-to-0.0.1
 [main]: https://github.com/motion-canvas/motion-canvas/tree/main

@@ -5,7 +5,7 @@
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "motion-canvas",
-  "homepage": "https://motioncanvas.io/",
+  "homepage": "https://motion-canvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "type": "module",

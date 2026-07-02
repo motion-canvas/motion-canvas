@@ -5,7 +5,7 @@ const config = {
   title: 'Motion Canvas',
   tagline:
     'A TypeScript library for creating animated videos using the Canvas API.',
-  url: 'https://motioncanvas.io',
+  url: 'https://motion-canvas.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',
@@ -22,7 +22,7 @@ const config = {
   customFields: {
     discordApi:
       'https://discord.com/api/guilds/1071029581009657896/widget.json',
-    discordUrl: 'https://chat.motioncanvas.io',
+    discordUrl: 'https://chat.motion-canvas.io',
     githubApi: 'https://api.github.com/repos/motion-canvas/motion-canvas',
     githubUrl: 'https://github.com/motion-canvas/motion-canvas',
   },
@@ -80,7 +80,7 @@ const config = {
               },
               {
                 label: 'Discord',
-                href: 'https://chat.motioncanvas.io',
+                href: 'https://chat.motion-canvas.io',
               },
             ],
           },

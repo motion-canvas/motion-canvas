@@ -4,7 +4,7 @@
   "description": "An FFmpeg video exporter for Motion Canvas",
   "main": "lib/server/index.js",
   "author": "motion-canvas",
-  "homepage": "https://motioncanvas.io/",
+  "homepage": "https://motion-canvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "GPLv3",
   "scripts": {

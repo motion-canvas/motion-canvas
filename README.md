@@ -11,7 +11,7 @@
   <a href="https://lerna.js.org"><img src="https://img.shields.io/badge/published%20with-lerna-c084fc?style=flat" alt="published with lerna"></a>
   <a href="https://vitejs.dev"><img src="https://img.shields.io/badge/powered%20by-vite-646cff?style=flat" alt="powered by vite"></a>
   <a href="https://www.npmjs.com/package/@motion-canvas/core"><img src="https://img.shields.io/npm/v/@motion-canvas/core?style=flat" alt="npm package version"></a>
-  <a href="https://chat.motioncanvas.io"><img src="https://img.shields.io/discord/1071029581009657896?style=flat&logo=discord&logoColor=fff&color=404eed" alt="discord"></a>
+  <a href="https://chat.motion-canvas.io"><img src="https://img.shields.io/discord/1071029581009657896?style=flat&logo=discord&logoColor=fff&color=404eed" alt="discord"></a>
 </p>
 <br/>
 
@@ -132,5 +132,5 @@ help make Motion Canvas better.
 [authenticate]:
   https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token
 [template]: https://github.com/motion-canvas/project-template#using-the-template
-[discord]: https://chat.motioncanvas.io
-[docs]: https://motioncanvas.io/docs/quickstart
+[discord]: https://chat.motion-canvas.io
+[docs]: https://motion-canvas.io/docs/quickstart

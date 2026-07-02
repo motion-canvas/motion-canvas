@@ -20,4 +20,4 @@ const shader = `\
 `;
 ```
 
-[Learn more](https://motioncanvas.io/docs/shaders) about working with shaders.
+[Learn more](https://motion-canvas.io/docs/shaders) about working with shaders.

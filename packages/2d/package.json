@@ -3,7 +3,7 @@
   "version": "3.17.2",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
-  "homepage": "https://motioncanvas.io/",
+  "homepage": "https://motion-canvas.io/",
   "bugs": "https://github.com/motion-canvas/motion-canvas/issues",
   "license": "MIT",
   "main": "lib/index.js",
