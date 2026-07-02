@@ -12,8 +12,8 @@ import {StageView} from './StageView';
 export function PreviewStage(props: JSX.HTMLAttributes<HTMLDivElement>) {
   const [stage] = useState(() => new Stage());
   const {player} = useApplication();
-  const {size, background} = useSharedSettings();
-  const {resolutionScale} = usePreviewSettings();
+  const {size} = useSharedSettings();
+  const {background, resolutionScale} = usePreviewSettings();
 
   useSubscribable(
     player.onRender,
