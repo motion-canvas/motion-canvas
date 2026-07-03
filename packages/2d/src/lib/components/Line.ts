@@ -223,11 +223,10 @@ export class Line extends Curve {
       const a = points[i];
       const b = points[i + 1];
       const length = a.sub(b).magnitude;
-      let pointCount = Math.min(Math.round(length * density), pointsLeft) + 1;
-
-      if (arcLength === 0) {
-        pointCount = 2;
-      }
+      let pointCount = Math.max(
+        Math.min(Math.round(length * density), pointsLeft) + 1,
+        2
+      );
 
       for (let j = 1; j < pointCount; j++) {
         points.splice(++i, 0, Vector2.lerp(a, b, j / pointCount));
