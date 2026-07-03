@@ -42,7 +42,7 @@ export function Navigation() {
       <TabLink
         title="Project Selection"
         id="project-selection-link"
-        href={window.location.pathname === '/' ? undefined : '../'}
+        href={window.location.pathname === '/' ? undefined : '/'}
       >
         <MotionCanvas />
       </TabLink>
