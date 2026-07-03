@@ -111,10 +111,11 @@ export class FFmpegExporterServer {
       });
 
       if (sound.gain) {
+        const linearGain = Math.pow(10, sound.gain / 10);
         filters.push({
           filter: 'volume',
-          options: {volume: `${sound.gain}dB`},
-        });
+          options: {volume: linearGain},
+        });      
       }
 
       if (sound.realPlaybackRate !== 1) {
