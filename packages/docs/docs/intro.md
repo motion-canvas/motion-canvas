@@ -18,6 +18,9 @@ Aside from providing the preview, the editor allows you to edit certain aspects
 of the animation which could otherwise be tedious. You can learn more about this
 functionality in the [time events](/docs/time-events) section.
 
+If you want to know how it works? look into
+[internals](/docs/getting-started/internals) section.
+
 Motion Canvas is a free and open source project. You can help making it better
 by reporting bugs, proposing new features, or contributing to the codebase. If
 you're interested, our [contribution guide][contributing] will help you get

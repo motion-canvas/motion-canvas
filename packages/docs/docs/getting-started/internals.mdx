@@ -1,0 +1,109 @@
+# Internals
+
+> A look into the canvas-based rendering system, signals, and reactive animations.
+
+---
+
+## It's Canvas!
+
+ Everything is rendered on `<canvas>`. [Canvas API on MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D).
+
+---
+
+## Scene Graph and Components
+
+- Node-based structure (like React but on canvas)
+- Tree of [`Node`](/api/2d/components/Node),[`Rect`](/api/2d/components/Rect), [`Circle`](/api/2d/components/Circle), etc.
+- You can create custom components that extend [`Node`](/api/2d/components/Node)
+- A Scene is a container for visual elements 
+    - has its own timeline segment
+    - contains a node tree 
+- You can see more in [Scene Hierarchy](https://motioncanvas.io/docs/scene-hierarchy) and [Custom Components](https://motioncanvas.io/docs/custom-components)
+
+---
+
+## Project and Timeline
+
+- Project is a collection of scenes and maintains references to all scenes
+- Timeline is a collection of keyframes and animations 
+- Manages scenes, timeline and playback state
+- Controls the animation loop and time-based events
+
+---
+
+## Reactivity with Signals
+
+- Signal enables animations through [`createSignal()`](/api/core/signals#createSignal) function and [`@signal()`](/api/2d/decorators/#signal)
+- [`@signal()`](/api/2d/decorators/#signal) is a decorator that makes a property reactive
+- [`createSignal()`](/api/core/signals#createSignal) is a function that creates a signal
+- You can see more in [Signals](https://motioncanvas.io/docs/signals)
+
+```tsx
+// Creating a signal
+const [value, setValue] = createSignal(0);
+
+// Using a signal decorator
+export class Counter extends Node {
+  @signal()
+  public declare count: SimpleSignal<number, this>;
+
+  constructor() {
+    super();
+    this.count(10); // Triggers reactivity
+  }
+
+}
+// Animate with signals
+yield* circle.position.x([-300, 300], 2);
+
+```
+
+---
+
+## Rendering to Canvas
+
+- MotionCanvas uses HTML5 Canvas rendering context
+- The renderer starts with the root node and recursively traverses the scene graph
+- Each node's render method is called, which:
+    - Applies its own transformations (position, rotation, scale)
+    - Sets context properties (fill style, stroke style, etc.)
+    - Draws itself using Canvas API methods
+    - Calls render on all of its children
+- The `ThreadGenerator` class manages the animation threading model
+- Each frame, the renderer:
+    - Clears the canvas
+    - Updates the current time
+    - Evaluates all signals based on current time
+    - Traverses the node tree
+    - Renders each node to canvas
+- You can see more in [ThreadGenerator](/api/core/threading#ThreadGenerator)
+---
+
+## Data Flow:
+
+- Project checks the current time 
+- Signals are evaluated based on time 
+- Node properties update (position , color, etc)
+- Canvas renderer traverses the node tree
+- Each node's `render` method is called to draw visual elements to canvas
+- Animation loop continues until the end of the timeline
+- You can see more in [Node](/api/2d/components/Node/#render) 
+
+--- 
+
+## Time-based Flow:
+
+- Generator functions control timing
+- `yield* ` syntax pauses execution
+- `waitFor(seconds)` creates timing gaps
+- `all([...])` runs animations in parallel
+- `sequence([...])` runs animations sequentially
+- Each animation is registered with the timeline
+- Timeline controller manages playback state
+- You can see more in [Animation Flow](/docs/animation-flow) and [Time Events](/docs/time-events)
+---
+
+## Resources
+
+- [Canvas API - MDN](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D)
+- [MotionCanvas API Docs](https://motioncanvas.io/api/core)

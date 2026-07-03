@@ -1,13 +1,9 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import type {MotionCanvasPlayerProps} from '@motion-canvas/player';
 import clsx from 'clsx';
-import React, {ComponentProps} from 'react';
+import React, {ComponentProps, useEffect, useState} from 'react';
 import AnimationLink from './AnimationLink';
 import styles from './styles.module.css';
-
-if (ExecutionEnvironment.canUseDOM) {
-  import('@motion-canvas/player');
-}
 
 declare global {
   namespace JSX {
@@ -31,6 +27,30 @@ export default function AnimationPlayer({
   small,
   link,
 }: AnimationPlayerProps) {
+  const [isPlayerLoaded, setPlayerLoaded] = useState(false);
+
+  useEffect(() => {
+    if (ExecutionEnvironment.canUseDOM) {
+      import('@motion-canvas/player').then(() => {
+        setPlayerLoaded(true);
+      });
+    }
+  }, []);
+
+  if (!ExecutionEnvironment.canUseDOM || !isPlayerLoaded) {
+    return (
+      <div
+        className={clsx(
+          styles.container,
+          banner && styles.banner,
+          small && styles.small,
+        )}
+      >
+        <div className={styles.player}> Loading animation</div>
+        {link && <AnimationLink name={link || name} />}
+      </div>
+    );
+  }
   return (
     <div
       className={clsx(
@@ -40,7 +60,7 @@ export default function AnimationPlayer({
       )}
     >
       <motion-canvas-player
-        class={styles.player}
+        className={styles.player}
         src={`/examples/${name}.js`}
         auto={banner}
       />
