@@ -45,6 +45,10 @@ export interface CurveProps extends ShapeProps {
    */
   endArrow?: SignalValue<boolean>;
   /**
+   * {@inheritDoc Curve.centerArrow}
+   */
+  centerArrow?: SignalValue<boolean>;
+  /**
    * {@inheritDoc Curve.arrowSize}
    */
   arrowSize?: SignalValue<number>;
@@ -156,6 +160,16 @@ export abstract class Curve extends Shape {
   @initial(24)
   @signal()
   public declare readonly arrowSize: SimpleSignal<number, this>;
+
+  /**
+   * Whether to display an arrow in center of visible curve.
+   *
+   * @remarks
+   * {@link centerArrow} to put arrow in center
+   */
+  @initial(false)
+  @signal()
+  public declare readonly centerArrow: SimpleSignal<boolean, this>;
 
   protected canHaveSubpath = false;
 
@@ -378,7 +392,9 @@ export abstract class Curve extends Shape {
   protected override getCacheBBox(): BBox {
     const box = this.childrenBBox();
     const arrowSize =
-      this.startArrow() || this.endArrow() ? this.arrowSize() : 0;
+      this.startArrow() || this.endArrow() || this.centerArrow()
+        ? this.arrowSize()
+        : 0;
     const lineWidth = this.lineWidth();
 
     const coefficient = this.lineWidthCoefficient();
@@ -405,13 +421,14 @@ export abstract class Curve extends Shape {
       !this.startArrow.isInitial() ||
       !this.end.isInitial() ||
       !this.endOffset.isInitial() ||
-      !this.endArrow.isInitial()
+      !this.endArrow.isInitial() ||
+      !this.centerArrow.isInitial()
     );
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
     super.drawShape(context);
-    if (this.startArrow() || this.endArrow()) {
+    if (this.startArrow() || this.endArrow() || this.centerArrow()) {
       this.drawArrows(context);
     }
   }
@@ -419,14 +436,29 @@ export abstract class Curve extends Shape {
   private drawArrows(context: CanvasRenderingContext2D) {
     const {startPoint, startTangent, endPoint, endTangent, arrowSize} =
       this.curveDrawingInfo();
+
     if (arrowSize < 0.001) {
       return;
     }
 
+    let start = this.percentageToDistance(this.start());
+    let end = this.percentageToDistance(this.end());
+
+    if (start > end) {
+      [start, end] = [end, start];
+    }
+
+    const midDistance = (start + end) / 2;
+    const midPointData = this.getPointAtDistance(midDistance);
+    const midPoint = midPointData.position;
+    const midTangent = midPointData.normal.perpendicular;
     context.save();
     context.beginPath();
     if (this.endArrow()) {
       this.drawArrow(context, endPoint, endTangent.flipped, arrowSize);
+    }
+    if (this.centerArrow()) {
+      this.drawArrow(context, midPoint, midTangent, arrowSize);
     }
     if (this.startArrow()) {
       this.drawArrow(context, startPoint, startTangent, arrowSize);
