@@ -11,6 +11,8 @@ export function* fadeTransition(duration = 0.6): ThreadGenerator {
   const progress = createSignal(0);
   const endTransition = useTransition(ctx => {
     ctx.globalAlpha = progress();
+  }, ctx => {
+    ctx.globalAlpha = 1 - progress();
   });
 
   yield* progress(1, duration);
