@@ -51,11 +51,11 @@ actions (The action is chosen based on the number of arguments):
    ```
 2. update the value:
    ```ts
-   signal(3);
+   value(3);
    ```
 3. create a [tween](/docs/tweening) for the value:
    ```ts
-   yield * signal(2, 0.3);
+   yield * value(2, 0.3);
    ```
 
 Instead of the actual value, a signal can be provided with a function that

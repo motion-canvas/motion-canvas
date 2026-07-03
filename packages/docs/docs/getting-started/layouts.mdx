@@ -70,6 +70,56 @@ class has additional `size` and `offset` properties:
 <ApiSnippet url={'/api/2d/components/Layout#offset'} />
 <hr />
 
+## Opting out of layout 
+
+You can disable layout behavior by passing `layout={false}` to your component:
+
+```tsx
+<Layout layout direction="row">
+  <Rect width={100} height={100} fill="green"/>
+  <Rect width={100} height={100} fill="red" layout={false} x={200} y={50}/>
+</Layout>
+```
+
+This behaves like absolute postioning in CSS Flexbox: 
+- The node doesn't affect or get affected by layout flow
+- The node doesn't lay out its own children
+- You're responsible for positioning it manually
+- It can still be visually inside a layout container
+
+```css
+.parent {
+  display: flex;
+}
+
+.child {
+  position: absolute;
+}
+```
+
+You can learn more about layout exceptions in the [Groups](#groups) section below.
+
+## Groups
+
+Nodes that don't extend the `Layout` class, such as the `Node` itself, are
+unaffected by the layout and are treated as if they were never there. This lets
+you apply filters and transformations to layout nodes without affecting the
+hierarchy.
+
+From the layout's perspective, all `<Rect>`s in the example below are siblings:
+
+```tsx
+<Layout direction={'column'} width={960} gap={40} layout>
+  <Node opacity={0.1}>
+    <Rect height={240} fill={'#ff6470'} />
+    <Rect height={240} fill={'#ff6470'} />
+  </Node>
+  <Rect height={240} fill={'#ff6470'} />
+</Layout>
+```
+
+<AnimationPlayer name="layout-group" small />
+
 ## Cardinal directions
 
 Layout nodes come with a set of helper properties that let you position them in
@@ -160,26 +210,5 @@ useful properties are listed below:
 
 <ApiSnippet url={'/api/2d/components/Layout#justifyContent'} />
 <hr />
-
-## Groups
-
-Nodes that don't extend the `Layout` class, such as the `Node` itself, are
-unaffected by the layout and are treated as if they were never there. This lets
-you apply filters and transformations to layout nodes without affecting the
-hierarchy.
-
-From the layout's perspective, all `<Rect>`s in the example below are siblings:
-
-```tsx
-<Layout direction={'column'} width={960} gap={40} layout>
-  <Node opacity={0.1}>
-    <Rect height={240} fill={'#ff6470'} />
-    <Rect height={240} fill={'#ff6470'} />
-  </Node>
-  <Rect height={240} fill={'#ff6470'} />
-</Layout>
-```
-
-<AnimationPlayer name="layout-group" small />
 
 [flexbox]: https://css-tricks.com/snippets/css/a-guide-to-flexbox/
