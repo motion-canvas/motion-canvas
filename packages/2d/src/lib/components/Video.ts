@@ -8,6 +8,7 @@ import {
   clamp,
   isReactive,
   useLogger,
+  usePlayback,
   useThread,
 } from '@motion-canvas/core';
 import {computed, initial, nodeName, signal} from '../decorators';
@@ -323,7 +324,12 @@ export class Video extends Rect {
         const time = useThread().time;
         const start = time();
         const offset = this.time();
-        this.time(() => this.clampTime(offset + (time() - start) * value));
+        // Workaround for an issue causing videos to always be 1 frame ahead of the
+        // current playback frame.
+        const frameDuration = usePlayback().framesToSeconds(1);
+        this.time(() =>
+          this.clampTime(offset + (time() - frameDuration - start) * value),
+        );
       }
     }
   }
@@ -333,8 +339,13 @@ export class Video extends Rect {
     const start = time();
     const offset = this.time();
     const playbackRate = this.playbackRate();
+    // Workaround for an issue causing videos to always be 1 frame ahead of the
+    // current playback frame.
+    const frameDuration = usePlayback().framesToSeconds(1);
     this.playing(true);
-    this.time(() => this.clampTime(offset + (time() - start) * playbackRate));
+    this.time(() =>
+      this.clampTime(offset + (time() - frameDuration - start) * playbackRate),
+    );
   }
 
   public pause() {
