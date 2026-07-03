@@ -783,6 +783,34 @@ export class SVG extends Shape {
           ...SVG.getMatrixTransformation(transformation),
         } as ImgProps,
       };
+    } else if (child.tagName === 'svg') {
+      // Handle nested <svg> elements (used by MathJax for stretchy brackets
+      // in cases/matrix environments). These have their own coordinate system
+      // defined by viewBox that we need to account for.
+      const nestedSvg = child as unknown as SVGSVGElement;
+      let nestedTransform = transformMatrix;
+
+      // Apply viewBox transformation if present
+      if (nestedSvg.hasAttribute('viewBox')) {
+        try {
+          const vb = nestedSvg.viewBox.baseVal;
+          const width = SVG.parseNumberAttribute(child, 'width') || vb.width;
+          const height = SVG.parseNumberAttribute(child, 'height') || vb.height;
+
+          // Calculate scale from viewBox to actual size
+          const scaleX = width / vb.width;
+          const scaleY = height / vb.height;
+
+          // Apply viewBox origin offset and scale
+          nestedTransform = nestedTransform
+            .scaleSelf(scaleX, scaleY)
+            .translateSelf(-vb.x, -vb.y);
+        } catch {
+          // viewBox parsing failed, continue with basic transform
+        }
+      }
+
+      yield* SVG.extractGroupNodes(child, svgRoot, nestedTransform, style);
     }
   }
 }
