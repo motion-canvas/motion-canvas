@@ -45,6 +45,10 @@ export interface CurveProps extends ShapeProps {
    */
   endArrow?: SignalValue<boolean>;
   /**
+   * {@inheritDoc Curve.centerArrow}
+   */
+  centerArrow?: SignalValue<boolean>;
+  /**
    * {@inheritDoc Curve.arrowSize}
    */
   arrowSize?: SignalValue<number>;
@@ -145,6 +149,18 @@ export abstract class Curve extends Shape {
   @initial(false)
   @signal()
   public declare readonly endArrow: SimpleSignal<boolean, this>;
+
+  /**
+   * Whether to display an arrow at the center of the visible curve.
+   *
+   * @remarks
+   * The arrow will be placed at the midpoint of the visible curve with its
+   * orientation matching the tangent at that point.
+   * Use {@link arrowSize} to control the size of the arrow.
+   */
+  @initial(false)
+  @signal()
+  public declare readonly centerArrow: SimpleSignal<boolean, this>;
 
   /**
    * Controls the size of the end and start arrows.
@@ -343,11 +359,18 @@ export abstract class Curve extends Shape {
     this.processSubpath(subpath, startPoint, endPoint);
     path.addPath(subpath);
 
+    const midDistance = (start + end) / 2;
+    const centerCurvePoint = getPointAtDistance(profile, midDistance);
+    const centerPoint = centerCurvePoint.position;
+    const centerTangent = centerCurvePoint.normal.flipped.perpendicular;
+
     return {
       startPoint: startPoint ?? Vector2.zero,
       startTangent: startTangent ?? Vector2.right,
       endPoint: endPoint ?? Vector2.zero,
       endTangent: endTangent ?? Vector2.right,
+      centerPoint,
+      centerTangent,
       arrowSize,
       path,
       startOffset: start,
@@ -378,7 +401,9 @@ export abstract class Curve extends Shape {
   protected override getCacheBBox(): BBox {
     const box = this.childrenBBox();
     const arrowSize =
-      this.startArrow() || this.endArrow() ? this.arrowSize() : 0;
+      this.startArrow() || this.endArrow() || this.centerArrow()
+        ? this.arrowSize()
+        : 0;
     const lineWidth = this.lineWidth();
 
     const coefficient = this.lineWidthCoefficient();
@@ -405,20 +430,28 @@ export abstract class Curve extends Shape {
       !this.startArrow.isInitial() ||
       !this.end.isInitial() ||
       !this.endOffset.isInitial() ||
-      !this.endArrow.isInitial()
+      !this.endArrow.isInitial() ||
+      !this.centerArrow.isInitial()
     );
   }
 
   protected override drawShape(context: CanvasRenderingContext2D) {
     super.drawShape(context);
-    if (this.startArrow() || this.endArrow()) {
+    if (this.startArrow() || this.endArrow() || this.centerArrow()) {
       this.drawArrows(context);
     }
   }
 
   private drawArrows(context: CanvasRenderingContext2D) {
-    const {startPoint, startTangent, endPoint, endTangent, arrowSize} =
-      this.curveDrawingInfo();
+    const {
+      startPoint,
+      startTangent,
+      endPoint,
+      endTangent,
+      centerPoint,
+      centerTangent,
+      arrowSize,
+    } = this.curveDrawingInfo();
     if (arrowSize < 0.001) {
       return;
     }
@@ -430,6 +463,9 @@ export abstract class Curve extends Shape {
     }
     if (this.startArrow()) {
       this.drawArrow(context, startPoint, startTangent, arrowSize);
+    }
+    if (this.centerArrow()) {
+      this.drawArrow(context, centerPoint, centerTangent.flipped, arrowSize);
     }
     context.fillStyle = resolveCanvasStyle(this.stroke(), context);
     context.closePath();
