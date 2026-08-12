@@ -7,5 +7,7 @@ export interface CurveDrawingInfo {
   endTangent: Vector2;
   startPoint: Vector2;
   startTangent: Vector2;
+  centerPoint: Vector2;
+  centerTangent: Vector2;
   startOffset: number;
 }
