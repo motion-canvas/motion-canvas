@@ -2,13 +2,7 @@ import useIsBrowser from '@docusaurus/useIsBrowser';
 import Comment from '@site/src/components/Api/Comment';
 import {useUrlLookup} from '@site/src/contexts/api';
 import clsx from 'clsx';
-import React, {
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import {ReactNode, useCallback, useEffect, useRef, useState} from 'react';
 import styles from './styles.module.css';
 
 const WIDTH = 480 + 16;
@@ -19,9 +13,9 @@ export default function Tooltip({children}: {children: ReactNode}) {
 
   const [show, setShow] = useState(false);
   const [comment, setComment] = useState(null);
-  const containerRef = useRef<HTMLDivElement>();
-  const linkRef = useRef<HTMLAnchorElement>();
-  const tooltipRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const updatePosition = useCallback(() => {
     if (!linkRef.current || !tooltipRef.current) return;

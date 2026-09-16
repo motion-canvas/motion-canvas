@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import {Plugin} from 'vite';
+import type {Plugin} from 'vite' with {'resolution-mode': 'import'};
 
 export function settingsPlugin(): Plugin {
   const settingsId = 'virtual:settings.meta';

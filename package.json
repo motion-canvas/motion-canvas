@@ -4,8 +4,11 @@
   "workspaces": [
     "packages/*"
   ],
+  "engines": {
+    "node": ">=24.20.0"
+  },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "core:dev": "npm run dev -w packages/core",
     "core:build": "npm run build -w packages/core",
     "core:bundle": "npm run bundle -w packages/core",
@@ -30,28 +33,52 @@
     "vite-plugin:dev": "npm run dev -w packages/vite-plugin",
     "vite-plugin:build": "npm run build -w packages/vite-plugin",
     "e2e:test": "npm run test -w packages/e2e",
-    "eslint": "eslint \"**/*.ts?(x)\"",
-    "eslint:fix": "eslint --fix \"**/*.ts?(x)\"",
+    "eslint": "eslint \"**/*.{ts,tsx,mts}\"",
+    "eslint:fix": "eslint --fix \"**/*.{ts,tsx,mts}\"",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.4.0",
-    "@commitlint/config-conventional": "^19.2.2",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
-    "eslint": "^8.54.0",
-    "eslint-plugin-tsdoc": "^0.2.17",
-    "husky": "^9.1.5",
-    "lerna": "^8.1.8",
-    "lint-staged": "^15.2.9",
-    "prettier": "^3.3.3",
-    "prettier-plugin-organize-imports": "^4.0.0",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-tsdoc": "^0.5.2",
+    "globals": "^17.12.0",
+    "husky": "^9.1.7",
+    "lerna": "^10.0.1",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.6",
+    "prettier-plugin-organize-imports": "^4.3.0",
+    "rolldown": "^1.2.9",
+    "typedoc": "^0.28.20",
+    "typescript": "~5.8.3",
+    "vite": "^8.3.0"
+  },
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/node": "^24.1.0",
+    "typedoc": {
+      "typescript": "$typescript"
+    },
+    "@commitlint/read": {
+      "conventional-commits-parser": "^7.1.2",
+      "conventional-commits-filter": "^6.0.1"
+    }
   },
   "lint-staged": {
-    "*.{ts,tsx}": "eslint --fix",
-    "*.{js,jsx,ts,tsx,md,scss}": "prettier --write"
+    "*.{ts,tsx,mts}": "eslint --fix",
+    "*.{js,jsx,ts,tsx,mts,md,scss}": "prettier --write"
+  },
+  "allowScripts": {
+    "core-js": true,
+    "ffmpeg-ffprobe-static@6.1.2-rc.1": true,
+    "nx@23.2.1": true,
+    "@parcel/watcher@2.6.0": true
   }
 }

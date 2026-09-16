@@ -4,7 +4,7 @@ export default function IconDiscord({
   width = 24,
   height = 24,
   ...props
-}: ComponentProps<'svg'>): JSX.Element {
+}: ComponentProps<'svg'>): React.JSX.Element {
   return (
     <svg
       viewBox="0 -2 127.14 96.36"

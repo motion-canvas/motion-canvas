@@ -59,13 +59,13 @@ export class Ray extends Curve {
    * The starting point of the ray.
    */
   @vector2Signal('from')
-  public declare readonly from: Vector2Signal<this>;
+  declare public readonly from: Vector2Signal<this>;
 
   /**
    * The ending point of the ray.
    */
   @vector2Signal('to')
-  public declare readonly to: Vector2Signal<this>;
+  declare public readonly to: Vector2Signal<this>;
 
   public constructor(props: RayProps) {
     super(props);

@@ -1,5 +1,5 @@
 import {Color} from '@motion-canvas/core';
-import {valid} from 'chroma-js';
+import chroma from 'chroma-js';
 import {useRef, useState} from 'preact/hooks';
 import {useReducedMotion} from '../../hooks';
 import {useClickOutside} from '../../hooks/useClickOutside';
@@ -33,7 +33,7 @@ export function ColorInput({value, onChange}: ColorInputProps) {
           onChange={event => {
             const input = event.target as HTMLInputElement;
             const newValue = input.value;
-            if (!newValue || valid(newValue)) {
+            if (!newValue || chroma.valid(newValue)) {
               onChange(newValue);
             } else {
               input.value = value?.serialize() ?? '';

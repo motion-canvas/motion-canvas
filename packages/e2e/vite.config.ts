@@ -1,7 +1,5 @@
-/// <reference types="vitest" />
-
 import motionCanvas from '@motion-canvas/vite-plugin';
-import {defineConfig} from 'vite';
+import {defineConfig} from 'vitest/config';
 
 export default defineConfig({
   plugins: [
@@ -11,5 +9,6 @@ export default defineConfig({
   ],
   test: {
     testTimeout: 60000,
+    hookTimeout: 60000,
   },
 });

@@ -7,12 +7,7 @@ export type FlexDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 export type FlexWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
 
 export type FlexBasis =
-  | Length
-  | 'content'
-  | 'max-content'
-  | 'min-content'
-  | 'fit-content'
-  | null;
+  Length | 'content' | 'max-content' | 'min-content' | 'fit-content' | null;
 
 export type FlexContent =
   | 'center'

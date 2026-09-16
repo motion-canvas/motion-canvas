@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
@@ -37,7 +35,14 @@ export default function SignaturePreview({
           <Token
             to={
               reflection.overwrites.externalUrl ??
-              getUrl(find(reflection.overwrites.id))
+              getUrl(
+                find(
+                  reflection.overwrites as unknown as {
+                    project: number;
+                    target?: number;
+                  },
+                ),
+              )
             }
             type="keyword"
           >
@@ -59,17 +64,17 @@ export default function SignaturePreview({
       ) : (
         <Token type="function">{reflection.name}</Token>
       )}
-      {!!reflection.typeParameter?.length && (
+      {!!reflection.typeParameters?.length && (
         <TokenList type={ListType.Angle}>
-          {reflection.typeParameter.map(type => (
+          {reflection.typeParameters.map(type => (
             <TypeParameterPreview key={type.id} reflection={find(type)} />
           ))}
         </TokenList>
       )}
       {reflection.parameters?.length ? (
         <TokenList type={ListType.Parentheses}>
-          {reflection.parameters.map(id => (
-            <ParameterPreview key={id} reflection={find(id)} />
+          {reflection.parameters.map(parameter => (
+            <ParameterPreview key={parameter.id} reflection={find(parameter)} />
           ))}
         </TokenList>
       ) : (

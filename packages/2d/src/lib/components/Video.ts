@@ -64,7 +64,7 @@ export class Video extends Rect {
    * ```
    */
   @signal()
-  public declare readonly src: SimpleSignal<string, this>;
+  declare public readonly src: SimpleSignal<string, this>;
 
   /**
    * The alpha value of this video.
@@ -75,7 +75,7 @@ export class Video extends Rect {
    */
   @initial(1)
   @signal()
-  public declare readonly alpha: SimpleSignal<number, this>;
+  declare public readonly alpha: SimpleSignal<number, this>;
 
   /**
    * Whether the video should be smoothed.
@@ -88,14 +88,14 @@ export class Video extends Rect {
    */
   @initial(true)
   @signal()
-  public declare readonly smoothing: SimpleSignal<boolean, this>;
+  declare public readonly smoothing: SimpleSignal<boolean, this>;
 
   /**
    * Whether this video should loop upon reaching the end.
    */
   @initial(false)
   @signal()
-  public declare readonly loop: SimpleSignal<boolean, this>;
+  declare public readonly loop: SimpleSignal<boolean, this>;
 
   /**
    * The rate at which the video plays, as multiples of the normal speed.
@@ -104,15 +104,15 @@ export class Video extends Rect {
    */
   @initial(1)
   @signal()
-  public declare readonly playbackRate: SimpleSignal<number, this>;
+  declare public readonly playbackRate: SimpleSignal<number, this>;
 
   @initial(0)
   @signal()
-  protected declare readonly time: SimpleSignal<number, this>;
+  declare protected readonly time: SimpleSignal<number, this>;
 
   @initial(false)
   @signal()
-  protected declare readonly playing: SimpleSignal<boolean, this>;
+  declare protected readonly playing: SimpleSignal<boolean, this>;
 
   private lastTime = -1;
 

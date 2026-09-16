@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import {Readable} from 'stream';
-import {ModuleNode, Plugin, ResolvedConfig} from 'vite';
+import type {ModuleNode, Plugin, ResolvedConfig} from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 const AUDIO_EXTENSION_REGEX = /\.(mp3|wav|ogg|aac|flac)(?:$|\?)/;
 const AUDIO_HMR_DELAY = 1000;

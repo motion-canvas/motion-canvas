@@ -97,7 +97,7 @@ export class Spline extends Curve {
    */
   @initial(0.4)
   @signal()
-  public declare readonly smoothness: SimpleSignal<number>;
+  declare public readonly smoothness: SimpleSignal<number>;
 
   /**
    * The knots of the spline as an array of knots with auto-calculated handles.
@@ -108,7 +108,7 @@ export class Spline extends Curve {
    */
   @initial(null)
   @signal()
-  public declare readonly points: SimpleSignal<
+  declare public readonly points: SimpleSignal<
     SignalValue<PossibleVector2>[] | null,
     this
   >;

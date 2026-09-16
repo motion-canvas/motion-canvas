@@ -1,5 +1,5 @@
 import path from 'path';
-import type {Plugin} from 'vite';
+import type {Plugin} from 'vite' with {'resolution-mode': 'import'};
 import {
   CorsProxyPluginConfig,
   assetsPlugin,

@@ -1,7 +1,6 @@
 import Token from '@site/src/components/Api/Code/Token';
 import FlagsSummary from '@site/src/components/Api/Preview/FlagsPreview';
 import Type from '@site/src/components/Api/Type';
-import React from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export default function TypeParameterPreview({

@@ -2,7 +2,6 @@
 
 import {FunctionComponent} from 'preact';
 import {CircleIcon} from './CircleIcon';
-import {CodeBlockIcon} from './CodeBlockIcon';
 import {CurveIcon} from './CurveIcon';
 import {GridIcon} from './GridIcon';
 import {ImgIcon} from './ImgIcon';
@@ -18,7 +17,6 @@ import {View2DIcon} from './View2DIcon';
 
 export const IconMap: Record<string, FunctionComponent> = {
   Circle: CircleIcon,
-  CodeBlock: CodeBlockIcon,
   Curve: CurveIcon,
   Grid: GridIcon,
   Img: ImgIcon,

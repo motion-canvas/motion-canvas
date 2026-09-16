@@ -1,7 +1,7 @@
-import type {JSX} from 'preact';
+import type {InputHTMLAttributes} from 'preact';
 import styles from './Controls.module.scss';
 
-type InputProps = JSX.HTMLAttributes<HTMLInputElement>;
+type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 export function Input({onChange, onChangeCapture, ...props}: InputProps) {
   return (

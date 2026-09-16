@@ -1,5 +1,4 @@
-import {ComponentChildren, JSX} from 'preact';
-import {Ref} from 'preact/hooks';
+import {ComponentChildren, type JSX, type Ref} from 'preact';
 import {Header} from '../layout';
 import styles from './Tabs.module.scss';
 

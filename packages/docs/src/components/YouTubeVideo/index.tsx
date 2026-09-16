@@ -14,7 +14,7 @@ export default function YouTubeVideo({
   width,
   height,
   title,
-}: YouTubeVideoProps): JSX.Element {
+}: YouTubeVideoProps): React.JSX.Element {
   return (
     <iframe
       className={styles.root}

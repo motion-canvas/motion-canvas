@@ -1,5 +1,5 @@
 import path from 'path';
-import {Plugin} from 'vite';
+import type {Plugin} from 'vite' with {'resolution-mode': 'import'};
 import {createMeta} from '../utils';
 
 const SCENE_QUERY_REGEX = /[?&]scene\b/;

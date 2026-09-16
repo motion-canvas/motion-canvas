@@ -15,6 +15,7 @@
     "@motion-canvas/2d": "*"
   },
   "devDependencies": {
+    "@motion-canvas/ffmpeg": "*",
     "@motion-canvas/ui": "*",
     "@motion-canvas/vite-plugin": "*"
   }

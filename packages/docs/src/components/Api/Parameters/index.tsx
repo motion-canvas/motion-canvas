@@ -1,10 +1,14 @@
 import Summary from '@site/src/components/Api/Comment/Summary';
 import ParameterPreview from '@site/src/components/Api/Preview/ParameterPreview';
 import {useApiFinder} from '@site/src/contexts/api';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 
-export default function Parameters({parameters}: {parameters: number[]}) {
+export default function Parameters({
+  parameters,
+}: {
+  parameters: JSONOutput.ParameterReflection[];
+}) {
   const find = useApiFinder();
   const data = useMemo(
     () => parameters?.map(find<JSONOutput.ParameterReflection>),

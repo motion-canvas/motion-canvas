@@ -1,5 +1,3 @@
-import React from 'react';
-
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
 import Container from '@site/src/components/Api/Code/Container';
 import Line from '@site/src/components/Api/Code/Line';

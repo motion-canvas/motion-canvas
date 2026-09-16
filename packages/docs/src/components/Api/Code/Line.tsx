@@ -1,4 +1,4 @@
-import React, {ReactNode, useLayoutEffect, useRef} from 'react';
+import {ReactNode, useLayoutEffect, useRef} from 'react';
 
 import clsx from 'clsx';
 import styles from './styles.module.css';
@@ -8,7 +8,7 @@ function compare(a: number, b: number) {
 }
 
 export default function Line({children}: {children?: ReactNode | ReactNode[]}) {
-  const line = useRef<HTMLSpanElement>();
+  const line = useRef<HTMLSpanElement>(null);
 
   useLayoutEffect(() => {
     if (!line.current) return;

@@ -1,6 +1,6 @@
 import followRedirects from 'follow-redirects';
 import {IncomingMessage, ServerResponse} from 'http';
-import {Connect, Plugin} from 'vite';
+import type {Connect, Plugin} from 'vite' with {'resolution-mode': 'import'};
 
 /**
  * Configuration used by the Proxy plugin

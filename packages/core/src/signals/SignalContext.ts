@@ -30,7 +30,9 @@ export interface Signal<
   TValue extends TSetterValue,
   TOwner = void,
   TContext = SignalContext<TSetterValue, TValue, TOwner>,
-> extends SignalSetter<TSetterValue, TOwner>,
+>
+  extends
+    SignalSetter<TSetterValue, TOwner>,
     SignalGetter<TValue>,
     SignalTween<TSetterValue, TValue> {
   /**

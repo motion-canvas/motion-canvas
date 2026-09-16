@@ -8,7 +8,7 @@
 import type {Props} from '@theme/Icon/LightMode';
 import React from 'react';
 
-export default function IconLightMode(props: Props): JSX.Element {
+export default function IconLightMode(props: Props): React.JSX.Element {
   return (
     <svg
       height="24px"

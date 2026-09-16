@@ -28,8 +28,8 @@ const CodeSample = `export default makeScene2D(function* (view) {
 });`;
 
 type FeatureItem = {
-  children: JSX.Element | JSX.Element[];
-  content: JSX.Element;
+  children: React.JSX.Element | React.JSX.Element[];
+  content: React.JSX.Element;
 };
 
 function Feature({content, children}: FeatureItem) {
@@ -43,7 +43,7 @@ function Feature({content, children}: FeatureItem) {
   );
 }
 
-export default function HomepageFeatures(): JSX.Element {
+export default function HomepageFeatures(): React.JSX.Element {
   return (
     <section>
       <Feature content={<UI />}>

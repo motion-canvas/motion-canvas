@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Type from '@site/src/components/Api/Type';
 import type {JSONOutput} from 'typedoc';
 
@@ -10,7 +8,8 @@ export default function NamedTupleMemberType({
 }) {
   return (
     <>
-      {type.name}: <Type type={type.element} />
+      {type.name}
+      {type.isOptional ? '?' : ''}: <Type type={type.element} />
     </>
   );
 }

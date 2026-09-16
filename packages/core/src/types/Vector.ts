@@ -21,11 +21,7 @@ export type SerializedVector2<T = number> = {
 };
 
 export type PossibleVector2<T = number> =
-  | SerializedVector2<T>
-  | {width: T; height: T}
-  | T
-  | [T, T]
-  | undefined;
+  SerializedVector2<T> | {width: T; height: T} | T | [T, T] | undefined;
 
 export type SimpleVector2Signal<T> = Signal<PossibleVector2, Vector2, T>;
 

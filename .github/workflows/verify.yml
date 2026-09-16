@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --verbose
@@ -28,10 +28,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
-      - run: npx eslint "**/*.ts?(x)"
+      - run: npx eslint "**/*.{ts,tsx,mts}"
   prettier:
     name: Code style
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npm run prettier
@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npx lerna run build
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npx lerna run build
@@ -71,12 +71,12 @@ jobs:
     name: E2E
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.46.1-jammy
+      image: mcr.microsoft.com/playwright:v1.63.0-jammy
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npx lerna run build
@@ -95,7 +95,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npx lerna run build

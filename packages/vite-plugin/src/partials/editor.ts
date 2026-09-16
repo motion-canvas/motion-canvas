@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import {Plugin} from 'vite';
+import type {Plugin} from 'vite' with {'resolution-mode': 'import'};
 import {ProjectData} from '../plugins';
 
 interface EditorPluginConfig {
@@ -34,7 +34,7 @@ export function editorPlugin({editor, projects}: EditorPluginConfig): Plugin {
           /* language=typescript */
           return `\
 import {editor} from '${editor}';
-import project from '${projects[0].filePath}?project';
+import project from '${path.resolve(projects[0].filePath)}?project';
 editor(project);
 `;
         }
@@ -46,7 +46,7 @@ editor(project);
             /* language=typescript */
             return `\
 import {editor} from '${editor}';
-import project from '${lookup.get(name)!.filePath}?project';
+import project from '${path.resolve(lookup.get(name)!.filePath)}?project';
 editor(project);
 `;
           }

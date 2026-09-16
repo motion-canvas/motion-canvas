@@ -46,7 +46,7 @@ import {useSubscribableValue} from '@site/src/utils/useSubscribable';
 import CodeBlock from '@theme/CodeBlock';
 import clsx from 'clsx';
 import {basicSetup} from 'codemirror';
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import styles from './styles.module.css';
 
 export interface FiddleProps {
@@ -78,8 +78,8 @@ export default function Fiddle({
 }: FiddleProps) {
   const [player, setPlayer] = useState<Player>(null);
   const editorView = useRef<EditorView>(null);
-  const editorRef = useRef<HTMLDivElement>();
-  const previewRef = useRef<HTMLDivElement>();
+  const editorRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const [mode, setMode] = useState(initialMode);
   const {pathname} = useLocation();
 

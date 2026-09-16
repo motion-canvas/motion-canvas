@@ -1,11 +1,11 @@
 import clsx from 'clsx';
-import type {JSX} from 'preact';
+import type {InputHTMLAttributes} from 'preact';
 import {useRef, useState} from 'preact/hooks';
 import {MouseButton, clamp} from '../../utils';
 import styles from './Controls.module.scss';
 
 type NumberInputProps = Omit<
-  JSX.HTMLAttributes<HTMLInputElement>,
+  InputHTMLAttributes<HTMLInputElement>,
   'value' | 'onChange' | 'min' | 'max' | 'step' | 'label'
 > & {
   value: number;

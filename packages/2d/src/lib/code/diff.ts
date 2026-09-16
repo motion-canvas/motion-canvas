@@ -7,12 +7,10 @@ type Subsequence = {
 /**
  * Performs a patience diff on two arrays of strings, returning an object
  * containing the lines that were deleted, inserted, and potentially moved
- * lines. The plus parameter can result in a significant performance hit due
- * to additional Longest Common Substring searches.
+ * lines.
  *
  * @param aLines - The original array of strings
  * @param bLines - The new array of strings
- * @param plus - Whether to return the moved lines
  *
  * Adapted from Jonathan "jonTrent" Trent's patience-diff algorithm.
  * Types and tests added by Hunter "hhenrichsen" Henrichsen.

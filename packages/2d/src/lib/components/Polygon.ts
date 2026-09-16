@@ -116,7 +116,7 @@ export class Polygon extends Curve {
    */
   @initial(6)
   @signal()
-  public declare readonly sides: SimpleSignal<number, this>;
+  declare public readonly sides: SimpleSignal<number, this>;
 
   /**
    * The radius of the polygon's corners.
@@ -134,7 +134,7 @@ export class Polygon extends Curve {
    */
   @initial(0)
   @signal()
-  public declare readonly radius: SimpleSignal<number, this>;
+  declare public readonly radius: SimpleSignal<number, this>;
 
   public constructor(props: PolygonProps) {
     super(props);

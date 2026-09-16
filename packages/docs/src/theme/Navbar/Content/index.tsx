@@ -10,7 +10,6 @@ import NavbarLogo from '@theme/Navbar/Logo';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarItem from '@theme/NavbarItem';
 import SearchBar from '@theme/SearchBar';
-import React from 'react';
 import styles from './styles.module.css';
 
 function NavbarItems({items}) {

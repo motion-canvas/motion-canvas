@@ -1,7 +1,7 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import type {MotionCanvasPlayerProps} from '@motion-canvas/player';
 import clsx from 'clsx';
-import React, {ComponentProps} from 'react';
+import {ComponentProps} from 'react';
 import AnimationLink from './AnimationLink';
 import styles from './styles.module.css';
 
@@ -9,11 +9,12 @@ if (ExecutionEnvironment.canUseDOM) {
   import('@motion-canvas/player');
 }
 
-declare global {
+declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      'motion-canvas-player': MotionCanvasPlayerProps & ComponentProps<'div'>;
+      'motion-canvas-player': MotionCanvasPlayerProps &
+        ComponentProps<'div'> & {class?: string};
     }
   }
 }

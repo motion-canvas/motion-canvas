@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 
 import Token from '@site/src/components/Api/Code/Token';
 import type {JSONOutput} from 'typedoc';

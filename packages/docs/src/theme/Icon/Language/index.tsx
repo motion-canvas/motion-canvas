@@ -12,7 +12,7 @@ export default function IconLanguage({
   width = 20,
   height = 20,
   ...props
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <svg
       viewBox="0 0 24 24"

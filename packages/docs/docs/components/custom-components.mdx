@@ -74,14 +74,14 @@ export class Switch extends Node {
   // @signal - is required by motion canvas
   // for every prop that was passed in.
   @signal()
-  public declare readonly initialState: SimpleSignal<boolean, this>;
+  declare public readonly initialState: SimpleSignal<boolean, this>;
 
   @initial('#68ABDF')
   // @colorSignal - some complex types provide a dedicated decorator for
   // signals that takes care of parsing.
   // In this case, `accent` will automatically convert strings into `Color`s
   @colorSignal()
-  public declare readonly accent: ColorSignal<this>;
+  declare public readonly accent: ColorSignal<this>;
   // ...
 }
 ```

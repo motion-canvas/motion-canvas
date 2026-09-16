@@ -2,14 +2,7 @@ import type {ReferenceReceiver} from '@motion-canvas/core';
 import type {Node} from './Node';
 
 export type ComponentChild =
-  | Node
-  | object
-  | string
-  | number
-  | bigint
-  | boolean
-  | null
-  | undefined;
+  Node | object | string | number | bigint | boolean | null | undefined;
 
 export type ComponentChildren = ComponentChild | ComponentChild[];
 export type NodeChildren = Node | Node[];

@@ -1,7 +1,6 @@
 import Link from '@docusaurus/Link';
 import IconCode from '@site/src/Icon/Code';
 import clsx from 'clsx';
-import React from 'react';
 import styles from './styles.module.css';
 
 export interface AnimationLinkProps {

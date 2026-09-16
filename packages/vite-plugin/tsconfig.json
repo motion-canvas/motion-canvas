@@ -2,10 +2,10 @@
   "compilerOptions": {
     "outDir": "lib",
     "strict": true,
-    "module": "commonjs",
+    "module": "node16",
     "esModuleInterop": true,
     "target": "es2021",
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,

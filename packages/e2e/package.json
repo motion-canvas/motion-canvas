@@ -10,9 +10,9 @@
   "dependencies": {
     "@motion-canvas/2d": "*",
     "@motion-canvas/core": "*",
-    "jest-image-snapshot": "^6.2.0",
-    "playwright": "^1.46.1",
-    "vitest": "^0.34.6"
+    "jest-image-snapshot": "^6.5.2",
+    "playwright": "^1.63.0",
+    "vitest": "^5.0.1"
   },
   "devDependencies": {
     "@motion-canvas/ui": "*",

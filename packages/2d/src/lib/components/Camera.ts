@@ -79,7 +79,7 @@ export class Camera extends Node {
    * The scene node that the camera is rendering.
    */
   @signal()
-  public declare readonly scene: SimpleSignal<Node, this>;
+  declare public readonly scene: SimpleSignal<Node, this>;
 
   public constructor({children, ...props}: CameraProps) {
     super(props);
@@ -100,7 +100,7 @@ export class Camera extends Node {
    */
   @cloneable(false)
   @signal()
-  public declare readonly zoom: SimpleSignal<number, this>;
+  declare public readonly zoom: SimpleSignal<number, this>;
 
   protected getZoom(): number {
     return 1 / this.scale.x();

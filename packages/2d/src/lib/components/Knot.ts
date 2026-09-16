@@ -69,7 +69,7 @@ export class Knot extends Node {
    */
   @wrapper(Vector2)
   @signal()
-  public declare readonly startHandle: Vector2Signal<this>;
+  declare public readonly startHandle: Vector2Signal<this>;
 
   /**
    * The position of the knot's end handle. The position is provided relative
@@ -91,7 +91,7 @@ export class Knot extends Node {
    */
   @wrapper(Vector2)
   @signal()
-  public declare readonly endHandle: Vector2Signal<this>;
+  declare public readonly endHandle: Vector2Signal<this>;
 
   /**
    * How much to blend between the user-provided handles and the auto-calculated
@@ -115,7 +115,7 @@ export class Knot extends Node {
     return {startHandle: value[0], endHandle: value[1]};
   })
   @compound({startHandle: 'startHandleAuto', endHandle: 'endHandleAuto'})
-  public declare readonly auto: KnotAutoSignal<this>;
+  declare public readonly auto: KnotAutoSignal<this>;
   public get startHandleAuto() {
     return this.auto.startHandle;
   }

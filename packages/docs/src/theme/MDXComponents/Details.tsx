@@ -5,7 +5,7 @@ import styles from './Details.module.css';
 export default function MDXDetails(props) {
   const items = React.Children.toArray(props.children);
   const summary = items.find(
-    item => React.isValidElement(item) && item.props?.mdxType === 'summary',
+    item => React.isValidElement(item) && item.type === 'summary',
   );
   const children = <>{items.filter(item => item !== summary)}</>;
   return (

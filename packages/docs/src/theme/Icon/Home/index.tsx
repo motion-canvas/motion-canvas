@@ -8,7 +8,7 @@
 import type {Props} from '@theme/Icon/Home';
 import React from 'react';
 
-export default function IconHome(props: Props): JSX.Element {
+export default function IconHome(props: Props): React.JSX.Element {
   return (
     <svg
       viewBox="0 0 24 24"

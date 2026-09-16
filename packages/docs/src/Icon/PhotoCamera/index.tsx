@@ -4,7 +4,7 @@ export function PhotoCamera({
   width = 24,
   height = 24,
   ...props
-}: ComponentProps<'svg'>): JSX.Element {
+}: ComponentProps<'svg'>): React.JSX.Element {
   return (
     <svg
       width={width}

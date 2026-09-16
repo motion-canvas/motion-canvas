@@ -1,5 +1,7 @@
 import path from 'path';
-import {Plugin, ResolvedConfig} from 'vite';
+import type {Plugin, ResolvedConfig} from 'vite' with {
+  'resolution-mode': 'import',
+};
 import {PluginOptions, ProjectData} from '../plugins';
 import {createMeta} from '../utils';
 import {getVersions} from '../versions';
@@ -78,9 +80,9 @@ import {MetaFile} from '@motion-canvas/core';
     config(config) {
       return {
         build: {
-          target: buildForEditor ? 'esnext' : 'modules',
+          target: buildForEditor ? 'esnext' : 'baseline-widely-available',
           assetsDir: './',
-          rollupOptions: {
+          rolldownOptions: {
             preserveEntrySignatures: 'strict',
             input: Object.fromEntries(
               projects.map(project => [
@@ -93,9 +95,11 @@ import {MetaFile} from '@motion-canvas/core';
         server: {
           port: config?.server?.port ?? 9000,
         },
-        esbuild: {
-          jsx: 'automatic',
-          jsxImportSource: '@motion-canvas/2d/lib',
+        oxc: {
+          jsx: {
+            runtime: 'automatic',
+            importSource: '@motion-canvas/2d/lib',
+          },
         },
         optimizeDeps: {
           entries: projects.map(project => project.filePath),

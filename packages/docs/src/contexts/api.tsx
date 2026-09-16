@@ -1,14 +1,24 @@
+import type {PropSidebarItem} from '@docusaurus/plugin-content-docs';
+import apiJson from '@site/src/generated/api.json';
+import sidebarJson from '@site/src/generated/sidebar.json';
 import React, {ReactNode, useContext} from 'react';
 import type {JSONOutput} from 'typedoc';
+
+export const apiData = apiJson as unknown as {
+  lookups: ApiLookups;
+  urlLookups: Record<string, ReflectionReference>;
+};
+export const apiSidebar = sidebarJson as unknown as PropSidebarItem[];
 
 declare module 'typedoc' {
   namespace JSONOutput {
     interface Type {
-      project?: number;
+      project: number;
     }
 
     interface Reflection {
-      project?: number;
+      project: number;
+      experimental?: boolean;
       docId: string;
       href: string;
       url: string;
@@ -72,14 +82,19 @@ export function useApiLookup(id: number): ApiLookup {
 }
 
 interface ApiFinder {
-  <T extends JSONOutput.Reflection>(value?: {id: number; project: number}): T;
+  <T extends JSONOutput.Reflection>(value?: {
+    id?: number;
+    target?: number;
+    project: number;
+  }): T;
 }
 
 export function useApiFinder(): ApiFinder {
   const {lookup} = useContext(Context);
   return (value => {
     if (typeof value?.project === 'number') {
-      return lookup[value.project][value.id];
+      const id = value.target ?? value.id;
+      return lookup[value.project][id];
     }
     return undefined;
   }) as ApiFinder;
@@ -98,7 +113,7 @@ export function useUrlLookup(): (url: string) => JSONOutput.Reflection | null {
   };
 }
 
-export function getUrl(reflection?: JSONOutput.DeclarationReflection) {
+export function getUrl(reflection?: JSONOutput.Reflection) {
   if (!reflection) return undefined;
   return reflection.href;
 }

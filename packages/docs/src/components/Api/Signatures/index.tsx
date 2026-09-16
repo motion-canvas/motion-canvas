@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import CodeBlock from '@site/src/components/Api/Code/CodeBlock';
 import Container from '@site/src/components/Api/Code/Container';
@@ -15,7 +15,7 @@ export default function Signatures({
   flags,
   source,
 }: {
-  signatures: number[];
+  signatures: JSONOutput.SignatureReflection[];
   flags: JSONOutput.ReflectionFlags;
   source?: JSONOutput.SourceReference;
 }) {
@@ -45,7 +45,7 @@ export default function Signatures({
         ))}
       </Container>
       <Comment comment={signature.comment} />
-      <TypeParameters parameters={signature.typeParameter}></TypeParameters>
+      <TypeParameters parameters={signature.typeParameters}></TypeParameters>
       <Parameters parameters={signature.parameters}></Parameters>
     </>
   );

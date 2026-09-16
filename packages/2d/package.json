@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/2d",
-  "version": "3.17.2",
+  "version": "4.0.0",
   "description": "A 2D renderer for Motion Canvas",
   "author": "motion-canvas",
   "homepage": "https://motion-canvas.io/",
@@ -12,8 +12,8 @@
     "dev": "tspc -p src/lib -w",
     "build": "npm run build-lib && npm run build-editor",
     "build-lib": "tspc -p src/lib/tsconfig.build.json",
-    "build-editor": "rollup -c rollup.editor.mjs",
-    "bundle": "rollup -c rollup.config.mjs",
+    "build-editor": "rolldown -c rolldown.editor.config.mjs",
+    "bundle": "rolldown -c rolldown.config.mjs",
     "test": "vitest"
   },
   "sideEffects": false,
@@ -29,21 +29,20 @@
   ],
   "devDependencies": {
     "@motion-canvas/internal": "0.0.0",
-    "@motion-canvas/ui": "^3.17.2",
-    "@preact/signals": "^1.2.1",
-    "clsx": "^2.0.0",
-    "jsdom": "^22.1.0",
-    "preact": "^10.19.2",
-    "vitest": "^0.34.6"
+    "@motion-canvas/ui": "4.0.0",
+    "clsx": "^2.1.1",
+    "jsdom": "^30.0.1",
+    "vitest": "^5.0.1"
   },
   "dependencies": {
-    "@codemirror/language": "^6.10.1",
-    "@lezer/common": "^1.2.1",
-    "@lezer/highlight": "^1.2.0",
-    "@motion-canvas/core": "^3.17.2",
-    "code-fns": "^0.8.2",
+    "@codemirror/language": "^6.12.4",
+    "@lezer/common": "^1.5.2",
+    "@lezer/highlight": "^1.2.3",
+    "@motion-canvas/core": "4.0.0",
+    "@preact/signals": "^2.11.2",
     "escape-string-regexp": "^5.0.0",
     "mathjax-full": "^3.2.2",
-    "parse-svg-path": "^0.1.2"
+    "parse-svg-path": "^0.2.0",
+    "preact": "^10.29.8"
   }
 }

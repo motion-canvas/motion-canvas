@@ -3,7 +3,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig({
   plugins: [
-    motionCanvas({
+    motionCanvas.default({
       project: [
         './src/quickstart.ts',
         './src/tex.ts',
@@ -13,7 +13,6 @@ export default defineConfig({
         './src/tweening-vector.ts',
         './src/tweening-visualiser.ts',
         './src/node-signal.ts',
-        './src/code-block.ts',
         './src/code.ts',
         './src/random.ts',
         './src/layout.ts',
@@ -31,7 +30,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         dir: '../docs/static/examples',
         entryFileNames: '[name].js',

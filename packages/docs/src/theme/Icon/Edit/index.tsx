@@ -14,7 +14,7 @@ import styles from './styles.module.css';
 export default function IconEdit({
   className,
   ...restProps
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <svg
       fill="currentColor"

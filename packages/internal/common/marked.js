@@ -3,20 +3,24 @@ const highlightJs = require('highlight.js');
 
 module.exports = new Marked({
   renderer: {
-    link(href, title, text) {
-      return `<a href='${href}' target='_blank'>${text}</a>`;
+    link({href, tokens}) {
+      return `<a href='${href}' target='_blank'>${this.parser.parseInline(
+        tokens,
+      )}</a>`;
     },
-    code(code, info) {
-      const [lang, ...rest] = (info || '').split(/\s+/);
-      code = code
+    code({text, lang}) {
+      const [language, ...rest] = (lang || '').split(/\s+/);
+      text = text
         .split('\n')
         .filter(line => !line.includes('prettier-ignore'))
         .join('\n');
-      const language = highlightJs.getLanguage(lang) ? lang : 'plaintext';
-      const result = highlightJs.highlight(code, {language});
+      const resolved = highlightJs.getLanguage(language)
+        ? language
+        : 'plaintext';
+      const result = highlightJs.highlight(text, {language: resolved});
       return `<pre class="${rest.join(
         ' ',
-      )}"><code class="language-${language}">${result.value}</code></pre>`;
+      )}"><code class="language-${resolved}">${result.value}</code></pre>`;
     },
   },
 });

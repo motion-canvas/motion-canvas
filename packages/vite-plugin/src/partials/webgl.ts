@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import {SourceNode} from 'source-map';
-import {normalizePath, Plugin, ResolvedConfig} from 'vite';
+import type {Plugin, ResolvedConfig} from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 declare module 'source-map' {
   interface SourceNode {
@@ -49,7 +51,7 @@ export function webglPlugin(): Plugin {
       };
 
       const glslSource = await resolveGlsl(context, id, code);
-      const sourceUrl = normalizePath(path.relative(config.root, base));
+      const sourceUrl = path.relative(config.root, base).replace(/\\/g, '/');
 
       const result = glslSource.toStringWithSourceMap();
       const map = result.map.toJSON();

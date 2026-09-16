@@ -1,5 +1,3 @@
-import React from 'react';
-
 import SignaturePreview from '@site/src/components/Api/Preview/SignaturePreview';
 import type {JSONOutput} from 'typedoc';
 
@@ -12,7 +10,7 @@ export default function FunctionPreview({
     reflection.signatures?.[0] ??
     reflection.getSignature ??
     reflection.setSignature ??
-    reflection.indexSignature;
+    reflection.indexSignatures?.[0];
 
   return <SignaturePreview reflection={signature} />;
 }

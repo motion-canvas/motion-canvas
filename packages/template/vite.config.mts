@@ -1,8 +1,8 @@
+import ffmpeg from '@motion-canvas/ffmpeg';
 import markdown from '@motion-canvas/internal/vite/markdown-literals';
+import motionCanvas from '@motion-canvas/vite-plugin';
 import preact from '@preact/preset-vite';
 import {defineConfig} from 'vite';
-import ffmpeg from '../ffmpeg/server';
-import motionCanvas from '../vite-plugin/src/main';
 
 export default defineConfig({
   resolve: {
@@ -34,14 +34,14 @@ export default defineConfig({
         /packages\/2d\/src\/editor\/(.*)\.tsx?$/,
       ],
     }),
-    motionCanvas({
+    motionCanvas.default({
       buildForEditor: true,
     }),
-    ffmpeg(),
+    ffmpeg.default(),
   ],
   build: {
     minify: false,
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: '[name].js',
       },

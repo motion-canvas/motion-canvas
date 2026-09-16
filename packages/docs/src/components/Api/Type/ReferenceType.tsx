@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import Type from '@site/src/components/Api/Type';
@@ -12,7 +10,9 @@ export default function ReferenceType({
   type: JSONOutput.ReferenceType;
 }) {
   const lookup = useApiLookup(type.project);
-  const reference = lookup?.[type.id];
+  const targetId = (type.target ?? (type as unknown as {id?: number}).id) as
+    number | undefined;
+  const reference = lookup?.[targetId];
   const to = type.externalUrl ?? getUrl(reference);
 
   return (

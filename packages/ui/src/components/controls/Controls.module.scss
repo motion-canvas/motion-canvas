@@ -226,7 +226,8 @@
     width: 200px;
     height: 200px;
     border-radius: var(--radius);
-    background-image: linear-gradient(transparent, black),
+    background-image:
+      linear-gradient(transparent, black),
       linear-gradient(to right, white, transparent);
     cursor: pointer;
 

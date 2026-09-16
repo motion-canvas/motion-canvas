@@ -6,6 +6,7 @@
     "noImplicitOverride": true,
     "module": "esnext",
     "target": "es2020",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "declaration": true,

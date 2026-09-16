@@ -23,7 +23,7 @@ export interface PathProps extends CurveProps {
 export class Path extends Curve {
   private currentProfile = createSignal<CurveProfile | null>(null);
   @signal()
-  public declare readonly data: SimpleSignal<string, this>;
+  declare public readonly data: SimpleSignal<string, this>;
 
   public constructor(props: PathProps) {
     super(props);

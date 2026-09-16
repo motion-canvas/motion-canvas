@@ -20,7 +20,7 @@ export enum ReflectionKind {
   Accessor = 262144,
   GetSignature = 524288,
   SetSignature = 1048576,
-  ObjectLiteral = 2097152,
-  TypeAlias = 4194304,
-  Reference = 8388608,
+  TypeAlias = 2097152,
+  Reference = 4194304,
+  Document = 8388608,
 }

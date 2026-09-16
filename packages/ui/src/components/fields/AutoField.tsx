@@ -1,5 +1,5 @@
 import {Color, Spacing, Vector2, isType} from '@motion-canvas/core';
-import {FunctionComponent} from 'preact';
+import type {JSX} from 'preact';
 import {ArrayField} from './ArrayField';
 import {ColorField} from './ColorField';
 import {NumberField} from './NumberField';
@@ -11,7 +11,9 @@ export interface AutoFieldProps {
   value: any;
 }
 
-const TYPE_MAP: Record<symbol, FunctionComponent<{value: any}>> = {
+type FieldComponent = (props: AutoFieldProps) => JSX.Element;
+
+const TYPE_MAP: Record<symbol, FieldComponent> = {
   [Vector2.symbol]: Vector2Field,
   [Color.symbol]: ColorField,
   [Spacing.symbol]: SpacingField,

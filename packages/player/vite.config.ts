@@ -8,7 +8,7 @@ export default defineConfig({
       formats: ['es'],
       fileName: 'main',
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['@motion-canvas/core'],
     },
   },

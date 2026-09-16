@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type {JSX} from 'preact';
 import styles from './index.module.scss';
 
-interface PreviewCanvasProps extends JSX.HTMLAttributes<HTMLDivElement> {}
+type PreviewCanvasProps = JSX.HTMLAttributes<HTMLDivElement>;
 
 /**
  * A wrapper for custom overlays.

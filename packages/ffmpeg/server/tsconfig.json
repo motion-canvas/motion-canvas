@@ -4,10 +4,10 @@
     "outDir": "../lib/server",
     "inlineSourceMap": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "node16",
     "skipLibCheck": true,
     "strict": true,
-    "module": "CommonJS",
+    "module": "node16",
     "target": "es2020",
     "declaration": true,
     "declarationMap": true

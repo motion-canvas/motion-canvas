@@ -1,20 +1,16 @@
 // @ts-check
 
-const {
-  Application,
-  TSConfigReader,
-  ReflectionKind,
-  Reflection,
-  DeclarationReflection,
-  CommentTag,
-  Comment,
-} = require('typedoc');
 const mdn = require('mdn-links');
 const fs = require('fs');
+
+/** @type {typeof import('typedoc')} */
+let td;
 
 module.exports = () => ({
   name: 'docusaurus-typedoc-plugin',
   async loadContent() {
+    td = await import('typedoc');
+
     const dir = './src/generated';
     if (fs.existsSync(dir) && process.env.NODE_ENV !== 'production') {
       const api = JSON.parse(
@@ -65,7 +61,7 @@ module.exports = () => ({
           '../2d/src/lib/scenes',
           '../2d/src/lib/utils',
         ],
-        tsconfig: '../2d/src/lib/tsconfig.json',
+        tsconfig: '../2d/src/lib/tsconfig.build.json',
       },
       '2d',
       core,
@@ -153,9 +149,9 @@ module.exports = () => ({
 });
 
 async function parseTypes(options, projectName, externalProject) {
-  const app = new Application();
-  app.options.addReader(new TSConfigReader());
-  app.bootstrap(options);
+  const app = await td.Application.bootstrap(options, [
+    new td.TSConfigReader(),
+  ]);
 
   app.converter.addUnknownSymbolResolver(ref => {
     const name = ref.symbolReference.path[0].path;
@@ -184,18 +180,26 @@ async function parseTypes(options, projectName, externalProject) {
     return mdn.getLink(name) ?? undefined;
   });
 
-  const project = app.convert();
+  const project = await app.convert();
   if (!project) return null;
 
   const hasOwnPage = [
-    ReflectionKind.Module,
-    ReflectionKind.Reference,
-    ReflectionKind.Interface,
-    ReflectionKind.Namespace,
-    ReflectionKind.Project,
-    ReflectionKind.Class,
-    ReflectionKind.Enum,
+    td.ReflectionKind.Module,
+    td.ReflectionKind.Reference,
+    td.ReflectionKind.Interface,
+    td.ReflectionKind.Namespace,
+    td.ReflectionKind.Project,
+    td.ReflectionKind.Class,
+    td.ReflectionKind.Enum,
   ];
+
+  const signatureKinds = new Set([
+    td.ReflectionKind.CallSignature,
+    td.ReflectionKind.ConstructorSignature,
+    td.ReflectionKind.GetSignature,
+    td.ReflectionKind.SetSignature,
+    td.ReflectionKind.IndexSignature,
+  ]);
 
   const traverse = reflection => {
     reflection.hasOwnPage = hasOwnPage.includes(reflection.kind);
@@ -241,16 +245,21 @@ async function parseTypes(options, projectName, externalProject) {
       if (reflection.flags?.isStatic) {
         name = `static-${name}`;
       }
-      if (reflection.parent.anchor) {
+      if (signatureKinds.has(reflection.kind) && reflection.parent.anchor) {
+        reflection.anchor = reflection.parent.anchor;
+      } else if (reflection.parent.anchor) {
         reflection.anchor = reflection.parent.anchor + '-' + name;
       } else {
         reflection.anchor = name;
       }
     }
 
-    reflection.href = reflection.anchor
-      ? reflection.url + '#' + reflection.anchor
-      : reflection.url;
+    const isHidden =
+      reflection.flags?.isPrivate || reflection.flags?.isProtected;
+    reflection.href =
+      reflection.anchor && !isHidden
+        ? reflection.url + '#' + reflection.anchor
+        : reflection.url;
 
     reflection.traverse(traverse);
   };
@@ -271,7 +280,7 @@ async function parseTypes(options, projectName, externalProject) {
   const urlLookup = {};
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -10,
     supports() {
       return true;
     },
@@ -282,11 +291,11 @@ async function parseTypes(options, projectName, externalProject) {
   });
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -20,
     supports(item) {
       return (
-        item instanceof DeclarationReflection &&
-        item.kind === ReflectionKind.Module
+        item instanceof td.DeclarationReflection &&
+        item.kind === td.ReflectionKind.Module
       );
     },
     toObject(item, obj) {
@@ -299,19 +308,19 @@ async function parseTypes(options, projectName, externalProject) {
   });
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -30,
     supports(item) {
-      return item instanceof Reflection;
+      return item instanceof td.Reflection;
     },
     toObject(item, obj) {
       obj.experimental = isExperimental(item);
 
-      if (!obj.experimental && item instanceof DeclarationReflection) {
+      if (!obj.experimental && item instanceof td.DeclarationReflection) {
         const signatures = [
           ...(obj.signatures ?? []),
           obj.setSignature,
           obj.getSignature,
-          obj.indexSignature,
+          ...(obj.indexSignatures ?? []),
         ].filter(item => !!item);
 
         obj.experimental = signatures.some(signature =>
@@ -324,9 +333,9 @@ async function parseTypes(options, projectName, externalProject) {
   });
 
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -40,
     supports(item) {
-      return item instanceof Reflection;
+      return item instanceof td.Reflection;
     },
     toObject(item, obj) {
       urlLookup[item.href] = {
@@ -349,12 +358,12 @@ async function parseTypes(options, projectName, externalProject) {
   const promises = [];
   const mdContents = [];
   app.serializer.addSerializer({
-    priority: -Infinity,
+    priority: -50,
     supports(item) {
-      return item instanceof Comment || item instanceof CommentTag;
+      return item instanceof td.Comment || item instanceof td.CommentTag;
     },
     toObject(item, obj) {
-      if (item instanceof CommentTag) {
+      if (item instanceof td.CommentTag) {
         obj.contentId = getContentName(project.id, promises.length);
         mdContents.push(obj.contentId);
         promises.push(
@@ -381,7 +390,7 @@ async function parseTypes(options, projectName, externalProject) {
       return obj;
     },
   });
-  app.serializer.projectToObject(project);
+  app.serializer.projectToObject(project, process.cwd());
 
   await Promise.all(promises);
 
@@ -404,7 +413,7 @@ function partsToMarkdown(parts) {
   return parts
     .map(part => {
       if (part.kind === 'inline-tag' && part.tag === '@link') {
-        if (part.target instanceof DeclarationReflection) {
+        if (part.target instanceof td.DeclarationReflection) {
           return `[\`${part.text}\`](${part.target.href})`;
         } else if (part.target) {
           return `[\`${part.text}\`](${part.target})`;

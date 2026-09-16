@@ -1,6 +1,6 @@
 import {ReflectionKind} from '@site/src/components/Api/ReflectionKind';
 import clsx from 'clsx';
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 import Controls from './Controls';
 import styles from './index.module.css';
 

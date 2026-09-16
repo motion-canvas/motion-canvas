@@ -60,7 +60,7 @@ export abstract class Curve extends Shape {
    */
   @initial(false)
   @signal()
-  public declare readonly closed: SimpleSignal<boolean, this>;
+  declare public readonly closed: SimpleSignal<boolean, this>;
 
   /**
    * A percentage from the start before which the curve should be clipped.
@@ -76,7 +76,7 @@ export abstract class Curve extends Shape {
    */
   @initial(0)
   @signal()
-  public declare readonly start: SimpleSignal<number, this>;
+  declare public readonly start: SimpleSignal<number, this>;
 
   /**
    * The offset in pixels from the start of the curve.
@@ -92,7 +92,7 @@ export abstract class Curve extends Shape {
    */
   @initial(0)
   @signal()
-  public declare readonly startOffset: SimpleSignal<number, this>;
+  declare public readonly startOffset: SimpleSignal<number, this>;
 
   /**
    * Whether to display an arrow at the start of the visible curve.
@@ -102,7 +102,7 @@ export abstract class Curve extends Shape {
    */
   @initial(false)
   @signal()
-  public declare readonly startArrow: SimpleSignal<boolean, this>;
+  declare public readonly startArrow: SimpleSignal<boolean, this>;
 
   /**
    * A percentage from the start after which the curve should be clipped.
@@ -118,7 +118,7 @@ export abstract class Curve extends Shape {
    */
   @initial(1)
   @signal()
-  public declare readonly end: SimpleSignal<number, this>;
+  declare public readonly end: SimpleSignal<number, this>;
 
   /**
    * The offset in pixels from the end of the curve.
@@ -134,7 +134,7 @@ export abstract class Curve extends Shape {
    */
   @initial(0)
   @signal()
-  public declare readonly endOffset: SimpleSignal<number, this>;
+  declare public readonly endOffset: SimpleSignal<number, this>;
 
   /**
    * Whether to display an arrow at the end of the visible curve.
@@ -144,7 +144,7 @@ export abstract class Curve extends Shape {
    */
   @initial(false)
   @signal()
-  public declare readonly endArrow: SimpleSignal<boolean, this>;
+  declare public readonly endArrow: SimpleSignal<boolean, this>;
 
   /**
    * Controls the size of the end and start arrows.
@@ -155,7 +155,7 @@ export abstract class Curve extends Shape {
    */
   @initial(24)
   @signal()
-  public declare readonly arrowSize: SimpleSignal<number, this>;
+  declare public readonly arrowSize: SimpleSignal<number, this>;
 
   protected canHaveSubpath = false;
 

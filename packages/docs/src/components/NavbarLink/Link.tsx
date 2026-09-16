@@ -1,6 +1,6 @@
 import styles from '@site/src/components/NavbarLink/styles.module.css';
 import clsx from 'clsx';
-import React, {ReactNode, useMemo} from 'react';
+import {ReactNode, useMemo} from 'react';
 
 export interface NavbarLinkProps {
   href: string;

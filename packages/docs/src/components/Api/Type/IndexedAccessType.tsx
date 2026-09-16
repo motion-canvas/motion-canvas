@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Type from '@site/src/components/Api/Type';
 import type {JSONOutput} from 'typedoc';
 

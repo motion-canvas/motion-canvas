@@ -2,7 +2,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import IconGitHub from '@site/src/Icon/GitHub';
 import NavbarLink from '@site/src/components/NavbarLink/Link';
 import useStorage from '@site/src/utils/useStorage';
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 
 export default function GitHubNavbarLink() {
   const {siteConfig} = useDocusaurusContext();

@@ -4,7 +4,7 @@ import IconExternalLink from '@site/src/Icon/ExternalLink';
 import customStyles from '@site/src/components/Api/Code/styles.module.css';
 import {useTokenStyle} from '@site/src/contexts/codeTheme';
 import clsx from 'clsx';
-import React, {ReactNode} from 'react';
+import {ReactNode} from 'react';
 
 export default function CodeBlock({
   children,

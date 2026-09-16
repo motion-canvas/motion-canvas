@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import {ComponentChildren, Ref, createContext, type JSX} from 'preact';
+import {
+  ComponentChildren,
+  Ref,
+  createContext,
+  type AnchorHTMLAttributes,
+  type JSX,
+} from 'preact';
 import {useContext} from 'preact/hooks';
 import styles from './Tabs.module.scss';
 
@@ -48,7 +54,7 @@ export function Tab({className, tab, forwardRef, ...props}: TabProps) {
   );
 }
 
-export interface TabLinkProps extends JSX.HTMLAttributes<HTMLAnchorElement> {
+export interface TabLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   children: ComponentChildren;
   disabled?: boolean;
 }

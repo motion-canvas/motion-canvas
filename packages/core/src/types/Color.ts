@@ -1,4 +1,5 @@
-import {Color, ColorSpace, InterpolationMode, mix} from 'chroma-js';
+import type {Color as ChromaColor} from 'chroma-js';
+import chroma from 'chroma-js';
 import {Signal, SignalContext, SignalValue} from '../signals';
 import type {InterpolationFunction} from '../tweening';
 import type {Type, WebGLConvertible} from './Type';
@@ -8,41 +9,25 @@ export type SerializedColor = string;
 export type PossibleColor =
   | SerializedColor
   | number
-  | Color
+  | ChromaColor
   | {r: number; g: number; b: number; a: number};
 
 export type ColorSignal<T> = Signal<PossibleColor, Color, T>;
 
-declare module 'chroma-js' {
-  interface Color extends Type, WebGLConvertible {
-    serialize(): string;
-    lerp(
-      to: ColorInterface | string,
-      value: number,
-      colorSpace?: ColorSpace,
-    ): ColorInterface;
-  }
-  type ColorInterface = import('chroma-js').Color;
-  type ColorSpace = import('chroma-js').InterpolationMode;
-  interface ColorStatic {
-    symbol: symbol;
-    lerp(
-      from: ColorInterface | string | null,
-      to: ColorInterface | string | null,
-      value: number,
-      colorSpace?: ColorSpace,
-    ): ColorInterface;
-    createLerp(colorSpace: ColorSpace): InterpolationFunction<ColorInterface>;
-    createSignal(
-      initial?: SignalValue<PossibleColor>,
-      interpolation?: InterpolationFunction<ColorInterface>,
-    ): ColorSignal<void>;
-  }
-  interface ChromaStatic {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    Color: ColorStatic & (new (color: PossibleColor) => ColorInterface);
-  }
-}
+/**
+ * The color spaces supported by chroma.js for interpolation.
+ */
+type ColorSpace =
+  | 'hcl'
+  | 'hsi'
+  | 'hsl'
+  | 'hsv'
+  | 'lab'
+  | 'lch'
+  | 'lrgb'
+  | 'oklab'
+  | 'oklch'
+  | 'rgb';
 
 /**
  * Represents a color.
@@ -51,64 +36,114 @@ declare module 'chroma-js' {
  * This is the same class as the one created by
  * {@link https://gka.github.io/chroma.js/ | chroma.js}. Check out their
  * documentation for more information on how to use it.
+ *
+ * The chainable methods inherited from chroma.js are redeclared here so that
+ * they return {@link Color} and can be combined with motion-canvas' own
+ * methods.
  */
-type ExtendedColor = Color;
-// iife prevents tree shaking from stripping our methods.
-const ExtendedColor: typeof Color = (() => {
-  Color.symbol = Color.prototype.symbol = Symbol.for(
-    '@motion-canvas/core/types/Color',
-  );
+export interface Color extends ChromaColor, Type, WebGLConvertible {
+  symbol: symbol;
+  alpha(): number;
+  alpha(value: number): Color;
+  darken(...args: Parameters<ChromaColor['darken']>): Color;
+  brighten(...args: Parameters<ChromaColor['brighten']>): Color;
+  saturate(...args: Parameters<ChromaColor['saturate']>): Color;
+  desaturate(...args: Parameters<ChromaColor['desaturate']>): Color;
+  mix(...args: Parameters<ChromaColor['mix']>): Color;
+  shade: (...args: Parameters<ChromaColor['shade']>) => Color;
+  tint: (...args: Parameters<ChromaColor['tint']>) => Color;
+  set(...args: Parameters<ChromaColor['set']>): Color;
+  luminance(): number;
+  luminance(...args: Parameters<ChromaColor['luminance']>): Color;
+  createLerp(colorSpace: ColorSpace): InterpolationFunction<Color>;
+  serialize(): string;
+  lerp(to: Color | string, value: number, colorSpace?: ColorSpace): Color;
+}
 
-  Color.lerp = Color.prototype.lerp = (
+interface ColorStatic {
+  prototype: Color;
+  symbol: symbol;
+  new (color: PossibleColor): Color;
+  lerp(
     from: Color | string | null,
     to: Color | string | null,
     value: number,
-    colorSpace: InterpolationMode = 'lch',
+    colorSpace?: ColorSpace,
+  ): Color;
+  createLerp(colorSpace: ColorSpace): InterpolationFunction<Color>;
+  createSignal(
+    initial?: SignalValue<PossibleColor>,
+    interpolation?: InterpolationFunction<Color>,
+  ): ColorSignal<void>;
+}
+
+// iife prevents tree shaking from stripping our methods.
+export const Color: ColorStatic = (() => {
+  const ColorClass = (
+    chroma as typeof chroma & {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Color: ColorStatic;
+    }
+  ).Color;
+
+  ColorClass.symbol = ColorClass.prototype.symbol = Symbol.for(
+    '@motion-canvas/core/types/Color',
+  );
+
+  ColorClass.lerp = (
+    from: Color | string | null,
+    to: Color | string | null,
+    value: number,
+    colorSpace: ColorSpace = 'lch',
   ) => {
     if (typeof from === 'string') {
-      from = new Color(from);
+      from = new ColorClass(from);
     }
     if (typeof to === 'string') {
-      to = new Color(to);
+      to = new ColorClass(to);
     }
 
-    const fromIsColor = from instanceof Color;
-    const toIsColor = to instanceof Color;
+    const fromIsColor = from instanceof ColorClass;
+    const toIsColor = to instanceof ColorClass;
 
     if (!fromIsColor) {
-      from = toIsColor ? (to as Color).alpha(0) : new Color('rgba(0, 0, 0, 0)');
+      from = toIsColor
+        ? (to as Color).alpha(0)
+        : new ColorClass('rgba(0, 0, 0, 0)');
     }
     if (!toIsColor) {
       to = fromIsColor
         ? (from as Color).alpha(0)
-        : new Color('rgba(0, 0, 0, 0)');
+        : new ColorClass('rgba(0, 0, 0, 0)');
     }
 
-    return mix(from as Color, to as Color, value, colorSpace);
+    return chroma.mix(from as Color, to as Color, value, colorSpace) as Color;
   };
 
-  Color.createLerp = Color.prototype.createLerp =
-    (colorSpace: InterpolationMode) =>
+  ColorClass.createLerp =
+    (colorSpace: ColorSpace) =>
     (from: Color | string | null, to: Color | string | null, value: number) =>
-      Color.lerp(from, to, value, colorSpace);
+      ColorClass.lerp(from, to, value, colorSpace);
 
-  Color.createSignal = (
+  ColorClass.prototype.createLerp = ColorClass.createLerp;
+
+  ColorClass.createSignal = (
     initial?: SignalValue<PossibleColor>,
-    interpolation: InterpolationFunction<Color> = Color.lerp,
+    interpolation: InterpolationFunction<Color> = ColorClass.lerp,
   ): ColorSignal<void> => {
     return new SignalContext(
       initial,
       interpolation,
       undefined,
-      value => new Color(value),
+      value => new ColorClass(value),
     ).toSignal();
   };
 
-  Color.prototype.toSymbol = () => {
-    return Color.symbol;
+  ColorClass.prototype.toSymbol = () => {
+    return ColorClass.symbol;
   };
 
-  Color.prototype.toUniform = function (
+  ColorClass.prototype.toUniform = function (
     this: Color,
     gl: WebGL2RenderingContext,
     location: WebGLUniformLocation,
@@ -116,20 +151,18 @@ const ExtendedColor: typeof Color = (() => {
     gl.uniform4fv(location, this.gl());
   };
 
-  Color.prototype.serialize = function (this: Color): SerializedColor {
+  ColorClass.prototype.serialize = function (this: Color): SerializedColor {
     return this.css();
   };
 
-  Color.prototype.lerp = function (
+  ColorClass.prototype.lerp = function (
     this: Color,
     to: Color,
     value: number,
     colorSpace?: ColorSpace,
   ) {
-    return Color.lerp(this, to, value, colorSpace);
+    return ColorClass.lerp(this, to, value, colorSpace);
   };
 
-  return Color;
+  return ColorClass;
 })();
-
-export {ExtendedColor as Color};

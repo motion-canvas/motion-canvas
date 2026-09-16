@@ -88,10 +88,7 @@ export interface ShaderConfig {
 }
 
 export type PossibleShaderConfig =
-  | (ShaderConfig | string)[]
-  | ShaderConfig
-  | string
-  | null;
+  (ShaderConfig | string)[] | ShaderConfig | string | null;
 
 export function parseShader(
   this: Node,

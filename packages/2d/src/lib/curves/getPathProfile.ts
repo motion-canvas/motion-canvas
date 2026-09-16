@@ -1,5 +1,5 @@
 import {Vector2, clamp} from '@motion-canvas/core';
-import parse, {PathCommand} from 'parse-svg-path';
+import parse, {Command as PathCommand} from 'parse-svg-path';
 import {ArcSegment} from './ArcSegment';
 import {CubicBezierSegment} from './CubicBezierSegment';
 import {CurveProfile} from './CurveProfile';

@@ -8,7 +8,6 @@ const config = {
   url: 'https://motion-canvas.io',
   baseUrl: '/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'throw',
   favicon: 'img/favicon.svg',
   organizationName: 'motion-canvas',
   projectName: 'motion-canvas.github.io',
@@ -18,6 +17,9 @@ const config = {
   },
   markdown: {
     mermaid: true,
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
   },
   customFields: {
     discordApi:
@@ -144,7 +146,6 @@ const config = {
         showLastUpdateAuthor: true,
         docItemComponent: '@site/src/components/DocPage',
         admonitions: {
-          tag: ':::',
           keywords: [
             'note',
             'tip',
@@ -169,6 +170,7 @@ const config = {
     '@docusaurus/plugin-content-pages',
     '@docusaurus/plugin-debug',
     '@docusaurus/plugin-sitemap',
+    '@docusaurus/plugin-svgr',
     [
       './editor',
       {

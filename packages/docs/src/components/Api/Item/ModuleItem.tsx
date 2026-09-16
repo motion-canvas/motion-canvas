@@ -2,13 +2,13 @@ import Comment from '@site/src/components/Api/Comment';
 import Filters from '@site/src/components/Api/Filters';
 import Group from '@site/src/components/Api/Group';
 import CodeBlock from '@theme/CodeBlock';
-import React from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export default function ModuleItem({
   reflection,
 }: {
   reflection: JSONOutput.DeclarationReflection;
+  headless?: boolean;
 }) {
   return (
     <>

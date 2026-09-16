@@ -4,7 +4,7 @@ export default function IconCode({
   width = 24,
   height = 24,
   ...props
-}: ComponentProps<'svg'>): JSX.Element {
+}: ComponentProps<'svg'>): React.JSX.Element {
   return (
     <svg
       viewBox="0 0 24 24"

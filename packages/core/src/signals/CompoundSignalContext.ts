@@ -29,8 +29,7 @@ export class CompoundSignalContext<
 
   public constructor(
     private readonly entries: (
-      | TKeys
-      | [keyof TValue, Signal<any, any, TOwner>]
+      TKeys | [keyof TValue, Signal<any, any, TOwner>]
     )[],
     parser: (value: TSetterValue) => TValue,
     initial: SignalValue<TSetterValue>,

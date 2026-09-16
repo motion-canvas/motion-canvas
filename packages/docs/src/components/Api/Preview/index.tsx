@@ -55,18 +55,16 @@ export default function CodePreview({
         break;
       case ReflectionKind.SetSignature:
         break;
-      case ReflectionKind.ObjectLiteral:
-        break;
       case ReflectionKind.TypeAlias:
         return TypeAliasPreview;
       case ReflectionKind.Reference:
         break;
     }
 
-    throw new Error(
-      `Missing component for reflection: ${reflection.kindString}`,
-    );
-  }, [reflection.id]);
+    throw new Error(`Missing component for reflection: ${reflection.kind}`);
+  }, [reflection.id]) as unknown as React.FC<{
+    reflection: JSONOutput.DeclarationReflection;
+  }>;
 
   return <Component reflection={reflection} />;
 }

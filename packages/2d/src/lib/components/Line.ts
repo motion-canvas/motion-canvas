@@ -242,7 +242,7 @@ export class Line extends Curve {
    */
   @initial(0)
   @signal()
-  public declare readonly radius: SimpleSignal<number, this>;
+  declare public readonly radius: SimpleSignal<number, this>;
 
   /**
    * The points of the line.
@@ -253,7 +253,7 @@ export class Line extends Curve {
    */
   @initial(null)
   @signal()
-  public declare readonly points: SimpleSignal<
+  declare public readonly points: SimpleSignal<
     SignalValue<PossibleVector2>[] | null,
     this
   >;

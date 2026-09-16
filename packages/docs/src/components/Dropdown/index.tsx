@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 export interface DropdownProps {
   options: {
@@ -17,8 +17,8 @@ export default function Dropdown({
   className,
   onChange,
 }: DropdownProps) {
-  const ref = useRef<HTMLDivElement>();
-  const linkRef = useRef<HTMLAnchorElement>();
+  const ref = useRef<HTMLDivElement>(null);
+  const linkRef = useRef<HTMLAnchorElement>(null);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

@@ -2,6 +2,7 @@ import {FilteredGroup} from '@site/src/components/Api/Group/index';
 import Item from '@site/src/components/Api/Item';
 import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
 import React from 'react';
+import type {JSONOutput} from 'typedoc';
 
 export default function Category({group}: {group: FilteredGroup}) {
   if (
@@ -19,7 +20,9 @@ export default function Category({group}: {group: FilteredGroup}) {
           {group.external.map(child => (
             <li key={child.id}>
               <code>
-                <ReferenceType type={child} />
+                <ReferenceType
+                  type={child as unknown as JSONOutput.ReferenceType}
+                />
               </code>
             </li>
           ))}

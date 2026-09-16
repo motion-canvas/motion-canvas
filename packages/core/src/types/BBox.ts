@@ -13,10 +13,7 @@ export type SerializedBBox = {
 };
 
 export type PossibleBBox =
-  | SerializedBBox
-  | [number, number, number, number]
-  | Vector2
-  | undefined;
+  SerializedBBox | [number, number, number, number] | Vector2 | undefined;
 
 export type RectSignal<T> = CompoundSignal<
   PossibleBBox,

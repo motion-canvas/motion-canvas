@@ -16,6 +16,7 @@ export default function TypeAliasItem({
   reflection,
 }: {
   reflection: JSONOutput.DeclarationReflection;
+  headless?: boolean;
 }) {
   const lookup = useApiLookup(reflection.project);
 
@@ -36,14 +37,17 @@ export default function TypeAliasItem({
       {reflection.signatures && (
         <>
           <h2>Callable</h2>
-          <Signatures signatures={reflection.signatures} />
+          <Signatures
+            signatures={reflection.signatures}
+            flags={reflection.flags}
+          />
         </>
       )}
       {reflection.groups?.map(group => (
         <React.Fragment key={group.title}>
           <h2>{group.title}</h2>
           {group.children
-            .map(child => lookup[child])
+            .map(child => lookup[child] as JSONOutput.DeclarationReflection)
             .filter(
               child =>
                 child &&

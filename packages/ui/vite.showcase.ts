@@ -7,6 +7,7 @@ export default defineConfig({
       entry: 'src/main.tsx',
       formats: ['es'],
       fileName: 'main',
+      cssFileName: 'style',
     },
     outDir: '../docs/static/editor',
   },

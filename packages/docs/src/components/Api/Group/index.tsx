@@ -5,13 +5,13 @@ import {Filters, matchFilters, useFilters} from '@site/src/contexts/filters';
 import Heading from '@theme/Heading';
 import TabItem from '@theme/TabItem';
 import Tabs from '@theme/Tabs';
-import React, {useEffect, useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export interface FilteredGroup {
   title: string;
-  external: JSONOutput.Reflection[];
-  nested: JSONOutput.Reflection[];
+  external: JSONOutput.DeclarationReflection[];
+  nested: JSONOutput.DeclarationReflection[];
   anchors: string[];
 }
 
@@ -24,7 +24,7 @@ function filterGroup(
   const nested = [];
   const anchors = [];
   for (const child of group.children) {
-    const reference = lookup[child];
+    const reference = lookup[child] as JSONOutput.DeclarationReflection;
     if (!reference || !matchFilters(filters, reference)) continue;
 
     anchors.push(reference.anchor);

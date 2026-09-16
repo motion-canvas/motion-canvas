@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import {Plugin, ResolvedConfig} from 'vite';
+import type {Plugin, ResolvedConfig} from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 export function metaPlugin(): Plugin {
   const timeStamps: Record<string, number> = {};

@@ -1,6 +1,8 @@
 import {PluginConfig} from '@motion-canvas/vite-plugin';
 import {ServerResponse} from 'node:http';
-import {Connect, ViteDevServer} from 'vite';
+import type {Connect, ViteDevServer} from 'vite' with {
+  'resolution-mode': 'import',
+};
 import {
   FFmpegExporterServer,
   FFmpegExporterSettings,

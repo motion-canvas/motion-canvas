@@ -1,5 +1,3 @@
-import React from 'react';
-
 import Token from '@site/src/components/Api/Code/Token';
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import FlagsPreview from '@site/src/components/Api/Preview/FlagsPreview';
@@ -27,7 +25,7 @@ export default function TypeAliasPreview({
         </TokenList>
       )}
       {' = '}
-      <Type type={reflection.type} />
+      {reflection.type && <Type type={reflection.type} />}
     </>
   );
 }

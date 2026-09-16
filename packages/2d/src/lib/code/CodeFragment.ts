@@ -10,10 +10,7 @@ export interface RawCodeFragment {
 }
 
 export type PossibleCodeFragment =
-  | CodeFragment
-  | CodeMetrics
-  | RawCodeFragment
-  | string;
+  CodeFragment | CodeMetrics | RawCodeFragment | string;
 
 export function metricsToFragment(value: CodeMetrics): CodeFragment {
   return {

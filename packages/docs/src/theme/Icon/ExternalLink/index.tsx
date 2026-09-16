@@ -9,7 +9,7 @@ import React from 'react';
 
 import styles from './styles.module.css';
 
-export default function IconExternalLink(): JSX.Element {
+export default function IconExternalLink(): React.JSX.Element {
   return (
     <svg
       width={16}

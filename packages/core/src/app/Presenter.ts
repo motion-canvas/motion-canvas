@@ -71,10 +71,7 @@ export class Presenter {
   private requestId: number | null = null;
   private requestedResume = false;
   private requestedSlide:
-    | string
-    | typeof NextSlide
-    | typeof PreviousSlide
-    | null = null;
+    string | typeof NextSlide | typeof PreviousSlide | null = null;
 
   public constructor(private project: Project) {
     this.logger = project.logger;

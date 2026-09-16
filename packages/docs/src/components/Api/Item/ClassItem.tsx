@@ -8,13 +8,13 @@ import Preview from '@site/src/components/Api/Preview';
 import Signatures from '@site/src/components/Api/Signatures';
 import ReferenceType from '@site/src/components/Api/Type/ReferenceType';
 import TypeParameters from '@site/src/components/Api/TypeParameters';
-import React from 'react';
 import type {JSONOutput} from 'typedoc';
 
 export default function ClassItem({
   reflection,
 }: {
   reflection: JSONOutput.DeclarationReflection;
+  headless?: boolean;
 }) {
   return (
     <>
@@ -34,7 +34,7 @@ export default function ClassItem({
           <h4>Implemented by</h4>
           <ul>
             {reflection.implementedBy.map(type => (
-              <li key={type.id}>
+              <li key={type.name}>
                 <code>
                   <ReferenceType type={type} />
                 </code>
@@ -48,7 +48,7 @@ export default function ClassItem({
           <h4>Extended by</h4>
           <ul>
             {reflection.extendedBy.map(type => (
-              <li key={type.id}>
+              <li key={type.name}>
                 <code>
                   <ReferenceType type={type} />
                 </code>
@@ -60,7 +60,10 @@ export default function ClassItem({
       {reflection.signatures && (
         <>
           <h2>Callable</h2>
-          <Signatures signatures={reflection.signatures} />
+          <Signatures
+            signatures={reflection.signatures}
+            flags={reflection.flags}
+          />
         </>
       )}
       {reflection.groups?.map(group => (

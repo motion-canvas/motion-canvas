@@ -4,7 +4,7 @@ import IconInfo from '@site/src/theme/Icon/Info';
 import IconLightBulb from '@site/src/theme/Icon/LightBulb';
 import IconWarning from '@site/src/theme/Icon/Warning';
 import Admonition from '@theme-original/Admonition';
-import React, {useMemo} from 'react';
+import {useMemo} from 'react';
 import styles from './styles.module.css';
 
 export default function AdmonitionWrapper({title, type, ...props}) {

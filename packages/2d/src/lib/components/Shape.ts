@@ -32,30 +32,30 @@ export interface ShapeProps extends LayoutProps {
 @nodeName('Shape')
 export abstract class Shape extends Layout {
   @canvasStyleSignal()
-  public declare readonly fill: CanvasStyleSignal<this>;
+  declare public readonly fill: CanvasStyleSignal<this>;
   @canvasStyleSignal()
-  public declare readonly stroke: CanvasStyleSignal<this>;
+  declare public readonly stroke: CanvasStyleSignal<this>;
   @initial(false)
   @signal()
-  public declare readonly strokeFirst: SimpleSignal<boolean, this>;
+  declare public readonly strokeFirst: SimpleSignal<boolean, this>;
   @initial(0)
   @signal()
-  public declare readonly lineWidth: SimpleSignal<number, this>;
+  declare public readonly lineWidth: SimpleSignal<number, this>;
   @initial('miter')
   @signal()
-  public declare readonly lineJoin: SimpleSignal<CanvasLineJoin, this>;
+  declare public readonly lineJoin: SimpleSignal<CanvasLineJoin, this>;
   @initial('butt')
   @signal()
-  public declare readonly lineCap: SimpleSignal<CanvasLineCap, this>;
+  declare public readonly lineCap: SimpleSignal<CanvasLineCap, this>;
   @initial([])
   @signal()
-  public declare readonly lineDash: SimpleSignal<number[], this>;
+  declare public readonly lineDash: SimpleSignal<number[], this>;
   @initial(0)
   @signal()
-  public declare readonly lineDashOffset: SimpleSignal<number, this>;
+  declare public readonly lineDashOffset: SimpleSignal<number, this>;
   @initial(true)
   @signal()
-  public declare readonly antialiased: SimpleSignal<boolean, this>;
+  declare public readonly antialiased: SimpleSignal<boolean, this>;
 
   protected readonly rippleStrength = createSignal<number, this>(0);
 

@@ -11,11 +11,11 @@ class Owner {
   @initial(2.2)
   @parser((value: number) => Math.round(value))
   @signal()
-  public declare readonly integer: SimpleSignal<number>;
+  declare public readonly integer: SimpleSignal<number>;
 
   @initial(0)
   @signal()
-  public declare readonly custom: SimpleSignal<number>;
+  declare public readonly custom: SimpleSignal<number>;
   public getCustom() {
     return 4;
   }

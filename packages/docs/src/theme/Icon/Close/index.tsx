@@ -13,7 +13,7 @@ export default function IconClose({
   height = 24,
   color = 'currentColor',
   ...restProps
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <svg viewBox="0 0 24 24" width={width} height={height} {...restProps}>
       <path

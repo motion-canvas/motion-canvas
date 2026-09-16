@@ -1,4 +1,6 @@
-import {Plugin as VitePlugin} from 'vite';
+import type {Plugin as VitePlugin} from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 /**
  * Represents a Motion Canvas project configured in the Vite plugin.

@@ -139,7 +139,7 @@ export class Circle extends Curve {
    */
   @initial(0)
   @signal()
-  public declare readonly startAngle: SimpleSignal<number, this>;
+  declare public readonly startAngle: SimpleSignal<number, this>;
 
   /**
    * The ending angle in degrees for the circle sector.
@@ -152,7 +152,7 @@ export class Circle extends Curve {
    */
   @initial(360)
   @signal()
-  public declare readonly endAngle: SimpleSignal<number, this>;
+  declare public readonly endAngle: SimpleSignal<number, this>;
 
   /**
    * Whether the circle sector should be drawn counterclockwise.
@@ -164,7 +164,7 @@ export class Circle extends Curve {
    */
   @initial(false)
   @signal()
-  public declare readonly counterclockwise: SimpleSignal<boolean, this>;
+  declare public readonly counterclockwise: SimpleSignal<boolean, this>;
 
   /**
    * Whether the path of this circle should be closed.
@@ -196,7 +196,7 @@ export class Circle extends Curve {
    *
    * @defaultValue false
    */
-  public declare readonly closed: SimpleSignal<boolean, this>;
+  declare public readonly closed: SimpleSignal<boolean, this>;
 
   public constructor(props: CircleProps) {
     super(props);

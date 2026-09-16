@@ -1,5 +1,3 @@
-const codeTheme = require('prism-react-renderer/themes/github');
-
 module.exports = {
   plain: {
     color: 'var(--hl-color)',

@@ -1,6 +1,6 @@
 import {Signal, useSignal} from '@preact/signals';
-import {ComponentChildren, createContext} from 'preact';
-import {Ref, useContext, useEffect, useRef} from 'preact/hooks';
+import {ComponentChildren, createContext, type RefObject} from 'preact';
+import {useContext, useEffect, useRef} from 'preact/hooks';
 import {MouseButton} from '../utils';
 import {useApplication} from './application';
 
@@ -202,8 +202,8 @@ interface ShortcutsContextValue {
   global: Signal<string | null>;
   surface: Signal<string | null>;
   modifiers: Signal<ModifierState>;
-  configs: Ref<ConfigMap>;
-  callbacks: Ref<CallbackMap>;
+  configs: RefObject<ConfigMap>;
+  callbacks: RefObject<CallbackMap>;
 }
 
 const ShortcutsContext = createContext<ShortcutsContextValue>(null);

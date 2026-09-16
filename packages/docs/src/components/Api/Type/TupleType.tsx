@@ -1,5 +1,3 @@
-import React from 'react';
-
 import TokenList, {ListType} from '@site/src/components/Api/Code/TokenList';
 import Type from '@site/src/components/Api/Type';
 import type {JSONOutput} from 'typedoc';

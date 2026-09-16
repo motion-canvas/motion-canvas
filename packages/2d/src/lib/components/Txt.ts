@@ -58,7 +58,7 @@ export class Txt extends Shape {
 
   @initial('')
   @signal()
-  public declare readonly text: SimpleSignal<string, this>;
+  declare public readonly text: SimpleSignal<string, this>;
 
   protected getText(): string {
     return this.innerText();

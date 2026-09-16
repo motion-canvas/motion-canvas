@@ -1,6 +1,6 @@
 import type {Scene} from '@motion-canvas/core';
 import clsx from 'clsx';
-import type {JSX} from 'preact';
+import type {HTMLAttributes} from 'preact';
 import {useLayoutEffect, useMemo, useRef, useState} from 'preact/hooks';
 import {useApplication, useModifiers, useTimelineContext} from '../../contexts';
 import {useScenes, useSharedSettings, useSubscribableValue} from '../../hooks';
@@ -85,7 +85,7 @@ function MainAudioClip() {
   );
 }
 
-interface AudioClipProps extends JSX.HTMLAttributes<HTMLDivElement> {
+interface AudioClipProps extends HTMLAttributes<HTMLDivElement> {
   audio: string;
   offset: number;
   start?: number;
@@ -93,6 +93,7 @@ interface AudioClipProps extends JSX.HTMLAttributes<HTMLDivElement> {
   realPlaybackRate?: number;
   hoverable?: boolean;
   editable?: boolean;
+  disabled?: boolean;
 }
 
 export function AudioClip({

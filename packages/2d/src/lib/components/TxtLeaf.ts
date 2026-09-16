@@ -45,7 +45,7 @@ export class TxtLeaf extends Shape {
   @initial('')
   @interpolation(textLerp)
   @signal()
-  public declare readonly text: SimpleSignal<string, this>;
+  declare public readonly text: SimpleSignal<string, this>;
 
   public constructor({children, ...rest}: TxtLeafProps) {
     super(rest);

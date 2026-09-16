@@ -1,16 +1,14 @@
 import {Toggle} from '@motion-canvas/ui';
 import {clsx} from 'clsx';
-import {ComponentChildren, JSX} from 'preact';
-import {Ref} from 'preact/hooks';
+import {ComponentChildren, JSX, type Ref} from 'preact';
 import styles from './index.module.scss';
 
 const DEPTH_VAR = '--depth';
 
-interface TreeElementProps
-  extends Omit<
-    JSX.HTMLAttributes<HTMLDivElement>,
-    'label' | 'icon' | 'onToggle'
-  > {
+interface TreeElementProps extends Omit<
+  JSX.HTMLAttributes<HTMLDivElement>,
+  'label' | 'icon' | 'onToggle'
+> {
   icon?: ComponentChildren;
   label: ComponentChildren;
   children?: ComponentChildren;

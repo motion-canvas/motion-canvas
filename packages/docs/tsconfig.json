@@ -1,7 +1,20 @@
 {
-  "extends": "@tsconfig/docusaurus/tsconfig.json",
+  "extends": "@docusaurus/tsconfig/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "."
+    "baseUrl": ".",
+    "ignoreDeprecations": "5.0",
+    "resolveJsonModule": true,
+    "strict": false,
+    "types": [
+      "node",
+      "@docusaurus/module-type-aliases",
+      "@docusaurus/theme-classic"
+    ],
+    "paths": {
+      "@site/*": ["./*"],
+      "typedoc": ["../../node_modules/typedoc/dist/types/index"]
+    }
   },
+  "exclude": [".docusaurus", "build", "*.js", "blog/*.tsx", "docs/**/*.tsx"],
   "include": ["."]
 }

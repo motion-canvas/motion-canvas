@@ -9,9 +9,9 @@ export interface PromiseHandle<T> {
   owner?: any;
 }
 
-export class DependencyContext<TOwner = void>
-  implements Promisable<DependencyContext<TOwner>>
-{
+export class DependencyContext<TOwner = void> implements Promisable<
+  DependencyContext<TOwner>
+> {
   protected static collectionSet = new Set<DependencyContext<any>>();
   protected static collectionStack: DependencyContext<any>[] = [];
   protected static promises: PromiseHandle<any>[] = [];

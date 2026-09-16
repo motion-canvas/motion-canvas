@@ -2,7 +2,7 @@ import {Collapsible} from '@docusaurus/theme-common';
 import Summary from '@site/src/components/Api/Comment/Summary';
 import ExperimentalWarning from '@site/src/components/ExperimentalWarning';
 import clsx from 'clsx';
-import React, {useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import type {JSONOutput} from 'typedoc';
 import styles from './styles.module.css';
 

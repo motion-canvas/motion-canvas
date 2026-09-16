@@ -1,6 +1,6 @@
 {
   "name": "@motion-canvas/vite-plugin",
-  "version": "3.17.2",
+  "version": "4.0.0",
   "description": "A Vite plugin for Motion Canvas projects",
   "main": "lib/index.js",
   "author": "motion-canvas",
@@ -19,17 +19,17 @@
     "lib"
   ],
   "peerDependencies": {
-    "vite": "4.x || 5.x"
+    "vite": "^8.0.0"
   },
   "devDependencies": {
-    "@types/follow-redirects": "^1.14.1",
-    "@types/mime-types": "^2.1.1",
-    "@types/node": "^18.14.0"
+    "@types/follow-redirects": "^1.14.4",
+    "@types/mime-types": "^3.0.1",
+    "@types/node": "^24.1.0"
   },
   "dependencies": {
-    "fast-glob": "^3.3.1",
-    "follow-redirects": "^1.15.2",
-    "mime-types": "^2.1.35",
-    "source-map": "^0.6.1"
+    "fast-glob": "^3.3.3",
+    "follow-redirects": "^1.16.0",
+    "mime-types": "^3.0.2",
+    "source-map": "^0.8.0"
   }
 }

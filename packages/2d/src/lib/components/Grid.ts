@@ -59,7 +59,7 @@ export class Grid extends Shape {
    */
   @initial(80)
   @vector2Signal('spacing')
-  public declare readonly spacing: Vector2Signal<this>;
+  declare public readonly spacing: Vector2Signal<this>;
 
   /**
    * The percentage that should be clipped from the beginning of each grid line.
@@ -72,7 +72,7 @@ export class Grid extends Shape {
    */
   @initial(0)
   @signal()
-  public declare readonly start: SimpleSignal<number, this>;
+  declare public readonly start: SimpleSignal<number, this>;
 
   /**
    * The percentage that should be clipped from the end of each grid line.
@@ -85,7 +85,7 @@ export class Grid extends Shape {
    */
   @initial(1)
   @signal()
-  public declare readonly end: SimpleSignal<number, this>;
+  declare public readonly end: SimpleSignal<number, this>;
 
   public constructor(props: GridProps) {
     super(props);
