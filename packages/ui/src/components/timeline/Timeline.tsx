@@ -254,6 +254,7 @@ export function Timeline() {
             }px`;
           }}
           onPointerDown={event => {
+            if (event.target === containerRef.current) return;
             if (event.button === MouseButton.Left) {
               event.preventDefault();
               event.currentTarget.setPointerCapture(event.pointerId);
