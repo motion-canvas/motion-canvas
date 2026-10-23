@@ -1186,7 +1186,13 @@ export class Node implements Promisable<Node> {
     this.stateStack = [];
     this.unregister();
     this.unregister = null!;
-    for (const {signal} of this) {
+    for (const {signal, key} of this) {
+      if (signal != null && !signal.context) {
+        throw new Error(
+          `Property "${key}" on node "${this.key}" is not a signal. ` +
+            'Do not overwrite properties decorated with @signal().',
+        );
+      }
       signal?.context.dispose();
     }
     for (const child of this.realChildren) {
