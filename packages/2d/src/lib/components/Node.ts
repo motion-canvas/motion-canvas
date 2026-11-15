@@ -972,6 +972,11 @@ export class Node implements Promisable<Node> {
    * After performing this operation, the node will stay in the same place
    * visually, but its parent will be changed.
    *
+   * This only holds when the new parent doesn't control the position of this
+   * node via layout. If the new parent has layout enabled, the layout will
+   * reposition the node, unless the node opts out of it with
+   * `layout={false}`.
+   *
    * @param newParent - The new parent of this node.
    */
   public reparent(newParent: Node): this {
