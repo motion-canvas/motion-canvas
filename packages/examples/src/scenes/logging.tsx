@@ -11,7 +11,7 @@ export default makeScene2D(function* (view) {
   logger.debug('Just here to debug some code.');
   logger.info('All fine, just a little info.');
   logger.warn('Be careful, something has gone wrong.');
-  logger.error('Oops. An error occured.');
+  logger.error('Oops. An error occurred.');
 
   // Logging Payloads
   yield* waitUntil('logging payloads');
